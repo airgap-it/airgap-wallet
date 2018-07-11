@@ -1,2 +1,2 @@
-# airgap-wallet
-The AirGap Wallet is installed on an everyday smartphone. This app has only access to public information.
+# AirGap Wallet
+We will release the code on GitHub shortly. Meanwhile you can download the app through the Google Play Store https://play.google.com/store/apps/details?id=it.airgap.wallet
