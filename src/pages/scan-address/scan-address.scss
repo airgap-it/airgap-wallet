@@ -1,0 +1,19 @@
+page-scan-address {
+  ion-icon{
+    color: white;
+  }
+  .transparent {
+    background: none !important;
+  }
+
+  p {
+    background-color: rgba(color($colors, primary), 0.5);
+    color: color($colors, white);
+  }
+  .row--height__100 {
+    height:100%;
+  }
+  h3{
+    color: color($colors, dark);
+  }
+}

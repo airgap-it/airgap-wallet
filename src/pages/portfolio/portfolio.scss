@@ -1,0 +1,61 @@
+page-portfolio {
+  .loading-header {
+    color: white;
+    font-weight: 300;
+    width: 100%;
+    text-align: center;
+    ion-spinner * {
+      width: 28px;
+      height: 28px;
+      stroke: #FFF !important;
+    }
+  }
+  .loading-content {
+    color: white;
+    font-weight: 300;
+    width: 100%;
+    margin-top: 20vh;
+    text-align: center;
+    ion-spinner * {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  .green {
+    color: #2ECC40;
+  }
+  .red {
+    color: #FF4136;
+  }
+  $transparent-white: rgba(255, 255, 255, .6); // This is just to make the header transparent and button/icon with white color
+  .toolbar-content,
+  span {
+    color: white;
+  }
+  .toolbar-background,
+  ion-navbar {
+    background-color: transparent !important;
+  }
+  ion-header {
+    background: linear-gradient(90deg, #00e7bf, 50%, #440094) !important;
+  }
+  .header-md::after,
+  .toolbar-background-ios {
+    background-image: none;
+    border-bottom: 0;
+  } // Footer
+  ion-card {
+    background-color: #DDDDDD;
+  }
+  .flip-list-move {
+    transition: transform 1s;
+  }
+
+
+  ion-header {
+    box-shadow: 0 0 4px 0 rgba(0,0,0,0.12), 0 4px 4px 0 rgba(0,0,0,0.24);
+  }
+  .empty-list {
+    height: 100%;
+  }
+}

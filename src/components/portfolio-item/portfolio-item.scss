@@ -1,0 +1,22 @@
+portfolio-item {
+  .symbol--icon {
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    left: 40px;
+    top: 40px;
+  }
+  h2, .items--right ion-col:first-of-type {
+    margin: 2px 0px 6px!important;
+  }
+  .green {
+    color: #2ECC40;
+  }
+  .red {
+    color: #FF4136;
+  }
+  ion-avatar {
+    background-color: color($colors, light);
+    border-radius: 50%;
+  }
+}

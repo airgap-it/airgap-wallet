@@ -1,0 +1,114 @@
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+ion-app{
+  background: none!important;
+}
+
+.scanning{
+  background: none!important;
+}
+
+.nav-decor {
+  background-color: transparent !important;
+}
+
+/* Content in item is not shortened */
+.item-md p {
+  white-space: initial;
+}
+/* Center content vertically and horizontally */
+.content--align__center-center {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.content--align-vert__center {
+  align-items: center!important;
+}
+
+.font--weight__light {
+  font-weight: 200;
+}
+.font--weight__bold {
+  font-weight: 700;
+}
+
+
+.background--color__primary {
+  background-color: color($colors, primary, base)
+}
+
+.colored-background{
+  color: color($colors, white);
+  background: color($colors, primary);
+
+  p, h1, h2, h3, .select-text {
+    color: color($colors, white);
+  }
+}
+
+.font--weight__med {
+  font-weight: 500;
+}
+
+.typography--mono {
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+  font-weight: 600!important;
+  font-size: 1.4rem;
+  word-wrap: break-word;
+}
+
+.typography--uppercase {
+  text-transform: uppercase;
+}
+
+.empty-list {
+  ion-icon {
+    font-size: 8rem;
+  }
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  font-weight: 100;
+  font-size: 1.4rem;
+  height: 75%;
+}
+
+.text--selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+qrcode {
+  padding: 40px;
+  background-color: white;
+}
+
+.platform-ios .placeholder--container {
+  min-width: 36px;
+  min-height: 36px;
+}
+.platform-android .placeholder--container {
+  min-width: 48px;
+  min-height: 48px;
+}

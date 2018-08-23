@@ -1,0 +1,7 @@
+{
+  "name": "airgap-wallet",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}

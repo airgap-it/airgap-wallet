@@ -1,0 +1,37 @@
+<ion-header no-border>
+  <ion-navbar color="primary">
+    <ion-title>Confirm Transaction</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+
+<ion-content padding>
+  <div *ngIf="transaction">
+    <from-to [transaction]="transaction"></from-to>
+
+    <ion-list margin-top>
+      <ion-item no-lines *ngFor="let parameter of transaction.information">
+        <h2>{{parameter.label}}</h2>
+        <h3>{{parameter.value}}</h3>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+
+<ion-footer no-border>
+  <ion-row>
+    <ion-col>
+      <button default block ion-button color="secondary" (click)="dismiss()" round item-right icon-left>
+        <ion-icon md-name="close"></ion-icon>
+        Decline
+      </button>
+    </ion-col>
+    <ion-col>
+      <button default block ion-button color="primary" (click)="broadcastTransaction()" round item-right icon-left>
+        <ion-icon md-name="check"></ion-icon>
+        Confirm
+      </button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

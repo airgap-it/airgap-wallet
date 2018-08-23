@@ -1,0 +1,37 @@
+page-coin-info {
+  /* TODO: remove if using component */
+  .symbol--icon {
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    left: 40px;
+    top: 34px;
+  }
+  h2, .items--right ion-col:first-of-type {
+    margin: 2px 0px 6px!important;
+  }
+
+  .loading-header {
+    color: white;
+    font-weight: 300;
+    width: 100%;
+    text-align: center;
+    ion-spinner * {
+      width: 28px;
+      height: 28px;
+      stroke: #FFF !important;
+    }
+  }
+  .loading-content {
+    color: white;
+    font-weight: 300;
+    width: 100%;
+    margin-top: 20vh;
+    text-align: center;
+    ion-spinner * {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+}
