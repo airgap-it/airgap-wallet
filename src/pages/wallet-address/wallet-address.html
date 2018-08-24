@@ -1,0 +1,41 @@
+<ion-header no-border>
+  <ion-navbar color="primary">
+    <ion-title>
+      <span ion-text color="white">{{ wallet.coinProtocol.symbol | uppercase }} Wallet Address</span>
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content fullscreen padding class="colored-background">
+
+  <ion-row padding>
+    <ion-col>
+      <ion-avatar item-start>
+        <identicon [address]="wallet.receivingPublicAddress"></identicon>
+        <img class="sub-avatar" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'">
+      </ion-avatar>
+    </ion-col>
+    <ion-col>
+      <h2>{{ wallet.coinProtocol.symbol | uppercase }}</h2>
+      <p>
+        Address:
+        <br>
+        <span class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
+      </p>
+    </ion-col>
+  </ion-row>
+
+  <ion-row justify-content-center padding-bottom>
+    <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
+  </ion-row>
+
+</ion-content>
+
+
+<ion-footer no-border>
+  <ion-toolbar padding transparent>
+    <ion-row justify-content-end>
+      <button ion-button round color="secondary" (click)="done()">Done</button>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

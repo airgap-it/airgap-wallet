@@ -1,0 +1,32 @@
+<ion-header no-border>
+  <ion-navbar color="primary">
+    <ion-title>
+      <span ion-text color="white">{{wallet?.coinProtocol.symbol | uppercase }} Transaction</span>
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content fullscreen padding class="colored-background">
+
+  <ion-row>
+    <h5>Open AirGap Vault and scan this transaction in order to sign it.</h5>
+  </ion-row>
+
+  <ion-row justify-content-center padding-top>
+    <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
+  </ion-row>
+
+  <from-to [transaction]="transaction"></from-to>
+</ion-content>
+
+
+<ion-footer transparent no-border padding>
+  <ion-buttons end>
+    <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
+      Sign on this device
+    </button>
+    <button default ion-button color="secondary" (click)="done()" round item-right>
+      Done
+    </button>
+  </ion-buttons>
+</ion-footer>

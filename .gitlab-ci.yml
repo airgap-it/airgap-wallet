@@ -1,0 +1,81 @@
+image: docker:latest
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE
+  IMAGE_TAG_CURRENT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+  IMAGE_TAG_ANDROID_CURRENT: $CI_REGISTRY_IMAGE:android-$CI_COMMIT_SHA
+  IMAGE_TAG_ANDROID_LATEST: $CI_REGISTRY_IMAGE:android-latest
+
+stages:
+  - build
+  - test
+  - native_build
+  - deploy
+
+build_ionic:
+  stage: build
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - echo "$GITLAB_DEPLOY_SSH_KEY" > airgap_cordova_secure_storage_deploy
+    - echo "$GITLAB_DEPLOY_SSH_KEY_PUB" > airgap_cordova_secure_storage_deploy.pub
+  script:
+    - docker build --cache-from $IMAGE_TAG_LATEST -t $IMAGE_TAG .
+    - docker tag $IMAGE_TAG $IMAGE_TAG_CURRENT
+    - docker tag $IMAGE_TAG $IMAGE_TAG_LATEST
+    - docker push $IMAGE_TAG_CURRENT
+    - docker push $IMAGE_TAG_LATEST
+  tags:
+    - docker
+
+unit:
+  stage: test
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker run $IMAGE_TAG_CURRENT npm run test-ci
+  tags:
+    - docker
+
+build_android:
+  stage: native_build
+  when: manual
+  tags:
+    - docker
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - echo "$GITLAB_DEPLOY_SSH_KEY" > airgap_cordova_secure_storage_deploy
+    - echo "$GITLAB_DEPLOY_SSH_KEY_PUB" > airgap_cordova_secure_storage_deploy.pub
+  script:
+    - docker build -f build/android/Dockerfile -t $IMAGE_TAG_ANDROID_CURRENT --build-arg KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD" --build-arg KEYSTORE_ALIAS="$KEYSTORE_ALIAS" --build-arg BUILD_NR="$CI_PIPELINE_ID" .
+    - docker run --name $CI_PIPELINE_ID $IMAGE_TAG_ANDROID_CURRENT echo "container ran."
+    - docker cp $CI_PIPELINE_ID:/app/android-release-unsigned.apk android-release-unsigned-$CI_PIPELINE_ID.apk
+    - docker cp $CI_PIPELINE_ID:/app/android-debug.apk android-debug-$CI_PIPELINE_ID.apk
+  after_script:
+    - docker rm -f $CI_PIPELINE_ID || true
+  artifacts:
+    paths:
+    - android-release-unsigned-$CI_PIPELINE_ID.apk
+    - android-debug-$CI_PIPELINE_ID.apk
+
+
+build_ios:
+  stage: native_build
+  when: manual
+  before_script:
+    - echo "$GITLAB_DEPLOY_SSH_KEY" > airgap_cordova_secure_storage_deploy
+    - echo "$GITLAB_DEPLOY_SSH_KEY_PUB" > airgap_cordova_secure_storage_deploy.pub
+  script:
+    - npm install
+    - sed -i -e "s/ios-CFBundleVersion=\"1.0.0\"/ios-CFBundleVersion=\"1.0.$CI_PIPELINE_ID\"/g" config.xml
+    - ionic run build --prod
+    - ionic cordova platform rm ios
+    - ionic cordova platform add ios@latest
+    - find ./resources/ -name "*.png" -exec convert "{}" -alpha off "{}" \;
+    - fastlane ios beta
+  artifacts:
+    paths:
+      - app-release.ipa
+  tags:
+    - ios
+  

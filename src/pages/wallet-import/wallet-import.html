@@ -1,0 +1,31 @@
+<ion-header no-border>
+  <ion-navbar color="primary">
+    <ion-title>Confirm Import</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content fullscreen padding class="colored-background">
+
+  <ion-row *ngIf="!walletAlreadyExists">
+    <p>
+      Would you like to import the following wallet?
+    </p>
+  </ion-row>
+
+  <portfolio-item [wallet]="wallet"></portfolio-item>
+
+  <ion-item *ngIf="walletAlreadyExists" color="danger" margin-top text-wrap>
+    You have already added this wallet in AirGap.
+  </ion-item>
+
+</ion-content>
+
+
+<ion-footer no-border>
+  <ion-toolbar padding transparent>
+    <ion-row justify-content-end>
+      <button ion-button round color="white" (click)="dismiss()">Cancel</button>
+      <button ion-button round color="secondary" *ngIf="!walletAlreadyExists" (click)="import()">Import</button>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

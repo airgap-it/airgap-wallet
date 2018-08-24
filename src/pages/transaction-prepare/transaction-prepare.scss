@@ -1,0 +1,65 @@
+page-transaction-prepare {
+  ion-spinner {
+    display: block;
+    margin: auto;
+  }
+  h2 {
+    color: color($colors, muted);
+  }
+  span {
+    font-weight: bold;
+  }
+  p {
+    color: color($colors, dark);
+    font-size: medium;
+    font-weight: bold;
+  }
+  .item p,
+  p {
+    color: color($colors, black);
+  }
+  .avatar--empty {
+    background-color: color($colors, light);
+    border-radius: 50%;
+    height: 48px;
+    width: 48px;
+  }
+
+  /* TODO: remove if using component */
+  .symbol--icon {
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    left: 40px;
+    top: 34px;
+  }
+  h2, .items--right ion-col:first-of-type {
+    margin: 2px 0px 6px!important;
+  }
+  /* */
+
+  .input--help {
+    padding-top: 12px;
+  }
+
+  .input--placeholder {
+    margin: 16px 0 0!important;
+  }
+  .label__fee {
+    padding-bottom: 4px;
+  }
+  .placeholder--icon {
+    font-size: 1.5em;
+  }
+  .identicon--container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: color($colors, light);
+    border-radius: 50%;
+  }
+
+  .symbol--icon {
+    top: 48px;
+  }
+}

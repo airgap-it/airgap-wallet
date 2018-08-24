@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>
+      Transaction
+    </ion-title>
+    <ion-buttons end>
+      <button (click)="openScanner()" ion-button icon-only>
+        <ion-icon name="md-barcode"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  <ion-item class="background--color__primary" no-lines text-wrap>
+    <img class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'">
+    <ion-avatar item-start>
+      <identicon [address]="wallet.receivingPublicAddress"></identicon>
+    </ion-avatar>
+    <ion-row no-padding>
+      <ion-col col-9 no-padding>
+        <h2>
+          <span class="font--weight__bold" ion-text color="white">{{wallet.currentBalance | amountConverter : { protocolIdentifier:
+            wallet.protocolIdentifier } }} </span>
+        </h2>
+      </ion-col>
+      <ion-col col-3 no-padding text-right>
+        <h2 ion-text color="whiteLight">${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier,
+          currentMarketPrice: wallet.currentMarketPrice } | number : '1.2-2' }}</h2>
+      </ion-col>
+    </ion-row>
+    <h3 ion-text color="whiteLight" class="typography--mono">{{ wallet.receivingPublicAddress }}</h3>
+  </ion-item>
+</ion-header>
+
+<ion-content padding>
+
+  <form [formGroup]="transactionForm" padding-bottom>
+    <ion-row>
+      <ion-col *ngIf="address.length === 0" class="content--align__center-center" col-2 (click)="openScanner()">
+        <ion-avatar class="identicon--container placeholder--container">
+          <ion-icon class="placeholder--icon" name="md-barcode"></ion-icon>
+        </ion-avatar>
+      </ion-col>
+      <ion-col>
+        <ion-item no-padding class="content--align-vert__center">
+          <ion-avatar *ngIf="address.length > 0" class="identicon--container" item-start>
+            <identicon [address]="address"></identicon>
+          </ion-avatar>
+
+          <ion-label stacked>
+            {{'To Address' | translate}}</ion-label>
+          <ion-textarea placeholder="{{'To Address' | translate}}" [(ngModel)]="address" formControlName="address" id="address-input"></ion-textarea>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+
+    <ion-item no-padding no-lines>
+      <ion-label stacked>Amount</ion-label>
+      <ion-input [(ngModel)]="amount" formControlName="amount" type="number" id="amount-input"></ion-input>
+      <span item-right class="input--placeholder">{{wallet.coinProtocol.symbol | uppercase}}</span>
+    </ion-item>
+
+
+    <div class="input--help">$ {{ amount * wallet.currentMarketPrice | number : '1.2-2' }}</div>
+
+    <ion-item no-padding padding-top no-lines>
+      <ion-label class="label__fee" stacked>Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+      <ion-range no-padding min="0" max="2" step="1" snaps="true" formControlName="feeLevel" id="feeLevel-input" color="primary">
+        <ion-icon range-left color="primary" md-name="hourglass_full"></ion-icon>
+        <ion-icon range-right color="primary" name="md-jet"></ion-icon>
+      </ion-range>
+    </ion-item>
+
+    <ion-row no-padding>
+      <ion-col no-padding>
+        <small>slow & cheap</small>
+      </ion-col>
+      <ion-col text-right no-padding>
+        <small>fast & expensive</small>
+      </ion-col>
+    </ion-row>
+
+    <ion-item no-padding no-lines>
+      <ion-label stacked></ion-label>
+      <ion-input id="fee-input" [(ngModel)]="fee" formControlName="fee" type="string"></ion-input>
+      <span item-right class="input--placeholder">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase}})</span>
+    </ion-item>
+
+    <div class="input--help">$ <span id="fee-amount">{{ fee * wallet.currentMarketPrice | number : '1.2-6' }}</span></div>
+  </form>
+
+  <!-- TODO: error handling
+  <p *ngIf="transactionForm.invalid" padding-vertical>This is not a valid ethereum address!</p>
+  -->
+</ion-content>
+
+<ion-footer no-border>
+  <ion-item no-lines transparent>
+    <button default ion-button color="primary" (click)="prepareTransaction(transactionForm.value)" [disabled]="transactionForm.invalid" round item-right
+      icon-left>
+      <ion-icon md-name="open_in_new"></ion-icon>
+      Create Transaction
+    </button>
+  </ion-item>
+</ion-footer>

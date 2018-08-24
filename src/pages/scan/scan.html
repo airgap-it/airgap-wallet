@@ -1,0 +1,20 @@
+<ion-content no-bounce [class.transparent]="hasCameraPermission">
+  <p padding no-margin text-center *ngIf="hasCameraPermission">Scan an address QR to prepare a transaction or scan a transaction QR to confirm and send it.</p>
+
+  <ion-row *ngIf="isBrowser" justify-content-center align-items-center>
+    <ion-col text-center>
+      <ion-icon name="qr-scanner"></ion-icon>
+      <h3 (click)="simulateScan(true)" padding-horizontal>Simulate tx (browser only)</h3>
+      <h3 (click)="simulateScan(false)" padding-horizontal>Simulate transaction (browser only)</h3>
+    </ion-col>
+  </ion-row>
+
+  <ion-row *ngIf="!hasCameraPermission" (click)="checkPermission(false)" justify-content-center align-items-center class="row--height__100">
+    <ion-col text-center>
+      <ion-icon name="eye-off"></ion-icon>
+      <h3 padding-horizontal>Click to allow camera access to scan a QR.</h3>
+    </ion-col>
+  </ion-row>
+
+
+</ion-content>
