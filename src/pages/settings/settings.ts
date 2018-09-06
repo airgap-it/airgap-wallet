@@ -58,9 +58,12 @@ export class SettingsPage {
     this.openUrl('https://translate.sook.ch/')
   }
 
+  /*
+  // Removed because of google policies
   public donate() {
     this.openUrl('https://airgap.it/#donate')
   }
+  */
 
   public githubDistro() {
     this.openUrl('https://github.com/airgap-it/airgap-distro')
