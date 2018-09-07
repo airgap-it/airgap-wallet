@@ -1,6 +1,6 @@
 <ion-header no-border>
   <ion-navbar color="primary">
-    <ion-title>Transaction Detail</ion-title>
+    <ion-title>{{ 'TRANSACTION_DETAIL' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -23,7 +23,7 @@
   <ion-item no-lines transparent>
     <button default ion-button color="primary" (click)="openBlockexplorer()" round item-right icon-left>
       <ion-icon md-name="check"></ion-icon>
-      OPEN BLOCKEXPLORER
+      {{ 'OPEN_BLOCK_EXPLORER' | translate }}
     </button>
   </ion-item>
 </ion-footer>

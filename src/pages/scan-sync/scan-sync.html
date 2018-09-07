@@ -1,7 +1,7 @@
 <ion-header no-border>
   <ion-navbar color="primary">
     <ion-title>
-      <span ion-text color="white">Sync Wallet Data</span>
+      <span ion-text color="white">{{ 'SYNC_WALLET_DATA' | translate }}</span>
     </ion-title>
   </ion-navbar>
 </ion-header>
@@ -10,10 +10,9 @@
 <ion-content fullscreen padding class="colored-background">
   <ion-row>
     <ion-col>
-      <p>To use the AirGap Wallet app you need to <b>sync with AirGap Vault</b>. Select the wallet you want to use in AirGap Vault and
-        display the sync QR code. Scan this code with AirGap Wallet.</p>
+      <p [innerHTML]="'SYNC_INSTRUCTIONS' | translate"></p>
       <img src="assets/img/airgap_step_4.png" />
-      <p>No private keys or any non public data will be shared during this process.</p>
+      <p>{{ 'SYNC_INSTRUCTIONS_2' | translate }}</p>
     </ion-col>
   </ion-row>
 
@@ -23,7 +22,9 @@
 <ion-footer no-border>
   <ion-toolbar padding transparent>
     <ion-row justify-content-end>
-      <button ion-button round color="secondary" (click)="goToScanPage()">Let's Go</button>
+      <button ion-button round color="secondary" (click)="goToScanPage()">
+        {{ 'LETS_GO' | translate }}
+      </button>
     </ion-row>
   </ion-toolbar>
 </ion-footer>

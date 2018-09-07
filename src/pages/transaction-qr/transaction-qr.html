@@ -9,7 +9,7 @@
 <ion-content fullscreen padding class="colored-background">
 
   <ion-row>
-    <h5>Open AirGap Vault and scan this transaction in order to sign it.</h5>
+    <h5>{{ 'SIGN_INSTRUCTIONS' | translate }}</h5>
   </ion-row>
 
   <ion-row justify-content-center padding-top>
@@ -23,10 +23,10 @@
 <ion-footer transparent no-border padding>
   <ion-buttons end>
     <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
-      Sign on this device
+      {{ 'SIGN_ON_THIS_DEVICE' | translate }}
     </button>
     <button default ion-button color="secondary" (click)="done()" round item-right>
-      Done
+      {{ 'DONE' | translate }}
     </button>
   </ion-buttons>
 </ion-footer>

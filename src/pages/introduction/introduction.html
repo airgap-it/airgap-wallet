@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="primary">
     <ion-title>
-      {{'The New Crypto Wallet Standard' | translate}}
+      {{'THE_NEW_CRYPTO_WALLET_STANDARD' | translate}}
     </ion-title>
     <ion-buttons end>
       <button ion-button (click)="dismiss()">
@@ -16,17 +16,16 @@
 
   <ion-segment [(ngModel)]="security" color="secondary">
     <ion-segment-button value="highest">
-      Highest Security
+      {{ 'HIGHEST_SECURITY' | translate }}
     </ion-segment-button>
     <ion-segment-button value="medium">
-      Medium Security
+      {{ 'HIGHEST_SECURITY' | translate }}
     </ion-segment-button>
   </ion-segment>
 
   <ng-container *ngIf="security === 'highest'">
     <ion-row>
-      <p>With the AirGap
-        <b>two device approach</b> secure key handling becomes more accessible.</p>
+      <p [innerHTML]="'INTRO_HIGHEST_SECURITY' | translate"></p>
     </ion-row>
 
     <ion-row padding-top align-items-center>
@@ -35,9 +34,7 @@
       </ion-col>
       <ion-col col-7>
         <h5>AirGap Wallet</h5>
-        <p>
-          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting
-          transactions to the blockchain.</p>
+        <p [innerHTML]="'INTRO_HIGHEST_WALLET' | translate"></p>
       </ion-col>
     </ion-row>
 
@@ -46,7 +43,7 @@
         <img class="connector--img" src="assets/img/qrcode.svg" />
       </ion-col>
       <ion-col col-7>
-        <strong>One-way communication with QR codes.</strong>
+        <strong>{{ 'INTRO_HIGHEST_QR' | translate }}</strong>
       </ion-col>
     </ion-row>
 
@@ -56,17 +53,14 @@
       </ion-col>
       <ion-col col-7>
         <h5>AirGap Vault</h5>
-        <p>The private key is generated and securely stored on another device with the AirGap Vault app.
-          <b>You have to install AirGap Vault to use AirGap Wallet</b>
-        </p>
+        <p [innerHTML]="'INTRO_HIGHEST_VAULT' | translate"></p>
       </ion-col>
     </ion-row>
   </ng-container>
 
   <ng-container *ngIf="security === 'medium'">
     <ion-row>
-      <p>With the AirGap
-        <b>two app approach</b> secure key handling becomes more accessible.</p>
+      <p [innerHTML]="'INTRO_MEDIUM_SECURITY' | translate"></p>
     </ion-row>
 
     <ion-row padding-top align-items-center>
@@ -75,9 +69,7 @@
       </ion-col>
       <ion-col col-7>
         <h5>AirGap Wallet</h5>
-        <p>
-          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting
-          transactions to the blockchain.</p>
+        <p [innerHTML]="'INTRO_MEDIUM_WALLET' | translate"></p>
       </ion-col>
     </ion-row>
 
@@ -86,7 +78,7 @@
         <img class="connector--img" src="assets/img/clone.svg" />
       </ion-col>
       <ion-col col-7>
-        <strong>Secure communication through app switching.</strong>
+        <strong>{{ 'INTRO_MEDIUM_CONNECTOR' | translate }}</strong>
       </ion-col>
     </ion-row>
 
@@ -96,9 +88,7 @@
       </ion-col>
       <ion-col col-7>
         <h5>AirGap Vault</h5>
-        <p>The private key is generated and securely stored in the AirGap Vault app.
-          <b>You have to install AirGap Vault to use AirGap Wallet</b>
-        </p>
+        <p [innerHTML]="'INTRO_MEDIUM_VAULT' | translate"></p>
       </ion-col>
     </ion-row>
   </ng-container>
@@ -108,8 +98,12 @@
 <ion-footer no-border>
   <ion-toolbar padding transparent>
     <ion-row justify-content-end>
-      <button ion-button round color="primary" (click)="downloadApp()">Install AirGap Vault</button>
-      <button ion-button round color="secondary" (click)="dismiss()">Let's Go</button>
+      <button ion-button round color="primary" (click)="downloadApp()">
+        {{ 'INSTALL_AIRGAP_VAULT' | translate }}
+      </button>
+      <button ion-button round color="secondary" (click)="dismiss()">
+        {{ 'LETS_GO' | translate }}
+      </button>
     </ion-row>
   </ion-toolbar>
 </ion-footer>

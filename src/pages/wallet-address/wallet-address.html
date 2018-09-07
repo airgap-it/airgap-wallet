@@ -1,7 +1,9 @@
 <ion-header no-border>
   <ion-navbar color="primary">
     <ion-title>
-      <span ion-text color="white">{{ wallet.coinProtocol.symbol | uppercase }} Wallet Address</span>
+      <span ion-text color="white">
+        {{ wallet.coinProtocol.symbol | uppercase }} Wallet Address
+      </span>
     </ion-title>
   </ion-navbar>
 </ion-header>
@@ -18,7 +20,7 @@
     <ion-col>
       <h2>{{ wallet.coinProtocol.symbol | uppercase }}</h2>
       <p>
-        Address:
+        {{ 'ADDRESS' | translate }}:
         <br>
         <span class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
       </p>
@@ -35,7 +37,9 @@
 <ion-footer no-border>
   <ion-toolbar padding transparent>
     <ion-row justify-content-end>
-      <button ion-button round color="secondary" (click)="done()">Done</button>
+      <button ion-button round color="secondary" (click)="done()">
+        {{ 'DONE' | translate }}
+      </button>
     </ion-row>
   </ion-toolbar>
 </ion-footer>

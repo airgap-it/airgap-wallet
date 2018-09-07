@@ -11,7 +11,9 @@
     <portfolio-item [wallet]="wallet"></portfolio-item>
   </ion-row>
   <ion-row class="background--color__primary" padding>
-    <span ion-text color="white" class="font--weight__bold">Transactions</span>
+    <span ion-text color="white" class="font--weight__bold">
+      {{ 'TRANSACTIONS' | translate }}
+    </span>
   </ion-row>
 </ion-header>
 
@@ -23,7 +25,7 @@
   <div class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
     <ion-icon md-name="inbox" color="dark"></ion-icon>
     <p>
-      There are no transactions yet for this wallet.
+      {{ 'NO_TRANSACTIONS' | translate }}
     </p>
   </div>
 
@@ -59,13 +61,13 @@
     <ion-col>
       <button block default ion-button color="primary" (click)="openReceivePage()" round item-left icon-start>
         <ion-icon md-name="call_received"></ion-icon>
-        Receive
+        {{ 'RECEIVE' | translate }}
       </button>
     </ion-col>
     <ion-col>
       <button block default ion-button color="primary" (click)="openPreparePage()" round item-right icon-start>
         <ion-icon name="send"></ion-icon>
-        Send
+        {{ 'SEND' | translate }}
       </button>
     </ion-col>
   </ion-row>

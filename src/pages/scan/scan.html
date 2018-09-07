@@ -1,5 +1,5 @@
 <ion-content no-bounce [class.transparent]="hasCameraPermission">
-  <p padding no-margin text-center *ngIf="hasCameraPermission">Scan an address QR to prepare a transaction or scan a transaction QR to confirm and send it.</p>
+  <p padding no-margin text-center *ngIf="hasCameraPermission">{{ 'SCAN_ALLOWED' | translate }}</p>
 
   <ion-row *ngIf="isBrowser" justify-content-center align-items-center>
     <ion-col text-center>
@@ -12,7 +12,7 @@
   <ion-row *ngIf="!hasCameraPermission" (click)="checkPermission(false)" justify-content-center align-items-center class="row--height__100">
     <ion-col text-center>
       <ion-icon name="eye-off"></ion-icon>
-      <h3 padding-horizontal>Click to allow camera access to scan a QR.</h3>
+      <h3 padding-horizontal>{{ 'ALLOW_SCAN' | translate }}</h3>
     </ion-col>
   </ion-row>
 

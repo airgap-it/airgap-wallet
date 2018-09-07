@@ -1,6 +1,6 @@
 <ion-header no-border>
   <ion-navbar color="primary">
-    <ion-title>Confirm Import</ion-title>
+    <ion-title>{{ 'CONFIRM_IMPORT' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -8,14 +8,14 @@
 
   <ion-row *ngIf="!walletAlreadyExists">
     <p>
-      Would you like to import the following wallet?
+      {{ 'CONFIRM_IMPORT_QUESTION' | translate }}
     </p>
   </ion-row>
 
   <portfolio-item [wallet]="wallet"></portfolio-item>
 
   <ion-item *ngIf="walletAlreadyExists" color="danger" margin-top text-wrap>
-    You have already added this wallet in AirGap.
+    {{ 'WALLEY_ALREADY_ADDED' | translate }}
   </ion-item>
 
 </ion-content>
@@ -24,8 +24,12 @@
 <ion-footer no-border>
   <ion-toolbar padding transparent>
     <ion-row justify-content-end>
-      <button ion-button round color="white" (click)="dismiss()">Cancel</button>
-      <button ion-button round color="secondary" *ngIf="!walletAlreadyExists" (click)="import()">Import</button>
+      <button ion-button round color="white" (click)="dismiss()">
+        {{ 'CANCEL' | translate }}
+      </button>
+      <button ion-button round color="secondary" *ngIf="!walletAlreadyExists" (click)="import()">
+        {{ 'IMPORT' | translate }}
+      </button>
     </ion-row>
   </ion-toolbar>
 </ion-footer>

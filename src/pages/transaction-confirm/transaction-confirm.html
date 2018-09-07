@@ -1,6 +1,6 @@
 <ion-header no-border>
   <ion-navbar color="primary">
-    <ion-title>Confirm Transaction</ion-title>
+    <ion-title>{{ 'CONFIRM_TRANSACTION' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -24,13 +24,13 @@
     <ion-col>
       <button default block ion-button color="secondary" (click)="dismiss()" round item-right icon-left>
         <ion-icon md-name="close"></ion-icon>
-        Decline
+        {{ 'DECLINE' | translate }}
       </button>
     </ion-col>
     <ion-col>
       <button default block ion-button color="primary" (click)="broadcastTransaction()" round item-right icon-left>
         <ion-icon md-name="check"></ion-icon>
-        Confirm
+        {{ 'CONFIRM' | translate }}
       </button>
     </ion-col>
   </ion-row>
