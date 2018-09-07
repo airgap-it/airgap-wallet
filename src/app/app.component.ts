@@ -19,7 +19,17 @@ export class MyApp {
   rootPage: any = TabsPage
 
   constructor(private platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, private translate: TranslateService, private deeplinks: Deeplinks) {
+    
     this.translate.setDefaultLang('en')
+
+    console.log(this.translate.getBrowserLang())
+
+    if (this.translate.getBrowserLang() !== undefined) {
+      this.translate.use(this.translate.getBrowserLang())
+    } else {
+      this.translate.use('en')
+    }
+
     this.platform.ready().then(() => {
       if (platform.is('cordova')) {
         statusBar.styleLightContent()
