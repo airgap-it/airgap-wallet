@@ -30,11 +30,13 @@ export class TransactionConfirmPage {
   }
 
   ionViewWillEnter() {
-    if (this.navParams.get('data')) {
-      this.transaction = this.qrProvider.getBroadcastFromData(this.navParams.get('data'))
-    } else if (this.navParams.get('transaction')) {
-      this.transaction = this.navParams.get('transaction')
-    }
+    this.platform.ready().then(() => {
+      if (this.navParams.get('data')) {
+        this.transaction = this.qrProvider.getBroadcastFromData(this.navParams.get('data'))
+      } else if (this.navParams.get('transaction')) {
+        this.transaction = this.navParams.get('transaction')
+      }
+    }).catch(console.error)
   }
 
   broadcastTransaction() {
