@@ -1,5 +1,7 @@
 # AirGap.it wallet
 
+![pipeline status](https://gitlab.papers.tech/papers/airgap/airgap-wallet/badges/master/pipeline.svg)
+
 An Ionic app to prepare and broadcast signed transaction to the network. This app will never come in touch with your private key. Those are securily managed in the **AirGap Vault** app. Because the phones are never physically connected to each other, we call our system AirGap.
 
 # Prerequisite
