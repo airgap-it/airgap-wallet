@@ -1,4 +1,6 @@
 <ion-content no-bounce [class.transparent]="hasCameraPermission">
+  <!--
+
   <p padding no-margin text-center *ngIf="hasCameraPermission">Scan an address QR to prepare a transaction or scan a transaction QR to confirm and send it.</p>
 
   <ion-row *ngIf="isBrowser" justify-content-center align-items-center>
@@ -16,5 +18,8 @@
     </ion-col>
   </ion-row>
 
+
+  -->
+  <zxing-scanner #scanner [device]="selectedDevice" [scannerEnabled]="scannerEnabled" (scanSuccess)="handleQrCodeResult($event)"></zxing-scanner>
 
 </ion-content>

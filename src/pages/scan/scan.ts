@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { IAirGapTransaction } from 'airgap-coin-lib'
 import { NavController, Platform, ToastController } from 'ionic-angular'
 
@@ -6,13 +6,24 @@ import { QrProvider } from '../../providers/qr/qr'
 import { ScannerProvider } from '../../providers/scanner/scanner'
 import { TransactionConfirmPage } from '../transaction-confirm/transaction-confirm'
 import { WalletImportPage } from '../wallet-import/wallet-import'
+import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
   selector: 'page-scan',
   templateUrl: 'scan.html'
 })
 export class ScanPage {
+  @ViewChild('scanner')
+  zxingScanner: ZXingScannerComponent
+  availableDevices: MediaDeviceInfo[]
+  selectedDevice: MediaDeviceInfo
+  scannerEnabled = true
+
+  hasCameras = false
+
   public hasCameraPermission = false
+  private webScan = false
 
   constructor(
     private navController: NavController,
@@ -27,6 +38,22 @@ export class ScanPage {
       this.checkPermission()
     } else if (this.platform.is('cordova')) {
       this.initScan()
+    } else if (this.platform.is('core')) {
+      console.log(this.zxingScanner)
+      this.webScan = true
+      this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
+        console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
+      })
+      if (this.selectedDevice) {
+        // Not the first time that we open scanner
+        this.zxingScanner.startScan(this.selectedDevice)
+      }
+      this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
+        this.hasCameras = true
+        this.availableDevices = devices
+        this.selectedDevice = devices[0]
+        console.log(this.selectedDevice)
+      })
     }
   }
 
@@ -65,6 +92,7 @@ export class ScanPage {
       })
       .then(v => {
         console.log('WalletImportPage openend', v)
+        // this.navController.push(PortfolioPage)
       })
       .catch(e => {
         console.log('WalletImportPage failed to open', e)
@@ -124,5 +152,29 @@ export class ScanPage {
   private initScan() {
     this.hasCameraPermission = true
     this.startScan()
+  }
+
+  handleQrCodeResult(resultString: string) {
+    const syncPrefix = 'airgap-wallet://import?data='
+    const broadcastPrefix = 'airgap-wallet://broadcast?data='
+    if (resultString.startsWith(syncPrefix)) {
+      let parts = resultString.split(syncPrefix)
+      this.handleImport(parts[parts.length - 1])
+      this.zxingScanner.resetScan()
+      // this.scanner.stopZxingScan()
+    } else if (resultString.startsWith(broadcastPrefix)) {
+      let parts = resultString.split(broadcastPrefix)
+      this.handleBroadcast(parts[parts.length - 1])
+      this.zxingScanner.resetScan()
+      // this.scanner.stopZxingScan()
+    } else {
+      this.displayToast('Invalid QR Code')
+      this.startScan()
+    }
+  }
+
+  ionViewDidLeave() {
+    this.zxingScanner.resetScan()
+    console.log('ionViewDidLeave')
   }
 }

@@ -36,6 +36,7 @@ import { QrProvider } from '../providers/qr/qr'
 import { ScannerProvider } from '../providers/scanner/scanner'
 import { WalletsProvider } from '../providers/wallets/wallets.provider'
 import { MomentModule } from 'ngx-moment'
+import { ZXingScannerModule } from '@zxing/ngx-scanner'
 
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
@@ -68,6 +69,7 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   imports: [
     BrowserModule,
+    ZXingScannerModule,
     HttpClientModule,
     MaterialIconsModule,
     MomentModule,
