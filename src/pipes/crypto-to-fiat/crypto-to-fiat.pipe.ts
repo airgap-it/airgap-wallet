@@ -8,6 +8,7 @@ import { getProtocolByIdentifier } from 'airgap-coin-lib'
 export class CryptoToFiatPipe implements PipeTransform {
   transform(value: BigNumber, args: { protocolIdentifier: string; currentMarketPrice: BigNumber }): any {
     if (
+      !args ||
       !args.currentMarketPrice ||
       !(args.currentMarketPrice instanceof BigNumber) ||
       isNaN(args.currentMarketPrice.toNumber()) ||

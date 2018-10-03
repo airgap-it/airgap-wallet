@@ -6,8 +6,8 @@ import { getProtocolByIdentifier } from 'airgap-coin-lib'
   name: 'feeConverter'
 })
 export class FeeConverterPipe implements PipeTransform {
-  transform(value: string, args: { protocolIdentifier: string }): any {
-    if (!args.protocolIdentifier || value === undefined || isNaN(Number(value))) {
+  transform(value: string | number, args: { protocolIdentifier: string }): string {
+    if (!args.protocolIdentifier || (!value && value !== 0) || isNaN(Number(value))) {
       console.warn(`FeeConverterPipe: necessary properties missing!\n` + `Protocol: ${args.protocolIdentifier}\n` + `Value: ${value}`)
       return ''
     }
@@ -17,6 +17,9 @@ export class FeeConverterPipe implements PipeTransform {
       return ''
     }
 
-    return new BigNumber(value).shiftedBy(-1 * protocol.feeDecimals).toFixed() + ' ' + protocol.feeSymbol.toUpperCase()
+    const amount = new BigNumber(value)
+    const fee = amount.shiftedBy(-1 * protocol.feeDecimals)
+
+    return fee.toFixed() + ' ' + protocol.feeSymbol.toUpperCase()
   }
 }

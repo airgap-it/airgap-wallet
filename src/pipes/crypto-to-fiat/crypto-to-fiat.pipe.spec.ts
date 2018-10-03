@@ -1,7 +1,7 @@
 import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 import { BigNumber } from 'bignumber.js'
 
-describe('CoinValueConverterPipe', () => {
+describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe
 
   beforeEach(() => {
@@ -34,5 +34,19 @@ describe('CoinValueConverterPipe', () => {
   it('should return an empty string when price is not a BigNumber', () => {
     let value: any = 'test'
     expect(cryptoToFiatPipe.transform(new BigNumber(1), { protocolIdentifier: 'eth', currentMarketPrice: value })).toEqual('')
+  })
+
+  it('should return an empty string when value is undefined', () => {
+    expect(cryptoToFiatPipe.transform(undefined, { protocolIdentifier: 'eth', currentMarketPrice: new BigNumber(200) })).toEqual('')
+  })
+
+  it('should return an empty string when protocolIdentifier is undefined', () => {
+    expect(cryptoToFiatPipe.transform(new BigNumber(1), { protocolIdentifier: undefined, currentMarketPrice: new BigNumber(200) })).toEqual(
+      ''
+    )
+  })
+
+  it('should return an empty string when currentMarketPrice is undefined', () => {
+    expect(cryptoToFiatPipe.transform(new BigNumber(1), { protocolIdentifier: 'eth', currentMarketPrice: undefined })).toEqual('')
   })
 })
