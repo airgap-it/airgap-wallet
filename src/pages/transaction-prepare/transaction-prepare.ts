@@ -69,18 +69,6 @@ export class TransactionPreparePage {
     })
   }
 
-  ionViewDidEnter() {
-    this.platform.ready().then(() => {
-      this.keyboard.disableScroll(true)
-    })
-  }
-
-  ionViewWillLeave() {
-    this.platform.ready().then(() => {
-      this.keyboard.disableScroll(false)
-    })
-  }
-
   public async prepareTransaction(transactionInfo: any) {
     transactionInfo.amount = new BigNumber(transactionInfo.amount).shiftedBy(this.wallet.coinProtocol.decimals)
     transactionInfo.fee = new BigNumber(transactionInfo.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
