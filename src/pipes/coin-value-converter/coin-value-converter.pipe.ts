@@ -7,8 +7,13 @@ import { getProtocolByIdentifier } from 'airgap-coin-lib'
 })
 export class CoinValueConverterPipe implements PipeTransform {
   transform(value: string, args: { protocolIdentifier: string; price: number }): any {
-    if (!args.price || !args.protocolIdentifier || value === undefined || isNaN(Number(value))) {
-      console.warn(`CoinValueConverterPipe: necessary properties missing!\n` + `Protocol: ${args.protocolIdentifier}\n` + `Value: ${value}`)
+    if (!args.price || isNaN(Number(args.price)) || !args.protocolIdentifier || value === undefined || isNaN(Number(value))) {
+      console.warn(
+        `CoinValueConverterPipe: necessary properties missing!\n` +
+          `Protocol: ${args.protocolIdentifier}\n` +
+          `Value: ${value}\n` +
+          `Price: ${args.price}`
+      )
       return ''
     }
 
