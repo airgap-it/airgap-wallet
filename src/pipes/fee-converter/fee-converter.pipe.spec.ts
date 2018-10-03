@@ -1,7 +1,6 @@
 import { FeeConverterPipe } from './fee-converter.pipe'
 
 describe('FeeConverter Pipe', () => {
-
   let feeConverterPipe: FeeConverterPipe
 
   beforeEach(() => {
@@ -17,14 +16,24 @@ describe('FeeConverter Pipe', () => {
   })
 
   it('should display a big ETH number to a non-scientific string representation', () => {
-    expect(feeConverterPipe.transform('10000000000000000000000000000000000', { protocolIdentifier: 'eth' })).toEqual('10000000000000000 ETH')
+    expect(feeConverterPipe.transform('10000000000000000000000000000000000', { protocolIdentifier: 'eth' })).toEqual(
+      '10000000000000000 ETH'
+    )
   })
 
   it('should return a valid amount if value is 0', () => {
     expect(feeConverterPipe.transform('0', { protocolIdentifier: 'eth' })).toEqual('0 ETH')
   })
 
+  it('should return an empty string for non-numeric value', () => {
+    expect(feeConverterPipe.transform('test', { protocolIdentifier: 'eth' })).toEqual('')
+  })
+
   it('should return an empty string when protocolIdentifier is not set', () => {
     expect(feeConverterPipe.transform('1', { protocolIdentifier: undefined })).toEqual('')
+  })
+
+  it('should return an empty string when protocolIdentifier unknown', () => {
+    expect(feeConverterPipe.transform('1', { protocolIdentifier: 'FeeConverterPipe' })).toEqual('')
   })
 })

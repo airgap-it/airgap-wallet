@@ -5,15 +5,19 @@ import { getProtocolByIdentifier } from 'airgap-coin-lib'
 @Pipe({
   name: 'coinValueConverter'
 })
-
 export class CoinValueConverterPipe implements PipeTransform {
-  transform(value: string, args: { protocolIdentifier: string, price: number }): any {
-    if (!args.price || !args.protocolIdentifier || value === undefined) {
-      console.error('CoinValueConverterPipe: necessary properties missing!')
+  transform(value: string, args: { protocolIdentifier: string; price: number }): any {
+    if (!args.price || !args.protocolIdentifier || value === undefined || isNaN(Number(value))) {
+      console.warn(
+        `CoinValueConverterPipe: necessary properties missing!\n` + `Protocol: ${args.protocolIdentifier}\n` + `Value: ${value}`
+      )
       return ''
     }
 
     const protocol = getProtocolByIdentifier(args.protocolIdentifier)
+    if (!protocol) {
+      return new BigNumber(value).times(args.price)
+    }
     const pricePerCoin = new BigNumber(args.price)
     const pricePerFeeUnit = pricePerCoin.shiftedBy(-1 * protocol.feeDecimals)
 

@@ -2,7 +2,6 @@ import { CoinValueConverterPipe } from './coin-value-converter.pipe'
 import { BigNumber } from 'bignumber.js'
 
 describe('CoinValueConverterPipe', () => {
-
   let coinValueConverterPipe: CoinValueConverterPipe
 
   beforeEach(() => {
@@ -15,5 +14,13 @@ describe('CoinValueConverterPipe', () => {
 
   it('should return an empty string when protocolIdentifier is not set', () => {
     expect(coinValueConverterPipe.transform('1', { protocolIdentifier: undefined, price: 200 })).toEqual('')
+  })
+
+  it('should return an empty string when value is not a number', () => {
+    expect(coinValueConverterPipe.transform('test', { protocolIdentifier: 'eth', price: 200 })).toEqual('')
+  })
+
+  it('should return an empty string when protocolIdentifier is unknown', () => {
+    expect(coinValueConverterPipe.transform('1', { protocolIdentifier: 'CoinValueConverterPipe', price: 200 })).toEqual('')
   })
 })
