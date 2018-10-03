@@ -43,7 +43,7 @@ export class MyApp {
         // nomatch.$link - the full link data
         console.error('Got a deeplink that didn\'t match', nomatch)
       })
-    })
+    }).catch(err => console.log(err))
   }
 
 }
