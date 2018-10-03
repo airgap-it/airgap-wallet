@@ -10,12 +10,11 @@ enum SettingsKeys {
 
 @Injectable()
 export class WalletsProvider {
-
   private walletList: AirGapMarketWallet[] = []
   public wallets: BehaviorSubject<AirGapMarketWallet[]> = new BehaviorSubject(this.walletList)
 
   constructor(private storage: Storage) {
-    this.storage.get(SettingsKeys.WALLET).then((rawWallets) => {
+    this.storage.get(SettingsKeys.WALLET).then(rawWallets => {
       let wallets = rawWallets
 
       // migrating double-serialization
@@ -28,13 +27,18 @@ export class WalletsProvider {
       }
 
       wallets.forEach(wallet => {
-        let airGapWallet = new AirGapMarketWallet(wallet.protocolIdentifier, wallet.publicKey, wallet.isExtendedPublicKey, wallet.derivationPath)
+        let airGapWallet = new AirGapMarketWallet(
+          wallet.protocolIdentifier,
+          wallet.publicKey,
+          wallet.isExtendedPublicKey,
+          wallet.derivationPath
+        )
 
         // if we have no addresses, derive using webworker and sync, else just sync
         if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
           const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
 
-          airGapWorker.onmessage = (event) => {
+          airGapWorker.onmessage = event => {
             airGapWallet.addresses = event.data.addresses
             airGapWallet.synchronize()
           }
@@ -65,7 +69,9 @@ export class WalletsProvider {
 
   removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
     return new Promise((resolve, reject) => {
-      let index = this.walletList.findIndex(wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier)
+      let index = this.walletList.findIndex(
+        wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+      )
       if (index > -1) {
         this.walletList.splice(index, 1)
       }
@@ -78,7 +84,8 @@ export class WalletsProvider {
   }
 
   walletExists(testWallet: AirGapMarketWallet) {
-    return this.walletList.some(wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier)
+    return this.walletList.some(
+      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+    )
   }
-
 }

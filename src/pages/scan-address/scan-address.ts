@@ -8,7 +8,6 @@ import { ScannerProvider } from '../../providers/scanner/scanner'
   templateUrl: 'scan-address.html'
 })
 export class ScanAddressPage {
-
   private callback: (address: string) => void
   private callbackCalled: boolean = false
 
@@ -18,18 +17,21 @@ export class ScanAddressPage {
 
   ionViewWillEnter() {
     this.scanner.show()
-    this.scanner.scan(text => {
-      if (!this.callbackCalled) {
-        console.log('scan callback', text)
-        this.callbackCalled = true
-        this.scanner.stopScan()
-        this.navCtrl.pop().then(() => {
-          this.sendAddressToParent(text)
-        })
+    this.scanner.scan(
+      text => {
+        if (!this.callbackCalled) {
+          console.log('scan callback', text)
+          this.callbackCalled = true
+          this.scanner.stopScan()
+          this.navCtrl.pop().then(() => {
+            this.sendAddressToParent(text)
+          })
+        }
+      },
+      error => {
+        console.log(error)
       }
-    }, error => {
-      console.log(error)
-    })
+    )
   }
 
   ionViewWillLeave() {

@@ -1,5 +1,14 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController, NavParams, ToastController, ViewController, BlockerDelegate, AlertController, Platform } from 'ionic-angular'
+import {
+  LoadingController,
+  NavController,
+  NavParams,
+  ToastController,
+  ViewController,
+  BlockerDelegate,
+  AlertController,
+  Platform
+} from 'ionic-angular'
 
 import { Transaction } from '../../models/transaction.model'
 import { QrProvider } from '../../providers/qr/qr'
@@ -11,9 +20,7 @@ declare var cordova: any
   selector: 'page-transaction-confirm',
   templateUrl: 'transaction-confirm.html'
 })
-
 export class TransactionConfirmPage {
-
   public transaction: Transaction
 
   constructor(
@@ -23,20 +30,24 @@ export class TransactionConfirmPage {
     public navController: NavController,
     public navParams: NavParams,
     private alertCtrl: AlertController,
-    private platform: Platform) { }
+    private platform: Platform
+  ) {}
 
   dismiss() {
     this.navController.popToRoot()
   }
 
   ionViewWillEnter() {
-    this.platform.ready().then(() => {
-      if (this.navParams.get('data')) {
-        this.transaction = this.qrProvider.getBroadcastFromData(this.navParams.get('data'))
-      } else if (this.navParams.get('transaction')) {
-        this.transaction = this.navParams.get('transaction')
-      }
-    }).catch(console.error)
+    this.platform
+      .ready()
+      .then(() => {
+        if (this.navParams.get('data')) {
+          this.transaction = this.qrProvider.getBroadcastFromData(this.navParams.get('data'))
+        } else if (this.navParams.get('transaction')) {
+          this.transaction = this.navParams.get('transaction')
+        }
+      })
+      .catch(console.error)
   }
 
   broadcastTransaction() {
@@ -68,56 +79,59 @@ export class TransactionConfirmPage {
       this.navController.popToRoot()
     }, 20 * 1000)
 
-    protocol.broadcastTransaction(this.transaction.payload).then(txId => {
-      if (interval) {
-        clearInterval(interval)
-      }
-      loading.dismiss()
-      let alert = this.alertCtrl.create({
-        title: 'Transaction broadcasted!',
-        message: 'Your transaction has been successfully broadcasted',
-        buttons: [
-          {
-            text: 'Open Blockexplorer',
-            handler: () => {
-              if (blockexplorer) {
-                this.openUrl(blockexplorer.replace('{{txId}}', txId))
-              } else {
-                let toast = this.toastCtrl.create({
-                  duration: 3000,
-                  message: 'Unable to open blockexplorer',
-                  showCloseButton: true,
-                  position: 'bottom'
-                })
-                toast.present()
+    protocol
+      .broadcastTransaction(this.transaction.payload)
+      .then(txId => {
+        if (interval) {
+          clearInterval(interval)
+        }
+        loading.dismiss()
+        let alert = this.alertCtrl.create({
+          title: 'Transaction broadcasted!',
+          message: 'Your transaction has been successfully broadcasted',
+          buttons: [
+            {
+              text: 'Open Blockexplorer',
+              handler: () => {
+                if (blockexplorer) {
+                  this.openUrl(blockexplorer.replace('{{txId}}', txId))
+                } else {
+                  let toast = this.toastCtrl.create({
+                    duration: 3000,
+                    message: 'Unable to open blockexplorer',
+                    showCloseButton: true,
+                    position: 'bottom'
+                  })
+                  toast.present()
+                }
+                this.navController.popToRoot()
               }
-              this.navController.popToRoot()
+            },
+            {
+              text: 'Ok',
+              handler: () => {
+                this.navController.popToRoot()
+              }
             }
-          },
-          {
-            text: 'Ok',
-            handler: () => {
-              this.navController.popToRoot()
-            }
-          }
-        ]
+          ]
+        })
+        alert.present()
       })
-      alert.present()
-    }).catch(e => {
-      if (interval) {
-        clearInterval(interval)
-      }
-      loading.dismiss()
-      console.warn(e)
-      let toast = this.toastCtrl.create({
-        duration: 5000,
-        message: 'Transaction broadcasting failed: ' + e,
-        showCloseButton: true,
-        position: 'bottom'
+      .catch(e => {
+        if (interval) {
+          clearInterval(interval)
+        }
+        loading.dismiss()
+        console.warn(e)
+        let toast = this.toastCtrl.create({
+          duration: 5000,
+          message: 'Transaction broadcasting failed: ' + e,
+          showCloseButton: true,
+          position: 'bottom'
+        })
+        toast.present()
+        this.navController.popToRoot()
       })
-      toast.present()
-      this.navController.popToRoot()
-    })
   }
 
   private openUrl(url: string) {

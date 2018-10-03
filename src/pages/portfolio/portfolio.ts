@@ -18,10 +18,8 @@ import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe
       transition('* => *', animate('500ms'))
     ])
   ]
-
 })
 export class PortfolioPage {
-
   isVisible = 'hidden'
 
   total: number = 0
@@ -50,14 +48,17 @@ export class PortfolioPage {
       this.walletsProvider.wallets.getValue().map(wallet => {
         return wallet.synchronize()
       })
-    ).then((results) => {
+    ).then(results => {
       let newTotal = 0
 
       let cryptoToFiatPipe = new CryptoToFiatPipe()
 
       results.map((result, index) => {
         let wallet = this.walletsProvider.wallets.getValue()[index]
-        let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice })
+        let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
+          protocolIdentifier: wallet.protocolIdentifier,
+          currentMarketPrice: wallet.currentMarketPrice
+        })
         newTotal += Number(fiatValue)
       })
 

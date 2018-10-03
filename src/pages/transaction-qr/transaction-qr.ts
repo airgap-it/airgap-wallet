@@ -9,9 +9,7 @@ declare let window
   selector: 'page-transaction-qr',
   templateUrl: 'transaction-qr.html'
 })
-
 export class TransactionQrPage {
-
   public preparedDataQR: string = ''
   public wallet: AirGapMarketWallet = null
   public transaction: Transaction = null
@@ -41,9 +39,10 @@ export class TransactionQrPage {
       () => {
         console.log('OK')
       },
-      (error) => {
+      error => {
         alert('Oops. Something went wrong here. Do you have AirGap Vault installed on the same Device?')
         console.log('CANNOT OPEN VAULT', this.preparedDataQR, error)
-      })
+      }
+    )
   }
 }

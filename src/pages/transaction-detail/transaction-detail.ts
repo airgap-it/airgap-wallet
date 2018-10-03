@@ -10,14 +10,9 @@ declare let cordova
   templateUrl: 'transaction-detail.html'
 })
 export class TransactionDetailPage {
-
   public transaction: Transaction
 
-  constructor(
-    public navController: NavController,
-    public navParams: NavParams,
-    private platform: Platform
-  ) {
+  constructor(public navController: NavController, public navParams: NavParams, private platform: Platform) {
     this.transaction = this.navParams.get('transaction')
     console.log(this.transaction)
   }

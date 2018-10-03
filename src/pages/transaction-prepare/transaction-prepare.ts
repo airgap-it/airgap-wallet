@@ -14,7 +14,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
   templateUrl: 'transaction-prepare.html'
 })
 export class TransactionPreparePage {
-
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
 
@@ -24,8 +23,16 @@ export class TransactionPreparePage {
   public fee: string = '0'
   public feeLevel: number = 0
 
-  constructor(public loadingCtrl: LoadingController, public formBuilder: FormBuilder, private toastController: ToastController, private navController: NavController, private navParams: NavParams, private _ngZone: NgZone, private platform: Platform, private keyboard: Keyboard) {
-
+  constructor(
+    public loadingCtrl: LoadingController,
+    public formBuilder: FormBuilder,
+    private toastController: ToastController,
+    private navController: NavController,
+    private navParams: NavParams,
+    private _ngZone: NgZone,
+    private platform: Platform,
+    private keyboard: Keyboard
+  ) {
     this.transactionForm = formBuilder.group({
       address: ['', [Validators.required]],
       amount: [0, [Validators.required]],
@@ -86,7 +93,13 @@ export class TransactionPreparePage {
 
     try {
       let rawUnsignedTx = await this.wallet.prepareTransaction([transactionInfo.address], [transactionInfo.amount], transactionInfo.fee)
-      let transaction = new Transaction([this.wallet.receivingPublicAddress], [transactionInfo.address], transactionInfo.amount, transactionInfo.fee, this.wallet.protocolIdentifier)
+      let transaction = new Transaction(
+        [this.wallet.receivingPublicAddress],
+        [transactionInfo.address],
+        transactionInfo.amount,
+        transactionInfo.fee,
+        this.wallet.protocolIdentifier
+      )
 
       let signQRData = {
         protocolIdentifier: this.wallet.protocolIdentifier,
@@ -105,18 +118,20 @@ export class TransactionPreparePage {
       loading.dismiss()
     } catch (e) {
       console.warn(e)
-      this.toastController.create({
-        message: e,
-        duration: 3000,
-        position: 'bottom'
-      }).present()
+      this.toastController
+        .create({
+          message: e,
+          duration: 3000,
+          position: 'bottom'
+        })
+        .present()
     } finally {
       loading.dismiss()
     }
   }
 
   public openScanner() {
-    let callback = (address) => {
+    let callback = address => {
       this.transactionForm.controls.address.setValue(address)
     }
     this.navController.push(ScanAddressPage, {

@@ -5,7 +5,6 @@ import { Component, Input } from '@angular/core'
   templateUrl: 'hexagon-icon.html'
 })
 export class HexagonIconComponent {
-
   @Input()
   public backgroundColor: string
 
@@ -20,5 +19,4 @@ export class HexagonIconComponent {
 
   @Input()
   public opacity = 1
-
 }

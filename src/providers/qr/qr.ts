@@ -4,7 +4,6 @@ import { Transaction } from '../../models/transaction.model'
 
 @Injectable()
 export class QrProvider {
-
   public getWalletFromData(data: string): AirGapMarketWallet {
     let json = this.extractData(data)
 

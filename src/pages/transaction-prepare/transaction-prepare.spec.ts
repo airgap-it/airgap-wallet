@@ -26,7 +26,6 @@ export function createTranslateLoader(http: HttpClient) {
 }
 
 describe('TransactionSigned Page', () => {
-
   const ethWallet = new WalletMock().ethWallet
   const ethTransaction = new WalletMock().ethTransaction
 
@@ -52,7 +51,7 @@ describe('TransactionSigned Page', () => {
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useFactory: (createTranslateLoader),
+            useFactory: createTranslateLoader,
             deps: [HttpClient]
           }
         })
@@ -83,7 +82,7 @@ describe('TransactionSigned Page', () => {
     expect(component instanceof TransactionPreparePage).toBe(true)
   })
 
-  it('should select the correct default fee, and low/medium/high fees', (done) => {
+  it('should select the correct default fee, and low/medium/high fees', done => {
     let el = fixture.debugElement.nativeElement
     let feeAmount = el.querySelector('#fee-amount')
 
@@ -131,8 +130,18 @@ describe('TransactionSigned Page', () => {
     // should push to the next page
     expect((component as any).navController.push).toHaveBeenCalledWith(TransactionQrPage, {
       wallet: component.wallet,
-      transaction:  new Transaction([ethWallet.receivingPublicAddress], [ethWallet.receivingPublicAddress], new BigNumber(0), new BigNumber(0), ethWallet.protocolIdentifier),
-      data: 'airgap-vault://sign?data=' + window.btoa('{"protocolIdentifier":"eth","publicKey":"03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6","payload":{"nonce":0,"gasLimit":21000,"gasPrice":"0","to":"0x4681Df42ca7d5f0E986FFeA979A55c333f5c0a05","from":"0x4681Df42ca7d5f0E986FFeA979A55c333f5c0a05","value":"0","chainId":1}}')
+      transaction: new Transaction(
+        [ethWallet.receivingPublicAddress],
+        [ethWallet.receivingPublicAddress],
+        new BigNumber(0),
+        new BigNumber(0),
+        ethWallet.protocolIdentifier
+      ),
+      data:
+        'airgap-vault://sign?data=' +
+        window.btoa(
+          '{"protocolIdentifier":"eth","publicKey":"03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6","payload":{"nonce":0,"gasLimit":21000,"gasPrice":"0","to":"0x4681Df42ca7d5f0E986FFeA979A55c333f5c0a05","from":"0x4681Df42ca7d5f0E986FFeA979A55c333f5c0a05","value":"0","chainId":1}}'
+        )
     })
   })
 
@@ -153,5 +162,4 @@ describe('TransactionSigned Page', () => {
       position: 'bottom'
     })
   })
-
 })

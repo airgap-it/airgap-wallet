@@ -6,8 +6,7 @@ import { NavController, NavParams } from 'ionic-angular'
   templateUrl: 'scan-sync.html'
 })
 export class ScanSyncPage {
-
-  constructor(public navCtrl: NavController, public navParams: NavParams) { }
+  constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
   goToScanPage() {
     this.navCtrl.popToRoot()

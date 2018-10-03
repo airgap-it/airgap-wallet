@@ -12,9 +12,7 @@ declare var cordova: any
   templateUrl: 'settings.html'
 })
 export class SettingsPage {
-
-  constructor(public navCtrl: NavController, private modalController: ModalController, public platform: Platform) {
-  }
+  constructor(public navCtrl: NavController, private modalController: ModalController, public platform: Platform) {}
 
   public about() {
     this.navCtrl.push(AboutPage)
@@ -22,20 +20,20 @@ export class SettingsPage {
 
   public share() {
     let options = {
-      message: 'Take a look at the app I found. It\s the most secure practical way to do crypto transactions.',
+      message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',
       // not supported on some apps (Facebook, Instagram)
       subject: 'Checkout airgap.it', // fi. for email
       url: 'https://www.airgap.it',
       chooserTitle: 'Pick an app' // Android only, you can override the default share sheet title
     }
 
-    let onSuccess = function (result: any) {
+    let onSuccess = function(result: any) {
       console.log(`Share completed: ${result.completed}`) // On Android apps mostly return false even while it's true
       console.log(`Shared to app: ${result.app}`)
       // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
     }
 
-    let onError = function (msg: string) {
+    let onError = function(msg: string) {
       console.log('Sharing failed with message: ' + msg)
     }
 

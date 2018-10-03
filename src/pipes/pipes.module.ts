@@ -7,20 +7,8 @@ import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
 import { CryptoToFiatPipe } from './crypto-to-fiat/crypto-to-fiat.pipe'
 
 @NgModule({
-  declarations: [
-    AmountConverterPipe,
-    FeeConverterPipe,
-    ShortenStringPipe,
-    CoinValueConverterPipe,
-    CryptoToFiatPipe
-  ],
+  declarations: [AmountConverterPipe, FeeConverterPipe, ShortenStringPipe, CoinValueConverterPipe, CryptoToFiatPipe],
   imports: [],
-  exports: [
-    AmountConverterPipe,
-    FeeConverterPipe,
-    ShortenStringPipe,
-    CoinValueConverterPipe,
-    CryptoToFiatPipe
-  ]
+  exports: [AmountConverterPipe, FeeConverterPipe, ShortenStringPipe, CoinValueConverterPipe, CryptoToFiatPipe]
 })
-export class PipesModule { }
+export class PipesModule {}
