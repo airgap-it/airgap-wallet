@@ -29,9 +29,7 @@ export class TransactionPreparePage {
     private toastController: ToastController,
     private navController: NavController,
     private navParams: NavParams,
-    private _ngZone: NgZone,
-    private platform: Platform,
-    private keyboard: Keyboard
+    private _ngZone: NgZone
   ) {
     this.transactionForm = formBuilder.group({
       address: ['', [Validators.required]],
