@@ -14,9 +14,7 @@ import { WalletsProvider } from '../../providers/wallets/wallets.provider'
     </ion-list>
   `
 })
-
 export class WalletEditPopoverComponent {
-
   private wallet: AirGapMarketWallet
   private onDelete: Function
 
@@ -24,7 +22,8 @@ export class WalletEditPopoverComponent {
     private alertCtrl: AlertController,
     private navParams: NavParams,
     private walletsProvider: WalletsProvider,
-    private viewCtrl: ViewController) {
+    private viewCtrl: ViewController
+  ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
   }
@@ -57,5 +56,4 @@ export class WalletEditPopoverComponent {
     })
     alert.present()
   }
-
 }

@@ -10,7 +10,7 @@ declare var cordova: any
 export class IntroductionPage {
   public security: string = 'highest'
 
-  constructor(private viewController: ViewController, private platform: Platform) { }
+  constructor(private viewController: ViewController, private platform: Platform) {}
 
   public dismiss() {
     this.viewController.dismiss()
@@ -37,5 +37,4 @@ export class IntroductionPage {
       window.open(url, '_blank')
     }
   }
-
 }

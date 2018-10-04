@@ -7,7 +7,6 @@ import { NavController, NavParams } from 'ionic-angular'
   templateUrl: 'about.html'
 })
 export class AboutPage {
-
   public appName = ''
   public packageName = ''
   public versionNumber = ''
@@ -23,5 +22,4 @@ export class AboutPage {
     this.versionNumber = await this.app.getVersionNumber()
     this.versionCode = await this.app.getVersionCode()
   }
-
 }

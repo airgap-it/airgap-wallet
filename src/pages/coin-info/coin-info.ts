@@ -12,7 +12,6 @@ import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover
   templateUrl: 'coin-info.html'
 })
 export class CoinInfoPage {
-
   isRefreshing = true
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
@@ -32,27 +31,20 @@ export class CoinInfoPage {
   }
 
   openReceivePage() {
-    this.navCtrl.push(
-      WalletAddressPage, {
-        wallet: this.wallet
-      }
-    )
+    this.navCtrl.push(WalletAddressPage, {
+      wallet: this.wallet
+    })
   }
 
   openTransactionDetailPage(transaction: IAirGapTransaction) {
-    this.navCtrl.push(
-      TransactionDetailPage, {
-        transaction: transaction
-      }
-    )
+    this.navCtrl.push(TransactionDetailPage, {
+      transaction: transaction
+    })
   }
 
   doRefresh(refresher: any = null) {
     this.isRefreshing = true
-    Promise.all([
-      this.wallet.fetchTransactions(50, 0),
-      this.wallet.synchronize()
-    ]).then(results => {
+    Promise.all([this.wallet.fetchTransactions(50, 0), this.wallet.synchronize()]).then(results => {
       this.transactions = results[0]
 
       if (refresher) {

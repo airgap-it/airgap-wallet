@@ -7,7 +7,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
   templateUrl: 'wallet-address.html'
 })
 export class WalletAddressPage {
-
   public wallet: AirGapMarketWallet
 
   constructor(private navController: NavController, private navParams: NavParams) {
@@ -17,5 +16,4 @@ export class WalletAddressPage {
   done() {
     this.navController.pop()
   }
-
 }

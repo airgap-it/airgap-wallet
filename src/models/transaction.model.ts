@@ -8,7 +8,6 @@ export class TransactionParameter {
 }
 
 export class Transaction implements IAirGapTransaction {
-
   amount: BigNumber
   blockHeight: string
   data: string
@@ -27,7 +26,14 @@ export class Transaction implements IAirGapTransaction {
   payload: string
   publicKey: string
 
-  constructor(from: string[], to: string[], amount: string | BigNumber, fee: string | BigNumber, protocolIdentifier: string, payload?: string) {
+  constructor(
+    from: string[],
+    to: string[],
+    amount: string | BigNumber,
+    fee: string | BigNumber,
+    protocolIdentifier: string,
+    payload?: string
+  ) {
     this.from = from
     this.to = to
     this.amount = new BigNumber(amount)
@@ -39,5 +45,4 @@ export class Transaction implements IAirGapTransaction {
   static fromAirGapTx(airgapTx: IAirGapTransaction, payload: string) {
     return new Transaction(airgapTx.from, airgapTx.to, airgapTx.amount, airgapTx.fee, airgapTx.protocolIdentifier, payload)
   }
-
 }

@@ -21,12 +21,7 @@ import { MomentModule } from 'ngx-moment'
     FromToComponent,
     WalletEditPopoverComponent
   ],
-  imports: [
-    IonicModule,
-    MaterialIconsModule,
-    PipesModule,
-    MomentModule
-  ],
+  imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule],
   exports: [
     PortfolioItemComponent,
     IdenticonComponent,
@@ -36,5 +31,4 @@ import { MomentModule } from 'ngx-moment'
     WalletEditPopoverComponent
   ]
 })
-
-export class ComponentsModule { }
+export class ComponentsModule {}

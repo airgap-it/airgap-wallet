@@ -7,12 +7,9 @@ declare var QRScanner: any
 
 @Injectable()
 export class ScannerProvider {
-
   public isShowing = false
 
-  constructor(private platform: Platform) {
-
-  }
+  constructor(private platform: Platform) {}
 
   public askForPermission() {
     if (this.platform.is('cordova')) {

@@ -2,59 +2,66 @@ import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-
-enum SettingsKeys {
-  WALLET = 'wallets',
-  CURRENCY = 'currency'
-}
+import { SettingsProvider, SettingsKey } from '../settings/settings'
 
 @Injectable()
 export class WalletsProvider {
-
   private walletList: AirGapMarketWallet[] = []
   public wallets: BehaviorSubject<AirGapMarketWallet[]> = new BehaviorSubject(this.walletList)
 
-  constructor(private storage: Storage) {
-    this.storage.get(SettingsKeys.WALLET).then((rawWallets) => {
-      let wallets = rawWallets
+  constructor(private settingsProvider: SettingsProvider) {
+    this.loadWalletsFromStorage().catch(console.error)
+  }
 
-      // migrating double-serialization
-      if (!(rawWallets instanceof Array)) {
-        wallets = JSON.parse(rawWallets)
-      }
+  private async loadWalletsFromStorage() {
+    const rawWallets = await this.settingsProvider.get(SettingsKey.WALLET)
+    let wallets = rawWallets
 
-      if (!wallets) {
-        wallets = []
-      }
+    // migrating double-serialization
+    if (!(rawWallets instanceof Array)) {
+      wallets = JSON.parse(rawWallets)
+    }
 
-      wallets.forEach(wallet => {
-        let airGapWallet = new AirGapMarketWallet(wallet.protocolIdentifier, wallet.publicKey, wallet.isExtendedPublicKey, wallet.derivationPath)
+    // "wallets" can be undefined here
+    if (!wallets) {
+      wallets = []
+    }
 
-        // if we have no addresses, derive using webworker and sync, else just sync
-        if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
-          const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
+    wallets.forEach(wallet => {
+      let airGapWallet = new AirGapMarketWallet(
+        wallet.protocolIdentifier,
+        wallet.publicKey,
+        wallet.isExtendedPublicKey,
+        wallet.derivationPath
+      )
 
-          airGapWorker.onmessage = (event) => {
-            airGapWallet.addresses = event.data.addresses
-            airGapWallet.synchronize()
-          }
+      // add derived addresses
+      airGapWallet.addresses = wallet.addresses
 
-          airGapWorker.postMessage({
-            protocolIdentifier: airGapWallet.protocolIdentifier,
-            publicKey: airGapWallet.publicKey,
-            isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
-            derivationPath: airGapWallet.derivationPath
-          })
-        } else {
-          airGapWallet.synchronize()
+      // if we have no addresses, derive using webworker and sync, else just sync
+      if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
+        const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
+
+        airGapWorker.onmessage = event => {
+          airGapWallet.addresses = event.data.addresses
+          airGapWallet.synchronize().catch(console.error)
         }
 
-        this.walletList.push(airGapWallet)
-      })
+        airGapWorker.postMessage({
+          protocolIdentifier: airGapWallet.protocolIdentifier,
+          publicKey: airGapWallet.publicKey,
+          isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
+          derivationPath: airGapWallet.derivationPath
+        })
+      } else {
+        airGapWallet.synchronize().catch(console.error)
+      }
+
+      this.walletList.push(airGapWallet)
     })
   }
 
-  addWallet(wallet: AirGapMarketWallet): Promise<any> {
+  public addWallet(wallet: AirGapMarketWallet): Promise<any> {
     if (this.walletExists(wallet)) {
       throw new Error('wallet already exists')
     }
@@ -63,22 +70,23 @@ export class WalletsProvider {
     return this.persist()
   }
 
-  removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let index = this.walletList.findIndex(wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier)
-      if (index > -1) {
-        this.walletList.splice(index, 1)
-      }
-      this.persist().then(resolve)
-    })
+  public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
+    let index = this.walletList.findIndex(
+      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+    )
+    if (index > -1) {
+      this.walletList.splice(index, 1)
+    }
+    return this.persist()
   }
 
-  persist(): Promise<void> {
-    return this.storage.set(SettingsKeys.WALLET, this.walletList)
+  private async persist(): Promise<void> {
+    return this.settingsProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
-  walletExists(testWallet: AirGapMarketWallet) {
-    return this.walletList.some(wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier)
+  public walletExists(testWallet: AirGapMarketWallet): boolean {
+    return this.walletList.some(
+      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+    )
   }
-
 }

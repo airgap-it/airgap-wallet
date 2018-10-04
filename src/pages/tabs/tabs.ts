@@ -6,30 +6,30 @@ import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
 
-import { Storage } from '@ionic/storage'
+import { SettingsProvider, SettingsKey } from '../../providers/settings/settings'
 @Component({
   templateUrl: 'tabs.html'
 })
 export class TabsPage {
-
   tab1Root = PortfolioPage
   tab2Root = ScanPage
   tab3Root = SettingsPage
 
-  constructor(public modalController: ModalController, private storage: Storage, private events: Events) {
-    this.storage.get('introduction').then((introduction) => {
-      if (!introduction) {
-        setTimeout(
-          () => {
-            this.storage.set('introduction', true)
-          },
-          3000)
-        const modal = this.modalController.create(IntroductionPage)
-        modal.onDidDismiss(() => {
-          this.events.publish('scan:start')
-        })
-        modal.present()
-      }
-    })
+  constructor(public modalController: ModalController, private settingsProvider: SettingsProvider, private events: Events) {
+    this.showIntroduction().catch(console.error)
+  }
+
+  private async showIntroduction() {
+    const introduction = await this.settingsProvider.get(SettingsKey.INTRODUCTION)
+    if (!introduction) {
+      setTimeout(async () => {
+        await this.settingsProvider.set(SettingsKey.INTRODUCTION, true)
+      }, 3000)
+      const modal = this.modalController.create(IntroductionPage)
+      modal.onDidDismiss(() => {
+        this.events.publish('scan:start')
+      })
+      modal.present().catch(console.error)
+    }
   }
 }

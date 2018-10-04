@@ -39,6 +39,7 @@ import { MomentModule } from 'ngx-moment'
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
 import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wallet-edit-popover.component'
+import { SettingsProvider } from '../providers/settings/settings'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -71,7 +72,7 @@ export function createTranslateLoader(http: HttpClient) {
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: (createTranslateLoader),
+        useFactory: createTranslateLoader,
         deps: [HttpClient]
       }
     }),
@@ -117,8 +118,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScannerProvider,
     AppVersion,
     WalletsProvider,
-    QrProvider
+    QrProvider,
+    SettingsProvider
   ]
 })
-
-export class AppModule { }
+export class AppModule {}
