@@ -114,7 +114,11 @@ qrcode {
   min-width: 48px;
   min-height: 48px;
 }
+
 /* FAB with a button, bottom padding fix for ios devices */
 .content-ios ion-fab[bottom] {
   bottom: calc(10px + env(safe-area-inset-bottom));
+}
+ion-fab .col {
+  padding: 0 10px;
 }
