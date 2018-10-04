@@ -17,16 +17,13 @@
   </ion-row>
 
   <from-to [transaction]="transaction"></from-to>
+  
+  <ion-fab bottom>
+      <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
+          Sign on this device
+        </button>
+        <button default ion-button color="secondary" (click)="done()" round item-right>
+          Done
+        </button>
+  </ion-fab>
 </ion-content>
-
-
-<ion-footer transparent no-border padding>
-  <ion-buttons end>
-    <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
-      Sign on this device
-    </button>
-    <button default ion-button color="secondary" (click)="done()" round item-right>
-      Done
-    </button>
-  </ion-buttons>
-</ion-footer>

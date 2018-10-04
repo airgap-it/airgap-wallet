@@ -6,7 +6,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content fullscreen padding class="colored-background">
+<ion-content padding class="colored-background">
 
   <ion-row padding>
     <ion-col>
@@ -29,13 +29,7 @@
     <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
   </ion-row>
 
-</ion-content>
-
-
-<ion-footer no-border>
-  <ion-toolbar padding transparent>
-    <ion-row justify-content-end>
+  <ion-fab bottom right>
       <button ion-button round color="secondary" (click)="done()">Done</button>
-    </ion-row>
-  </ion-toolbar>
-</ion-footer>
+  </ion-fab>
+</ion-content>

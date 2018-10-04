@@ -7,7 +7,7 @@
 </ion-header>
 
 
-<ion-content fullscreen padding class="colored-background">
+<ion-content padding class="colored-background">
   <ion-row>
     <ion-col>
       <p>To use the AirGap Wallet app you need to <b>sync with AirGap Vault</b>. Select the wallet you want to use in AirGap Vault and
@@ -17,13 +17,7 @@
     </ion-col>
   </ion-row>
 
-
-</ion-content>
-
-<ion-footer no-border>
-  <ion-toolbar padding transparent>
-    <ion-row justify-content-end>
+  <ion-fab bottom right>
       <button ion-button round color="secondary" (click)="goToScanPage()">Let's Go</button>
-    </ion-row>
-  </ion-toolbar>
-</ion-footer>
+    </ion-fab>
+</ion-content>
