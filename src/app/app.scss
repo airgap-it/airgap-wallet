@@ -106,11 +106,8 @@ qrcode {
   background-color: white;
 }
 
+.platform-android .placeholder--container,
 .platform-ios .placeholder--container {
-  min-width: 36px;
-  min-height: 36px;
-}
-.platform-android .placeholder--container {
   min-width: 48px;
   min-height: 48px;
 }
