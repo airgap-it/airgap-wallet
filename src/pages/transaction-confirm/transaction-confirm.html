@@ -17,21 +17,21 @@
       </ion-item>
     </ion-list>
   </div>
-</ion-content>
 
-<ion-footer no-border>
-  <ion-row>
-    <ion-col>
-      <button default block ion-button color="secondary" (click)="dismiss()" round item-right icon-left>
-        <ion-icon md-name="close"></ion-icon>
-        Decline
-      </button>
-    </ion-col>
-    <ion-col>
-      <button default block ion-button color="primary" (click)="broadcastTransaction()" round item-right icon-left>
-        <ion-icon md-name="check"></ion-icon>
-        Confirm
-      </button>
-    </ion-col>
-  </ion-row>
-</ion-footer>
+  <ion-fab bottom>
+      <ion-row>
+        <ion-col>
+            <button default full ion-button color="secondary" (click)="dismiss()" round icon-left>
+                <ion-icon md-name="close"></ion-icon>
+                Decline
+              </button>
+        </ion-col>
+        <ion-col>
+            <button default full ion-button color="primary" (click)="broadcastTransaction()" round icon-left>
+                <ion-icon md-name="check"></ion-icon>
+                Confirm
+              </button>
+        </ion-col>
+      </ion-row>
+    </ion-fab>
+</ion-content>

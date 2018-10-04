@@ -1,6 +1,5 @@
 // http://ionicframework.com/docs/v2/theming/
 
-
 // App Global Sass
 // --------------------------------------------------
 // Put style rules here that you want to apply globally. These
@@ -15,12 +14,12 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
-ion-app{
-  background: none!important;
+ion-app {
+  background: none !important;
 }
 
-.scanning{
-  background: none!important;
+.scanning {
+  background: none !important;
 }
 
 .nav-decor {
@@ -38,7 +37,7 @@ ion-app{
   display: flex;
 }
 .content--align-vert__center {
-  align-items: center!important;
+  align-items: center !important;
 }
 
 .font--weight__light {
@@ -48,16 +47,19 @@ ion-app{
   font-weight: 700;
 }
 
-
 .background--color__primary {
-  background-color: color($colors, primary, base)
+  background-color: color($colors, primary, base);
 }
 
-.colored-background{
+.colored-background {
   color: color($colors, white);
   background: color($colors, primary);
 
-  p, h1, h2, h3, .select-text {
+  p,
+  h1,
+  h2,
+  h3,
+  .select-text {
     color: color($colors, secondary);
   }
 }
@@ -67,8 +69,8 @@ ion-app{
 }
 
 .typography--mono {
-  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
-  font-weight: 600!important;
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+  font-weight: 600 !important;
   font-size: 1.4rem;
   word-wrap: break-word;
 }
@@ -104,11 +106,16 @@ qrcode {
   background-color: white;
 }
 
+.platform-android .placeholder--container,
 .platform-ios .placeholder--container {
-  min-width: 36px;
-  min-height: 36px;
-}
-.platform-android .placeholder--container {
   min-width: 48px;
   min-height: 48px;
+}
+
+/* FAB with a button, bottom padding fix for ios devices */
+.content-ios ion-fab[bottom] {
+  bottom: calc(10px + env(safe-area-inset-bottom));
+}
+ion-fab .col {
+  padding: 0 10px;
 }

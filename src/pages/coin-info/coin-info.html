@@ -52,21 +52,21 @@
       <ion-spinner color="black"></ion-spinner>
     </div>
   </ion-list>
-</ion-content>
 
-<ion-footer no-border>
-  <ion-row>
-    <ion-col>
-      <button block default ion-button color="primary" (click)="openReceivePage()" round item-left icon-start>
-        <ion-icon md-name="call_received"></ion-icon>
-        Receive
-      </button>
-    </ion-col>
-    <ion-col>
-      <button block default ion-button color="primary" (click)="openPreparePage()" round item-right icon-start>
-        <ion-icon name="send"></ion-icon>
-        Send
-      </button>
-    </ion-col>
-  </ion-row>
-</ion-footer>
+  <ion-fab bottom>
+    <ion-row>
+      <ion-col>
+          <button full default ion-button color="primary" (click)="openReceivePage()" round icon-start>
+              <ion-icon md-name="call_received"></ion-icon>
+              Receive
+            </button>
+      </ion-col>
+      <ion-col>
+          <button full default ion-button color="primary" (click)="openPreparePage()" round icon-start>
+              <ion-icon name="send"></ion-icon>
+              Send
+          </button>
+      </ion-col>
+    </ion-row>
+  </ion-fab>
+</ion-content>

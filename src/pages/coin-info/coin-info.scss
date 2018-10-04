@@ -7,8 +7,9 @@ page-coin-info {
     left: 40px;
     top: 34px;
   }
-  h2, .items--right ion-col:first-of-type {
-    margin: 2px 0px 6px!important;
+  h2,
+  .items--right ion-col:first-of-type {
+    margin: 2px 0px 6px !important;
   }
 
   .loading-header {
@@ -19,7 +20,7 @@ page-coin-info {
     ion-spinner * {
       width: 28px;
       height: 28px;
-      stroke: #FFF !important;
+      stroke: #fff !important;
     }
   }
   .loading-content {
@@ -33,5 +34,7 @@ page-coin-info {
       height: 28px;
     }
   }
-
+  ion-fab {
+    width: 100%;
+  }
 }

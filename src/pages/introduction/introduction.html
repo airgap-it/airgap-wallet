@@ -11,7 +11,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding no-bounce fullscreen>
+<ion-content padding no-bounce >
 
   <ion-segment [(ngModel)]="security" color="secondary">
     <ion-segment-button value="highest">
@@ -102,13 +102,8 @@
     </ion-row>
   </ng-container>
 
-</ion-content>
-
-<ion-footer no-border>
-  <ion-toolbar padding transparent>
-    <ion-row justify-content-end>
+  <ion-fab bottom right>
       <button ion-button round color="primary" (click)="downloadApp()">Install AirGap Vault</button>
       <button ion-button round color="secondary" (click)="dismiss()">Let's Go</button>
-    </ion-row>
-  </ion-toolbar>
-</ion-footer>
+  </ion-fab>
+</ion-content>
