@@ -4,7 +4,7 @@
       <ion-icon name="menu"></ion-icon>
     </button>
   </ion-navbar>
-  <div [@visibilityChanged]="isVisible" style="opacity: 0">
+  <div>
     <div style="color: white; width: 100%; text-align:center; height: 150px; font-size: 40px; font-weight: 300; margin-top: 20px">
       <div style="margin-top: 30px;">
         ${{ total | number : '1.2-2' }}
@@ -23,28 +23,26 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div [@visibilityChanged]="isVisible" style="opacity: 0">
-    <div *ngIf="wallets | async as wallets; else loading">
-      <ng-container *ngIf="wallets.length; else noItems">
-        <ion-list no-lines margin-top *ngFor="let wallet of wallets">
-          <portfolio-item [wallet]="wallet" tappable (click)="openDetail(wallet)"></portfolio-item>
-        </ion-list>
-      </ng-container>
-      <ng-template #noItems>
-        <div class="empty-list" padding>
-          <ion-icon md-name="account_balance_wallet" color="dark"></ion-icon>
-          <p>
-            To use AirGap Wallet you need to download the public data from the AirGap Vault application.
-          </p>
-        </div>
-      </ng-template>
-    </div>
+  <ng-container *ngIf="wallets | async as wallets; else loading">
+    <ng-container *ngIf="wallets.length; else noItems">
+      <ion-list no-lines margin-top *ngFor="let wallet of wallets">
+        <portfolio-item [wallet]="wallet" tappable (click)="openDetail(wallet)"></portfolio-item>
+      </ion-list>
+    </ng-container>
+    <ng-template #noItems>
+      <div class="empty-list" padding>
+        <ion-icon md-name="account_balance_wallet" color="dark"></ion-icon>
+        <p>
+          To use AirGap Wallet you need to download the public data from the AirGap Vault application.
+        </p>
+      </div>
+    </ng-template>
     <ng-template #loading>
       <div class="loading-content">
         <ion-spinner color="black"></ion-spinner>
       </div>
     </ng-template>
-  </div>
+  </ng-container>
 
   <ion-fab right bottom>
     <button ion-fab color="secondary" (click)="openSyncPage()">

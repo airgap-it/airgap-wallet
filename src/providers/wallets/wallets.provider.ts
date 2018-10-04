@@ -3,11 +3,17 @@ import { Storage } from '@ionic/storage'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SettingsProvider, SettingsKey } from '../settings/settings'
+import { Subject } from 'rxjs'
 
 @Injectable()
 export class WalletsProvider {
   private walletList: AirGapMarketWallet[] = []
   public wallets: BehaviorSubject<AirGapMarketWallet[]> = new BehaviorSubject(this.walletList)
+  private walletChangedBehaviour: Subject<void> = new Subject()
+
+  get walledChangedObservable() {
+    return this.walletChangedBehaviour.asObservable().debounceTime(100)
+  }
 
   constructor(private settingsProvider: SettingsProvider) {
     this.loadWalletsFromStorage().catch(console.error)
@@ -44,7 +50,12 @@ export class WalletsProvider {
 
         airGapWorker.onmessage = event => {
           airGapWallet.addresses = event.data.addresses
-          airGapWallet.synchronize().catch(console.error)
+          airGapWallet
+            .synchronize()
+            .then(() => {
+              this.walletChangedBehaviour.next()
+            })
+            .catch(console.error)
         }
 
         airGapWorker.postMessage({
@@ -54,7 +65,12 @@ export class WalletsProvider {
           derivationPath: airGapWallet.derivationPath
         })
       } else {
-        airGapWallet.synchronize().catch(console.error)
+        airGapWallet
+          .synchronize()
+          .then(() => {
+            this.walletChangedBehaviour.next()
+          })
+          .catch(console.error)
       }
 
       this.walletList.push(airGapWallet)
