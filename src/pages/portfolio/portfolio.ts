@@ -27,6 +27,9 @@ export class PortfolioPage {
     this.wallets.subscribe(wallets => {
       this.calculateTotal(wallets)
     })
+    this.walletsProvider.walledChangedObservable.subscribe(() => {
+      this.calculateTotal(this.walletsProvider.wallets.getValue())
+    })
   }
 
   ionViewDidEnter() {
