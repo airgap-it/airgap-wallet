@@ -115,8 +115,6 @@ qrcode {
   min-height: 48px;
 }
 
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-  ion-fab[bottom] {
-    bottom: 24px;
-  }
+ion-fab[bottom] {
+  bottom: calc(10px + env(safe-area-inset-bottom));
 }
