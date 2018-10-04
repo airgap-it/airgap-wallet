@@ -1,4 +1,4 @@
-import { animate, state, style, transition, trigger } from '@angular/animations'
+import { animate, state, style, transition, trigger, query, stagger } from '@angular/animations'
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { Observable } from 'rxjs'
@@ -11,13 +11,7 @@ import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe
 @Component({
   selector: 'page-portfolio',
   templateUrl: 'portfolio.html',
-  animations: [
-    trigger('visibilityChanged', [
-      state('shown', style({ opacity: 1 })),
-      state('hidden', style({ opacity: 0 })),
-      transition('* => *', animate('500ms'))
-    ])
-  ]
+  animations: []
 })
 export class PortfolioPage {
   isVisible = 'hidden'
@@ -29,6 +23,10 @@ export class PortfolioPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: WalletsProvider) {
     this.wallets = this.walletsProvider.wallets.asObservable()
+    // If a wallet gets added or removed, recalculate all values
+    this.wallets.subscribe(wallets => {
+      this.calculateTotal(wallets)
+    })
   }
 
   ionViewDidEnter() {
@@ -43,31 +41,34 @@ export class PortfolioPage {
     this.navCtrl.push(ScanSyncPage)
   }
 
-  doRefresh(refresher: any = null) {
-    Promise.all(
+  async doRefresh(refresher: any = null) {
+    await Promise.all(
       this.walletsProvider.wallets.getValue().map(wallet => {
         return wallet.synchronize()
       })
-    ).then(results => {
-      let newTotal = 0
+    )
 
-      let cryptoToFiatPipe = new CryptoToFiatPipe()
+    this.calculateTotal(this.walletsProvider.wallets.getValue(), refresher)
+  }
 
-      results.map((result, index) => {
-        let wallet = this.walletsProvider.wallets.getValue()[index]
-        let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
-          protocolIdentifier: wallet.protocolIdentifier,
-          currentMarketPrice: wallet.currentMarketPrice
-        })
-        newTotal += Number(fiatValue)
+  calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
+    console.log('calculating total')
+    let newTotal = 0
+    let cryptoToFiatPipe = new CryptoToFiatPipe()
+
+    wallets.forEach(wallet => {
+      let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
+        protocolIdentifier: wallet.protocolIdentifier,
+        currentMarketPrice: wallet.currentMarketPrice
       })
-
-      if (refresher) {
-        refresher.complete()
-      }
-
-      this.total = newTotal
-      this.isVisible = 'visible'
+      newTotal += Number(fiatValue)
     })
+
+    if (refresher) {
+      refresher.complete()
+    }
+
+    this.total = newTotal
+    this.isVisible = 'visible'
   }
 }
