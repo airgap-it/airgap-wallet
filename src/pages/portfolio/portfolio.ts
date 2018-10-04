@@ -1,4 +1,3 @@
-import { animate, state, style, transition, trigger, query, stagger } from '@angular/animations'
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { Observable } from 'rxjs'
