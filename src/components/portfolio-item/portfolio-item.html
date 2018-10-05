@@ -5,19 +5,21 @@
   </ion-avatar>
 
   <h2 *ngIf="wallet.currentMarketPrice">
-    <span class="font--weight__bold" ion-text color="black">{{ wallet.currentBalance?.toNumber() | amountConverter : { protocolIdentifier: wallet.protocolIdentifier } }}</span>
+    <span class="font--weight__bold" ion-text color="black">{{ wallet.currentBalance?.toNumber() | amountConverter : {
+      protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}</span>
   </h2>
   <small *ngIf="!wallet.currentMarketPrice">
     syncing with blockchain ...
   </small>
-  
+
   <h3 *ngIf="wallet.addresses.length > 0" ion-text color="blackLight" class="typography--mono">
     {{ wallet.receivingPublicAddress | shortenString }}
   </h3>
-  
+
   <ion-row class="items--right" item-end>
     <ion-col col-12 no-padding text-right>
-      <p ion-text color="black">${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice } | number : '1.2-2' }}</p>
+      <p ion-text color="black">${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier:
+        wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice } | number : '1.2-2' }}</p>
     </ion-col>
     <ion-col col-12 no-padding text-right>
       <p>
