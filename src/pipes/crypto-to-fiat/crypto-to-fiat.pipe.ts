@@ -17,12 +17,12 @@ export class CryptoToFiatPipe implements PipeTransform {
       !(value instanceof BigNumber) ||
       isNaN(value.toNumber())
     ) {
-      console.warn(
+      /* console.warn(
         `CryptoToFiatPipe: necessary properties missing!\n` +
           `Market Price: ${args.currentMarketPrice}\n` +
           `Protocol: ${args.protocolIdentifier}\n` +
           `Value: ${value}`
-      )
+      ) */
       return ''
     }
 

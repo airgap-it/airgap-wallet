@@ -8,4 +8,7 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 export class PortfolioItemComponent {
   @Input()
   wallet: AirGapMarketWallet
+
+  @Input()
+  maxDigits: number = 0
 }
