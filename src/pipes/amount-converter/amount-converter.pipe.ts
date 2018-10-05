@@ -30,7 +30,7 @@ export class AmountConverterPipe implements PipeTransform {
       return value.toFormat()
     }
 
-    if (value.toFixed().length < maxDigits) {
+    if (value.toFixed().length <= maxDigits) {
       return value.toFormat()
     }
 
@@ -41,7 +41,7 @@ export class AmountConverterPipe implements PipeTransform {
     }
 
     // Need regex to remove all unneccesary trailing zeros
-    return '~' + value.toFormat(maxDigits - integerValueLength).replace(/\.?0+$/, '')
+    return value.toFormat(maxDigits - integerValueLength).replace(/\.?0+$/, '')
   }
 
   makeFullNumberSmaller(value: BigNumber, maxDigits: number): string {
@@ -52,27 +52,27 @@ export class AmountConverterPipe implements PipeTransform {
     let result = value.integerValue()
 
     if (result.toString().length <= maxDigits) {
-      return '~' + result.toFormat()
+      return result.toFormat()
     }
 
     if (result.toString().length <= 3) {
-      return '~' + result.toFormat()
+      return result.toFormat()
     }
 
     // number is too long, take 3 digits away and try again
     result = result.dividedToIntegerBy(1000)
 
     if (result.toFixed().length <= maxDigits) {
-      return '~' + result.toFormat() + 'K'
+      return result.toFormat() + 'K'
     }
 
     if (result.toFixed().length <= 3) {
-      return '~' + result.toFormat() + 'K'
+      return result.toFormat() + 'K'
     }
 
     // number is too long, take 3 digits away and try again
     result = result.dividedToIntegerBy(1000)
 
-    return '~' + result.toFormat() + 'M'
+    return result.toFormat() + 'M'
   }
 }
