@@ -1,6 +1,6 @@
 import { AmountConverterPipe } from './amount-converter.pipe'
 import BigNumber from 'bignumber.js'
-BigNumber.config({
+const BN = BigNumber.clone({
   FORMAT: {
     decimalSeparator: `.`,
     groupSeparator: `'`,
@@ -17,65 +17,65 @@ describe('AmountConverter Pipe', () => {
 
   describe('format number with commas', () => {
     it('should format short number', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1`))).toEqual(`1`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1`))).toEqual(`1`)
     })
 
     it('should add highcommas', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1234567891`))).toEqual(`1'234'567'891`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1234567891`))).toEqual(`1'234'567'891`)
     })
 
     it('should should add highcommas only to first part of number', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`12345.67891`))).toEqual(`12'345.67891`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`12345.67891`))).toEqual(`12'345.67891`)
     })
 
     it('should format long numbers', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1234567891.1234567891`))).toEqual(`1'234'567'891.1234567891`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1234567891.1234567891`))).toEqual(`1'234'567'891.1234567891`)
     })
 
     it('should format short number if smaller than maxDigits', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1`), 8)).toEqual(`1`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1`), 8)).toEqual(`1`)
     })
 
     it('should add "K" if number is too long', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1234567891`), 8)).toEqual(`1'234'567K`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1234567891`), 8)).toEqual(`1'234'567K`)
     })
 
     it('should add "K" if number is too long and omit floating point', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1234567891.1234567891`), 8)).toEqual(`1'234'567K`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1234567891.1234567891`), 8)).toEqual(`1'234'567K`)
     })
 
     it('should format floating point part correctly', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`12345.67891`), 8)).toEqual(`12'345.679`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`12345.67891`), 8)).toEqual(`12'345.679`)
     })
 
     it('should add "M" if number is too long', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`12345678912345`), 8)).toEqual(`12'345'678M`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`12345678912345`), 8)).toEqual(`12'345'678M`)
     })
 
     it('should add "M" if number is too long and omit floating point', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`12345678912345.000000000001`), 8)).toEqual(`12'345'678M`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`12345678912345.000000000001`), 8)).toEqual(`12'345'678M`)
     })
 
     it('should limit long floating point', () => {
-      expect(amountConverterPipe.formatBigNumber(new BigNumber(`1.000000000001`), 8)).toEqual(`1`)
+      expect(amountConverterPipe.formatBigNumber(new BN(`1.000000000001`), 8)).toEqual(`1`)
     })
   })
 
   describe('makeFullNumberSmaller', () => {
     it('should not make small number smaller', () => {
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('1'), 3)).toEqual('1')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('12'), 3)).toEqual('12')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('123'), 3)).toEqual('123')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('1'), 3)).toEqual('1')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('12'), 3)).toEqual('12')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('123'), 3)).toEqual('123')
     })
 
     it('should make large number smaller', () => {
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('1234'), 3)).toEqual('1K')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('12345'), 3)).toEqual('12K')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('123456'), 3)).toEqual('123K')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('1234567'), 3)).toEqual('1M')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('12345678'), 3)).toEqual('12M')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('123456789'), 3)).toEqual('123M')
-      expect(amountConverterPipe.makeFullNumberSmaller(new BigNumber('123456789123456789'), 3)).toEqual(`123'456'789'123M`)
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('1234'), 3)).toEqual('1K')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('12345'), 3)).toEqual('12K')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('123456'), 3)).toEqual('123K')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('1234567'), 3)).toEqual('1M')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('12345678'), 3)).toEqual('12M')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('123456789'), 3)).toEqual('123M')
+      expect(amountConverterPipe.makeFullNumberSmaller(new BN('123456789123456789'), 3)).toEqual(`123'456'789'123M`)
     })
   })
 

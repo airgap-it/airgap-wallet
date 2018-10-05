@@ -1,6 +1,7 @@
 import { PipeTransform, Pipe } from '@angular/core'
 import { BigNumber } from 'bignumber.js'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+
 @Pipe({
   name: 'amountConverter'
 })
@@ -21,7 +22,14 @@ export class AmountConverterPipe implements PipeTransform {
       return ''
     }
 
-    const amount = new BigNumber(value).shiftedBy(-1 * protocol.decimals)
+    const BN = BigNumber.clone({
+      FORMAT: {
+        decimalSeparator: `.`,
+        groupSeparator: `'`,
+        groupSize: 3
+      }
+    })
+    const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 
