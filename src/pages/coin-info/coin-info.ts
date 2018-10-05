@@ -6,6 +6,7 @@ import { TransactionDetailPage } from '../transaction-detail/transaction-detail'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { WalletAddressPage } from '../wallet-address/wallet-address'
 import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover/wallet-edit-popover.component'
+import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 
 @Component({
   selector: 'page-coin-info',
@@ -16,7 +17,12 @@ export class CoinInfoPage {
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public popoverCtrl: PopoverController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public popoverCtrl: PopoverController,
+    public walletProvider: WalletsProvider
+  ) {
     this.wallet = this.navParams.get('wallet')
   }
 
@@ -52,6 +58,7 @@ export class CoinInfoPage {
       }
 
       this.isRefreshing = false
+      this.walletProvider.triggerWalletChanged()
     })
   }
 

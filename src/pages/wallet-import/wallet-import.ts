@@ -44,7 +44,9 @@ export class WalletImportPage {
 
           airGapWorker.onmessage = event => {
             this.wallet.addresses = event.data.addresses
-            this.wallet.synchronize()
+            this.wallet.synchronize().then(() => {
+              this.wallets.triggerWalletChanged()
+            })
             loading.dismiss()
           }
 
