@@ -4,7 +4,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content  padding class="colored-background">
+<ion-content padding class="colored-background">
 
   <ion-row *ngIf="!walletAlreadyExists">
     <p>
@@ -12,14 +12,14 @@
     </p>
   </ion-row>
 
-  <portfolio-item [wallet]="wallet"></portfolio-item>
+  <portfolio-item [wallet]="wallet" [maxDigits]="8"></portfolio-item>
 
   <ion-item *ngIf="walletAlreadyExists" color="danger" margin-top text-wrap>
     You have already added this wallet in AirGap.
   </ion-item>
 
   <ion-fab bottom right>
-      <button ion-button round color="white" (click)="dismiss()">Cancel</button>
-      <button ion-button round color="secondary" *ngIf="!walletAlreadyExists" (click)="import()">Import</button>
+    <button ion-button round color="white" (click)="dismiss()">Cancel</button>
+    <button ion-button round color="secondary" *ngIf="!walletAlreadyExists" (click)="import()">Import</button>
   </ion-fab>
 </ion-content>
