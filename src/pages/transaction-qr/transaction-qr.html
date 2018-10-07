@@ -16,9 +16,11 @@
     <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
   </ion-row>
 
-  <from-to [transaction]="transaction"></from-to>
+  <ion-row padding-bottom margin-bottom>
+    <from-to [transaction]="transaction"></from-to>
+  </ion-row>
   
-  <ion-fab bottom>
+  <ion-fab bottom right>
       <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
           Sign on this device
         </button>
