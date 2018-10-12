@@ -12,11 +12,15 @@ export class WalletsProvider {
   private walletChangedBehaviour: Subject<void> = new Subject()
 
   get walledChangedObservable() {
-    return this.walletChangedBehaviour.asObservable().debounceTime(100)
+    return this.walletChangedBehaviour.asObservable().auditTime(50)
   }
 
   constructor(private settingsProvider: SettingsProvider) {
     this.loadWalletsFromStorage().catch(console.error)
+  }
+
+  public triggerWalletChanged() {
+    this.walletChangedBehaviour.next()
   }
 
   private async loadWalletsFromStorage() {
@@ -53,7 +57,7 @@ export class WalletsProvider {
           airGapWallet
             .synchronize()
             .then(() => {
-              this.walletChangedBehaviour.next()
+              this.triggerWalletChanged()
             })
             .catch(console.error)
         }
@@ -68,7 +72,7 @@ export class WalletsProvider {
         airGapWallet
           .synchronize()
           .then(() => {
-            this.walletChangedBehaviour.next()
+            this.triggerWalletChanged()
           })
           .catch(console.error)
       }
