@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>
+      {{'Install AirGap Vault' | translate}}
+    </ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()">
+        <ion-icon name="md-close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <h1>Let's install AirGap Vault!</h1>
+
+  <p padding-bottom>There are a few ways to install AirGap Vault, choose the one that fits the best for you.</p>
+
+  <button id="btn-generate-secret" ion-button color="primary" (click)="downloadAndroid()" round icon-left margin-top>
+    <ion-icon md-name="android"></ion-icon>
+    Android
+  </button>
+
+  <p padding-bottom>Install AirGap Vault directly from the Google Play Store for this or a dedicated device.</p>
+
+  <button id="btn-import-secret" ion-button color="primary" (click)="downloadIos()" round icon-left>
+    <ion-icon md-name="smartphone"></ion-icon>
+    iOS
+  </button>
+
+  <p padding-bottom>Install AirGap Vault directly from the App Store for this or a dedicated device.</p>
+
+  <button id="btn-recover-secret" ion-button color="primary" (click)="downloadDistribution()" round icon-left>
+    <ion-icon md-name="computer"></ion-icon>
+    Linux Distribution
+  </button>
+
+  <p>Install AirGap Vault Distribution on a dedicated computer for signing transactions air gapped.</p>
+
+
+  <ion-fab bottom right>
+    <button ion-button round color="secondary" (click)="dismiss()">Let's Go</button>
+  </ion-fab>
+</ion-content>

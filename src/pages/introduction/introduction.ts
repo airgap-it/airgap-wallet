@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
-import { Platform, ViewController } from 'ionic-angular'
+import { ViewController, ModalController } from 'ionic-angular'
+import { IntroductionDownloadPage } from '../introduction-download/introduction-download'
 
 declare var cordova: any
 
@@ -10,31 +11,13 @@ declare var cordova: any
 export class IntroductionPage {
   public security: string = 'highest'
 
-  constructor(private viewController: ViewController, private platform: Platform) {}
+  constructor(private viewController: ViewController, public modalController: ModalController) {}
 
   public dismiss() {
     this.viewController.dismiss()
   }
 
-  public downloadClient() {
-    this.openUrl('https://github.com/airgap-it')
-  }
-
-  public downloadApp() {
-    // This should open App Store and not InAppBrowser
-    if (this.platform.is('android')) {
-      window.open('https://play.google.com/store/apps/details?id=it.airgap.vault')
-    } else if (this.platform.is('ios')) {
-      window.open('itms-apps://itunes.apple.com/app/id1417126841')
-    }
-    this.dismiss()
-  }
-
-  private openUrl(url: string) {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+  public openIntroductionDownloadPage() {
+    this.modalController.create(IntroductionDownloadPage).present()
   }
 }
