@@ -11,7 +11,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding no-bounce >
+<ion-content padding no-bounce>
 
   <ion-segment [(ngModel)]="security" color="secondary">
     <ion-segment-button value="highest">
@@ -35,7 +35,8 @@
       <ion-col col-7>
         <h5>AirGap Wallet</h5>
         <p>
-          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting
+          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for
+          broadcasting
           transactions to the blockchain.</p>
       </ion-col>
     </ion-row>
@@ -75,7 +76,8 @@
       <ion-col col-7>
         <h5>AirGap Wallet</h5>
         <p>
-          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting
+          <b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for
+          broadcasting
           transactions to the blockchain.</p>
       </ion-col>
     </ion-row>
@@ -103,7 +105,7 @@
   </ng-container>
 
   <ion-fab bottom right>
-      <button ion-button round color="primary" (click)="downloadApp()">Install AirGap Vault</button>
-      <button ion-button round color="secondary" (click)="dismiss()">Let's Go</button>
+    <button ion-button round color="primary" (click)="openIntroductionDownloadPage()">Install AirGap Vault</button>
+    <button ion-button round color="secondary" (click)="dismiss()">Let's Go</button>
   </ion-fab>
 </ion-content>

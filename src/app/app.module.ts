@@ -30,6 +30,7 @@ import { TransactionPreparePage } from '../pages/transaction-prepare/transaction
 import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
 import { WalletAddressPage } from '../pages/wallet-address/wallet-address'
 import { WalletImportPage } from '../pages/wallet-import/wallet-import'
+import { IntroductionDownloadPage } from '../pages/introduction-download/introduction-download'
 import { PipesModule } from '../pipes/pipes.module'
 import { QrProvider } from '../providers/qr/qr'
 import { ScannerProvider } from '../providers/scanner/scanner'
@@ -62,7 +63,8 @@ export function createTranslateLoader(http: HttpClient) {
     TransactionQrPage,
     ScanAddressPage,
     ScanSyncPage,
-    WalletImportPage
+    WalletImportPage,
+    IntroductionDownloadPage
   ],
   imports: [
     BrowserModule,
@@ -106,7 +108,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanAddressPage,
     ScanSyncPage,
     WalletImportPage,
-    WalletEditPopoverComponent
+    WalletEditPopoverComponent,
+    IntroductionDownloadPage
   ],
   providers: [
     StatusBar,
