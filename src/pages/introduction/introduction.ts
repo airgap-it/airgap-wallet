@@ -18,6 +18,14 @@ export class IntroductionPage {
   }
 
   public openIntroductionDownloadPage() {
-    this.modalController.create(IntroductionDownloadPage).present()
+    const modal = this.modalController.create(IntroductionDownloadPage)
+
+    modal.onDidDismiss(shouldCloseAllModals => {
+      if (shouldCloseAllModals) {
+        this.dismiss()
+      }
+    })
+
+    modal.present()
   }
 }
