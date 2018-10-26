@@ -36,11 +36,11 @@ export class IntroductionDownloadPage {
   }
 
   public downloadDistribution() {
-    this.dismiss(true)
     if (this.platform.is('cordova')) {
       window.open('https://github.com/airgap-it/airgap-distro', '_system')
     } else {
       window.open('https://github.com/airgap-it/airgap-distro', '_blank')
     }
+    this.dismiss(true)
   }
 }
