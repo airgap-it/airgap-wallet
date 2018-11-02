@@ -38,7 +38,6 @@ export class ScanPage {
     } else if (this.platform.is('cordova')) {
       this.initScan()
     } else if (this.platform.is('core')) {
-      console.log(this.zxingScanner)
       this.isWebScan = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
@@ -51,7 +50,6 @@ export class ScanPage {
         this.hasCameras = true
         this.availableDevices = devices
         this.selectedDevice = devices[0]
-        console.log(this.selectedDevice)
       })
     }
   }
