@@ -20,16 +20,17 @@
       <p>
         Address:
         <br>
-        <span class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
+        <span (click)="copy()" class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
       </p>
     </ion-col>
   </ion-row>
 
   <ion-row justify-content-center padding-bottom>
-    <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
+    <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="1" foreground="black" background="white" level="L"
+      size="400"></qrcode>
   </ion-row>
 
   <ion-fab bottom right>
-      <button ion-button round color="secondary" (click)="done()">Done</button>
+    <button ion-button round color="secondary" (click)="done()">Done</button>
   </ion-fab>
 </ion-content>
