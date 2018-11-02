@@ -36,7 +36,6 @@ export class ScanAddressPage {
       )
     } else if (this.platform.is('core')) {
       this.scannerEnabled = true
-      console.log(this.zxingScanner)
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
