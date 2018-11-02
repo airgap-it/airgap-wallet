@@ -45,6 +45,7 @@
     "@angular/platform-browser-dynamic": "5.0.1",
     "@ionic-native/app-version": "4.5.3",
     "@ionic-native/barcode-scanner": "4.5.3",
+    "@ionic-native/clipboard": "^4.16.0",
     "@ionic-native/core": "4.5.3",
     "@ionic-native/deeplinks": "^4.7.0",
     "@ionic-native/keyboard": "^4.5.3",
@@ -55,7 +56,7 @@
     "@ngx-translate/core": "9.1.1",
     "@ngx-translate/http-loader": "2.0.1",
     "@types/node": "8.0.31",
-    "@zxing/ngx-scanner": "^1.2.1",
+    "@zxing/ngx-scanner": "1.2.1",
     "airgap-coin-lib": "github:airgap-it/airgap-coin-lib#ca31908b921e22f22f39c1f3a3a23877755fff74",
     "angular2-qrcode": "2.0.1",
     "angular2-template-loader": "0.6.2",
@@ -64,6 +65,7 @@
     "chart.js": "^2.7.2",
     "com.lampa.startapp": "^6.1.6",
     "cordova-android": "7.1.0",
+    "cordova-clipboard": "^1.2.1",
     "cordova-ios": "4.5.4",
     "cordova-plugin-add-swift-support": "^1.7.2",
     "cordova-plugin-app-version": "^0.1.9",
@@ -164,7 +166,8 @@
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-queries-schemes": {},
       "cordova-sqlite-storage": {},
-      "cordova-plugin-ionic-keyboard": {}
+      "cordova-plugin-ionic-keyboard": {},
+      "cordova-clipboard": {}
     },
     "platforms": [
       "android",
