@@ -20,12 +20,13 @@
       <p>
         Address:
         <br>
-        <span (click)="copy()" class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
+        <span (click)="copyAddressToClipboard()" class="text--selectable typography--mono">{{
+          wallet.receivingPublicAddress }}</span>
       </p>
     </ion-col>
   </ion-row>
 
-  <ion-row justify-content-center padding-bottom>
+  <ion-row (click)="copyAddressToClipboard()" justify-content-center padding-bottom>
     <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="1" foreground="black" background="white" level="L"
       size="400"></qrcode>
   </ion-row>

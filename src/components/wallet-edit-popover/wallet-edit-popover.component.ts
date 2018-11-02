@@ -8,7 +8,7 @@ import { Clipboard } from '@ionic-native/clipboard'
   template: `
     <ion-list no-lines no-detail>
       <ion-list-header>Wallet Settings</ion-list-header>
-      <button ion-item detail-none (click)='copy()'>
+      <button ion-item detail-none (click)='copyAddressToClipboard()'>
         <ion-icon name='clipboard' color='dark' item-end></ion-icon>
         Copy address
       </button>
@@ -35,7 +35,7 @@ export class WalletEditPopoverComponent {
     this.onDelete = this.navParams.get('onDelete')
   }
 
-  async copy() {
+  async copyAddressToClipboard() {
     await this.clipboard.copy(this.wallet.receivingPublicAddress)
     let toast = this.toastController.create({
       message: 'Address was copied to your clipboard',
