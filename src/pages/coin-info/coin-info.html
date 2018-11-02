@@ -30,20 +30,28 @@
   <ion-list no-lines>
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar item-start>
-        <identicon [address]='t.to[0]'></identicon>
+        <identicon *ngIf="t.isInbound" [address]='t.from[0]'></identicon>
+        <identicon *ngIf="!t.isInbound" [address]='t.to[0]'></identicon>
       </ion-avatar>
       <h2>
         <ion-icon *ngIf="t.isInbound" md-name="call_received"></ion-icon>
         <ion-icon *ngIf="!t.isInbound" md-name="call_made"></ion-icon>
-        <span class="font--weight__bold" ion-text color="black">{{ t.amount | amountConverter : { protocolIdentifier: wallet.protocolIdentifier
+        <span class="font--weight__bold" ion-text color="black">{{ t.amount | amountConverter : { protocolIdentifier:
+          wallet.protocolIdentifier
           } }}</span>
       </h2>
       <h3 ion-text color="blackLight" class="typography--mono">
-        {{ t.from[0] | shortenString }}
+        <ng-container *ngIf="t.isInbound">
+          {{ t.from[0] | shortenString }}
+        </ng-container>
+        <ng-container *ngIf="!t.isInbound">
+          {{ t.to[0] | shortenString }}
+        </ng-container>
       </h3>
       <ion-row class="items--right" item-end>
         <ion-col col-12 no-padding text-right>
-          <p ion-text color="blackLight">{{ (t.timestamp | amFromUnix) | amCalendar: { sameDay: '[Today at] HH:mm', sameElse:
+          <p ion-text color="blackLight">{{ (t.timestamp | amFromUnix) | amCalendar: { sameDay: '[Today at] HH:mm',
+            sameElse:
             'HH:mm - L' } }}</p>
         </ion-col>
       </ion-row>
@@ -56,16 +64,16 @@
   <ion-fab bottom>
     <ion-row>
       <ion-col>
-          <button full default ion-button color="primary" (click)="openReceivePage()" round icon-start>
-              <ion-icon md-name="call_received"></ion-icon>
-              Receive
-            </button>
+        <button full default ion-button color="primary" (click)="openReceivePage()" round icon-start>
+          <ion-icon md-name="call_received"></ion-icon>
+          Receive
+        </button>
       </ion-col>
       <ion-col>
-          <button full default ion-button color="primary" (click)="openPreparePage()" round icon-start>
-              <ion-icon name="send"></ion-icon>
-              Send
-          </button>
+        <button full default ion-button color="primary" (click)="openPreparePage()" round icon-start>
+          <ion-icon name="send"></ion-icon>
+          Send
+        </button>
       </ion-col>
     </ion-row>
   </ion-fab>
