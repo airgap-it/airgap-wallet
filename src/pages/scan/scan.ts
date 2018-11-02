@@ -7,7 +7,6 @@ import { ScannerProvider } from '../../providers/scanner/scanner'
 import { TransactionConfirmPage } from '../transaction-confirm/transaction-confirm'
 import { WalletImportPage } from '../wallet-import/wallet-import'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
-import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
   selector: 'page-scan',
@@ -18,11 +17,12 @@ export class ScanPage {
   zxingScanner: ZXingScannerComponent
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
-  webScan = false
+  webScannerEnabled = true
 
   hasCameras = false
 
-  public hasCameraPermission = false
+  hasCameraPermission = false
+  isWebScan = false
 
   constructor(
     private navController: NavController,
@@ -38,8 +38,7 @@ export class ScanPage {
     } else if (this.platform.is('cordova')) {
       this.initScan()
     } else if (this.platform.is('core')) {
-      this.webScan = true
-      console.log(this.zxingScanner)
+      this.isWebScan = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
@@ -51,7 +50,6 @@ export class ScanPage {
         this.hasCameras = true
         this.availableDevices = devices
         this.selectedDevice = devices[0]
-        console.log(this.selectedDevice)
       })
     }
   }
