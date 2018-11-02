@@ -17,7 +17,7 @@ export class ScanAddressPage {
   zxingScanner: ZXingScannerComponent
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
-  scannerEnabled = false
+  webScan = false
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private platform: Platform, private scanner: ScannerProvider) {
     this.callback = this.navParams.get('callback')
@@ -35,7 +35,8 @@ export class ScanAddressPage {
         }
       )
     } else if (this.platform.is('core')) {
-      this.scannerEnabled = true
+      this.webScan = true
+      console.log(this.zxingScanner)
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
@@ -57,7 +58,7 @@ export class ScanAddressPage {
       if (this.platform.is('cordova')) {
         this.scanner.stopScan()
       } else {
-        this.zxingScanner.resetScan()
+        this.webScan = false
       }
       this.navCtrl.pop().then(() => {
         this.sendAddressToParent(text)
@@ -69,7 +70,7 @@ export class ScanAddressPage {
     if (this.platform.is('cordova')) {
       this.scanner.destroy()
     } else {
-      this.zxingScanner.resetScan()
+      this.webScan = false
     }
   }
 
