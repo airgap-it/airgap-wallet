@@ -18,12 +18,12 @@ export class ScanPage {
   zxingScanner: ZXingScannerComponent
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
-  scannerEnabled = true
+  scannerEnabled = false
 
   hasCameras = false
 
   public hasCameraPermission = false
-  private webScan = false
+  public webScan = false
 
   constructor(
     private navController: NavController,
@@ -39,8 +39,8 @@ export class ScanPage {
     } else if (this.platform.is('cordova')) {
       this.initScan()
     } else if (this.platform.is('core')) {
+      this.scannerEnabled = true
       console.log(this.zxingScanner)
-      this.webScan = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
