@@ -157,11 +157,11 @@ export class ScanPage {
     if (resultString.startsWith(syncPrefix)) {
       let parts = resultString.split(syncPrefix)
       this.handleImport(parts[parts.length - 1])
-      this.webScan = false
+      this.zxingScanner.resetScan()
     } else if (resultString.startsWith(broadcastPrefix)) {
       let parts = resultString.split(broadcastPrefix)
       this.handleBroadcast(parts[parts.length - 1])
-      this.webScan = false
+      this.zxingScanner.resetScan()
       // this.scanner.stopZxingScan()
     } else {
       this.displayToast('Invalid QR Code')
@@ -170,7 +170,7 @@ export class ScanPage {
   }
 
   ionViewDidLeave() {
-    this.webScan = false
+    this.zxingScanner.resetScan()
     console.log('ionViewDidLeave')
   }
 }
