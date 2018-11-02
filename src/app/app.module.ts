@@ -11,7 +11,7 @@ import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { QRCodeModule } from 'angularx-qrcode'
-import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular'
+import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
 import { ComponentsModule } from '../components/components.module'
@@ -43,6 +43,7 @@ import { IonicStorageModule } from '@ionic/storage'
 import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wallet-edit-popover.component'
 import { SettingsProvider } from '../providers/settings/settings'
 import { Clipboard } from '@ionic-native/clipboard'
+import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -120,7 +121,7 @@ export function createTranslateLoader(http: HttpClient) {
     BarcodeScanner,
     Keyboard,
     Deeplinks,
-    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    { provide: ErrorHandler, useClass: SentryErrorHandler },
     ScannerProvider,
     AppVersion,
     WalletsProvider,

@@ -37,3 +37,5 @@ airgap_cordova_secure_storage_deploy.pub
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+.env

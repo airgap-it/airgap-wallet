@@ -19,7 +19,7 @@ export class WalletAddressPage {
     this.wallet = this.navParams.get('wallet')
   }
 
-  async copy() {
+  async copyAddressToClipboard() {
     await this.clipboard.copy(this.wallet.receivingPublicAddress)
     let toast = this.toastController.create({
       message: 'Address was copied to your clipboard',

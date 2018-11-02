@@ -158,7 +158,6 @@ export class ScanPage {
       let parts = resultString.split(syncPrefix)
       this.handleImport(parts[parts.length - 1])
       this.zxingScanner.resetScan()
-      // this.scanner.stopZxingScan()
     } else if (resultString.startsWith(broadcastPrefix)) {
       let parts = resultString.split(broadcastPrefix)
       this.handleBroadcast(parts[parts.length - 1])
