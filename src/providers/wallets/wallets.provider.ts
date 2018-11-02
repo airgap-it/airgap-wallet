@@ -87,6 +87,7 @@ export class WalletsProvider {
     }
 
     this.walletList.push(wallet)
+    this.wallets.next(this.walletList)
     return this.persist()
   }
 
@@ -97,6 +98,8 @@ export class WalletsProvider {
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
+
+    this.wallets.next(this.walletList)
     return this.persist()
   }
 

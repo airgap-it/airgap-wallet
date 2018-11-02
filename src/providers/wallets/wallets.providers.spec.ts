@@ -5,6 +5,7 @@ import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SettingsProvider } from '../settings/settings'
+import { doesNotThrow } from 'assert'
 
 describe('WalletsProvider', () => {
   let walletsProvider: WalletsProvider
@@ -38,6 +39,32 @@ describe('WalletsProvider', () => {
       true,
       `m/44'/0'/0'`
     )
+    await walletsProvider.removeWallet(wallet)
+    expect(walletsProvider.wallets.getValue().length).toEqual(0)
+    await walletsProvider.addWallet(wallet)
+    expect(walletsProvider.wallets.getValue().length).toEqual(1)
+  })
+
+  it('should update wallet observalbe when adding a wallet', async done => {
+    let wallet = new AirGapMarketWallet(
+      'btc',
+      'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
+      true,
+      `m/44'/0'/0'`
+    )
+
+    let numOfTimesCalled = 0
+    walletsProvider.wallets.subscribe(values => {
+      numOfTimesCalled++
+      if (numOfTimesCalled >= 3) {
+        // Needs to be 3 times
+        // 1. Initial value
+        // 2. Remove wallet
+        // 3. Add wallet
+        done()
+      }
+    })
+
     await walletsProvider.removeWallet(wallet)
     expect(walletsProvider.wallets.getValue().length).toEqual(0)
     await walletsProvider.addWallet(wallet)
