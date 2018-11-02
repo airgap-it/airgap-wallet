@@ -7,4 +7,6 @@
 
 <ion-content no-bounce [class.transparent]="true">
   <p ion-text color="white" padding no-margin text-center>Scan the QR code of a wallet address.</p>
+
+  <zxing-scanner #scanner [device]="selectedDevice" [scannerEnabled]="scannerEnabled" (scanSuccess)="handleQRScanned($event)"></zxing-scanner>
 </ion-content>

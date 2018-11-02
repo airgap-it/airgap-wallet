@@ -55,6 +55,7 @@
     "@ngx-translate/core": "9.1.1",
     "@ngx-translate/http-loader": "2.0.1",
     "@types/node": "8.0.31",
+    "@zxing/ngx-scanner": "^1.2.1",
     "airgap-coin-lib": "github:airgap-it/airgap-coin-lib#ca31908b921e22f22f39c1f3a3a23877755fff74",
     "angular2-qrcode": "2.0.1",
     "angular2-template-loader": "0.6.2",

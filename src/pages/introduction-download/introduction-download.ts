@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
-import { Platform, IonicPage, NavController, ViewController } from 'ionic-angular'
+import { Platform, NavController, ViewController } from 'ionic-angular'
 
-@IonicPage()
 @Component({
   selector: 'page-introduction-download',
   templateUrl: 'introduction-download.html'

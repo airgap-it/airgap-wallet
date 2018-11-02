@@ -4,20 +4,20 @@ page-scan {
   }
 
   p {
-    background-color: rgba(color($colors, black), 0.5);
+    background-color: rgba(color($colors, primary), 0.5);
     color: color($colors, white);
   }
   .row--height__100 {
-    height:100%;
+    height: 100%;
   }
 
-  ion-icon{
+  ion-icon {
     font-size: 180px;
     width: 100%;
     color: color($colors, dark);
   }
 
-  h3{
+  h3 {
     color: color($colors, dark);
   }
 }
