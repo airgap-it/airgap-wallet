@@ -9,15 +9,21 @@
 
 <ion-content padding class="colored-background">
   <ion-row>
-    <ion-col>
-      <p>To use the AirGap Wallet app you need to <b>sync with AirGap Vault</b>. Select the wallet you want to use in AirGap Vault and
-        display the sync QR code. Scan this code with AirGap Wallet.</p>
-      <img src="assets/img/sync_wallet_onboarding.svg" />
-      <p>No private keys or any non public data will be shared during this process.</p>
-    </ion-col>
+    <strong>
+      <p>
+        Open AirGap Vault, select a <span ion-text color="white">Wallet</span> and then <span ion-text color="white">Sync</span>,
+        scan the Sync QR code with AirGap Wallet.
+      </p>
+    </strong>
+  </ion-row>
+  <ion-row justify-content-center>
+    <img src="assets/img/sync-wallet_onboarding_2.png" />
+  </ion-row>
+  <ion-row>
+    <p>No private keys or any non-public data will be shared during this process.</p>
   </ion-row>
 
   <ion-fab bottom right>
-      <button ion-button round color="secondary" (click)="goToScanPage()">Let's Go</button>
-    </ion-fab>
+    <button ion-button round color="secondary" (click)="goToScanPage()">Scan Sync QR Code</button>
+  </ion-fab>
 </ion-content>
