@@ -32,11 +32,11 @@ import { WalletAddressPage } from '../pages/wallet-address/wallet-address'
 import { WalletImportPage } from '../pages/wallet-import/wallet-import'
 import { IntroductionDownloadPage } from '../pages/introduction-download/introduction-download'
 import { PipesModule } from '../pipes/pipes.module'
-import { QrProvider } from '../providers/qr/qr'
 import { ScannerProvider } from '../providers/scanner/scanner'
 import { WalletsProvider } from '../providers/wallets/wallets.provider'
 import { MomentModule } from 'ngx-moment'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
@@ -125,9 +125,9 @@ export function createTranslateLoader(http: HttpClient) {
     ScannerProvider,
     AppVersion,
     WalletsProvider,
-    QrProvider,
     SettingsProvider,
-    Clipboard
+    Clipboard,
+    SchemeRoutingProvider
   ]
 })
 export class AppModule {}

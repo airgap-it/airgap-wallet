@@ -1,12 +1,9 @@
 import { Component, ViewChild } from '@angular/core'
-import { IAirGapTransaction } from 'airgap-coin-lib'
-import { NavController, Platform, ToastController } from 'ionic-angular'
+import { Platform } from 'ionic-angular'
 
-import { QrProvider } from '../../providers/qr/qr'
 import { ScannerProvider } from '../../providers/scanner/scanner'
-import { TransactionConfirmPage } from '../transaction-confirm/transaction-confirm'
-import { WalletImportPage } from '../wallet-import/wallet-import'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+import { SchemeRoutingProvider } from '../../providers/scheme-routing/scheme-routing'
 
 @Component({
   selector: 'page-scan',
@@ -24,13 +21,7 @@ export class ScanPage {
   hasCameraPermission = false
   isWebScan = false
 
-  constructor(
-    private navController: NavController,
-    private scanner: ScannerProvider,
-    private platform: Platform,
-    private toastController: ToastController,
-    private qrProvider: QrProvider
-  ) {}
+  constructor(private scanner: ScannerProvider, private platform: Platform, private schemeRouting: SchemeRoutingProvider) {}
 
   ionViewWillEnter() {
     if (this.platform.is('android') && this.platform.is('cordova')) {
@@ -82,64 +73,11 @@ export class ScanPage {
     }
   }
 
-  handleImport(data: string) {
-    this.navController
-      .push(WalletImportPage, {
-        data: data
-      })
-      .then(v => {
-        console.log('WalletImportPage openend', v)
-        // this.navController.push(PortfolioPage)
-      })
-      .catch(e => {
-        console.log('WalletImportPage failed to open', e)
-      })
-  }
-
-  handleBroadcast(qrText: string) {
-    let transaction: IAirGapTransaction = this.qrProvider.getBroadcastFromData(qrText)
-
-    if (transaction) {
-      this.navController
-        .push(TransactionConfirmPage, {
-          transaction: transaction
-        })
-        .then(v => {
-          console.log('TransactionConfirmPage opened', v)
-        })
-        .catch(e => {
-          console.log('TransactionConfirmPage failed to open', e)
-        })
-    }
-  }
-
   public startScan() {
     this.scanner.show()
     this.scanner.scan(text => {
-      const syncPrefix = 'airgap-wallet://import?data='
-      const broadcastPrefix = 'airgap-wallet://broadcast?data='
-
-      if (text.startsWith(syncPrefix)) {
-        let parts = text.split(syncPrefix)
-        this.handleImport(parts[parts.length - 1])
-      } else if (text.startsWith(broadcastPrefix)) {
-        let parts = text.split(broadcastPrefix)
-        this.handleBroadcast(parts[parts.length - 1])
-      } else {
-        this.displayToast('Invalid QR Code')
-        this.startScan()
-      }
+      this.handleQrCodeResult(text)
     }, console.error)
-  }
-
-  private displayToast(message: string) {
-    this.toastController
-      .create({
-        message: message,
-        duration: 3000,
-        position: 'bottom'
-      })
-      .present()
   }
 
   ionViewWillLeave() {
@@ -152,21 +90,9 @@ export class ScanPage {
   }
 
   handleQrCodeResult(resultString: string) {
-    const syncPrefix = 'airgap-wallet://import?data='
-    const broadcastPrefix = 'airgap-wallet://broadcast?data='
-    if (resultString.startsWith(syncPrefix)) {
-      let parts = resultString.split(syncPrefix)
-      this.handleImport(parts[parts.length - 1])
-      this.zxingScanner.resetScan()
-    } else if (resultString.startsWith(broadcastPrefix)) {
-      let parts = resultString.split(broadcastPrefix)
-      this.handleBroadcast(parts[parts.length - 1])
-      this.zxingScanner.resetScan()
-      // this.scanner.stopZxingScan()
-    } else {
-      this.displayToast('Invalid QR Code')
-      this.startScan()
-    }
+    console.log('got new text', resultString)
+
+    this.schemeRouting.handleNewSyncRequest(resultString)
   }
 
   ionViewDidLeave() {

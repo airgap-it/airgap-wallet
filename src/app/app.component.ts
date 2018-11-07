@@ -11,6 +11,7 @@ import { WalletImportPage } from '../pages/wallet-import/wallet-import'
 
 import { configureScope } from '@sentry/browser'
 import { AppVersion } from '@ionic-native/app-version'
+import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 
 @Component({
   templateUrl: 'app.html'
@@ -23,20 +24,21 @@ export class MyApp {
 
   constructor(
     private platform: Platform,
-    statusBar: StatusBar,
-    splashScreen: SplashScreen,
+    private statusBar: StatusBar,
+    private splashScreen: SplashScreen,
     private translate: TranslateService,
     private deeplinks: Deeplinks,
-    private appVersion: AppVersion
+    private appVersion: AppVersion,
+    private schemeRoutingProvider: SchemeRoutingProvider
   ) {
     this.translate.setDefaultLang('en')
     this.platform
       .ready()
       .then(() => {
         if (platform.is('cordova')) {
-          statusBar.styleLightContent()
-          statusBar.backgroundColorByHexString('#00e8cc')
-          splashScreen.hide()
+          this.statusBar.styleLightContent()
+          this.statusBar.backgroundColorByHexString('#00e8cc')
+          this.splashScreen.hide()
           configureScope(scope => {
             scope.addEventProcessor(async event => {
               event.release = await this.appVersion.getVersionNumber()
@@ -58,9 +60,8 @@ export class MyApp {
   async ngAfterViewInit() {
     await this.platform.ready()
     this.deeplinks
-      .routeWithNavController(this.nav, {
-        '/broadcast': TransactionConfirmPage,
-        '/import': WalletImportPage
+      .route({
+        '/': null
       })
       .subscribe(
         match => {
@@ -68,6 +69,7 @@ export class MyApp {
           // match.$args - the args passed in the link
           // match.$link - the full link data
           console.log('Successfully matched route', JSON.stringify(match))
+          this.schemeRoutingProvider.handleNewSyncRequest(match.$link.url)
         },
         nomatch => {
           // nomatch.$link - the full link data

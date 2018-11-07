@@ -7,15 +7,8 @@
 
 
 <ion-content padding>
-  <div *ngIf="transaction">
-    <from-to [transaction]="transaction"></from-to>
-
-    <ion-list margin-top>
-      <ion-item no-lines *ngFor="let parameter of transaction.information">
-        <h2>{{parameter.label}}</h2>
-        <h3>{{parameter.value}}</h3>
-      </ion-item>
-    </ion-list>
+  <div *ngIf="airGapTx">
+    <from-to [transaction]="airGapTx"></from-to>
   </div>
 
   <ion-fab bottom>

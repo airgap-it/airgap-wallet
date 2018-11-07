@@ -143,7 +143,7 @@ describe('AmountConverter Pipe', () => {
   const truthyProtocolIdentifiers = [
     { value: '1', protocolIdentifier: 'btc', expected: '0.00000001 BTC' },
     { value: '1', protocolIdentifier: 'eth', expected: '0.000000000000000001 ETH' },
-    { value: '1', protocolIdentifier: 'eth-erc20-ae', expected: '0.000000000000000001 AE' }
+    { value: '1', protocolIdentifier: 'eth-erc20-ae', expected: '0.000000000000000001 AE-ERC20' }
   ]
   makeTests(truthyProtocolIdentifiers)
 

@@ -1,13 +1,11 @@
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { BigNumber } from 'bignumber.js'
-import { NavController, NavParams, ToastController, Platform, LoadingController } from 'ionic-angular'
+import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular'
 
-import { Transaction } from '../../models/transaction.model'
 import { ScanAddressPage } from '../scan-address/scan-address'
 import { TransactionQrPage } from '../transaction-qr/transaction-qr'
-import { Keyboard } from '@ionic-native/keyboard'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -78,27 +76,33 @@ export class TransactionPreparePage {
     await loading.present()
 
     try {
-      let rawUnsignedTx = await this.wallet.prepareTransaction([transactionInfo.address], [transactionInfo.amount], transactionInfo.fee)
-      let transaction = new Transaction(
-        [this.wallet.receivingPublicAddress],
+      // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
+      let rawUnsignedTx: any = await this.wallet.prepareTransaction(
         [transactionInfo.address],
-        transactionInfo.amount,
-        transactionInfo.fee,
-        this.wallet.protocolIdentifier
+        [transactionInfo.amount],
+        transactionInfo.fee
       )
 
-      let signQRData = {
-        protocolIdentifier: this.wallet.protocolIdentifier,
+      const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,
-        payload: rawUnsignedTx
-      }
+        transaction: rawUnsignedTx
+      })
 
-      let base64 = window.btoa(JSON.stringify(signQRData))
+      const syncProtocol = new SyncProtocolUtils()
+      const serializedTx = await syncProtocol.serialize({
+        version: 1,
+        protocol: this.wallet.coinProtocol.identifier,
+        type: EncodedType.UNSIGNED_TRANSACTION,
+        payload: {
+          publicKey: this.wallet.publicKey,
+          transaction: rawUnsignedTx
+        }
+      })
 
       this.navController.push(TransactionQrPage, {
         wallet: this.wallet,
-        transaction: transaction,
-        data: 'airgap-vault://sign?data=' + base64
+        airGapTx: airGapTx,
+        data: 'airgap-vault://?d=' + serializedTx
       })
 
       loading.dismiss()

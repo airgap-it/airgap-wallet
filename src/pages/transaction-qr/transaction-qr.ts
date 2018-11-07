@@ -12,11 +12,11 @@ declare let window
 export class TransactionQrPage {
   public preparedDataQR: string = ''
   public wallet: AirGapMarketWallet = null
-  public transaction: Transaction = null
+  public airGapTx: Transaction = null
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private platform: Platform) {
     this.wallet = this.navParams.get('wallet')
-    this.transaction = this.navParams.get('transaction')
+    this.airGapTx = this.navParams.get('airGapTx')
     this.preparedDataQR = this.navParams.get('data')
   }
 
