@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
 export class ClipboardBrowserProvider {
   async copy(text: string) {
     try {
-      await navigator.clipboard.writeText(text)
+      await (navigator as any).clipboard.writeText(text)
     } catch (err) {
       console.error('Failed to copy: ', err)
     }
