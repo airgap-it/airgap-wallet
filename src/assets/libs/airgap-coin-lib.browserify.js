@@ -1810,12 +1810,13 @@ var hd_wallet_1 = require("@aeternity/hd-wallet");
 var axios_1 = require("axios");
 var rlp = require("rlp");
 var bs58check = require("bs58check");
+var Web3 = require("web3");
 var AEProtocol = /** @class */ (function () {
     function AEProtocol(epochRPC) {
         if (epochRPC === void 0) { epochRPC = 'https://sdk-edgenet.aepps.com'; }
         this.epochRPC = epochRPC;
         this.symbol = 'AE';
-        this.name = 'Aeternity';
+        this.name = 'æternity';
         this.feeSymbol = 'ae';
         this.decimals = 18;
         this.feeDecimals = 18;
@@ -1863,10 +1864,10 @@ var AEProtocol = /** @class */ (function () {
         return 'ak_' + base58;
     };
     AEProtocol.prototype.getTransactionsFromPublicKey = function (publicKey, limit, offset) {
-        return Promise.resolve([{}]);
+        return Promise.resolve([]);
     };
     AEProtocol.prototype.getTransactionsFromAddresses = function (addresses, limit, offset) {
-        return Promise.resolve([{}]);
+        return Promise.resolve([]);
     };
     AEProtocol.prototype.signWithPrivateKey = function (privateKey, transaction) {
         // sign and cut off first byte ('ae')
@@ -1912,37 +1913,35 @@ var AEProtocol = /** @class */ (function () {
     };
     AEProtocol.prototype.getBalanceOfAddresses = function (addresses) {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var balance;
+            var balance, _i, addresses_1, address, data, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         balance = new bignumber_js_1.default(0);
-                        return [4 /*yield*/, Promise.all(addresses.map(function (address) { return __awaiter(_this, void 0, void 0, function () {
-                                var data, error_1;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            _a.trys.push([0, 2, , 3]);
-                                            return [4 /*yield*/, axios_1.default.get(this.epochRPC + "/v2/accounts/" + address)];
-                                        case 1:
-                                            data = (_a.sent()).data;
-                                            balance.plus(new bignumber_js_1.default(data.balance));
-                                            return [3 /*break*/, 3];
-                                        case 2:
-                                            error_1 = _a.sent();
-                                            // if node returns 404 (which means 'no account found'), go with 0 balance
-                                            if (error_1.response.status === 404) {
-                                                return [2 /*return*/];
-                                            }
-                                            throw error_1;
-                                        case 3: return [2 /*return*/];
-                                    }
-                                });
-                            }); }))];
+                        _i = 0, addresses_1 = addresses;
+                        _a.label = 1;
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/, balance];
+                        if (!(_i < addresses_1.length)) return [3 /*break*/, 6];
+                        address = addresses_1[_i];
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, axios_1.default.get(this.epochRPC + "/v2/accounts/" + address)];
+                    case 3:
+                        data = (_a.sent()).data;
+                        balance = balance.plus(new bignumber_js_1.default(data.balance));
+                        return [3 /*break*/, 5];
+                    case 4:
+                        error_1 = _a.sent();
+                        // if node returns 404 (which means 'no account found'), go with 0 balance
+                        if (error_1.response.status !== 404) {
+                            throw error_1;
+                        }
+                        return [3 /*break*/, 5];
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 6: return [2 /*return*/, balance];
                 }
             });
         });
@@ -1953,12 +1952,27 @@ var AEProtocol = /** @class */ (function () {
     };
     AEProtocol.prototype.prepareTransactionFromPublicKey = function (publicKey, recipients, values, fee) {
         return __awaiter(this, void 0, void 0, function () {
-            var accountResponse, sender, recipient, txObj, txArray, rlpEncodedTx, preparedTx;
+            var nonce, accountResponse, error_2, sender, recipient, txObj, txArray, rlpEncodedTx, preparedTx;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, axios_1.default.get(this.epochRPC + "/v2/accounts/" + this.getAddressFromPublicKey(publicKey))];
+                    case 0:
+                        nonce = 0;
+                        _a.label = 1;
                     case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, axios_1.default.get(this.epochRPC + "/v2/accounts/" + this.getAddressFromPublicKey(publicKey))];
+                    case 2:
                         accountResponse = (_a.sent()).data;
+                        nonce = accountResponse.nonce + 1;
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_2 = _a.sent();
+                        // if node returns 404 (which means 'no account found'), go with nonce 0
+                        if (error_2.response.status !== 404) {
+                            throw error_2;
+                        }
+                        return [3 /*break*/, 4];
+                    case 4:
                         sender = publicKey;
                         recipient = bs58check.decode(recipients[0].replace('ak_', ''));
                         txObj = {
@@ -1969,7 +1983,7 @@ var AEProtocol = /** @class */ (function () {
                             amount: this.toHexBuffer(values[0]),
                             fee: this.toHexBuffer(fee),
                             ttl: this.toHexBuffer(10000),
-                            nonce: this.toHexBuffer(accountResponse.nonce + 1),
+                            nonce: this.toHexBuffer(nonce),
                             payload: Buffer.from('')
                         };
                         txArray = Object.keys(txObj).map(function (a) { return txObj[a]; });
@@ -1988,7 +2002,7 @@ var AEProtocol = /** @class */ (function () {
             var data;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, axios_1.default.post(this.epochRPC + "/v2/transactions", { tx: rawTransaction })];
+                    case 0: return [4 /*yield*/, axios_1.default.post(this.epochRPC + "/v2/transactions", { tx: rawTransaction }, { headers: { 'Content-Type': 'application/json' } })];
                     case 1:
                         data = (_a.sent()).data;
                         return [2 /*return*/, data.tx_hash];
@@ -1997,7 +2011,8 @@ var AEProtocol = /** @class */ (function () {
         });
     };
     AEProtocol.prototype.toHexBuffer = function (value) {
-        return Buffer.from(value.toString(16).padStart(2, '0'), 'hex');
+        var hexString = Web3.utils.toHex(value).substr(2);
+        return Buffer.from(hexString.padStart(hexString.length % 2 === 0 ? hexString.length : hexString.length + 1, '0'), 'hex');
     };
     // Unsupported Functionality for Aeternity
     AEProtocol.prototype.getExtendedPrivateKeyFromHexSecret = function (secret, derivationPath) {
@@ -2026,7 +2041,7 @@ var AEProtocol = /** @class */ (function () {
 exports.AEProtocol = AEProtocol;
 
 }).call(this,require("buffer").Buffer)
-},{"@aeternity/hd-wallet":1,"axios":57,"bignumber.js":89,"bs58check":206,"buffer":208,"rlp":362,"tweetnacl":35}],8:[function(require,module,exports){
+},{"@aeternity/hd-wallet":1,"axios":57,"bignumber.js":89,"bs58check":206,"buffer":208,"rlp":362,"tweetnacl":35,"web3":534}],8:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -2046,7 +2061,7 @@ var AETokenProtocol = /** @class */ (function (_super) {
         var _this = _super.call(this, '0x5ca9a71b1d01849c0a95490cc00559717fcf0d1d') // we probably need another network here, explorer is ok
          || this;
         _this.symbol = 'AE-ERC20';
-        _this.name = 'Aeternity ERC20';
+        _this.name = 'æternity Ethereum Token';
         _this.identifier = 'eth-erc20-ae';
         return _this;
     }
@@ -2164,7 +2179,7 @@ var BitcoinProtocol = /** @class */ (function () {
             }
             for (var _b = 0, _c = transaction.outs; _b < _c.length; _b++) {
                 var output = _c[_b];
-                transactionBuilder.addOutput(output.recipient, output.value);
+                transactionBuilder.addOutput(output.recipient, output.value.toNumber());
             }
             for (var i = 0; i < transaction.ins.length; i++) {
                 transactionBuilder.sign(i, node.derivePath(transaction.ins[i].derivationPath));
@@ -2409,7 +2424,7 @@ var BitcoinProtocol = /** @class */ (function () {
                         resolve(transaction);
                     }
                     else {
-                        reject("Not enough Balance, having " + valueAccumulator.toString() + " of " + totalRequiredBalance.toString());
+                        reject("Not enough Balance, having " + valueAccumulator.toFixed() + " of " + totalRequiredBalance.toFixed());
                     }
                 }
             })
@@ -2780,9 +2795,9 @@ var EthereumProtocol = /** @class */ (function () {
                         var transaction = {
                             nonce: _this.web3.utils.toHex(txCount),
                             gasLimit: _this.web3.utils.toHex(gasLimit),
-                            gasPrice: _this.web3.utils.toHex(gasPrice.toString()),
+                            gasPrice: _this.web3.utils.toHex(gasPrice.toFixed()),
                             to: recipients[0],
-                            value: _this.web3.utils.toHex(values[0].toString()),
+                            value: _this.web3.utils.toHex(values[0].toFixed()),
                             chainId: _this.chainId,
                             data: '0x'
                         };
@@ -3035,9 +3050,9 @@ var GenericERC20 = /** @class */ (function (_super) {
                                     var transaction = {
                                         nonce: _this.web3.utils.toHex(txCount),
                                         gasLimit: _this.web3.utils.toHex(gasAmount),
-                                        gasPrice: _this.web3.utils.toHex(gasPrice.toString()),
+                                        gasPrice: _this.web3.utils.toHex(gasPrice.toFixed()),
                                         to: _this.tokenContract._address,
-                                        value: _this.web3.utils.toHex(new bignumber_js_1.default(0).toString()),
+                                        value: _this.web3.utils.toHex(new bignumber_js_1.default(0).toFixed()),
                                         chainId: _this.chainId,
                                         data: _this.tokenContract.methods.transfer(recipients[0], _this.web3.utils.toHex(values[0]).toString()).encodeABI()
                                     };
@@ -3543,8 +3558,8 @@ var BitcoinSignedTransactionSerializer = /** @class */ (function (_super) {
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY] = transaction.publicKey;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION] = transaction.transaction;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.FROM] = transaction.from;
-        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.AMOUNT] = transaction.amount.toString();
-        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.FEE] = transaction.fee.toString();
+        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.AMOUNT] = transaction.amount.toFixed();
+        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.FEE] = transaction.fee.toFixed();
         var serializedBuffer = toBuffer_1.toBuffer(toSerialize);
         return serializedBuffer;
     };
@@ -3795,7 +3810,7 @@ function toBuffer(rlpArray) {
         return Buffer.from(rlpArray ? '1' : '0');
     }
     if (bignumber_js_1.default.isBigNumber(rlpArray)) {
-        return Buffer.from(rlpArray.toString());
+        return Buffer.from(rlpArray.toFixed());
     }
     return Buffer.from(rlpArray);
 }
