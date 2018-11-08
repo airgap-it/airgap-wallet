@@ -92,7 +92,8 @@ export class TransactionPreparePage {
         type: EncodedType.UNSIGNED_TRANSACTION,
         payload: {
           publicKey: this.wallet.publicKey,
-          transaction: rawUnsignedTx
+          transaction: rawUnsignedTx,
+          callback: 'airgap-wallet://?d='
         }
       })
 
