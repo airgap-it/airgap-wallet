@@ -54,8 +54,10 @@ page-portfolio {
   ion-header {
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.12), 0 4px 4px 0 rgba(0, 0, 0, 0.24);
   }
-  .empty-list {
-    height: 100%;
+  .container__empty {
+    img {
+      height: 30vh;
+    }
   }
   /* FAB with a button, bottom padding fix for ios devices, reset for FAB on page with bottom navigation */
   .content-ios ion-fab[bottom] {

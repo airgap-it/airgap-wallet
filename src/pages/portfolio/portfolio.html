@@ -30,12 +30,14 @@
       </ion-list>
     </ng-container>
     <ng-template #noItems>
-      <div class="empty-list" padding>
-        <ion-icon md-name="account_balance_wallet" color="dark"></ion-icon>
+      <ion-row class="container__empty" padding justify-content-center>
+        <img src="assets/img/sync_wallet_onboarding_1.svg" />
         <p>
-          To use AirGap Wallet you need to download the public data from the AirGap Vault application.
+          To use the AirGap Wallet app you need to <strong>Sync with AirGap Vault</strong>. Select the wallet in AirGap
+          Vault and
+          display the sync QR code. Scan this code with AirGap Wallet.
         </p>
-      </div>
+      </ion-row>
     </ng-template>
     <ng-template #loading>
       <div class="loading-content">
@@ -45,8 +47,12 @@
   </ng-container>
 
   <ion-fab right bottom>
-    <button ion-fab color="secondary" (click)="openSyncPage()">
+    <button *ngIf="wallets.length" ion-fab color="secondary" (click)="openSyncPage()">
       <ion-icon md-name="vertical_align_bottom"></ion-icon>
+    </button>
+    <button *ngIf="!wallets.length" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
+      <ion-icon md-name="vertical_align_bottom"></ion-icon>
+      Sync with AirGap Vault
     </button>
   </ion-fab>
 </ion-content>
