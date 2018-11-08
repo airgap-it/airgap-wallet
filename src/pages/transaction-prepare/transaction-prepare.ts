@@ -65,9 +65,10 @@ export class TransactionPreparePage {
     })
   }
 
-  public async prepareTransaction(transactionInfo: any) {
-    transactionInfo.amount = new BigNumber(transactionInfo.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-    transactionInfo.fee = new BigNumber(transactionInfo.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+  public async prepareTransaction() {
+    const transactionInfo = this.transactionForm.value
+    const amount = new BigNumber(transactionInfo.amount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const fee = new BigNumber(transactionInfo.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     let loading = this.loadingCtrl.create({
       content: 'Preparing TX...'
@@ -77,11 +78,7 @@ export class TransactionPreparePage {
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      let rawUnsignedTx: any = await this.wallet.prepareTransaction(
-        [transactionInfo.address],
-        [transactionInfo.amount],
-        transactionInfo.fee
-      )
+      let rawUnsignedTx: any = await this.wallet.prepareTransaction([transactionInfo.address], [amount], fee)
 
       const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,

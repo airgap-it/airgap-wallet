@@ -92,7 +92,7 @@
   <p *ngIf="transactionForm.invalid" padding-vertical>This is not a valid ethereum address!</p>
   -->
   <ion-fab bottom right>
-      <button default ion-button color="primary" (click)="prepareTransaction(transactionForm.value)" [disabled]="transactionForm.invalid" round icon-left>
+      <button default ion-button color="primary" (click)="prepareTransaction()" [disabled]="transactionForm.invalid" round icon-left>
       <ion-icon md-name="open_in_new"></ion-icon>
       Create Transaction
     </button>
