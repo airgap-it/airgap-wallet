@@ -69,7 +69,7 @@ export class MyApp {
           // match.$args - the args passed in the link
           // match.$link - the full link data
           console.log('Successfully matched route', JSON.stringify(match))
-          this.schemeRoutingProvider.handleNewSyncRequest(match.$link.url)
+          this.schemeRoutingProvider.handleNewSyncRequest(this.nav, match.$link.url)
         },
         nomatch => {
           // nomatch.$link - the full link data

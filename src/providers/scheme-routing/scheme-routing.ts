@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
-import {
-  DeserializedSyncProtocol,
-  UnsignedTransaction,
-  SyncProtocolUtils,
-  EncodedType,
-  SyncWalletRequest,
-  AirGapMarketWallet
-} from 'airgap-coin-lib'
-import { TransactionDetailPage } from '../../pages/transaction-detail/transaction-detail'
+import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
 import { WalletImportPage } from '../../pages/wallet-import/wallet-import'
 import { TransactionConfirmPage } from '../../pages/transaction-confirm/transaction-confirm'
 
 @Injectable()
 export class SchemeRoutingProvider {
+  private navController: NavController
   private syncSchemeHandlers: {
     [key in EncodedType]: (deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>
   }
@@ -26,16 +19,14 @@ export class SchemeRoutingProvider {
     }
   }
 
-  private getNavController() {
-    return this.app.getActiveNav()
-  }
-
   async handleNewSyncRequest(
+    navCtrl: NavController,
     rawString: string,
     scanAgainCallback: Function = () => {
       /* */
     }
   ) {
+    this.navController = navCtrl
     const syncProtocol = new SyncProtocolUtils()
 
     let url = new URL(rawString)
@@ -67,9 +58,8 @@ export class SchemeRoutingProvider {
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath
     )
-    const navController = this.getNavController()
-    if (navController) {
-      navController
+    if (this.navController) {
+      this.navController
         .push(WalletImportPage, {
           wallet: wallet
         })
@@ -80,13 +70,27 @@ export class SchemeRoutingProvider {
         .catch(e => {
           console.log('WalletImportPage failed to open', e)
         })
+
+      /*
+        const cancelButton = {
+        text: 'Okay!',
+        role: 'cancel',
+        handler: () => {
+          scanAgainCallback()
+        }
+      }
+      this.showAlert(
+        'No secret found',
+        'You do not have any compatible wallet for this public key in AirGap. Please import your secret and create the corresponding wallet to sign this transaction',
+        [cancelButton]
+      )
+        */
     }
   }
 
   async handleSignedTransaction(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
-    const navController = this.getNavController()
-    if (navController) {
-      navController
+    if (this.navController) {
+      this.navController
         .push(TransactionConfirmPage, {
           signedTransactionSync: deserializedSync
         })

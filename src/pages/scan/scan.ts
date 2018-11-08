@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core'
-import { Platform } from 'ionic-angular'
+import { Platform, NavController } from 'ionic-angular'
 
 import { ScannerProvider } from '../../providers/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
@@ -21,7 +21,12 @@ export class ScanPage {
   hasCameraPermission = false
   isWebScan = false
 
-  constructor(private scanner: ScannerProvider, private platform: Platform, private schemeRouting: SchemeRoutingProvider) {}
+  constructor(
+    private scanner: ScannerProvider,
+    private navController: NavController,
+    private platform: Platform,
+    private schemeRouting: SchemeRoutingProvider
+  ) {}
 
   ionViewWillEnter() {
     if (this.platform.is('android') && this.platform.is('cordova')) {
@@ -92,7 +97,7 @@ export class ScanPage {
   handleQrCodeResult(resultString: string) {
     console.log('got new text', resultString)
 
-    this.schemeRouting.handleNewSyncRequest(resultString)
+    this.schemeRouting.handleNewSyncRequest(this.navController, resultString)
   }
 
   ionViewDidLeave() {
