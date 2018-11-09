@@ -16,5 +16,5 @@
     </ion-col>
   </ion-row>
 
-  <zxing-scanner #scanner [device]="selectedDevice" [scannerEnabled]="webScannerEnabled" (scanSuccess)="handleQrCodeResult($event)"></zxing-scanner>
+  <zxing-scanner [hidden]="!isWebScan" #scanner [device]="selectedDevice" [scannerEnabled]="webScannerEnabled" (scanSuccess)="handleQrCodeResult($event)"></zxing-scanner>
 </ion-content>

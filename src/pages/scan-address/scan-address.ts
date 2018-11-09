@@ -18,6 +18,7 @@ export class ScanAddressPage {
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
   scannerEnabled = false
+  isWebScan = false
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private platform: Platform, private scanner: ScannerProvider) {
     this.callback = this.navParams.get('callback')
@@ -35,6 +36,7 @@ export class ScanAddressPage {
         }
       )
     } else if (this.platform.is('core')) {
+      this.isWebScan = true
       this.scannerEnabled = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
