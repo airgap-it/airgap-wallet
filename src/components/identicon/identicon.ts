@@ -10,6 +10,9 @@ export class IdenticonComponent {
   private identicon
   @Input()
   set address(value: string) {
+    if (!value) {
+      return
+    }
     if (value.startsWith('ak_')) {
       this.identicon = createIcon({ seed: value }).toDataURL()
     } else {
