@@ -1835,7 +1835,7 @@ var AEProtocol = /** @class */ (function () {
         ];
         this.supportsHD = false;
         this.standardDerivationPath = "m/44h/457h/0h/0h/0h";
-        this.addressValidationPattern = '^ak_+[1-9A-Za-z][^OIl]{48}$';
+        this.addressValidationPattern = '^ak_+[1-9A-Za-z]{50}$';
         // ae specifics
         this.defaultNetworkId = 'ae_mainnet';
     }
@@ -3327,7 +3327,7 @@ function unsignedTransactionSerializerByProtocolIdentifier(protocolIdentifier) {
         btc: bitcoin_transactions_serializer_1.BitcoinUnsignedTransactionSerializer,
         ae: aeternity_transactions_serializer_2.AeternityUnsignedTransactionSerializer
     };
-    var protocol = Object.keys(implementedSerializers).find(function (protocol) { return protocol.startsWith(protocolIdentifier); });
+    var protocol = Object.keys(implementedSerializers).find(function (protocol) { return protocolIdentifier.startsWith(protocol); });
     if (!protocol) {
         throw new errors_1.ProtocolNotSupported();
     }
@@ -3340,7 +3340,7 @@ function signedTransactionSerializerByProtocolIdentifier(protocolIdentifier) {
         btc: bitcoin_transactions_serializer_2.BitcoinSignedTransactionSerializer,
         ae: aeternity_transactions_serializer_1.AeternitySignedTransactionSerializer
     };
-    var protocol = Object.keys(implementedSerializers).find(function (protocol) { return protocol.startsWith(protocolIdentifier); });
+    var protocol = Object.keys(implementedSerializers).find(function (protocol) { return protocolIdentifier.startsWith(protocol); });
     if (!protocol) {
         throw new errors_1.ProtocolNotSupported();
     }
@@ -3419,10 +3419,10 @@ var SyncProtocolUtils = /** @class */ (function () {
                 typedPayload = deserializedSyncProtocol.payload;
                 switch (deserializedSyncProtocol.type) {
                     case EncodedType.UNSIGNED_TRANSACTION:
-                        untypedPayload = _1.unsignedTransactionSerializerByProtocolIdentifier(protocol).serialize(typedPayload);
+                        untypedPayload = _1.unsignedTransactionSerializerByProtocolIdentifier(deserializedSyncProtocol.protocol).serialize(typedPayload);
                         break;
                     case EncodedType.SIGNED_TRANSACTION:
-                        untypedPayload = _1.signedTransactionSerializerByProtocolIdentifier(protocol).serialize(typedPayload);
+                        untypedPayload = _1.signedTransactionSerializerByProtocolIdentifier(deserializedSyncProtocol.protocol).serialize(typedPayload);
                         break;
                     case EncodedType.WALLET_SYNC:
                         untypedPayload = new wallet_sync_serializer_1.WalletSerializer().serialize(typedPayload);
