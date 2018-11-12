@@ -1817,6 +1817,7 @@ var AEProtocol = /** @class */ (function () {
         this.epochRPC = epochRPC;
         this.symbol = 'AE';
         this.name = 'æternity';
+        this.marketSymbol = 'ae';
         this.feeSymbol = 'ae';
         this.decimals = 18;
         this.feeDecimals = 18;
@@ -2062,6 +2063,7 @@ var AETokenProtocol = /** @class */ (function (_super) {
          || this;
         _this.symbol = 'AE-ERC20';
         _this.name = 'æternity Ethereum Token';
+        _this.marketSymbol = 'ae';
         _this.identifier = 'eth-erc20-ae';
         return _this;
     }
@@ -2083,6 +2085,7 @@ var BitcoinProtocol = /** @class */ (function () {
         if (bitcoinJSLib === void 0) { bitcoinJSLib = bitcoinJS; }
         this.symbol = 'BTC';
         this.name = 'Bitcoin';
+        this.marketSymbol = 'btc';
         this.feeSymbol = 'btc';
         this.feeDefaults = {
             low: new bignumber_js_1.default('0.00002'),
@@ -2653,6 +2656,7 @@ var EthereumProtocol = /** @class */ (function () {
         this.jsonRPCAPI = jsonRPCAPI;
         this.symbol = 'ETH';
         this.name = 'Ethereum';
+        this.marketSymbol = 'eth';
         this.feeSymbol = 'eth';
         this.feeDefaults = {
             low: new bignumber_js_1.BigNumber('0.00021'),
@@ -2941,7 +2945,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var EthereumProtocol_1 = require("./EthereumProtocol");
 var axios_1 = require("axios");
 var bignumber_js_1 = require("bignumber.js");
-var assert_1 = require("assert");
 var abiDecoder = require("abi-decoder");
 var ethUtil = require("ethereumjs-util");
 var EthereumTransaction = require('ethereumjs-tx');
@@ -3124,7 +3127,7 @@ var GenericERC20 = /** @class */ (function (_super) {
                 .then(function (values) {
                 overallResolve([].concat.apply([], values));
             })
-                .catch(assert_1.rejects);
+                .catch(overallReject);
         });
     };
     GenericERC20.prototype.getTransactionDetailsFromSigned = function (signedTx) {
@@ -3147,7 +3150,7 @@ var GenericERC20 = /** @class */ (function (_super) {
 }(EthereumProtocol_1.EthereumProtocol));
 exports.GenericERC20 = GenericERC20;
 
-},{"./EthereumProtocol":12,"abi-decoder":2,"assert":53,"axios":57,"bignumber.js":89,"ethereumjs-tx":258,"ethereumjs-util":259}],15:[function(require,module,exports){
+},{"./EthereumProtocol":12,"abi-decoder":2,"axios":57,"bignumber.js":89,"ethereumjs-tx":258,"ethereumjs-util":259}],15:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -3489,7 +3492,7 @@ exports.SignedTransactionSerializer = SignedTransactionSerializer;
 var SyncProtocolSignedTransactionKeys;
 (function (SyncProtocolSignedTransactionKeys) {
     SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["SIGNED_TRANSACTION"] = 0] = "SIGNED_TRANSACTION";
-    SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["PUBLIC_KEY"] = 1] = "PUBLIC_KEY";
+    SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["ACCOUNT_IDENTIFIER"] = 1] = "ACCOUNT_IDENTIFIER";
     SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["FROM"] = 2] = "FROM";
     SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["FEE"] = 3] = "FEE";
     SyncProtocolSignedTransactionKeys[SyncProtocolSignedTransactionKeys["AMOUNT"] = 4] = "AMOUNT";
@@ -3517,14 +3520,14 @@ var AeternitySignedTransactionSerializer = /** @class */ (function (_super) {
     }
     AeternitySignedTransactionSerializer.prototype.serialize = function (transaction) {
         var toSerialize = [];
-        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY] = transaction.publicKey;
+        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER] = transaction.accountIdentifier;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION] = transaction.transaction;
         var serializedBuffer = toBuffer_1.toBuffer(toSerialize);
         return serializedBuffer;
     };
     AeternitySignedTransactionSerializer.prototype.deserialize = function (serializedTx) {
         return {
-            publicKey: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY].toString(),
+            accountIdentifier: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER].toString(),
             transaction: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION].toString()
         };
     };
@@ -3555,7 +3558,7 @@ var BitcoinSignedTransactionSerializer = /** @class */ (function (_super) {
     }
     BitcoinSignedTransactionSerializer.prototype.serialize = function (transaction) {
         var toSerialize = [];
-        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY] = transaction.publicKey;
+        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER] = transaction.accountIdentifier;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION] = transaction.transaction;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.FROM] = transaction.from;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.AMOUNT] = transaction.amount.toFixed();
@@ -3565,7 +3568,7 @@ var BitcoinSignedTransactionSerializer = /** @class */ (function (_super) {
     };
     BitcoinSignedTransactionSerializer.prototype.deserialize = function (serializedTx) {
         return {
-            publicKey: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY].toString(),
+            accountIdentifier: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER].toString(),
             transaction: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION].toString(),
             from: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.FROM].map(function (obj) { return obj.toString(); }),
             amount: new bignumber_js_1.default(serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.AMOUNT].toString()),
@@ -3598,14 +3601,14 @@ var EthereumSignedTransactionSerializer = /** @class */ (function (_super) {
     }
     EthereumSignedTransactionSerializer.prototype.serialize = function (transaction) {
         var toSerialize = [];
-        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY] = transaction.publicKey;
+        toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER] = transaction.accountIdentifier;
         toSerialize[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION] = transaction.transaction;
         var serializedBuffer = toBuffer_1.toBuffer(toSerialize);
         return serializedBuffer;
     };
     EthereumSignedTransactionSerializer.prototype.deserialize = function (serializedTx) {
         return {
-            publicKey: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.PUBLIC_KEY].toString(),
+            accountIdentifier: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.ACCOUNT_IDENTIFIER].toString(),
             transaction: serializedTx[signed_transaction_serializer_1.SyncProtocolSignedTransactionKeys.SIGNED_TRANSACTION].toString()
         };
     };
@@ -3653,7 +3656,7 @@ var AeternityUnsignedTransactionSerializer = /** @class */ (function (_super) {
         var serializedTx = toBuffer_1.toBuffer([
             [transaction.transaction.networkId, transaction.transaction.transaction],
             transaction.publicKey,
-            transaction.callback ? transaction.callback : 'airgap-vault://?d=' // callback-scheme
+            transaction.callback ? transaction.callback : 'airgap-wallet://?d=' // callback-scheme
         ]);
         return serializedTx;
     };
@@ -3700,7 +3703,7 @@ var BitcoinUnsignedTransactionSerializer = /** @class */ (function (_super) {
                 unsignedTx.transaction.outs.map(function (output) { return [output.isChange, output.recipient, output.value]; }).slice()
             ],
             unsignedTx.publicKey,
-            unsignedTx.callback ? unsignedTx.callback : 'airgap-vault://?d=' // callback-scheme
+            unsignedTx.callback ? unsignedTx.callback : 'airgap-wallet://?d=' // callback-scheme
         ];
         var serializedTx = toBuffer_1.toBuffer(toSerialize);
         return serializedTx;
@@ -3770,7 +3773,7 @@ var EthereumUnsignedTransactionSerializer = /** @class */ (function (_super) {
                 transaction.transaction.data ? transaction.transaction.data : '0x' // data is optional, include empty if necessary
             ],
             transaction.publicKey,
-            transaction.callback ? transaction.callback : 'airgap-vault://?d=' // callback-scheme
+            transaction.callback ? transaction.callback : 'airgap-wallet://?d=' // callback-scheme
         ]);
         return serializedTx;
     };
@@ -3889,14 +3892,13 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
     AirGapMarketWallet.prototype.synchronize = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            Promise.all([
-                _this.balanceOf(),
-                _this.fetchCurrentMarketPrice()
-            ]).then(function (results) {
+            Promise.all([_this.balanceOf(), _this.fetchCurrentMarketPrice()])
+                .then(function (results) {
                 _this.currentBalance = results[0];
                 _this.currentMarketPrice = results[1];
                 resolve();
-            }).catch(function (error) {
+            })
+                .catch(function (error) {
                 reject(error);
             });
         });
@@ -3905,11 +3907,13 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
         var _this = this;
         if (baseSymbol === void 0) { baseSymbol = 'USD'; }
         return new Promise(function (resolve, reject) {
-            cryptocompare.price(_this.coinProtocol.symbol.toUpperCase(), baseSymbol)
+            cryptocompare
+                .price(_this.coinProtocol.marketSymbol.toUpperCase(), baseSymbol)
                 .then(function (prices) {
                 _this.currentMarketPrice = new bignumber_js_1.default(prices.USD);
                 resolve(_this.currentMarketPrice);
-            }).catch(console.error);
+            })
+                .catch(console.error);
         });
     };
     AirGapMarketWallet.prototype.fetchDailyMarketPrices = function (numberOfDays, date, baseSymbol) {
@@ -3917,10 +3921,12 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
         if (baseSymbol === void 0) { baseSymbol = 'USD'; }
         this.dailyMarketSample = [];
         return new Promise(function (resolve, reject) {
-            _this.algoSelector(numberOfDays, TimeUnit.Days, date, baseSymbol).then(function (marketSample) {
+            _this.algoSelector(numberOfDays, TimeUnit.Days, date, baseSymbol)
+                .then(function (marketSample) {
                 _this.dailyMarketSample = marketSample;
                 resolve(_this.dailyMarketSample);
-            }).catch();
+            })
+                .catch();
         });
     };
     AirGapMarketWallet.prototype.fetchHourlyMarketPrices = function (numberOfHours, date, baseSymbol) {
@@ -3928,10 +3934,12 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
         if (baseSymbol === void 0) { baseSymbol = 'USD'; }
         this.hourlyMarketSample = [];
         return new Promise(function (resolve, reject) {
-            _this.algoSelector(numberOfHours, TimeUnit.Hours, date, baseSymbol).then(function (marketSample) {
+            _this.algoSelector(numberOfHours, TimeUnit.Hours, date, baseSymbol)
+                .then(function (marketSample) {
                 _this.hourlyMarketSample = marketSample;
                 resolve(_this.hourlyMarketSample);
-            }).catch();
+            })
+                .catch();
         });
     };
     AirGapMarketWallet.prototype.fetchMinutesMarketPrices = function (numberOfMinutes, date, baseSymbol) {
@@ -3939,26 +3947,34 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
         if (baseSymbol === void 0) { baseSymbol = 'USD'; }
         this.minuteMarketSample = [];
         return new Promise(function (resolve, reject) {
-            _this.algoSelector(numberOfMinutes, TimeUnit.Minutes, date, baseSymbol).then(function (marketSample) {
+            _this.algoSelector(numberOfMinutes, TimeUnit.Minutes, date, baseSymbol)
+                .then(function (marketSample) {
                 _this.minuteMarketSample = marketSample;
                 resolve(_this.minuteMarketSample);
-            }).catch();
+            })
+                .catch();
         });
     };
     AirGapMarketWallet.prototype.fetchWalletValue = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             if (_this.currentMarketPrice) {
-                _this.balanceOf().then(function (balance) {
+                _this.balanceOf()
+                    .then(function (balance) {
                     resolve(new bignumber_js_1.default(balance.toNumber() * _this.currentMarketPrice.toNumber()));
-                }).catch(reject);
+                })
+                    .catch(reject);
             }
             else {
-                _this.fetchCurrentMarketPrice().then(function () {
-                    _this.balanceOf().then(function (balance) {
+                _this.fetchCurrentMarketPrice()
+                    .then(function () {
+                    _this.balanceOf()
+                        .then(function (balance) {
                         resolve(new bignumber_js_1.default(balance.toNumber() * _this.currentMarketPrice.toNumber()));
-                    }).catch(reject);
-                }).catch(reject);
+                    })
+                        .catch(reject);
+                })
+                    .catch(reject);
             }
         });
     };
@@ -3968,19 +3984,19 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
         return new Promise(function (resolve, reject) {
             var promise;
             if (timeUnit === 'days') {
-                promise = cryptocompare.histoDay(_this.coinProtocol.symbol.toUpperCase(), baseSymbol, {
+                promise = cryptocompare.histoDay(_this.coinProtocol.marketSymbol.toUpperCase(), baseSymbol, {
                     limit: numberOfMinutes - 1,
                     timestamp: date
                 });
             }
             else if (timeUnit === 'hours') {
-                promise = cryptocompare.histoHour(_this.coinProtocol.symbol.toUpperCase(), baseSymbol, {
+                promise = cryptocompare.histoHour(_this.coinProtocol.marketSymbol.toUpperCase(), baseSymbol, {
                     limit: numberOfMinutes - 1,
                     timestamp: date
                 });
             }
             else if (timeUnit === 'minutes') {
-                promise = cryptocompare.histoMinute(_this.coinProtocol.symbol.toUpperCase(), baseSymbol, {
+                promise = cryptocompare.histoMinute(_this.coinProtocol.marketSymbol.toUpperCase(), baseSymbol, {
                     limit: numberOfMinutes - 1,
                     timestamp: date
                 });
@@ -3988,7 +4004,8 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
             else {
                 promise = Promise.reject('Invalid time unit');
             }
-            promise.then(function (prices) {
+            promise
+                .then(function (prices) {
                 for (var idx in prices) {
                     var marketDataObject = {
                         time: prices[idx].time,
@@ -4001,7 +4018,8 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
                     _this.marketSample.push(marketDataObject);
                 }
                 resolve(_this.marketSample);
-            }).catch(console.error);
+            })
+                .catch(console.error);
         });
     };
     return AirGapMarketWallet;
