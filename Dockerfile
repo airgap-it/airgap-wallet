@@ -38,6 +38,9 @@ RUN echo "Host gitlab.papers.tech\n\tStrictHostKeyChecking no\n" >> /root/.ssh/c
 # install dependencies
 RUN npm install
 
+# Build fix
+RUN cd node_modules/airgap-coin-lib && npm i && npm run build && cd /app
+
 # install static webserver
 RUN npm install node-static -g
 
