@@ -47,10 +47,10 @@
   </ng-container>
 
   <ion-fab right bottom>
-    <button *ngIf="wallets.length" ion-fab color="secondary" (click)="openSyncPage()">
+    <button *ngIf="(wallets | async).length > 0" ion-fab color="secondary" (click)="openSyncPage()">
       <ion-icon md-name="vertical_align_bottom"></ion-icon>
     </button>
-    <button *ngIf="!wallets.length" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
+    <button *ngIf="(wallets | async).length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
       <ion-icon md-name="vertical_align_bottom"></ion-icon>
       Sync with AirGap Vault
     </button>

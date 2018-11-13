@@ -1,18 +1,7 @@
 import { Component } from '@angular/core'
-import {
-  LoadingController,
-  NavController,
-  NavParams,
-  ToastController,
-  ViewController,
-  BlockerDelegate,
-  AlertController,
-  Platform
-} from 'ionic-angular'
+import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { Transaction } from '../../models/transaction.model'
-import { QrProvider } from '../../providers/qr/qr'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, IAirGapTransaction, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
 
 declare var cordova: any
 
@@ -21,10 +10,11 @@ declare var cordova: any
   templateUrl: 'transaction-confirm.html'
 })
 export class TransactionConfirmPage {
-  public transaction: Transaction
+  public signedTx: string
+  public airGapTx: IAirGapTransaction
+  public protocol: ICoinProtocol
 
   constructor(
-    private qrProvider: QrProvider,
     public loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     public navController: NavController,
@@ -37,17 +27,12 @@ export class TransactionConfirmPage {
     this.navController.popToRoot()
   }
 
-  ionViewWillEnter() {
-    this.platform
-      .ready()
-      .then(() => {
-        if (this.navParams.get('data')) {
-          this.transaction = this.qrProvider.getBroadcastFromData(this.navParams.get('data'))
-        } else if (this.navParams.get('transaction')) {
-          this.transaction = this.navParams.get('transaction')
-        }
-      })
-      .catch(console.error)
+  async ionViewWillEnter() {
+    await this.platform.ready()
+    const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
+    this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
+    this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
+    this.airGapTx = this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
   }
 
   broadcastTransaction() {
@@ -57,14 +42,15 @@ export class TransactionConfirmPage {
 
     loading.present()
 
-    let protocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
     let blockexplorer = '' // TODO: Move to coinlib
-    if (this.transaction.protocolIdentifier === 'btc') {
+    if (this.protocol.identifier === 'btc') {
       blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.transaction.protocolIdentifier === 'eth') {
+    } else if (this.protocol.identifier === 'eth') {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier === 'eth-erc20-ae') {
+    } else if (this.protocol.identifier === 'eth-erc20-ae') {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
+    } else if (this.protocol.identifier === 'ae') {
+      blockexplorer = 'https://sdk-edgenet.aepps.com/v2/transactions/{{txId}}'
     }
 
     let interval = setTimeout(() => {
@@ -79,8 +65,8 @@ export class TransactionConfirmPage {
       this.navController.popToRoot()
     }, 20 * 1000)
 
-    protocol
-      .broadcastTransaction(this.transaction.payload)
+    this.protocol
+      .broadcastTransaction(this.signedTx)
       .then(txId => {
         if (interval) {
           clearInterval(interval)

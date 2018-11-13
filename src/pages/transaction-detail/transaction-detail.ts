@@ -27,6 +27,8 @@ export class TransactionDetailPage {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
     } else if (this.transaction.protocolIdentifier === 'eth-erc20-ae') {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
+    } else if (this.transaction.protocolIdentifier === 'ae') {
+      blockexplorer = 'https://sdk-edgenet.aepps.com/v2/transactions/{{txId}}'
     }
 
     if (hash && blockexplorer) {

@@ -39,7 +39,10 @@ export class WalletEditPopoverComponent {
     await this.clipboard.copy(this.wallet.receivingPublicAddress)
     let toast = this.toastController.create({
       message: 'Address was copied to your clipboard',
-      duration: 3000
+      duration: 2000,
+      position: 'top',
+      showCloseButton: true,
+      closeButtonText: 'Ok'
     })
     await toast.present()
     await this.viewCtrl.dismiss()

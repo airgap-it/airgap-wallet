@@ -11,7 +11,7 @@ import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { QRCodeModule } from 'angularx-qrcode'
-import { IonicApp, IonicModule } from 'ionic-angular'
+import { IonicApp, IonicModule, Platform } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
 import { ComponentsModule } from '../components/components.module'
@@ -32,11 +32,11 @@ import { WalletAddressPage } from '../pages/wallet-address/wallet-address'
 import { WalletImportPage } from '../pages/wallet-import/wallet-import'
 import { IntroductionDownloadPage } from '../pages/introduction-download/introduction-download'
 import { PipesModule } from '../pipes/pipes.module'
-import { QrProvider } from '../providers/qr/qr'
 import { ScannerProvider } from '../providers/scanner/scanner'
 import { WalletsProvider } from '../providers/wallets/wallets.provider'
 import { MomentModule } from 'ngx-moment'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
@@ -44,6 +44,7 @@ import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wa
 import { SettingsProvider } from '../providers/settings/settings'
 import { Clipboard } from '@ionic-native/clipboard'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
+import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -125,9 +126,14 @@ export function createTranslateLoader(http: HttpClient) {
     ScannerProvider,
     AppVersion,
     WalletsProvider,
-    QrProvider,
     SettingsProvider,
-    Clipboard
+    {
+      provide: Clipboard,
+      useFactory: (platform: Platform) => (platform.is('cordova') ? new Clipboard() : new ClipboardBrowserProvider()),
+      deps: [Platform]
+    },
+    SchemeRoutingProvider,
+    ClipboardBrowserProvider
   ]
 })
 export class AppModule {}
