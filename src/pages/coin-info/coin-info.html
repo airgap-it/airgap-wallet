@@ -1,64 +1,64 @@
 <ion-header>
   <ion-navbar color="primary">
-    <ion-title>{{wallet?.coinProtocol.symbol | uppercase}}</ion-title>
+    <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }}</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only (click)="presentEditPopover($event)">
-        <ion-icon name="more"></ion-icon>
-      </button>
+      <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <ion-row style="display: block">
-    <portfolio-item [wallet]="wallet"></portfolio-item>
-  </ion-row>
+  <ion-row style="display: block"> <portfolio-item [wallet]="wallet"></portfolio-item> </ion-row>
   <ion-row class="background--color__primary" padding>
     <span ion-text color="white" class="font--weight__bold">Transactions</span>
   </ion-row>
 </ion-header>
 
 <ion-content>
-  <ion-refresher (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  <ion-refresher (ionRefresh)="doRefresh($event)"> <ion-refresher-content></ion-refresher-content> </ion-refresher>
 
   <div class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
     <ion-icon md-name="inbox" color="dark"></ion-icon>
-    <p>
-      There are no transactions yet for this wallet.
-    </p>
+    <p>There are no transactions yet for this wallet.</p>
   </div>
 
   <ion-list no-lines>
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar item-start>
-        <identicon *ngIf="t.isInbound" [address]='t.from[0]'></identicon>
-        <identicon *ngIf="!t.isInbound" [address]='t.to[0]'></identicon>
+        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon> <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
       </ion-avatar>
       <h2>
         <ion-icon *ngIf="t.isInbound" md-name="call_received"></ion-icon>
         <ion-icon *ngIf="!t.isInbound" md-name="call_made"></ion-icon>
-        <span class="font--weight__bold" ion-text color="black">{{ t.amount | amountConverter : { protocolIdentifier:
-          wallet.protocolIdentifier
-          } }}</span>
+        <span class="font--weight__bold" ion-text color="black">{{
+          t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier }
+        }}</span>
       </h2>
       <h3 ion-text color="blackLight" class="typography--mono">
-        <ng-container *ngIf="t.isInbound">
-          {{ t.from[0] | shortenString }}
-        </ng-container>
-        <ng-container *ngIf="!t.isInbound">
-          {{ t.to[0] | shortenString }}
-        </ng-container>
+        <ng-container *ngIf="t.isInbound"> {{ t.from[0] | shortenString }} </ng-container>
+        <ng-container *ngIf="!t.isInbound"> {{ t.to[0] | shortenString }} </ng-container>
       </h3>
       <ion-row class="items--right" item-end>
-        <ion-col col-12 no-padding text-right>
-          <p ion-text color="blackLight">{{ (t.timestamp | amFromUnix) | amCalendar: { sameDay: '[Today at] HH:mm',
-            sameElse:
-            'HH:mm - L' } }}</p>
+        <ion-col no-padding>
+          <ion-row justify-content-end>
+            <p ion-text color="blackLight">
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
+              }}
+            </p>
+          </ion-row>
+          <ion-row justify-content-end>
+            <p ion-text color="blackLight">
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
+              }}
+            </p>
+          </ion-row>
         </ion-col>
       </ion-row>
     </ion-item>
-    <div *ngIf="isRefreshing" class="loading-content">
-      <ion-spinner color="black"></ion-spinner>
-    </div>
+    <div *ngIf="isRefreshing" class="loading-content"><ion-spinner color="black"></ion-spinner></div>
   </ion-list>
 
   <ion-fab bottom>
