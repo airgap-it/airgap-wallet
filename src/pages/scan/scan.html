@@ -1,20 +1,30 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <ion-title>Scanner</ion-title>
-  </ion-navbar>
+  <ion-navbar color="primary"> <ion-title>Scan QR</ion-title> </ion-navbar>
 </ion-header>
 
-<ion-content no-bounce [class.transparent]="hasCameraPermission">
-  <p ion-text color="white" padding no-margin text-center *ngIf="isWebScan || hasCameraPermission">Scan a sync QR
-    to add a wallet or scan a transaction QR to confirm and send it.</p>
-
+<!--
+  <ion-content no-bounce [class.transparent]="hasCameraPermission">
+  <p ion-text color="white" padding no-margin text-center *ngIf="isWebScan || hasCameraPermission">
+    Scan a sync QR to add a wallet or scan a transaction QR to confirm and send it.
+  </p>
   <ion-row *ngIf="!isWebScan && !hasCameraPermission" (click)="checkPermission(false)" justify-content-center
-    align-items-center class="row--height__100">
+-->
+<ion-content>
+  <ion-row justify-content-center align-items-center class="row--height__100">
     <ion-col text-center>
-      <ion-icon name="eye-off"></ion-icon>
-      <h3 padding-horizontal>Click to allow camera access to scan a QR.</h3>
+      <img src="../assets/img/permission_onboarding_camera.svg" />
+      <h3 padding-horizontal>
+        In order to scan QR codes, AirGap Wallet needs the <span ion-text color="primary">camera permission</span>.
+      </h3>
     </ion-col>
   </ion-row>
-
-  <zxing-scanner [hidden]="!isWebScan" #scanner [device]="selectedDevice" [scannerEnabled]="webScannerEnabled" (scanSuccess)="handleQrCodeResult($event)"></zxing-scanner>
+  <!--
+    <zxing-scanner
+      [hidden]="!isWebScan"
+      #scanner
+      [device]="selectedDevice"
+      [scannerEnabled]="webScannerEnabled"
+      (scanSuccess)="handleQrCodeResult($event)"
+    ></zxing-scanner>
+  -->
 </ion-content>
