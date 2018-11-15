@@ -13,11 +13,13 @@ export class TransactionQrPage {
   public preparedDataQR: string = ''
   public wallet: AirGapMarketWallet = null
   public airGapTx: Transaction = null
+  public isBrowser: boolean = false
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private platform: Platform) {
     this.wallet = this.navParams.get('wallet')
     this.airGapTx = this.navParams.get('airGapTx')
     this.preparedDataQR = this.navParams.get('data')
+    this.isBrowser = !this.platform.is('cordova')
   }
 
   done() {

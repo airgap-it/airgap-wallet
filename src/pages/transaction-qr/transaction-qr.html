@@ -1,31 +1,22 @@
 <ion-header no-border>
   <ion-navbar color="primary">
     <ion-title>
-      <span ion-text color="white">{{wallet?.coinProtocol.symbol | uppercase }} Transaction</span>
+      <span ion-text color="white">{{ wallet?.coinProtocol.symbol | uppercase }} Transaction</span>
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding class="colored-background">
-
-  <ion-row>
-    <h5>Open AirGap Vault and scan this transaction in order to sign it.</h5>
-  </ion-row>
+  <ion-row><h5>Open AirGap Vault and scan this transaction in order to sign it.</h5></ion-row>
 
   <ion-row justify-content-center padding-top>
     <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
   </ion-row>
 
-  <ion-row padding-bottom margin-bottom>
-    <from-to [transaction]="airGapTx"></from-to>
-  </ion-row>
-  
+  <ion-row padding-bottom margin-bottom><from-to [transaction]="airGapTx"></from-to></ion-row>
+
   <ion-fab bottom right>
-      <button default ion-button color="white" (click)="sameDeviceSign()" round item-right>
-          Sign on this device
-        </button>
-        <button default ion-button color="secondary" (click)="done()" round item-right>
-          Done
-        </button>
+    <button *ngIf="!isBrowser" default ion-button color="white" (click)="sameDeviceSign()" round item-right>Sign on this device</button>
+    <button default ion-button color="secondary" (click)="done()" round item-right>Done</button>
   </ion-fab>
 </ion-content>
