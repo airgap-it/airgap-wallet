@@ -60,7 +60,7 @@
     "@sentry/browser": "^4.2.4",
     "@types/node": "8.0.31",
     "@zxing/ngx-scanner": "1.2.1",
-    "airgap-coin-lib": "github:airgap-it/airgap-coin-lib#7cac694f44753f3d148eb7ab8600242eaa7ce06e",
+    "airgap-coin-lib": "github:airgap-it/airgap-coin-lib#563c60f2f68c5b03281d37404ae0e4a8cacea71f",
     "angular2-qrcode": "2.0.1",
     "angular2-template-loader": "0.6.2",
     "angularx-qrcode": "^1.2.2",
