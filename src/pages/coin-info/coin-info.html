@@ -14,8 +14,17 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"> <ion-refresher-content></ion-refresher-content> </ion-refresher>
 
-  <div class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
-    <ion-icon md-name="inbox" color="dark"></ion-icon>
+  <!--
+    TODO: show during phase 0 of AE migration
+    <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
+      <img padding-vertical src="../assets/img/permission_onboarding_camera.svg" />
+      <h5 ion-text color="primary">12450 AE</h5>
+      <p>Your tokens will become transferable after the æternity mainnet has launched.</p>
+    </div>
+  -->
+
+  <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
+    <img padding-vertical src="../assets/img/permission_onboarding_camera.svg" />
     <p>There are no transactions yet for this wallet.</p>
   </div>
 
