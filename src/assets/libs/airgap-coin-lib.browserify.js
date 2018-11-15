@@ -1813,7 +1813,7 @@ var bs58check = require("bs58check");
 var Web3 = require("web3");
 var AEProtocol = /** @class */ (function () {
     function AEProtocol(epochRPC) {
-        if (epochRPC === void 0) { epochRPC = 'https://sdk-edgenet.aepps.com'; }
+        if (epochRPC === void 0) { epochRPC = 'https://ae-epoch-rpc-proxy.gke.papers.tech'; }
         this.epochRPC = epochRPC;
         this.symbol = 'AE';
         this.name = 'æternity';
@@ -1957,7 +1957,7 @@ var AEProtocol = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        nonce = 0;
+                        nonce = 1;
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
