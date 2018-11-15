@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ViewController, ModalController } from 'ionic-angular'
+import { ViewController, ModalController, Platform } from 'ionic-angular'
 import { IntroductionDownloadPage } from '../introduction-download/introduction-download'
 
 declare var cordova: any
@@ -10,8 +10,11 @@ declare var cordova: any
 })
 export class IntroductionPage {
   public security: string = 'highest'
+  public isBrowser: boolean = false
 
-  constructor(private viewController: ViewController, public modalController: ModalController) {}
+  constructor(public platform: Platform, private viewController: ViewController, public modalController: ModalController) {
+    this.isBrowser = !this.platform.is('cordova')
+  }
 
   public dismiss() {
     this.viewController.dismiss()
