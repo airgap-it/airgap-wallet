@@ -7,6 +7,7 @@ import { TransactionPreparePage } from '../transaction-prepare/transaction-prepa
 import { WalletAddressPage } from '../wallet-address/wallet-address'
 import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover/wallet-edit-popover.component'
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { HttpClient } from '@angular/common/http'
 
 @Component({
   selector: 'page-coin-info',
@@ -17,13 +18,18 @@ export class CoinInfoPage {
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
 
+  protocolIdentifier: string
+  aeTxEnabled: boolean = false
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public popoverCtrl: PopoverController,
-    public walletProvider: WalletsProvider
+    public walletProvider: WalletsProvider,
+    public http: HttpClient
   ) {
     this.wallet = this.navParams.get('wallet')
+    this.protocolIdentifier = this.wallet.coinProtocol.identifier
   }
 
   ionViewDidEnter() {
@@ -50,6 +56,14 @@ export class CoinInfoPage {
 
   doRefresh(refresher: any = null) {
     this.isRefreshing = true
+
+    // this can safely be removed after AE has made the switch to mainnet
+    if (this.protocolIdentifier === 'ae') {
+      this.http.get('http://ae-epoch-rpc-proxy.gke.papers.tech/status').subscribe((result: any) => {
+        this.aeTxEnabled = result.transactionsEnabled
+      })
+    }
+
     Promise.all([this.wallet.fetchTransactions(50, 0), this.wallet.synchronize()]).then(results => {
       this.transactions = results[0]
 
