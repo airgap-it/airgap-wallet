@@ -14,14 +14,24 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"> <ion-refresher-content></ion-refresher-content> </ion-refresher>
 
-  <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing && protocolIdentifier === 'ae' && !aeTxEnabled">
-    <img padding-vertical src="../../assets/img/permission_onboarding_camera.svg" />
-    <h5 ion-text color="primary">{{ wallet?.currentBalance?.toNumber() | amountConverter : { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}</h5>
+  <div
+    padding-horizontal
+    class="empty-list"
+    *ngIf="transactions.length === 0 && !isRefreshing && protocolIdentifier === 'ae' && !aeTxEnabled"
+  >
+    <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
+    <h5 ion-text color="primary">
+      {{ wallet?.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+    </h5>
     <p>Your tokens will become transferable after the æternity mainnet has launched.</p>
   </div>
 
-  <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing && !(protocolIdentifier === 'ae' && !aeTxEnabled)">
-    <img padding-vertical src="../../assets/img/permission_onboarding_camera.svg" />
+  <div
+    padding-horizontal
+    class="empty-list"
+    *ngIf="transactions.length === 0 && !isRefreshing && !(protocolIdentifier === 'ae' && !aeTxEnabled)"
+  >
+    <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
     <p>There are no transactions yet for this wallet.</p>
   </div>
 
@@ -76,7 +86,16 @@
         </button>
       </ion-col>
       <ion-col>
-        <button full default ion-button color="primary" (click)="openPreparePage()" [disabled]="protocolIdentifier === 'ae' && !aeTxEnabled" round icon-start>
+        <button
+          full
+          default
+          ion-button
+          color="primary"
+          (click)="openPreparePage()"
+          [disabled]="protocolIdentifier === 'ae' && !aeTxEnabled"
+          round
+          icon-start
+        >
           <ion-icon name="send"></ion-icon>
           Send
         </button>
