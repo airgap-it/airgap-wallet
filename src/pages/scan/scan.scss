@@ -9,6 +9,9 @@ page-scan {
   }
   .row--height__100 {
     height: 100%;
+    img {
+      height: 45vh;
+    }
   }
 
   ion-icon {
