@@ -107,6 +107,10 @@ export class WalletsProvider {
     return this.settingsProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
+  public walletByPublicKeyAndProtocol(publicKey: string, protocolIdentifier: string): AirGapMarketWallet {
+    return this.walletList.find(wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier)
+  }
+
   public walletExists(testWallet: AirGapMarketWallet): boolean {
     return this.walletList.some(
       wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier

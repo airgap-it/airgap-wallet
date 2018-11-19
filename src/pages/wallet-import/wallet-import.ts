@@ -34,7 +34,10 @@ export class WalletImportPage {
         this.wallet = this.navParams.get('wallet') // TODO: Catch error if wallet cannot be imported
 
         if (this.wallets.walletExists(this.wallet)) {
+          this.wallet = this.wallets.walletByPublicKeyAndProtocol(this.wallet.publicKey, this.wallet.protocolIdentifier)
           this.walletAlreadyExists = true
+          loading.dismiss()
+          return
         }
 
         const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
