@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-navbar color="primary"> <ion-title>Scan QR</ion-title> </ion-navbar>
+  <ion-navbar color="primary"><ion-title>Scan QR</ion-title></ion-navbar>
 </ion-header>
 
 <ion-content no-bounce [class.transparent]="hasCameraPermission">
@@ -7,6 +7,7 @@
     Scan a sync QR to add a wallet or scan a transaction QR to confirm and send it.
   </p>
 
+  <div class="guides"><img class="svg qr-scan-guides" src="assets/img/qr_code_guides.svg" /></div>
   <ion-row
     *ngIf="!isWebScan && !hasCameraPermission"
     (click)="checkPermission(false)"
@@ -17,7 +18,9 @@
     <ion-col text-center>
       <img src="../assets/img/permission_onboarding_camera.svg" />
       <h3 padding-horizontal>
-        In order to scan QR codes, AirGap Wallet needs the <span ion-text color="primary">camera permission</span>.
+        In order to scan QR codes, AirGap Wallet needs the
+        <span ion-text color="primary">camera permission</span>
+        .
       </h3>
     </ion-col>
   </ion-row>

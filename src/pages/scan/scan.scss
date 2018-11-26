@@ -14,6 +14,23 @@ page-scan {
     }
   }
 
+  .guides {
+    display: flex;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    .qr-scan-guides {
+      width: 60%;
+      max-width: 400px;
+      margin-bottom: 8em;
+      max-height: 50%;
+    }
+  }
+
   ion-icon {
     font-size: 180px;
     width: 100%;
