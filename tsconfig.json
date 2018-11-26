@@ -12,9 +12,9 @@
     "typeRoots": ["./node_modules/@types"],
     "types": ["jasmine", "node"],
     "paths": {
-      "*": ["node_modules/@types/*", "*"],
       "bignumber.js": ["node_modules/bignumber.js"]
-    }
+    },
+    "baseUrl": "./"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "src/**/*.spec.ts", "src/**/__tests__/*.ts"],

@@ -7,7 +7,7 @@ import { SplashScreen } from '@ionic-native/splash-screen'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { Keyboard } from '@ionic-native/keyboard'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 import { PlatformMock, StatusBarMock, SplashScreenMock, NavParamsMock, NavMock } from '../../../test-config/mocks-ionic'
 import { NavControllerMock, KeyboardMock, LoadingControllerMock, ToastControllerMock } from 'ionic-mocks'
@@ -151,7 +151,7 @@ describe('TransactionPrepare Page', () => {
     component.transactionForm.controls['amount'].setValue(10)
     component.transactionForm.controls['fee'].setValue(10)
 
-    await component.prepareTransaction(component.transactionForm.value)
+    await component.prepareTransaction()
 
     // should create a loadingCtrl
     expect((component as any).loadingCtrl.create).toHaveBeenCalled()
