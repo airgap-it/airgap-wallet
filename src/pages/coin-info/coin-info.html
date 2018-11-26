@@ -21,7 +21,14 @@
     <h5 ion-text color="primary">
       {{ wallet?.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
     </h5>
-    <p>Your tokens will become transferable after the æternity mainnet has launched.</p>
+    <p>
+      Your tokens migrated during
+      <!-- TODO: set migration phase -->
+      <strong ion-text color="primary">Phase 1</strong>
+      will become available with the next hardfork at
+      <!-- TODO: set end date of phase -->
+      <strong ion-text color="primary">the end of May.</strong>
+    </p>
   </div>
 
   <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
