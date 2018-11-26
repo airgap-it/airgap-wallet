@@ -7,7 +7,6 @@
     Scan a sync QR to add a wallet or scan a transaction QR to confirm and send it.
   </p>
 
-  <div class="guides"><img class="svg qr-scan-guides" src="assets/img/qr_code_guides.svg" /></div>
   <ion-row
     *ngIf="!isWebScan && !hasCameraPermission"
     (click)="checkPermission(false)"
@@ -32,4 +31,6 @@
     [scannerEnabled]="webScannerEnabled"
     (scanSuccess)="handleQrCodeResult($event)"
   ></zxing-scanner>
+
+  <div class="guides"><img class="qr-scan-guides" src="assets/img/qr_code_guides.svg" /></div>
 </ion-content>
