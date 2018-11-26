@@ -32,8 +32,8 @@
     <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
       <p>Currently unable to display transaction history. Please refer to the Blockexplorer.</p>
       <button full default ion-button color="primary" (click)="openReceivePage()" round icon-end>
-        <ion-icon md-name="open_in_new" (click)="openBlockexplorer()"></ion-icon>
         Open Blockexplorer
+        <ion-icon md-name="open_in_new" (click)="openBlockexplorer()"></ion-icon>
       </button>
     </span>
   </div>
@@ -59,14 +59,20 @@
         <ion-col no-padding>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
-              'HH:mm' } }}
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
+              }}
             </p>
           </ion-row>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
-              'L' } }}
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
+              }}
             </p>
           </ion-row>
         </ion-col>
