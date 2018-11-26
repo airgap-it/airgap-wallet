@@ -30,8 +30,8 @@
       There are no transactions yet for this wallet.
     </p>
     <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
-      <p>Currently unable to display transaction history. Please refer to the Blockexplorer.</p>
-      <button full default ion-button color="primary" (click)="openReceivePage()" round icon-end>
+      <p>Currently unable to display the transaction history. Please refer to the Blockexplorer.</p>
+      <button default ion-button color="secondary" (click)="openReceivePage()" round icon-end>
         Open Blockexplorer
         <ion-icon md-name="open_in_new" (click)="openBlockexplorer()"></ion-icon>
       </button>
