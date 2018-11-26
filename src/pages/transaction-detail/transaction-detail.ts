@@ -33,6 +33,11 @@ export class TransactionDetailPage {
 
     if (hash && blockexplorer) {
       this.openUrl(blockexplorer.replace('{{txId}}', hash))
+    } else {
+      // TODO: Remove AE specific code, but add an alert that there was an error.
+      if (this.transaction.protocolIdentifier === 'ae') {
+        this.openUrl('https://explorer.aepps.com/')
+      }
     }
   }
 

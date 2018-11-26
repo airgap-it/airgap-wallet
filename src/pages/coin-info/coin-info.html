@@ -5,14 +5,12 @@
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <ion-row style="display: block"> <portfolio-item [wallet]="wallet"></portfolio-item> </ion-row>
-  <ion-row class="background--color__primary" padding>
-    <span ion-text color="white" class="font--weight__bold">Transactions</span>
-  </ion-row>
+  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+  <ion-row class="background--color__primary" padding><span ion-text color="white" class="font--weight__bold">Transactions</span></ion-row>
 </ion-header>
 
 <ion-content>
-  <ion-refresher (ionRefresh)="doRefresh($event)"> <ion-refresher-content></ion-refresher-content> </ion-refresher>
+  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <div
     padding-horizontal
@@ -26,49 +24,49 @@
     <p>Your tokens will become transferable after the æternity mainnet has launched.</p>
   </div>
 
-  <div
-    padding-horizontal
-    class="empty-list"
-    *ngIf="transactions.length === 0 && !isRefreshing && !(protocolIdentifier === 'ae' && !aeTxEnabled)"
-  >
+  <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
     <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
-    <p>There are no transactions yet for this wallet.</p>
+    <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
+      There are no transactions yet for this wallet.
+    </p>
+    <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
+      <p>Currently unable to display transaction history. Please refer to the Blockexplorer.</p>
+      <button full default ion-button color="primary" (click)="openReceivePage()" round icon-end>
+        <ion-icon md-name="open_in_new" (click)="openBlockexplorer()"></ion-icon>
+        Open Blockexplorer
+      </button>
+    </span>
   </div>
 
   <ion-list no-lines>
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar item-start>
-        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon> <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
+        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon>
+        <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
       </ion-avatar>
       <h2>
         <ion-icon *ngIf="t.isInbound" md-name="call_received"></ion-icon>
         <ion-icon *ngIf="!t.isInbound" md-name="call_made"></ion-icon>
-        <span class="font--weight__bold" ion-text color="black">{{
-          t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier }
-        }}</span>
+        <span class="font--weight__bold" ion-text color="black">
+          {{ t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}
+        </span>
       </h2>
       <h3 ion-text color="blackLight" class="typography--mono">
-        <ng-container *ngIf="t.isInbound"> {{ t.from[0] | shortenString }} </ng-container>
-        <ng-container *ngIf="!t.isInbound"> {{ t.to[0] | shortenString }} </ng-container>
+        <ng-container *ngIf="t.isInbound">{{ t.from[0] | shortenString }}</ng-container>
+        <ng-container *ngIf="!t.isInbound">{{ t.to[0] | shortenString }}</ng-container>
       </h3>
       <ion-row class="items--right" item-end>
         <ion-col no-padding>
           <ion-row justify-content-end>
-            <p ion-text color="blackLight">
-              {{
-                t.timestamp
-                  | amFromUnix
-                  | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
-              }}
+            <p ion-text color="blackLight" *ngIf="t.timestamp">
+              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
+              'HH:mm' } }}
             </p>
           </ion-row>
           <ion-row justify-content-end>
-            <p ion-text color="blackLight">
-              {{
-                t.timestamp
-                  | amFromUnix
-                  | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
-              }}
+            <p ion-text color="blackLight" *ngIf="t.timestamp">
+              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
+              'L' } }}
             </p>
           </ion-row>
         </ion-col>
