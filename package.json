@@ -64,7 +64,7 @@
     "angular2-qrcode": "2.0.1",
     "angular2-template-loader": "0.6.2",
     "angularx-qrcode": "^1.2.2",
-    "bignumber.js": "^7.2.1",
+    "bignumber.js": "^8.0.0",
     "chart.js": "^2.7.2",
     "com.lampa.startapp": "^6.1.6",
     "cordova-android": "7.1.0",
