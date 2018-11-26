@@ -31,9 +31,9 @@
     </p>
     <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
       <p>Currently unable to display the transaction history. Please refer to the Blockexplorer.</p>
-      <button default ion-button color="secondary" (click)="openReceivePage()" round icon-end>
+      <button default ion-button color="secondary" (click)="openBlockexplorer()" round icon-end>
         Open Blockexplorer
-        <ion-icon md-name="open_in_new" (click)="openBlockexplorer()"></ion-icon>
+        <ion-icon md-name="open_in_new" ></ion-icon>
       </button>
     </span>
   </div>
