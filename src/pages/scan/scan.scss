@@ -8,25 +8,22 @@ page-scan {
     color: color($colors, white);
   }
   .row--height__100 {
-    height: 100%;
+    height: calc(100% - 64px);
     img {
       height: 45vh;
     }
   }
 
-  .guides {
-    display: flex;
+  .guides--container {
     position: absolute;
     height: 100%;
     width: 100%;
-    align-items: center;
-    justify-content: center;
     top: 0;
     left: 0;
-    .qr-scan-guides {
+    .guides--container__img {
       width: 60%;
       max-width: 400px;
-      margin-bottom: 8em;
+      margin-top: 3em;
       max-height: 50%;
     }
   }
