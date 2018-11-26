@@ -1,5 +1,5 @@
 import { AmountConverterPipe } from './amount-converter.pipe'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 const BN = BigNumber.clone({
   FORMAT: {
     decimalSeparator: `.`,

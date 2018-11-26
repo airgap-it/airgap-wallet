@@ -1,5 +1,5 @@
 import { IAirGapTransaction } from 'airgap-coin-lib'
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 export class TransactionParameter {
   label: string

@@ -7,16 +7,24 @@ import { TransactionConfirmPage } from '../../pages/transaction-confirm/transact
 @Injectable()
 export class SchemeRoutingProvider {
   private navController: NavController
+  /* TS 2.7 feature
   private syncSchemeHandlers: {
     [key in EncodedType]: (deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>
   }
+  */
+  private syncSchemeHandlers: ((deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>)[] = []
 
   constructor(protected app: App, private alertController: AlertController) {
+    /* TS 2.7 feature
     this.syncSchemeHandlers = {
       [EncodedType.WALLET_SYNC]: this.handleWalletSync.bind(this),
       [EncodedType.UNSIGNED_TRANSACTION]: this.syncTypeNotSupportedAlert.bind(this),
       [EncodedType.SIGNED_TRANSACTION]: this.handleSignedTransaction.bind(this)
     }
+    */
+    this.syncSchemeHandlers[EncodedType.WALLET_SYNC] = this.handleWalletSync.bind(this)
+    this.syncSchemeHandlers[EncodedType.UNSIGNED_TRANSACTION] = this.syncTypeNotSupportedAlert.bind(this)
+    this.syncSchemeHandlers[EncodedType.SIGNED_TRANSACTION] = this.handleSignedTransaction.bind(this)
   }
 
   async handleNewSyncRequest(

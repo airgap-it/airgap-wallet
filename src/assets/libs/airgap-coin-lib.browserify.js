@@ -1,12 +1,12 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.airgapCoinLib = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-!function(r,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.AeternityClient=t():r.AeternityClient=t()}(window,function(){return function(r){var t={};function n(e){if(t[e])return t[e].exports;var o=t[e]={i:e,l:!1,exports:{}};return r[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=r,n.c=t,n.d=function(r,t,e){n.o(r,t)||Object.defineProperty(r,t,{enumerable:!0,get:e})},n.r=function(r){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(r,"__esModule",{value:!0})},n.t=function(r,t){if(1&t&&(r=n(r)),8&t)return r;if(4&t&&"object"==typeof r&&r&&r.__esModule)return r;var e=Object.create(null);if(n.r(e),Object.defineProperty(e,"default",{enumerable:!0,value:r}),2&t&&"string"!=typeof r)for(var o in r)n.d(e,o,function(t){return r[t]}.bind(null,o));return e},n.n=function(r){var t=r&&r.__esModule?function(){return r.default}:function(){return r};return n.d(t,"a",t),t},n.o=function(r,t){return Object.prototype.hasOwnProperty.call(r,t)},n.p="",n(n.s=12)}([function(r,t,n){"use strict";(function(r){n.d(t,"c",function(){return s}),n.d(t,"a",function(){return u}),n.d(t,"b",function(){return c});var e=n(2),o=n.n(e),i=n(1),h=n(3);const f=r.from("ed25519 seed"),a=2147483648;function s(r){return o.a.sign.keyPair.fromSeed(r)}function u(t,n){const e=""===t?[]:Object(h.fromString)(t).toPathArray();return e.forEach((r,t)=>{if(r<a)throw new Error(`Segment #${t+1} is not hardened`)}),e.reduce((t,n)=>(function({privateKey:t,chainCode:n},e){if(e<a)throw new Error(`Child index #${e} is not supported`);const o=r.allocUnsafe(4);o.writeUInt32BE(e,0);const h=r.concat([r.alloc(1,0),r.from(t),r.from(o)]),f=Object(i.full)(h,r.from(n));return{privateKey:f.slice(0,32),chainCode:f.slice(32)}})(t,n),n)}function c(r,t){if(!["m","m/"].includes(r.slice(0,2)))throw new Error("Invalid path");const n=function(r){const t=Object(i.full)(r,f);return{privateKey:t.slice(0,32),chainCode:t.slice(32)}}(t);return u(r.slice(2),n)}}).call(this,n(4).Buffer)},function(r,t,n){!function(t,e){"use strict";r.exports?r.exports=e(n(10)):t.nacl.auth=e(t.nacl)}(this,function(r){"use strict";if(!r)throw new Error("tweetnacl not loaded");var t=128,n=64;function e(e,o){var i,h,f=new Uint8Array(t+Math.max(n,e.length));for(o.length>t&&(o=r.hash(o)),i=0;i<t;i++)f[i]=54;for(i=0;i<o.length;i++)f[i]^=o[i];for(f.set(e,t),h=r.hash(f.subarray(0,t+e.length)),i=0;i<t;i++)f[i]=92;for(i=0;i<o.length;i++)f[i]^=o[i];return f.set(h,t),r.hash(f.subarray(0,t+h.length))}function o(r,t){var n=new Uint8Array(32);return n.set(e(r,t).subarray(0,32)),n}return o.full=function(r,t){return e(r,t)},o.authLength=32,o.authFullLength=64,o.keyLength=32,o})},function(r,t,n){!function(r){"use strict";var t=function(r){var t,n=new Float64Array(16);if(r)for(t=0;t<r.length;t++)n[t]=r[t];return n},e=function(){throw new Error("no PRNG")},o=new Uint8Array(16),i=new Uint8Array(32);i[0]=9;var h=t(),f=t([1]),a=t([56129,1]),s=t([30883,4953,19914,30187,55467,16705,2637,112,59544,30585,16505,36039,65139,11119,27886,20995]),u=t([61785,9906,39828,60374,45398,33411,5274,224,53552,61171,33010,6542,64743,22239,55772,9222]),c=t([54554,36645,11616,51542,42930,38181,51040,26924,56412,64982,57905,49316,21502,52590,14035,8553]),l=t([26200,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214]),y=t([41136,18958,6951,50414,58488,44335,6150,12099,55207,15867,153,11085,57099,20417,9344,11139]);function p(r,t,n,e){r[t]=n>>24&255,r[t+1]=n>>16&255,r[t+2]=n>>8&255,r[t+3]=255&n,r[t+4]=e>>24&255,r[t+5]=e>>16&255,r[t+6]=e>>8&255,r[t+7]=255&e}function g(r,t,n,e,o){var i,h=0;for(i=0;i<o;i++)h|=r[t+i]^n[e+i];return(1&h-1>>>8)-1}function w(r,t,n,e){return g(r,t,n,e,16)}function v(r,t,n,e){return g(r,t,n,e,32)}function b(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=i,E=h,U=f,m=a,x=s,B=u,R=c,M=l,S=y,P=p,T=g,Y=w,L=v,O=b,I=d,k=A,C=0;C<20;C+=2)_^=(o=(L^=(o=(S^=(o=(x^=(o=_+L|0)<<7|o>>>25)+_|0)<<9|o>>>23)+x|0)<<13|o>>>19)+S|0)<<18|o>>>14,B^=(o=(E^=(o=(O^=(o=(P^=(o=B+E|0)<<7|o>>>25)+B|0)<<9|o>>>23)+P|0)<<13|o>>>19)+O|0)<<18|o>>>14,T^=(o=(R^=(o=(U^=(o=(I^=(o=T+R|0)<<7|o>>>25)+T|0)<<9|o>>>23)+I|0)<<13|o>>>19)+U|0)<<18|o>>>14,k^=(o=(Y^=(o=(M^=(o=(m^=(o=k+Y|0)<<7|o>>>25)+k|0)<<9|o>>>23)+m|0)<<13|o>>>19)+M|0)<<18|o>>>14,_^=(o=(m^=(o=(U^=(o=(E^=(o=_+m|0)<<7|o>>>25)+_|0)<<9|o>>>23)+E|0)<<13|o>>>19)+U|0)<<18|o>>>14,B^=(o=(x^=(o=(M^=(o=(R^=(o=B+x|0)<<7|o>>>25)+B|0)<<9|o>>>23)+R|0)<<13|o>>>19)+M|0)<<18|o>>>14,T^=(o=(P^=(o=(S^=(o=(Y^=(o=T+P|0)<<7|o>>>25)+T|0)<<9|o>>>23)+Y|0)<<13|o>>>19)+S|0)<<18|o>>>14,k^=(o=(I^=(o=(O^=(o=(L^=(o=k+I|0)<<7|o>>>25)+k|0)<<9|o>>>23)+L|0)<<13|o>>>19)+O|0)<<18|o>>>14;_=_+i|0,E=E+h|0,U=U+f|0,m=m+a|0,x=x+s|0,B=B+u|0,R=R+c|0,M=M+l|0,S=S+y|0,P=P+p|0,T=T+g|0,Y=Y+w|0,L=L+v|0,O=O+b|0,I=I+d|0,k=k+A|0,r[0]=_>>>0&255,r[1]=_>>>8&255,r[2]=_>>>16&255,r[3]=_>>>24&255,r[4]=E>>>0&255,r[5]=E>>>8&255,r[6]=E>>>16&255,r[7]=E>>>24&255,r[8]=U>>>0&255,r[9]=U>>>8&255,r[10]=U>>>16&255,r[11]=U>>>24&255,r[12]=m>>>0&255,r[13]=m>>>8&255,r[14]=m>>>16&255,r[15]=m>>>24&255,r[16]=x>>>0&255,r[17]=x>>>8&255,r[18]=x>>>16&255,r[19]=x>>>24&255,r[20]=B>>>0&255,r[21]=B>>>8&255,r[22]=B>>>16&255,r[23]=B>>>24&255,r[24]=R>>>0&255,r[25]=R>>>8&255,r[26]=R>>>16&255,r[27]=R>>>24&255,r[28]=M>>>0&255,r[29]=M>>>8&255,r[30]=M>>>16&255,r[31]=M>>>24&255,r[32]=S>>>0&255,r[33]=S>>>8&255,r[34]=S>>>16&255,r[35]=S>>>24&255,r[36]=P>>>0&255,r[37]=P>>>8&255,r[38]=P>>>16&255,r[39]=P>>>24&255,r[40]=T>>>0&255,r[41]=T>>>8&255,r[42]=T>>>16&255,r[43]=T>>>24&255,r[44]=Y>>>0&255,r[45]=Y>>>8&255,r[46]=Y>>>16&255,r[47]=Y>>>24&255,r[48]=L>>>0&255,r[49]=L>>>8&255,r[50]=L>>>16&255,r[51]=L>>>24&255,r[52]=O>>>0&255,r[53]=O>>>8&255,r[54]=O>>>16&255,r[55]=O>>>24&255,r[56]=I>>>0&255,r[57]=I>>>8&255,r[58]=I>>>16&255,r[59]=I>>>24&255,r[60]=k>>>0&255,r[61]=k>>>8&255,r[62]=k>>>16&255,r[63]=k>>>24&255}(r,t,n,e)}function d(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=0;_<20;_+=2)i^=(o=(v^=(o=(y^=(o=(s^=(o=i+v|0)<<7|o>>>25)+i|0)<<9|o>>>23)+s|0)<<13|o>>>19)+y|0)<<18|o>>>14,u^=(o=(h^=(o=(b^=(o=(p^=(o=u+h|0)<<7|o>>>25)+u|0)<<9|o>>>23)+p|0)<<13|o>>>19)+b|0)<<18|o>>>14,g^=(o=(c^=(o=(f^=(o=(d^=(o=g+c|0)<<7|o>>>25)+g|0)<<9|o>>>23)+d|0)<<13|o>>>19)+f|0)<<18|o>>>14,A^=(o=(w^=(o=(l^=(o=(a^=(o=A+w|0)<<7|o>>>25)+A|0)<<9|o>>>23)+a|0)<<13|o>>>19)+l|0)<<18|o>>>14,i^=(o=(a^=(o=(f^=(o=(h^=(o=i+a|0)<<7|o>>>25)+i|0)<<9|o>>>23)+h|0)<<13|o>>>19)+f|0)<<18|o>>>14,u^=(o=(s^=(o=(l^=(o=(c^=(o=u+s|0)<<7|o>>>25)+u|0)<<9|o>>>23)+c|0)<<13|o>>>19)+l|0)<<18|o>>>14,g^=(o=(p^=(o=(y^=(o=(w^=(o=g+p|0)<<7|o>>>25)+g|0)<<9|o>>>23)+w|0)<<13|o>>>19)+y|0)<<18|o>>>14,A^=(o=(d^=(o=(b^=(o=(v^=(o=A+d|0)<<7|o>>>25)+A|0)<<9|o>>>23)+v|0)<<13|o>>>19)+b|0)<<18|o>>>14;r[0]=i>>>0&255,r[1]=i>>>8&255,r[2]=i>>>16&255,r[3]=i>>>24&255,r[4]=u>>>0&255,r[5]=u>>>8&255,r[6]=u>>>16&255,r[7]=u>>>24&255,r[8]=g>>>0&255,r[9]=g>>>8&255,r[10]=g>>>16&255,r[11]=g>>>24&255,r[12]=A>>>0&255,r[13]=A>>>8&255,r[14]=A>>>16&255,r[15]=A>>>24&255,r[16]=c>>>0&255,r[17]=c>>>8&255,r[18]=c>>>16&255,r[19]=c>>>24&255,r[20]=l>>>0&255,r[21]=l>>>8&255,r[22]=l>>>16&255,r[23]=l>>>24&255,r[24]=y>>>0&255,r[25]=y>>>8&255,r[26]=y>>>16&255,r[27]=y>>>24&255,r[28]=p>>>0&255,r[29]=p>>>8&255,r[30]=p>>>16&255,r[31]=p>>>24&255}(r,t,n,e)}var A=new Uint8Array([101,120,112,97,110,100,32,51,50,45,98,121,116,101,32,107]);function _(r,t,n,e,o,i,h){var f,a,s=new Uint8Array(16),u=new Uint8Array(64);for(a=0;a<16;a++)s[a]=0;for(a=0;a<8;a++)s[a]=i[a];for(;o>=64;){for(b(u,s,h,A),a=0;a<64;a++)r[t+a]=n[e+a]^u[a];for(f=1,a=8;a<16;a++)f=f+(255&s[a])|0,s[a]=255&f,f>>>=8;o-=64,t+=64,e+=64}if(o>0)for(b(u,s,h,A),a=0;a<o;a++)r[t+a]=n[e+a]^u[a];return 0}function E(r,t,n,e,o){var i,h,f=new Uint8Array(16),a=new Uint8Array(64);for(h=0;h<16;h++)f[h]=0;for(h=0;h<8;h++)f[h]=e[h];for(;n>=64;){for(b(a,f,o,A),h=0;h<64;h++)r[t+h]=a[h];for(i=1,h=8;h<16;h++)i=i+(255&f[h])|0,f[h]=255&i,i>>>=8;n-=64,t+=64}if(n>0)for(b(a,f,o,A),h=0;h<n;h++)r[t+h]=a[h];return 0}function U(r,t,n,e,o){var i=new Uint8Array(32);d(i,e,o,A);for(var h=new Uint8Array(8),f=0;f<8;f++)h[f]=e[f+16];return E(r,t,n,h,i)}function m(r,t,n,e,o,i,h){var f=new Uint8Array(32);d(f,i,h,A);for(var a=new Uint8Array(8),s=0;s<8;s++)a[s]=i[s+16];return _(r,t,n,e,o,a,f)}var x=function(r){var t,n,e,o,i,h,f,a;this.buffer=new Uint8Array(16),this.r=new Uint16Array(10),this.h=new Uint16Array(10),this.pad=new Uint16Array(8),this.leftover=0,this.fin=0,t=255&r[0]|(255&r[1])<<8,this.r[0]=8191&t,n=255&r[2]|(255&r[3])<<8,this.r[1]=8191&(t>>>13|n<<3),e=255&r[4]|(255&r[5])<<8,this.r[2]=7939&(n>>>10|e<<6),o=255&r[6]|(255&r[7])<<8,this.r[3]=8191&(e>>>7|o<<9),i=255&r[8]|(255&r[9])<<8,this.r[4]=255&(o>>>4|i<<12),this.r[5]=i>>>1&8190,h=255&r[10]|(255&r[11])<<8,this.r[6]=8191&(i>>>14|h<<2),f=255&r[12]|(255&r[13])<<8,this.r[7]=8065&(h>>>11|f<<5),a=255&r[14]|(255&r[15])<<8,this.r[8]=8191&(f>>>8|a<<8),this.r[9]=a>>>5&127,this.pad[0]=255&r[16]|(255&r[17])<<8,this.pad[1]=255&r[18]|(255&r[19])<<8,this.pad[2]=255&r[20]|(255&r[21])<<8,this.pad[3]=255&r[22]|(255&r[23])<<8,this.pad[4]=255&r[24]|(255&r[25])<<8,this.pad[5]=255&r[26]|(255&r[27])<<8,this.pad[6]=255&r[28]|(255&r[29])<<8,this.pad[7]=255&r[30]|(255&r[31])<<8};function B(r,t,n,e,o,i){var h=new x(i);return h.update(n,e,o),h.finish(r,t),0}function R(r,t,n,e,o,i){var h=new Uint8Array(16);return B(h,0,n,e,o,i),w(r,t,h,0)}function M(r,t,n,e,o){var i;if(n<32)return-1;for(m(r,0,t,0,n,e,o),B(r,16,r,32,n-32,r),i=0;i<16;i++)r[i]=0;return 0}function S(r,t,n,e,o){var i,h=new Uint8Array(32);if(n<32)return-1;if(U(h,0,32,e,o),0!==R(t,16,t,32,n-32,h))return-1;for(m(r,0,t,0,n,e,o),i=0;i<32;i++)r[i]=0;return 0}function P(r,t){var n;for(n=0;n<16;n++)r[n]=0|t[n]}function T(r){var t,n,e=1;for(t=0;t<16;t++)n=r[t]+e+65535,e=Math.floor(n/65536),r[t]=n-65536*e;r[0]+=e-1+37*(e-1)}function Y(r,t,n){for(var e,o=~(n-1),i=0;i<16;i++)e=o&(r[i]^t[i]),r[i]^=e,t[i]^=e}function L(r,n){var e,o,i,h=t(),f=t();for(e=0;e<16;e++)f[e]=n[e];for(T(f),T(f),T(f),o=0;o<2;o++){for(h[0]=f[0]-65517,e=1;e<15;e++)h[e]=f[e]-65535-(h[e-1]>>16&1),h[e-1]&=65535;h[15]=f[15]-32767-(h[14]>>16&1),i=h[15]>>16&1,h[14]&=65535,Y(f,h,1-i)}for(e=0;e<16;e++)r[2*e]=255&f[e],r[2*e+1]=f[e]>>8}function O(r,t){var n=new Uint8Array(32),e=new Uint8Array(32);return L(n,r),L(e,t),v(n,0,e,0)}function I(r){var t=new Uint8Array(32);return L(t,r),1&t[0]}function k(r,t){var n;for(n=0;n<16;n++)r[n]=t[2*n]+(t[2*n+1]<<8);r[15]&=32767}function C(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]+n[e]}function K(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]-n[e]}function z(r,t,n){var e,o,i=0,h=0,f=0,a=0,s=0,u=0,c=0,l=0,y=0,p=0,g=0,w=0,v=0,b=0,d=0,A=0,_=0,E=0,U=0,m=0,x=0,B=0,R=0,M=0,S=0,P=0,T=0,Y=0,L=0,O=0,I=0,k=n[0],C=n[1],K=n[2],z=n[3],N=n[4],D=n[5],j=n[6],F=n[7],Z=n[8],G=n[9],V=n[10],X=n[11],H=n[12],W=n[13],$=n[14],q=n[15];i+=(e=t[0])*k,h+=e*C,f+=e*K,a+=e*z,s+=e*N,u+=e*D,c+=e*j,l+=e*F,y+=e*Z,p+=e*G,g+=e*V,w+=e*X,v+=e*H,b+=e*W,d+=e*$,A+=e*q,h+=(e=t[1])*k,f+=e*C,a+=e*K,s+=e*z,u+=e*N,c+=e*D,l+=e*j,y+=e*F,p+=e*Z,g+=e*G,w+=e*V,v+=e*X,b+=e*H,d+=e*W,A+=e*$,_+=e*q,f+=(e=t[2])*k,a+=e*C,s+=e*K,u+=e*z,c+=e*N,l+=e*D,y+=e*j,p+=e*F,g+=e*Z,w+=e*G,v+=e*V,b+=e*X,d+=e*H,A+=e*W,_+=e*$,E+=e*q,a+=(e=t[3])*k,s+=e*C,u+=e*K,c+=e*z,l+=e*N,y+=e*D,p+=e*j,g+=e*F,w+=e*Z,v+=e*G,b+=e*V,d+=e*X,A+=e*H,_+=e*W,E+=e*$,U+=e*q,s+=(e=t[4])*k,u+=e*C,c+=e*K,l+=e*z,y+=e*N,p+=e*D,g+=e*j,w+=e*F,v+=e*Z,b+=e*G,d+=e*V,A+=e*X,_+=e*H,E+=e*W,U+=e*$,m+=e*q,u+=(e=t[5])*k,c+=e*C,l+=e*K,y+=e*z,p+=e*N,g+=e*D,w+=e*j,v+=e*F,b+=e*Z,d+=e*G,A+=e*V,_+=e*X,E+=e*H,U+=e*W,m+=e*$,x+=e*q,c+=(e=t[6])*k,l+=e*C,y+=e*K,p+=e*z,g+=e*N,w+=e*D,v+=e*j,b+=e*F,d+=e*Z,A+=e*G,_+=e*V,E+=e*X,U+=e*H,m+=e*W,x+=e*$,B+=e*q,l+=(e=t[7])*k,y+=e*C,p+=e*K,g+=e*z,w+=e*N,v+=e*D,b+=e*j,d+=e*F,A+=e*Z,_+=e*G,E+=e*V,U+=e*X,m+=e*H,x+=e*W,B+=e*$,R+=e*q,y+=(e=t[8])*k,p+=e*C,g+=e*K,w+=e*z,v+=e*N,b+=e*D,d+=e*j,A+=e*F,_+=e*Z,E+=e*G,U+=e*V,m+=e*X,x+=e*H,B+=e*W,R+=e*$,M+=e*q,p+=(e=t[9])*k,g+=e*C,w+=e*K,v+=e*z,b+=e*N,d+=e*D,A+=e*j,_+=e*F,E+=e*Z,U+=e*G,m+=e*V,x+=e*X,B+=e*H,R+=e*W,M+=e*$,S+=e*q,g+=(e=t[10])*k,w+=e*C,v+=e*K,b+=e*z,d+=e*N,A+=e*D,_+=e*j,E+=e*F,U+=e*Z,m+=e*G,x+=e*V,B+=e*X,R+=e*H,M+=e*W,S+=e*$,P+=e*q,w+=(e=t[11])*k,v+=e*C,b+=e*K,d+=e*z,A+=e*N,_+=e*D,E+=e*j,U+=e*F,m+=e*Z,x+=e*G,B+=e*V,R+=e*X,M+=e*H,S+=e*W,P+=e*$,T+=e*q,v+=(e=t[12])*k,b+=e*C,d+=e*K,A+=e*z,_+=e*N,E+=e*D,U+=e*j,m+=e*F,x+=e*Z,B+=e*G,R+=e*V,M+=e*X,S+=e*H,P+=e*W,T+=e*$,Y+=e*q,b+=(e=t[13])*k,d+=e*C,A+=e*K,_+=e*z,E+=e*N,U+=e*D,m+=e*j,x+=e*F,B+=e*Z,R+=e*G,M+=e*V,S+=e*X,P+=e*H,T+=e*W,Y+=e*$,L+=e*q,d+=(e=t[14])*k,A+=e*C,_+=e*K,E+=e*z,U+=e*N,m+=e*D,x+=e*j,B+=e*F,R+=e*Z,M+=e*G,S+=e*V,P+=e*X,T+=e*H,Y+=e*W,L+=e*$,O+=e*q,A+=(e=t[15])*k,h+=38*(E+=e*K),f+=38*(U+=e*z),a+=38*(m+=e*N),s+=38*(x+=e*D),u+=38*(B+=e*j),c+=38*(R+=e*F),l+=38*(M+=e*Z),y+=38*(S+=e*G),p+=38*(P+=e*V),g+=38*(T+=e*X),w+=38*(Y+=e*H),v+=38*(L+=e*W),b+=38*(O+=e*$),d+=38*(I+=e*q),i=(e=(i+=38*(_+=e*C))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i=(e=(i+=o-1+37*(o-1))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i+=o-1+37*(o-1),r[0]=i,r[1]=h,r[2]=f,r[3]=a,r[4]=s,r[5]=u,r[6]=c,r[7]=l,r[8]=y,r[9]=p,r[10]=g,r[11]=w,r[12]=v,r[13]=b,r[14]=d,r[15]=A}function N(r,t){z(r,t,t)}function D(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=253;e>=0;e--)N(o,o),2!==e&&4!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}function j(r,n,e){var o,i,h=new Uint8Array(32),f=new Float64Array(80),s=t(),u=t(),c=t(),l=t(),y=t(),p=t();for(i=0;i<31;i++)h[i]=n[i];for(h[31]=127&n[31]|64,h[0]&=248,k(f,e),i=0;i<16;i++)u[i]=f[i],l[i]=s[i]=c[i]=0;for(s[0]=l[0]=1,i=254;i>=0;--i)Y(s,u,o=h[i>>>3]>>>(7&i)&1),Y(c,l,o),C(y,s,c),K(s,s,c),C(c,u,l),K(u,u,l),N(l,y),N(p,s),z(s,c,s),z(c,u,y),C(y,s,c),K(s,s,c),N(u,s),K(c,l,p),z(s,c,a),C(s,s,l),z(c,c,s),z(s,l,p),z(l,u,f),N(u,y),Y(s,u,o),Y(c,l,o);for(i=0;i<16;i++)f[i+16]=s[i],f[i+32]=c[i],f[i+48]=u[i],f[i+64]=l[i];var g=f.subarray(32),w=f.subarray(16);return D(g,g),z(w,w,g),L(r,w),0}function F(r,t){return j(r,t,i)}function Z(r,t){return e(t,32),F(r,t)}function G(r,t,n){var e=new Uint8Array(32);return j(e,n,t),d(r,o,e,A)}x.prototype.blocks=function(r,t,n){for(var e,o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E=this.fin?0:2048,U=this.h[0],m=this.h[1],x=this.h[2],B=this.h[3],R=this.h[4],M=this.h[5],S=this.h[6],P=this.h[7],T=this.h[8],Y=this.h[9],L=this.r[0],O=this.r[1],I=this.r[2],k=this.r[3],C=this.r[4],K=this.r[5],z=this.r[6],N=this.r[7],D=this.r[8],j=this.r[9];n>=16;)U+=8191&(e=255&r[t+0]|(255&r[t+1])<<8),m+=8191&(e>>>13|(o=255&r[t+2]|(255&r[t+3])<<8)<<3),x+=8191&(o>>>10|(i=255&r[t+4]|(255&r[t+5])<<8)<<6),B+=8191&(i>>>7|(h=255&r[t+6]|(255&r[t+7])<<8)<<9),R+=8191&(h>>>4|(f=255&r[t+8]|(255&r[t+9])<<8)<<12),M+=f>>>1&8191,S+=8191&(f>>>14|(a=255&r[t+10]|(255&r[t+11])<<8)<<2),P+=8191&(a>>>11|(s=255&r[t+12]|(255&r[t+13])<<8)<<5),u=255&r[t+14]|(255&r[t+15])<<8,l=c=0,l+=U*L,l+=m*(5*j),l+=x*(5*D),l+=B*(5*N),c=(l+=R*(5*z))>>>13,l&=8191,l+=M*(5*K),l+=S*(5*C),l+=P*(5*k),l+=(T+=8191&(s>>>8|u<<8))*(5*I),y=c+=(l+=(Y+=u>>>5|E)*(5*O))>>>13,y+=U*O,y+=m*L,y+=x*(5*j),y+=B*(5*D),c=(y+=R*(5*N))>>>13,y&=8191,y+=M*(5*z),y+=S*(5*K),y+=P*(5*C),y+=T*(5*k),c+=(y+=Y*(5*I))>>>13,y&=8191,p=c,p+=U*I,p+=m*O,p+=x*L,p+=B*(5*j),c=(p+=R*(5*D))>>>13,p&=8191,p+=M*(5*N),p+=S*(5*z),p+=P*(5*K),p+=T*(5*C),g=c+=(p+=Y*(5*k))>>>13,g+=U*k,g+=m*I,g+=x*O,g+=B*L,c=(g+=R*(5*j))>>>13,g&=8191,g+=M*(5*D),g+=S*(5*N),g+=P*(5*z),g+=T*(5*K),w=c+=(g+=Y*(5*C))>>>13,w+=U*C,w+=m*k,w+=x*I,w+=B*O,c=(w+=R*L)>>>13,w&=8191,w+=M*(5*j),w+=S*(5*D),w+=P*(5*N),w+=T*(5*z),v=c+=(w+=Y*(5*K))>>>13,v+=U*K,v+=m*C,v+=x*k,v+=B*I,c=(v+=R*O)>>>13,v&=8191,v+=M*L,v+=S*(5*j),v+=P*(5*D),v+=T*(5*N),b=c+=(v+=Y*(5*z))>>>13,b+=U*z,b+=m*K,b+=x*C,b+=B*k,c=(b+=R*I)>>>13,b&=8191,b+=M*O,b+=S*L,b+=P*(5*j),b+=T*(5*D),d=c+=(b+=Y*(5*N))>>>13,d+=U*N,d+=m*z,d+=x*K,d+=B*C,c=(d+=R*k)>>>13,d&=8191,d+=M*I,d+=S*O,d+=P*L,d+=T*(5*j),A=c+=(d+=Y*(5*D))>>>13,A+=U*D,A+=m*N,A+=x*z,A+=B*K,c=(A+=R*C)>>>13,A&=8191,A+=M*k,A+=S*I,A+=P*O,A+=T*L,_=c+=(A+=Y*(5*j))>>>13,_+=U*j,_+=m*D,_+=x*N,_+=B*z,c=(_+=R*K)>>>13,_&=8191,_+=M*C,_+=S*k,_+=P*I,_+=T*O,U=l=8191&(c=(c=((c+=(_+=Y*L)>>>13)<<2)+c|0)+(l&=8191)|0),m=y+=c>>>=13,x=p&=8191,B=g&=8191,R=w&=8191,M=v&=8191,S=b&=8191,P=d&=8191,T=A&=8191,Y=_&=8191,t+=16,n-=16;this.h[0]=U,this.h[1]=m,this.h[2]=x,this.h[3]=B,this.h[4]=R,this.h[5]=M,this.h[6]=S,this.h[7]=P,this.h[8]=T,this.h[9]=Y},x.prototype.finish=function(r,t){var n,e,o,i,h=new Uint16Array(10);if(this.leftover){for(i=this.leftover,this.buffer[i++]=1;i<16;i++)this.buffer[i]=0;this.fin=1,this.blocks(this.buffer,0,16)}for(n=this.h[1]>>>13,this.h[1]&=8191,i=2;i<10;i++)this.h[i]+=n,n=this.h[i]>>>13,this.h[i]&=8191;for(this.h[0]+=5*n,n=this.h[0]>>>13,this.h[0]&=8191,this.h[1]+=n,n=this.h[1]>>>13,this.h[1]&=8191,this.h[2]+=n,h[0]=this.h[0]+5,n=h[0]>>>13,h[0]&=8191,i=1;i<10;i++)h[i]=this.h[i]+n,n=h[i]>>>13,h[i]&=8191;for(h[9]-=8192,e=(1^n)-1,i=0;i<10;i++)h[i]&=e;for(e=~e,i=0;i<10;i++)this.h[i]=this.h[i]&e|h[i];for(this.h[0]=65535&(this.h[0]|this.h[1]<<13),this.h[1]=65535&(this.h[1]>>>3|this.h[2]<<10),this.h[2]=65535&(this.h[2]>>>6|this.h[3]<<7),this.h[3]=65535&(this.h[3]>>>9|this.h[4]<<4),this.h[4]=65535&(this.h[4]>>>12|this.h[5]<<1|this.h[6]<<14),this.h[5]=65535&(this.h[6]>>>2|this.h[7]<<11),this.h[6]=65535&(this.h[7]>>>5|this.h[8]<<8),this.h[7]=65535&(this.h[8]>>>8|this.h[9]<<5),o=this.h[0]+this.pad[0],this.h[0]=65535&o,i=1;i<8;i++)o=(this.h[i]+this.pad[i]|0)+(o>>>16)|0,this.h[i]=65535&o;r[t+0]=this.h[0]>>>0&255,r[t+1]=this.h[0]>>>8&255,r[t+2]=this.h[1]>>>0&255,r[t+3]=this.h[1]>>>8&255,r[t+4]=this.h[2]>>>0&255,r[t+5]=this.h[2]>>>8&255,r[t+6]=this.h[3]>>>0&255,r[t+7]=this.h[3]>>>8&255,r[t+8]=this.h[4]>>>0&255,r[t+9]=this.h[4]>>>8&255,r[t+10]=this.h[5]>>>0&255,r[t+11]=this.h[5]>>>8&255,r[t+12]=this.h[6]>>>0&255,r[t+13]=this.h[6]>>>8&255,r[t+14]=this.h[7]>>>0&255,r[t+15]=this.h[7]>>>8&255},x.prototype.update=function(r,t,n){var e,o;if(this.leftover){for((o=16-this.leftover)>n&&(o=n),e=0;e<o;e++)this.buffer[this.leftover+e]=r[t+e];if(n-=o,t+=o,this.leftover+=o,this.leftover<16)return;this.blocks(this.buffer,0,16),this.leftover=0}if(n>=16&&(o=n-n%16,this.blocks(r,t,o),t+=o,n-=o),n){for(e=0;e<n;e++)this.buffer[this.leftover+e]=r[t+e];this.leftover+=n}};var V=M,X=S;var H=[1116352408,3609767458,1899447441,602891725,3049323471,3964484399,3921009573,2173295548,961987163,4081628472,1508970993,3053834265,2453635748,2937671579,2870763221,3664609560,3624381080,2734883394,310598401,1164996542,607225278,1323610764,1426881987,3590304994,1925078388,4068182383,2162078206,991336113,2614888103,633803317,3248222580,3479774868,3835390401,2666613458,4022224774,944711139,264347078,2341262773,604807628,2007800933,770255983,1495990901,1249150122,1856431235,1555081692,3175218132,1996064986,2198950837,2554220882,3999719339,2821834349,766784016,2952996808,2566594879,3210313671,3203337956,3336571891,1034457026,3584528711,2466948901,113926993,3758326383,338241895,168717936,666307205,1188179964,773529912,1546045734,1294757372,1522805485,1396182291,2643833823,1695183700,2343527390,1986661051,1014477480,2177026350,1206759142,2456956037,344077627,2730485921,1290863460,2820302411,3158454273,3259730800,3505952657,3345764771,106217008,3516065817,3606008344,3600352804,1432725776,4094571909,1467031594,275423344,851169720,430227734,3100823752,506948616,1363258195,659060556,3750685593,883997877,3785050280,958139571,3318307427,1322822218,3812723403,1537002063,2003034995,1747873779,3602036899,1955562222,1575990012,2024104815,1125592928,2227730452,2716904306,2361852424,442776044,2428436474,593698344,2756734187,3733110249,3204031479,2999351573,3329325298,3815920427,3391569614,3928383900,3515267271,566280711,3940187606,3454069534,4118630271,4000239992,116418474,1914138554,174292421,2731055270,289380356,3203993006,460393269,320620315,685471733,587496836,852142971,1086792851,1017036298,365543100,1126000580,2618297676,1288033470,3409855158,1501505948,4234509866,1607167915,987167468,1816402316,1246189591];function W(r,t,n,e){for(var o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E,U,m,x,B,R,M,S,P=new Int32Array(16),T=new Int32Array(16),Y=r[0],L=r[1],O=r[2],I=r[3],k=r[4],C=r[5],K=r[6],z=r[7],N=t[0],D=t[1],j=t[2],F=t[3],Z=t[4],G=t[5],V=t[6],X=t[7],W=0;e>=128;){for(E=0;E<16;E++)U=8*E+W,P[E]=n[U+0]<<24|n[U+1]<<16|n[U+2]<<8|n[U+3],T[E]=n[U+4]<<24|n[U+5]<<16|n[U+6]<<8|n[U+7];for(E=0;E<80;E++)if(o=Y,i=L,h=O,f=I,a=k,s=C,u=K,c=z,l=N,y=D,p=j,g=F,w=Z,v=G,b=V,d=X,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,B+=65535&(x=(Z>>>14|k<<18)^(Z>>>18|k<<14)^(k>>>9|Z<<23)),R+=x>>>16,M+=65535&(m=(k>>>14|Z<<18)^(k>>>18|Z<<14)^(Z>>>9|k<<23)),S+=m>>>16,B+=65535&(x=Z&G^~Z&V),R+=x>>>16,M+=65535&(m=k&C^~k&K),S+=m>>>16,m=H[2*E],B+=65535&(x=H[2*E+1]),R+=x>>>16,M+=65535&m,S+=m>>>16,m=P[E%16],R+=(x=T[E%16])>>>16,M+=65535&m,S+=m>>>16,M+=(R+=(B+=65535&x)>>>16)>>>16,B=65535&(x=_=65535&B|R<<16),R=x>>>16,M=65535&(m=A=65535&M|(S+=M>>>16)<<16),S=m>>>16,B+=65535&(x=(N>>>28|Y<<4)^(Y>>>2|N<<30)^(Y>>>7|N<<25)),R+=x>>>16,M+=65535&(m=(Y>>>28|N<<4)^(N>>>2|Y<<30)^(N>>>7|Y<<25)),S+=m>>>16,R+=(x=N&D^N&j^D&j)>>>16,M+=65535&(m=Y&L^Y&O^L&O),S+=m>>>16,c=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,d=65535&B|R<<16,B=65535&(x=g),R=x>>>16,M=65535&(m=f),S=m>>>16,R+=(x=_)>>>16,M+=65535&(m=A),S+=m>>>16,L=o,O=i,I=h,k=f=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,C=a,K=s,z=u,Y=c,D=l,j=y,F=p,Z=g=65535&B|R<<16,G=w,V=v,X=b,N=d,E%16==15)for(U=0;U<16;U++)m=P[U],B=65535&(x=T[U]),R=x>>>16,M=65535&m,S=m>>>16,m=P[(U+9)%16],B+=65535&(x=T[(U+9)%16]),R+=x>>>16,M+=65535&m,S+=m>>>16,A=P[(U+1)%16],B+=65535&(x=((_=T[(U+1)%16])>>>1|A<<31)^(_>>>8|A<<24)^(_>>>7|A<<25)),R+=x>>>16,M+=65535&(m=(A>>>1|_<<31)^(A>>>8|_<<24)^A>>>7),S+=m>>>16,A=P[(U+14)%16],R+=(x=((_=T[(U+14)%16])>>>19|A<<13)^(A>>>29|_<<3)^(_>>>6|A<<26))>>>16,M+=65535&(m=(A>>>19|_<<13)^(_>>>29|A<<3)^A>>>6),S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,P[U]=65535&M|S<<16,T[U]=65535&B|R<<16;B=65535&(x=N),R=x>>>16,M=65535&(m=Y),S=m>>>16,m=r[0],R+=(x=t[0])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[0]=Y=65535&M|S<<16,t[0]=N=65535&B|R<<16,B=65535&(x=D),R=x>>>16,M=65535&(m=L),S=m>>>16,m=r[1],R+=(x=t[1])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[1]=L=65535&M|S<<16,t[1]=D=65535&B|R<<16,B=65535&(x=j),R=x>>>16,M=65535&(m=O),S=m>>>16,m=r[2],R+=(x=t[2])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[2]=O=65535&M|S<<16,t[2]=j=65535&B|R<<16,B=65535&(x=F),R=x>>>16,M=65535&(m=I),S=m>>>16,m=r[3],R+=(x=t[3])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[3]=I=65535&M|S<<16,t[3]=F=65535&B|R<<16,B=65535&(x=Z),R=x>>>16,M=65535&(m=k),S=m>>>16,m=r[4],R+=(x=t[4])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[4]=k=65535&M|S<<16,t[4]=Z=65535&B|R<<16,B=65535&(x=G),R=x>>>16,M=65535&(m=C),S=m>>>16,m=r[5],R+=(x=t[5])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[5]=C=65535&M|S<<16,t[5]=G=65535&B|R<<16,B=65535&(x=V),R=x>>>16,M=65535&(m=K),S=m>>>16,m=r[6],R+=(x=t[6])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[6]=K=65535&M|S<<16,t[6]=V=65535&B|R<<16,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,m=r[7],R+=(x=t[7])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[7]=z=65535&M|S<<16,t[7]=X=65535&B|R<<16,W+=128,e-=128}return e}function $(r,t,n){var e,o=new Int32Array(8),i=new Int32Array(8),h=new Uint8Array(256),f=n;for(o[0]=1779033703,o[1]=3144134277,o[2]=1013904242,o[3]=2773480762,o[4]=1359893119,o[5]=2600822924,o[6]=528734635,o[7]=1541459225,i[0]=4089235720,i[1]=2227873595,i[2]=4271175723,i[3]=1595750129,i[4]=2917565137,i[5]=725511199,i[6]=4215389547,i[7]=327033209,W(o,i,t,n),n%=128,e=0;e<n;e++)h[e]=t[f-n+e];for(h[n]=128,h[(n=256-128*(n<112?1:0))-9]=0,p(h,n-8,f/536870912|0,f<<3),W(o,i,h,n),e=0;e<8;e++)p(r,8*e,o[e],i[e]);return 0}function q(r,n){var e=t(),o=t(),i=t(),h=t(),f=t(),a=t(),s=t(),c=t(),l=t();K(e,r[1],r[0]),K(l,n[1],n[0]),z(e,e,l),C(o,r[0],r[1]),C(l,n[0],n[1]),z(o,o,l),z(i,r[3],n[3]),z(i,i,u),z(h,r[2],n[2]),C(h,h,h),K(f,o,e),K(a,h,i),C(s,h,i),C(c,o,e),z(r[0],f,a),z(r[1],c,s),z(r[2],s,a),z(r[3],f,c)}function J(r,t,n){var e;for(e=0;e<4;e++)Y(r[e],t[e],n)}function Q(r,n){var e=t(),o=t(),i=t();D(i,n[2]),z(e,n[0],i),z(o,n[1],i),L(r,o),r[31]^=I(e)<<7}function rr(r,t,n){var e,o;for(P(r[0],h),P(r[1],f),P(r[2],f),P(r[3],h),o=255;o>=0;--o)J(r,t,e=n[o/8|0]>>(7&o)&1),q(t,r),q(r,r),J(r,t,e)}function tr(r,n){var e=[t(),t(),t(),t()];P(e[0],c),P(e[1],l),P(e[2],f),z(e[3],c,l),rr(r,e,n)}function nr(r,n,o){var i,h=new Uint8Array(64),f=[t(),t(),t(),t()];for(o||e(n,32),$(h,n,32),h[0]&=248,h[31]&=127,h[31]|=64,tr(f,h),Q(r,f),i=0;i<32;i++)n[i+32]=r[i];return 0}var er=new Float64Array([237,211,245,92,26,99,18,88,214,156,247,162,222,249,222,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16]);function or(r,t){var n,e,o,i;for(e=63;e>=32;--e){for(n=0,o=e-32,i=e-12;o<i;++o)t[o]+=n-16*t[e]*er[o-(e-32)],n=t[o]+128>>8,t[o]-=256*n;t[o]+=n,t[e]=0}for(n=0,o=0;o<32;o++)t[o]+=n-(t[31]>>4)*er[o],n=t[o]>>8,t[o]&=255;for(o=0;o<32;o++)t[o]-=n*er[o];for(e=0;e<32;e++)t[e+1]+=t[e]>>8,r[e]=255&t[e]}function ir(r){var t,n=new Float64Array(64);for(t=0;t<64;t++)n[t]=r[t];for(t=0;t<64;t++)r[t]=0;or(r,n)}function hr(r,n,e,o){var i,h,f=new Uint8Array(64),a=new Uint8Array(64),s=new Uint8Array(64),u=new Float64Array(64),c=[t(),t(),t(),t()];$(f,o,32),f[0]&=248,f[31]&=127,f[31]|=64;var l=e+64;for(i=0;i<e;i++)r[64+i]=n[i];for(i=0;i<32;i++)r[32+i]=f[32+i];for($(s,r.subarray(32),e+32),ir(s),tr(c,s),Q(r,c),i=32;i<64;i++)r[i]=o[i];for($(a,r,e+64),ir(a),i=0;i<64;i++)u[i]=0;for(i=0;i<32;i++)u[i]=s[i];for(i=0;i<32;i++)for(h=0;h<32;h++)u[i+h]+=a[i]*f[h];return or(r.subarray(32),u),l}function fr(r,n){var e=t(),o=t(),i=t(),a=t(),u=t(),c=t(),l=t();return P(r[2],f),k(r[1],n),N(i,r[1]),z(a,i,s),K(i,i,r[2]),C(a,r[2],a),N(u,a),N(c,u),z(l,c,u),z(e,l,i),z(e,e,a),function(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=250;e>=0;e--)N(o,o),1!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}(e,e),z(e,e,i),z(e,e,a),z(e,e,a),z(r[0],e,a),N(o,r[0]),z(o,o,a),O(o,i)&&z(r[0],r[0],y),N(o,r[0]),z(o,o,a),O(o,i)?-1:(I(r[0])===n[31]>>7&&K(r[0],h,r[0]),z(r[3],r[0],r[1]),0)}function ar(r,n,e,o){var i,h=new Uint8Array(32),f=new Uint8Array(64),a=[t(),t(),t(),t()],s=[t(),t(),t(),t()];if(-1,e<64)return-1;if(fr(s,o))return-1;for(i=0;i<e;i++)r[i]=n[i];for(i=0;i<32;i++)r[i+32]=o[i];if($(f,r,e),ir(f),rr(a,s,f),tr(s,n.subarray(32)),q(a,s),Q(h,a),e-=64,v(n,0,h,0)){for(i=0;i<e;i++)r[i]=0;return-1}for(i=0;i<e;i++)r[i]=n[i+64];return e}var sr=32,ur=24,cr=32,lr=32,yr=ur;function pr(r,t){if(r.length!==sr)throw new Error("bad key size");if(t.length!==ur)throw new Error("bad nonce size")}function gr(){for(var r=0;r<arguments.length;r++)if(!(arguments[r]instanceof Uint8Array))throw new TypeError("unexpected type, use Uint8Array")}function wr(r){for(var t=0;t<r.length;t++)r[t]=0}r.lowlevel={crypto_core_hsalsa20:d,crypto_stream_xor:m,crypto_stream:U,crypto_stream_salsa20_xor:_,crypto_stream_salsa20:E,crypto_onetimeauth:B,crypto_onetimeauth_verify:R,crypto_verify_16:w,crypto_verify_32:v,crypto_secretbox:M,crypto_secretbox_open:S,crypto_scalarmult:j,crypto_scalarmult_base:F,crypto_box_beforenm:G,crypto_box_afternm:V,crypto_box:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),V(r,t,n,e,h)},crypto_box_open:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),X(r,t,n,e,h)},crypto_box_keypair:Z,crypto_hash:$,crypto_sign:hr,crypto_sign_keypair:nr,crypto_sign_open:ar,crypto_secretbox_KEYBYTES:sr,crypto_secretbox_NONCEBYTES:ur,crypto_secretbox_ZEROBYTES:32,crypto_secretbox_BOXZEROBYTES:16,crypto_scalarmult_BYTES:32,crypto_scalarmult_SCALARBYTES:32,crypto_box_PUBLICKEYBYTES:cr,crypto_box_SECRETKEYBYTES:lr,crypto_box_BEFORENMBYTES:32,crypto_box_NONCEBYTES:yr,crypto_box_ZEROBYTES:32,crypto_box_BOXZEROBYTES:16,crypto_sign_BYTES:64,crypto_sign_PUBLICKEYBYTES:32,crypto_sign_SECRETKEYBYTES:64,crypto_sign_SEEDBYTES:32,crypto_hash_BYTES:64},r.randomBytes=function(r){var t=new Uint8Array(r);return e(t,r),t},r.secretbox=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(32+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+32]=r[i];return M(o,e,e.length,t,n),o.subarray(16)},r.secretbox.open=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(16+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+16]=r[i];return e.length<32?null:0!==S(o,e,e.length,t,n)?null:o.subarray(32)},r.secretbox.keyLength=sr,r.secretbox.nonceLength=ur,r.secretbox.overheadLength=16,r.scalarMult=function(r,t){if(gr(r,t),32!==r.length)throw new Error("bad n size");if(32!==t.length)throw new Error("bad p size");var n=new Uint8Array(32);return j(n,r,t),n},r.scalarMult.base=function(r){if(gr(r),32!==r.length)throw new Error("bad n size");var t=new Uint8Array(32);return F(t,r),t},r.scalarMult.scalarLength=32,r.scalarMult.groupElementLength=32,r.box=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox(t,n,i)},r.box.before=function(r,t){gr(r,t),function(r,t){if(r.length!==cr)throw new Error("bad public key size");if(t.length!==lr)throw new Error("bad secret key size")}(r,t);var n=new Uint8Array(32);return G(n,r,t),n},r.box.after=r.secretbox,r.box.open=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox.open(t,n,i)},r.box.open.after=r.secretbox.open,r.box.keyPair=function(){var r=new Uint8Array(cr),t=new Uint8Array(lr);return Z(r,t),{publicKey:r,secretKey:t}},r.box.keyPair.fromSecretKey=function(r){if(gr(r),r.length!==lr)throw new Error("bad secret key size");var t=new Uint8Array(cr);return F(t,r),{publicKey:t,secretKey:new Uint8Array(r)}},r.box.publicKeyLength=cr,r.box.secretKeyLength=lr,r.box.sharedKeyLength=32,r.box.nonceLength=yr,r.box.overheadLength=r.secretbox.overheadLength,r.sign=function(r,t){if(gr(r,t),64!==t.length)throw new Error("bad secret key size");var n=new Uint8Array(64+r.length);return hr(n,r,r.length,t),n},r.sign.open=function(r,t){if(gr(r,t),32!==t.length)throw new Error("bad public key size");var n=new Uint8Array(r.length),e=ar(n,r,r.length,t);if(e<0)return null;for(var o=new Uint8Array(e),i=0;i<o.length;i++)o[i]=n[i];return o},r.sign.detached=function(t,n){for(var e=r.sign(t,n),o=new Uint8Array(64),i=0;i<o.length;i++)o[i]=e[i];return o},r.sign.detached.verify=function(r,t,n){if(gr(r,t,n),64!==t.length)throw new Error("bad signature size");if(32!==n.length)throw new Error("bad public key size");var e,o=new Uint8Array(64+r.length),i=new Uint8Array(64+r.length);for(e=0;e<64;e++)o[e]=t[e];for(e=0;e<r.length;e++)o[e+64]=r[e];return ar(i,o,o.length,n)>=0},r.sign.keyPair=function(){var r=new Uint8Array(32),t=new Uint8Array(64);return nr(r,t),{publicKey:r,secretKey:t}},r.sign.keyPair.fromSecretKey=function(r){if(gr(r),64!==r.length)throw new Error("bad secret key size");for(var t=new Uint8Array(32),n=0;n<t.length;n++)t[n]=r[32+n];return{publicKey:t,secretKey:new Uint8Array(r)}},r.sign.keyPair.fromSeed=function(r){if(gr(r),32!==r.length)throw new Error("bad seed size");for(var t=new Uint8Array(32),n=new Uint8Array(64),e=0;e<32;e++)n[e]=r[e];return nr(t,n,!0),{publicKey:t,secretKey:n}},r.sign.publicKeyLength=32,r.sign.secretKeyLength=64,r.sign.seedLength=32,r.sign.signatureLength=64,r.hash=function(r){gr(r);var t=new Uint8Array(64);return $(t,r,r.length),t},r.hash.hashLength=64,r.verify=function(r,t){return gr(r,t),0!==r.length&&0!==t.length&&(r.length===t.length&&0===g(r,0,t,0,r.length))},r.setPRNG=function(r){e=r},function(){var t="undefined"!=typeof self?self.crypto||self.msCrypto:null;if(t&&t.getRandomValues){r.setPRNG(function(r,n){var e,o=new Uint8Array(n);for(e=0;e<n;e+=65536)t.getRandomValues(o.subarray(e,e+Math.min(n-e,65536)));for(e=0;e<n;e++)r[e]=o[e];wr(o)})}else(t=n(9))&&t.randomBytes&&r.setPRNG(function(r,n){var e,o=t.randomBytes(n);for(e=0;e<n;e++)r[e]=o[e];wr(o)})}()}(r.exports?r.exports:self.nacl=self.nacl||{})},function(r,t){var n=function(r){if(!Array.isArray(r))throw new Error("Input must be an Array");if(0===r.length)throw new Error("Path must contain at least one level");for(var t=0;t<r.length;t++)if("number"!=typeof r[t])throw new Error("Path element is not a number");this.path=r};n.validatePathArray=function(r){try{return n.fromPathArray(r),!0}catch(r){return!1}},n.validateString=function(r,t){try{return n.fromString(r,t),!0}catch(r){return!1}},n.fromPathArray=function(r){return new n(r)},n.fromString=function(r,t){if(/^m\//i.test(r))r=r.slice(2);else if(t)throw new Error("Root element is required");for(var e=r.split("/"),o=new Array(e.length),i=0;i<e.length;i++){var h=/(\d+)([hH\']?)/.exec(e[i]);if(null===h)throw new Error("Invalid input");if(o[i]=parseInt(h[1],10),o[i]>=2147483648)throw new Error("Invalid child index");if("h"===h[2]||"H"===h[2]||"'"===h[2])o[i]+=2147483648;else if(0!=h[2].length)throw new Error("Invalid modifier")}return new n(o)},n.prototype.toPathArray=function(){return this.path},n.prototype.toString=function(r,t){for(var n=new Array(this.path.length),e=0;e<this.path.length;e++){var o=this.path[e];n[e]=2147483648&o?(2147483647&o)+(t?"h":"'"):o}return(r?"":"m/")+n.join("/")},n.prototype.inspect=function(){return"BIPPath <"+this.toString()+">"},r.exports=n},function(r,t,n){"use strict";(function(r){
+!function(r,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.AeternityClient=t():r.AeternityClient=t()}(window,function(){return function(r){var t={};function n(e){if(t[e])return t[e].exports;var o=t[e]={i:e,l:!1,exports:{}};return r[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=r,n.c=t,n.d=function(r,t,e){n.o(r,t)||Object.defineProperty(r,t,{enumerable:!0,get:e})},n.r=function(r){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(r,"__esModule",{value:!0})},n.t=function(r,t){if(1&t&&(r=n(r)),8&t)return r;if(4&t&&"object"==typeof r&&r&&r.__esModule)return r;var e=Object.create(null);if(n.r(e),Object.defineProperty(e,"default",{enumerable:!0,value:r}),2&t&&"string"!=typeof r)for(var o in r)n.d(e,o,function(t){return r[t]}.bind(null,o));return e},n.n=function(r){var t=r&&r.__esModule?function(){return r.default}:function(){return r};return n.d(t,"a",t),t},n.o=function(r,t){return Object.prototype.hasOwnProperty.call(r,t)},n.p="",n(n.s=12)}([function(r,t,n){"use strict";(function(r){n.d(t,"c",function(){return s}),n.d(t,"a",function(){return u}),n.d(t,"b",function(){return c});var e=n(2),o=n.n(e),i=n(1),h=n(3);const f=r.from("ed25519 seed"),a=2147483648;function s(r){return o.a.sign.keyPair.fromSeed(r)}function u(t,n){const e=""===t?[]:Object(h.fromString)(t).toPathArray();return e.forEach((r,t)=>{if(r<a)throw new Error(`Segment #${t+1} is not hardened`)}),e.reduce((t,n)=>(function({privateKey:t,chainCode:n},e){if(e<a)throw new Error(`Child index #${e} is not supported`);const o=r.allocUnsafe(4);o.writeUInt32BE(e,0);const h=r.concat([r.alloc(1,0),r.from(t),r.from(o)]),f=Object(i.full)(h,r.from(n));return{privateKey:f.slice(0,32),chainCode:f.slice(32)}})(t,n),n)}function c(r,t){if(!["m","m/"].includes(r.slice(0,2)))throw new Error("Invalid path");const n=function(r){const t=Object(i.full)(r,f);return{privateKey:t.slice(0,32),chainCode:t.slice(32)}}(t);return u(r.slice(2),n)}}).call(this,n(4).Buffer)},function(r,t,n){!function(t,e){"use strict";r.exports?r.exports=e(n(10)):t.nacl.auth=e(t.nacl)}(this,function(r){"use strict";if(!r)throw new Error("tweetnacl not loaded");var t=128,n=64;function e(e,o){var i,h,f=new Uint8Array(t+Math.max(n,e.length));for(o.length>t&&(o=r.hash(o)),i=0;i<t;i++)f[i]=54;for(i=0;i<o.length;i++)f[i]^=o[i];for(f.set(e,t),h=r.hash(f.subarray(0,t+e.length)),i=0;i<t;i++)f[i]=92;for(i=0;i<o.length;i++)f[i]^=o[i];return f.set(h,t),r.hash(f.subarray(0,t+h.length))}function o(r,t){var n=new Uint8Array(32);return n.set(e(r,t).subarray(0,32)),n}return o.full=function(r,t){return e(r,t)},o.authLength=32,o.authFullLength=64,o.keyLength=32,o})},function(r,t,n){!function(r){"use strict";var t=function(r){var t,n=new Float64Array(16);if(r)for(t=0;t<r.length;t++)n[t]=r[t];return n},e=function(){throw new Error("no PRNG")},o=new Uint8Array(16),i=new Uint8Array(32);i[0]=9;var h=t(),f=t([1]),a=t([56129,1]),s=t([30883,4953,19914,30187,55467,16705,2637,112,59544,30585,16505,36039,65139,11119,27886,20995]),u=t([61785,9906,39828,60374,45398,33411,5274,224,53552,61171,33010,6542,64743,22239,55772,9222]),c=t([54554,36645,11616,51542,42930,38181,51040,26924,56412,64982,57905,49316,21502,52590,14035,8553]),l=t([26200,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214]),y=t([41136,18958,6951,50414,58488,44335,6150,12099,55207,15867,153,11085,57099,20417,9344,11139]);function p(r,t,n,e){r[t]=n>>24&255,r[t+1]=n>>16&255,r[t+2]=n>>8&255,r[t+3]=255&n,r[t+4]=e>>24&255,r[t+5]=e>>16&255,r[t+6]=e>>8&255,r[t+7]=255&e}function g(r,t,n,e,o){var i,h=0;for(i=0;i<o;i++)h|=r[t+i]^n[e+i];return(1&h-1>>>8)-1}function w(r,t,n,e){return g(r,t,n,e,16)}function v(r,t,n,e){return g(r,t,n,e,32)}function b(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=i,E=h,U=f,m=a,x=s,B=u,R=c,M=l,S=y,P=p,T=g,Y=w,L=v,O=b,I=d,k=A,C=0;C<20;C+=2)_^=(o=(L^=(o=(S^=(o=(x^=(o=_+L|0)<<7|o>>>25)+_|0)<<9|o>>>23)+x|0)<<13|o>>>19)+S|0)<<18|o>>>14,B^=(o=(E^=(o=(O^=(o=(P^=(o=B+E|0)<<7|o>>>25)+B|0)<<9|o>>>23)+P|0)<<13|o>>>19)+O|0)<<18|o>>>14,T^=(o=(R^=(o=(U^=(o=(I^=(o=T+R|0)<<7|o>>>25)+T|0)<<9|o>>>23)+I|0)<<13|o>>>19)+U|0)<<18|o>>>14,k^=(o=(Y^=(o=(M^=(o=(m^=(o=k+Y|0)<<7|o>>>25)+k|0)<<9|o>>>23)+m|0)<<13|o>>>19)+M|0)<<18|o>>>14,_^=(o=(m^=(o=(U^=(o=(E^=(o=_+m|0)<<7|o>>>25)+_|0)<<9|o>>>23)+E|0)<<13|o>>>19)+U|0)<<18|o>>>14,B^=(o=(x^=(o=(M^=(o=(R^=(o=B+x|0)<<7|o>>>25)+B|0)<<9|o>>>23)+R|0)<<13|o>>>19)+M|0)<<18|o>>>14,T^=(o=(P^=(o=(S^=(o=(Y^=(o=T+P|0)<<7|o>>>25)+T|0)<<9|o>>>23)+Y|0)<<13|o>>>19)+S|0)<<18|o>>>14,k^=(o=(I^=(o=(O^=(o=(L^=(o=k+I|0)<<7|o>>>25)+k|0)<<9|o>>>23)+L|0)<<13|o>>>19)+O|0)<<18|o>>>14;_=_+i|0,E=E+h|0,U=U+f|0,m=m+a|0,x=x+s|0,B=B+u|0,R=R+c|0,M=M+l|0,S=S+y|0,P=P+p|0,T=T+g|0,Y=Y+w|0,L=L+v|0,O=O+b|0,I=I+d|0,k=k+A|0,r[0]=_>>>0&255,r[1]=_>>>8&255,r[2]=_>>>16&255,r[3]=_>>>24&255,r[4]=E>>>0&255,r[5]=E>>>8&255,r[6]=E>>>16&255,r[7]=E>>>24&255,r[8]=U>>>0&255,r[9]=U>>>8&255,r[10]=U>>>16&255,r[11]=U>>>24&255,r[12]=m>>>0&255,r[13]=m>>>8&255,r[14]=m>>>16&255,r[15]=m>>>24&255,r[16]=x>>>0&255,r[17]=x>>>8&255,r[18]=x>>>16&255,r[19]=x>>>24&255,r[20]=B>>>0&255,r[21]=B>>>8&255,r[22]=B>>>16&255,r[23]=B>>>24&255,r[24]=R>>>0&255,r[25]=R>>>8&255,r[26]=R>>>16&255,r[27]=R>>>24&255,r[28]=M>>>0&255,r[29]=M>>>8&255,r[30]=M>>>16&255,r[31]=M>>>24&255,r[32]=S>>>0&255,r[33]=S>>>8&255,r[34]=S>>>16&255,r[35]=S>>>24&255,r[36]=P>>>0&255,r[37]=P>>>8&255,r[38]=P>>>16&255,r[39]=P>>>24&255,r[40]=T>>>0&255,r[41]=T>>>8&255,r[42]=T>>>16&255,r[43]=T>>>24&255,r[44]=Y>>>0&255,r[45]=Y>>>8&255,r[46]=Y>>>16&255,r[47]=Y>>>24&255,r[48]=L>>>0&255,r[49]=L>>>8&255,r[50]=L>>>16&255,r[51]=L>>>24&255,r[52]=O>>>0&255,r[53]=O>>>8&255,r[54]=O>>>16&255,r[55]=O>>>24&255,r[56]=I>>>0&255,r[57]=I>>>8&255,r[58]=I>>>16&255,r[59]=I>>>24&255,r[60]=k>>>0&255,r[61]=k>>>8&255,r[62]=k>>>16&255,r[63]=k>>>24&255}(r,t,n,e)}function d(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=0;_<20;_+=2)i^=(o=(v^=(o=(y^=(o=(s^=(o=i+v|0)<<7|o>>>25)+i|0)<<9|o>>>23)+s|0)<<13|o>>>19)+y|0)<<18|o>>>14,u^=(o=(h^=(o=(b^=(o=(p^=(o=u+h|0)<<7|o>>>25)+u|0)<<9|o>>>23)+p|0)<<13|o>>>19)+b|0)<<18|o>>>14,g^=(o=(c^=(o=(f^=(o=(d^=(o=g+c|0)<<7|o>>>25)+g|0)<<9|o>>>23)+d|0)<<13|o>>>19)+f|0)<<18|o>>>14,A^=(o=(w^=(o=(l^=(o=(a^=(o=A+w|0)<<7|o>>>25)+A|0)<<9|o>>>23)+a|0)<<13|o>>>19)+l|0)<<18|o>>>14,i^=(o=(a^=(o=(f^=(o=(h^=(o=i+a|0)<<7|o>>>25)+i|0)<<9|o>>>23)+h|0)<<13|o>>>19)+f|0)<<18|o>>>14,u^=(o=(s^=(o=(l^=(o=(c^=(o=u+s|0)<<7|o>>>25)+u|0)<<9|o>>>23)+c|0)<<13|o>>>19)+l|0)<<18|o>>>14,g^=(o=(p^=(o=(y^=(o=(w^=(o=g+p|0)<<7|o>>>25)+g|0)<<9|o>>>23)+w|0)<<13|o>>>19)+y|0)<<18|o>>>14,A^=(o=(d^=(o=(b^=(o=(v^=(o=A+d|0)<<7|o>>>25)+A|0)<<9|o>>>23)+v|0)<<13|o>>>19)+b|0)<<18|o>>>14;r[0]=i>>>0&255,r[1]=i>>>8&255,r[2]=i>>>16&255,r[3]=i>>>24&255,r[4]=u>>>0&255,r[5]=u>>>8&255,r[6]=u>>>16&255,r[7]=u>>>24&255,r[8]=g>>>0&255,r[9]=g>>>8&255,r[10]=g>>>16&255,r[11]=g>>>24&255,r[12]=A>>>0&255,r[13]=A>>>8&255,r[14]=A>>>16&255,r[15]=A>>>24&255,r[16]=c>>>0&255,r[17]=c>>>8&255,r[18]=c>>>16&255,r[19]=c>>>24&255,r[20]=l>>>0&255,r[21]=l>>>8&255,r[22]=l>>>16&255,r[23]=l>>>24&255,r[24]=y>>>0&255,r[25]=y>>>8&255,r[26]=y>>>16&255,r[27]=y>>>24&255,r[28]=p>>>0&255,r[29]=p>>>8&255,r[30]=p>>>16&255,r[31]=p>>>24&255}(r,t,n,e)}var A=new Uint8Array([101,120,112,97,110,100,32,51,50,45,98,121,116,101,32,107]);function _(r,t,n,e,o,i,h){var f,a,s=new Uint8Array(16),u=new Uint8Array(64);for(a=0;a<16;a++)s[a]=0;for(a=0;a<8;a++)s[a]=i[a];for(;o>=64;){for(b(u,s,h,A),a=0;a<64;a++)r[t+a]=n[e+a]^u[a];for(f=1,a=8;a<16;a++)f=f+(255&s[a])|0,s[a]=255&f,f>>>=8;o-=64,t+=64,e+=64}if(o>0)for(b(u,s,h,A),a=0;a<o;a++)r[t+a]=n[e+a]^u[a];return 0}function E(r,t,n,e,o){var i,h,f=new Uint8Array(16),a=new Uint8Array(64);for(h=0;h<16;h++)f[h]=0;for(h=0;h<8;h++)f[h]=e[h];for(;n>=64;){for(b(a,f,o,A),h=0;h<64;h++)r[t+h]=a[h];for(i=1,h=8;h<16;h++)i=i+(255&f[h])|0,f[h]=255&i,i>>>=8;n-=64,t+=64}if(n>0)for(b(a,f,o,A),h=0;h<n;h++)r[t+h]=a[h];return 0}function U(r,t,n,e,o){var i=new Uint8Array(32);d(i,e,o,A);for(var h=new Uint8Array(8),f=0;f<8;f++)h[f]=e[f+16];return E(r,t,n,h,i)}function m(r,t,n,e,o,i,h){var f=new Uint8Array(32);d(f,i,h,A);for(var a=new Uint8Array(8),s=0;s<8;s++)a[s]=i[s+16];return _(r,t,n,e,o,a,f)}var x=function(r){var t,n,e,o,i,h,f,a;this.buffer=new Uint8Array(16),this.r=new Uint16Array(10),this.h=new Uint16Array(10),this.pad=new Uint16Array(8),this.leftover=0,this.fin=0,t=255&r[0]|(255&r[1])<<8,this.r[0]=8191&t,n=255&r[2]|(255&r[3])<<8,this.r[1]=8191&(t>>>13|n<<3),e=255&r[4]|(255&r[5])<<8,this.r[2]=7939&(n>>>10|e<<6),o=255&r[6]|(255&r[7])<<8,this.r[3]=8191&(e>>>7|o<<9),i=255&r[8]|(255&r[9])<<8,this.r[4]=255&(o>>>4|i<<12),this.r[5]=i>>>1&8190,h=255&r[10]|(255&r[11])<<8,this.r[6]=8191&(i>>>14|h<<2),f=255&r[12]|(255&r[13])<<8,this.r[7]=8065&(h>>>11|f<<5),a=255&r[14]|(255&r[15])<<8,this.r[8]=8191&(f>>>8|a<<8),this.r[9]=a>>>5&127,this.pad[0]=255&r[16]|(255&r[17])<<8,this.pad[1]=255&r[18]|(255&r[19])<<8,this.pad[2]=255&r[20]|(255&r[21])<<8,this.pad[3]=255&r[22]|(255&r[23])<<8,this.pad[4]=255&r[24]|(255&r[25])<<8,this.pad[5]=255&r[26]|(255&r[27])<<8,this.pad[6]=255&r[28]|(255&r[29])<<8,this.pad[7]=255&r[30]|(255&r[31])<<8};function B(r,t,n,e,o,i){var h=new x(i);return h.update(n,e,o),h.finish(r,t),0}function R(r,t,n,e,o,i){var h=new Uint8Array(16);return B(h,0,n,e,o,i),w(r,t,h,0)}function M(r,t,n,e,o){var i;if(n<32)return-1;for(m(r,0,t,0,n,e,o),B(r,16,r,32,n-32,r),i=0;i<16;i++)r[i]=0;return 0}function S(r,t,n,e,o){var i,h=new Uint8Array(32);if(n<32)return-1;if(U(h,0,32,e,o),0!==R(t,16,t,32,n-32,h))return-1;for(m(r,0,t,0,n,e,o),i=0;i<32;i++)r[i]=0;return 0}function P(r,t){var n;for(n=0;n<16;n++)r[n]=0|t[n]}function T(r){var t,n,e=1;for(t=0;t<16;t++)n=r[t]+e+65535,e=Math.floor(n/65536),r[t]=n-65536*e;r[0]+=e-1+37*(e-1)}function Y(r,t,n){for(var e,o=~(n-1),i=0;i<16;i++)e=o&(r[i]^t[i]),r[i]^=e,t[i]^=e}function L(r,n){var e,o,i,h=t(),f=t();for(e=0;e<16;e++)f[e]=n[e];for(T(f),T(f),T(f),o=0;o<2;o++){for(h[0]=f[0]-65517,e=1;e<15;e++)h[e]=f[e]-65535-(h[e-1]>>16&1),h[e-1]&=65535;h[15]=f[15]-32767-(h[14]>>16&1),i=h[15]>>16&1,h[14]&=65535,Y(f,h,1-i)}for(e=0;e<16;e++)r[2*e]=255&f[e],r[2*e+1]=f[e]>>8}function O(r,t){var n=new Uint8Array(32),e=new Uint8Array(32);return L(n,r),L(e,t),v(n,0,e,0)}function I(r){var t=new Uint8Array(32);return L(t,r),1&t[0]}function k(r,t){var n;for(n=0;n<16;n++)r[n]=t[2*n]+(t[2*n+1]<<8);r[15]&=32767}function C(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]+n[e]}function K(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]-n[e]}function z(r,t,n){var e,o,i=0,h=0,f=0,a=0,s=0,u=0,c=0,l=0,y=0,p=0,g=0,w=0,v=0,b=0,d=0,A=0,_=0,E=0,U=0,m=0,x=0,B=0,R=0,M=0,S=0,P=0,T=0,Y=0,L=0,O=0,I=0,k=n[0],C=n[1],K=n[2],z=n[3],N=n[4],D=n[5],j=n[6],F=n[7],Z=n[8],G=n[9],V=n[10],X=n[11],H=n[12],W=n[13],$=n[14],q=n[15];i+=(e=t[0])*k,h+=e*C,f+=e*K,a+=e*z,s+=e*N,u+=e*D,c+=e*j,l+=e*F,y+=e*Z,p+=e*G,g+=e*V,w+=e*X,v+=e*H,b+=e*W,d+=e*$,A+=e*q,h+=(e=t[1])*k,f+=e*C,a+=e*K,s+=e*z,u+=e*N,c+=e*D,l+=e*j,y+=e*F,p+=e*Z,g+=e*G,w+=e*V,v+=e*X,b+=e*H,d+=e*W,A+=e*$,_+=e*q,f+=(e=t[2])*k,a+=e*C,s+=e*K,u+=e*z,c+=e*N,l+=e*D,y+=e*j,p+=e*F,g+=e*Z,w+=e*G,v+=e*V,b+=e*X,d+=e*H,A+=e*W,_+=e*$,E+=e*q,a+=(e=t[3])*k,s+=e*C,u+=e*K,c+=e*z,l+=e*N,y+=e*D,p+=e*j,g+=e*F,w+=e*Z,v+=e*G,b+=e*V,d+=e*X,A+=e*H,_+=e*W,E+=e*$,U+=e*q,s+=(e=t[4])*k,u+=e*C,c+=e*K,l+=e*z,y+=e*N,p+=e*D,g+=e*j,w+=e*F,v+=e*Z,b+=e*G,d+=e*V,A+=e*X,_+=e*H,E+=e*W,U+=e*$,m+=e*q,u+=(e=t[5])*k,c+=e*C,l+=e*K,y+=e*z,p+=e*N,g+=e*D,w+=e*j,v+=e*F,b+=e*Z,d+=e*G,A+=e*V,_+=e*X,E+=e*H,U+=e*W,m+=e*$,x+=e*q,c+=(e=t[6])*k,l+=e*C,y+=e*K,p+=e*z,g+=e*N,w+=e*D,v+=e*j,b+=e*F,d+=e*Z,A+=e*G,_+=e*V,E+=e*X,U+=e*H,m+=e*W,x+=e*$,B+=e*q,l+=(e=t[7])*k,y+=e*C,p+=e*K,g+=e*z,w+=e*N,v+=e*D,b+=e*j,d+=e*F,A+=e*Z,_+=e*G,E+=e*V,U+=e*X,m+=e*H,x+=e*W,B+=e*$,R+=e*q,y+=(e=t[8])*k,p+=e*C,g+=e*K,w+=e*z,v+=e*N,b+=e*D,d+=e*j,A+=e*F,_+=e*Z,E+=e*G,U+=e*V,m+=e*X,x+=e*H,B+=e*W,R+=e*$,M+=e*q,p+=(e=t[9])*k,g+=e*C,w+=e*K,v+=e*z,b+=e*N,d+=e*D,A+=e*j,_+=e*F,E+=e*Z,U+=e*G,m+=e*V,x+=e*X,B+=e*H,R+=e*W,M+=e*$,S+=e*q,g+=(e=t[10])*k,w+=e*C,v+=e*K,b+=e*z,d+=e*N,A+=e*D,_+=e*j,E+=e*F,U+=e*Z,m+=e*G,x+=e*V,B+=e*X,R+=e*H,M+=e*W,S+=e*$,P+=e*q,w+=(e=t[11])*k,v+=e*C,b+=e*K,d+=e*z,A+=e*N,_+=e*D,E+=e*j,U+=e*F,m+=e*Z,x+=e*G,B+=e*V,R+=e*X,M+=e*H,S+=e*W,P+=e*$,T+=e*q,v+=(e=t[12])*k,b+=e*C,d+=e*K,A+=e*z,_+=e*N,E+=e*D,U+=e*j,m+=e*F,x+=e*Z,B+=e*G,R+=e*V,M+=e*X,S+=e*H,P+=e*W,T+=e*$,Y+=e*q,b+=(e=t[13])*k,d+=e*C,A+=e*K,_+=e*z,E+=e*N,U+=e*D,m+=e*j,x+=e*F,B+=e*Z,R+=e*G,M+=e*V,S+=e*X,P+=e*H,T+=e*W,Y+=e*$,L+=e*q,d+=(e=t[14])*k,A+=e*C,_+=e*K,E+=e*z,U+=e*N,m+=e*D,x+=e*j,B+=e*F,R+=e*Z,M+=e*G,S+=e*V,P+=e*X,T+=e*H,Y+=e*W,L+=e*$,O+=e*q,A+=(e=t[15])*k,h+=38*(E+=e*K),f+=38*(U+=e*z),a+=38*(m+=e*N),s+=38*(x+=e*D),u+=38*(B+=e*j),c+=38*(R+=e*F),l+=38*(M+=e*Z),y+=38*(S+=e*G),p+=38*(P+=e*V),g+=38*(T+=e*X),w+=38*(Y+=e*H),v+=38*(L+=e*W),b+=38*(O+=e*$),d+=38*(I+=e*q),i=(e=(i+=38*(_+=e*C))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i=(e=(i+=o-1+37*(o-1))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i+=o-1+37*(o-1),r[0]=i,r[1]=h,r[2]=f,r[3]=a,r[4]=s,r[5]=u,r[6]=c,r[7]=l,r[8]=y,r[9]=p,r[10]=g,r[11]=w,r[12]=v,r[13]=b,r[14]=d,r[15]=A}function N(r,t){z(r,t,t)}function D(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=253;e>=0;e--)N(o,o),2!==e&&4!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}function j(r,n,e){var o,i,h=new Uint8Array(32),f=new Float64Array(80),s=t(),u=t(),c=t(),l=t(),y=t(),p=t();for(i=0;i<31;i++)h[i]=n[i];for(h[31]=127&n[31]|64,h[0]&=248,k(f,e),i=0;i<16;i++)u[i]=f[i],l[i]=s[i]=c[i]=0;for(s[0]=l[0]=1,i=254;i>=0;--i)Y(s,u,o=h[i>>>3]>>>(7&i)&1),Y(c,l,o),C(y,s,c),K(s,s,c),C(c,u,l),K(u,u,l),N(l,y),N(p,s),z(s,c,s),z(c,u,y),C(y,s,c),K(s,s,c),N(u,s),K(c,l,p),z(s,c,a),C(s,s,l),z(c,c,s),z(s,l,p),z(l,u,f),N(u,y),Y(s,u,o),Y(c,l,o);for(i=0;i<16;i++)f[i+16]=s[i],f[i+32]=c[i],f[i+48]=u[i],f[i+64]=l[i];var g=f.subarray(32),w=f.subarray(16);return D(g,g),z(w,w,g),L(r,w),0}function F(r,t){return j(r,t,i)}function Z(r,t){return e(t,32),F(r,t)}function G(r,t,n){var e=new Uint8Array(32);return j(e,n,t),d(r,o,e,A)}x.prototype.blocks=function(r,t,n){for(var e,o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E=this.fin?0:2048,U=this.h[0],m=this.h[1],x=this.h[2],B=this.h[3],R=this.h[4],M=this.h[5],S=this.h[6],P=this.h[7],T=this.h[8],Y=this.h[9],L=this.r[0],O=this.r[1],I=this.r[2],k=this.r[3],C=this.r[4],K=this.r[5],z=this.r[6],N=this.r[7],D=this.r[8],j=this.r[9];n>=16;)l=c=0,l+=(U+=8191&(e=255&r[t+0]|(255&r[t+1])<<8))*L,l+=(m+=8191&(e>>>13|(o=255&r[t+2]|(255&r[t+3])<<8)<<3))*(5*j),l+=(x+=8191&(o>>>10|(i=255&r[t+4]|(255&r[t+5])<<8)<<6))*(5*D),l+=(B+=8191&(i>>>7|(h=255&r[t+6]|(255&r[t+7])<<8)<<9))*(5*N),c=(l+=(R+=8191&(h>>>4|(f=255&r[t+8]|(255&r[t+9])<<8)<<12))*(5*z))>>>13,l&=8191,l+=(M+=f>>>1&8191)*(5*K),l+=(S+=8191&(f>>>14|(a=255&r[t+10]|(255&r[t+11])<<8)<<2))*(5*C),l+=(P+=8191&(a>>>11|(s=255&r[t+12]|(255&r[t+13])<<8)<<5))*(5*k),l+=(T+=8191&(s>>>8|(u=255&r[t+14]|(255&r[t+15])<<8)<<8))*(5*I),y=c+=(l+=(Y+=u>>>5|E)*(5*O))>>>13,y+=U*O,y+=m*L,y+=x*(5*j),y+=B*(5*D),c=(y+=R*(5*N))>>>13,y&=8191,y+=M*(5*z),y+=S*(5*K),y+=P*(5*C),y+=T*(5*k),c+=(y+=Y*(5*I))>>>13,y&=8191,p=c,p+=U*I,p+=m*O,p+=x*L,p+=B*(5*j),c=(p+=R*(5*D))>>>13,p&=8191,p+=M*(5*N),p+=S*(5*z),p+=P*(5*K),p+=T*(5*C),g=c+=(p+=Y*(5*k))>>>13,g+=U*k,g+=m*I,g+=x*O,g+=B*L,c=(g+=R*(5*j))>>>13,g&=8191,g+=M*(5*D),g+=S*(5*N),g+=P*(5*z),g+=T*(5*K),w=c+=(g+=Y*(5*C))>>>13,w+=U*C,w+=m*k,w+=x*I,w+=B*O,c=(w+=R*L)>>>13,w&=8191,w+=M*(5*j),w+=S*(5*D),w+=P*(5*N),w+=T*(5*z),v=c+=(w+=Y*(5*K))>>>13,v+=U*K,v+=m*C,v+=x*k,v+=B*I,c=(v+=R*O)>>>13,v&=8191,v+=M*L,v+=S*(5*j),v+=P*(5*D),v+=T*(5*N),b=c+=(v+=Y*(5*z))>>>13,b+=U*z,b+=m*K,b+=x*C,b+=B*k,c=(b+=R*I)>>>13,b&=8191,b+=M*O,b+=S*L,b+=P*(5*j),b+=T*(5*D),d=c+=(b+=Y*(5*N))>>>13,d+=U*N,d+=m*z,d+=x*K,d+=B*C,c=(d+=R*k)>>>13,d&=8191,d+=M*I,d+=S*O,d+=P*L,d+=T*(5*j),A=c+=(d+=Y*(5*D))>>>13,A+=U*D,A+=m*N,A+=x*z,A+=B*K,c=(A+=R*C)>>>13,A&=8191,A+=M*k,A+=S*I,A+=P*O,A+=T*L,_=c+=(A+=Y*(5*j))>>>13,_+=U*j,_+=m*D,_+=x*N,_+=B*z,c=(_+=R*K)>>>13,_&=8191,_+=M*C,_+=S*k,_+=P*I,_+=T*O,U=l=8191&(c=(c=((c+=(_+=Y*L)>>>13)<<2)+c|0)+(l&=8191)|0),m=y+=c>>>=13,x=p&=8191,B=g&=8191,R=w&=8191,M=v&=8191,S=b&=8191,P=d&=8191,T=A&=8191,Y=_&=8191,t+=16,n-=16;this.h[0]=U,this.h[1]=m,this.h[2]=x,this.h[3]=B,this.h[4]=R,this.h[5]=M,this.h[6]=S,this.h[7]=P,this.h[8]=T,this.h[9]=Y},x.prototype.finish=function(r,t){var n,e,o,i,h=new Uint16Array(10);if(this.leftover){for(i=this.leftover,this.buffer[i++]=1;i<16;i++)this.buffer[i]=0;this.fin=1,this.blocks(this.buffer,0,16)}for(n=this.h[1]>>>13,this.h[1]&=8191,i=2;i<10;i++)this.h[i]+=n,n=this.h[i]>>>13,this.h[i]&=8191;for(this.h[0]+=5*n,n=this.h[0]>>>13,this.h[0]&=8191,this.h[1]+=n,n=this.h[1]>>>13,this.h[1]&=8191,this.h[2]+=n,h[0]=this.h[0]+5,n=h[0]>>>13,h[0]&=8191,i=1;i<10;i++)h[i]=this.h[i]+n,n=h[i]>>>13,h[i]&=8191;for(h[9]-=8192,e=(1^n)-1,i=0;i<10;i++)h[i]&=e;for(e=~e,i=0;i<10;i++)this.h[i]=this.h[i]&e|h[i];for(this.h[0]=65535&(this.h[0]|this.h[1]<<13),this.h[1]=65535&(this.h[1]>>>3|this.h[2]<<10),this.h[2]=65535&(this.h[2]>>>6|this.h[3]<<7),this.h[3]=65535&(this.h[3]>>>9|this.h[4]<<4),this.h[4]=65535&(this.h[4]>>>12|this.h[5]<<1|this.h[6]<<14),this.h[5]=65535&(this.h[6]>>>2|this.h[7]<<11),this.h[6]=65535&(this.h[7]>>>5|this.h[8]<<8),this.h[7]=65535&(this.h[8]>>>8|this.h[9]<<5),o=this.h[0]+this.pad[0],this.h[0]=65535&o,i=1;i<8;i++)o=(this.h[i]+this.pad[i]|0)+(o>>>16)|0,this.h[i]=65535&o;r[t+0]=this.h[0]>>>0&255,r[t+1]=this.h[0]>>>8&255,r[t+2]=this.h[1]>>>0&255,r[t+3]=this.h[1]>>>8&255,r[t+4]=this.h[2]>>>0&255,r[t+5]=this.h[2]>>>8&255,r[t+6]=this.h[3]>>>0&255,r[t+7]=this.h[3]>>>8&255,r[t+8]=this.h[4]>>>0&255,r[t+9]=this.h[4]>>>8&255,r[t+10]=this.h[5]>>>0&255,r[t+11]=this.h[5]>>>8&255,r[t+12]=this.h[6]>>>0&255,r[t+13]=this.h[6]>>>8&255,r[t+14]=this.h[7]>>>0&255,r[t+15]=this.h[7]>>>8&255},x.prototype.update=function(r,t,n){var e,o;if(this.leftover){for((o=16-this.leftover)>n&&(o=n),e=0;e<o;e++)this.buffer[this.leftover+e]=r[t+e];if(n-=o,t+=o,this.leftover+=o,this.leftover<16)return;this.blocks(this.buffer,0,16),this.leftover=0}if(n>=16&&(o=n-n%16,this.blocks(r,t,o),t+=o,n-=o),n){for(e=0;e<n;e++)this.buffer[this.leftover+e]=r[t+e];this.leftover+=n}};var V=M,X=S;var H=[1116352408,3609767458,1899447441,602891725,3049323471,3964484399,3921009573,2173295548,961987163,4081628472,1508970993,3053834265,2453635748,2937671579,2870763221,3664609560,3624381080,2734883394,310598401,1164996542,607225278,1323610764,1426881987,3590304994,1925078388,4068182383,2162078206,991336113,2614888103,633803317,3248222580,3479774868,3835390401,2666613458,4022224774,944711139,264347078,2341262773,604807628,2007800933,770255983,1495990901,1249150122,1856431235,1555081692,3175218132,1996064986,2198950837,2554220882,3999719339,2821834349,766784016,2952996808,2566594879,3210313671,3203337956,3336571891,1034457026,3584528711,2466948901,113926993,3758326383,338241895,168717936,666307205,1188179964,773529912,1546045734,1294757372,1522805485,1396182291,2643833823,1695183700,2343527390,1986661051,1014477480,2177026350,1206759142,2456956037,344077627,2730485921,1290863460,2820302411,3158454273,3259730800,3505952657,3345764771,106217008,3516065817,3606008344,3600352804,1432725776,4094571909,1467031594,275423344,851169720,430227734,3100823752,506948616,1363258195,659060556,3750685593,883997877,3785050280,958139571,3318307427,1322822218,3812723403,1537002063,2003034995,1747873779,3602036899,1955562222,1575990012,2024104815,1125592928,2227730452,2716904306,2361852424,442776044,2428436474,593698344,2756734187,3733110249,3204031479,2999351573,3329325298,3815920427,3391569614,3928383900,3515267271,566280711,3940187606,3454069534,4118630271,4000239992,116418474,1914138554,174292421,2731055270,289380356,3203993006,460393269,320620315,685471733,587496836,852142971,1086792851,1017036298,365543100,1126000580,2618297676,1288033470,3409855158,1501505948,4234509866,1607167915,987167468,1816402316,1246189591];function W(r,t,n,e){for(var o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E,U,m,x,B,R,M,S,P=new Int32Array(16),T=new Int32Array(16),Y=r[0],L=r[1],O=r[2],I=r[3],k=r[4],C=r[5],K=r[6],z=r[7],N=t[0],D=t[1],j=t[2],F=t[3],Z=t[4],G=t[5],V=t[6],X=t[7],W=0;e>=128;){for(E=0;E<16;E++)U=8*E+W,P[E]=n[U+0]<<24|n[U+1]<<16|n[U+2]<<8|n[U+3],T[E]=n[U+4]<<24|n[U+5]<<16|n[U+6]<<8|n[U+7];for(E=0;E<80;E++)if(o=Y,i=L,h=O,f=I,a=k,s=C,u=K,z,l=N,y=D,p=j,g=F,w=Z,v=G,b=V,X,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,B+=65535&(x=(Z>>>14|k<<18)^(Z>>>18|k<<14)^(k>>>9|Z<<23)),R+=x>>>16,M+=65535&(m=(k>>>14|Z<<18)^(k>>>18|Z<<14)^(Z>>>9|k<<23)),S+=m>>>16,B+=65535&(x=Z&G^~Z&V),R+=x>>>16,M+=65535&(m=k&C^~k&K),S+=m>>>16,m=H[2*E],B+=65535&(x=H[2*E+1]),R+=x>>>16,M+=65535&m,S+=m>>>16,m=P[E%16],R+=(x=T[E%16])>>>16,M+=65535&m,S+=m>>>16,M+=(R+=(B+=65535&x)>>>16)>>>16,B=65535&(x=_=65535&B|R<<16),R=x>>>16,M=65535&(m=A=65535&M|(S+=M>>>16)<<16),S=m>>>16,B+=65535&(x=(N>>>28|Y<<4)^(Y>>>2|N<<30)^(Y>>>7|N<<25)),R+=x>>>16,M+=65535&(m=(Y>>>28|N<<4)^(N>>>2|Y<<30)^(N>>>7|Y<<25)),S+=m>>>16,R+=(x=N&D^N&j^D&j)>>>16,M+=65535&(m=Y&L^Y&O^L&O),S+=m>>>16,c=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,d=65535&B|R<<16,B=65535&(x=g),R=x>>>16,M=65535&(m=f),S=m>>>16,R+=(x=_)>>>16,M+=65535&(m=A),S+=m>>>16,L=o,O=i,I=h,k=f=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,C=a,K=s,z=u,Y=c,D=l,j=y,F=p,Z=g=65535&B|R<<16,G=w,V=v,X=b,N=d,E%16==15)for(U=0;U<16;U++)m=P[U],B=65535&(x=T[U]),R=x>>>16,M=65535&m,S=m>>>16,m=P[(U+9)%16],B+=65535&(x=T[(U+9)%16]),R+=x>>>16,M+=65535&m,S+=m>>>16,A=P[(U+1)%16],B+=65535&(x=((_=T[(U+1)%16])>>>1|A<<31)^(_>>>8|A<<24)^(_>>>7|A<<25)),R+=x>>>16,M+=65535&(m=(A>>>1|_<<31)^(A>>>8|_<<24)^A>>>7),S+=m>>>16,A=P[(U+14)%16],R+=(x=((_=T[(U+14)%16])>>>19|A<<13)^(A>>>29|_<<3)^(_>>>6|A<<26))>>>16,M+=65535&(m=(A>>>19|_<<13)^(_>>>29|A<<3)^A>>>6),S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,P[U]=65535&M|S<<16,T[U]=65535&B|R<<16;B=65535&(x=N),R=x>>>16,M=65535&(m=Y),S=m>>>16,m=r[0],R+=(x=t[0])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[0]=Y=65535&M|S<<16,t[0]=N=65535&B|R<<16,B=65535&(x=D),R=x>>>16,M=65535&(m=L),S=m>>>16,m=r[1],R+=(x=t[1])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[1]=L=65535&M|S<<16,t[1]=D=65535&B|R<<16,B=65535&(x=j),R=x>>>16,M=65535&(m=O),S=m>>>16,m=r[2],R+=(x=t[2])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[2]=O=65535&M|S<<16,t[2]=j=65535&B|R<<16,B=65535&(x=F),R=x>>>16,M=65535&(m=I),S=m>>>16,m=r[3],R+=(x=t[3])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[3]=I=65535&M|S<<16,t[3]=F=65535&B|R<<16,B=65535&(x=Z),R=x>>>16,M=65535&(m=k),S=m>>>16,m=r[4],R+=(x=t[4])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[4]=k=65535&M|S<<16,t[4]=Z=65535&B|R<<16,B=65535&(x=G),R=x>>>16,M=65535&(m=C),S=m>>>16,m=r[5],R+=(x=t[5])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[5]=C=65535&M|S<<16,t[5]=G=65535&B|R<<16,B=65535&(x=V),R=x>>>16,M=65535&(m=K),S=m>>>16,m=r[6],R+=(x=t[6])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[6]=K=65535&M|S<<16,t[6]=V=65535&B|R<<16,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,m=r[7],R+=(x=t[7])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[7]=z=65535&M|S<<16,t[7]=X=65535&B|R<<16,W+=128,e-=128}return e}function $(r,t,n){var e,o=new Int32Array(8),i=new Int32Array(8),h=new Uint8Array(256),f=n;for(o[0]=1779033703,o[1]=3144134277,o[2]=1013904242,o[3]=2773480762,o[4]=1359893119,o[5]=2600822924,o[6]=528734635,o[7]=1541459225,i[0]=4089235720,i[1]=2227873595,i[2]=4271175723,i[3]=1595750129,i[4]=2917565137,i[5]=725511199,i[6]=4215389547,i[7]=327033209,W(o,i,t,n),n%=128,e=0;e<n;e++)h[e]=t[f-n+e];for(h[n]=128,h[(n=256-128*(n<112?1:0))-9]=0,p(h,n-8,f/536870912|0,f<<3),W(o,i,h,n),e=0;e<8;e++)p(r,8*e,o[e],i[e]);return 0}function q(r,n){var e=t(),o=t(),i=t(),h=t(),f=t(),a=t(),s=t(),c=t(),l=t();K(e,r[1],r[0]),K(l,n[1],n[0]),z(e,e,l),C(o,r[0],r[1]),C(l,n[0],n[1]),z(o,o,l),z(i,r[3],n[3]),z(i,i,u),z(h,r[2],n[2]),C(h,h,h),K(f,o,e),K(a,h,i),C(s,h,i),C(c,o,e),z(r[0],f,a),z(r[1],c,s),z(r[2],s,a),z(r[3],f,c)}function J(r,t,n){var e;for(e=0;e<4;e++)Y(r[e],t[e],n)}function Q(r,n){var e=t(),o=t(),i=t();D(i,n[2]),z(e,n[0],i),z(o,n[1],i),L(r,o),r[31]^=I(e)<<7}function rr(r,t,n){var e,o;for(P(r[0],h),P(r[1],f),P(r[2],f),P(r[3],h),o=255;o>=0;--o)J(r,t,e=n[o/8|0]>>(7&o)&1),q(t,r),q(r,r),J(r,t,e)}function tr(r,n){var e=[t(),t(),t(),t()];P(e[0],c),P(e[1],l),P(e[2],f),z(e[3],c,l),rr(r,e,n)}function nr(r,n,o){var i,h=new Uint8Array(64),f=[t(),t(),t(),t()];for(o||e(n,32),$(h,n,32),h[0]&=248,h[31]&=127,h[31]|=64,tr(f,h),Q(r,f),i=0;i<32;i++)n[i+32]=r[i];return 0}var er=new Float64Array([237,211,245,92,26,99,18,88,214,156,247,162,222,249,222,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16]);function or(r,t){var n,e,o,i;for(e=63;e>=32;--e){for(n=0,o=e-32,i=e-12;o<i;++o)t[o]+=n-16*t[e]*er[o-(e-32)],n=t[o]+128>>8,t[o]-=256*n;t[o]+=n,t[e]=0}for(n=0,o=0;o<32;o++)t[o]+=n-(t[31]>>4)*er[o],n=t[o]>>8,t[o]&=255;for(o=0;o<32;o++)t[o]-=n*er[o];for(e=0;e<32;e++)t[e+1]+=t[e]>>8,r[e]=255&t[e]}function ir(r){var t,n=new Float64Array(64);for(t=0;t<64;t++)n[t]=r[t];for(t=0;t<64;t++)r[t]=0;or(r,n)}function hr(r,n,e,o){var i,h,f=new Uint8Array(64),a=new Uint8Array(64),s=new Uint8Array(64),u=new Float64Array(64),c=[t(),t(),t(),t()];$(f,o,32),f[0]&=248,f[31]&=127,f[31]|=64;var l=e+64;for(i=0;i<e;i++)r[64+i]=n[i];for(i=0;i<32;i++)r[32+i]=f[32+i];for($(s,r.subarray(32),e+32),ir(s),tr(c,s),Q(r,c),i=32;i<64;i++)r[i]=o[i];for($(a,r,e+64),ir(a),i=0;i<64;i++)u[i]=0;for(i=0;i<32;i++)u[i]=s[i];for(i=0;i<32;i++)for(h=0;h<32;h++)u[i+h]+=a[i]*f[h];return or(r.subarray(32),u),l}function fr(r,n){var e=t(),o=t(),i=t(),a=t(),u=t(),c=t(),l=t();return P(r[2],f),k(r[1],n),N(i,r[1]),z(a,i,s),K(i,i,r[2]),C(a,r[2],a),N(u,a),N(c,u),z(l,c,u),z(e,l,i),z(e,e,a),function(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=250;e>=0;e--)N(o,o),1!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}(e,e),z(e,e,i),z(e,e,a),z(e,e,a),z(r[0],e,a),N(o,r[0]),z(o,o,a),O(o,i)&&z(r[0],r[0],y),N(o,r[0]),z(o,o,a),O(o,i)?-1:(I(r[0])===n[31]>>7&&K(r[0],h,r[0]),z(r[3],r[0],r[1]),0)}function ar(r,n,e,o){var i,h=new Uint8Array(32),f=new Uint8Array(64),a=[t(),t(),t(),t()],s=[t(),t(),t(),t()];if(-1,e<64)return-1;if(fr(s,o))return-1;for(i=0;i<e;i++)r[i]=n[i];for(i=0;i<32;i++)r[i+32]=o[i];if($(f,r,e),ir(f),rr(a,s,f),tr(s,n.subarray(32)),q(a,s),Q(h,a),e-=64,v(n,0,h,0)){for(i=0;i<e;i++)r[i]=0;return-1}for(i=0;i<e;i++)r[i]=n[i+64];return e}var sr=32,ur=24,cr=32,lr=32,yr=ur;function pr(r,t){if(r.length!==sr)throw new Error("bad key size");if(t.length!==ur)throw new Error("bad nonce size")}function gr(){for(var r=0;r<arguments.length;r++)if(!(arguments[r]instanceof Uint8Array))throw new TypeError("unexpected type, use Uint8Array")}function wr(r){for(var t=0;t<r.length;t++)r[t]=0}r.lowlevel={crypto_core_hsalsa20:d,crypto_stream_xor:m,crypto_stream:U,crypto_stream_salsa20_xor:_,crypto_stream_salsa20:E,crypto_onetimeauth:B,crypto_onetimeauth_verify:R,crypto_verify_16:w,crypto_verify_32:v,crypto_secretbox:M,crypto_secretbox_open:S,crypto_scalarmult:j,crypto_scalarmult_base:F,crypto_box_beforenm:G,crypto_box_afternm:V,crypto_box:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),V(r,t,n,e,h)},crypto_box_open:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),X(r,t,n,e,h)},crypto_box_keypair:Z,crypto_hash:$,crypto_sign:hr,crypto_sign_keypair:nr,crypto_sign_open:ar,crypto_secretbox_KEYBYTES:sr,crypto_secretbox_NONCEBYTES:ur,crypto_secretbox_ZEROBYTES:32,crypto_secretbox_BOXZEROBYTES:16,crypto_scalarmult_BYTES:32,crypto_scalarmult_SCALARBYTES:32,crypto_box_PUBLICKEYBYTES:cr,crypto_box_SECRETKEYBYTES:lr,crypto_box_BEFORENMBYTES:32,crypto_box_NONCEBYTES:yr,crypto_box_ZEROBYTES:32,crypto_box_BOXZEROBYTES:16,crypto_sign_BYTES:64,crypto_sign_PUBLICKEYBYTES:32,crypto_sign_SECRETKEYBYTES:64,crypto_sign_SEEDBYTES:32,crypto_hash_BYTES:64},r.randomBytes=function(r){var t=new Uint8Array(r);return e(t,r),t},r.secretbox=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(32+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+32]=r[i];return M(o,e,e.length,t,n),o.subarray(16)},r.secretbox.open=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(16+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+16]=r[i];return e.length<32?null:0!==S(o,e,e.length,t,n)?null:o.subarray(32)},r.secretbox.keyLength=sr,r.secretbox.nonceLength=ur,r.secretbox.overheadLength=16,r.scalarMult=function(r,t){if(gr(r,t),32!==r.length)throw new Error("bad n size");if(32!==t.length)throw new Error("bad p size");var n=new Uint8Array(32);return j(n,r,t),n},r.scalarMult.base=function(r){if(gr(r),32!==r.length)throw new Error("bad n size");var t=new Uint8Array(32);return F(t,r),t},r.scalarMult.scalarLength=32,r.scalarMult.groupElementLength=32,r.box=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox(t,n,i)},r.box.before=function(r,t){gr(r,t),function(r,t){if(r.length!==cr)throw new Error("bad public key size");if(t.length!==lr)throw new Error("bad secret key size")}(r,t);var n=new Uint8Array(32);return G(n,r,t),n},r.box.after=r.secretbox,r.box.open=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox.open(t,n,i)},r.box.open.after=r.secretbox.open,r.box.keyPair=function(){var r=new Uint8Array(cr),t=new Uint8Array(lr);return Z(r,t),{publicKey:r,secretKey:t}},r.box.keyPair.fromSecretKey=function(r){if(gr(r),r.length!==lr)throw new Error("bad secret key size");var t=new Uint8Array(cr);return F(t,r),{publicKey:t,secretKey:new Uint8Array(r)}},r.box.publicKeyLength=cr,r.box.secretKeyLength=lr,r.box.sharedKeyLength=32,r.box.nonceLength=yr,r.box.overheadLength=r.secretbox.overheadLength,r.sign=function(r,t){if(gr(r,t),64!==t.length)throw new Error("bad secret key size");var n=new Uint8Array(64+r.length);return hr(n,r,r.length,t),n},r.sign.open=function(r,t){if(gr(r,t),32!==t.length)throw new Error("bad public key size");var n=new Uint8Array(r.length),e=ar(n,r,r.length,t);if(e<0)return null;for(var o=new Uint8Array(e),i=0;i<o.length;i++)o[i]=n[i];return o},r.sign.detached=function(t,n){for(var e=r.sign(t,n),o=new Uint8Array(64),i=0;i<o.length;i++)o[i]=e[i];return o},r.sign.detached.verify=function(r,t,n){if(gr(r,t,n),64!==t.length)throw new Error("bad signature size");if(32!==n.length)throw new Error("bad public key size");var e,o=new Uint8Array(64+r.length),i=new Uint8Array(64+r.length);for(e=0;e<64;e++)o[e]=t[e];for(e=0;e<r.length;e++)o[e+64]=r[e];return ar(i,o,o.length,n)>=0},r.sign.keyPair=function(){var r=new Uint8Array(32),t=new Uint8Array(64);return nr(r,t),{publicKey:r,secretKey:t}},r.sign.keyPair.fromSecretKey=function(r){if(gr(r),64!==r.length)throw new Error("bad secret key size");for(var t=new Uint8Array(32),n=0;n<t.length;n++)t[n]=r[32+n];return{publicKey:t,secretKey:new Uint8Array(r)}},r.sign.keyPair.fromSeed=function(r){if(gr(r),32!==r.length)throw new Error("bad seed size");for(var t=new Uint8Array(32),n=new Uint8Array(64),e=0;e<32;e++)n[e]=r[e];return nr(t,n,!0),{publicKey:t,secretKey:n}},r.sign.publicKeyLength=32,r.sign.secretKeyLength=64,r.sign.seedLength=32,r.sign.signatureLength=64,r.hash=function(r){gr(r);var t=new Uint8Array(64);return $(t,r,r.length),t},r.hash.hashLength=64,r.verify=function(r,t){return gr(r,t),0!==r.length&&0!==t.length&&(r.length===t.length&&0===g(r,0,t,0,r.length))},r.setPRNG=function(r){e=r},function(){var t="undefined"!=typeof self?self.crypto||self.msCrypto:null;if(t&&t.getRandomValues){r.setPRNG(function(r,n){var e,o=new Uint8Array(n);for(e=0;e<n;e+=65536)t.getRandomValues(o.subarray(e,e+Math.min(n-e,65536)));for(e=0;e<n;e++)r[e]=o[e];wr(o)})}else(t=n(9))&&t.randomBytes&&r.setPRNG(function(r,n){var e,o=t.randomBytes(n);for(e=0;e<n;e++)r[e]=o[e];wr(o)})}()}(r.exports?r.exports:self.nacl=self.nacl||{})},function(r,t){var n=function(r){if(!Array.isArray(r))throw new Error("Input must be an Array");if(0===r.length)throw new Error("Path must contain at least one level");for(var t=0;t<r.length;t++)if("number"!=typeof r[t])throw new Error("Path element is not a number");this.path=r};n.validatePathArray=function(r){try{return n.fromPathArray(r),!0}catch(r){return!1}},n.validateString=function(r,t){try{return n.fromString(r,t),!0}catch(r){return!1}},n.fromPathArray=function(r){return new n(r)},n.fromString=function(r,t){if(/^m\//i.test(r))r=r.slice(2);else if(t)throw new Error("Root element is required");for(var e=r.split("/"),o=new Array(e.length),i=0;i<e.length;i++){var h=/(\d+)([hH\']?)/.exec(e[i]);if(null===h)throw new Error("Invalid input");if(o[i]=parseInt(h[1],10),o[i]>=2147483648)throw new Error("Invalid child index");if("h"===h[2]||"H"===h[2]||"'"===h[2])o[i]+=2147483648;else if(0!=h[2].length)throw new Error("Invalid modifier")}return new n(o)},n.prototype.toPathArray=function(){return this.path},n.prototype.toString=function(r,t){for(var n=new Array(this.path.length),e=0;e<this.path.length;e++){var o=this.path[e];n[e]=2147483648&o?(2147483647&o)+(t?"h":"'"):o}return(r?"":"m/")+n.join("/")},n.prototype.inspect=function(){return"BIPPath <"+this.toString()+">"},r.exports=n},function(r,t,n){"use strict";(function(r){
 /*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
  * @license  MIT
  */
-var e=n(6),o=n(7),i=n(8);function h(){return a.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function f(r,t){if(h()<t)throw new RangeError("Invalid typed array length");return a.TYPED_ARRAY_SUPPORT?(r=new Uint8Array(t)).__proto__=a.prototype:(null===r&&(r=new a(t)),r.length=t),r}function a(r,t,n){if(!(a.TYPED_ARRAY_SUPPORT||this instanceof a))return new a(r,t,n);if("number"==typeof r){if("string"==typeof t)throw new Error("If encoding is specified then the first argument must be a string");return c(this,r)}return s(this,r,t,n)}function s(r,t,n,e){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?function(r,t,n,e){if(t.byteLength,n<0||t.byteLength<n)throw new RangeError("'offset' is out of bounds");if(t.byteLength<n+(e||0))throw new RangeError("'length' is out of bounds");t=void 0===n&&void 0===e?new Uint8Array(t):void 0===e?new Uint8Array(t,n):new Uint8Array(t,n,e);a.TYPED_ARRAY_SUPPORT?(r=t).__proto__=a.prototype:r=l(r,t);return r}(r,t,n,e):"string"==typeof t?function(r,t,n){"string"==typeof n&&""!==n||(n="utf8");if(!a.isEncoding(n))throw new TypeError('"encoding" must be a valid string encoding');var e=0|p(t,n),o=(r=f(r,e)).write(t,n);o!==e&&(r=r.slice(0,o));return r}(r,t,n):function(r,t){if(a.isBuffer(t)){var n=0|y(t.length);return 0===(r=f(r,n)).length?r:(t.copy(r,0,0,n),r)}if(t){if("undefined"!=typeof ArrayBuffer&&t.buffer instanceof ArrayBuffer||"length"in t)return"number"!=typeof t.length||function(r){return r!=r}(t.length)?f(r,0):l(r,t);if("Buffer"===t.type&&i(t.data))return l(r,t.data)}throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}(r,t)}function u(r){if("number"!=typeof r)throw new TypeError('"size" argument must be a number');if(r<0)throw new RangeError('"size" argument must not be negative')}function c(r,t){if(u(t),r=f(r,t<0?0:0|y(t)),!a.TYPED_ARRAY_SUPPORT)for(var n=0;n<t;++n)r[n]=0;return r}function l(r,t){var n=t.length<0?0:0|y(t.length);r=f(r,n);for(var e=0;e<n;e+=1)r[e]=255&t[e];return r}function y(r){if(r>=h())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+h().toString(16)+" bytes");return 0|r}function p(r,t){if(a.isBuffer(r))return r.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(r)||r instanceof ArrayBuffer))return r.byteLength;"string"!=typeof r&&(r=""+r);var n=r.length;if(0===n)return 0;for(var e=!1;;)switch(t){case"ascii":case"latin1":case"binary":return n;case"utf8":case"utf-8":case void 0:return N(r).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*n;case"hex":return n>>>1;case"base64":return D(r).length;default:if(e)return N(r).length;t=(""+t).toLowerCase(),e=!0}}function g(r,t,n){var e=r[t];r[t]=r[n],r[n]=e}function w(r,t,n,e,o){if(0===r.length)return-1;if("string"==typeof n?(e=n,n=0):n>2147483647?n=2147483647:n<-2147483648&&(n=-2147483648),n=+n,isNaN(n)&&(n=o?0:r.length-1),n<0&&(n=r.length+n),n>=r.length){if(o)return-1;n=r.length-1}else if(n<0){if(!o)return-1;n=0}if("string"==typeof t&&(t=a.from(t,e)),a.isBuffer(t))return 0===t.length?-1:v(r,t,n,e,o);if("number"==typeof t)return t&=255,a.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?o?Uint8Array.prototype.indexOf.call(r,t,n):Uint8Array.prototype.lastIndexOf.call(r,t,n):v(r,[t],n,e,o);throw new TypeError("val must be string, number or Buffer")}function v(r,t,n,e,o){var i,h=1,f=r.length,a=t.length;if(void 0!==e&&("ucs2"===(e=String(e).toLowerCase())||"ucs-2"===e||"utf16le"===e||"utf-16le"===e)){if(r.length<2||t.length<2)return-1;h=2,f/=2,a/=2,n/=2}function s(r,t){return 1===h?r[t]:r.readUInt16BE(t*h)}if(o){var u=-1;for(i=n;i<f;i++)if(s(r,i)===s(t,-1===u?0:i-u)){if(-1===u&&(u=i),i-u+1===a)return u*h}else-1!==u&&(i-=i-u),u=-1}else for(n+a>f&&(n=f-a),i=n;i>=0;i--){for(var c=!0,l=0;l<a;l++)if(s(r,i+l)!==s(t,l)){c=!1;break}if(c)return i}return-1}function b(r,t,n,e){n=Number(n)||0;var o=r.length-n;e?(e=Number(e))>o&&(e=o):e=o;var i=t.length;if(i%2!=0)throw new TypeError("Invalid hex string");e>i/2&&(e=i/2);for(var h=0;h<e;++h){var f=parseInt(t.substr(2*h,2),16);if(isNaN(f))return h;r[n+h]=f}return h}function d(r,t,n,e){return j(N(t,r.length-n),r,n,e)}function A(r,t,n,e){return j(function(r){for(var t=[],n=0;n<r.length;++n)t.push(255&r.charCodeAt(n));return t}(t),r,n,e)}function _(r,t,n,e){return A(r,t,n,e)}function E(r,t,n,e){return j(D(t),r,n,e)}function U(r,t,n,e){return j(function(r,t){for(var n,e,o,i=[],h=0;h<r.length&&!((t-=2)<0);++h)n=r.charCodeAt(h),e=n>>8,o=n%256,i.push(o),i.push(e);return i}(t,r.length-n),r,n,e)}function m(r,t,n){return 0===t&&n===r.length?e.fromByteArray(r):e.fromByteArray(r.slice(t,n))}function x(r,t,n){n=Math.min(r.length,n);for(var e=[],o=t;o<n;){var i,h,f,a,s=r[o],u=null,c=s>239?4:s>223?3:s>191?2:1;if(o+c<=n)switch(c){case 1:s<128&&(u=s);break;case 2:128==(192&(i=r[o+1]))&&(a=(31&s)<<6|63&i)>127&&(u=a);break;case 3:i=r[o+1],h=r[o+2],128==(192&i)&&128==(192&h)&&(a=(15&s)<<12|(63&i)<<6|63&h)>2047&&(a<55296||a>57343)&&(u=a);break;case 4:i=r[o+1],h=r[o+2],f=r[o+3],128==(192&i)&&128==(192&h)&&128==(192&f)&&(a=(15&s)<<18|(63&i)<<12|(63&h)<<6|63&f)>65535&&a<1114112&&(u=a)}null===u?(u=65533,c=1):u>65535&&(u-=65536,e.push(u>>>10&1023|55296),u=56320|1023&u),e.push(u),o+=c}return function(r){var t=r.length;if(t<=B)return String.fromCharCode.apply(String,r);var n="",e=0;for(;e<t;)n+=String.fromCharCode.apply(String,r.slice(e,e+=B));return n}(e)}t.Buffer=a,t.SlowBuffer=function(r){+r!=r&&(r=0);return a.alloc(+r)},t.INSPECT_MAX_BYTES=50,a.TYPED_ARRAY_SUPPORT=void 0!==r.TYPED_ARRAY_SUPPORT?r.TYPED_ARRAY_SUPPORT:function(){try{var r=new Uint8Array(1);return r.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===r.foo()&&"function"==typeof r.subarray&&0===r.subarray(1,1).byteLength}catch(r){return!1}}(),t.kMaxLength=h(),a.poolSize=8192,a._augment=function(r){return r.__proto__=a.prototype,r},a.from=function(r,t,n){return s(null,r,t,n)},a.TYPED_ARRAY_SUPPORT&&(a.prototype.__proto__=Uint8Array.prototype,a.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&a[Symbol.species]===a&&Object.defineProperty(a,Symbol.species,{value:null,configurable:!0})),a.alloc=function(r,t,n){return function(r,t,n,e){return u(t),t<=0?f(r,t):void 0!==n?"string"==typeof e?f(r,t).fill(n,e):f(r,t).fill(n):f(r,t)}(null,r,t,n)},a.allocUnsafe=function(r){return c(null,r)},a.allocUnsafeSlow=function(r){return c(null,r)},a.isBuffer=function(r){return!(null==r||!r._isBuffer)},a.compare=function(r,t){if(!a.isBuffer(r)||!a.isBuffer(t))throw new TypeError("Arguments must be Buffers");if(r===t)return 0;for(var n=r.length,e=t.length,o=0,i=Math.min(n,e);o<i;++o)if(r[o]!==t[o]){n=r[o],e=t[o];break}return n<e?-1:e<n?1:0},a.isEncoding=function(r){switch(String(r).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},a.concat=function(r,t){if(!i(r))throw new TypeError('"list" argument must be an Array of Buffers');if(0===r.length)return a.alloc(0);var n;if(void 0===t)for(t=0,n=0;n<r.length;++n)t+=r[n].length;var e=a.allocUnsafe(t),o=0;for(n=0;n<r.length;++n){var h=r[n];if(!a.isBuffer(h))throw new TypeError('"list" argument must be an Array of Buffers');h.copy(e,o),o+=h.length}return e},a.byteLength=p,a.prototype._isBuffer=!0,a.prototype.swap16=function(){var r=this.length;if(r%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;t<r;t+=2)g(this,t,t+1);return this},a.prototype.swap32=function(){var r=this.length;if(r%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;t<r;t+=4)g(this,t,t+3),g(this,t+1,t+2);return this},a.prototype.swap64=function(){var r=this.length;if(r%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;t<r;t+=8)g(this,t,t+7),g(this,t+1,t+6),g(this,t+2,t+5),g(this,t+3,t+4);return this},a.prototype.toString=function(){var r=0|this.length;return 0===r?"":0===arguments.length?x(this,0,r):function(r,t,n){var e=!1;if((void 0===t||t<0)&&(t=0),t>this.length)return"";if((void 0===n||n>this.length)&&(n=this.length),n<=0)return"";if((n>>>=0)<=(t>>>=0))return"";for(r||(r="utf8");;)switch(r){case"hex":return S(this,t,n);case"utf8":case"utf-8":return x(this,t,n);case"ascii":return R(this,t,n);case"latin1":case"binary":return M(this,t,n);case"base64":return m(this,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return P(this,t,n);default:if(e)throw new TypeError("Unknown encoding: "+r);r=(r+"").toLowerCase(),e=!0}}.apply(this,arguments)},a.prototype.equals=function(r){if(!a.isBuffer(r))throw new TypeError("Argument must be a Buffer");return this===r||0===a.compare(this,r)},a.prototype.inspect=function(){var r="",n=t.INSPECT_MAX_BYTES;return this.length>0&&(r=this.toString("hex",0,n).match(/.{2}/g).join(" "),this.length>n&&(r+=" ... ")),"<Buffer "+r+">"},a.prototype.compare=function(r,t,n,e,o){if(!a.isBuffer(r))throw new TypeError("Argument must be a Buffer");if(void 0===t&&(t=0),void 0===n&&(n=r?r.length:0),void 0===e&&(e=0),void 0===o&&(o=this.length),t<0||n>r.length||e<0||o>this.length)throw new RangeError("out of range index");if(e>=o&&t>=n)return 0;if(e>=o)return-1;if(t>=n)return 1;if(t>>>=0,n>>>=0,e>>>=0,o>>>=0,this===r)return 0;for(var i=o-e,h=n-t,f=Math.min(i,h),s=this.slice(e,o),u=r.slice(t,n),c=0;c<f;++c)if(s[c]!==u[c]){i=s[c],h=u[c];break}return i<h?-1:h<i?1:0},a.prototype.includes=function(r,t,n){return-1!==this.indexOf(r,t,n)},a.prototype.indexOf=function(r,t,n){return w(this,r,t,n,!0)},a.prototype.lastIndexOf=function(r,t,n){return w(this,r,t,n,!1)},a.prototype.write=function(r,t,n,e){if(void 0===t)e="utf8",n=this.length,t=0;else if(void 0===n&&"string"==typeof t)e=t,n=this.length,t=0;else{if(!isFinite(t))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t|=0,isFinite(n)?(n|=0,void 0===e&&(e="utf8")):(e=n,n=void 0)}var o=this.length-t;if((void 0===n||n>o)&&(n=o),r.length>0&&(n<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");e||(e="utf8");for(var i=!1;;)switch(e){case"hex":return b(this,r,t,n);case"utf8":case"utf-8":return d(this,r,t,n);case"ascii":return A(this,r,t,n);case"latin1":case"binary":return _(this,r,t,n);case"base64":return E(this,r,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return U(this,r,t,n);default:if(i)throw new TypeError("Unknown encoding: "+e);e=(""+e).toLowerCase(),i=!0}},a.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var B=4096;function R(r,t,n){var e="";n=Math.min(r.length,n);for(var o=t;o<n;++o)e+=String.fromCharCode(127&r[o]);return e}function M(r,t,n){var e="";n=Math.min(r.length,n);for(var o=t;o<n;++o)e+=String.fromCharCode(r[o]);return e}function S(r,t,n){var e=r.length;(!t||t<0)&&(t=0),(!n||n<0||n>e)&&(n=e);for(var o="",i=t;i<n;++i)o+=z(r[i]);return o}function P(r,t,n){for(var e=r.slice(t,n),o="",i=0;i<e.length;i+=2)o+=String.fromCharCode(e[i]+256*e[i+1]);return o}function T(r,t,n){if(r%1!=0||r<0)throw new RangeError("offset is not uint");if(r+t>n)throw new RangeError("Trying to access beyond buffer length")}function Y(r,t,n,e,o,i){if(!a.isBuffer(r))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>o||t<i)throw new RangeError('"value" argument is out of bounds');if(n+e>r.length)throw new RangeError("Index out of range")}function L(r,t,n,e){t<0&&(t=65535+t+1);for(var o=0,i=Math.min(r.length-n,2);o<i;++o)r[n+o]=(t&255<<8*(e?o:1-o))>>>8*(e?o:1-o)}function O(r,t,n,e){t<0&&(t=4294967295+t+1);for(var o=0,i=Math.min(r.length-n,4);o<i;++o)r[n+o]=t>>>8*(e?o:3-o)&255}function I(r,t,n,e,o,i){if(n+e>r.length)throw new RangeError("Index out of range");if(n<0)throw new RangeError("Index out of range")}function k(r,t,n,e,i){return i||I(r,0,n,4),o.write(r,t,n,e,23,4),n+4}function C(r,t,n,e,i){return i||I(r,0,n,8),o.write(r,t,n,e,52,8),n+8}a.prototype.slice=function(r,t){var n,e=this.length;if(r=~~r,t=void 0===t?e:~~t,r<0?(r+=e)<0&&(r=0):r>e&&(r=e),t<0?(t+=e)<0&&(t=0):t>e&&(t=e),t<r&&(t=r),a.TYPED_ARRAY_SUPPORT)(n=this.subarray(r,t)).__proto__=a.prototype;else{var o=t-r;n=new a(o,void 0);for(var i=0;i<o;++i)n[i]=this[i+r]}return n},a.prototype.readUIntLE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r],o=1,i=0;++i<t&&(o*=256);)e+=this[r+i]*o;return e},a.prototype.readUIntBE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r+--t],o=1;t>0&&(o*=256);)e+=this[r+--t]*o;return e},a.prototype.readUInt8=function(r,t){return t||T(r,1,this.length),this[r]},a.prototype.readUInt16LE=function(r,t){return t||T(r,2,this.length),this[r]|this[r+1]<<8},a.prototype.readUInt16BE=function(r,t){return t||T(r,2,this.length),this[r]<<8|this[r+1]},a.prototype.readUInt32LE=function(r,t){return t||T(r,4,this.length),(this[r]|this[r+1]<<8|this[r+2]<<16)+16777216*this[r+3]},a.prototype.readUInt32BE=function(r,t){return t||T(r,4,this.length),16777216*this[r]+(this[r+1]<<16|this[r+2]<<8|this[r+3])},a.prototype.readIntLE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r],o=1,i=0;++i<t&&(o*=256);)e+=this[r+i]*o;return e>=(o*=128)&&(e-=Math.pow(2,8*t)),e},a.prototype.readIntBE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=t,o=1,i=this[r+--e];e>0&&(o*=256);)i+=this[r+--e]*o;return i>=(o*=128)&&(i-=Math.pow(2,8*t)),i},a.prototype.readInt8=function(r,t){return t||T(r,1,this.length),128&this[r]?-1*(255-this[r]+1):this[r]},a.prototype.readInt16LE=function(r,t){t||T(r,2,this.length);var n=this[r]|this[r+1]<<8;return 32768&n?4294901760|n:n},a.prototype.readInt16BE=function(r,t){t||T(r,2,this.length);var n=this[r+1]|this[r]<<8;return 32768&n?4294901760|n:n},a.prototype.readInt32LE=function(r,t){return t||T(r,4,this.length),this[r]|this[r+1]<<8|this[r+2]<<16|this[r+3]<<24},a.prototype.readInt32BE=function(r,t){return t||T(r,4,this.length),this[r]<<24|this[r+1]<<16|this[r+2]<<8|this[r+3]},a.prototype.readFloatLE=function(r,t){return t||T(r,4,this.length),o.read(this,r,!0,23,4)},a.prototype.readFloatBE=function(r,t){return t||T(r,4,this.length),o.read(this,r,!1,23,4)},a.prototype.readDoubleLE=function(r,t){return t||T(r,8,this.length),o.read(this,r,!0,52,8)},a.prototype.readDoubleBE=function(r,t){return t||T(r,8,this.length),o.read(this,r,!1,52,8)},a.prototype.writeUIntLE=function(r,t,n,e){(r=+r,t|=0,n|=0,e)||Y(this,r,t,n,Math.pow(2,8*n)-1,0);var o=1,i=0;for(this[t]=255&r;++i<n&&(o*=256);)this[t+i]=r/o&255;return t+n},a.prototype.writeUIntBE=function(r,t,n,e){(r=+r,t|=0,n|=0,e)||Y(this,r,t,n,Math.pow(2,8*n)-1,0);var o=n-1,i=1;for(this[t+o]=255&r;--o>=0&&(i*=256);)this[t+o]=r/i&255;return t+n},a.prototype.writeUInt8=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,1,255,0),a.TYPED_ARRAY_SUPPORT||(r=Math.floor(r)),this[t]=255&r,t+1},a.prototype.writeUInt16LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,65535,0),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8):L(this,r,t,!0),t+2},a.prototype.writeUInt16BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,65535,0),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>8,this[t+1]=255&r):L(this,r,t,!1),t+2},a.prototype.writeUInt32LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,4294967295,0),a.TYPED_ARRAY_SUPPORT?(this[t+3]=r>>>24,this[t+2]=r>>>16,this[t+1]=r>>>8,this[t]=255&r):O(this,r,t,!0),t+4},a.prototype.writeUInt32BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,4294967295,0),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>24,this[t+1]=r>>>16,this[t+2]=r>>>8,this[t+3]=255&r):O(this,r,t,!1),t+4},a.prototype.writeIntLE=function(r,t,n,e){if(r=+r,t|=0,!e){var o=Math.pow(2,8*n-1);Y(this,r,t,n,o-1,-o)}var i=0,h=1,f=0;for(this[t]=255&r;++i<n&&(h*=256);)r<0&&0===f&&0!==this[t+i-1]&&(f=1),this[t+i]=(r/h>>0)-f&255;return t+n},a.prototype.writeIntBE=function(r,t,n,e){if(r=+r,t|=0,!e){var o=Math.pow(2,8*n-1);Y(this,r,t,n,o-1,-o)}var i=n-1,h=1,f=0;for(this[t+i]=255&r;--i>=0&&(h*=256);)r<0&&0===f&&0!==this[t+i+1]&&(f=1),this[t+i]=(r/h>>0)-f&255;return t+n},a.prototype.writeInt8=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,1,127,-128),a.TYPED_ARRAY_SUPPORT||(r=Math.floor(r)),r<0&&(r=255+r+1),this[t]=255&r,t+1},a.prototype.writeInt16LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,32767,-32768),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8):L(this,r,t,!0),t+2},a.prototype.writeInt16BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,32767,-32768),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>8,this[t+1]=255&r):L(this,r,t,!1),t+2},a.prototype.writeInt32LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,2147483647,-2147483648),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8,this[t+2]=r>>>16,this[t+3]=r>>>24):O(this,r,t,!0),t+4},a.prototype.writeInt32BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,2147483647,-2147483648),r<0&&(r=4294967295+r+1),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>24,this[t+1]=r>>>16,this[t+2]=r>>>8,this[t+3]=255&r):O(this,r,t,!1),t+4},a.prototype.writeFloatLE=function(r,t,n){return k(this,r,t,!0,n)},a.prototype.writeFloatBE=function(r,t,n){return k(this,r,t,!1,n)},a.prototype.writeDoubleLE=function(r,t,n){return C(this,r,t,!0,n)},a.prototype.writeDoubleBE=function(r,t,n){return C(this,r,t,!1,n)},a.prototype.copy=function(r,t,n,e){if(n||(n=0),e||0===e||(e=this.length),t>=r.length&&(t=r.length),t||(t=0),e>0&&e<n&&(e=n),e===n)return 0;if(0===r.length||0===this.length)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(n<0||n>=this.length)throw new RangeError("sourceStart out of bounds");if(e<0)throw new RangeError("sourceEnd out of bounds");e>this.length&&(e=this.length),r.length-t<e-n&&(e=r.length-t+n);var o,i=e-n;if(this===r&&n<t&&t<e)for(o=i-1;o>=0;--o)r[o+t]=this[o+n];else if(i<1e3||!a.TYPED_ARRAY_SUPPORT)for(o=0;o<i;++o)r[o+t]=this[o+n];else Uint8Array.prototype.set.call(r,this.subarray(n,n+i),t);return i},a.prototype.fill=function(r,t,n,e){if("string"==typeof r){if("string"==typeof t?(e=t,t=0,n=this.length):"string"==typeof n&&(e=n,n=this.length),1===r.length){var o=r.charCodeAt(0);o<256&&(r=o)}if(void 0!==e&&"string"!=typeof e)throw new TypeError("encoding must be a string");if("string"==typeof e&&!a.isEncoding(e))throw new TypeError("Unknown encoding: "+e)}else"number"==typeof r&&(r&=255);if(t<0||this.length<t||this.length<n)throw new RangeError("Out of range index");if(n<=t)return this;var i;if(t>>>=0,n=void 0===n?this.length:n>>>0,r||(r=0),"number"==typeof r)for(i=t;i<n;++i)this[i]=r;else{var h=a.isBuffer(r)?r:N(new a(r,e).toString()),f=h.length;for(i=0;i<n-t;++i)this[i+t]=h[i%f]}return this};var K=/[^+\/0-9A-Za-z-_]/g;function z(r){return r<16?"0"+r.toString(16):r.toString(16)}function N(r,t){var n;t=t||1/0;for(var e=r.length,o=null,i=[],h=0;h<e;++h){if((n=r.charCodeAt(h))>55295&&n<57344){if(!o){if(n>56319){(t-=3)>-1&&i.push(239,191,189);continue}if(h+1===e){(t-=3)>-1&&i.push(239,191,189);continue}o=n;continue}if(n<56320){(t-=3)>-1&&i.push(239,191,189),o=n;continue}n=65536+(o-55296<<10|n-56320)}else o&&(t-=3)>-1&&i.push(239,191,189);if(o=null,n<128){if((t-=1)<0)break;i.push(n)}else if(n<2048){if((t-=2)<0)break;i.push(n>>6|192,63&n|128)}else if(n<65536){if((t-=3)<0)break;i.push(n>>12|224,n>>6&63|128,63&n|128)}else{if(!(n<1114112))throw new Error("Invalid code point");if((t-=4)<0)break;i.push(n>>18|240,n>>12&63|128,n>>6&63|128,63&n|128)}}return i}function D(r){return e.toByteArray(function(r){if((r=function(r){return r.trim?r.trim():r.replace(/^\s+|\s+$/g,"")}(r).replace(K,"")).length<2)return"";for(;r.length%4!=0;)r+="=";return r}(r))}function j(r,t,n,e){for(var o=0;o<e&&!(o+n>=t.length||o>=r.length);++o)t[o+n]=r[o];return o}}).call(this,n(5))},function(r,t){var n;n=function(){return this}();try{n=n||Function("return this")()||(0,eval)("this")}catch(r){"object"==typeof window&&(n=window)}r.exports=n},function(r,t,n){"use strict";t.byteLength=function(r){var t=s(r),n=t[0],e=t[1];return 3*(n+e)/4-e},t.toByteArray=function(r){for(var t,n=s(r),e=n[0],h=n[1],f=new i(function(r,t,n){return 3*(t+n)/4-n}(0,e,h)),a=0,u=h>0?e-4:e,c=0;c<u;c+=4)t=o[r.charCodeAt(c)]<<18|o[r.charCodeAt(c+1)]<<12|o[r.charCodeAt(c+2)]<<6|o[r.charCodeAt(c+3)],f[a++]=t>>16&255,f[a++]=t>>8&255,f[a++]=255&t;2===h&&(t=o[r.charCodeAt(c)]<<2|o[r.charCodeAt(c+1)]>>4,f[a++]=255&t);1===h&&(t=o[r.charCodeAt(c)]<<10|o[r.charCodeAt(c+1)]<<4|o[r.charCodeAt(c+2)]>>2,f[a++]=t>>8&255,f[a++]=255&t);return f},t.fromByteArray=function(r){for(var t,n=r.length,o=n%3,i=[],h=0,f=n-o;h<f;h+=16383)i.push(c(r,h,h+16383>f?f:h+16383));1===o?(t=r[n-1],i.push(e[t>>2]+e[t<<4&63]+"==")):2===o&&(t=(r[n-2]<<8)+r[n-1],i.push(e[t>>10]+e[t>>4&63]+e[t<<2&63]+"="));return i.join("")};for(var e=[],o=[],i="undefined"!=typeof Uint8Array?Uint8Array:Array,h="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",f=0,a=h.length;f<a;++f)e[f]=h[f],o[h.charCodeAt(f)]=f;function s(r){var t=r.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var n=r.indexOf("=");return-1===n&&(n=t),[n,n===t?0:4-n%4]}function u(r){return e[r>>18&63]+e[r>>12&63]+e[r>>6&63]+e[63&r]}function c(r,t,n){for(var e,o=[],i=t;i<n;i+=3)e=(r[i]<<16&16711680)+(r[i+1]<<8&65280)+(255&r[i+2]),o.push(u(e));return o.join("")}o["-".charCodeAt(0)]=62,o["_".charCodeAt(0)]=63},function(r,t){t.read=function(r,t,n,e,o){var i,h,f=8*o-e-1,a=(1<<f)-1,s=a>>1,u=-7,c=n?o-1:0,l=n?-1:1,y=r[t+c];for(c+=l,i=y&(1<<-u)-1,y>>=-u,u+=f;u>0;i=256*i+r[t+c],c+=l,u-=8);for(h=i&(1<<-u)-1,i>>=-u,u+=e;u>0;h=256*h+r[t+c],c+=l,u-=8);if(0===i)i=1-s;else{if(i===a)return h?NaN:1/0*(y?-1:1);h+=Math.pow(2,e),i-=s}return(y?-1:1)*h*Math.pow(2,i-e)},t.write=function(r,t,n,e,o,i){var h,f,a,s=8*i-o-1,u=(1<<s)-1,c=u>>1,l=23===o?Math.pow(2,-24)-Math.pow(2,-77):0,y=e?0:i-1,p=e?1:-1,g=t<0||0===t&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(f=isNaN(t)?1:0,h=u):(h=Math.floor(Math.log(t)/Math.LN2),t*(a=Math.pow(2,-h))<1&&(h--,a*=2),(t+=h+c>=1?l/a:l*Math.pow(2,1-c))*a>=2&&(h++,a/=2),h+c>=u?(f=0,h=u):h+c>=1?(f=(t*a-1)*Math.pow(2,o),h+=c):(f=t*Math.pow(2,c-1)*Math.pow(2,o),h=0));o>=8;r[n+y]=255&f,y+=p,f/=256,o-=8);for(h=h<<o|f,s+=o;s>0;r[n+y]=255&h,y+=p,h/=256,s-=8);r[n+y-p]|=128*g}},function(r,t){var n={}.toString;r.exports=Array.isArray||function(r){return"[object Array]"==n.call(r)}},function(r,t){},function(r,t,n){!function(r){"use strict";var t=function(r){var t,n=new Float64Array(16);if(r)for(t=0;t<r.length;t++)n[t]=r[t];return n},e=function(){throw new Error("no PRNG")},o=new Uint8Array(16),i=new Uint8Array(32);i[0]=9;var h=t(),f=t([1]),a=t([56129,1]),s=t([30883,4953,19914,30187,55467,16705,2637,112,59544,30585,16505,36039,65139,11119,27886,20995]),u=t([61785,9906,39828,60374,45398,33411,5274,224,53552,61171,33010,6542,64743,22239,55772,9222]),c=t([54554,36645,11616,51542,42930,38181,51040,26924,56412,64982,57905,49316,21502,52590,14035,8553]),l=t([26200,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214]),y=t([41136,18958,6951,50414,58488,44335,6150,12099,55207,15867,153,11085,57099,20417,9344,11139]);function p(r,t,n,e){r[t]=n>>24&255,r[t+1]=n>>16&255,r[t+2]=n>>8&255,r[t+3]=255&n,r[t+4]=e>>24&255,r[t+5]=e>>16&255,r[t+6]=e>>8&255,r[t+7]=255&e}function g(r,t,n,e,o){var i,h=0;for(i=0;i<o;i++)h|=r[t+i]^n[e+i];return(1&h-1>>>8)-1}function w(r,t,n,e){return g(r,t,n,e,16)}function v(r,t,n,e){return g(r,t,n,e,32)}function b(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=i,E=h,U=f,m=a,x=s,B=u,R=c,M=l,S=y,P=p,T=g,Y=w,L=v,O=b,I=d,k=A,C=0;C<20;C+=2)_^=(o=(L^=(o=(S^=(o=(x^=(o=_+L|0)<<7|o>>>25)+_|0)<<9|o>>>23)+x|0)<<13|o>>>19)+S|0)<<18|o>>>14,B^=(o=(E^=(o=(O^=(o=(P^=(o=B+E|0)<<7|o>>>25)+B|0)<<9|o>>>23)+P|0)<<13|o>>>19)+O|0)<<18|o>>>14,T^=(o=(R^=(o=(U^=(o=(I^=(o=T+R|0)<<7|o>>>25)+T|0)<<9|o>>>23)+I|0)<<13|o>>>19)+U|0)<<18|o>>>14,k^=(o=(Y^=(o=(M^=(o=(m^=(o=k+Y|0)<<7|o>>>25)+k|0)<<9|o>>>23)+m|0)<<13|o>>>19)+M|0)<<18|o>>>14,_^=(o=(m^=(o=(U^=(o=(E^=(o=_+m|0)<<7|o>>>25)+_|0)<<9|o>>>23)+E|0)<<13|o>>>19)+U|0)<<18|o>>>14,B^=(o=(x^=(o=(M^=(o=(R^=(o=B+x|0)<<7|o>>>25)+B|0)<<9|o>>>23)+R|0)<<13|o>>>19)+M|0)<<18|o>>>14,T^=(o=(P^=(o=(S^=(o=(Y^=(o=T+P|0)<<7|o>>>25)+T|0)<<9|o>>>23)+Y|0)<<13|o>>>19)+S|0)<<18|o>>>14,k^=(o=(I^=(o=(O^=(o=(L^=(o=k+I|0)<<7|o>>>25)+k|0)<<9|o>>>23)+L|0)<<13|o>>>19)+O|0)<<18|o>>>14;_=_+i|0,E=E+h|0,U=U+f|0,m=m+a|0,x=x+s|0,B=B+u|0,R=R+c|0,M=M+l|0,S=S+y|0,P=P+p|0,T=T+g|0,Y=Y+w|0,L=L+v|0,O=O+b|0,I=I+d|0,k=k+A|0,r[0]=_>>>0&255,r[1]=_>>>8&255,r[2]=_>>>16&255,r[3]=_>>>24&255,r[4]=E>>>0&255,r[5]=E>>>8&255,r[6]=E>>>16&255,r[7]=E>>>24&255,r[8]=U>>>0&255,r[9]=U>>>8&255,r[10]=U>>>16&255,r[11]=U>>>24&255,r[12]=m>>>0&255,r[13]=m>>>8&255,r[14]=m>>>16&255,r[15]=m>>>24&255,r[16]=x>>>0&255,r[17]=x>>>8&255,r[18]=x>>>16&255,r[19]=x>>>24&255,r[20]=B>>>0&255,r[21]=B>>>8&255,r[22]=B>>>16&255,r[23]=B>>>24&255,r[24]=R>>>0&255,r[25]=R>>>8&255,r[26]=R>>>16&255,r[27]=R>>>24&255,r[28]=M>>>0&255,r[29]=M>>>8&255,r[30]=M>>>16&255,r[31]=M>>>24&255,r[32]=S>>>0&255,r[33]=S>>>8&255,r[34]=S>>>16&255,r[35]=S>>>24&255,r[36]=P>>>0&255,r[37]=P>>>8&255,r[38]=P>>>16&255,r[39]=P>>>24&255,r[40]=T>>>0&255,r[41]=T>>>8&255,r[42]=T>>>16&255,r[43]=T>>>24&255,r[44]=Y>>>0&255,r[45]=Y>>>8&255,r[46]=Y>>>16&255,r[47]=Y>>>24&255,r[48]=L>>>0&255,r[49]=L>>>8&255,r[50]=L>>>16&255,r[51]=L>>>24&255,r[52]=O>>>0&255,r[53]=O>>>8&255,r[54]=O>>>16&255,r[55]=O>>>24&255,r[56]=I>>>0&255,r[57]=I>>>8&255,r[58]=I>>>16&255,r[59]=I>>>24&255,r[60]=k>>>0&255,r[61]=k>>>8&255,r[62]=k>>>16&255,r[63]=k>>>24&255}(r,t,n,e)}function d(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=0;_<20;_+=2)i^=(o=(v^=(o=(y^=(o=(s^=(o=i+v|0)<<7|o>>>25)+i|0)<<9|o>>>23)+s|0)<<13|o>>>19)+y|0)<<18|o>>>14,u^=(o=(h^=(o=(b^=(o=(p^=(o=u+h|0)<<7|o>>>25)+u|0)<<9|o>>>23)+p|0)<<13|o>>>19)+b|0)<<18|o>>>14,g^=(o=(c^=(o=(f^=(o=(d^=(o=g+c|0)<<7|o>>>25)+g|0)<<9|o>>>23)+d|0)<<13|o>>>19)+f|0)<<18|o>>>14,A^=(o=(w^=(o=(l^=(o=(a^=(o=A+w|0)<<7|o>>>25)+A|0)<<9|o>>>23)+a|0)<<13|o>>>19)+l|0)<<18|o>>>14,i^=(o=(a^=(o=(f^=(o=(h^=(o=i+a|0)<<7|o>>>25)+i|0)<<9|o>>>23)+h|0)<<13|o>>>19)+f|0)<<18|o>>>14,u^=(o=(s^=(o=(l^=(o=(c^=(o=u+s|0)<<7|o>>>25)+u|0)<<9|o>>>23)+c|0)<<13|o>>>19)+l|0)<<18|o>>>14,g^=(o=(p^=(o=(y^=(o=(w^=(o=g+p|0)<<7|o>>>25)+g|0)<<9|o>>>23)+w|0)<<13|o>>>19)+y|0)<<18|o>>>14,A^=(o=(d^=(o=(b^=(o=(v^=(o=A+d|0)<<7|o>>>25)+A|0)<<9|o>>>23)+v|0)<<13|o>>>19)+b|0)<<18|o>>>14;r[0]=i>>>0&255,r[1]=i>>>8&255,r[2]=i>>>16&255,r[3]=i>>>24&255,r[4]=u>>>0&255,r[5]=u>>>8&255,r[6]=u>>>16&255,r[7]=u>>>24&255,r[8]=g>>>0&255,r[9]=g>>>8&255,r[10]=g>>>16&255,r[11]=g>>>24&255,r[12]=A>>>0&255,r[13]=A>>>8&255,r[14]=A>>>16&255,r[15]=A>>>24&255,r[16]=c>>>0&255,r[17]=c>>>8&255,r[18]=c>>>16&255,r[19]=c>>>24&255,r[20]=l>>>0&255,r[21]=l>>>8&255,r[22]=l>>>16&255,r[23]=l>>>24&255,r[24]=y>>>0&255,r[25]=y>>>8&255,r[26]=y>>>16&255,r[27]=y>>>24&255,r[28]=p>>>0&255,r[29]=p>>>8&255,r[30]=p>>>16&255,r[31]=p>>>24&255}(r,t,n,e)}var A=new Uint8Array([101,120,112,97,110,100,32,51,50,45,98,121,116,101,32,107]);function _(r,t,n,e,o,i,h){var f,a,s=new Uint8Array(16),u=new Uint8Array(64);for(a=0;a<16;a++)s[a]=0;for(a=0;a<8;a++)s[a]=i[a];for(;o>=64;){for(b(u,s,h,A),a=0;a<64;a++)r[t+a]=n[e+a]^u[a];for(f=1,a=8;a<16;a++)f=f+(255&s[a])|0,s[a]=255&f,f>>>=8;o-=64,t+=64,e+=64}if(o>0)for(b(u,s,h,A),a=0;a<o;a++)r[t+a]=n[e+a]^u[a];return 0}function E(r,t,n,e,o){var i,h,f=new Uint8Array(16),a=new Uint8Array(64);for(h=0;h<16;h++)f[h]=0;for(h=0;h<8;h++)f[h]=e[h];for(;n>=64;){for(b(a,f,o,A),h=0;h<64;h++)r[t+h]=a[h];for(i=1,h=8;h<16;h++)i=i+(255&f[h])|0,f[h]=255&i,i>>>=8;n-=64,t+=64}if(n>0)for(b(a,f,o,A),h=0;h<n;h++)r[t+h]=a[h];return 0}function U(r,t,n,e,o){var i=new Uint8Array(32);d(i,e,o,A);for(var h=new Uint8Array(8),f=0;f<8;f++)h[f]=e[f+16];return E(r,t,n,h,i)}function m(r,t,n,e,o,i,h){var f=new Uint8Array(32);d(f,i,h,A);for(var a=new Uint8Array(8),s=0;s<8;s++)a[s]=i[s+16];return _(r,t,n,e,o,a,f)}var x=function(r){var t,n,e,o,i,h,f,a;this.buffer=new Uint8Array(16),this.r=new Uint16Array(10),this.h=new Uint16Array(10),this.pad=new Uint16Array(8),this.leftover=0,this.fin=0,t=255&r[0]|(255&r[1])<<8,this.r[0]=8191&t,n=255&r[2]|(255&r[3])<<8,this.r[1]=8191&(t>>>13|n<<3),e=255&r[4]|(255&r[5])<<8,this.r[2]=7939&(n>>>10|e<<6),o=255&r[6]|(255&r[7])<<8,this.r[3]=8191&(e>>>7|o<<9),i=255&r[8]|(255&r[9])<<8,this.r[4]=255&(o>>>4|i<<12),this.r[5]=i>>>1&8190,h=255&r[10]|(255&r[11])<<8,this.r[6]=8191&(i>>>14|h<<2),f=255&r[12]|(255&r[13])<<8,this.r[7]=8065&(h>>>11|f<<5),a=255&r[14]|(255&r[15])<<8,this.r[8]=8191&(f>>>8|a<<8),this.r[9]=a>>>5&127,this.pad[0]=255&r[16]|(255&r[17])<<8,this.pad[1]=255&r[18]|(255&r[19])<<8,this.pad[2]=255&r[20]|(255&r[21])<<8,this.pad[3]=255&r[22]|(255&r[23])<<8,this.pad[4]=255&r[24]|(255&r[25])<<8,this.pad[5]=255&r[26]|(255&r[27])<<8,this.pad[6]=255&r[28]|(255&r[29])<<8,this.pad[7]=255&r[30]|(255&r[31])<<8};function B(r,t,n,e,o,i){var h=new x(i);return h.update(n,e,o),h.finish(r,t),0}function R(r,t,n,e,o,i){var h=new Uint8Array(16);return B(h,0,n,e,o,i),w(r,t,h,0)}function M(r,t,n,e,o){var i;if(n<32)return-1;for(m(r,0,t,0,n,e,o),B(r,16,r,32,n-32,r),i=0;i<16;i++)r[i]=0;return 0}function S(r,t,n,e,o){var i,h=new Uint8Array(32);if(n<32)return-1;if(U(h,0,32,e,o),0!==R(t,16,t,32,n-32,h))return-1;for(m(r,0,t,0,n,e,o),i=0;i<32;i++)r[i]=0;return 0}function P(r,t){var n;for(n=0;n<16;n++)r[n]=0|t[n]}function T(r){var t,n,e=1;for(t=0;t<16;t++)n=r[t]+e+65535,e=Math.floor(n/65536),r[t]=n-65536*e;r[0]+=e-1+37*(e-1)}function Y(r,t,n){for(var e,o=~(n-1),i=0;i<16;i++)e=o&(r[i]^t[i]),r[i]^=e,t[i]^=e}function L(r,n){var e,o,i,h=t(),f=t();for(e=0;e<16;e++)f[e]=n[e];for(T(f),T(f),T(f),o=0;o<2;o++){for(h[0]=f[0]-65517,e=1;e<15;e++)h[e]=f[e]-65535-(h[e-1]>>16&1),h[e-1]&=65535;h[15]=f[15]-32767-(h[14]>>16&1),i=h[15]>>16&1,h[14]&=65535,Y(f,h,1-i)}for(e=0;e<16;e++)r[2*e]=255&f[e],r[2*e+1]=f[e]>>8}function O(r,t){var n=new Uint8Array(32),e=new Uint8Array(32);return L(n,r),L(e,t),v(n,0,e,0)}function I(r){var t=new Uint8Array(32);return L(t,r),1&t[0]}function k(r,t){var n;for(n=0;n<16;n++)r[n]=t[2*n]+(t[2*n+1]<<8);r[15]&=32767}function C(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]+n[e]}function K(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]-n[e]}function z(r,t,n){var e,o,i=0,h=0,f=0,a=0,s=0,u=0,c=0,l=0,y=0,p=0,g=0,w=0,v=0,b=0,d=0,A=0,_=0,E=0,U=0,m=0,x=0,B=0,R=0,M=0,S=0,P=0,T=0,Y=0,L=0,O=0,I=0,k=n[0],C=n[1],K=n[2],z=n[3],N=n[4],D=n[5],j=n[6],F=n[7],Z=n[8],G=n[9],V=n[10],X=n[11],H=n[12],W=n[13],$=n[14],q=n[15];i+=(e=t[0])*k,h+=e*C,f+=e*K,a+=e*z,s+=e*N,u+=e*D,c+=e*j,l+=e*F,y+=e*Z,p+=e*G,g+=e*V,w+=e*X,v+=e*H,b+=e*W,d+=e*$,A+=e*q,h+=(e=t[1])*k,f+=e*C,a+=e*K,s+=e*z,u+=e*N,c+=e*D,l+=e*j,y+=e*F,p+=e*Z,g+=e*G,w+=e*V,v+=e*X,b+=e*H,d+=e*W,A+=e*$,_+=e*q,f+=(e=t[2])*k,a+=e*C,s+=e*K,u+=e*z,c+=e*N,l+=e*D,y+=e*j,p+=e*F,g+=e*Z,w+=e*G,v+=e*V,b+=e*X,d+=e*H,A+=e*W,_+=e*$,E+=e*q,a+=(e=t[3])*k,s+=e*C,u+=e*K,c+=e*z,l+=e*N,y+=e*D,p+=e*j,g+=e*F,w+=e*Z,v+=e*G,b+=e*V,d+=e*X,A+=e*H,_+=e*W,E+=e*$,U+=e*q,s+=(e=t[4])*k,u+=e*C,c+=e*K,l+=e*z,y+=e*N,p+=e*D,g+=e*j,w+=e*F,v+=e*Z,b+=e*G,d+=e*V,A+=e*X,_+=e*H,E+=e*W,U+=e*$,m+=e*q,u+=(e=t[5])*k,c+=e*C,l+=e*K,y+=e*z,p+=e*N,g+=e*D,w+=e*j,v+=e*F,b+=e*Z,d+=e*G,A+=e*V,_+=e*X,E+=e*H,U+=e*W,m+=e*$,x+=e*q,c+=(e=t[6])*k,l+=e*C,y+=e*K,p+=e*z,g+=e*N,w+=e*D,v+=e*j,b+=e*F,d+=e*Z,A+=e*G,_+=e*V,E+=e*X,U+=e*H,m+=e*W,x+=e*$,B+=e*q,l+=(e=t[7])*k,y+=e*C,p+=e*K,g+=e*z,w+=e*N,v+=e*D,b+=e*j,d+=e*F,A+=e*Z,_+=e*G,E+=e*V,U+=e*X,m+=e*H,x+=e*W,B+=e*$,R+=e*q,y+=(e=t[8])*k,p+=e*C,g+=e*K,w+=e*z,v+=e*N,b+=e*D,d+=e*j,A+=e*F,_+=e*Z,E+=e*G,U+=e*V,m+=e*X,x+=e*H,B+=e*W,R+=e*$,M+=e*q,p+=(e=t[9])*k,g+=e*C,w+=e*K,v+=e*z,b+=e*N,d+=e*D,A+=e*j,_+=e*F,E+=e*Z,U+=e*G,m+=e*V,x+=e*X,B+=e*H,R+=e*W,M+=e*$,S+=e*q,g+=(e=t[10])*k,w+=e*C,v+=e*K,b+=e*z,d+=e*N,A+=e*D,_+=e*j,E+=e*F,U+=e*Z,m+=e*G,x+=e*V,B+=e*X,R+=e*H,M+=e*W,S+=e*$,P+=e*q,w+=(e=t[11])*k,v+=e*C,b+=e*K,d+=e*z,A+=e*N,_+=e*D,E+=e*j,U+=e*F,m+=e*Z,x+=e*G,B+=e*V,R+=e*X,M+=e*H,S+=e*W,P+=e*$,T+=e*q,v+=(e=t[12])*k,b+=e*C,d+=e*K,A+=e*z,_+=e*N,E+=e*D,U+=e*j,m+=e*F,x+=e*Z,B+=e*G,R+=e*V,M+=e*X,S+=e*H,P+=e*W,T+=e*$,Y+=e*q,b+=(e=t[13])*k,d+=e*C,A+=e*K,_+=e*z,E+=e*N,U+=e*D,m+=e*j,x+=e*F,B+=e*Z,R+=e*G,M+=e*V,S+=e*X,P+=e*H,T+=e*W,Y+=e*$,L+=e*q,d+=(e=t[14])*k,A+=e*C,_+=e*K,E+=e*z,U+=e*N,m+=e*D,x+=e*j,B+=e*F,R+=e*Z,M+=e*G,S+=e*V,P+=e*X,T+=e*H,Y+=e*W,L+=e*$,O+=e*q,A+=(e=t[15])*k,h+=38*(E+=e*K),f+=38*(U+=e*z),a+=38*(m+=e*N),s+=38*(x+=e*D),u+=38*(B+=e*j),c+=38*(R+=e*F),l+=38*(M+=e*Z),y+=38*(S+=e*G),p+=38*(P+=e*V),g+=38*(T+=e*X),w+=38*(Y+=e*H),v+=38*(L+=e*W),b+=38*(O+=e*$),d+=38*(I+=e*q),i=(e=(i+=38*(_+=e*C))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i=(e=(i+=o-1+37*(o-1))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i+=o-1+37*(o-1),r[0]=i,r[1]=h,r[2]=f,r[3]=a,r[4]=s,r[5]=u,r[6]=c,r[7]=l,r[8]=y,r[9]=p,r[10]=g,r[11]=w,r[12]=v,r[13]=b,r[14]=d,r[15]=A}function N(r,t){z(r,t,t)}function D(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=253;e>=0;e--)N(o,o),2!==e&&4!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}function j(r,n,e){var o,i,h=new Uint8Array(32),f=new Float64Array(80),s=t(),u=t(),c=t(),l=t(),y=t(),p=t();for(i=0;i<31;i++)h[i]=n[i];for(h[31]=127&n[31]|64,h[0]&=248,k(f,e),i=0;i<16;i++)u[i]=f[i],l[i]=s[i]=c[i]=0;for(s[0]=l[0]=1,i=254;i>=0;--i)Y(s,u,o=h[i>>>3]>>>(7&i)&1),Y(c,l,o),C(y,s,c),K(s,s,c),C(c,u,l),K(u,u,l),N(l,y),N(p,s),z(s,c,s),z(c,u,y),C(y,s,c),K(s,s,c),N(u,s),K(c,l,p),z(s,c,a),C(s,s,l),z(c,c,s),z(s,l,p),z(l,u,f),N(u,y),Y(s,u,o),Y(c,l,o);for(i=0;i<16;i++)f[i+16]=s[i],f[i+32]=c[i],f[i+48]=u[i],f[i+64]=l[i];var g=f.subarray(32),w=f.subarray(16);return D(g,g),z(w,w,g),L(r,w),0}function F(r,t){return j(r,t,i)}function Z(r,t){return e(t,32),F(r,t)}function G(r,t,n){var e=new Uint8Array(32);return j(e,n,t),d(r,o,e,A)}x.prototype.blocks=function(r,t,n){for(var e,o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E=this.fin?0:2048,U=this.h[0],m=this.h[1],x=this.h[2],B=this.h[3],R=this.h[4],M=this.h[5],S=this.h[6],P=this.h[7],T=this.h[8],Y=this.h[9],L=this.r[0],O=this.r[1],I=this.r[2],k=this.r[3],C=this.r[4],K=this.r[5],z=this.r[6],N=this.r[7],D=this.r[8],j=this.r[9];n>=16;)U+=8191&(e=255&r[t+0]|(255&r[t+1])<<8),m+=8191&(e>>>13|(o=255&r[t+2]|(255&r[t+3])<<8)<<3),x+=8191&(o>>>10|(i=255&r[t+4]|(255&r[t+5])<<8)<<6),B+=8191&(i>>>7|(h=255&r[t+6]|(255&r[t+7])<<8)<<9),R+=8191&(h>>>4|(f=255&r[t+8]|(255&r[t+9])<<8)<<12),M+=f>>>1&8191,S+=8191&(f>>>14|(a=255&r[t+10]|(255&r[t+11])<<8)<<2),P+=8191&(a>>>11|(s=255&r[t+12]|(255&r[t+13])<<8)<<5),u=255&r[t+14]|(255&r[t+15])<<8,l=c=0,l+=U*L,l+=m*(5*j),l+=x*(5*D),l+=B*(5*N),c=(l+=R*(5*z))>>>13,l&=8191,l+=M*(5*K),l+=S*(5*C),l+=P*(5*k),l+=(T+=8191&(s>>>8|u<<8))*(5*I),y=c+=(l+=(Y+=u>>>5|E)*(5*O))>>>13,y+=U*O,y+=m*L,y+=x*(5*j),y+=B*(5*D),c=(y+=R*(5*N))>>>13,y&=8191,y+=M*(5*z),y+=S*(5*K),y+=P*(5*C),y+=T*(5*k),c+=(y+=Y*(5*I))>>>13,y&=8191,p=c,p+=U*I,p+=m*O,p+=x*L,p+=B*(5*j),c=(p+=R*(5*D))>>>13,p&=8191,p+=M*(5*N),p+=S*(5*z),p+=P*(5*K),p+=T*(5*C),g=c+=(p+=Y*(5*k))>>>13,g+=U*k,g+=m*I,g+=x*O,g+=B*L,c=(g+=R*(5*j))>>>13,g&=8191,g+=M*(5*D),g+=S*(5*N),g+=P*(5*z),g+=T*(5*K),w=c+=(g+=Y*(5*C))>>>13,w+=U*C,w+=m*k,w+=x*I,w+=B*O,c=(w+=R*L)>>>13,w&=8191,w+=M*(5*j),w+=S*(5*D),w+=P*(5*N),w+=T*(5*z),v=c+=(w+=Y*(5*K))>>>13,v+=U*K,v+=m*C,v+=x*k,v+=B*I,c=(v+=R*O)>>>13,v&=8191,v+=M*L,v+=S*(5*j),v+=P*(5*D),v+=T*(5*N),b=c+=(v+=Y*(5*z))>>>13,b+=U*z,b+=m*K,b+=x*C,b+=B*k,c=(b+=R*I)>>>13,b&=8191,b+=M*O,b+=S*L,b+=P*(5*j),b+=T*(5*D),d=c+=(b+=Y*(5*N))>>>13,d+=U*N,d+=m*z,d+=x*K,d+=B*C,c=(d+=R*k)>>>13,d&=8191,d+=M*I,d+=S*O,d+=P*L,d+=T*(5*j),A=c+=(d+=Y*(5*D))>>>13,A+=U*D,A+=m*N,A+=x*z,A+=B*K,c=(A+=R*C)>>>13,A&=8191,A+=M*k,A+=S*I,A+=P*O,A+=T*L,_=c+=(A+=Y*(5*j))>>>13,_+=U*j,_+=m*D,_+=x*N,_+=B*z,c=(_+=R*K)>>>13,_&=8191,_+=M*C,_+=S*k,_+=P*I,_+=T*O,U=l=8191&(c=(c=((c+=(_+=Y*L)>>>13)<<2)+c|0)+(l&=8191)|0),m=y+=c>>>=13,x=p&=8191,B=g&=8191,R=w&=8191,M=v&=8191,S=b&=8191,P=d&=8191,T=A&=8191,Y=_&=8191,t+=16,n-=16;this.h[0]=U,this.h[1]=m,this.h[2]=x,this.h[3]=B,this.h[4]=R,this.h[5]=M,this.h[6]=S,this.h[7]=P,this.h[8]=T,this.h[9]=Y},x.prototype.finish=function(r,t){var n,e,o,i,h=new Uint16Array(10);if(this.leftover){for(i=this.leftover,this.buffer[i++]=1;i<16;i++)this.buffer[i]=0;this.fin=1,this.blocks(this.buffer,0,16)}for(n=this.h[1]>>>13,this.h[1]&=8191,i=2;i<10;i++)this.h[i]+=n,n=this.h[i]>>>13,this.h[i]&=8191;for(this.h[0]+=5*n,n=this.h[0]>>>13,this.h[0]&=8191,this.h[1]+=n,n=this.h[1]>>>13,this.h[1]&=8191,this.h[2]+=n,h[0]=this.h[0]+5,n=h[0]>>>13,h[0]&=8191,i=1;i<10;i++)h[i]=this.h[i]+n,n=h[i]>>>13,h[i]&=8191;for(h[9]-=8192,e=(1^n)-1,i=0;i<10;i++)h[i]&=e;for(e=~e,i=0;i<10;i++)this.h[i]=this.h[i]&e|h[i];for(this.h[0]=65535&(this.h[0]|this.h[1]<<13),this.h[1]=65535&(this.h[1]>>>3|this.h[2]<<10),this.h[2]=65535&(this.h[2]>>>6|this.h[3]<<7),this.h[3]=65535&(this.h[3]>>>9|this.h[4]<<4),this.h[4]=65535&(this.h[4]>>>12|this.h[5]<<1|this.h[6]<<14),this.h[5]=65535&(this.h[6]>>>2|this.h[7]<<11),this.h[6]=65535&(this.h[7]>>>5|this.h[8]<<8),this.h[7]=65535&(this.h[8]>>>8|this.h[9]<<5),o=this.h[0]+this.pad[0],this.h[0]=65535&o,i=1;i<8;i++)o=(this.h[i]+this.pad[i]|0)+(o>>>16)|0,this.h[i]=65535&o;r[t+0]=this.h[0]>>>0&255,r[t+1]=this.h[0]>>>8&255,r[t+2]=this.h[1]>>>0&255,r[t+3]=this.h[1]>>>8&255,r[t+4]=this.h[2]>>>0&255,r[t+5]=this.h[2]>>>8&255,r[t+6]=this.h[3]>>>0&255,r[t+7]=this.h[3]>>>8&255,r[t+8]=this.h[4]>>>0&255,r[t+9]=this.h[4]>>>8&255,r[t+10]=this.h[5]>>>0&255,r[t+11]=this.h[5]>>>8&255,r[t+12]=this.h[6]>>>0&255,r[t+13]=this.h[6]>>>8&255,r[t+14]=this.h[7]>>>0&255,r[t+15]=this.h[7]>>>8&255},x.prototype.update=function(r,t,n){var e,o;if(this.leftover){for((o=16-this.leftover)>n&&(o=n),e=0;e<o;e++)this.buffer[this.leftover+e]=r[t+e];if(n-=o,t+=o,this.leftover+=o,this.leftover<16)return;this.blocks(this.buffer,0,16),this.leftover=0}if(n>=16&&(o=n-n%16,this.blocks(r,t,o),t+=o,n-=o),n){for(e=0;e<n;e++)this.buffer[this.leftover+e]=r[t+e];this.leftover+=n}};var V=M,X=S;var H=[1116352408,3609767458,1899447441,602891725,3049323471,3964484399,3921009573,2173295548,961987163,4081628472,1508970993,3053834265,2453635748,2937671579,2870763221,3664609560,3624381080,2734883394,310598401,1164996542,607225278,1323610764,1426881987,3590304994,1925078388,4068182383,2162078206,991336113,2614888103,633803317,3248222580,3479774868,3835390401,2666613458,4022224774,944711139,264347078,2341262773,604807628,2007800933,770255983,1495990901,1249150122,1856431235,1555081692,3175218132,1996064986,2198950837,2554220882,3999719339,2821834349,766784016,2952996808,2566594879,3210313671,3203337956,3336571891,1034457026,3584528711,2466948901,113926993,3758326383,338241895,168717936,666307205,1188179964,773529912,1546045734,1294757372,1522805485,1396182291,2643833823,1695183700,2343527390,1986661051,1014477480,2177026350,1206759142,2456956037,344077627,2730485921,1290863460,2820302411,3158454273,3259730800,3505952657,3345764771,106217008,3516065817,3606008344,3600352804,1432725776,4094571909,1467031594,275423344,851169720,430227734,3100823752,506948616,1363258195,659060556,3750685593,883997877,3785050280,958139571,3318307427,1322822218,3812723403,1537002063,2003034995,1747873779,3602036899,1955562222,1575990012,2024104815,1125592928,2227730452,2716904306,2361852424,442776044,2428436474,593698344,2756734187,3733110249,3204031479,2999351573,3329325298,3815920427,3391569614,3928383900,3515267271,566280711,3940187606,3454069534,4118630271,4000239992,116418474,1914138554,174292421,2731055270,289380356,3203993006,460393269,320620315,685471733,587496836,852142971,1086792851,1017036298,365543100,1126000580,2618297676,1288033470,3409855158,1501505948,4234509866,1607167915,987167468,1816402316,1246189591];function W(r,t,n,e){for(var o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E,U,m,x,B,R,M,S,P=new Int32Array(16),T=new Int32Array(16),Y=r[0],L=r[1],O=r[2],I=r[3],k=r[4],C=r[5],K=r[6],z=r[7],N=t[0],D=t[1],j=t[2],F=t[3],Z=t[4],G=t[5],V=t[6],X=t[7],W=0;e>=128;){for(E=0;E<16;E++)U=8*E+W,P[E]=n[U+0]<<24|n[U+1]<<16|n[U+2]<<8|n[U+3],T[E]=n[U+4]<<24|n[U+5]<<16|n[U+6]<<8|n[U+7];for(E=0;E<80;E++)if(o=Y,i=L,h=O,f=I,a=k,s=C,u=K,c=z,l=N,y=D,p=j,g=F,w=Z,v=G,b=V,d=X,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,B+=65535&(x=(Z>>>14|k<<18)^(Z>>>18|k<<14)^(k>>>9|Z<<23)),R+=x>>>16,M+=65535&(m=(k>>>14|Z<<18)^(k>>>18|Z<<14)^(Z>>>9|k<<23)),S+=m>>>16,B+=65535&(x=Z&G^~Z&V),R+=x>>>16,M+=65535&(m=k&C^~k&K),S+=m>>>16,m=H[2*E],B+=65535&(x=H[2*E+1]),R+=x>>>16,M+=65535&m,S+=m>>>16,m=P[E%16],R+=(x=T[E%16])>>>16,M+=65535&m,S+=m>>>16,M+=(R+=(B+=65535&x)>>>16)>>>16,B=65535&(x=_=65535&B|R<<16),R=x>>>16,M=65535&(m=A=65535&M|(S+=M>>>16)<<16),S=m>>>16,B+=65535&(x=(N>>>28|Y<<4)^(Y>>>2|N<<30)^(Y>>>7|N<<25)),R+=x>>>16,M+=65535&(m=(Y>>>28|N<<4)^(N>>>2|Y<<30)^(N>>>7|Y<<25)),S+=m>>>16,R+=(x=N&D^N&j^D&j)>>>16,M+=65535&(m=Y&L^Y&O^L&O),S+=m>>>16,c=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,d=65535&B|R<<16,B=65535&(x=g),R=x>>>16,M=65535&(m=f),S=m>>>16,R+=(x=_)>>>16,M+=65535&(m=A),S+=m>>>16,L=o,O=i,I=h,k=f=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,C=a,K=s,z=u,Y=c,D=l,j=y,F=p,Z=g=65535&B|R<<16,G=w,V=v,X=b,N=d,E%16==15)for(U=0;U<16;U++)m=P[U],B=65535&(x=T[U]),R=x>>>16,M=65535&m,S=m>>>16,m=P[(U+9)%16],B+=65535&(x=T[(U+9)%16]),R+=x>>>16,M+=65535&m,S+=m>>>16,A=P[(U+1)%16],B+=65535&(x=((_=T[(U+1)%16])>>>1|A<<31)^(_>>>8|A<<24)^(_>>>7|A<<25)),R+=x>>>16,M+=65535&(m=(A>>>1|_<<31)^(A>>>8|_<<24)^A>>>7),S+=m>>>16,A=P[(U+14)%16],R+=(x=((_=T[(U+14)%16])>>>19|A<<13)^(A>>>29|_<<3)^(_>>>6|A<<26))>>>16,M+=65535&(m=(A>>>19|_<<13)^(_>>>29|A<<3)^A>>>6),S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,P[U]=65535&M|S<<16,T[U]=65535&B|R<<16;B=65535&(x=N),R=x>>>16,M=65535&(m=Y),S=m>>>16,m=r[0],R+=(x=t[0])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[0]=Y=65535&M|S<<16,t[0]=N=65535&B|R<<16,B=65535&(x=D),R=x>>>16,M=65535&(m=L),S=m>>>16,m=r[1],R+=(x=t[1])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[1]=L=65535&M|S<<16,t[1]=D=65535&B|R<<16,B=65535&(x=j),R=x>>>16,M=65535&(m=O),S=m>>>16,m=r[2],R+=(x=t[2])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[2]=O=65535&M|S<<16,t[2]=j=65535&B|R<<16,B=65535&(x=F),R=x>>>16,M=65535&(m=I),S=m>>>16,m=r[3],R+=(x=t[3])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[3]=I=65535&M|S<<16,t[3]=F=65535&B|R<<16,B=65535&(x=Z),R=x>>>16,M=65535&(m=k),S=m>>>16,m=r[4],R+=(x=t[4])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[4]=k=65535&M|S<<16,t[4]=Z=65535&B|R<<16,B=65535&(x=G),R=x>>>16,M=65535&(m=C),S=m>>>16,m=r[5],R+=(x=t[5])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[5]=C=65535&M|S<<16,t[5]=G=65535&B|R<<16,B=65535&(x=V),R=x>>>16,M=65535&(m=K),S=m>>>16,m=r[6],R+=(x=t[6])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[6]=K=65535&M|S<<16,t[6]=V=65535&B|R<<16,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,m=r[7],R+=(x=t[7])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[7]=z=65535&M|S<<16,t[7]=X=65535&B|R<<16,W+=128,e-=128}return e}function $(r,t,n){var e,o=new Int32Array(8),i=new Int32Array(8),h=new Uint8Array(256),f=n;for(o[0]=1779033703,o[1]=3144134277,o[2]=1013904242,o[3]=2773480762,o[4]=1359893119,o[5]=2600822924,o[6]=528734635,o[7]=1541459225,i[0]=4089235720,i[1]=2227873595,i[2]=4271175723,i[3]=1595750129,i[4]=2917565137,i[5]=725511199,i[6]=4215389547,i[7]=327033209,W(o,i,t,n),n%=128,e=0;e<n;e++)h[e]=t[f-n+e];for(h[n]=128,h[(n=256-128*(n<112?1:0))-9]=0,p(h,n-8,f/536870912|0,f<<3),W(o,i,h,n),e=0;e<8;e++)p(r,8*e,o[e],i[e]);return 0}function q(r,n){var e=t(),o=t(),i=t(),h=t(),f=t(),a=t(),s=t(),c=t(),l=t();K(e,r[1],r[0]),K(l,n[1],n[0]),z(e,e,l),C(o,r[0],r[1]),C(l,n[0],n[1]),z(o,o,l),z(i,r[3],n[3]),z(i,i,u),z(h,r[2],n[2]),C(h,h,h),K(f,o,e),K(a,h,i),C(s,h,i),C(c,o,e),z(r[0],f,a),z(r[1],c,s),z(r[2],s,a),z(r[3],f,c)}function J(r,t,n){var e;for(e=0;e<4;e++)Y(r[e],t[e],n)}function Q(r,n){var e=t(),o=t(),i=t();D(i,n[2]),z(e,n[0],i),z(o,n[1],i),L(r,o),r[31]^=I(e)<<7}function rr(r,t,n){var e,o;for(P(r[0],h),P(r[1],f),P(r[2],f),P(r[3],h),o=255;o>=0;--o)J(r,t,e=n[o/8|0]>>(7&o)&1),q(t,r),q(r,r),J(r,t,e)}function tr(r,n){var e=[t(),t(),t(),t()];P(e[0],c),P(e[1],l),P(e[2],f),z(e[3],c,l),rr(r,e,n)}function nr(r,n,o){var i,h=new Uint8Array(64),f=[t(),t(),t(),t()];for(o||e(n,32),$(h,n,32),h[0]&=248,h[31]&=127,h[31]|=64,tr(f,h),Q(r,f),i=0;i<32;i++)n[i+32]=r[i];return 0}var er=new Float64Array([237,211,245,92,26,99,18,88,214,156,247,162,222,249,222,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16]);function or(r,t){var n,e,o,i;for(e=63;e>=32;--e){for(n=0,o=e-32,i=e-12;o<i;++o)t[o]+=n-16*t[e]*er[o-(e-32)],n=t[o]+128>>8,t[o]-=256*n;t[o]+=n,t[e]=0}for(n=0,o=0;o<32;o++)t[o]+=n-(t[31]>>4)*er[o],n=t[o]>>8,t[o]&=255;for(o=0;o<32;o++)t[o]-=n*er[o];for(e=0;e<32;e++)t[e+1]+=t[e]>>8,r[e]=255&t[e]}function ir(r){var t,n=new Float64Array(64);for(t=0;t<64;t++)n[t]=r[t];for(t=0;t<64;t++)r[t]=0;or(r,n)}function hr(r,n,e,o){var i,h,f=new Uint8Array(64),a=new Uint8Array(64),s=new Uint8Array(64),u=new Float64Array(64),c=[t(),t(),t(),t()];$(f,o,32),f[0]&=248,f[31]&=127,f[31]|=64;var l=e+64;for(i=0;i<e;i++)r[64+i]=n[i];for(i=0;i<32;i++)r[32+i]=f[32+i];for($(s,r.subarray(32),e+32),ir(s),tr(c,s),Q(r,c),i=32;i<64;i++)r[i]=o[i];for($(a,r,e+64),ir(a),i=0;i<64;i++)u[i]=0;for(i=0;i<32;i++)u[i]=s[i];for(i=0;i<32;i++)for(h=0;h<32;h++)u[i+h]+=a[i]*f[h];return or(r.subarray(32),u),l}function fr(r,n){var e=t(),o=t(),i=t(),a=t(),u=t(),c=t(),l=t();return P(r[2],f),k(r[1],n),N(i,r[1]),z(a,i,s),K(i,i,r[2]),C(a,r[2],a),N(u,a),N(c,u),z(l,c,u),z(e,l,i),z(e,e,a),function(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=250;e>=0;e--)N(o,o),1!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}(e,e),z(e,e,i),z(e,e,a),z(e,e,a),z(r[0],e,a),N(o,r[0]),z(o,o,a),O(o,i)&&z(r[0],r[0],y),N(o,r[0]),z(o,o,a),O(o,i)?-1:(I(r[0])===n[31]>>7&&K(r[0],h,r[0]),z(r[3],r[0],r[1]),0)}function ar(r,n,e,o){var i,h=new Uint8Array(32),f=new Uint8Array(64),a=[t(),t(),t(),t()],s=[t(),t(),t(),t()];if(-1,e<64)return-1;if(fr(s,o))return-1;for(i=0;i<e;i++)r[i]=n[i];for(i=0;i<32;i++)r[i+32]=o[i];if($(f,r,e),ir(f),rr(a,s,f),tr(s,n.subarray(32)),q(a,s),Q(h,a),e-=64,v(n,0,h,0)){for(i=0;i<e;i++)r[i]=0;return-1}for(i=0;i<e;i++)r[i]=n[i+64];return e}var sr=32,ur=24,cr=32,lr=32,yr=ur;function pr(r,t){if(r.length!==sr)throw new Error("bad key size");if(t.length!==ur)throw new Error("bad nonce size")}function gr(){for(var r=0;r<arguments.length;r++)if(!(arguments[r]instanceof Uint8Array))throw new TypeError("unexpected type, use Uint8Array")}function wr(r){for(var t=0;t<r.length;t++)r[t]=0}r.lowlevel={crypto_core_hsalsa20:d,crypto_stream_xor:m,crypto_stream:U,crypto_stream_salsa20_xor:_,crypto_stream_salsa20:E,crypto_onetimeauth:B,crypto_onetimeauth_verify:R,crypto_verify_16:w,crypto_verify_32:v,crypto_secretbox:M,crypto_secretbox_open:S,crypto_scalarmult:j,crypto_scalarmult_base:F,crypto_box_beforenm:G,crypto_box_afternm:V,crypto_box:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),V(r,t,n,e,h)},crypto_box_open:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),X(r,t,n,e,h)},crypto_box_keypair:Z,crypto_hash:$,crypto_sign:hr,crypto_sign_keypair:nr,crypto_sign_open:ar,crypto_secretbox_KEYBYTES:sr,crypto_secretbox_NONCEBYTES:ur,crypto_secretbox_ZEROBYTES:32,crypto_secretbox_BOXZEROBYTES:16,crypto_scalarmult_BYTES:32,crypto_scalarmult_SCALARBYTES:32,crypto_box_PUBLICKEYBYTES:cr,crypto_box_SECRETKEYBYTES:lr,crypto_box_BEFORENMBYTES:32,crypto_box_NONCEBYTES:yr,crypto_box_ZEROBYTES:32,crypto_box_BOXZEROBYTES:16,crypto_sign_BYTES:64,crypto_sign_PUBLICKEYBYTES:32,crypto_sign_SECRETKEYBYTES:64,crypto_sign_SEEDBYTES:32,crypto_hash_BYTES:64},r.randomBytes=function(r){var t=new Uint8Array(r);return e(t,r),t},r.secretbox=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(32+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+32]=r[i];return M(o,e,e.length,t,n),o.subarray(16)},r.secretbox.open=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(16+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+16]=r[i];return e.length<32?null:0!==S(o,e,e.length,t,n)?null:o.subarray(32)},r.secretbox.keyLength=sr,r.secretbox.nonceLength=ur,r.secretbox.overheadLength=16,r.scalarMult=function(r,t){if(gr(r,t),32!==r.length)throw new Error("bad n size");if(32!==t.length)throw new Error("bad p size");var n=new Uint8Array(32);return j(n,r,t),n},r.scalarMult.base=function(r){if(gr(r),32!==r.length)throw new Error("bad n size");var t=new Uint8Array(32);return F(t,r),t},r.scalarMult.scalarLength=32,r.scalarMult.groupElementLength=32,r.box=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox(t,n,i)},r.box.before=function(r,t){gr(r,t),function(r,t){if(r.length!==cr)throw new Error("bad public key size");if(t.length!==lr)throw new Error("bad secret key size")}(r,t);var n=new Uint8Array(32);return G(n,r,t),n},r.box.after=r.secretbox,r.box.open=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox.open(t,n,i)},r.box.open.after=r.secretbox.open,r.box.keyPair=function(){var r=new Uint8Array(cr),t=new Uint8Array(lr);return Z(r,t),{publicKey:r,secretKey:t}},r.box.keyPair.fromSecretKey=function(r){if(gr(r),r.length!==lr)throw new Error("bad secret key size");var t=new Uint8Array(cr);return F(t,r),{publicKey:t,secretKey:new Uint8Array(r)}},r.box.publicKeyLength=cr,r.box.secretKeyLength=lr,r.box.sharedKeyLength=32,r.box.nonceLength=yr,r.box.overheadLength=r.secretbox.overheadLength,r.sign=function(r,t){if(gr(r,t),64!==t.length)throw new Error("bad secret key size");var n=new Uint8Array(64+r.length);return hr(n,r,r.length,t),n},r.sign.open=function(r,t){if(gr(r,t),32!==t.length)throw new Error("bad public key size");var n=new Uint8Array(r.length),e=ar(n,r,r.length,t);if(e<0)return null;for(var o=new Uint8Array(e),i=0;i<o.length;i++)o[i]=n[i];return o},r.sign.detached=function(t,n){for(var e=r.sign(t,n),o=new Uint8Array(64),i=0;i<o.length;i++)o[i]=e[i];return o},r.sign.detached.verify=function(r,t,n){if(gr(r,t,n),64!==t.length)throw new Error("bad signature size");if(32!==n.length)throw new Error("bad public key size");var e,o=new Uint8Array(64+r.length),i=new Uint8Array(64+r.length);for(e=0;e<64;e++)o[e]=t[e];for(e=0;e<r.length;e++)o[e+64]=r[e];return ar(i,o,o.length,n)>=0},r.sign.keyPair=function(){var r=new Uint8Array(32),t=new Uint8Array(64);return nr(r,t),{publicKey:r,secretKey:t}},r.sign.keyPair.fromSecretKey=function(r){if(gr(r),64!==r.length)throw new Error("bad secret key size");for(var t=new Uint8Array(32),n=0;n<t.length;n++)t[n]=r[32+n];return{publicKey:t,secretKey:new Uint8Array(r)}},r.sign.keyPair.fromSeed=function(r){if(gr(r),32!==r.length)throw new Error("bad seed size");for(var t=new Uint8Array(32),n=new Uint8Array(64),e=0;e<32;e++)n[e]=r[e];return nr(t,n,!0),{publicKey:t,secretKey:n}},r.sign.publicKeyLength=32,r.sign.secretKeyLength=64,r.sign.seedLength=32,r.sign.signatureLength=64,r.hash=function(r){gr(r);var t=new Uint8Array(64);return $(t,r,r.length),t},r.hash.hashLength=64,r.verify=function(r,t){return gr(r,t),0!==r.length&&0!==t.length&&(r.length===t.length&&0===g(r,0,t,0,r.length))},r.setPRNG=function(r){e=r},function(){var t="undefined"!=typeof self?self.crypto||self.msCrypto:null;if(t&&t.getRandomValues){r.setPRNG(function(r,n){var e,o=new Uint8Array(n);for(e=0;e<n;e+=65536)t.getRandomValues(o.subarray(e,e+Math.min(n-e,65536)));for(e=0;e<n;e++)r[e]=o[e];wr(o)})}else(t=n(11))&&t.randomBytes&&r.setPRNG(function(r,n){var e,o=t.randomBytes(n);for(e=0;e<n;e++)r[e]=o[e];wr(o)})}()}(r.exports?r.exports:self.nacl=self.nacl||{})},function(r,t){},function(r,t,n){"use strict";n.r(t);var e=n(0);function o(r){return Object(e.b)("m/44h/457h",r)}function i(r,t="m/44h/457h/0h/0h/0h"){return Object(e.c)(Object(e.b)(t,r).privateKey)}function h(r,t){return new Array(t).fill().map((t,n)=>Object(e.c)(Object(e.a)(`${n}h/0h/0h`,r).privateKey))}n.d(t,"generateHDWallet",function(){return o}),n.d(t,"generateWalletUsingDerivationPath",function(){return i}),n.d(t,"getHDWalletAccounts",function(){return h})}])});
+var e=n(6),o=n(7),i=n(8);function h(){return a.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function f(r,t){if(h()<t)throw new RangeError("Invalid typed array length");return a.TYPED_ARRAY_SUPPORT?(r=new Uint8Array(t)).__proto__=a.prototype:(null===r&&(r=new a(t)),r.length=t),r}function a(r,t,n){if(!(a.TYPED_ARRAY_SUPPORT||this instanceof a))return new a(r,t,n);if("number"==typeof r){if("string"==typeof t)throw new Error("If encoding is specified then the first argument must be a string");return c(this,r)}return s(this,r,t,n)}function s(r,t,n,e){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?function(r,t,n,e){if(t.byteLength,n<0||t.byteLength<n)throw new RangeError("'offset' is out of bounds");if(t.byteLength<n+(e||0))throw new RangeError("'length' is out of bounds");t=void 0===n&&void 0===e?new Uint8Array(t):void 0===e?new Uint8Array(t,n):new Uint8Array(t,n,e);a.TYPED_ARRAY_SUPPORT?(r=t).__proto__=a.prototype:r=l(r,t);return r}(r,t,n,e):"string"==typeof t?function(r,t,n){"string"==typeof n&&""!==n||(n="utf8");if(!a.isEncoding(n))throw new TypeError('"encoding" must be a valid string encoding');var e=0|p(t,n),o=(r=f(r,e)).write(t,n);o!==e&&(r=r.slice(0,o));return r}(r,t,n):function(r,t){if(a.isBuffer(t)){var n=0|y(t.length);return 0===(r=f(r,n)).length?r:(t.copy(r,0,0,n),r)}if(t){if("undefined"!=typeof ArrayBuffer&&t.buffer instanceof ArrayBuffer||"length"in t)return"number"!=typeof t.length||(e=t.length)!=e?f(r,0):l(r,t);if("Buffer"===t.type&&i(t.data))return l(r,t.data)}var e;throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}(r,t)}function u(r){if("number"!=typeof r)throw new TypeError('"size" argument must be a number');if(r<0)throw new RangeError('"size" argument must not be negative')}function c(r,t){if(u(t),r=f(r,t<0?0:0|y(t)),!a.TYPED_ARRAY_SUPPORT)for(var n=0;n<t;++n)r[n]=0;return r}function l(r,t){var n=t.length<0?0:0|y(t.length);r=f(r,n);for(var e=0;e<n;e+=1)r[e]=255&t[e];return r}function y(r){if(r>=h())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+h().toString(16)+" bytes");return 0|r}function p(r,t){if(a.isBuffer(r))return r.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(r)||r instanceof ArrayBuffer))return r.byteLength;"string"!=typeof r&&(r=""+r);var n=r.length;if(0===n)return 0;for(var e=!1;;)switch(t){case"ascii":case"latin1":case"binary":return n;case"utf8":case"utf-8":case void 0:return N(r).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*n;case"hex":return n>>>1;case"base64":return D(r).length;default:if(e)return N(r).length;t=(""+t).toLowerCase(),e=!0}}function g(r,t,n){var e=r[t];r[t]=r[n],r[n]=e}function w(r,t,n,e,o){if(0===r.length)return-1;if("string"==typeof n?(e=n,n=0):n>2147483647?n=2147483647:n<-2147483648&&(n=-2147483648),n=+n,isNaN(n)&&(n=o?0:r.length-1),n<0&&(n=r.length+n),n>=r.length){if(o)return-1;n=r.length-1}else if(n<0){if(!o)return-1;n=0}if("string"==typeof t&&(t=a.from(t,e)),a.isBuffer(t))return 0===t.length?-1:v(r,t,n,e,o);if("number"==typeof t)return t&=255,a.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?o?Uint8Array.prototype.indexOf.call(r,t,n):Uint8Array.prototype.lastIndexOf.call(r,t,n):v(r,[t],n,e,o);throw new TypeError("val must be string, number or Buffer")}function v(r,t,n,e,o){var i,h=1,f=r.length,a=t.length;if(void 0!==e&&("ucs2"===(e=String(e).toLowerCase())||"ucs-2"===e||"utf16le"===e||"utf-16le"===e)){if(r.length<2||t.length<2)return-1;h=2,f/=2,a/=2,n/=2}function s(r,t){return 1===h?r[t]:r.readUInt16BE(t*h)}if(o){var u=-1;for(i=n;i<f;i++)if(s(r,i)===s(t,-1===u?0:i-u)){if(-1===u&&(u=i),i-u+1===a)return u*h}else-1!==u&&(i-=i-u),u=-1}else for(n+a>f&&(n=f-a),i=n;i>=0;i--){for(var c=!0,l=0;l<a;l++)if(s(r,i+l)!==s(t,l)){c=!1;break}if(c)return i}return-1}function b(r,t,n,e){n=Number(n)||0;var o=r.length-n;e?(e=Number(e))>o&&(e=o):e=o;var i=t.length;if(i%2!=0)throw new TypeError("Invalid hex string");e>i/2&&(e=i/2);for(var h=0;h<e;++h){var f=parseInt(t.substr(2*h,2),16);if(isNaN(f))return h;r[n+h]=f}return h}function d(r,t,n,e){return j(N(t,r.length-n),r,n,e)}function A(r,t,n,e){return j(function(r){for(var t=[],n=0;n<r.length;++n)t.push(255&r.charCodeAt(n));return t}(t),r,n,e)}function _(r,t,n,e){return A(r,t,n,e)}function E(r,t,n,e){return j(D(t),r,n,e)}function U(r,t,n,e){return j(function(r,t){for(var n,e,o,i=[],h=0;h<r.length&&!((t-=2)<0);++h)n=r.charCodeAt(h),e=n>>8,o=n%256,i.push(o),i.push(e);return i}(t,r.length-n),r,n,e)}function m(r,t,n){return 0===t&&n===r.length?e.fromByteArray(r):e.fromByteArray(r.slice(t,n))}function x(r,t,n){n=Math.min(r.length,n);for(var e=[],o=t;o<n;){var i,h,f,a,s=r[o],u=null,c=s>239?4:s>223?3:s>191?2:1;if(o+c<=n)switch(c){case 1:s<128&&(u=s);break;case 2:128==(192&(i=r[o+1]))&&(a=(31&s)<<6|63&i)>127&&(u=a);break;case 3:i=r[o+1],h=r[o+2],128==(192&i)&&128==(192&h)&&(a=(15&s)<<12|(63&i)<<6|63&h)>2047&&(a<55296||a>57343)&&(u=a);break;case 4:i=r[o+1],h=r[o+2],f=r[o+3],128==(192&i)&&128==(192&h)&&128==(192&f)&&(a=(15&s)<<18|(63&i)<<12|(63&h)<<6|63&f)>65535&&a<1114112&&(u=a)}null===u?(u=65533,c=1):u>65535&&(u-=65536,e.push(u>>>10&1023|55296),u=56320|1023&u),e.push(u),o+=c}return function(r){var t=r.length;if(t<=B)return String.fromCharCode.apply(String,r);var n="",e=0;for(;e<t;)n+=String.fromCharCode.apply(String,r.slice(e,e+=B));return n}(e)}t.Buffer=a,t.SlowBuffer=function(r){+r!=r&&(r=0);return a.alloc(+r)},t.INSPECT_MAX_BYTES=50,a.TYPED_ARRAY_SUPPORT=void 0!==r.TYPED_ARRAY_SUPPORT?r.TYPED_ARRAY_SUPPORT:function(){try{var r=new Uint8Array(1);return r.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===r.foo()&&"function"==typeof r.subarray&&0===r.subarray(1,1).byteLength}catch(r){return!1}}(),t.kMaxLength=h(),a.poolSize=8192,a._augment=function(r){return r.__proto__=a.prototype,r},a.from=function(r,t,n){return s(null,r,t,n)},a.TYPED_ARRAY_SUPPORT&&(a.prototype.__proto__=Uint8Array.prototype,a.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&a[Symbol.species]===a&&Object.defineProperty(a,Symbol.species,{value:null,configurable:!0})),a.alloc=function(r,t,n){return function(r,t,n,e){return u(t),t<=0?f(r,t):void 0!==n?"string"==typeof e?f(r,t).fill(n,e):f(r,t).fill(n):f(r,t)}(null,r,t,n)},a.allocUnsafe=function(r){return c(null,r)},a.allocUnsafeSlow=function(r){return c(null,r)},a.isBuffer=function(r){return!(null==r||!r._isBuffer)},a.compare=function(r,t){if(!a.isBuffer(r)||!a.isBuffer(t))throw new TypeError("Arguments must be Buffers");if(r===t)return 0;for(var n=r.length,e=t.length,o=0,i=Math.min(n,e);o<i;++o)if(r[o]!==t[o]){n=r[o],e=t[o];break}return n<e?-1:e<n?1:0},a.isEncoding=function(r){switch(String(r).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},a.concat=function(r,t){if(!i(r))throw new TypeError('"list" argument must be an Array of Buffers');if(0===r.length)return a.alloc(0);var n;if(void 0===t)for(t=0,n=0;n<r.length;++n)t+=r[n].length;var e=a.allocUnsafe(t),o=0;for(n=0;n<r.length;++n){var h=r[n];if(!a.isBuffer(h))throw new TypeError('"list" argument must be an Array of Buffers');h.copy(e,o),o+=h.length}return e},a.byteLength=p,a.prototype._isBuffer=!0,a.prototype.swap16=function(){var r=this.length;if(r%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;t<r;t+=2)g(this,t,t+1);return this},a.prototype.swap32=function(){var r=this.length;if(r%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;t<r;t+=4)g(this,t,t+3),g(this,t+1,t+2);return this},a.prototype.swap64=function(){var r=this.length;if(r%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;t<r;t+=8)g(this,t,t+7),g(this,t+1,t+6),g(this,t+2,t+5),g(this,t+3,t+4);return this},a.prototype.toString=function(){var r=0|this.length;return 0===r?"":0===arguments.length?x(this,0,r):function(r,t,n){var e=!1;if((void 0===t||t<0)&&(t=0),t>this.length)return"";if((void 0===n||n>this.length)&&(n=this.length),n<=0)return"";if((n>>>=0)<=(t>>>=0))return"";for(r||(r="utf8");;)switch(r){case"hex":return S(this,t,n);case"utf8":case"utf-8":return x(this,t,n);case"ascii":return R(this,t,n);case"latin1":case"binary":return M(this,t,n);case"base64":return m(this,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return P(this,t,n);default:if(e)throw new TypeError("Unknown encoding: "+r);r=(r+"").toLowerCase(),e=!0}}.apply(this,arguments)},a.prototype.equals=function(r){if(!a.isBuffer(r))throw new TypeError("Argument must be a Buffer");return this===r||0===a.compare(this,r)},a.prototype.inspect=function(){var r="",n=t.INSPECT_MAX_BYTES;return this.length>0&&(r=this.toString("hex",0,n).match(/.{2}/g).join(" "),this.length>n&&(r+=" ... ")),"<Buffer "+r+">"},a.prototype.compare=function(r,t,n,e,o){if(!a.isBuffer(r))throw new TypeError("Argument must be a Buffer");if(void 0===t&&(t=0),void 0===n&&(n=r?r.length:0),void 0===e&&(e=0),void 0===o&&(o=this.length),t<0||n>r.length||e<0||o>this.length)throw new RangeError("out of range index");if(e>=o&&t>=n)return 0;if(e>=o)return-1;if(t>=n)return 1;if(this===r)return 0;for(var i=(o>>>=0)-(e>>>=0),h=(n>>>=0)-(t>>>=0),f=Math.min(i,h),s=this.slice(e,o),u=r.slice(t,n),c=0;c<f;++c)if(s[c]!==u[c]){i=s[c],h=u[c];break}return i<h?-1:h<i?1:0},a.prototype.includes=function(r,t,n){return-1!==this.indexOf(r,t,n)},a.prototype.indexOf=function(r,t,n){return w(this,r,t,n,!0)},a.prototype.lastIndexOf=function(r,t,n){return w(this,r,t,n,!1)},a.prototype.write=function(r,t,n,e){if(void 0===t)e="utf8",n=this.length,t=0;else if(void 0===n&&"string"==typeof t)e=t,n=this.length,t=0;else{if(!isFinite(t))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t|=0,isFinite(n)?(n|=0,void 0===e&&(e="utf8")):(e=n,n=void 0)}var o=this.length-t;if((void 0===n||n>o)&&(n=o),r.length>0&&(n<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");e||(e="utf8");for(var i=!1;;)switch(e){case"hex":return b(this,r,t,n);case"utf8":case"utf-8":return d(this,r,t,n);case"ascii":return A(this,r,t,n);case"latin1":case"binary":return _(this,r,t,n);case"base64":return E(this,r,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return U(this,r,t,n);default:if(i)throw new TypeError("Unknown encoding: "+e);e=(""+e).toLowerCase(),i=!0}},a.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var B=4096;function R(r,t,n){var e="";n=Math.min(r.length,n);for(var o=t;o<n;++o)e+=String.fromCharCode(127&r[o]);return e}function M(r,t,n){var e="";n=Math.min(r.length,n);for(var o=t;o<n;++o)e+=String.fromCharCode(r[o]);return e}function S(r,t,n){var e=r.length;(!t||t<0)&&(t=0),(!n||n<0||n>e)&&(n=e);for(var o="",i=t;i<n;++i)o+=z(r[i]);return o}function P(r,t,n){for(var e=r.slice(t,n),o="",i=0;i<e.length;i+=2)o+=String.fromCharCode(e[i]+256*e[i+1]);return o}function T(r,t,n){if(r%1!=0||r<0)throw new RangeError("offset is not uint");if(r+t>n)throw new RangeError("Trying to access beyond buffer length")}function Y(r,t,n,e,o,i){if(!a.isBuffer(r))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>o||t<i)throw new RangeError('"value" argument is out of bounds');if(n+e>r.length)throw new RangeError("Index out of range")}function L(r,t,n,e){t<0&&(t=65535+t+1);for(var o=0,i=Math.min(r.length-n,2);o<i;++o)r[n+o]=(t&255<<8*(e?o:1-o))>>>8*(e?o:1-o)}function O(r,t,n,e){t<0&&(t=4294967295+t+1);for(var o=0,i=Math.min(r.length-n,4);o<i;++o)r[n+o]=t>>>8*(e?o:3-o)&255}function I(r,t,n,e,o,i){if(n+e>r.length)throw new RangeError("Index out of range");if(n<0)throw new RangeError("Index out of range")}function k(r,t,n,e,i){return i||I(r,0,n,4),o.write(r,t,n,e,23,4),n+4}function C(r,t,n,e,i){return i||I(r,0,n,8),o.write(r,t,n,e,52,8),n+8}a.prototype.slice=function(r,t){var n,e=this.length;if((r=~~r)<0?(r+=e)<0&&(r=0):r>e&&(r=e),(t=void 0===t?e:~~t)<0?(t+=e)<0&&(t=0):t>e&&(t=e),t<r&&(t=r),a.TYPED_ARRAY_SUPPORT)(n=this.subarray(r,t)).__proto__=a.prototype;else{var o=t-r;n=new a(o,void 0);for(var i=0;i<o;++i)n[i]=this[i+r]}return n},a.prototype.readUIntLE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r],o=1,i=0;++i<t&&(o*=256);)e+=this[r+i]*o;return e},a.prototype.readUIntBE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r+--t],o=1;t>0&&(o*=256);)e+=this[r+--t]*o;return e},a.prototype.readUInt8=function(r,t){return t||T(r,1,this.length),this[r]},a.prototype.readUInt16LE=function(r,t){return t||T(r,2,this.length),this[r]|this[r+1]<<8},a.prototype.readUInt16BE=function(r,t){return t||T(r,2,this.length),this[r]<<8|this[r+1]},a.prototype.readUInt32LE=function(r,t){return t||T(r,4,this.length),(this[r]|this[r+1]<<8|this[r+2]<<16)+16777216*this[r+3]},a.prototype.readUInt32BE=function(r,t){return t||T(r,4,this.length),16777216*this[r]+(this[r+1]<<16|this[r+2]<<8|this[r+3])},a.prototype.readIntLE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=this[r],o=1,i=0;++i<t&&(o*=256);)e+=this[r+i]*o;return e>=(o*=128)&&(e-=Math.pow(2,8*t)),e},a.prototype.readIntBE=function(r,t,n){r|=0,t|=0,n||T(r,t,this.length);for(var e=t,o=1,i=this[r+--e];e>0&&(o*=256);)i+=this[r+--e]*o;return i>=(o*=128)&&(i-=Math.pow(2,8*t)),i},a.prototype.readInt8=function(r,t){return t||T(r,1,this.length),128&this[r]?-1*(255-this[r]+1):this[r]},a.prototype.readInt16LE=function(r,t){t||T(r,2,this.length);var n=this[r]|this[r+1]<<8;return 32768&n?4294901760|n:n},a.prototype.readInt16BE=function(r,t){t||T(r,2,this.length);var n=this[r+1]|this[r]<<8;return 32768&n?4294901760|n:n},a.prototype.readInt32LE=function(r,t){return t||T(r,4,this.length),this[r]|this[r+1]<<8|this[r+2]<<16|this[r+3]<<24},a.prototype.readInt32BE=function(r,t){return t||T(r,4,this.length),this[r]<<24|this[r+1]<<16|this[r+2]<<8|this[r+3]},a.prototype.readFloatLE=function(r,t){return t||T(r,4,this.length),o.read(this,r,!0,23,4)},a.prototype.readFloatBE=function(r,t){return t||T(r,4,this.length),o.read(this,r,!1,23,4)},a.prototype.readDoubleLE=function(r,t){return t||T(r,8,this.length),o.read(this,r,!0,52,8)},a.prototype.readDoubleBE=function(r,t){return t||T(r,8,this.length),o.read(this,r,!1,52,8)},a.prototype.writeUIntLE=function(r,t,n,e){(r=+r,t|=0,n|=0,e)||Y(this,r,t,n,Math.pow(2,8*n)-1,0);var o=1,i=0;for(this[t]=255&r;++i<n&&(o*=256);)this[t+i]=r/o&255;return t+n},a.prototype.writeUIntBE=function(r,t,n,e){(r=+r,t|=0,n|=0,e)||Y(this,r,t,n,Math.pow(2,8*n)-1,0);var o=n-1,i=1;for(this[t+o]=255&r;--o>=0&&(i*=256);)this[t+o]=r/i&255;return t+n},a.prototype.writeUInt8=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,1,255,0),a.TYPED_ARRAY_SUPPORT||(r=Math.floor(r)),this[t]=255&r,t+1},a.prototype.writeUInt16LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,65535,0),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8):L(this,r,t,!0),t+2},a.prototype.writeUInt16BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,65535,0),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>8,this[t+1]=255&r):L(this,r,t,!1),t+2},a.prototype.writeUInt32LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,4294967295,0),a.TYPED_ARRAY_SUPPORT?(this[t+3]=r>>>24,this[t+2]=r>>>16,this[t+1]=r>>>8,this[t]=255&r):O(this,r,t,!0),t+4},a.prototype.writeUInt32BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,4294967295,0),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>24,this[t+1]=r>>>16,this[t+2]=r>>>8,this[t+3]=255&r):O(this,r,t,!1),t+4},a.prototype.writeIntLE=function(r,t,n,e){if(r=+r,t|=0,!e){var o=Math.pow(2,8*n-1);Y(this,r,t,n,o-1,-o)}var i=0,h=1,f=0;for(this[t]=255&r;++i<n&&(h*=256);)r<0&&0===f&&0!==this[t+i-1]&&(f=1),this[t+i]=(r/h>>0)-f&255;return t+n},a.prototype.writeIntBE=function(r,t,n,e){if(r=+r,t|=0,!e){var o=Math.pow(2,8*n-1);Y(this,r,t,n,o-1,-o)}var i=n-1,h=1,f=0;for(this[t+i]=255&r;--i>=0&&(h*=256);)r<0&&0===f&&0!==this[t+i+1]&&(f=1),this[t+i]=(r/h>>0)-f&255;return t+n},a.prototype.writeInt8=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,1,127,-128),a.TYPED_ARRAY_SUPPORT||(r=Math.floor(r)),r<0&&(r=255+r+1),this[t]=255&r,t+1},a.prototype.writeInt16LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,32767,-32768),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8):L(this,r,t,!0),t+2},a.prototype.writeInt16BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,2,32767,-32768),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>8,this[t+1]=255&r):L(this,r,t,!1),t+2},a.prototype.writeInt32LE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,2147483647,-2147483648),a.TYPED_ARRAY_SUPPORT?(this[t]=255&r,this[t+1]=r>>>8,this[t+2]=r>>>16,this[t+3]=r>>>24):O(this,r,t,!0),t+4},a.prototype.writeInt32BE=function(r,t,n){return r=+r,t|=0,n||Y(this,r,t,4,2147483647,-2147483648),r<0&&(r=4294967295+r+1),a.TYPED_ARRAY_SUPPORT?(this[t]=r>>>24,this[t+1]=r>>>16,this[t+2]=r>>>8,this[t+3]=255&r):O(this,r,t,!1),t+4},a.prototype.writeFloatLE=function(r,t,n){return k(this,r,t,!0,n)},a.prototype.writeFloatBE=function(r,t,n){return k(this,r,t,!1,n)},a.prototype.writeDoubleLE=function(r,t,n){return C(this,r,t,!0,n)},a.prototype.writeDoubleBE=function(r,t,n){return C(this,r,t,!1,n)},a.prototype.copy=function(r,t,n,e){if(n||(n=0),e||0===e||(e=this.length),t>=r.length&&(t=r.length),t||(t=0),e>0&&e<n&&(e=n),e===n)return 0;if(0===r.length||0===this.length)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(n<0||n>=this.length)throw new RangeError("sourceStart out of bounds");if(e<0)throw new RangeError("sourceEnd out of bounds");e>this.length&&(e=this.length),r.length-t<e-n&&(e=r.length-t+n);var o,i=e-n;if(this===r&&n<t&&t<e)for(o=i-1;o>=0;--o)r[o+t]=this[o+n];else if(i<1e3||!a.TYPED_ARRAY_SUPPORT)for(o=0;o<i;++o)r[o+t]=this[o+n];else Uint8Array.prototype.set.call(r,this.subarray(n,n+i),t);return i},a.prototype.fill=function(r,t,n,e){if("string"==typeof r){if("string"==typeof t?(e=t,t=0,n=this.length):"string"==typeof n&&(e=n,n=this.length),1===r.length){var o=r.charCodeAt(0);o<256&&(r=o)}if(void 0!==e&&"string"!=typeof e)throw new TypeError("encoding must be a string");if("string"==typeof e&&!a.isEncoding(e))throw new TypeError("Unknown encoding: "+e)}else"number"==typeof r&&(r&=255);if(t<0||this.length<t||this.length<n)throw new RangeError("Out of range index");if(n<=t)return this;var i;if(t>>>=0,n=void 0===n?this.length:n>>>0,r||(r=0),"number"==typeof r)for(i=t;i<n;++i)this[i]=r;else{var h=a.isBuffer(r)?r:N(new a(r,e).toString()),f=h.length;for(i=0;i<n-t;++i)this[i+t]=h[i%f]}return this};var K=/[^+\/0-9A-Za-z-_]/g;function z(r){return r<16?"0"+r.toString(16):r.toString(16)}function N(r,t){var n;t=t||1/0;for(var e=r.length,o=null,i=[],h=0;h<e;++h){if((n=r.charCodeAt(h))>55295&&n<57344){if(!o){if(n>56319){(t-=3)>-1&&i.push(239,191,189);continue}if(h+1===e){(t-=3)>-1&&i.push(239,191,189);continue}o=n;continue}if(n<56320){(t-=3)>-1&&i.push(239,191,189),o=n;continue}n=65536+(o-55296<<10|n-56320)}else o&&(t-=3)>-1&&i.push(239,191,189);if(o=null,n<128){if((t-=1)<0)break;i.push(n)}else if(n<2048){if((t-=2)<0)break;i.push(n>>6|192,63&n|128)}else if(n<65536){if((t-=3)<0)break;i.push(n>>12|224,n>>6&63|128,63&n|128)}else{if(!(n<1114112))throw new Error("Invalid code point");if((t-=4)<0)break;i.push(n>>18|240,n>>12&63|128,n>>6&63|128,63&n|128)}}return i}function D(r){return e.toByteArray(function(r){if((r=function(r){return r.trim?r.trim():r.replace(/^\s+|\s+$/g,"")}(r).replace(K,"")).length<2)return"";for(;r.length%4!=0;)r+="=";return r}(r))}function j(r,t,n,e){for(var o=0;o<e&&!(o+n>=t.length||o>=r.length);++o)t[o+n]=r[o];return o}}).call(this,n(5))},function(r,t){var n;n=function(){return this}();try{n=n||Function("return this")()||(0,eval)("this")}catch(r){"object"==typeof window&&(n=window)}r.exports=n},function(r,t,n){"use strict";t.byteLength=function(r){var t=s(r),n=t[0],e=t[1];return 3*(n+e)/4-e},t.toByteArray=function(r){for(var t,n=s(r),e=n[0],h=n[1],f=new i(function(r,t,n){return 3*(t+n)/4-n}(0,e,h)),a=0,u=h>0?e-4:e,c=0;c<u;c+=4)t=o[r.charCodeAt(c)]<<18|o[r.charCodeAt(c+1)]<<12|o[r.charCodeAt(c+2)]<<6|o[r.charCodeAt(c+3)],f[a++]=t>>16&255,f[a++]=t>>8&255,f[a++]=255&t;2===h&&(t=o[r.charCodeAt(c)]<<2|o[r.charCodeAt(c+1)]>>4,f[a++]=255&t);1===h&&(t=o[r.charCodeAt(c)]<<10|o[r.charCodeAt(c+1)]<<4|o[r.charCodeAt(c+2)]>>2,f[a++]=t>>8&255,f[a++]=255&t);return f},t.fromByteArray=function(r){for(var t,n=r.length,o=n%3,i=[],h=0,f=n-o;h<f;h+=16383)i.push(u(r,h,h+16383>f?f:h+16383));1===o?(t=r[n-1],i.push(e[t>>2]+e[t<<4&63]+"==")):2===o&&(t=(r[n-2]<<8)+r[n-1],i.push(e[t>>10]+e[t>>4&63]+e[t<<2&63]+"="));return i.join("")};for(var e=[],o=[],i="undefined"!=typeof Uint8Array?Uint8Array:Array,h="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",f=0,a=h.length;f<a;++f)e[f]=h[f],o[h.charCodeAt(f)]=f;function s(r){var t=r.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var n=r.indexOf("=");return-1===n&&(n=t),[n,n===t?0:4-n%4]}function u(r,t,n){for(var o,i,h=[],f=t;f<n;f+=3)o=(r[f]<<16&16711680)+(r[f+1]<<8&65280)+(255&r[f+2]),h.push(e[(i=o)>>18&63]+e[i>>12&63]+e[i>>6&63]+e[63&i]);return h.join("")}o["-".charCodeAt(0)]=62,o["_".charCodeAt(0)]=63},function(r,t){t.read=function(r,t,n,e,o){var i,h,f=8*o-e-1,a=(1<<f)-1,s=a>>1,u=-7,c=n?o-1:0,l=n?-1:1,y=r[t+c];for(c+=l,i=y&(1<<-u)-1,y>>=-u,u+=f;u>0;i=256*i+r[t+c],c+=l,u-=8);for(h=i&(1<<-u)-1,i>>=-u,u+=e;u>0;h=256*h+r[t+c],c+=l,u-=8);if(0===i)i=1-s;else{if(i===a)return h?NaN:1/0*(y?-1:1);h+=Math.pow(2,e),i-=s}return(y?-1:1)*h*Math.pow(2,i-e)},t.write=function(r,t,n,e,o,i){var h,f,a,s=8*i-o-1,u=(1<<s)-1,c=u>>1,l=23===o?Math.pow(2,-24)-Math.pow(2,-77):0,y=e?0:i-1,p=e?1:-1,g=t<0||0===t&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(f=isNaN(t)?1:0,h=u):(h=Math.floor(Math.log(t)/Math.LN2),t*(a=Math.pow(2,-h))<1&&(h--,a*=2),(t+=h+c>=1?l/a:l*Math.pow(2,1-c))*a>=2&&(h++,a/=2),h+c>=u?(f=0,h=u):h+c>=1?(f=(t*a-1)*Math.pow(2,o),h+=c):(f=t*Math.pow(2,c-1)*Math.pow(2,o),h=0));o>=8;r[n+y]=255&f,y+=p,f/=256,o-=8);for(h=h<<o|f,s+=o;s>0;r[n+y]=255&h,y+=p,h/=256,s-=8);r[n+y-p]|=128*g}},function(r,t){var n={}.toString;r.exports=Array.isArray||function(r){return"[object Array]"==n.call(r)}},function(r,t){},function(r,t,n){!function(r){"use strict";var t=function(r){var t,n=new Float64Array(16);if(r)for(t=0;t<r.length;t++)n[t]=r[t];return n},e=function(){throw new Error("no PRNG")},o=new Uint8Array(16),i=new Uint8Array(32);i[0]=9;var h=t(),f=t([1]),a=t([56129,1]),s=t([30883,4953,19914,30187,55467,16705,2637,112,59544,30585,16505,36039,65139,11119,27886,20995]),u=t([61785,9906,39828,60374,45398,33411,5274,224,53552,61171,33010,6542,64743,22239,55772,9222]),c=t([54554,36645,11616,51542,42930,38181,51040,26924,56412,64982,57905,49316,21502,52590,14035,8553]),l=t([26200,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214]),y=t([41136,18958,6951,50414,58488,44335,6150,12099,55207,15867,153,11085,57099,20417,9344,11139]);function p(r,t,n,e){r[t]=n>>24&255,r[t+1]=n>>16&255,r[t+2]=n>>8&255,r[t+3]=255&n,r[t+4]=e>>24&255,r[t+5]=e>>16&255,r[t+6]=e>>8&255,r[t+7]=255&e}function g(r,t,n,e,o){var i,h=0;for(i=0;i<o;i++)h|=r[t+i]^n[e+i];return(1&h-1>>>8)-1}function w(r,t,n,e){return g(r,t,n,e,16)}function v(r,t,n,e){return g(r,t,n,e,32)}function b(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=i,E=h,U=f,m=a,x=s,B=u,R=c,M=l,S=y,P=p,T=g,Y=w,L=v,O=b,I=d,k=A,C=0;C<20;C+=2)_^=(o=(L^=(o=(S^=(o=(x^=(o=_+L|0)<<7|o>>>25)+_|0)<<9|o>>>23)+x|0)<<13|o>>>19)+S|0)<<18|o>>>14,B^=(o=(E^=(o=(O^=(o=(P^=(o=B+E|0)<<7|o>>>25)+B|0)<<9|o>>>23)+P|0)<<13|o>>>19)+O|0)<<18|o>>>14,T^=(o=(R^=(o=(U^=(o=(I^=(o=T+R|0)<<7|o>>>25)+T|0)<<9|o>>>23)+I|0)<<13|o>>>19)+U|0)<<18|o>>>14,k^=(o=(Y^=(o=(M^=(o=(m^=(o=k+Y|0)<<7|o>>>25)+k|0)<<9|o>>>23)+m|0)<<13|o>>>19)+M|0)<<18|o>>>14,_^=(o=(m^=(o=(U^=(o=(E^=(o=_+m|0)<<7|o>>>25)+_|0)<<9|o>>>23)+E|0)<<13|o>>>19)+U|0)<<18|o>>>14,B^=(o=(x^=(o=(M^=(o=(R^=(o=B+x|0)<<7|o>>>25)+B|0)<<9|o>>>23)+R|0)<<13|o>>>19)+M|0)<<18|o>>>14,T^=(o=(P^=(o=(S^=(o=(Y^=(o=T+P|0)<<7|o>>>25)+T|0)<<9|o>>>23)+Y|0)<<13|o>>>19)+S|0)<<18|o>>>14,k^=(o=(I^=(o=(O^=(o=(L^=(o=k+I|0)<<7|o>>>25)+k|0)<<9|o>>>23)+L|0)<<13|o>>>19)+O|0)<<18|o>>>14;_=_+i|0,E=E+h|0,U=U+f|0,m=m+a|0,x=x+s|0,B=B+u|0,R=R+c|0,M=M+l|0,S=S+y|0,P=P+p|0,T=T+g|0,Y=Y+w|0,L=L+v|0,O=O+b|0,I=I+d|0,k=k+A|0,r[0]=_>>>0&255,r[1]=_>>>8&255,r[2]=_>>>16&255,r[3]=_>>>24&255,r[4]=E>>>0&255,r[5]=E>>>8&255,r[6]=E>>>16&255,r[7]=E>>>24&255,r[8]=U>>>0&255,r[9]=U>>>8&255,r[10]=U>>>16&255,r[11]=U>>>24&255,r[12]=m>>>0&255,r[13]=m>>>8&255,r[14]=m>>>16&255,r[15]=m>>>24&255,r[16]=x>>>0&255,r[17]=x>>>8&255,r[18]=x>>>16&255,r[19]=x>>>24&255,r[20]=B>>>0&255,r[21]=B>>>8&255,r[22]=B>>>16&255,r[23]=B>>>24&255,r[24]=R>>>0&255,r[25]=R>>>8&255,r[26]=R>>>16&255,r[27]=R>>>24&255,r[28]=M>>>0&255,r[29]=M>>>8&255,r[30]=M>>>16&255,r[31]=M>>>24&255,r[32]=S>>>0&255,r[33]=S>>>8&255,r[34]=S>>>16&255,r[35]=S>>>24&255,r[36]=P>>>0&255,r[37]=P>>>8&255,r[38]=P>>>16&255,r[39]=P>>>24&255,r[40]=T>>>0&255,r[41]=T>>>8&255,r[42]=T>>>16&255,r[43]=T>>>24&255,r[44]=Y>>>0&255,r[45]=Y>>>8&255,r[46]=Y>>>16&255,r[47]=Y>>>24&255,r[48]=L>>>0&255,r[49]=L>>>8&255,r[50]=L>>>16&255,r[51]=L>>>24&255,r[52]=O>>>0&255,r[53]=O>>>8&255,r[54]=O>>>16&255,r[55]=O>>>24&255,r[56]=I>>>0&255,r[57]=I>>>8&255,r[58]=I>>>16&255,r[59]=I>>>24&255,r[60]=k>>>0&255,r[61]=k>>>8&255,r[62]=k>>>16&255,r[63]=k>>>24&255}(r,t,n,e)}function d(r,t,n,e){!function(r,t,n,e){for(var o,i=255&e[0]|(255&e[1])<<8|(255&e[2])<<16|(255&e[3])<<24,h=255&n[0]|(255&n[1])<<8|(255&n[2])<<16|(255&n[3])<<24,f=255&n[4]|(255&n[5])<<8|(255&n[6])<<16|(255&n[7])<<24,a=255&n[8]|(255&n[9])<<8|(255&n[10])<<16|(255&n[11])<<24,s=255&n[12]|(255&n[13])<<8|(255&n[14])<<16|(255&n[15])<<24,u=255&e[4]|(255&e[5])<<8|(255&e[6])<<16|(255&e[7])<<24,c=255&t[0]|(255&t[1])<<8|(255&t[2])<<16|(255&t[3])<<24,l=255&t[4]|(255&t[5])<<8|(255&t[6])<<16|(255&t[7])<<24,y=255&t[8]|(255&t[9])<<8|(255&t[10])<<16|(255&t[11])<<24,p=255&t[12]|(255&t[13])<<8|(255&t[14])<<16|(255&t[15])<<24,g=255&e[8]|(255&e[9])<<8|(255&e[10])<<16|(255&e[11])<<24,w=255&n[16]|(255&n[17])<<8|(255&n[18])<<16|(255&n[19])<<24,v=255&n[20]|(255&n[21])<<8|(255&n[22])<<16|(255&n[23])<<24,b=255&n[24]|(255&n[25])<<8|(255&n[26])<<16|(255&n[27])<<24,d=255&n[28]|(255&n[29])<<8|(255&n[30])<<16|(255&n[31])<<24,A=255&e[12]|(255&e[13])<<8|(255&e[14])<<16|(255&e[15])<<24,_=0;_<20;_+=2)i^=(o=(v^=(o=(y^=(o=(s^=(o=i+v|0)<<7|o>>>25)+i|0)<<9|o>>>23)+s|0)<<13|o>>>19)+y|0)<<18|o>>>14,u^=(o=(h^=(o=(b^=(o=(p^=(o=u+h|0)<<7|o>>>25)+u|0)<<9|o>>>23)+p|0)<<13|o>>>19)+b|0)<<18|o>>>14,g^=(o=(c^=(o=(f^=(o=(d^=(o=g+c|0)<<7|o>>>25)+g|0)<<9|o>>>23)+d|0)<<13|o>>>19)+f|0)<<18|o>>>14,A^=(o=(w^=(o=(l^=(o=(a^=(o=A+w|0)<<7|o>>>25)+A|0)<<9|o>>>23)+a|0)<<13|o>>>19)+l|0)<<18|o>>>14,i^=(o=(a^=(o=(f^=(o=(h^=(o=i+a|0)<<7|o>>>25)+i|0)<<9|o>>>23)+h|0)<<13|o>>>19)+f|0)<<18|o>>>14,u^=(o=(s^=(o=(l^=(o=(c^=(o=u+s|0)<<7|o>>>25)+u|0)<<9|o>>>23)+c|0)<<13|o>>>19)+l|0)<<18|o>>>14,g^=(o=(p^=(o=(y^=(o=(w^=(o=g+p|0)<<7|o>>>25)+g|0)<<9|o>>>23)+w|0)<<13|o>>>19)+y|0)<<18|o>>>14,A^=(o=(d^=(o=(b^=(o=(v^=(o=A+d|0)<<7|o>>>25)+A|0)<<9|o>>>23)+v|0)<<13|o>>>19)+b|0)<<18|o>>>14;r[0]=i>>>0&255,r[1]=i>>>8&255,r[2]=i>>>16&255,r[3]=i>>>24&255,r[4]=u>>>0&255,r[5]=u>>>8&255,r[6]=u>>>16&255,r[7]=u>>>24&255,r[8]=g>>>0&255,r[9]=g>>>8&255,r[10]=g>>>16&255,r[11]=g>>>24&255,r[12]=A>>>0&255,r[13]=A>>>8&255,r[14]=A>>>16&255,r[15]=A>>>24&255,r[16]=c>>>0&255,r[17]=c>>>8&255,r[18]=c>>>16&255,r[19]=c>>>24&255,r[20]=l>>>0&255,r[21]=l>>>8&255,r[22]=l>>>16&255,r[23]=l>>>24&255,r[24]=y>>>0&255,r[25]=y>>>8&255,r[26]=y>>>16&255,r[27]=y>>>24&255,r[28]=p>>>0&255,r[29]=p>>>8&255,r[30]=p>>>16&255,r[31]=p>>>24&255}(r,t,n,e)}var A=new Uint8Array([101,120,112,97,110,100,32,51,50,45,98,121,116,101,32,107]);function _(r,t,n,e,o,i,h){var f,a,s=new Uint8Array(16),u=new Uint8Array(64);for(a=0;a<16;a++)s[a]=0;for(a=0;a<8;a++)s[a]=i[a];for(;o>=64;){for(b(u,s,h,A),a=0;a<64;a++)r[t+a]=n[e+a]^u[a];for(f=1,a=8;a<16;a++)f=f+(255&s[a])|0,s[a]=255&f,f>>>=8;o-=64,t+=64,e+=64}if(o>0)for(b(u,s,h,A),a=0;a<o;a++)r[t+a]=n[e+a]^u[a];return 0}function E(r,t,n,e,o){var i,h,f=new Uint8Array(16),a=new Uint8Array(64);for(h=0;h<16;h++)f[h]=0;for(h=0;h<8;h++)f[h]=e[h];for(;n>=64;){for(b(a,f,o,A),h=0;h<64;h++)r[t+h]=a[h];for(i=1,h=8;h<16;h++)i=i+(255&f[h])|0,f[h]=255&i,i>>>=8;n-=64,t+=64}if(n>0)for(b(a,f,o,A),h=0;h<n;h++)r[t+h]=a[h];return 0}function U(r,t,n,e,o){var i=new Uint8Array(32);d(i,e,o,A);for(var h=new Uint8Array(8),f=0;f<8;f++)h[f]=e[f+16];return E(r,t,n,h,i)}function m(r,t,n,e,o,i,h){var f=new Uint8Array(32);d(f,i,h,A);for(var a=new Uint8Array(8),s=0;s<8;s++)a[s]=i[s+16];return _(r,t,n,e,o,a,f)}var x=function(r){var t,n,e,o,i,h,f,a;this.buffer=new Uint8Array(16),this.r=new Uint16Array(10),this.h=new Uint16Array(10),this.pad=new Uint16Array(8),this.leftover=0,this.fin=0,t=255&r[0]|(255&r[1])<<8,this.r[0]=8191&t,n=255&r[2]|(255&r[3])<<8,this.r[1]=8191&(t>>>13|n<<3),e=255&r[4]|(255&r[5])<<8,this.r[2]=7939&(n>>>10|e<<6),o=255&r[6]|(255&r[7])<<8,this.r[3]=8191&(e>>>7|o<<9),i=255&r[8]|(255&r[9])<<8,this.r[4]=255&(o>>>4|i<<12),this.r[5]=i>>>1&8190,h=255&r[10]|(255&r[11])<<8,this.r[6]=8191&(i>>>14|h<<2),f=255&r[12]|(255&r[13])<<8,this.r[7]=8065&(h>>>11|f<<5),a=255&r[14]|(255&r[15])<<8,this.r[8]=8191&(f>>>8|a<<8),this.r[9]=a>>>5&127,this.pad[0]=255&r[16]|(255&r[17])<<8,this.pad[1]=255&r[18]|(255&r[19])<<8,this.pad[2]=255&r[20]|(255&r[21])<<8,this.pad[3]=255&r[22]|(255&r[23])<<8,this.pad[4]=255&r[24]|(255&r[25])<<8,this.pad[5]=255&r[26]|(255&r[27])<<8,this.pad[6]=255&r[28]|(255&r[29])<<8,this.pad[7]=255&r[30]|(255&r[31])<<8};function B(r,t,n,e,o,i){var h=new x(i);return h.update(n,e,o),h.finish(r,t),0}function R(r,t,n,e,o,i){var h=new Uint8Array(16);return B(h,0,n,e,o,i),w(r,t,h,0)}function M(r,t,n,e,o){var i;if(n<32)return-1;for(m(r,0,t,0,n,e,o),B(r,16,r,32,n-32,r),i=0;i<16;i++)r[i]=0;return 0}function S(r,t,n,e,o){var i,h=new Uint8Array(32);if(n<32)return-1;if(U(h,0,32,e,o),0!==R(t,16,t,32,n-32,h))return-1;for(m(r,0,t,0,n,e,o),i=0;i<32;i++)r[i]=0;return 0}function P(r,t){var n;for(n=0;n<16;n++)r[n]=0|t[n]}function T(r){var t,n,e=1;for(t=0;t<16;t++)n=r[t]+e+65535,e=Math.floor(n/65536),r[t]=n-65536*e;r[0]+=e-1+37*(e-1)}function Y(r,t,n){for(var e,o=~(n-1),i=0;i<16;i++)e=o&(r[i]^t[i]),r[i]^=e,t[i]^=e}function L(r,n){var e,o,i,h=t(),f=t();for(e=0;e<16;e++)f[e]=n[e];for(T(f),T(f),T(f),o=0;o<2;o++){for(h[0]=f[0]-65517,e=1;e<15;e++)h[e]=f[e]-65535-(h[e-1]>>16&1),h[e-1]&=65535;h[15]=f[15]-32767-(h[14]>>16&1),i=h[15]>>16&1,h[14]&=65535,Y(f,h,1-i)}for(e=0;e<16;e++)r[2*e]=255&f[e],r[2*e+1]=f[e]>>8}function O(r,t){var n=new Uint8Array(32),e=new Uint8Array(32);return L(n,r),L(e,t),v(n,0,e,0)}function I(r){var t=new Uint8Array(32);return L(t,r),1&t[0]}function k(r,t){var n;for(n=0;n<16;n++)r[n]=t[2*n]+(t[2*n+1]<<8);r[15]&=32767}function C(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]+n[e]}function K(r,t,n){for(var e=0;e<16;e++)r[e]=t[e]-n[e]}function z(r,t,n){var e,o,i=0,h=0,f=0,a=0,s=0,u=0,c=0,l=0,y=0,p=0,g=0,w=0,v=0,b=0,d=0,A=0,_=0,E=0,U=0,m=0,x=0,B=0,R=0,M=0,S=0,P=0,T=0,Y=0,L=0,O=0,I=0,k=n[0],C=n[1],K=n[2],z=n[3],N=n[4],D=n[5],j=n[6],F=n[7],Z=n[8],G=n[9],V=n[10],X=n[11],H=n[12],W=n[13],$=n[14],q=n[15];i+=(e=t[0])*k,h+=e*C,f+=e*K,a+=e*z,s+=e*N,u+=e*D,c+=e*j,l+=e*F,y+=e*Z,p+=e*G,g+=e*V,w+=e*X,v+=e*H,b+=e*W,d+=e*$,A+=e*q,h+=(e=t[1])*k,f+=e*C,a+=e*K,s+=e*z,u+=e*N,c+=e*D,l+=e*j,y+=e*F,p+=e*Z,g+=e*G,w+=e*V,v+=e*X,b+=e*H,d+=e*W,A+=e*$,_+=e*q,f+=(e=t[2])*k,a+=e*C,s+=e*K,u+=e*z,c+=e*N,l+=e*D,y+=e*j,p+=e*F,g+=e*Z,w+=e*G,v+=e*V,b+=e*X,d+=e*H,A+=e*W,_+=e*$,E+=e*q,a+=(e=t[3])*k,s+=e*C,u+=e*K,c+=e*z,l+=e*N,y+=e*D,p+=e*j,g+=e*F,w+=e*Z,v+=e*G,b+=e*V,d+=e*X,A+=e*H,_+=e*W,E+=e*$,U+=e*q,s+=(e=t[4])*k,u+=e*C,c+=e*K,l+=e*z,y+=e*N,p+=e*D,g+=e*j,w+=e*F,v+=e*Z,b+=e*G,d+=e*V,A+=e*X,_+=e*H,E+=e*W,U+=e*$,m+=e*q,u+=(e=t[5])*k,c+=e*C,l+=e*K,y+=e*z,p+=e*N,g+=e*D,w+=e*j,v+=e*F,b+=e*Z,d+=e*G,A+=e*V,_+=e*X,E+=e*H,U+=e*W,m+=e*$,x+=e*q,c+=(e=t[6])*k,l+=e*C,y+=e*K,p+=e*z,g+=e*N,w+=e*D,v+=e*j,b+=e*F,d+=e*Z,A+=e*G,_+=e*V,E+=e*X,U+=e*H,m+=e*W,x+=e*$,B+=e*q,l+=(e=t[7])*k,y+=e*C,p+=e*K,g+=e*z,w+=e*N,v+=e*D,b+=e*j,d+=e*F,A+=e*Z,_+=e*G,E+=e*V,U+=e*X,m+=e*H,x+=e*W,B+=e*$,R+=e*q,y+=(e=t[8])*k,p+=e*C,g+=e*K,w+=e*z,v+=e*N,b+=e*D,d+=e*j,A+=e*F,_+=e*Z,E+=e*G,U+=e*V,m+=e*X,x+=e*H,B+=e*W,R+=e*$,M+=e*q,p+=(e=t[9])*k,g+=e*C,w+=e*K,v+=e*z,b+=e*N,d+=e*D,A+=e*j,_+=e*F,E+=e*Z,U+=e*G,m+=e*V,x+=e*X,B+=e*H,R+=e*W,M+=e*$,S+=e*q,g+=(e=t[10])*k,w+=e*C,v+=e*K,b+=e*z,d+=e*N,A+=e*D,_+=e*j,E+=e*F,U+=e*Z,m+=e*G,x+=e*V,B+=e*X,R+=e*H,M+=e*W,S+=e*$,P+=e*q,w+=(e=t[11])*k,v+=e*C,b+=e*K,d+=e*z,A+=e*N,_+=e*D,E+=e*j,U+=e*F,m+=e*Z,x+=e*G,B+=e*V,R+=e*X,M+=e*H,S+=e*W,P+=e*$,T+=e*q,v+=(e=t[12])*k,b+=e*C,d+=e*K,A+=e*z,_+=e*N,E+=e*D,U+=e*j,m+=e*F,x+=e*Z,B+=e*G,R+=e*V,M+=e*X,S+=e*H,P+=e*W,T+=e*$,Y+=e*q,b+=(e=t[13])*k,d+=e*C,A+=e*K,_+=e*z,E+=e*N,U+=e*D,m+=e*j,x+=e*F,B+=e*Z,R+=e*G,M+=e*V,S+=e*X,P+=e*H,T+=e*W,Y+=e*$,L+=e*q,d+=(e=t[14])*k,A+=e*C,_+=e*K,E+=e*z,U+=e*N,m+=e*D,x+=e*j,B+=e*F,R+=e*Z,M+=e*G,S+=e*V,P+=e*X,T+=e*H,Y+=e*W,L+=e*$,O+=e*q,A+=(e=t[15])*k,h+=38*(E+=e*K),f+=38*(U+=e*z),a+=38*(m+=e*N),s+=38*(x+=e*D),u+=38*(B+=e*j),c+=38*(R+=e*F),l+=38*(M+=e*Z),y+=38*(S+=e*G),p+=38*(P+=e*V),g+=38*(T+=e*X),w+=38*(Y+=e*H),v+=38*(L+=e*W),b+=38*(O+=e*$),d+=38*(I+=e*q),i=(e=(i+=38*(_+=e*C))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i=(e=(i+=o-1+37*(o-1))+(o=1)+65535)-65536*(o=Math.floor(e/65536)),h=(e=h+o+65535)-65536*(o=Math.floor(e/65536)),f=(e=f+o+65535)-65536*(o=Math.floor(e/65536)),a=(e=a+o+65535)-65536*(o=Math.floor(e/65536)),s=(e=s+o+65535)-65536*(o=Math.floor(e/65536)),u=(e=u+o+65535)-65536*(o=Math.floor(e/65536)),c=(e=c+o+65535)-65536*(o=Math.floor(e/65536)),l=(e=l+o+65535)-65536*(o=Math.floor(e/65536)),y=(e=y+o+65535)-65536*(o=Math.floor(e/65536)),p=(e=p+o+65535)-65536*(o=Math.floor(e/65536)),g=(e=g+o+65535)-65536*(o=Math.floor(e/65536)),w=(e=w+o+65535)-65536*(o=Math.floor(e/65536)),v=(e=v+o+65535)-65536*(o=Math.floor(e/65536)),b=(e=b+o+65535)-65536*(o=Math.floor(e/65536)),d=(e=d+o+65535)-65536*(o=Math.floor(e/65536)),A=(e=A+o+65535)-65536*(o=Math.floor(e/65536)),i+=o-1+37*(o-1),r[0]=i,r[1]=h,r[2]=f,r[3]=a,r[4]=s,r[5]=u,r[6]=c,r[7]=l,r[8]=y,r[9]=p,r[10]=g,r[11]=w,r[12]=v,r[13]=b,r[14]=d,r[15]=A}function N(r,t){z(r,t,t)}function D(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=253;e>=0;e--)N(o,o),2!==e&&4!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}function j(r,n,e){var o,i,h=new Uint8Array(32),f=new Float64Array(80),s=t(),u=t(),c=t(),l=t(),y=t(),p=t();for(i=0;i<31;i++)h[i]=n[i];for(h[31]=127&n[31]|64,h[0]&=248,k(f,e),i=0;i<16;i++)u[i]=f[i],l[i]=s[i]=c[i]=0;for(s[0]=l[0]=1,i=254;i>=0;--i)Y(s,u,o=h[i>>>3]>>>(7&i)&1),Y(c,l,o),C(y,s,c),K(s,s,c),C(c,u,l),K(u,u,l),N(l,y),N(p,s),z(s,c,s),z(c,u,y),C(y,s,c),K(s,s,c),N(u,s),K(c,l,p),z(s,c,a),C(s,s,l),z(c,c,s),z(s,l,p),z(l,u,f),N(u,y),Y(s,u,o),Y(c,l,o);for(i=0;i<16;i++)f[i+16]=s[i],f[i+32]=c[i],f[i+48]=u[i],f[i+64]=l[i];var g=f.subarray(32),w=f.subarray(16);return D(g,g),z(w,w,g),L(r,w),0}function F(r,t){return j(r,t,i)}function Z(r,t){return e(t,32),F(r,t)}function G(r,t,n){var e=new Uint8Array(32);return j(e,n,t),d(r,o,e,A)}x.prototype.blocks=function(r,t,n){for(var e,o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E=this.fin?0:2048,U=this.h[0],m=this.h[1],x=this.h[2],B=this.h[3],R=this.h[4],M=this.h[5],S=this.h[6],P=this.h[7],T=this.h[8],Y=this.h[9],L=this.r[0],O=this.r[1],I=this.r[2],k=this.r[3],C=this.r[4],K=this.r[5],z=this.r[6],N=this.r[7],D=this.r[8],j=this.r[9];n>=16;)l=c=0,l+=(U+=8191&(e=255&r[t+0]|(255&r[t+1])<<8))*L,l+=(m+=8191&(e>>>13|(o=255&r[t+2]|(255&r[t+3])<<8)<<3))*(5*j),l+=(x+=8191&(o>>>10|(i=255&r[t+4]|(255&r[t+5])<<8)<<6))*(5*D),l+=(B+=8191&(i>>>7|(h=255&r[t+6]|(255&r[t+7])<<8)<<9))*(5*N),c=(l+=(R+=8191&(h>>>4|(f=255&r[t+8]|(255&r[t+9])<<8)<<12))*(5*z))>>>13,l&=8191,l+=(M+=f>>>1&8191)*(5*K),l+=(S+=8191&(f>>>14|(a=255&r[t+10]|(255&r[t+11])<<8)<<2))*(5*C),l+=(P+=8191&(a>>>11|(s=255&r[t+12]|(255&r[t+13])<<8)<<5))*(5*k),l+=(T+=8191&(s>>>8|(u=255&r[t+14]|(255&r[t+15])<<8)<<8))*(5*I),y=c+=(l+=(Y+=u>>>5|E)*(5*O))>>>13,y+=U*O,y+=m*L,y+=x*(5*j),y+=B*(5*D),c=(y+=R*(5*N))>>>13,y&=8191,y+=M*(5*z),y+=S*(5*K),y+=P*(5*C),y+=T*(5*k),c+=(y+=Y*(5*I))>>>13,y&=8191,p=c,p+=U*I,p+=m*O,p+=x*L,p+=B*(5*j),c=(p+=R*(5*D))>>>13,p&=8191,p+=M*(5*N),p+=S*(5*z),p+=P*(5*K),p+=T*(5*C),g=c+=(p+=Y*(5*k))>>>13,g+=U*k,g+=m*I,g+=x*O,g+=B*L,c=(g+=R*(5*j))>>>13,g&=8191,g+=M*(5*D),g+=S*(5*N),g+=P*(5*z),g+=T*(5*K),w=c+=(g+=Y*(5*C))>>>13,w+=U*C,w+=m*k,w+=x*I,w+=B*O,c=(w+=R*L)>>>13,w&=8191,w+=M*(5*j),w+=S*(5*D),w+=P*(5*N),w+=T*(5*z),v=c+=(w+=Y*(5*K))>>>13,v+=U*K,v+=m*C,v+=x*k,v+=B*I,c=(v+=R*O)>>>13,v&=8191,v+=M*L,v+=S*(5*j),v+=P*(5*D),v+=T*(5*N),b=c+=(v+=Y*(5*z))>>>13,b+=U*z,b+=m*K,b+=x*C,b+=B*k,c=(b+=R*I)>>>13,b&=8191,b+=M*O,b+=S*L,b+=P*(5*j),b+=T*(5*D),d=c+=(b+=Y*(5*N))>>>13,d+=U*N,d+=m*z,d+=x*K,d+=B*C,c=(d+=R*k)>>>13,d&=8191,d+=M*I,d+=S*O,d+=P*L,d+=T*(5*j),A=c+=(d+=Y*(5*D))>>>13,A+=U*D,A+=m*N,A+=x*z,A+=B*K,c=(A+=R*C)>>>13,A&=8191,A+=M*k,A+=S*I,A+=P*O,A+=T*L,_=c+=(A+=Y*(5*j))>>>13,_+=U*j,_+=m*D,_+=x*N,_+=B*z,c=(_+=R*K)>>>13,_&=8191,_+=M*C,_+=S*k,_+=P*I,_+=T*O,U=l=8191&(c=(c=((c+=(_+=Y*L)>>>13)<<2)+c|0)+(l&=8191)|0),m=y+=c>>>=13,x=p&=8191,B=g&=8191,R=w&=8191,M=v&=8191,S=b&=8191,P=d&=8191,T=A&=8191,Y=_&=8191,t+=16,n-=16;this.h[0]=U,this.h[1]=m,this.h[2]=x,this.h[3]=B,this.h[4]=R,this.h[5]=M,this.h[6]=S,this.h[7]=P,this.h[8]=T,this.h[9]=Y},x.prototype.finish=function(r,t){var n,e,o,i,h=new Uint16Array(10);if(this.leftover){for(i=this.leftover,this.buffer[i++]=1;i<16;i++)this.buffer[i]=0;this.fin=1,this.blocks(this.buffer,0,16)}for(n=this.h[1]>>>13,this.h[1]&=8191,i=2;i<10;i++)this.h[i]+=n,n=this.h[i]>>>13,this.h[i]&=8191;for(this.h[0]+=5*n,n=this.h[0]>>>13,this.h[0]&=8191,this.h[1]+=n,n=this.h[1]>>>13,this.h[1]&=8191,this.h[2]+=n,h[0]=this.h[0]+5,n=h[0]>>>13,h[0]&=8191,i=1;i<10;i++)h[i]=this.h[i]+n,n=h[i]>>>13,h[i]&=8191;for(h[9]-=8192,e=(1^n)-1,i=0;i<10;i++)h[i]&=e;for(e=~e,i=0;i<10;i++)this.h[i]=this.h[i]&e|h[i];for(this.h[0]=65535&(this.h[0]|this.h[1]<<13),this.h[1]=65535&(this.h[1]>>>3|this.h[2]<<10),this.h[2]=65535&(this.h[2]>>>6|this.h[3]<<7),this.h[3]=65535&(this.h[3]>>>9|this.h[4]<<4),this.h[4]=65535&(this.h[4]>>>12|this.h[5]<<1|this.h[6]<<14),this.h[5]=65535&(this.h[6]>>>2|this.h[7]<<11),this.h[6]=65535&(this.h[7]>>>5|this.h[8]<<8),this.h[7]=65535&(this.h[8]>>>8|this.h[9]<<5),o=this.h[0]+this.pad[0],this.h[0]=65535&o,i=1;i<8;i++)o=(this.h[i]+this.pad[i]|0)+(o>>>16)|0,this.h[i]=65535&o;r[t+0]=this.h[0]>>>0&255,r[t+1]=this.h[0]>>>8&255,r[t+2]=this.h[1]>>>0&255,r[t+3]=this.h[1]>>>8&255,r[t+4]=this.h[2]>>>0&255,r[t+5]=this.h[2]>>>8&255,r[t+6]=this.h[3]>>>0&255,r[t+7]=this.h[3]>>>8&255,r[t+8]=this.h[4]>>>0&255,r[t+9]=this.h[4]>>>8&255,r[t+10]=this.h[5]>>>0&255,r[t+11]=this.h[5]>>>8&255,r[t+12]=this.h[6]>>>0&255,r[t+13]=this.h[6]>>>8&255,r[t+14]=this.h[7]>>>0&255,r[t+15]=this.h[7]>>>8&255},x.prototype.update=function(r,t,n){var e,o;if(this.leftover){for((o=16-this.leftover)>n&&(o=n),e=0;e<o;e++)this.buffer[this.leftover+e]=r[t+e];if(n-=o,t+=o,this.leftover+=o,this.leftover<16)return;this.blocks(this.buffer,0,16),this.leftover=0}if(n>=16&&(o=n-n%16,this.blocks(r,t,o),t+=o,n-=o),n){for(e=0;e<n;e++)this.buffer[this.leftover+e]=r[t+e];this.leftover+=n}};var V=M,X=S;var H=[1116352408,3609767458,1899447441,602891725,3049323471,3964484399,3921009573,2173295548,961987163,4081628472,1508970993,3053834265,2453635748,2937671579,2870763221,3664609560,3624381080,2734883394,310598401,1164996542,607225278,1323610764,1426881987,3590304994,1925078388,4068182383,2162078206,991336113,2614888103,633803317,3248222580,3479774868,3835390401,2666613458,4022224774,944711139,264347078,2341262773,604807628,2007800933,770255983,1495990901,1249150122,1856431235,1555081692,3175218132,1996064986,2198950837,2554220882,3999719339,2821834349,766784016,2952996808,2566594879,3210313671,3203337956,3336571891,1034457026,3584528711,2466948901,113926993,3758326383,338241895,168717936,666307205,1188179964,773529912,1546045734,1294757372,1522805485,1396182291,2643833823,1695183700,2343527390,1986661051,1014477480,2177026350,1206759142,2456956037,344077627,2730485921,1290863460,2820302411,3158454273,3259730800,3505952657,3345764771,106217008,3516065817,3606008344,3600352804,1432725776,4094571909,1467031594,275423344,851169720,430227734,3100823752,506948616,1363258195,659060556,3750685593,883997877,3785050280,958139571,3318307427,1322822218,3812723403,1537002063,2003034995,1747873779,3602036899,1955562222,1575990012,2024104815,1125592928,2227730452,2716904306,2361852424,442776044,2428436474,593698344,2756734187,3733110249,3204031479,2999351573,3329325298,3815920427,3391569614,3928383900,3515267271,566280711,3940187606,3454069534,4118630271,4000239992,116418474,1914138554,174292421,2731055270,289380356,3203993006,460393269,320620315,685471733,587496836,852142971,1086792851,1017036298,365543100,1126000580,2618297676,1288033470,3409855158,1501505948,4234509866,1607167915,987167468,1816402316,1246189591];function W(r,t,n,e){for(var o,i,h,f,a,s,u,c,l,y,p,g,w,v,b,d,A,_,E,U,m,x,B,R,M,S,P=new Int32Array(16),T=new Int32Array(16),Y=r[0],L=r[1],O=r[2],I=r[3],k=r[4],C=r[5],K=r[6],z=r[7],N=t[0],D=t[1],j=t[2],F=t[3],Z=t[4],G=t[5],V=t[6],X=t[7],W=0;e>=128;){for(E=0;E<16;E++)U=8*E+W,P[E]=n[U+0]<<24|n[U+1]<<16|n[U+2]<<8|n[U+3],T[E]=n[U+4]<<24|n[U+5]<<16|n[U+6]<<8|n[U+7];for(E=0;E<80;E++)if(o=Y,i=L,h=O,f=I,a=k,s=C,u=K,z,l=N,y=D,p=j,g=F,w=Z,v=G,b=V,X,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,B+=65535&(x=(Z>>>14|k<<18)^(Z>>>18|k<<14)^(k>>>9|Z<<23)),R+=x>>>16,M+=65535&(m=(k>>>14|Z<<18)^(k>>>18|Z<<14)^(Z>>>9|k<<23)),S+=m>>>16,B+=65535&(x=Z&G^~Z&V),R+=x>>>16,M+=65535&(m=k&C^~k&K),S+=m>>>16,m=H[2*E],B+=65535&(x=H[2*E+1]),R+=x>>>16,M+=65535&m,S+=m>>>16,m=P[E%16],R+=(x=T[E%16])>>>16,M+=65535&m,S+=m>>>16,M+=(R+=(B+=65535&x)>>>16)>>>16,B=65535&(x=_=65535&B|R<<16),R=x>>>16,M=65535&(m=A=65535&M|(S+=M>>>16)<<16),S=m>>>16,B+=65535&(x=(N>>>28|Y<<4)^(Y>>>2|N<<30)^(Y>>>7|N<<25)),R+=x>>>16,M+=65535&(m=(Y>>>28|N<<4)^(N>>>2|Y<<30)^(N>>>7|Y<<25)),S+=m>>>16,R+=(x=N&D^N&j^D&j)>>>16,M+=65535&(m=Y&L^Y&O^L&O),S+=m>>>16,c=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,d=65535&B|R<<16,B=65535&(x=g),R=x>>>16,M=65535&(m=f),S=m>>>16,R+=(x=_)>>>16,M+=65535&(m=A),S+=m>>>16,L=o,O=i,I=h,k=f=65535&(M+=(R+=(B+=65535&x)>>>16)>>>16)|(S+=M>>>16)<<16,C=a,K=s,z=u,Y=c,D=l,j=y,F=p,Z=g=65535&B|R<<16,G=w,V=v,X=b,N=d,E%16==15)for(U=0;U<16;U++)m=P[U],B=65535&(x=T[U]),R=x>>>16,M=65535&m,S=m>>>16,m=P[(U+9)%16],B+=65535&(x=T[(U+9)%16]),R+=x>>>16,M+=65535&m,S+=m>>>16,A=P[(U+1)%16],B+=65535&(x=((_=T[(U+1)%16])>>>1|A<<31)^(_>>>8|A<<24)^(_>>>7|A<<25)),R+=x>>>16,M+=65535&(m=(A>>>1|_<<31)^(A>>>8|_<<24)^A>>>7),S+=m>>>16,A=P[(U+14)%16],R+=(x=((_=T[(U+14)%16])>>>19|A<<13)^(A>>>29|_<<3)^(_>>>6|A<<26))>>>16,M+=65535&(m=(A>>>19|_<<13)^(_>>>29|A<<3)^A>>>6),S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,P[U]=65535&M|S<<16,T[U]=65535&B|R<<16;B=65535&(x=N),R=x>>>16,M=65535&(m=Y),S=m>>>16,m=r[0],R+=(x=t[0])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[0]=Y=65535&M|S<<16,t[0]=N=65535&B|R<<16,B=65535&(x=D),R=x>>>16,M=65535&(m=L),S=m>>>16,m=r[1],R+=(x=t[1])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[1]=L=65535&M|S<<16,t[1]=D=65535&B|R<<16,B=65535&(x=j),R=x>>>16,M=65535&(m=O),S=m>>>16,m=r[2],R+=(x=t[2])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[2]=O=65535&M|S<<16,t[2]=j=65535&B|R<<16,B=65535&(x=F),R=x>>>16,M=65535&(m=I),S=m>>>16,m=r[3],R+=(x=t[3])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[3]=I=65535&M|S<<16,t[3]=F=65535&B|R<<16,B=65535&(x=Z),R=x>>>16,M=65535&(m=k),S=m>>>16,m=r[4],R+=(x=t[4])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[4]=k=65535&M|S<<16,t[4]=Z=65535&B|R<<16,B=65535&(x=G),R=x>>>16,M=65535&(m=C),S=m>>>16,m=r[5],R+=(x=t[5])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[5]=C=65535&M|S<<16,t[5]=G=65535&B|R<<16,B=65535&(x=V),R=x>>>16,M=65535&(m=K),S=m>>>16,m=r[6],R+=(x=t[6])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[6]=K=65535&M|S<<16,t[6]=V=65535&B|R<<16,B=65535&(x=X),R=x>>>16,M=65535&(m=z),S=m>>>16,m=r[7],R+=(x=t[7])>>>16,M+=65535&m,S+=m>>>16,S+=(M+=(R+=(B+=65535&x)>>>16)>>>16)>>>16,r[7]=z=65535&M|S<<16,t[7]=X=65535&B|R<<16,W+=128,e-=128}return e}function $(r,t,n){var e,o=new Int32Array(8),i=new Int32Array(8),h=new Uint8Array(256),f=n;for(o[0]=1779033703,o[1]=3144134277,o[2]=1013904242,o[3]=2773480762,o[4]=1359893119,o[5]=2600822924,o[6]=528734635,o[7]=1541459225,i[0]=4089235720,i[1]=2227873595,i[2]=4271175723,i[3]=1595750129,i[4]=2917565137,i[5]=725511199,i[6]=4215389547,i[7]=327033209,W(o,i,t,n),n%=128,e=0;e<n;e++)h[e]=t[f-n+e];for(h[n]=128,h[(n=256-128*(n<112?1:0))-9]=0,p(h,n-8,f/536870912|0,f<<3),W(o,i,h,n),e=0;e<8;e++)p(r,8*e,o[e],i[e]);return 0}function q(r,n){var e=t(),o=t(),i=t(),h=t(),f=t(),a=t(),s=t(),c=t(),l=t();K(e,r[1],r[0]),K(l,n[1],n[0]),z(e,e,l),C(o,r[0],r[1]),C(l,n[0],n[1]),z(o,o,l),z(i,r[3],n[3]),z(i,i,u),z(h,r[2],n[2]),C(h,h,h),K(f,o,e),K(a,h,i),C(s,h,i),C(c,o,e),z(r[0],f,a),z(r[1],c,s),z(r[2],s,a),z(r[3],f,c)}function J(r,t,n){var e;for(e=0;e<4;e++)Y(r[e],t[e],n)}function Q(r,n){var e=t(),o=t(),i=t();D(i,n[2]),z(e,n[0],i),z(o,n[1],i),L(r,o),r[31]^=I(e)<<7}function rr(r,t,n){var e,o;for(P(r[0],h),P(r[1],f),P(r[2],f),P(r[3],h),o=255;o>=0;--o)J(r,t,e=n[o/8|0]>>(7&o)&1),q(t,r),q(r,r),J(r,t,e)}function tr(r,n){var e=[t(),t(),t(),t()];P(e[0],c),P(e[1],l),P(e[2],f),z(e[3],c,l),rr(r,e,n)}function nr(r,n,o){var i,h=new Uint8Array(64),f=[t(),t(),t(),t()];for(o||e(n,32),$(h,n,32),h[0]&=248,h[31]&=127,h[31]|=64,tr(f,h),Q(r,f),i=0;i<32;i++)n[i+32]=r[i];return 0}var er=new Float64Array([237,211,245,92,26,99,18,88,214,156,247,162,222,249,222,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16]);function or(r,t){var n,e,o,i;for(e=63;e>=32;--e){for(n=0,o=e-32,i=e-12;o<i;++o)t[o]+=n-16*t[e]*er[o-(e-32)],n=t[o]+128>>8,t[o]-=256*n;t[o]+=n,t[e]=0}for(n=0,o=0;o<32;o++)t[o]+=n-(t[31]>>4)*er[o],n=t[o]>>8,t[o]&=255;for(o=0;o<32;o++)t[o]-=n*er[o];for(e=0;e<32;e++)t[e+1]+=t[e]>>8,r[e]=255&t[e]}function ir(r){var t,n=new Float64Array(64);for(t=0;t<64;t++)n[t]=r[t];for(t=0;t<64;t++)r[t]=0;or(r,n)}function hr(r,n,e,o){var i,h,f=new Uint8Array(64),a=new Uint8Array(64),s=new Uint8Array(64),u=new Float64Array(64),c=[t(),t(),t(),t()];$(f,o,32),f[0]&=248,f[31]&=127,f[31]|=64;var l=e+64;for(i=0;i<e;i++)r[64+i]=n[i];for(i=0;i<32;i++)r[32+i]=f[32+i];for($(s,r.subarray(32),e+32),ir(s),tr(c,s),Q(r,c),i=32;i<64;i++)r[i]=o[i];for($(a,r,e+64),ir(a),i=0;i<64;i++)u[i]=0;for(i=0;i<32;i++)u[i]=s[i];for(i=0;i<32;i++)for(h=0;h<32;h++)u[i+h]+=a[i]*f[h];return or(r.subarray(32),u),l}function fr(r,n){var e=t(),o=t(),i=t(),a=t(),u=t(),c=t(),l=t();return P(r[2],f),k(r[1],n),N(i,r[1]),z(a,i,s),K(i,i,r[2]),C(a,r[2],a),N(u,a),N(c,u),z(l,c,u),z(e,l,i),z(e,e,a),function(r,n){var e,o=t();for(e=0;e<16;e++)o[e]=n[e];for(e=250;e>=0;e--)N(o,o),1!==e&&z(o,o,n);for(e=0;e<16;e++)r[e]=o[e]}(e,e),z(e,e,i),z(e,e,a),z(e,e,a),z(r[0],e,a),N(o,r[0]),z(o,o,a),O(o,i)&&z(r[0],r[0],y),N(o,r[0]),z(o,o,a),O(o,i)?-1:(I(r[0])===n[31]>>7&&K(r[0],h,r[0]),z(r[3],r[0],r[1]),0)}function ar(r,n,e,o){var i,h=new Uint8Array(32),f=new Uint8Array(64),a=[t(),t(),t(),t()],s=[t(),t(),t(),t()];if(-1,e<64)return-1;if(fr(s,o))return-1;for(i=0;i<e;i++)r[i]=n[i];for(i=0;i<32;i++)r[i+32]=o[i];if($(f,r,e),ir(f),rr(a,s,f),tr(s,n.subarray(32)),q(a,s),Q(h,a),e-=64,v(n,0,h,0)){for(i=0;i<e;i++)r[i]=0;return-1}for(i=0;i<e;i++)r[i]=n[i+64];return e}var sr=32,ur=24,cr=32,lr=32,yr=ur;function pr(r,t){if(r.length!==sr)throw new Error("bad key size");if(t.length!==ur)throw new Error("bad nonce size")}function gr(){for(var r=0;r<arguments.length;r++)if(!(arguments[r]instanceof Uint8Array))throw new TypeError("unexpected type, use Uint8Array")}function wr(r){for(var t=0;t<r.length;t++)r[t]=0}r.lowlevel={crypto_core_hsalsa20:d,crypto_stream_xor:m,crypto_stream:U,crypto_stream_salsa20_xor:_,crypto_stream_salsa20:E,crypto_onetimeauth:B,crypto_onetimeauth_verify:R,crypto_verify_16:w,crypto_verify_32:v,crypto_secretbox:M,crypto_secretbox_open:S,crypto_scalarmult:j,crypto_scalarmult_base:F,crypto_box_beforenm:G,crypto_box_afternm:V,crypto_box:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),V(r,t,n,e,h)},crypto_box_open:function(r,t,n,e,o,i){var h=new Uint8Array(32);return G(h,o,i),X(r,t,n,e,h)},crypto_box_keypair:Z,crypto_hash:$,crypto_sign:hr,crypto_sign_keypair:nr,crypto_sign_open:ar,crypto_secretbox_KEYBYTES:sr,crypto_secretbox_NONCEBYTES:ur,crypto_secretbox_ZEROBYTES:32,crypto_secretbox_BOXZEROBYTES:16,crypto_scalarmult_BYTES:32,crypto_scalarmult_SCALARBYTES:32,crypto_box_PUBLICKEYBYTES:cr,crypto_box_SECRETKEYBYTES:lr,crypto_box_BEFORENMBYTES:32,crypto_box_NONCEBYTES:yr,crypto_box_ZEROBYTES:32,crypto_box_BOXZEROBYTES:16,crypto_sign_BYTES:64,crypto_sign_PUBLICKEYBYTES:32,crypto_sign_SECRETKEYBYTES:64,crypto_sign_SEEDBYTES:32,crypto_hash_BYTES:64},r.randomBytes=function(r){var t=new Uint8Array(r);return e(t,r),t},r.secretbox=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(32+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+32]=r[i];return M(o,e,e.length,t,n),o.subarray(16)},r.secretbox.open=function(r,t,n){gr(r,t,n),pr(n,t);for(var e=new Uint8Array(16+r.length),o=new Uint8Array(e.length),i=0;i<r.length;i++)e[i+16]=r[i];return e.length<32?null:0!==S(o,e,e.length,t,n)?null:o.subarray(32)},r.secretbox.keyLength=sr,r.secretbox.nonceLength=ur,r.secretbox.overheadLength=16,r.scalarMult=function(r,t){if(gr(r,t),32!==r.length)throw new Error("bad n size");if(32!==t.length)throw new Error("bad p size");var n=new Uint8Array(32);return j(n,r,t),n},r.scalarMult.base=function(r){if(gr(r),32!==r.length)throw new Error("bad n size");var t=new Uint8Array(32);return F(t,r),t},r.scalarMult.scalarLength=32,r.scalarMult.groupElementLength=32,r.box=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox(t,n,i)},r.box.before=function(r,t){gr(r,t),function(r,t){if(r.length!==cr)throw new Error("bad public key size");if(t.length!==lr)throw new Error("bad secret key size")}(r,t);var n=new Uint8Array(32);return G(n,r,t),n},r.box.after=r.secretbox,r.box.open=function(t,n,e,o){var i=r.box.before(e,o);return r.secretbox.open(t,n,i)},r.box.open.after=r.secretbox.open,r.box.keyPair=function(){var r=new Uint8Array(cr),t=new Uint8Array(lr);return Z(r,t),{publicKey:r,secretKey:t}},r.box.keyPair.fromSecretKey=function(r){if(gr(r),r.length!==lr)throw new Error("bad secret key size");var t=new Uint8Array(cr);return F(t,r),{publicKey:t,secretKey:new Uint8Array(r)}},r.box.publicKeyLength=cr,r.box.secretKeyLength=lr,r.box.sharedKeyLength=32,r.box.nonceLength=yr,r.box.overheadLength=r.secretbox.overheadLength,r.sign=function(r,t){if(gr(r,t),64!==t.length)throw new Error("bad secret key size");var n=new Uint8Array(64+r.length);return hr(n,r,r.length,t),n},r.sign.open=function(r,t){if(gr(r,t),32!==t.length)throw new Error("bad public key size");var n=new Uint8Array(r.length),e=ar(n,r,r.length,t);if(e<0)return null;for(var o=new Uint8Array(e),i=0;i<o.length;i++)o[i]=n[i];return o},r.sign.detached=function(t,n){for(var e=r.sign(t,n),o=new Uint8Array(64),i=0;i<o.length;i++)o[i]=e[i];return o},r.sign.detached.verify=function(r,t,n){if(gr(r,t,n),64!==t.length)throw new Error("bad signature size");if(32!==n.length)throw new Error("bad public key size");var e,o=new Uint8Array(64+r.length),i=new Uint8Array(64+r.length);for(e=0;e<64;e++)o[e]=t[e];for(e=0;e<r.length;e++)o[e+64]=r[e];return ar(i,o,o.length,n)>=0},r.sign.keyPair=function(){var r=new Uint8Array(32),t=new Uint8Array(64);return nr(r,t),{publicKey:r,secretKey:t}},r.sign.keyPair.fromSecretKey=function(r){if(gr(r),64!==r.length)throw new Error("bad secret key size");for(var t=new Uint8Array(32),n=0;n<t.length;n++)t[n]=r[32+n];return{publicKey:t,secretKey:new Uint8Array(r)}},r.sign.keyPair.fromSeed=function(r){if(gr(r),32!==r.length)throw new Error("bad seed size");for(var t=new Uint8Array(32),n=new Uint8Array(64),e=0;e<32;e++)n[e]=r[e];return nr(t,n,!0),{publicKey:t,secretKey:n}},r.sign.publicKeyLength=32,r.sign.secretKeyLength=64,r.sign.seedLength=32,r.sign.signatureLength=64,r.hash=function(r){gr(r);var t=new Uint8Array(64);return $(t,r,r.length),t},r.hash.hashLength=64,r.verify=function(r,t){return gr(r,t),0!==r.length&&0!==t.length&&(r.length===t.length&&0===g(r,0,t,0,r.length))},r.setPRNG=function(r){e=r},function(){var t="undefined"!=typeof self?self.crypto||self.msCrypto:null;if(t&&t.getRandomValues){r.setPRNG(function(r,n){var e,o=new Uint8Array(n);for(e=0;e<n;e+=65536)t.getRandomValues(o.subarray(e,e+Math.min(n-e,65536)));for(e=0;e<n;e++)r[e]=o[e];wr(o)})}else(t=n(11))&&t.randomBytes&&r.setPRNG(function(r,n){var e,o=t.randomBytes(n);for(e=0;e<n;e++)r[e]=o[e];wr(o)})}()}(r.exports?r.exports:self.nacl=self.nacl||{})},function(r,t){},function(r,t,n){"use strict";n.r(t);var e=n(0);function o(r){return Object(e.b)("m/44h/457h",r)}function i(r,t="m/44h/457h/0h/0h/0h"){return Object(e.c)(Object(e.b)(t,r).privateKey)}function h(r,t){return new Array(t).fill().map((t,n)=>Object(e.c)(Object(e.a)(`${n}h/0h/0h`,r).privateKey))}n.d(t,"generateHDWallet",function(){return o}),n.d(t,"generateWalletUsingDerivationPath",function(){return i}),n.d(t,"getHDWalletAccounts",function(){return h})}])});
 },{}],2:[function(require,module,exports){
 const Web3 = require('web3')
 let web3 = new Web3()
@@ -1811,7 +1811,7 @@ var axios_1 = require("axios");
 var rlp = require("rlp");
 var bs58check = require("bs58check");
 var Web3 = require("web3");
-var AEProtocol = /** @class */ (function () {
+var AEProtocol = (function () {
     function AEProtocol(epochRPC) {
         if (epochRPC === void 0) { epochRPC = 'https://ae-epoch-rpc-proxy.gke.papers.tech'; }
         this.epochRPC = epochRPC;
@@ -1838,6 +1838,7 @@ var AEProtocol = /** @class */ (function () {
         this.addressValidationPattern = '^ak_+[1-9A-Za-z]{50}$';
         // ae specifics
         this.defaultNetworkId = 'ae_mainnet';
+        this.epochMiddleware = 'https://ae-epoch-rpc-proxy.gke.papers.tech';
     }
     /**
      * Returns the PublicKey as String, derived from a supplied hex-string
@@ -1865,10 +1866,40 @@ var AEProtocol = /** @class */ (function () {
         return 'ak_' + base58;
     };
     AEProtocol.prototype.getTransactionsFromPublicKey = function (publicKey, limit, offset) {
-        return Promise.resolve([]);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.getTransactionsFromAddresses([this.getAddressFromPublicKey(publicKey)], limit, offset)];
+            });
+        });
     };
     AEProtocol.prototype.getTransactionsFromAddresses = function (addresses, limit, offset) {
-        return Promise.resolve([]);
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var allTransactions, transactions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Promise.all(addresses.map(function (address) {
+                            return axios_1.default.get(_this.epochMiddleware + "/middleware/transactions/account/" + address);
+                        }))];
+                    case 1:
+                        allTransactions = _a.sent();
+                        transactions = [].concat.apply([], allTransactions.map(function (axiosData) {
+                            return axiosData.data.transactions;
+                        }));
+                        return [2 /*return*/, transactions.map(function (obj) {
+                                var airGapTx = {
+                                    amount: new bignumber_js_1.default(obj.tx.amount),
+                                    fee: new bignumber_js_1.default(obj.tx.fee),
+                                    from: [obj.tx.sender_id],
+                                    isInbound: addresses.indexOf(obj.tx.sender_id) !== -1,
+                                    protocolIdentifier: _this.identifier,
+                                    to: [obj.tx.recipient_id]
+                                };
+                                return airGapTx;
+                            })];
+                }
+            });
+        });
     };
     AEProtocol.prototype.signWithPrivateKey = function (privateKey, transaction) {
         // sign and cut off first byte ('ae')
@@ -2042,7 +2073,7 @@ var AEProtocol = /** @class */ (function () {
 exports.AEProtocol = AEProtocol;
 
 }).call(this,require("buffer").Buffer)
-},{"@aeternity/hd-wallet":1,"axios":57,"bignumber.js":89,"bs58check":206,"buffer":208,"rlp":362,"tweetnacl":35,"web3":534}],8:[function(require,module,exports){
+},{"@aeternity/hd-wallet":1,"axios":58,"bignumber.js":35,"bs58check":206,"buffer":208,"rlp":362,"tweetnacl":36,"web3":534}],8:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -2056,7 +2087,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var GenericERC20_1 = require("./GenericERC20");
-var AETokenProtocol = /** @class */ (function (_super) {
+var AETokenProtocol = (function (_super) {
     __extends(AETokenProtocol, _super);
     function AETokenProtocol() {
         var _this = _super.call(this, '0x5ca9a71b1d01849c0a95490cc00559717fcf0d1d') // we probably need another network here, explorer is ok
@@ -2078,7 +2109,7 @@ var assert = require("assert");
 var bitcoinJS = require("bitcoinjs-lib");
 var axios_1 = require("axios");
 var bignumber_js_1 = require("bignumber.js");
-var BitcoinProtocol = /** @class */ (function () {
+var BitcoinProtocol = (function () {
     function BitcoinProtocol(network, baseApiUrl, bitcoinJSLib) {
         if (network === void 0) { network = bitcoinJS.networks.bitcoin; }
         if (baseApiUrl === void 0) { baseApiUrl = 'https://insight.bitpay.com'; }
@@ -2591,7 +2622,7 @@ var BitcoinProtocol = /** @class */ (function () {
 }());
 exports.BitcoinProtocol = BitcoinProtocol;
 
-},{"assert":53,"axios":57,"bignumber.js":89,"bitcoinjs-lib":138}],10:[function(require,module,exports){
+},{"assert":54,"axios":58,"bignumber.js":35,"bitcoinjs-lib":138}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -2606,7 +2637,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BitcoinProtocol_1 = require("./BitcoinProtocol");
 var bitcoinJS = require("bitcoinjs-lib");
-var BitcoinTestnetProtocol = /** @class */ (function (_super) {
+var BitcoinTestnetProtocol = (function (_super) {
     __extends(BitcoinTestnetProtocol, _super);
     function BitcoinTestnetProtocol() {
         return _super.call(this, bitcoinJS.networks.testnet, 'https://test-insight.bitpay.com') || this;
@@ -2629,7 +2660,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var EthereumProtocol_1 = require("./EthereumProtocol");
-var EthereumClassicProtocol = /** @class */ (function (_super) {
+var EthereumClassicProtocol = (function (_super) {
     __extends(EthereumClassicProtocol, _super);
     function EthereumClassicProtocol() {
         return _super.call(this, 'https://mew.epool.io/', 'https://classic.trustwalletapp.com', 61) || this; // we probably need another network here, explorer is ok
@@ -2648,7 +2679,7 @@ var ethUtil = require("ethereumjs-util");
 var axios_1 = require("axios");
 var Web3 = require("web3");
 var EthereumTransaction = require('ethereumjs-tx');
-var EthereumProtocol = /** @class */ (function () {
+var EthereumProtocol = (function () {
     function EthereumProtocol(jsonRPCAPI, infoAPI, chainId) {
         if (jsonRPCAPI === void 0) { jsonRPCAPI = 'https://mainnet.infura.io/'; }
         if (infoAPI === void 0) { infoAPI = 'https://api.trustwalletapp.com/'; }
@@ -2906,7 +2937,7 @@ var EthereumProtocol = /** @class */ (function () {
 exports.EthereumProtocol = EthereumProtocol;
 
 }).call(this,require("buffer").Buffer)
-},{"axios":57,"bignumber.js":89,"bitcoinjs-lib":138,"buffer":208,"ethereumjs-tx":258,"ethereumjs-util":259,"web3":534}],13:[function(require,module,exports){
+},{"axios":58,"bignumber.js":35,"bitcoinjs-lib":138,"buffer":208,"ethereumjs-tx":258,"ethereumjs-util":259,"web3":534}],13:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -2920,7 +2951,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var EthereumProtocol_1 = require("./EthereumProtocol");
-var EthereumRopstenProtocol = /** @class */ (function (_super) {
+var EthereumRopstenProtocol = (function (_super) {
     __extends(EthereumRopstenProtocol, _super);
     function EthereumRopstenProtocol() {
         return _super.call(this, 'https://api.myetherwallet.com/rop', 'https://ropsten.trustwalletapp.com/', 3) || this; // we probably need another network here, explorer is ok
@@ -2991,7 +3022,7 @@ var AUTH_TOKEN_ABI = [
     }
 ];
 abiDecoder.addABI(AUTH_TOKEN_ABI);
-var GenericERC20 = /** @class */ (function (_super) {
+var GenericERC20 = (function (_super) {
     __extends(GenericERC20, _super);
     function GenericERC20(contractAddress, jsonRPCAPI, infoAPI, chainId) {
         if (jsonRPCAPI === void 0) { jsonRPCAPI = 'https://mainnet.infura.io/'; }
@@ -3150,7 +3181,7 @@ var GenericERC20 = /** @class */ (function (_super) {
 }(EthereumProtocol_1.EthereumProtocol));
 exports.GenericERC20 = GenericERC20;
 
-},{"./EthereumProtocol":12,"abi-decoder":2,"axios":57,"bignumber.js":89,"ethereumjs-tx":258,"ethereumjs-util":259}],15:[function(require,module,exports){
+},{"./EthereumProtocol":12,"abi-decoder":2,"axios":58,"bignumber.js":35,"ethereumjs-tx":258,"ethereumjs-util":259}],15:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -3164,7 +3195,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var GenericERC20_1 = require("./GenericERC20");
-var HOPTokenProtocol = /** @class */ (function (_super) {
+var HOPTokenProtocol = (function (_super) {
     __extends(HOPTokenProtocol, _super);
     function HOPTokenProtocol() {
         return _super.call(this, '0x2dd847af80418D280B7078888B6A6133083001C9', 'https://ropsten.infura.io/', 'https://ropsten.trustwalletapp.com/', 3) || this; // we probably need another network here, explorer is ok
@@ -3188,7 +3219,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BitcoinProtocol_1 = require("./BitcoinProtocol");
 var bitcoinJS = require("bitcoinjs-lib");
-var LitecoinProtocol = /** @class */ (function (_super) {
+var LitecoinProtocol = (function (_super) {
     __extends(LitecoinProtocol, _super);
     function LitecoinProtocol() {
         return _super.call(this, bitcoinJS.networks.litecoin, 'https://insight.litecore.io') || this;
@@ -3213,7 +3244,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BitcoinProtocol_1 = require("./BitcoinProtocol");
 var zcashJS = require('bitcoinjs-lib-zcash');
 var networks_1 = require("../networks");
-var ZCashProtocol = /** @class */ (function (_super) {
+var ZCashProtocol = (function (_super) {
     __extends(ZCashProtocol, _super);
     function ZCashProtocol() {
         return _super.call(this, networks_1.networks.zcash, 'https://explorer.zcashfr.io', zcashJS) || this;
@@ -3238,7 +3269,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BitcoinProtocol_1 = require("./BitcoinProtocol");
 var zcashJS = require('bitcoinjs-lib-zcash');
 var networks_1 = require("../networks");
-var ZCashTestnetProtocol = /** @class */ (function (_super) {
+var ZCashTestnetProtocol = (function (_super) {
     __extends(ZCashTestnetProtocol, _super);
     function ZCashTestnetProtocol() {
         return _super.call(this, networks_1.networks.zcash, 'https://explorer.testnet.z.cash', zcashJS) || this; // we probably need another network here, explorer is ok
@@ -3269,7 +3300,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Gets thrown if the serializer version does not match
  */
-var SerializerVersionMismatch = /** @class */ (function (_super) {
+var SerializerVersionMismatch = (function (_super) {
     __extends(SerializerVersionMismatch, _super);
     function SerializerVersionMismatch() {
         return _super.call(this, 'SERIALIZER_VERSION_MISMATCH') || this;
@@ -3280,7 +3311,7 @@ exports.SerializerVersionMismatch = SerializerVersionMismatch;
 /**
  * Gets thrown if the serializer cannot handle the specified coin/protocol
  */
-var ProtocolNotSupported = /** @class */ (function (_super) {
+var ProtocolNotSupported = (function (_super) {
     __extends(ProtocolNotSupported, _super);
     function ProtocolNotSupported() {
         return _super.call(this, 'PROTOCOL_NOT_SUPPORTED') || this;
@@ -3291,7 +3322,7 @@ exports.ProtocolNotSupported = ProtocolNotSupported;
 /**
  * Gets thrown if the serializer CAN handle the specified coin/protocol, but not in this version
  */
-var ProtocolVersionMismatch = /** @class */ (function (_super) {
+var ProtocolVersionMismatch = (function (_super) {
     __extends(ProtocolVersionMismatch, _super);
     function ProtocolVersionMismatch() {
         return _super.call(this, 'PROTOCOL_VERSION_MISMATCH') || this;
@@ -3302,7 +3333,7 @@ exports.ProtocolVersionMismatch = ProtocolVersionMismatch;
 /**
  * Gets thrown if the specified Type is not supported
  */
-var TypeNotSupported = /** @class */ (function (_super) {
+var TypeNotSupported = (function (_super) {
     __extends(TypeNotSupported, _super);
     function TypeNotSupported() {
         return _super.call(this, 'TYPE_NOT_SUPPORTED') || this;
@@ -3406,7 +3437,7 @@ var EncodedType;
     EncodedType[EncodedType["SIGNED_TRANSACTION"] = 1] = "SIGNED_TRANSACTION";
     EncodedType[EncodedType["WALLET_SYNC"] = 2] = "WALLET_SYNC";
 })(EncodedType = exports.EncodedType || (exports.EncodedType = {}));
-var SyncProtocolUtils = /** @class */ (function () {
+var SyncProtocolUtils = (function () {
     function SyncProtocolUtils() {
     }
     SyncProtocolUtils.prototype.serialize = function (deserializedSyncProtocol) {
@@ -3483,7 +3514,7 @@ exports.SyncProtocolUtils = SyncProtocolUtils;
 },{".":21,"./constants":19,"./errors":20,"./utils/toBuffer":31,"./wallet-sync.serializer":32,"bs58check":206,"rlp":362}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var SignedTransactionSerializer = /** @class */ (function () {
+var SignedTransactionSerializer = (function () {
     function SignedTransactionSerializer() {
     }
     return SignedTransactionSerializer;
@@ -3513,7 +3544,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var toBuffer_1 = require("../utils/toBuffer");
 var signed_transaction_serializer_1 = require("../signed-transaction.serializer");
-var AeternitySignedTransactionSerializer = /** @class */ (function (_super) {
+var AeternitySignedTransactionSerializer = (function (_super) {
     __extends(AeternitySignedTransactionSerializer, _super);
     function AeternitySignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3551,7 +3582,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var toBuffer_1 = require("../utils/toBuffer");
 var signed_transaction_serializer_1 = require("../signed-transaction.serializer");
 var bignumber_js_1 = require("bignumber.js");
-var BitcoinSignedTransactionSerializer = /** @class */ (function (_super) {
+var BitcoinSignedTransactionSerializer = (function (_super) {
     __extends(BitcoinSignedTransactionSerializer, _super);
     function BitcoinSignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3579,7 +3610,7 @@ var BitcoinSignedTransactionSerializer = /** @class */ (function (_super) {
 }(signed_transaction_serializer_1.SignedTransactionSerializer));
 exports.BitcoinSignedTransactionSerializer = BitcoinSignedTransactionSerializer;
 
-},{"../signed-transaction.serializer":23,"../utils/toBuffer":31,"bignumber.js":89}],26:[function(require,module,exports){
+},{"../signed-transaction.serializer":23,"../utils/toBuffer":31,"bignumber.js":35}],26:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -3594,7 +3625,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var toBuffer_1 = require("../utils/toBuffer");
 var signed_transaction_serializer_1 = require("../signed-transaction.serializer");
-var EthereumSignedTransactionSerializer = /** @class */ (function (_super) {
+var EthereumSignedTransactionSerializer = (function (_super) {
     __extends(EthereumSignedTransactionSerializer, _super);
     function EthereumSignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3619,7 +3650,7 @@ exports.EthereumSignedTransactionSerializer = EthereumSignedTransactionSerialize
 },{"../signed-transaction.serializer":23,"../utils/toBuffer":31}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var UnsignedTransactionSerializer = /** @class */ (function () {
+var UnsignedTransactionSerializer = (function () {
     function UnsignedTransactionSerializer() {
     }
     return UnsignedTransactionSerializer;
@@ -3647,7 +3678,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var unsigned_transaction_serializer_1 = require("../unsigned-transaction.serializer");
 var toBuffer_1 = require("../utils/toBuffer");
-var AeternityUnsignedTransactionSerializer = /** @class */ (function (_super) {
+var AeternityUnsignedTransactionSerializer = (function (_super) {
     __extends(AeternityUnsignedTransactionSerializer, _super);
     function AeternityUnsignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3691,7 +3722,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var unsigned_transaction_serializer_1 = require("../unsigned-transaction.serializer");
 var bignumber_js_1 = require("bignumber.js");
 var toBuffer_1 = require("../utils/toBuffer");
-var BitcoinUnsignedTransactionSerializer = /** @class */ (function (_super) {
+var BitcoinUnsignedTransactionSerializer = (function (_super) {
     __extends(BitcoinUnsignedTransactionSerializer, _super);
     function BitcoinUnsignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3741,7 +3772,7 @@ var BitcoinUnsignedTransactionSerializer = /** @class */ (function (_super) {
 }(unsigned_transaction_serializer_1.UnsignedTransactionSerializer));
 exports.BitcoinUnsignedTransactionSerializer = BitcoinUnsignedTransactionSerializer;
 
-},{"../unsigned-transaction.serializer":27,"../utils/toBuffer":31,"bignumber.js":89}],30:[function(require,module,exports){
+},{"../unsigned-transaction.serializer":27,"../utils/toBuffer":31,"bignumber.js":35}],30:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -3756,7 +3787,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var unsigned_transaction_serializer_1 = require("../unsigned-transaction.serializer");
 var toBuffer_1 = require("../utils/toBuffer");
-var EthereumUnsignedTransactionSerializer = /** @class */ (function (_super) {
+var EthereumUnsignedTransactionSerializer = (function (_super) {
     __extends(EthereumUnsignedTransactionSerializer, _super);
     function EthereumUnsignedTransactionSerializer() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3820,11 +3851,11 @@ function toBuffer(rlpArray) {
 exports.toBuffer = toBuffer;
 
 }).call(this,require("buffer").Buffer)
-},{"bignumber.js":89,"buffer":208}],32:[function(require,module,exports){
+},{"bignumber.js":35,"buffer":208}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var toBuffer_1 = require("./utils/toBuffer");
-var WalletSerializer = /** @class */ (function () {
+var WalletSerializer = (function () {
     function WalletSerializer() {
     }
     WalletSerializer.prototype.serialize = function (syncWalletRequest) {
@@ -3875,7 +3906,7 @@ var TimeUnit;
     TimeUnit["Days"] = "days";
     TimeUnit["Minutes"] = "minutes";
 })(TimeUnit = exports.TimeUnit || (exports.TimeUnit = {}));
-var AirGapMarketWallet = /** @class */ (function (_super) {
+var AirGapMarketWallet = (function (_super) {
     __extends(AirGapMarketWallet, _super);
     function AirGapMarketWallet(protocolIdentifier, publicKey, isExtendedPublicKey, derivationPath) {
         var _this = _super.call(this, protocolIdentifier, publicKey, isExtendedPublicKey, derivationPath) || this;
@@ -4026,11 +4057,11 @@ var AirGapMarketWallet = /** @class */ (function (_super) {
 }(AirGapWallet_1.AirGapWallet));
 exports.AirGapMarketWallet = AirGapMarketWallet;
 
-},{"./AirGapWallet":34,"bignumber.js":89,"cryptocompare":219}],34:[function(require,module,exports){
+},{"./AirGapWallet":34,"bignumber.js":35,"cryptocompare":219}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var __1 = require("..");
-var AirGapWallet = /** @class */ (function () {
+var AirGapWallet = (function () {
     function AirGapWallet(protocolIdentifier, publicKey, isExtendedPublicKey, derivationPath) {
         this.protocolIdentifier = protocolIdentifier;
         this.publicKey = publicKey;
@@ -4106,6 +4137,2867 @@ var AirGapWallet = /** @class */ (function () {
 exports.AirGapWallet = AirGapWallet;
 
 },{"..":5}],35:[function(require,module,exports){
+;(function (globalObject) {
+  'use strict';
+
+/*
+ *      bignumber.js v8.0.1
+ *      A JavaScript library for arbitrary-precision arithmetic.
+ *      https://github.com/MikeMcl/bignumber.js
+ *      Copyright (c) 2018 Michael Mclaughlin <M8ch88l@gmail.com>
+ *      MIT Licensed.
+ *
+ *      BigNumber.prototype methods     |  BigNumber methods
+ *                                      |
+ *      absoluteValue            abs    |  clone
+ *      comparedTo                      |  config               set
+ *      decimalPlaces            dp     |      DECIMAL_PLACES
+ *      dividedBy                div    |      ROUNDING_MODE
+ *      dividedToIntegerBy       idiv   |      EXPONENTIAL_AT
+ *      exponentiatedBy          pow    |      RANGE
+ *      integerValue                    |      CRYPTO
+ *      isEqualTo                eq     |      MODULO_MODE
+ *      isFinite                        |      POW_PRECISION
+ *      isGreaterThan            gt     |      FORMAT
+ *      isGreaterThanOrEqualTo   gte    |      ALPHABET
+ *      isInteger                       |  isBigNumber
+ *      isLessThan               lt     |  maximum              max
+ *      isLessThanOrEqualTo      lte    |  minimum              min
+ *      isNaN                           |  random
+ *      isNegative                      |  sum
+ *      isPositive                      |
+ *      isZero                          |
+ *      minus                           |
+ *      modulo                   mod    |
+ *      multipliedBy             times  |
+ *      negated                         |
+ *      plus                            |
+ *      precision                sd     |
+ *      shiftedBy                       |
+ *      squareRoot               sqrt   |
+ *      toExponential                   |
+ *      toFixed                         |
+ *      toFormat                        |
+ *      toFraction                      |
+ *      toJSON                          |
+ *      toNumber                        |
+ *      toPrecision                     |
+ *      toString                        |
+ *      valueOf                         |
+ *
+ */
+
+
+  var BigNumber,
+    isNumeric = /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i,
+
+    mathceil = Math.ceil,
+    mathfloor = Math.floor,
+
+    bignumberError = '[BigNumber Error] ',
+    tooManyDigits = bignumberError + 'Number primitive has more than 15 significant digits: ',
+
+    BASE = 1e14,
+    LOG_BASE = 14,
+    MAX_SAFE_INTEGER = 0x1fffffffffffff,         // 2^53 - 1
+    // MAX_INT32 = 0x7fffffff,                   // 2^31 - 1
+    POWS_TEN = [1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13],
+    SQRT_BASE = 1e7,
+
+    // EDITABLE
+    // The limit on the value of DECIMAL_PLACES, TO_EXP_NEG, TO_EXP_POS, MIN_EXP, MAX_EXP, and
+    // the arguments to toExponential, toFixed, toFormat, and toPrecision.
+    MAX = 1E9;                                   // 0 to MAX_INT32
+
+
+  /*
+   * Create and return a BigNumber constructor.
+   */
+  function clone(configObject) {
+    var div, convertBase, parseNumeric,
+      P = BigNumber.prototype = { constructor: BigNumber, toString: null, valueOf: null },
+      ONE = new BigNumber(1),
+
+
+      //----------------------------- EDITABLE CONFIG DEFAULTS -------------------------------
+
+
+      // The default values below must be integers within the inclusive ranges stated.
+      // The values can also be changed at run-time using BigNumber.set.
+
+      // The maximum number of decimal places for operations involving division.
+      DECIMAL_PLACES = 20,                     // 0 to MAX
+
+      // The rounding mode used when rounding to the above decimal places, and when using
+      // toExponential, toFixed, toFormat and toPrecision, and round (default value).
+      // UP         0 Away from zero.
+      // DOWN       1 Towards zero.
+      // CEIL       2 Towards +Infinity.
+      // FLOOR      3 Towards -Infinity.
+      // HALF_UP    4 Towards nearest neighbour. If equidistant, up.
+      // HALF_DOWN  5 Towards nearest neighbour. If equidistant, down.
+      // HALF_EVEN  6 Towards nearest neighbour. If equidistant, towards even neighbour.
+      // HALF_CEIL  7 Towards nearest neighbour. If equidistant, towards +Infinity.
+      // HALF_FLOOR 8 Towards nearest neighbour. If equidistant, towards -Infinity.
+      ROUNDING_MODE = 4,                       // 0 to 8
+
+      // EXPONENTIAL_AT : [TO_EXP_NEG , TO_EXP_POS]
+
+      // The exponent value at and beneath which toString returns exponential notation.
+      // Number type: -7
+      TO_EXP_NEG = -7,                         // 0 to -MAX
+
+      // The exponent value at and above which toString returns exponential notation.
+      // Number type: 21
+      TO_EXP_POS = 21,                         // 0 to MAX
+
+      // RANGE : [MIN_EXP, MAX_EXP]
+
+      // The minimum exponent value, beneath which underflow to zero occurs.
+      // Number type: -324  (5e-324)
+      MIN_EXP = -1e7,                          // -1 to -MAX
+
+      // The maximum exponent value, above which overflow to Infinity occurs.
+      // Number type:  308  (1.7976931348623157e+308)
+      // For MAX_EXP > 1e7, e.g. new BigNumber('1e100000000').plus(1) may be slow.
+      MAX_EXP = 1e7,                           // 1 to MAX
+
+      // Whether to use cryptographically-secure random number generation, if available.
+      CRYPTO = false,                          // true or false
+
+      // The modulo mode used when calculating the modulus: a mod n.
+      // The quotient (q = a / n) is calculated according to the corresponding rounding mode.
+      // The remainder (r) is calculated as: r = a - n * q.
+      //
+      // UP        0 The remainder is positive if the dividend is negative, else is negative.
+      // DOWN      1 The remainder has the same sign as the dividend.
+      //             This modulo mode is commonly known as 'truncated division' and is
+      //             equivalent to (a % n) in JavaScript.
+      // FLOOR     3 The remainder has the same sign as the divisor (Python %).
+      // HALF_EVEN 6 This modulo mode implements the IEEE 754 remainder function.
+      // EUCLID    9 Euclidian division. q = sign(n) * floor(a / abs(n)).
+      //             The remainder is always positive.
+      //
+      // The truncated division, floored division, Euclidian division and IEEE 754 remainder
+      // modes are commonly used for the modulus operation.
+      // Although the other rounding modes can also be used, they may not give useful results.
+      MODULO_MODE = 1,                         // 0 to 9
+
+      // The maximum number of significant digits of the result of the exponentiatedBy operation.
+      // If POW_PRECISION is 0, there will be unlimited significant digits.
+      POW_PRECISION = 0,                    // 0 to MAX
+
+      // The format specification used by the BigNumber.prototype.toFormat method.
+      FORMAT = {
+        prefix: '',
+        groupSize: 3,
+        secondaryGroupSize: 0,
+        groupSeparator: ',',
+        decimalSeparator: '.',
+        fractionGroupSize: 0,
+        fractionGroupSeparator: '\xA0',      // non-breaking space
+        suffix: ''
+      },
+
+      // The alphabet used for base conversion. It must be at least 2 characters long, with no '+',
+      // '-', '.', whitespace, or repeated character.
+      // '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_'
+      ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+
+    //------------------------------------------------------------------------------------------
+
+
+    // CONSTRUCTOR
+
+
+    /*
+     * The BigNumber constructor and exported function.
+     * Create and return a new instance of a BigNumber object.
+     *
+     * n {number|string|BigNumber} A numeric value.
+     * [b] {number} The base of n. Integer, 2 to ALPHABET.length inclusive.
+     */
+    function BigNumber(n, b) {
+      var alphabet, c, caseChanged, e, i, isNum, len, str,
+        x = this;
+
+      // Enable constructor usage without new.
+      if (!(x instanceof BigNumber)) {
+
+        // Don't throw on constructor call without new (#81).
+        // '[BigNumber Error] Constructor call without new: {n}'
+        //throw Error(bignumberError + ' Constructor call without new: ' + n);
+        return new BigNumber(n, b);
+      }
+
+      if (b == null) {
+
+        // Duplicate.
+        if (n instanceof BigNumber) {
+          x.s = n.s;
+          x.e = n.e;
+          x.c = (n = n.c) ? n.slice() : n;
+          return;
+        }
+
+        isNum = typeof n == 'number';
+
+        if (isNum && n * 0 == 0) {
+
+          // Use `1 / n` to handle minus zero also.
+          x.s = 1 / n < 0 ? (n = -n, -1) : 1;
+
+          // Faster path for integers.
+          if (n === ~~n) {
+            for (e = 0, i = n; i >= 10; i /= 10, e++);
+            x.e = e;
+            x.c = [n];
+            return;
+          }
+
+          str = String(n);
+        } else {
+          str = String(n);
+          if (!isNumeric.test(str)) return parseNumeric(x, str, isNum);
+          x.s = str.charCodeAt(0) == 45 ? (str = str.slice(1), -1) : 1;
+        }
+
+        // Decimal point?
+        if ((e = str.indexOf('.')) > -1) str = str.replace('.', '');
+
+        // Exponential form?
+        if ((i = str.search(/e/i)) > 0) {
+
+          // Determine exponent.
+          if (e < 0) e = i;
+          e += +str.slice(i + 1);
+          str = str.substring(0, i);
+        } else if (e < 0) {
+
+          // Integer.
+          e = str.length;
+        }
+
+      } else {
+
+        // '[BigNumber Error] Base {not a primitive number|not an integer|out of range}: {b}'
+        intCheck(b, 2, ALPHABET.length, 'Base');
+        str = String(n);
+
+        // Allow exponential notation to be used with base 10 argument, while
+        // also rounding to DECIMAL_PLACES as with other bases.
+        if (b == 10) {
+          x = new BigNumber(n instanceof BigNumber ? n : str);
+          return round(x, DECIMAL_PLACES + x.e + 1, ROUNDING_MODE);
+        }
+
+        isNum = typeof n == 'number';
+
+        if (isNum) {
+
+          // Avoid potential interpretation of Infinity and NaN as base 44+ values.
+          if (n * 0 != 0) return parseNumeric(x, str, isNum, b);
+
+          x.s = 1 / n < 0 ? (str = str.slice(1), -1) : 1;
+
+          // '[BigNumber Error] Number primitive has more than 15 significant digits: {n}'
+          if (BigNumber.DEBUG && str.replace(/^0\.0*|\./, '').length > 15) {
+            throw Error
+             (tooManyDigits + n);
+          }
+
+          // Prevent later check for length on converted number.
+          isNum = false;
+        } else {
+          x.s = str.charCodeAt(0) === 45 ? (str = str.slice(1), -1) : 1;
+        }
+
+        alphabet = ALPHABET.slice(0, b);
+        e = i = 0;
+
+        // Check that str is a valid base b number.
+        // Don't use RegExp so alphabet can contain special characters.
+        for (len = str.length; i < len; i++) {
+          if (alphabet.indexOf(c = str.charAt(i)) < 0) {
+            if (c == '.') {
+
+              // If '.' is not the first character and it has not be found before.
+              if (i > e) {
+                e = len;
+                continue;
+              }
+            } else if (!caseChanged) {
+
+              // Allow e.g. hexadecimal 'FF' as well as 'ff'.
+              if (str == str.toUpperCase() && (str = str.toLowerCase()) ||
+                  str == str.toLowerCase() && (str = str.toUpperCase())) {
+                caseChanged = true;
+                i = -1;
+                e = 0;
+                continue;
+              }
+            }
+
+            return parseNumeric(x, String(n), isNum, b);
+          }
+        }
+
+        str = convertBase(str, b, 10, x.s);
+
+        // Decimal point?
+        if ((e = str.indexOf('.')) > -1) str = str.replace('.', '');
+        else e = str.length;
+      }
+
+      // Determine leading zeros.
+      for (i = 0; str.charCodeAt(i) === 48; i++);
+
+      // Determine trailing zeros.
+      for (len = str.length; str.charCodeAt(--len) === 48;);
+
+      str = str.slice(i, ++len);
+
+      if (str) {
+        len -= i;
+
+        // '[BigNumber Error] Number primitive has more than 15 significant digits: {n}'
+        if (isNum && BigNumber.DEBUG &&
+          len > 15 && (n > MAX_SAFE_INTEGER || n !== mathfloor(n))) {
+            throw Error
+             (tooManyDigits + (x.s * n));
+        }
+
+        e = e - i - 1;
+
+         // Overflow?
+        if (e > MAX_EXP) {
+
+          // Infinity.
+          x.c = x.e = null;
+
+        // Underflow?
+        } else if (e < MIN_EXP) {
+
+          // Zero.
+          x.c = [x.e = 0];
+        } else {
+          x.e = e;
+          x.c = [];
+
+          // Transform base
+
+          // e is the base 10 exponent.
+          // i is where to slice str to get the first element of the coefficient array.
+          i = (e + 1) % LOG_BASE;
+          if (e < 0) i += LOG_BASE;
+
+          if (i < len) {
+            if (i) x.c.push(+str.slice(0, i));
+
+            for (len -= LOG_BASE; i < len;) {
+              x.c.push(+str.slice(i, i += LOG_BASE));
+            }
+
+            str = str.slice(i);
+            i = LOG_BASE - str.length;
+          } else {
+            i -= len;
+          }
+
+          for (; i--; str += '0');
+          x.c.push(+str);
+        }
+      } else {
+
+        // Zero.
+        x.c = [x.e = 0];
+      }
+    }
+
+
+    // CONSTRUCTOR PROPERTIES
+
+
+    BigNumber.clone = clone;
+
+    BigNumber.ROUND_UP = 0;
+    BigNumber.ROUND_DOWN = 1;
+    BigNumber.ROUND_CEIL = 2;
+    BigNumber.ROUND_FLOOR = 3;
+    BigNumber.ROUND_HALF_UP = 4;
+    BigNumber.ROUND_HALF_DOWN = 5;
+    BigNumber.ROUND_HALF_EVEN = 6;
+    BigNumber.ROUND_HALF_CEIL = 7;
+    BigNumber.ROUND_HALF_FLOOR = 8;
+    BigNumber.EUCLID = 9;
+
+
+    /*
+     * Configure infrequently-changing library-wide settings.
+     *
+     * Accept an object with the following optional properties (if the value of a property is
+     * a number, it must be an integer within the inclusive range stated):
+     *
+     *   DECIMAL_PLACES   {number}           0 to MAX
+     *   ROUNDING_MODE    {number}           0 to 8
+     *   EXPONENTIAL_AT   {number|number[]}  -MAX to MAX  or  [-MAX to 0, 0 to MAX]
+     *   RANGE            {number|number[]}  -MAX to MAX (not zero)  or  [-MAX to -1, 1 to MAX]
+     *   CRYPTO           {boolean}          true or false
+     *   MODULO_MODE      {number}           0 to 9
+     *   POW_PRECISION       {number}           0 to MAX
+     *   ALPHABET         {string}           A string of two or more unique characters which does
+     *                                       not contain '.'.
+     *   FORMAT           {object}           An object with some of the following properties:
+     *     prefix                 {string}
+     *     groupSize              {number}
+     *     secondaryGroupSize     {number}
+     *     groupSeparator         {string}
+     *     decimalSeparator       {string}
+     *     fractionGroupSize      {number}
+     *     fractionGroupSeparator {string}
+     *     suffix                 {string}
+     *
+     * (The values assigned to the above FORMAT object properties are not checked for validity.)
+     *
+     * E.g.
+     * BigNumber.config({ DECIMAL_PLACES : 20, ROUNDING_MODE : 4 })
+     *
+     * Ignore properties/parameters set to null or undefined, except for ALPHABET.
+     *
+     * Return an object with the properties current values.
+     */
+    BigNumber.config = BigNumber.set = function (obj) {
+      var p, v;
+
+      if (obj != null) {
+
+        if (typeof obj == 'object') {
+
+          // DECIMAL_PLACES {number} Integer, 0 to MAX inclusive.
+          // '[BigNumber Error] DECIMAL_PLACES {not a primitive number|not an integer|out of range}: {v}'
+          if (obj.hasOwnProperty(p = 'DECIMAL_PLACES')) {
+            v = obj[p];
+            intCheck(v, 0, MAX, p);
+            DECIMAL_PLACES = v;
+          }
+
+          // ROUNDING_MODE {number} Integer, 0 to 8 inclusive.
+          // '[BigNumber Error] ROUNDING_MODE {not a primitive number|not an integer|out of range}: {v}'
+          if (obj.hasOwnProperty(p = 'ROUNDING_MODE')) {
+            v = obj[p];
+            intCheck(v, 0, 8, p);
+            ROUNDING_MODE = v;
+          }
+
+          // EXPONENTIAL_AT {number|number[]}
+          // Integer, -MAX to MAX inclusive or
+          // [integer -MAX to 0 inclusive, 0 to MAX inclusive].
+          // '[BigNumber Error] EXPONENTIAL_AT {not a primitive number|not an integer|out of range}: {v}'
+          if (obj.hasOwnProperty(p = 'EXPONENTIAL_AT')) {
+            v = obj[p];
+            if (v && v.pop) {
+              intCheck(v[0], -MAX, 0, p);
+              intCheck(v[1], 0, MAX, p);
+              TO_EXP_NEG = v[0];
+              TO_EXP_POS = v[1];
+            } else {
+              intCheck(v, -MAX, MAX, p);
+              TO_EXP_NEG = -(TO_EXP_POS = v < 0 ? -v : v);
+            }
+          }
+
+          // RANGE {number|number[]} Non-zero integer, -MAX to MAX inclusive or
+          // [integer -MAX to -1 inclusive, integer 1 to MAX inclusive].
+          // '[BigNumber Error] RANGE {not a primitive number|not an integer|out of range|cannot be zero}: {v}'
+          if (obj.hasOwnProperty(p = 'RANGE')) {
+            v = obj[p];
+            if (v && v.pop) {
+              intCheck(v[0], -MAX, -1, p);
+              intCheck(v[1], 1, MAX, p);
+              MIN_EXP = v[0];
+              MAX_EXP = v[1];
+            } else {
+              intCheck(v, -MAX, MAX, p);
+              if (v) {
+                MIN_EXP = -(MAX_EXP = v < 0 ? -v : v);
+              } else {
+                throw Error
+                 (bignumberError + p + ' cannot be zero: ' + v);
+              }
+            }
+          }
+
+          // CRYPTO {boolean} true or false.
+          // '[BigNumber Error] CRYPTO not true or false: {v}'
+          // '[BigNumber Error] crypto unavailable'
+          if (obj.hasOwnProperty(p = 'CRYPTO')) {
+            v = obj[p];
+            if (v === !!v) {
+              if (v) {
+                if (typeof crypto != 'undefined' && crypto &&
+                 (crypto.getRandomValues || crypto.randomBytes)) {
+                  CRYPTO = v;
+                } else {
+                  CRYPTO = !v;
+                  throw Error
+                   (bignumberError + 'crypto unavailable');
+                }
+              } else {
+                CRYPTO = v;
+              }
+            } else {
+              throw Error
+               (bignumberError + p + ' not true or false: ' + v);
+            }
+          }
+
+          // MODULO_MODE {number} Integer, 0 to 9 inclusive.
+          // '[BigNumber Error] MODULO_MODE {not a primitive number|not an integer|out of range}: {v}'
+          if (obj.hasOwnProperty(p = 'MODULO_MODE')) {
+            v = obj[p];
+            intCheck(v, 0, 9, p);
+            MODULO_MODE = v;
+          }
+
+          // POW_PRECISION {number} Integer, 0 to MAX inclusive.
+          // '[BigNumber Error] POW_PRECISION {not a primitive number|not an integer|out of range}: {v}'
+          if (obj.hasOwnProperty(p = 'POW_PRECISION')) {
+            v = obj[p];
+            intCheck(v, 0, MAX, p);
+            POW_PRECISION = v;
+          }
+
+          // FORMAT {object}
+          // '[BigNumber Error] FORMAT not an object: {v}'
+          if (obj.hasOwnProperty(p = 'FORMAT')) {
+            v = obj[p];
+            if (typeof v == 'object') FORMAT = v;
+            else throw Error
+             (bignumberError + p + ' not an object: ' + v);
+          }
+
+          // ALPHABET {string}
+          // '[BigNumber Error] ALPHABET invalid: {v}'
+          if (obj.hasOwnProperty(p = 'ALPHABET')) {
+            v = obj[p];
+
+            // Disallow if only one character,
+            // or if it contains '+', '-', '.', whitespace, or a repeated character.
+            if (typeof v == 'string' && !/^.$|[+-.\s]|(.).*\1/.test(v)) {
+              ALPHABET = v;
+            } else {
+              throw Error
+               (bignumberError + p + ' invalid: ' + v);
+            }
+          }
+
+        } else {
+
+          // '[BigNumber Error] Object expected: {v}'
+          throw Error
+           (bignumberError + 'Object expected: ' + obj);
+        }
+      }
+
+      return {
+        DECIMAL_PLACES: DECIMAL_PLACES,
+        ROUNDING_MODE: ROUNDING_MODE,
+        EXPONENTIAL_AT: [TO_EXP_NEG, TO_EXP_POS],
+        RANGE: [MIN_EXP, MAX_EXP],
+        CRYPTO: CRYPTO,
+        MODULO_MODE: MODULO_MODE,
+        POW_PRECISION: POW_PRECISION,
+        FORMAT: FORMAT,
+        ALPHABET: ALPHABET
+      };
+    };
+
+
+    /*
+     * Return true if v is a BigNumber instance, otherwise return false.
+     *
+     * v {any}
+     */
+    BigNumber.isBigNumber = function (v) {
+      return v instanceof BigNumber || v && v._isBigNumber === true || false;
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the maximum of the arguments.
+     *
+     * arguments {number|string|BigNumber}
+     */
+    BigNumber.maximum = BigNumber.max = function () {
+      return maxOrMin(arguments, P.lt);
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the minimum of the arguments.
+     *
+     * arguments {number|string|BigNumber}
+     */
+    BigNumber.minimum = BigNumber.min = function () {
+      return maxOrMin(arguments, P.gt);
+    };
+
+
+    /*
+     * Return a new BigNumber with a random value equal to or greater than 0 and less than 1,
+     * and with dp, or DECIMAL_PLACES if dp is omitted, decimal places (or less if trailing
+     * zeros are produced).
+     *
+     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp}'
+     * '[BigNumber Error] crypto unavailable'
+     */
+    BigNumber.random = (function () {
+      var pow2_53 = 0x20000000000000;
+
+      // Return a 53 bit integer n, where 0 <= n < 9007199254740992.
+      // Check if Math.random() produces more than 32 bits of randomness.
+      // If it does, assume at least 53 bits are produced, otherwise assume at least 30 bits.
+      // 0x40000000 is 2^30, 0x800000 is 2^23, 0x1fffff is 2^21 - 1.
+      var random53bitInt = (Math.random() * pow2_53) & 0x1fffff
+       ? function () { return mathfloor(Math.random() * pow2_53); }
+       : function () { return ((Math.random() * 0x40000000 | 0) * 0x800000) +
+         (Math.random() * 0x800000 | 0); };
+
+      return function (dp) {
+        var a, b, e, k, v,
+          i = 0,
+          c = [],
+          rand = new BigNumber(ONE);
+
+        if (dp == null) dp = DECIMAL_PLACES;
+        else intCheck(dp, 0, MAX);
+
+        k = mathceil(dp / LOG_BASE);
+
+        if (CRYPTO) {
+
+          // Browsers supporting crypto.getRandomValues.
+          if (crypto.getRandomValues) {
+
+            a = crypto.getRandomValues(new Uint32Array(k *= 2));
+
+            for (; i < k;) {
+
+              // 53 bits:
+              // ((Math.pow(2, 32) - 1) * Math.pow(2, 21)).toString(2)
+              // 11111 11111111 11111111 11111111 11100000 00000000 00000000
+              // ((Math.pow(2, 32) - 1) >>> 11).toString(2)
+              //                                     11111 11111111 11111111
+              // 0x20000 is 2^21.
+              v = a[i] * 0x20000 + (a[i + 1] >>> 11);
+
+              // Rejection sampling:
+              // 0 <= v < 9007199254740992
+              // Probability that v >= 9e15, is
+              // 7199254740992 / 9007199254740992 ~= 0.0008, i.e. 1 in 1251
+              if (v >= 9e15) {
+                b = crypto.getRandomValues(new Uint32Array(2));
+                a[i] = b[0];
+                a[i + 1] = b[1];
+              } else {
+
+                // 0 <= v <= 8999999999999999
+                // 0 <= (v % 1e14) <= 99999999999999
+                c.push(v % 1e14);
+                i += 2;
+              }
+            }
+            i = k / 2;
+
+          // Node.js supporting crypto.randomBytes.
+          } else if (crypto.randomBytes) {
+
+            // buffer
+            a = crypto.randomBytes(k *= 7);
+
+            for (; i < k;) {
+
+              // 0x1000000000000 is 2^48, 0x10000000000 is 2^40
+              // 0x100000000 is 2^32, 0x1000000 is 2^24
+              // 11111 11111111 11111111 11111111 11111111 11111111 11111111
+              // 0 <= v < 9007199254740992
+              v = ((a[i] & 31) * 0x1000000000000) + (a[i + 1] * 0x10000000000) +
+                 (a[i + 2] * 0x100000000) + (a[i + 3] * 0x1000000) +
+                 (a[i + 4] << 16) + (a[i + 5] << 8) + a[i + 6];
+
+              if (v >= 9e15) {
+                crypto.randomBytes(7).copy(a, i);
+              } else {
+
+                // 0 <= (v % 1e14) <= 99999999999999
+                c.push(v % 1e14);
+                i += 7;
+              }
+            }
+            i = k / 7;
+          } else {
+            CRYPTO = false;
+            throw Error
+             (bignumberError + 'crypto unavailable');
+          }
+        }
+
+        // Use Math.random.
+        if (!CRYPTO) {
+
+          for (; i < k;) {
+            v = random53bitInt();
+            if (v < 9e15) c[i++] = v % 1e14;
+          }
+        }
+
+        k = c[--i];
+        dp %= LOG_BASE;
+
+        // Convert trailing digits to zeros according to dp.
+        if (k && dp) {
+          v = POWS_TEN[LOG_BASE - dp];
+          c[i] = mathfloor(k / v) * v;
+        }
+
+        // Remove trailing elements which are zero.
+        for (; c[i] === 0; c.pop(), i--);
+
+        // Zero?
+        if (i < 0) {
+          c = [e = 0];
+        } else {
+
+          // Remove leading elements which are zero and adjust exponent accordingly.
+          for (e = -1 ; c[0] === 0; c.splice(0, 1), e -= LOG_BASE);
+
+          // Count the digits of the first element of c to determine leading zeros, and...
+          for (i = 1, v = c[0]; v >= 10; v /= 10, i++);
+
+          // adjust the exponent accordingly.
+          if (i < LOG_BASE) e -= LOG_BASE - i;
+        }
+
+        rand.e = e;
+        rand.c = c;
+        return rand;
+      };
+    })();
+
+
+    /*
+     * Return a BigNumber whose value is the sum of the arguments.
+     *
+     * arguments {number|string|BigNumber}
+     */
+    BigNumber.sum = function () {
+      var i = 1,
+        args = arguments,
+        sum = new BigNumber(args[0]);
+      for (; i < args.length;) sum = sum.plus(args[i++]);
+      return sum;
+    };
+
+
+    // PRIVATE FUNCTIONS
+
+
+    // Called by BigNumber and BigNumber.prototype.toString.
+    convertBase = (function () {
+      var decimal = '0123456789';
+
+      /*
+       * Convert string of baseIn to an array of numbers of baseOut.
+       * Eg. toBaseOut('255', 10, 16) returns [15, 15].
+       * Eg. toBaseOut('ff', 16, 10) returns [2, 5, 5].
+       */
+      function toBaseOut(str, baseIn, baseOut, alphabet) {
+        var j,
+          arr = [0],
+          arrL,
+          i = 0,
+          len = str.length;
+
+        for (; i < len;) {
+          for (arrL = arr.length; arrL--; arr[arrL] *= baseIn);
+
+          arr[0] += alphabet.indexOf(str.charAt(i++));
+
+          for (j = 0; j < arr.length; j++) {
+
+            if (arr[j] > baseOut - 1) {
+              if (arr[j + 1] == null) arr[j + 1] = 0;
+              arr[j + 1] += arr[j] / baseOut | 0;
+              arr[j] %= baseOut;
+            }
+          }
+        }
+
+        return arr.reverse();
+      }
+
+      // Convert a numeric string of baseIn to a numeric string of baseOut.
+      // If the caller is toString, we are converting from base 10 to baseOut.
+      // If the caller is BigNumber, we are converting from baseIn to base 10.
+      return function (str, baseIn, baseOut, sign, callerIsToString) {
+        var alphabet, d, e, k, r, x, xc, y,
+          i = str.indexOf('.'),
+          dp = DECIMAL_PLACES,
+          rm = ROUNDING_MODE;
+
+        // Non-integer.
+        if (i >= 0) {
+          k = POW_PRECISION;
+
+          // Unlimited precision.
+          POW_PRECISION = 0;
+          str = str.replace('.', '');
+          y = new BigNumber(baseIn);
+          x = y.pow(str.length - i);
+          POW_PRECISION = k;
+
+          // Convert str as if an integer, then restore the fraction part by dividing the
+          // result by its base raised to a power.
+
+          y.c = toBaseOut(toFixedPoint(coeffToString(x.c), x.e, '0'),
+           10, baseOut, decimal);
+          y.e = y.c.length;
+        }
+
+        // Convert the number as integer.
+
+        xc = toBaseOut(str, baseIn, baseOut, callerIsToString
+         ? (alphabet = ALPHABET, decimal)
+         : (alphabet = decimal, ALPHABET));
+
+        // xc now represents str as an integer and converted to baseOut. e is the exponent.
+        e = k = xc.length;
+
+        // Remove trailing zeros.
+        for (; xc[--k] == 0; xc.pop());
+
+        // Zero?
+        if (!xc[0]) return alphabet.charAt(0);
+
+        // Does str represent an integer? If so, no need for the division.
+        if (i < 0) {
+          --e;
+        } else {
+          x.c = xc;
+          x.e = e;
+
+          // The sign is needed for correct rounding.
+          x.s = sign;
+          x = div(x, y, dp, rm, baseOut);
+          xc = x.c;
+          r = x.r;
+          e = x.e;
+        }
+
+        // xc now represents str converted to baseOut.
+
+        // THe index of the rounding digit.
+        d = e + dp + 1;
+
+        // The rounding digit: the digit to the right of the digit that may be rounded up.
+        i = xc[d];
+
+        // Look at the rounding digits and mode to determine whether to round up.
+
+        k = baseOut / 2;
+        r = r || d < 0 || xc[d + 1] != null;
+
+        r = rm < 4 ? (i != null || r) && (rm == 0 || rm == (x.s < 0 ? 3 : 2))
+              : i > k || i == k &&(rm == 4 || r || rm == 6 && xc[d - 1] & 1 ||
+               rm == (x.s < 0 ? 8 : 7));
+
+        // If the index of the rounding digit is not greater than zero, or xc represents
+        // zero, then the result of the base conversion is zero or, if rounding up, a value
+        // such as 0.00001.
+        if (d < 1 || !xc[0]) {
+
+          // 1^-dp or 0
+          str = r ? toFixedPoint(alphabet.charAt(1), -dp, alphabet.charAt(0)) : alphabet.charAt(0);
+        } else {
+
+          // Truncate xc to the required number of decimal places.
+          xc.length = d;
+
+          // Round up?
+          if (r) {
+
+            // Rounding up may mean the previous digit has to be rounded up and so on.
+            for (--baseOut; ++xc[--d] > baseOut;) {
+              xc[d] = 0;
+
+              if (!d) {
+                ++e;
+                xc = [1].concat(xc);
+              }
+            }
+          }
+
+          // Determine trailing zeros.
+          for (k = xc.length; !xc[--k];);
+
+          // E.g. [4, 11, 15] becomes 4bf.
+          for (i = 0, str = ''; i <= k; str += alphabet.charAt(xc[i++]));
+
+          // Add leading zeros, decimal point and trailing zeros as required.
+          str = toFixedPoint(str, e, alphabet.charAt(0));
+        }
+
+        // The caller will add the sign.
+        return str;
+      };
+    })();
+
+
+    // Perform division in the specified base. Called by div and convertBase.
+    div = (function () {
+
+      // Assume non-zero x and k.
+      function multiply(x, k, base) {
+        var m, temp, xlo, xhi,
+          carry = 0,
+          i = x.length,
+          klo = k % SQRT_BASE,
+          khi = k / SQRT_BASE | 0;
+
+        for (x = x.slice(); i--;) {
+          xlo = x[i] % SQRT_BASE;
+          xhi = x[i] / SQRT_BASE | 0;
+          m = khi * xlo + xhi * klo;
+          temp = klo * xlo + ((m % SQRT_BASE) * SQRT_BASE) + carry;
+          carry = (temp / base | 0) + (m / SQRT_BASE | 0) + khi * xhi;
+          x[i] = temp % base;
+        }
+
+        if (carry) x = [carry].concat(x);
+
+        return x;
+      }
+
+      function compare(a, b, aL, bL) {
+        var i, cmp;
+
+        if (aL != bL) {
+          cmp = aL > bL ? 1 : -1;
+        } else {
+
+          for (i = cmp = 0; i < aL; i++) {
+
+            if (a[i] != b[i]) {
+              cmp = a[i] > b[i] ? 1 : -1;
+              break;
+            }
+          }
+        }
+
+        return cmp;
+      }
+
+      function subtract(a, b, aL, base) {
+        var i = 0;
+
+        // Subtract b from a.
+        for (; aL--;) {
+          a[aL] -= i;
+          i = a[aL] < b[aL] ? 1 : 0;
+          a[aL] = i * base + a[aL] - b[aL];
+        }
+
+        // Remove leading zeros.
+        for (; !a[0] && a.length > 1; a.splice(0, 1));
+      }
+
+      // x: dividend, y: divisor.
+      return function (x, y, dp, rm, base) {
+        var cmp, e, i, more, n, prod, prodL, q, qc, rem, remL, rem0, xi, xL, yc0,
+          yL, yz,
+          s = x.s == y.s ? 1 : -1,
+          xc = x.c,
+          yc = y.c;
+
+        // Either NaN, Infinity or 0?
+        if (!xc || !xc[0] || !yc || !yc[0]) {
+
+          return new BigNumber(
+
+           // Return NaN if either NaN, or both Infinity or 0.
+           !x.s || !y.s || (xc ? yc && xc[0] == yc[0] : !yc) ? NaN :
+
+            // Return ±0 if x is ±0 or y is ±Infinity, or return ±Infinity as y is ±0.
+            xc && xc[0] == 0 || !yc ? s * 0 : s / 0
+         );
+        }
+
+        q = new BigNumber(s);
+        qc = q.c = [];
+        e = x.e - y.e;
+        s = dp + e + 1;
+
+        if (!base) {
+          base = BASE;
+          e = bitFloor(x.e / LOG_BASE) - bitFloor(y.e / LOG_BASE);
+          s = s / LOG_BASE | 0;
+        }
+
+        // Result exponent may be one less then the current value of e.
+        // The coefficients of the BigNumbers from convertBase may have trailing zeros.
+        for (i = 0; yc[i] == (xc[i] || 0); i++);
+
+        if (yc[i] > (xc[i] || 0)) e--;
+
+        if (s < 0) {
+          qc.push(1);
+          more = true;
+        } else {
+          xL = xc.length;
+          yL = yc.length;
+          i = 0;
+          s += 2;
+
+          // Normalise xc and yc so highest order digit of yc is >= base / 2.
+
+          n = mathfloor(base / (yc[0] + 1));
+
+          // Not necessary, but to handle odd bases where yc[0] == (base / 2) - 1.
+          // if (n > 1 || n++ == 1 && yc[0] < base / 2) {
+          if (n > 1) {
+            yc = multiply(yc, n, base);
+            xc = multiply(xc, n, base);
+            yL = yc.length;
+            xL = xc.length;
+          }
+
+          xi = yL;
+          rem = xc.slice(0, yL);
+          remL = rem.length;
+
+          // Add zeros to make remainder as long as divisor.
+          for (; remL < yL; rem[remL++] = 0);
+          yz = yc.slice();
+          yz = [0].concat(yz);
+          yc0 = yc[0];
+          if (yc[1] >= base / 2) yc0++;
+          // Not necessary, but to prevent trial digit n > base, when using base 3.
+          // else if (base == 3 && yc0 == 1) yc0 = 1 + 1e-15;
+
+          do {
+            n = 0;
+
+            // Compare divisor and remainder.
+            cmp = compare(yc, rem, yL, remL);
+
+            // If divisor < remainder.
+            if (cmp < 0) {
+
+              // Calculate trial digit, n.
+
+              rem0 = rem[0];
+              if (yL != remL) rem0 = rem0 * base + (rem[1] || 0);
+
+              // n is how many times the divisor goes into the current remainder.
+              n = mathfloor(rem0 / yc0);
+
+              //  Algorithm:
+              //  product = divisor multiplied by trial digit (n).
+              //  Compare product and remainder.
+              //  If product is greater than remainder:
+              //    Subtract divisor from product, decrement trial digit.
+              //  Subtract product from remainder.
+              //  If product was less than remainder at the last compare:
+              //    Compare new remainder and divisor.
+              //    If remainder is greater than divisor:
+              //      Subtract divisor from remainder, increment trial digit.
+
+              if (n > 1) {
+
+                // n may be > base only when base is 3.
+                if (n >= base) n = base - 1;
+
+                // product = divisor * trial digit.
+                prod = multiply(yc, n, base);
+                prodL = prod.length;
+                remL = rem.length;
+
+                // Compare product and remainder.
+                // If product > remainder then trial digit n too high.
+                // n is 1 too high about 5% of the time, and is not known to have
+                // ever been more than 1 too high.
+                while (compare(prod, rem, prodL, remL) == 1) {
+                  n--;
+
+                  // Subtract divisor from product.
+                  subtract(prod, yL < prodL ? yz : yc, prodL, base);
+                  prodL = prod.length;
+                  cmp = 1;
+                }
+              } else {
+
+                // n is 0 or 1, cmp is -1.
+                // If n is 0, there is no need to compare yc and rem again below,
+                // so change cmp to 1 to avoid it.
+                // If n is 1, leave cmp as -1, so yc and rem are compared again.
+                if (n == 0) {
+
+                  // divisor < remainder, so n must be at least 1.
+                  cmp = n = 1;
+                }
+
+                // product = divisor
+                prod = yc.slice();
+                prodL = prod.length;
+              }
+
+              if (prodL < remL) prod = [0].concat(prod);
+
+              // Subtract product from remainder.
+              subtract(rem, prod, remL, base);
+              remL = rem.length;
+
+               // If product was < remainder.
+              if (cmp == -1) {
+
+                // Compare divisor and new remainder.
+                // If divisor < new remainder, subtract divisor from remainder.
+                // Trial digit n too low.
+                // n is 1 too low about 5% of the time, and very rarely 2 too low.
+                while (compare(yc, rem, yL, remL) < 1) {
+                  n++;
+
+                  // Subtract divisor from remainder.
+                  subtract(rem, yL < remL ? yz : yc, remL, base);
+                  remL = rem.length;
+                }
+              }
+            } else if (cmp === 0) {
+              n++;
+              rem = [0];
+            } // else cmp === 1 and n will be 0
+
+            // Add the next digit, n, to the result array.
+            qc[i++] = n;
+
+            // Update the remainder.
+            if (rem[0]) {
+              rem[remL++] = xc[xi] || 0;
+            } else {
+              rem = [xc[xi]];
+              remL = 1;
+            }
+          } while ((xi++ < xL || rem[0] != null) && s--);
+
+          more = rem[0] != null;
+
+          // Leading zero?
+          if (!qc[0]) qc.splice(0, 1);
+        }
+
+        if (base == BASE) {
+
+          // To calculate q.e, first get the number of digits of qc[0].
+          for (i = 1, s = qc[0]; s >= 10; s /= 10, i++);
+
+          round(q, dp + (q.e = i + e * LOG_BASE - 1) + 1, rm, more);
+
+        // Caller is convertBase.
+        } else {
+          q.e = e;
+          q.r = +more;
+        }
+
+        return q;
+      };
+    })();
+
+
+    /*
+     * Return a string representing the value of BigNumber n in fixed-point or exponential
+     * notation rounded to the specified decimal places or significant digits.
+     *
+     * n: a BigNumber.
+     * i: the index of the last digit required (i.e. the digit that may be rounded up).
+     * rm: the rounding mode.
+     * id: 1 (toExponential) or 2 (toPrecision).
+     */
+    function format(n, i, rm, id) {
+      var c0, e, ne, len, str;
+
+      if (rm == null) rm = ROUNDING_MODE;
+      else intCheck(rm, 0, 8);
+
+      if (!n.c) return n.toString();
+
+      c0 = n.c[0];
+      ne = n.e;
+
+      if (i == null) {
+        str = coeffToString(n.c);
+        str = id == 1 || id == 2 && ne <= TO_EXP_NEG
+         ? toExponential(str, ne)
+         : toFixedPoint(str, ne, '0');
+      } else {
+        n = round(new BigNumber(n), i, rm);
+
+        // n.e may have changed if the value was rounded up.
+        e = n.e;
+
+        str = coeffToString(n.c);
+        len = str.length;
+
+        // toPrecision returns exponential notation if the number of significant digits
+        // specified is less than the number of digits necessary to represent the integer
+        // part of the value in fixed-point notation.
+
+        // Exponential notation.
+        if (id == 1 || id == 2 && (i <= e || e <= TO_EXP_NEG)) {
+
+          // Append zeros?
+          for (; len < i; str += '0', len++);
+          str = toExponential(str, e);
+
+        // Fixed-point notation.
+        } else {
+          i -= ne;
+          str = toFixedPoint(str, e, '0');
+
+          // Append zeros?
+          if (e + 1 > len) {
+            if (--i > 0) for (str += '.'; i--; str += '0');
+          } else {
+            i += e - len;
+            if (i > 0) {
+              if (e + 1 == len) str += '.';
+              for (; i--; str += '0');
+            }
+          }
+        }
+      }
+
+      return n.s < 0 && c0 ? '-' + str : str;
+    }
+
+
+    // Handle BigNumber.max and BigNumber.min.
+    function maxOrMin(args, method) {
+      var n,
+        i = 1,
+        m = new BigNumber(args[0]);
+
+      for (; i < args.length; i++) {
+        n = new BigNumber(args[i]);
+
+        // If any number is NaN, return NaN.
+        if (!n.s) {
+          m = n;
+          break;
+        } else if (method.call(m, n)) {
+          m = n;
+        }
+      }
+
+      return m;
+    }
+
+
+    /*
+     * Strip trailing zeros, calculate base 10 exponent and check against MIN_EXP and MAX_EXP.
+     * Called by minus, plus and times.
+     */
+    function normalise(n, c, e) {
+      var i = 1,
+        j = c.length;
+
+       // Remove trailing zeros.
+      for (; !c[--j]; c.pop());
+
+      // Calculate the base 10 exponent. First get the number of digits of c[0].
+      for (j = c[0]; j >= 10; j /= 10, i++);
+
+      // Overflow?
+      if ((e = i + e * LOG_BASE - 1) > MAX_EXP) {
+
+        // Infinity.
+        n.c = n.e = null;
+
+      // Underflow?
+      } else if (e < MIN_EXP) {
+
+        // Zero.
+        n.c = [n.e = 0];
+      } else {
+        n.e = e;
+        n.c = c;
+      }
+
+      return n;
+    }
+
+
+    // Handle values that fail the validity test in BigNumber.
+    parseNumeric = (function () {
+      var basePrefix = /^(-?)0([xbo])(?=\w[\w.]*$)/i,
+        dotAfter = /^([^.]+)\.$/,
+        dotBefore = /^\.([^.]+)$/,
+        isInfinityOrNaN = /^-?(Infinity|NaN)$/,
+        whitespaceOrPlus = /^\s*\+(?=[\w.])|^\s+|\s+$/g;
+
+      return function (x, str, isNum, b) {
+        var base,
+          s = isNum ? str : str.replace(whitespaceOrPlus, '');
+
+        // No exception on ±Infinity or NaN.
+        if (isInfinityOrNaN.test(s)) {
+          x.s = isNaN(s) ? null : s < 0 ? -1 : 1;
+          x.c = x.e = null;
+        } else {
+          if (!isNum) {
+
+            // basePrefix = /^(-?)0([xbo])(?=\w[\w.]*$)/i
+            s = s.replace(basePrefix, function (m, p1, p2) {
+              base = (p2 = p2.toLowerCase()) == 'x' ? 16 : p2 == 'b' ? 2 : 8;
+              return !b || b == base ? p1 : m;
+            });
+
+            if (b) {
+              base = b;
+
+              // E.g. '1.' to '1', '.1' to '0.1'
+              s = s.replace(dotAfter, '$1').replace(dotBefore, '0.$1');
+            }
+
+            if (str != s) return new BigNumber(s, base);
+          }
+
+          // '[BigNumber Error] Not a number: {n}'
+          // '[BigNumber Error] Not a base {b} number: {n}'
+          if (BigNumber.DEBUG) {
+            throw Error
+              (bignumberError + 'Not a' + (b ? ' base ' + b : '') + ' number: ' + str);
+          }
+
+          // NaN
+          x.c = x.e = x.s = null;
+        }
+      }
+    })();
+
+
+    /*
+     * Round x to sd significant digits using rounding mode rm. Check for over/under-flow.
+     * If r is truthy, it is known that there are more digits after the rounding digit.
+     */
+    function round(x, sd, rm, r) {
+      var d, i, j, k, n, ni, rd,
+        xc = x.c,
+        pows10 = POWS_TEN;
+
+      // if x is not Infinity or NaN...
+      if (xc) {
+
+        // rd is the rounding digit, i.e. the digit after the digit that may be rounded up.
+        // n is a base 1e14 number, the value of the element of array x.c containing rd.
+        // ni is the index of n within x.c.
+        // d is the number of digits of n.
+        // i is the index of rd within n including leading zeros.
+        // j is the actual index of rd within n (if < 0, rd is a leading zero).
+        out: {
+
+          // Get the number of digits of the first element of xc.
+          for (d = 1, k = xc[0]; k >= 10; k /= 10, d++);
+          i = sd - d;
+
+          // If the rounding digit is in the first element of xc...
+          if (i < 0) {
+            i += LOG_BASE;
+            j = sd;
+            n = xc[ni = 0];
+
+            // Get the rounding digit at index j of n.
+            rd = n / pows10[d - j - 1] % 10 | 0;
+          } else {
+            ni = mathceil((i + 1) / LOG_BASE);
+
+            if (ni >= xc.length) {
+
+              if (r) {
+
+                // Needed by sqrt.
+                for (; xc.length <= ni; xc.push(0));
+                n = rd = 0;
+                d = 1;
+                i %= LOG_BASE;
+                j = i - LOG_BASE + 1;
+              } else {
+                break out;
+              }
+            } else {
+              n = k = xc[ni];
+
+              // Get the number of digits of n.
+              for (d = 1; k >= 10; k /= 10, d++);
+
+              // Get the index of rd within n.
+              i %= LOG_BASE;
+
+              // Get the index of rd within n, adjusted for leading zeros.
+              // The number of leading zeros of n is given by LOG_BASE - d.
+              j = i - LOG_BASE + d;
+
+              // Get the rounding digit at index j of n.
+              rd = j < 0 ? 0 : n / pows10[d - j - 1] % 10 | 0;
+            }
+          }
+
+          r = r || sd < 0 ||
+
+          // Are there any non-zero digits after the rounding digit?
+          // The expression  n % pows10[d - j - 1]  returns all digits of n to the right
+          // of the digit at j, e.g. if n is 908714 and j is 2, the expression gives 714.
+           xc[ni + 1] != null || (j < 0 ? n : n % pows10[d - j - 1]);
+
+          r = rm < 4
+           ? (rd || r) && (rm == 0 || rm == (x.s < 0 ? 3 : 2))
+           : rd > 5 || rd == 5 && (rm == 4 || r || rm == 6 &&
+
+            // Check whether the digit to the left of the rounding digit is odd.
+            ((i > 0 ? j > 0 ? n / pows10[d - j] : 0 : xc[ni - 1]) % 10) & 1 ||
+             rm == (x.s < 0 ? 8 : 7));
+
+          if (sd < 1 || !xc[0]) {
+            xc.length = 0;
+
+            if (r) {
+
+              // Convert sd to decimal places.
+              sd -= x.e + 1;
+
+              // 1, 0.1, 0.01, 0.001, 0.0001 etc.
+              xc[0] = pows10[(LOG_BASE - sd % LOG_BASE) % LOG_BASE];
+              x.e = -sd || 0;
+            } else {
+
+              // Zero.
+              xc[0] = x.e = 0;
+            }
+
+            return x;
+          }
+
+          // Remove excess digits.
+          if (i == 0) {
+            xc.length = ni;
+            k = 1;
+            ni--;
+          } else {
+            xc.length = ni + 1;
+            k = pows10[LOG_BASE - i];
+
+            // E.g. 56700 becomes 56000 if 7 is the rounding digit.
+            // j > 0 means i > number of leading zeros of n.
+            xc[ni] = j > 0 ? mathfloor(n / pows10[d - j] % pows10[j]) * k : 0;
+          }
+
+          // Round up?
+          if (r) {
+
+            for (; ;) {
+
+              // If the digit to be rounded up is in the first element of xc...
+              if (ni == 0) {
+
+                // i will be the length of xc[0] before k is added.
+                for (i = 1, j = xc[0]; j >= 10; j /= 10, i++);
+                j = xc[0] += k;
+                for (k = 1; j >= 10; j /= 10, k++);
+
+                // if i != k the length has increased.
+                if (i != k) {
+                  x.e++;
+                  if (xc[0] == BASE) xc[0] = 1;
+                }
+
+                break;
+              } else {
+                xc[ni] += k;
+                if (xc[ni] != BASE) break;
+                xc[ni--] = 0;
+                k = 1;
+              }
+            }
+          }
+
+          // Remove trailing zeros.
+          for (i = xc.length; xc[--i] === 0; xc.pop());
+        }
+
+        // Overflow? Infinity.
+        if (x.e > MAX_EXP) {
+          x.c = x.e = null;
+
+        // Underflow? Zero.
+        } else if (x.e < MIN_EXP) {
+          x.c = [x.e = 0];
+        }
+      }
+
+      return x;
+    }
+
+
+    function valueOf(n) {
+      var str,
+        e = n.e;
+
+      if (e === null) return n.toString();
+
+      str = coeffToString(n.c);
+
+      str = e <= TO_EXP_NEG || e >= TO_EXP_POS
+        ? toExponential(str, e)
+        : toFixedPoint(str, e, '0');
+
+      return n.s < 0 ? '-' + str : str;
+    }
+
+
+    // PROTOTYPE/INSTANCE METHODS
+
+
+    /*
+     * Return a new BigNumber whose value is the absolute value of this BigNumber.
+     */
+    P.absoluteValue = P.abs = function () {
+      var x = new BigNumber(this);
+      if (x.s < 0) x.s = 1;
+      return x;
+    };
+
+
+    /*
+     * Return
+     *   1 if the value of this BigNumber is greater than the value of BigNumber(y, b),
+     *   -1 if the value of this BigNumber is less than the value of BigNumber(y, b),
+     *   0 if they have the same value,
+     *   or null if the value of either is NaN.
+     */
+    P.comparedTo = function (y, b) {
+      return compare(this, new BigNumber(y, b));
+    };
+
+
+    /*
+     * If dp is undefined or null or true or false, return the number of decimal places of the
+     * value of this BigNumber, or null if the value of this BigNumber is ±Infinity or NaN.
+     *
+     * Otherwise, if dp is a number, return a new BigNumber whose value is the value of this
+     * BigNumber rounded to a maximum of dp decimal places using rounding mode rm, or
+     * ROUNDING_MODE if rm is omitted.
+     *
+     * [dp] {number} Decimal places: integer, 0 to MAX inclusive.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
+     */
+    P.decimalPlaces = P.dp = function (dp, rm) {
+      var c, n, v,
+        x = this;
+
+      if (dp != null) {
+        intCheck(dp, 0, MAX);
+        if (rm == null) rm = ROUNDING_MODE;
+        else intCheck(rm, 0, 8);
+
+        return round(new BigNumber(x), dp + x.e + 1, rm);
+      }
+
+      if (!(c = x.c)) return null;
+      n = ((v = c.length - 1) - bitFloor(this.e / LOG_BASE)) * LOG_BASE;
+
+      // Subtract the number of trailing zeros of the last number.
+      if (v = c[v]) for (; v % 10 == 0; v /= 10, n--);
+      if (n < 0) n = 0;
+
+      return n;
+    };
+
+
+    /*
+     *  n / 0 = I
+     *  n / N = N
+     *  n / I = 0
+     *  0 / n = 0
+     *  0 / 0 = N
+     *  0 / N = N
+     *  0 / I = 0
+     *  N / n = N
+     *  N / 0 = N
+     *  N / N = N
+     *  N / I = N
+     *  I / n = I
+     *  I / 0 = I
+     *  I / N = N
+     *  I / I = N
+     *
+     * Return a new BigNumber whose value is the value of this BigNumber divided by the value of
+     * BigNumber(y, b), rounded according to DECIMAL_PLACES and ROUNDING_MODE.
+     */
+    P.dividedBy = P.div = function (y, b) {
+      return div(this, new BigNumber(y, b), DECIMAL_PLACES, ROUNDING_MODE);
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the integer part of dividing the value of this
+     * BigNumber by the value of BigNumber(y, b).
+     */
+    P.dividedToIntegerBy = P.idiv = function (y, b) {
+      return div(this, new BigNumber(y, b), 0, 1);
+    };
+
+
+    /*
+     * Return a BigNumber whose value is the value of this BigNumber exponentiated by n.
+     *
+     * If m is present, return the result modulo m.
+     * If n is negative round according to DECIMAL_PLACES and ROUNDING_MODE.
+     * If POW_PRECISION is non-zero and m is not present, round to POW_PRECISION using ROUNDING_MODE.
+     *
+     * The modular power operation works efficiently when x, n, and m are integers, otherwise it
+     * is equivalent to calculating x.exponentiatedBy(n).modulo(m) with a POW_PRECISION of 0.
+     *
+     * n {number|string|BigNumber} The exponent. An integer.
+     * [m] {number|string|BigNumber} The modulus.
+     *
+     * '[BigNumber Error] Exponent not an integer: {n}'
+     */
+    P.exponentiatedBy = P.pow = function (n, m) {
+      var half, isModExp, i, k, more, nIsBig, nIsNeg, nIsOdd, y,
+        x = this;
+
+      n = new BigNumber(n);
+
+      // Allow NaN and ±Infinity, but not other non-integers.
+      if (n.c && !n.isInteger()) {
+        throw Error
+          (bignumberError + 'Exponent not an integer: ' + valueOf(n));
+      }
+
+      if (m != null) m = new BigNumber(m);
+
+      // Exponent of MAX_SAFE_INTEGER is 15.
+      nIsBig = n.e > 14;
+
+      // If x is NaN, ±Infinity, ±0 or ±1, or n is ±Infinity, NaN or ±0.
+      if (!x.c || !x.c[0] || x.c[0] == 1 && !x.e && x.c.length == 1 || !n.c || !n.c[0]) {
+
+        // The sign of the result of pow when x is negative depends on the evenness of n.
+        // If +n overflows to ±Infinity, the evenness of n would be not be known.
+        y = new BigNumber(Math.pow(+valueOf(x), nIsBig ? 2 - isOdd(n) : +valueOf(n)));
+        return m ? y.mod(m) : y;
+      }
+
+      nIsNeg = n.s < 0;
+
+      if (m) {
+
+        // x % m returns NaN if abs(m) is zero, or m is NaN.
+        if (m.c ? !m.c[0] : !m.s) return new BigNumber(NaN);
+
+        isModExp = !nIsNeg && x.isInteger() && m.isInteger();
+
+        if (isModExp) x = x.mod(m);
+
+      // Overflow to ±Infinity: >=2**1e10 or >=1.0000024**1e15.
+      // Underflow to ±0: <=0.79**1e10 or <=0.9999975**1e15.
+      } else if (n.e > 9 && (x.e > 0 || x.e < -1 || (x.e == 0
+        // [1, 240000000]
+        ? x.c[0] > 1 || nIsBig && x.c[1] >= 24e7
+        // [80000000000000]  [99999750000000]
+        : x.c[0] < 8e13 || nIsBig && x.c[0] <= 9999975e7))) {
+
+        // If x is negative and n is odd, k = -0, else k = 0.
+        k = x.s < 0 && isOdd(n) ? -0 : 0;
+
+        // If x >= 1, k = ±Infinity.
+        if (x.e > -1) k = 1 / k;
+
+        // If n is negative return ±0, else return ±Infinity.
+        return new BigNumber(nIsNeg ? 1 / k : k);
+
+      } else if (POW_PRECISION) {
+
+        // Truncating each coefficient array to a length of k after each multiplication
+        // equates to truncating significant digits to POW_PRECISION + [28, 41],
+        // i.e. there will be a minimum of 28 guard digits retained.
+        k = mathceil(POW_PRECISION / LOG_BASE + 2);
+      }
+
+      if (nIsBig) {
+        half = new BigNumber(0.5);
+        if (nIsNeg) n.s = 1;
+        nIsOdd = isOdd(n);
+      } else {
+        i = Math.abs(+valueOf(n));
+        nIsOdd = i % 2;
+      }
+
+      y = new BigNumber(ONE);
+
+      // Performs 54 loop iterations for n of 9007199254740991.
+      for (; ;) {
+
+        if (nIsOdd) {
+          y = y.times(x);
+          if (!y.c) break;
+
+          if (k) {
+            if (y.c.length > k) y.c.length = k;
+          } else if (isModExp) {
+            y = y.mod(m);    //y = y.minus(div(y, m, 0, MODULO_MODE).times(m));
+          }
+        }
+
+        if (i) {
+          i = mathfloor(i / 2);
+          if (i === 0) break;
+          nIsOdd = i % 2;
+        } else {
+          n = n.times(half);
+          round(n, n.e + 1, 1);
+
+          if (n.e > 14) {
+            nIsOdd = isOdd(n);
+          } else {
+            i = +valueOf(n);
+            if (i === 0) break;
+            nIsOdd = i % 2;
+          }
+        }
+
+        x = x.times(x);
+
+        if (k) {
+          if (x.c && x.c.length > k) x.c.length = k;
+        } else if (isModExp) {
+          x = x.mod(m);    //x = x.minus(div(x, m, 0, MODULO_MODE).times(m));
+        }
+      }
+
+      if (isModExp) return y;
+      if (nIsNeg) y = ONE.div(y);
+
+      return m ? y.mod(m) : k ? round(y, POW_PRECISION, ROUNDING_MODE, more) : y;
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the value of this BigNumber rounded to an integer
+     * using rounding mode rm, or ROUNDING_MODE if rm is omitted.
+     *
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {rm}'
+     */
+    P.integerValue = function (rm) {
+      var n = new BigNumber(this);
+      if (rm == null) rm = ROUNDING_MODE;
+      else intCheck(rm, 0, 8);
+      return round(n, n.e + 1, rm);
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is equal to the value of BigNumber(y, b),
+     * otherwise return false.
+     */
+    P.isEqualTo = P.eq = function (y, b) {
+      return compare(this, new BigNumber(y, b)) === 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is a finite number, otherwise return false.
+     */
+    P.isFinite = function () {
+      return !!this.c;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is greater than the value of BigNumber(y, b),
+     * otherwise return false.
+     */
+    P.isGreaterThan = P.gt = function (y, b) {
+      return compare(this, new BigNumber(y, b)) > 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is greater than or equal to the value of
+     * BigNumber(y, b), otherwise return false.
+     */
+    P.isGreaterThanOrEqualTo = P.gte = function (y, b) {
+      return (b = compare(this, new BigNumber(y, b))) === 1 || b === 0;
+
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is an integer, otherwise return false.
+     */
+    P.isInteger = function () {
+      return !!this.c && bitFloor(this.e / LOG_BASE) > this.c.length - 2;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is less than the value of BigNumber(y, b),
+     * otherwise return false.
+     */
+    P.isLessThan = P.lt = function (y, b) {
+      return compare(this, new BigNumber(y, b)) < 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is less than or equal to the value of
+     * BigNumber(y, b), otherwise return false.
+     */
+    P.isLessThanOrEqualTo = P.lte = function (y, b) {
+      return (b = compare(this, new BigNumber(y, b))) === -1 || b === 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is NaN, otherwise return false.
+     */
+    P.isNaN = function () {
+      return !this.s;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is negative, otherwise return false.
+     */
+    P.isNegative = function () {
+      return this.s < 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is positive, otherwise return false.
+     */
+    P.isPositive = function () {
+      return this.s > 0;
+    };
+
+
+    /*
+     * Return true if the value of this BigNumber is 0 or -0, otherwise return false.
+     */
+    P.isZero = function () {
+      return !!this.c && this.c[0] == 0;
+    };
+
+
+    /*
+     *  n - 0 = n
+     *  n - N = N
+     *  n - I = -I
+     *  0 - n = -n
+     *  0 - 0 = 0
+     *  0 - N = N
+     *  0 - I = -I
+     *  N - n = N
+     *  N - 0 = N
+     *  N - N = N
+     *  N - I = N
+     *  I - n = I
+     *  I - 0 = I
+     *  I - N = N
+     *  I - I = N
+     *
+     * Return a new BigNumber whose value is the value of this BigNumber minus the value of
+     * BigNumber(y, b).
+     */
+    P.minus = function (y, b) {
+      var i, j, t, xLTy,
+        x = this,
+        a = x.s;
+
+      y = new BigNumber(y, b);
+      b = y.s;
+
+      // Either NaN?
+      if (!a || !b) return new BigNumber(NaN);
+
+      // Signs differ?
+      if (a != b) {
+        y.s = -b;
+        return x.plus(y);
+      }
+
+      var xe = x.e / LOG_BASE,
+        ye = y.e / LOG_BASE,
+        xc = x.c,
+        yc = y.c;
+
+      if (!xe || !ye) {
+
+        // Either Infinity?
+        if (!xc || !yc) return xc ? (y.s = -b, y) : new BigNumber(yc ? x : NaN);
+
+        // Either zero?
+        if (!xc[0] || !yc[0]) {
+
+          // Return y if y is non-zero, x if x is non-zero, or zero if both are zero.
+          return yc[0] ? (y.s = -b, y) : new BigNumber(xc[0] ? x :
+
+           // IEEE 754 (2008) 6.3: n - n = -0 when rounding to -Infinity
+           ROUNDING_MODE == 3 ? -0 : 0);
+        }
+      }
+
+      xe = bitFloor(xe);
+      ye = bitFloor(ye);
+      xc = xc.slice();
+
+      // Determine which is the bigger number.
+      if (a = xe - ye) {
+
+        if (xLTy = a < 0) {
+          a = -a;
+          t = xc;
+        } else {
+          ye = xe;
+          t = yc;
+        }
+
+        t.reverse();
+
+        // Prepend zeros to equalise exponents.
+        for (b = a; b--; t.push(0));
+        t.reverse();
+      } else {
+
+        // Exponents equal. Check digit by digit.
+        j = (xLTy = (a = xc.length) < (b = yc.length)) ? a : b;
+
+        for (a = b = 0; b < j; b++) {
+
+          if (xc[b] != yc[b]) {
+            xLTy = xc[b] < yc[b];
+            break;
+          }
+        }
+      }
+
+      // x < y? Point xc to the array of the bigger number.
+      if (xLTy) t = xc, xc = yc, yc = t, y.s = -y.s;
+
+      b = (j = yc.length) - (i = xc.length);
+
+      // Append zeros to xc if shorter.
+      // No need to add zeros to yc if shorter as subtract only needs to start at yc.length.
+      if (b > 0) for (; b--; xc[i++] = 0);
+      b = BASE - 1;
+
+      // Subtract yc from xc.
+      for (; j > a;) {
+
+        if (xc[--j] < yc[j]) {
+          for (i = j; i && !xc[--i]; xc[i] = b);
+          --xc[i];
+          xc[j] += BASE;
+        }
+
+        xc[j] -= yc[j];
+      }
+
+      // Remove leading zeros and adjust exponent accordingly.
+      for (; xc[0] == 0; xc.splice(0, 1), --ye);
+
+      // Zero?
+      if (!xc[0]) {
+
+        // Following IEEE 754 (2008) 6.3,
+        // n - n = +0  but  n - n = -0  when rounding towards -Infinity.
+        y.s = ROUNDING_MODE == 3 ? -1 : 1;
+        y.c = [y.e = 0];
+        return y;
+      }
+
+      // No need to check for Infinity as +x - +y != Infinity && -x - -y != Infinity
+      // for finite x and y.
+      return normalise(y, xc, ye);
+    };
+
+
+    /*
+     *   n % 0 =  N
+     *   n % N =  N
+     *   n % I =  n
+     *   0 % n =  0
+     *  -0 % n = -0
+     *   0 % 0 =  N
+     *   0 % N =  N
+     *   0 % I =  0
+     *   N % n =  N
+     *   N % 0 =  N
+     *   N % N =  N
+     *   N % I =  N
+     *   I % n =  N
+     *   I % 0 =  N
+     *   I % N =  N
+     *   I % I =  N
+     *
+     * Return a new BigNumber whose value is the value of this BigNumber modulo the value of
+     * BigNumber(y, b). The result depends on the value of MODULO_MODE.
+     */
+    P.modulo = P.mod = function (y, b) {
+      var q, s,
+        x = this;
+
+      y = new BigNumber(y, b);
+
+      // Return NaN if x is Infinity or NaN, or y is NaN or zero.
+      if (!x.c || !y.s || y.c && !y.c[0]) {
+        return new BigNumber(NaN);
+
+      // Return x if y is Infinity or x is zero.
+      } else if (!y.c || x.c && !x.c[0]) {
+        return new BigNumber(x);
+      }
+
+      if (MODULO_MODE == 9) {
+
+        // Euclidian division: q = sign(y) * floor(x / abs(y))
+        // r = x - qy    where  0 <= r < abs(y)
+        s = y.s;
+        y.s = 1;
+        q = div(x, y, 0, 3);
+        y.s = s;
+        q.s *= s;
+      } else {
+        q = div(x, y, 0, MODULO_MODE);
+      }
+
+      y = x.minus(q.times(y));
+
+      // To match JavaScript %, ensure sign of zero is sign of dividend.
+      if (!y.c[0] && MODULO_MODE == 1) y.s = x.s;
+
+      return y;
+    };
+
+
+    /*
+     *  n * 0 = 0
+     *  n * N = N
+     *  n * I = I
+     *  0 * n = 0
+     *  0 * 0 = 0
+     *  0 * N = N
+     *  0 * I = N
+     *  N * n = N
+     *  N * 0 = N
+     *  N * N = N
+     *  N * I = N
+     *  I * n = I
+     *  I * 0 = N
+     *  I * N = N
+     *  I * I = I
+     *
+     * Return a new BigNumber whose value is the value of this BigNumber multiplied by the value
+     * of BigNumber(y, b).
+     */
+    P.multipliedBy = P.times = function (y, b) {
+      var c, e, i, j, k, m, xcL, xlo, xhi, ycL, ylo, yhi, zc,
+        base, sqrtBase,
+        x = this,
+        xc = x.c,
+        yc = (y = new BigNumber(y, b)).c;
+
+      // Either NaN, ±Infinity or ±0?
+      if (!xc || !yc || !xc[0] || !yc[0]) {
+
+        // Return NaN if either is NaN, or one is 0 and the other is Infinity.
+        if (!x.s || !y.s || xc && !xc[0] && !yc || yc && !yc[0] && !xc) {
+          y.c = y.e = y.s = null;
+        } else {
+          y.s *= x.s;
+
+          // Return ±Infinity if either is ±Infinity.
+          if (!xc || !yc) {
+            y.c = y.e = null;
+
+          // Return ±0 if either is ±0.
+          } else {
+            y.c = [0];
+            y.e = 0;
+          }
+        }
+
+        return y;
+      }
+
+      e = bitFloor(x.e / LOG_BASE) + bitFloor(y.e / LOG_BASE);
+      y.s *= x.s;
+      xcL = xc.length;
+      ycL = yc.length;
+
+      // Ensure xc points to longer array and xcL to its length.
+      if (xcL < ycL) zc = xc, xc = yc, yc = zc, i = xcL, xcL = ycL, ycL = i;
+
+      // Initialise the result array with zeros.
+      for (i = xcL + ycL, zc = []; i--; zc.push(0));
+
+      base = BASE;
+      sqrtBase = SQRT_BASE;
+
+      for (i = ycL; --i >= 0;) {
+        c = 0;
+        ylo = yc[i] % sqrtBase;
+        yhi = yc[i] / sqrtBase | 0;
+
+        for (k = xcL, j = i + k; j > i;) {
+          xlo = xc[--k] % sqrtBase;
+          xhi = xc[k] / sqrtBase | 0;
+          m = yhi * xlo + xhi * ylo;
+          xlo = ylo * xlo + ((m % sqrtBase) * sqrtBase) + zc[j] + c;
+          c = (xlo / base | 0) + (m / sqrtBase | 0) + yhi * xhi;
+          zc[j--] = xlo % base;
+        }
+
+        zc[j] = c;
+      }
+
+      if (c) {
+        ++e;
+      } else {
+        zc.splice(0, 1);
+      }
+
+      return normalise(y, zc, e);
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the value of this BigNumber negated,
+     * i.e. multiplied by -1.
+     */
+    P.negated = function () {
+      var x = new BigNumber(this);
+      x.s = -x.s || null;
+      return x;
+    };
+
+
+    /*
+     *  n + 0 = n
+     *  n + N = N
+     *  n + I = I
+     *  0 + n = n
+     *  0 + 0 = 0
+     *  0 + N = N
+     *  0 + I = I
+     *  N + n = N
+     *  N + 0 = N
+     *  N + N = N
+     *  N + I = N
+     *  I + n = I
+     *  I + 0 = I
+     *  I + N = N
+     *  I + I = I
+     *
+     * Return a new BigNumber whose value is the value of this BigNumber plus the value of
+     * BigNumber(y, b).
+     */
+    P.plus = function (y, b) {
+      var t,
+        x = this,
+        a = x.s;
+
+      y = new BigNumber(y, b);
+      b = y.s;
+
+      // Either NaN?
+      if (!a || !b) return new BigNumber(NaN);
+
+      // Signs differ?
+       if (a != b) {
+        y.s = -b;
+        return x.minus(y);
+      }
+
+      var xe = x.e / LOG_BASE,
+        ye = y.e / LOG_BASE,
+        xc = x.c,
+        yc = y.c;
+
+      if (!xe || !ye) {
+
+        // Return ±Infinity if either ±Infinity.
+        if (!xc || !yc) return new BigNumber(a / 0);
+
+        // Either zero?
+        // Return y if y is non-zero, x if x is non-zero, or zero if both are zero.
+        if (!xc[0] || !yc[0]) return yc[0] ? y : new BigNumber(xc[0] ? x : a * 0);
+      }
+
+      xe = bitFloor(xe);
+      ye = bitFloor(ye);
+      xc = xc.slice();
+
+      // Prepend zeros to equalise exponents. Faster to use reverse then do unshifts.
+      if (a = xe - ye) {
+        if (a > 0) {
+          ye = xe;
+          t = yc;
+        } else {
+          a = -a;
+          t = xc;
+        }
+
+        t.reverse();
+        for (; a--; t.push(0));
+        t.reverse();
+      }
+
+      a = xc.length;
+      b = yc.length;
+
+      // Point xc to the longer array, and b to the shorter length.
+      if (a - b < 0) t = yc, yc = xc, xc = t, b = a;
+
+      // Only start adding at yc.length - 1 as the further digits of xc can be ignored.
+      for (a = 0; b;) {
+        a = (xc[--b] = xc[b] + yc[b] + a) / BASE | 0;
+        xc[b] = BASE === xc[b] ? 0 : xc[b] % BASE;
+      }
+
+      if (a) {
+        xc = [a].concat(xc);
+        ++ye;
+      }
+
+      // No need to check for zero, as +x + +y != 0 && -x + -y != 0
+      // ye = MAX_EXP + 1 possible
+      return normalise(y, xc, ye);
+    };
+
+
+    /*
+     * If sd is undefined or null or true or false, return the number of significant digits of
+     * the value of this BigNumber, or null if the value of this BigNumber is ±Infinity or NaN.
+     * If sd is true include integer-part trailing zeros in the count.
+     *
+     * Otherwise, if sd is a number, return a new BigNumber whose value is the value of this
+     * BigNumber rounded to a maximum of sd significant digits using rounding mode rm, or
+     * ROUNDING_MODE if rm is omitted.
+     *
+     * sd {number|boolean} number: significant digits: integer, 1 to MAX inclusive.
+     *                     boolean: whether to count integer-part trailing zeros: true or false.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {sd|rm}'
+     */
+    P.precision = P.sd = function (sd, rm) {
+      var c, n, v,
+        x = this;
+
+      if (sd != null && sd !== !!sd) {
+        intCheck(sd, 1, MAX);
+        if (rm == null) rm = ROUNDING_MODE;
+        else intCheck(rm, 0, 8);
+
+        return round(new BigNumber(x), sd, rm);
+      }
+
+      if (!(c = x.c)) return null;
+      v = c.length - 1;
+      n = v * LOG_BASE + 1;
+
+      if (v = c[v]) {
+
+        // Subtract the number of trailing zeros of the last element.
+        for (; v % 10 == 0; v /= 10, n--);
+
+        // Add the number of digits of the first element.
+        for (v = c[0]; v >= 10; v /= 10, n++);
+      }
+
+      if (sd && x.e + 1 > n) n = x.e + 1;
+
+      return n;
+    };
+
+
+    /*
+     * Return a new BigNumber whose value is the value of this BigNumber shifted by k places
+     * (powers of 10). Shift to the right if n > 0, and to the left if n < 0.
+     *
+     * k {number} Integer, -MAX_SAFE_INTEGER to MAX_SAFE_INTEGER inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {k}'
+     */
+    P.shiftedBy = function (k) {
+      intCheck(k, -MAX_SAFE_INTEGER, MAX_SAFE_INTEGER);
+      return this.times('1e' + k);
+    };
+
+
+    /*
+     *  sqrt(-n) =  N
+     *  sqrt(N) =  N
+     *  sqrt(-I) =  N
+     *  sqrt(I) =  I
+     *  sqrt(0) =  0
+     *  sqrt(-0) = -0
+     *
+     * Return a new BigNumber whose value is the square root of the value of this BigNumber,
+     * rounded according to DECIMAL_PLACES and ROUNDING_MODE.
+     */
+    P.squareRoot = P.sqrt = function () {
+      var m, n, r, rep, t,
+        x = this,
+        c = x.c,
+        s = x.s,
+        e = x.e,
+        dp = DECIMAL_PLACES + 4,
+        half = new BigNumber('0.5');
+
+      // Negative/NaN/Infinity/zero?
+      if (s !== 1 || !c || !c[0]) {
+        return new BigNumber(!s || s < 0 && (!c || c[0]) ? NaN : c ? x : 1 / 0);
+      }
+
+      // Initial estimate.
+      s = Math.sqrt(+valueOf(x));
+
+      // Math.sqrt underflow/overflow?
+      // Pass x to Math.sqrt as integer, then adjust the exponent of the result.
+      if (s == 0 || s == 1 / 0) {
+        n = coeffToString(c);
+        if ((n.length + e) % 2 == 0) n += '0';
+        s = Math.sqrt(+n);
+        e = bitFloor((e + 1) / 2) - (e < 0 || e % 2);
+
+        if (s == 1 / 0) {
+          n = '1e' + e;
+        } else {
+          n = s.toExponential();
+          n = n.slice(0, n.indexOf('e') + 1) + e;
+        }
+
+        r = new BigNumber(n);
+      } else {
+        r = new BigNumber(s + '');
+      }
+
+      // Check for zero.
+      // r could be zero if MIN_EXP is changed after the this value was created.
+      // This would cause a division by zero (x/t) and hence Infinity below, which would cause
+      // coeffToString to throw.
+      if (r.c[0]) {
+        e = r.e;
+        s = e + dp;
+        if (s < 3) s = 0;
+
+        // Newton-Raphson iteration.
+        for (; ;) {
+          t = r;
+          r = half.times(t.plus(div(x, t, dp, 1)));
+
+          if (coeffToString(t.c).slice(0, s) === (n = coeffToString(r.c)).slice(0, s)) {
+
+            // The exponent of r may here be one less than the final result exponent,
+            // e.g 0.0009999 (e-4) --> 0.001 (e-3), so adjust s so the rounding digits
+            // are indexed correctly.
+            if (r.e < e) --s;
+            n = n.slice(s - 3, s + 1);
+
+            // The 4th rounding digit may be in error by -1 so if the 4 rounding digits
+            // are 9999 or 4999 (i.e. approaching a rounding boundary) continue the
+            // iteration.
+            if (n == '9999' || !rep && n == '4999') {
+
+              // On the first iteration only, check to see if rounding up gives the
+              // exact result as the nines may infinitely repeat.
+              if (!rep) {
+                round(t, t.e + DECIMAL_PLACES + 2, 0);
+
+                if (t.times(t).eq(x)) {
+                  r = t;
+                  break;
+                }
+              }
+
+              dp += 4;
+              s += 4;
+              rep = 1;
+            } else {
+
+              // If rounding digits are null, 0{0,4} or 50{0,3}, check for exact
+              // result. If not, then there are further digits and m will be truthy.
+              if (!+n || !+n.slice(1) && n.charAt(0) == '5') {
+
+                // Truncate to the first rounding digit.
+                round(r, r.e + DECIMAL_PLACES + 2, 1);
+                m = !r.times(r).eq(x);
+              }
+
+              break;
+            }
+          }
+        }
+      }
+
+      return round(r, r.e + DECIMAL_PLACES + 1, ROUNDING_MODE, m);
+    };
+
+
+    /*
+     * Return a string representing the value of this BigNumber in exponential notation and
+     * rounded using ROUNDING_MODE to dp fixed decimal places.
+     *
+     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
+     */
+    P.toExponential = function (dp, rm) {
+      if (dp != null) {
+        intCheck(dp, 0, MAX);
+        dp++;
+      }
+      return format(this, dp, rm, 1);
+    };
+
+
+    /*
+     * Return a string representing the value of this BigNumber in fixed-point notation rounding
+     * to dp fixed decimal places using rounding mode rm, or ROUNDING_MODE if rm is omitted.
+     *
+     * Note: as with JavaScript's number type, (-0).toFixed(0) is '0',
+     * but e.g. (-0.00001).toFixed(0) is '-0'.
+     *
+     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
+     */
+    P.toFixed = function (dp, rm) {
+      if (dp != null) {
+        intCheck(dp, 0, MAX);
+        dp = dp + this.e + 1;
+      }
+      return format(this, dp, rm);
+    };
+
+
+    /*
+     * Return a string representing the value of this BigNumber in fixed-point notation rounded
+     * using rm or ROUNDING_MODE to dp decimal places, and formatted according to the properties
+     * of the format or FORMAT object (see BigNumber.set).
+     *
+     * The formatting object may contain some or all of the properties shown below.
+     *
+     * FORMAT = {
+     *   prefix: '',
+     *   groupSize: 3,
+     *   secondaryGroupSize: 0,
+     *   groupSeparator: ',',
+     *   decimalSeparator: '.',
+     *   fractionGroupSize: 0,
+     *   fractionGroupSeparator: '\xA0',      // non-breaking space
+     *   suffix: ''
+     * };
+     *
+     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     * [format] {object} Formatting options. See FORMAT pbject above.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
+     * '[BigNumber Error] Argument not an object: {format}'
+     */
+    P.toFormat = function (dp, rm, format) {
+      var str,
+        x = this;
+
+      if (format == null) {
+        if (dp != null && rm && typeof rm == 'object') {
+          format = rm;
+          rm = null;
+        } else if (dp && typeof dp == 'object') {
+          format = dp;
+          dp = rm = null;
+        } else {
+          format = FORMAT;
+        }
+      } else if (typeof format != 'object') {
+        throw Error
+          (bignumberError + 'Argument not an object: ' + format);
+      }
+
+      str = x.toFixed(dp, rm);
+
+      if (x.c) {
+        var i,
+          arr = str.split('.'),
+          g1 = +format.groupSize,
+          g2 = +format.secondaryGroupSize,
+          groupSeparator = format.groupSeparator || '',
+          intPart = arr[0],
+          fractionPart = arr[1],
+          isNeg = x.s < 0,
+          intDigits = isNeg ? intPart.slice(1) : intPart,
+          len = intDigits.length;
+
+        if (g2) i = g1, g1 = g2, g2 = i, len -= i;
+
+        if (g1 > 0 && len > 0) {
+          i = len % g1 || g1;
+          intPart = intDigits.substr(0, i);
+          for (; i < len; i += g1) intPart += groupSeparator + intDigits.substr(i, g1);
+          if (g2 > 0) intPart += groupSeparator + intDigits.slice(i);
+          if (isNeg) intPart = '-' + intPart;
+        }
+
+        str = fractionPart
+         ? intPart + (format.decimalSeparator || '') + ((g2 = +format.fractionGroupSize)
+          ? fractionPart.replace(new RegExp('\\d{' + g2 + '}\\B', 'g'),
+           '$&' + (format.fractionGroupSeparator || ''))
+          : fractionPart)
+         : intPart;
+      }
+
+      return (format.prefix || '') + str + (format.suffix || '');
+    };
+
+
+    /*
+     * Return an array of two BigNumbers representing the value of this BigNumber as a simple
+     * fraction with an integer numerator and an integer denominator.
+     * The denominator will be a positive non-zero value less than or equal to the specified
+     * maximum denominator. If a maximum denominator is not specified, the denominator will be
+     * the lowest value necessary to represent the number exactly.
+     *
+     * [md] {number|string|BigNumber} Integer >= 1, or Infinity. The maximum denominator.
+     *
+     * '[BigNumber Error] Argument {not an integer|out of range} : {md}'
+     */
+    P.toFraction = function (md) {
+      var d, d0, d1, d2, e, exp, n, n0, n1, q, r, s,
+        x = this,
+        xc = x.c;
+
+      if (md != null) {
+        n = new BigNumber(md);
+
+        // Throw if md is less than one or is not an integer, unless it is Infinity.
+        if (!n.isInteger() && (n.c || n.s !== 1) || n.lt(ONE)) {
+          throw Error
+            (bignumberError + 'Argument ' +
+              (n.isInteger() ? 'out of range: ' : 'not an integer: ') + valueOf(n));
+        }
+      }
+
+      if (!xc) return new BigNumber(x);
+
+      d = new BigNumber(ONE);
+      n1 = d0 = new BigNumber(ONE);
+      d1 = n0 = new BigNumber(ONE);
+      s = coeffToString(xc);
+
+      // Determine initial denominator.
+      // d is a power of 10 and the minimum max denominator that specifies the value exactly.
+      e = d.e = s.length - x.e - 1;
+      d.c[0] = POWS_TEN[(exp = e % LOG_BASE) < 0 ? LOG_BASE + exp : exp];
+      md = !md || n.comparedTo(d) > 0 ? (e > 0 ? d : n1) : n;
+
+      exp = MAX_EXP;
+      MAX_EXP = 1 / 0;
+      n = new BigNumber(s);
+
+      // n0 = d1 = 0
+      n0.c[0] = 0;
+
+      for (; ;)  {
+        q = div(n, d, 0, 1);
+        d2 = d0.plus(q.times(d1));
+        if (d2.comparedTo(md) == 1) break;
+        d0 = d1;
+        d1 = d2;
+        n1 = n0.plus(q.times(d2 = n1));
+        n0 = d2;
+        d = n.minus(q.times(d2 = d));
+        n = d2;
+      }
+
+      d2 = div(md.minus(d0), d1, 0, 1);
+      n0 = n0.plus(d2.times(n1));
+      d0 = d0.plus(d2.times(d1));
+      n0.s = n1.s = x.s;
+      e = e * 2;
+
+      // Determine which fraction is closer to x, n0/d0 or n1/d1
+      r = div(n1, d1, e, ROUNDING_MODE).minus(x).abs().comparedTo(
+          div(n0, d0, e, ROUNDING_MODE).minus(x).abs()) < 1 ? [n1, d1] : [n0, d0];
+
+      MAX_EXP = exp;
+
+      return r;
+    };
+
+
+    /*
+     * Return the value of this BigNumber converted to a number primitive.
+     */
+    P.toNumber = function () {
+      return +valueOf(this);
+    };
+
+
+    /*
+     * Return a string representing the value of this BigNumber rounded to sd significant digits
+     * using rounding mode rm or ROUNDING_MODE. If sd is less than the number of digits
+     * necessary to represent the integer part of the value in fixed-point notation, then use
+     * exponential notation.
+     *
+     * [sd] {number} Significant digits. Integer, 1 to MAX inclusive.
+     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
+     *
+     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {sd|rm}'
+     */
+    P.toPrecision = function (sd, rm) {
+      if (sd != null) intCheck(sd, 1, MAX);
+      return format(this, sd, rm, 2);
+    };
+
+
+    /*
+     * Return a string representing the value of this BigNumber in base b, or base 10 if b is
+     * omitted. If a base is specified, including base 10, round according to DECIMAL_PLACES and
+     * ROUNDING_MODE. If a base is not specified, and this BigNumber has a positive exponent
+     * that is equal to or greater than TO_EXP_POS, or a negative exponent equal to or less than
+     * TO_EXP_NEG, return exponential notation.
+     *
+     * [b] {number} Integer, 2 to ALPHABET.length inclusive.
+     *
+     * '[BigNumber Error] Base {not a primitive number|not an integer|out of range}: {b}'
+     */
+    P.toString = function (b) {
+      var str,
+        n = this,
+        s = n.s,
+        e = n.e;
+
+      // Infinity or NaN?
+      if (e === null) {
+        if (s) {
+          str = 'Infinity';
+          if (s < 0) str = '-' + str;
+        } else {
+          str = 'NaN';
+        }
+      } else {
+        str = coeffToString(n.c);
+
+        if (b == null) {
+          str = e <= TO_EXP_NEG || e >= TO_EXP_POS
+           ? toExponential(str, e)
+           : toFixedPoint(str, e, '0');
+        } else {
+          intCheck(b, 2, ALPHABET.length, 'Base');
+          str = convertBase(toFixedPoint(str, e, '0'), 10, b, s, true);
+        }
+
+        if (s < 0 && n.c[0]) str = '-' + str;
+      }
+
+      return str;
+    };
+
+
+    /*
+     * Return as toString, but do not accept a base argument, and include the minus sign for
+     * negative zero.
+     */
+    P.valueOf = P.toJSON = function () {
+      return valueOf(this);
+    };
+
+
+    P._isBigNumber = true;
+
+    if (typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol') {
+      P[Symbol.toStringTag] = 'BigNumber';
+      // Node.js v10.12.0+
+      P[Symbol.for('nodejs.util.inspect.custom')] = P.valueOf;
+    }
+
+    if (configObject != null) BigNumber.set(configObject);
+
+    return BigNumber;
+  }
+
+
+  // PRIVATE HELPER FUNCTIONS
+
+
+  function bitFloor(n) {
+    var i = n | 0;
+    return n > 0 || n === i ? i : i - 1;
+  }
+
+
+  // Return a coefficient array as a string of base 10 digits.
+  function coeffToString(a) {
+    var s, z,
+      i = 1,
+      j = a.length,
+      r = a[0] + '';
+
+    for (; i < j;) {
+      s = a[i++] + '';
+      z = LOG_BASE - s.length;
+      for (; z--; s = '0' + s);
+      r += s;
+    }
+
+    // Determine trailing zeros.
+    for (j = r.length; r.charCodeAt(--j) === 48;);
+
+    return r.slice(0, j + 1 || 1);
+  }
+
+
+  // Compare the value of BigNumbers x and y.
+  function compare(x, y) {
+    var a, b,
+      xc = x.c,
+      yc = y.c,
+      i = x.s,
+      j = y.s,
+      k = x.e,
+      l = y.e;
+
+    // Either NaN?
+    if (!i || !j) return null;
+
+    a = xc && !xc[0];
+    b = yc && !yc[0];
+
+    // Either zero?
+    if (a || b) return a ? b ? 0 : -j : i;
+
+    // Signs differ?
+    if (i != j) return i;
+
+    a = i < 0;
+    b = k == l;
+
+    // Either Infinity?
+    if (!xc || !yc) return b ? 0 : !xc ^ a ? 1 : -1;
+
+    // Compare exponents.
+    if (!b) return k > l ^ a ? 1 : -1;
+
+    j = (k = xc.length) < (l = yc.length) ? k : l;
+
+    // Compare digit by digit.
+    for (i = 0; i < j; i++) if (xc[i] != yc[i]) return xc[i] > yc[i] ^ a ? 1 : -1;
+
+    // Compare lengths.
+    return k == l ? 0 : k > l ^ a ? 1 : -1;
+  }
+
+
+  /*
+   * Check that n is a primitive number, an integer, and in range, otherwise throw.
+   */
+  function intCheck(n, min, max, name) {
+    if (n < min || n > max || n !== (n < 0 ? mathceil(n) : mathfloor(n))) {
+      throw Error
+       (bignumberError + (name || 'Argument') + (typeof n == 'number'
+         ? n < min || n > max ? ' out of range: ' : ' not an integer: '
+         : ' not a primitive number: ') + String(n));
+    }
+  }
+
+
+  // Assumes finite n.
+  function isOdd(n) {
+    var k = n.c.length - 1;
+    return bitFloor(n.e / LOG_BASE) == k && n.c[k] % 2 != 0;
+  }
+
+
+  function toExponential(str, e) {
+    return (str.length > 1 ? str.charAt(0) + '.' + str.slice(1) : str) +
+     (e < 0 ? 'e' : 'e+') + e;
+  }
+
+
+  function toFixedPoint(str, e, z) {
+    var len, zs;
+
+    // Negative exponent?
+    if (e < 0) {
+
+      // Prepend zeros.
+      for (zs = z + '.'; ++e; zs += z);
+      str = zs + str;
+
+    // Positive exponent
+    } else {
+      len = str.length;
+
+      // Append zeros.
+      if (++e > len) {
+        for (zs = z, e -= len; --e; zs += z);
+        str += zs;
+      } else if (e < len) {
+        str = str.slice(0, e) + '.' + str.slice(e);
+      }
+    }
+
+    return str;
+  }
+
+
+  // EXPORT
+
+
+  BigNumber = clone();
+  BigNumber['default'] = BigNumber.BigNumber = BigNumber;
+
+  // AMD.
+  if (typeof define == 'function' && define.amd) {
+    define(function () { return BigNumber; });
+
+  // Node.js and other environments that support module.exports.
+  } else if (typeof module != 'undefined' && module.exports) {
+    module.exports = BigNumber;
+
+  // Browser.
+  } else {
+    if (!globalObject) {
+      globalObject = typeof self != 'undefined' && self ? self : window;
+    }
+
+    globalObject.BigNumber = BigNumber;
+  }
+})(this);
+
+},{}],36:[function(require,module,exports){
 (function(nacl) {
 'use strict';
 
@@ -6484,10 +9376,10 @@ nacl.setPRNG = function(fn) {
 
 })(typeof module !== 'undefined' && module.exports ? module.exports : (self.nacl = self.nacl || {}));
 
-},{"crypto":172}],36:[function(require,module,exports){
+},{"crypto":172}],37:[function(require,module,exports){
 module.exports = require('./register')().Promise
 
-},{"./register":38}],37:[function(require,module,exports){
+},{"./register":39}],38:[function(require,module,exports){
 "use strict"
     // global key for user preferred registration
 var REGISTRATION_KEY = '@@any-promise/REGISTRATION',
@@ -6567,7 +9459,7 @@ module.exports = function(root, loadImplementation){
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 module.exports = require('./loader')(window, loadImplementation)
 
@@ -6587,7 +9479,7 @@ function loadImplementation(){
   }
 }
 
-},{"./loader":37}],39:[function(require,module,exports){
+},{"./loader":38}],40:[function(require,module,exports){
 var asn1 = exports;
 
 asn1.bignum = require('bn.js');
@@ -6598,7 +9490,7 @@ asn1.constants = require('./asn1/constants');
 asn1.decoders = require('./asn1/decoders');
 asn1.encoders = require('./asn1/encoders');
 
-},{"./asn1/api":40,"./asn1/base":42,"./asn1/constants":46,"./asn1/decoders":48,"./asn1/encoders":51,"bn.js":170}],40:[function(require,module,exports){
+},{"./asn1/api":41,"./asn1/base":43,"./asn1/constants":47,"./asn1/decoders":49,"./asn1/encoders":52,"bn.js":170}],41:[function(require,module,exports){
 var asn1 = require('../asn1');
 var inherits = require('inherits');
 
@@ -6661,7 +9553,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":39,"inherits":296,"vm":203}],41:[function(require,module,exports){
+},{"../asn1":40,"inherits":296,"vm":203}],42:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -6779,7 +9671,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":42,"buffer":208,"inherits":296}],42:[function(require,module,exports){
+},{"../base":43,"buffer":208,"inherits":296}],43:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -6787,7 +9679,7 @@ base.DecoderBuffer = require('./buffer').DecoderBuffer;
 base.EncoderBuffer = require('./buffer').EncoderBuffer;
 base.Node = require('./node');
 
-},{"./buffer":41,"./node":43,"./reporter":44}],43:[function(require,module,exports){
+},{"./buffer":42,"./node":44,"./reporter":45}],44:[function(require,module,exports){
 var Reporter = require('../base').Reporter;
 var EncoderBuffer = require('../base').EncoderBuffer;
 var DecoderBuffer = require('../base').DecoderBuffer;
@@ -7423,7 +10315,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":42,"minimalistic-assert":311}],44:[function(require,module,exports){
+},{"../base":43,"minimalistic-assert":311}],45:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -7546,7 +10438,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":296}],45:[function(require,module,exports){
+},{"inherits":296}],46:[function(require,module,exports){
 var constants = require('../constants');
 
 exports.tagClass = {
@@ -7590,7 +10482,7 @@ exports.tag = {
 };
 exports.tagByName = constants._reverse(exports.tag);
 
-},{"../constants":46}],46:[function(require,module,exports){
+},{"../constants":47}],47:[function(require,module,exports){
 var constants = exports;
 
 // Helper
@@ -7611,7 +10503,7 @@ constants._reverse = function reverse(map) {
 
 constants.der = require('./der');
 
-},{"./der":45}],47:[function(require,module,exports){
+},{"./der":46}],48:[function(require,module,exports){
 var inherits = require('inherits');
 
 var asn1 = require('../../asn1');
@@ -7937,13 +10829,13 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":39,"inherits":296}],48:[function(require,module,exports){
+},{"../../asn1":40,"inherits":296}],49:[function(require,module,exports){
 var decoders = exports;
 
 decoders.der = require('./der');
 decoders.pem = require('./pem');
 
-},{"./der":47,"./pem":49}],49:[function(require,module,exports){
+},{"./der":48,"./pem":50}],50:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -7994,7 +10886,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"./der":47,"buffer":208,"inherits":296}],50:[function(require,module,exports){
+},{"./der":48,"buffer":208,"inherits":296}],51:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -8291,13 +11183,13 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":39,"buffer":208,"inherits":296}],51:[function(require,module,exports){
+},{"../../asn1":40,"buffer":208,"inherits":296}],52:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
 encoders.pem = require('./pem');
 
-},{"./der":50,"./pem":52}],52:[function(require,module,exports){
+},{"./der":51,"./pem":53}],53:[function(require,module,exports){
 var inherits = require('inherits');
 
 var DEREncoder = require('./der');
@@ -8320,7 +11212,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"./der":50,"inherits":296}],53:[function(require,module,exports){
+},{"./der":51,"inherits":296}],54:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -8814,7 +11706,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":56}],54:[function(require,module,exports){
+},{"util/":57}],55:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -8839,14 +11731,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -9436,9 +12328,9 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":55,"_process":201,"inherits":54}],57:[function(require,module,exports){
+},{"./support/isBuffer":56,"_process":201,"inherits":55}],58:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":59}],58:[function(require,module,exports){
+},{"./lib/axios":60}],59:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -9622,7 +12514,7 @@ module.exports = function xhrAdapter(config) {
 };
 
 }).call(this,require('_process'))
-},{"../core/createError":65,"./../core/settle":68,"./../helpers/btoa":72,"./../helpers/buildURL":73,"./../helpers/cookies":75,"./../helpers/isURLSameOrigin":77,"./../helpers/parseHeaders":79,"./../utils":81,"_process":201}],59:[function(require,module,exports){
+},{"../core/createError":66,"./../core/settle":69,"./../helpers/btoa":73,"./../helpers/buildURL":74,"./../helpers/cookies":76,"./../helpers/isURLSameOrigin":78,"./../helpers/parseHeaders":80,"./../utils":82,"_process":201}],60:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -9676,7 +12568,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":60,"./cancel/CancelToken":61,"./cancel/isCancel":62,"./core/Axios":63,"./defaults":70,"./helpers/bind":71,"./helpers/spread":80,"./utils":81}],60:[function(require,module,exports){
+},{"./cancel/Cancel":61,"./cancel/CancelToken":62,"./cancel/isCancel":63,"./core/Axios":64,"./defaults":71,"./helpers/bind":72,"./helpers/spread":81,"./utils":82}],61:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9697,7 +12589,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -9756,14 +12648,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":60}],62:[function(require,module,exports){
+},{"./Cancel":61}],63:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 var defaults = require('./../defaults');
@@ -9844,7 +12736,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"./../defaults":70,"./../utils":81,"./InterceptorManager":64,"./dispatchRequest":66}],64:[function(require,module,exports){
+},{"./../defaults":71,"./../utils":82,"./InterceptorManager":65,"./dispatchRequest":67}],65:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9898,7 +12790,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":81}],65:[function(require,module,exports){
+},{"./../utils":82}],66:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -9918,7 +12810,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":67}],66:[function(require,module,exports){
+},{"./enhanceError":68}],67:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10006,7 +12898,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":62,"../defaults":70,"./../helpers/combineURLs":74,"./../helpers/isAbsoluteURL":76,"./../utils":81,"./transformData":69}],67:[function(require,module,exports){
+},{"../cancel/isCancel":63,"../defaults":71,"./../helpers/combineURLs":75,"./../helpers/isAbsoluteURL":77,"./../utils":82,"./transformData":70}],68:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10029,7 +12921,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -10057,7 +12949,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":65}],69:[function(require,module,exports){
+},{"./createError":66}],70:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10079,7 +12971,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":81}],70:[function(require,module,exports){
+},{"./../utils":82}],71:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -10179,7 +13071,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":58,"./adapters/xhr":58,"./helpers/normalizeHeaderName":78,"./utils":81,"_process":201}],71:[function(require,module,exports){
+},{"./adapters/http":59,"./adapters/xhr":59,"./helpers/normalizeHeaderName":79,"./utils":82,"_process":201}],72:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -10192,7 +13084,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 'use strict';
 
 // btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
@@ -10230,7 +13122,7 @@ function btoa(input) {
 
 module.exports = btoa;
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10298,7 +13190,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":81}],74:[function(require,module,exports){
+},{"./../utils":82}],75:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10314,7 +13206,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10369,7 +13261,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":81}],76:[function(require,module,exports){
+},{"./../utils":82}],77:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10385,7 +13277,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10455,7 +13347,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":81}],78:[function(require,module,exports){
+},{"./../utils":82}],79:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -10469,7 +13361,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":81}],79:[function(require,module,exports){
+},{"../utils":82}],80:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10524,7 +13416,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":81}],80:[function(require,module,exports){
+},{"./../utils":82}],81:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10553,7 +13445,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -10858,7 +13750,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":71,"is-buffer":297}],82:[function(require,module,exports){
+},{"./helpers/bind":72,"is-buffer":297}],83:[function(require,module,exports){
 // base-x encoding / decoding
 // Copyright (c) 2018 base-x contributors
 // Copyright (c) 2014-2018 The Bitcoin Core developers (base58.cpp)
@@ -11010,7 +13902,7 @@ module.exports = function base (ALPHABET) {
   }
 }
 
-},{"safe-buffer":363}],83:[function(require,module,exports){
+},{"safe-buffer":363}],84:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -11163,7 +14055,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 'use strict'
 var ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
 
@@ -11312,7 +14204,7 @@ module.exports = {
   fromWords: fromWords
 }
 
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 // (public) Constructor
 function BigInteger(a, b, c) {
   if (!(this instanceof BigInteger))
@@ -12823,7 +15715,7 @@ BigInteger.valueOf = nbv
 
 module.exports = BigInteger
 
-},{"../package.json":88}],86:[function(require,module,exports){
+},{"../package.json":89}],87:[function(require,module,exports){
 (function (Buffer){
 // FIXME: Kind of a weird way to throw exceptions, consider removing
 var assert = require('assert')
@@ -12918,14 +15810,14 @@ BigInteger.prototype.toHex = function(size) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./bigi":85,"assert":53,"buffer":208}],87:[function(require,module,exports){
+},{"./bigi":86,"assert":54,"buffer":208}],88:[function(require,module,exports){
 var BigInteger = require('./bigi')
 
 //addons
 require('./convert')
 
 module.exports = BigInteger
-},{"./bigi":85,"./convert":86}],88:[function(require,module,exports){
+},{"./bigi":86,"./convert":87}],89:[function(require,module,exports){
 module.exports={
   "_from": "bigi@^1.4.0",
   "_id": "bigi@1.4.2",
@@ -13014,2822 +15906,6 @@ module.exports={
   },
   "version": "1.4.2"
 }
-
-},{}],89:[function(require,module,exports){
-;(function (globalObject) {
-  'use strict';
-
-/*
- *      bignumber.js v7.2.1
- *      A JavaScript library for arbitrary-precision arithmetic.
- *      https://github.com/MikeMcl/bignumber.js
- *      Copyright (c) 2018 Michael Mclaughlin <M8ch88l@gmail.com>
- *      MIT Licensed.
- *
- *      BigNumber.prototype methods     |  BigNumber methods
- *                                      |
- *      absoluteValue            abs    |  clone
- *      comparedTo                      |  config               set
- *      decimalPlaces            dp     |      DECIMAL_PLACES
- *      dividedBy                div    |      ROUNDING_MODE
- *      dividedToIntegerBy       idiv   |      EXPONENTIAL_AT
- *      exponentiatedBy          pow    |      RANGE
- *      integerValue                    |      CRYPTO
- *      isEqualTo                eq     |      MODULO_MODE
- *      isFinite                        |      POW_PRECISION
- *      isGreaterThan            gt     |      FORMAT
- *      isGreaterThanOrEqualTo   gte    |      ALPHABET
- *      isInteger                       |  isBigNumber
- *      isLessThan               lt     |  maximum              max
- *      isLessThanOrEqualTo      lte    |  minimum              min
- *      isNaN                           |  random
- *      isNegative                      |
- *      isPositive                      |
- *      isZero                          |
- *      minus                           |
- *      modulo                   mod    |
- *      multipliedBy             times  |
- *      negated                         |
- *      plus                            |
- *      precision                sd     |
- *      shiftedBy                       |
- *      squareRoot               sqrt   |
- *      toExponential                   |
- *      toFixed                         |
- *      toFormat                        |
- *      toFraction                      |
- *      toJSON                          |
- *      toNumber                        |
- *      toPrecision                     |
- *      toString                        |
- *      valueOf                         |
- *
- */
-
-
-  var BigNumber,
-    isNumeric = /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i,
-
-    mathceil = Math.ceil,
-    mathfloor = Math.floor,
-
-    bignumberError = '[BigNumber Error] ',
-    tooManyDigits = bignumberError + 'Number primitive has more than 15 significant digits: ',
-
-    BASE = 1e14,
-    LOG_BASE = 14,
-    MAX_SAFE_INTEGER = 0x1fffffffffffff,         // 2^53 - 1
-    // MAX_INT32 = 0x7fffffff,                   // 2^31 - 1
-    POWS_TEN = [1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13],
-    SQRT_BASE = 1e7,
-
-    // EDITABLE
-    // The limit on the value of DECIMAL_PLACES, TO_EXP_NEG, TO_EXP_POS, MIN_EXP, MAX_EXP, and
-    // the arguments to toExponential, toFixed, toFormat, and toPrecision.
-    MAX = 1E9;                                   // 0 to MAX_INT32
-
-
-  /*
-   * Create and return a BigNumber constructor.
-   */
-  function clone(configObject) {
-    var div, convertBase, parseNumeric,
-      P = BigNumber.prototype = { constructor: BigNumber, toString: null, valueOf: null },
-      ONE = new BigNumber(1),
-
-
-      //----------------------------- EDITABLE CONFIG DEFAULTS -------------------------------
-
-
-      // The default values below must be integers within the inclusive ranges stated.
-      // The values can also be changed at run-time using BigNumber.set.
-
-      // The maximum number of decimal places for operations involving division.
-      DECIMAL_PLACES = 20,                     // 0 to MAX
-
-      // The rounding mode used when rounding to the above decimal places, and when using
-      // toExponential, toFixed, toFormat and toPrecision, and round (default value).
-      // UP         0 Away from zero.
-      // DOWN       1 Towards zero.
-      // CEIL       2 Towards +Infinity.
-      // FLOOR      3 Towards -Infinity.
-      // HALF_UP    4 Towards nearest neighbour. If equidistant, up.
-      // HALF_DOWN  5 Towards nearest neighbour. If equidistant, down.
-      // HALF_EVEN  6 Towards nearest neighbour. If equidistant, towards even neighbour.
-      // HALF_CEIL  7 Towards nearest neighbour. If equidistant, towards +Infinity.
-      // HALF_FLOOR 8 Towards nearest neighbour. If equidistant, towards -Infinity.
-      ROUNDING_MODE = 4,                       // 0 to 8
-
-      // EXPONENTIAL_AT : [TO_EXP_NEG , TO_EXP_POS]
-
-      // The exponent value at and beneath which toString returns exponential notation.
-      // Number type: -7
-      TO_EXP_NEG = -7,                         // 0 to -MAX
-
-      // The exponent value at and above which toString returns exponential notation.
-      // Number type: 21
-      TO_EXP_POS = 21,                         // 0 to MAX
-
-      // RANGE : [MIN_EXP, MAX_EXP]
-
-      // The minimum exponent value, beneath which underflow to zero occurs.
-      // Number type: -324  (5e-324)
-      MIN_EXP = -1e7,                          // -1 to -MAX
-
-      // The maximum exponent value, above which overflow to Infinity occurs.
-      // Number type:  308  (1.7976931348623157e+308)
-      // For MAX_EXP > 1e7, e.g. new BigNumber('1e100000000').plus(1) may be slow.
-      MAX_EXP = 1e7,                           // 1 to MAX
-
-      // Whether to use cryptographically-secure random number generation, if available.
-      CRYPTO = false,                          // true or false
-
-      // The modulo mode used when calculating the modulus: a mod n.
-      // The quotient (q = a / n) is calculated according to the corresponding rounding mode.
-      // The remainder (r) is calculated as: r = a - n * q.
-      //
-      // UP        0 The remainder is positive if the dividend is negative, else is negative.
-      // DOWN      1 The remainder has the same sign as the dividend.
-      //             This modulo mode is commonly known as 'truncated division' and is
-      //             equivalent to (a % n) in JavaScript.
-      // FLOOR     3 The remainder has the same sign as the divisor (Python %).
-      // HALF_EVEN 6 This modulo mode implements the IEEE 754 remainder function.
-      // EUCLID    9 Euclidian division. q = sign(n) * floor(a / abs(n)).
-      //             The remainder is always positive.
-      //
-      // The truncated division, floored division, Euclidian division and IEEE 754 remainder
-      // modes are commonly used for the modulus operation.
-      // Although the other rounding modes can also be used, they may not give useful results.
-      MODULO_MODE = 1,                         // 0 to 9
-
-      // The maximum number of significant digits of the result of the exponentiatedBy operation.
-      // If POW_PRECISION is 0, there will be unlimited significant digits.
-      POW_PRECISION = 0,                    // 0 to MAX
-
-      // The format specification used by the BigNumber.prototype.toFormat method.
-      FORMAT = {
-        decimalSeparator: '.',
-        groupSeparator: ',',
-        groupSize: 3,
-        secondaryGroupSize: 0,
-        fractionGroupSeparator: '\xA0',      // non-breaking space
-        fractionGroupSize: 0
-      },
-
-      // The alphabet used for base conversion.
-      // It must be at least 2 characters long, with no '.' or repeated character.
-      // '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_'
-      ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';
-
-
-    //------------------------------------------------------------------------------------------
-
-
-    // CONSTRUCTOR
-
-
-    /*
-     * The BigNumber constructor and exported function.
-     * Create and return a new instance of a BigNumber object.
-     *
-     * n {number|string|BigNumber} A numeric value.
-     * [b] {number} The base of n. Integer, 2 to ALPHABET.length inclusive.
-     */
-    function BigNumber(n, b) {
-      var alphabet, c, caseChanged, e, i, isNum, len, str,
-        x = this;
-
-      // Enable constructor usage without new.
-      if (!(x instanceof BigNumber)) {
-
-        // Don't throw on constructor call without new (#81).
-        // '[BigNumber Error] Constructor call without new: {n}'
-        //throw Error(bignumberError + ' Constructor call without new: ' + n);
-        return new BigNumber(n, b);
-      }
-
-      if (b == null) {
-
-        // Duplicate.
-        if (n instanceof BigNumber) {
-          x.s = n.s;
-          x.e = n.e;
-          x.c = (n = n.c) ? n.slice() : n;
-          return;
-        }
-
-        isNum = typeof n == 'number';
-
-        if (isNum && n * 0 == 0) {
-
-          // Use `1 / n` to handle minus zero also.
-          x.s = 1 / n < 0 ? (n = -n, -1) : 1;
-
-          // Faster path for integers.
-          if (n === ~~n) {
-            for (e = 0, i = n; i >= 10; i /= 10, e++);
-            x.e = e;
-            x.c = [n];
-            return;
-          }
-
-          str = n + '';
-        } else {
-          if (!isNumeric.test(str = n + '')) return parseNumeric(x, str, isNum);
-          x.s = str.charCodeAt(0) == 45 ? (str = str.slice(1), -1) : 1;
-        }
-
-        // Decimal point?
-        if ((e = str.indexOf('.')) > -1) str = str.replace('.', '');
-
-        // Exponential form?
-        if ((i = str.search(/e/i)) > 0) {
-
-          // Determine exponent.
-          if (e < 0) e = i;
-          e += +str.slice(i + 1);
-          str = str.substring(0, i);
-        } else if (e < 0) {
-
-          // Integer.
-          e = str.length;
-        }
-
-      } else {
-
-        // '[BigNumber Error] Base {not a primitive number|not an integer|out of range}: {b}'
-        intCheck(b, 2, ALPHABET.length, 'Base');
-        str = n + '';
-
-        // Allow exponential notation to be used with base 10 argument, while
-        // also rounding to DECIMAL_PLACES as with other bases.
-        if (b == 10) {
-          x = new BigNumber(n instanceof BigNumber ? n : str);
-          return round(x, DECIMAL_PLACES + x.e + 1, ROUNDING_MODE);
-        }
-
-        isNum = typeof n == 'number';
-
-        if (isNum) {
-
-          // Avoid potential interpretation of Infinity and NaN as base 44+ values.
-          if (n * 0 != 0) return parseNumeric(x, str, isNum, b);
-
-          x.s = 1 / n < 0 ? (str = str.slice(1), -1) : 1;
-
-          // '[BigNumber Error] Number primitive has more than 15 significant digits: {n}'
-          if (BigNumber.DEBUG && str.replace(/^0\.0*|\./, '').length > 15) {
-            throw Error
-             (tooManyDigits + n);
-          }
-
-          // Prevent later check for length on converted number.
-          isNum = false;
-        } else {
-          x.s = str.charCodeAt(0) === 45 ? (str = str.slice(1), -1) : 1;
-        }
-
-        alphabet = ALPHABET.slice(0, b);
-        e = i = 0;
-
-        // Check that str is a valid base b number.
-        // Don't use RegExp so alphabet can contain special characters.
-        for (len = str.length; i < len; i++) {
-          if (alphabet.indexOf(c = str.charAt(i)) < 0) {
-            if (c == '.') {
-
-              // If '.' is not the first character and it has not be found before.
-              if (i > e) {
-                e = len;
-                continue;
-              }
-            } else if (!caseChanged) {
-
-              // Allow e.g. hexadecimal 'FF' as well as 'ff'.
-              if (str == str.toUpperCase() && (str = str.toLowerCase()) ||
-                  str == str.toLowerCase() && (str = str.toUpperCase())) {
-                caseChanged = true;
-                i = -1;
-                e = 0;
-                continue;
-              }
-            }
-
-            return parseNumeric(x, n + '', isNum, b);
-          }
-        }
-
-        str = convertBase(str, b, 10, x.s);
-
-        // Decimal point?
-        if ((e = str.indexOf('.')) > -1) str = str.replace('.', '');
-        else e = str.length;
-      }
-
-      // Determine leading zeros.
-      for (i = 0; str.charCodeAt(i) === 48; i++);
-
-      // Determine trailing zeros.
-      for (len = str.length; str.charCodeAt(--len) === 48;);
-
-      str = str.slice(i, ++len);
-
-      if (str) {
-        len -= i;
-
-        // '[BigNumber Error] Number primitive has more than 15 significant digits: {n}'
-        if (isNum && BigNumber.DEBUG &&
-          len > 15 && (n > MAX_SAFE_INTEGER || n !== mathfloor(n))) {
-            throw Error
-             (tooManyDigits + (x.s * n));
-        }
-
-        e = e - i - 1;
-
-         // Overflow?
-        if (e > MAX_EXP) {
-
-          // Infinity.
-          x.c = x.e = null;
-
-        // Underflow?
-        } else if (e < MIN_EXP) {
-
-          // Zero.
-          x.c = [x.e = 0];
-        } else {
-          x.e = e;
-          x.c = [];
-
-          // Transform base
-
-          // e is the base 10 exponent.
-          // i is where to slice str to get the first element of the coefficient array.
-          i = (e + 1) % LOG_BASE;
-          if (e < 0) i += LOG_BASE;
-
-          if (i < len) {
-            if (i) x.c.push(+str.slice(0, i));
-
-            for (len -= LOG_BASE; i < len;) {
-              x.c.push(+str.slice(i, i += LOG_BASE));
-            }
-
-            str = str.slice(i);
-            i = LOG_BASE - str.length;
-          } else {
-            i -= len;
-          }
-
-          for (; i--; str += '0');
-          x.c.push(+str);
-        }
-      } else {
-
-        // Zero.
-        x.c = [x.e = 0];
-      }
-    }
-
-
-    // CONSTRUCTOR PROPERTIES
-
-
-    BigNumber.clone = clone;
-
-    BigNumber.ROUND_UP = 0;
-    BigNumber.ROUND_DOWN = 1;
-    BigNumber.ROUND_CEIL = 2;
-    BigNumber.ROUND_FLOOR = 3;
-    BigNumber.ROUND_HALF_UP = 4;
-    BigNumber.ROUND_HALF_DOWN = 5;
-    BigNumber.ROUND_HALF_EVEN = 6;
-    BigNumber.ROUND_HALF_CEIL = 7;
-    BigNumber.ROUND_HALF_FLOOR = 8;
-    BigNumber.EUCLID = 9;
-
-
-    /*
-     * Configure infrequently-changing library-wide settings.
-     *
-     * Accept an object with the following optional properties (if the value of a property is
-     * a number, it must be an integer within the inclusive range stated):
-     *
-     *   DECIMAL_PLACES   {number}           0 to MAX
-     *   ROUNDING_MODE    {number}           0 to 8
-     *   EXPONENTIAL_AT   {number|number[]}  -MAX to MAX  or  [-MAX to 0, 0 to MAX]
-     *   RANGE            {number|number[]}  -MAX to MAX (not zero)  or  [-MAX to -1, 1 to MAX]
-     *   CRYPTO           {boolean}          true or false
-     *   MODULO_MODE      {number}           0 to 9
-     *   POW_PRECISION       {number}           0 to MAX
-     *   ALPHABET         {string}           A string of two or more unique characters which does
-     *                                       not contain '.'.
-     *   FORMAT           {object}           An object with some of the following properties:
-     *      decimalSeparator       {string}
-     *      groupSeparator         {string}
-     *      groupSize              {number}
-     *      secondaryGroupSize     {number}
-     *      fractionGroupSeparator {string}
-     *      fractionGroupSize      {number}
-     *
-     * (The values assigned to the above FORMAT object properties are not checked for validity.)
-     *
-     * E.g.
-     * BigNumber.config({ DECIMAL_PLACES : 20, ROUNDING_MODE : 4 })
-     *
-     * Ignore properties/parameters set to null or undefined, except for ALPHABET.
-     *
-     * Return an object with the properties current values.
-     */
-    BigNumber.config = BigNumber.set = function (obj) {
-      var p, v;
-
-      if (obj != null) {
-
-        if (typeof obj == 'object') {
-
-          // DECIMAL_PLACES {number} Integer, 0 to MAX inclusive.
-          // '[BigNumber Error] DECIMAL_PLACES {not a primitive number|not an integer|out of range}: {v}'
-          if (obj.hasOwnProperty(p = 'DECIMAL_PLACES')) {
-            v = obj[p];
-            intCheck(v, 0, MAX, p);
-            DECIMAL_PLACES = v;
-          }
-
-          // ROUNDING_MODE {number} Integer, 0 to 8 inclusive.
-          // '[BigNumber Error] ROUNDING_MODE {not a primitive number|not an integer|out of range}: {v}'
-          if (obj.hasOwnProperty(p = 'ROUNDING_MODE')) {
-            v = obj[p];
-            intCheck(v, 0, 8, p);
-            ROUNDING_MODE = v;
-          }
-
-          // EXPONENTIAL_AT {number|number[]}
-          // Integer, -MAX to MAX inclusive or
-          // [integer -MAX to 0 inclusive, 0 to MAX inclusive].
-          // '[BigNumber Error] EXPONENTIAL_AT {not a primitive number|not an integer|out of range}: {v}'
-          if (obj.hasOwnProperty(p = 'EXPONENTIAL_AT')) {
-            v = obj[p];
-            if (isArray(v)) {
-              intCheck(v[0], -MAX, 0, p);
-              intCheck(v[1], 0, MAX, p);
-              TO_EXP_NEG = v[0];
-              TO_EXP_POS = v[1];
-            } else {
-              intCheck(v, -MAX, MAX, p);
-              TO_EXP_NEG = -(TO_EXP_POS = v < 0 ? -v : v);
-            }
-          }
-
-          // RANGE {number|number[]} Non-zero integer, -MAX to MAX inclusive or
-          // [integer -MAX to -1 inclusive, integer 1 to MAX inclusive].
-          // '[BigNumber Error] RANGE {not a primitive number|not an integer|out of range|cannot be zero}: {v}'
-          if (obj.hasOwnProperty(p = 'RANGE')) {
-            v = obj[p];
-            if (isArray(v)) {
-              intCheck(v[0], -MAX, -1, p);
-              intCheck(v[1], 1, MAX, p);
-              MIN_EXP = v[0];
-              MAX_EXP = v[1];
-            } else {
-              intCheck(v, -MAX, MAX, p);
-              if (v) {
-                MIN_EXP = -(MAX_EXP = v < 0 ? -v : v);
-              } else {
-                throw Error
-                 (bignumberError + p + ' cannot be zero: ' + v);
-              }
-            }
-          }
-
-          // CRYPTO {boolean} true or false.
-          // '[BigNumber Error] CRYPTO not true or false: {v}'
-          // '[BigNumber Error] crypto unavailable'
-          if (obj.hasOwnProperty(p = 'CRYPTO')) {
-            v = obj[p];
-            if (v === !!v) {
-              if (v) {
-                if (typeof crypto != 'undefined' && crypto &&
-                 (crypto.getRandomValues || crypto.randomBytes)) {
-                  CRYPTO = v;
-                } else {
-                  CRYPTO = !v;
-                  throw Error
-                   (bignumberError + 'crypto unavailable');
-                }
-              } else {
-                CRYPTO = v;
-              }
-            } else {
-              throw Error
-               (bignumberError + p + ' not true or false: ' + v);
-            }
-          }
-
-          // MODULO_MODE {number} Integer, 0 to 9 inclusive.
-          // '[BigNumber Error] MODULO_MODE {not a primitive number|not an integer|out of range}: {v}'
-          if (obj.hasOwnProperty(p = 'MODULO_MODE')) {
-            v = obj[p];
-            intCheck(v, 0, 9, p);
-            MODULO_MODE = v;
-          }
-
-          // POW_PRECISION {number} Integer, 0 to MAX inclusive.
-          // '[BigNumber Error] POW_PRECISION {not a primitive number|not an integer|out of range}: {v}'
-          if (obj.hasOwnProperty(p = 'POW_PRECISION')) {
-            v = obj[p];
-            intCheck(v, 0, MAX, p);
-            POW_PRECISION = v;
-          }
-
-          // FORMAT {object}
-          // '[BigNumber Error] FORMAT not an object: {v}'
-          if (obj.hasOwnProperty(p = 'FORMAT')) {
-            v = obj[p];
-            if (typeof v == 'object') FORMAT = v;
-            else throw Error
-             (bignumberError + p + ' not an object: ' + v);
-          }
-
-          // ALPHABET {string}
-          // '[BigNumber Error] ALPHABET invalid: {v}'
-          if (obj.hasOwnProperty(p = 'ALPHABET')) {
-            v = obj[p];
-
-            // Disallow if only one character, or contains '.' or a repeated character.
-            if (typeof v == 'string' && !/^.$|\.|(.).*\1/.test(v)) {
-              ALPHABET = v;
-            } else {
-              throw Error
-               (bignumberError + p + ' invalid: ' + v);
-            }
-          }
-
-        } else {
-
-          // '[BigNumber Error] Object expected: {v}'
-          throw Error
-           (bignumberError + 'Object expected: ' + obj);
-        }
-      }
-
-      return {
-        DECIMAL_PLACES: DECIMAL_PLACES,
-        ROUNDING_MODE: ROUNDING_MODE,
-        EXPONENTIAL_AT: [TO_EXP_NEG, TO_EXP_POS],
-        RANGE: [MIN_EXP, MAX_EXP],
-        CRYPTO: CRYPTO,
-        MODULO_MODE: MODULO_MODE,
-        POW_PRECISION: POW_PRECISION,
-        FORMAT: FORMAT,
-        ALPHABET: ALPHABET
-      };
-    };
-
-
-    /*
-     * Return true if v is a BigNumber instance, otherwise return false.
-     *
-     * v {any}
-     */
-    BigNumber.isBigNumber = function (v) {
-      return v instanceof BigNumber || v && v._isBigNumber === true || false;
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the maximum of the arguments.
-     *
-     * arguments {number|string|BigNumber}
-     */
-    BigNumber.maximum = BigNumber.max = function () {
-      return maxOrMin(arguments, P.lt);
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the minimum of the arguments.
-     *
-     * arguments {number|string|BigNumber}
-     */
-    BigNumber.minimum = BigNumber.min = function () {
-      return maxOrMin(arguments, P.gt);
-    };
-
-
-    /*
-     * Return a new BigNumber with a random value equal to or greater than 0 and less than 1,
-     * and with dp, or DECIMAL_PLACES if dp is omitted, decimal places (or less if trailing
-     * zeros are produced).
-     *
-     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp}'
-     * '[BigNumber Error] crypto unavailable'
-     */
-    BigNumber.random = (function () {
-      var pow2_53 = 0x20000000000000;
-
-      // Return a 53 bit integer n, where 0 <= n < 9007199254740992.
-      // Check if Math.random() produces more than 32 bits of randomness.
-      // If it does, assume at least 53 bits are produced, otherwise assume at least 30 bits.
-      // 0x40000000 is 2^30, 0x800000 is 2^23, 0x1fffff is 2^21 - 1.
-      var random53bitInt = (Math.random() * pow2_53) & 0x1fffff
-       ? function () { return mathfloor(Math.random() * pow2_53); }
-       : function () { return ((Math.random() * 0x40000000 | 0) * 0x800000) +
-         (Math.random() * 0x800000 | 0); };
-
-      return function (dp) {
-        var a, b, e, k, v,
-          i = 0,
-          c = [],
-          rand = new BigNumber(ONE);
-
-        if (dp == null) dp = DECIMAL_PLACES;
-        else intCheck(dp, 0, MAX);
-
-        k = mathceil(dp / LOG_BASE);
-
-        if (CRYPTO) {
-
-          // Browsers supporting crypto.getRandomValues.
-          if (crypto.getRandomValues) {
-
-            a = crypto.getRandomValues(new Uint32Array(k *= 2));
-
-            for (; i < k;) {
-
-              // 53 bits:
-              // ((Math.pow(2, 32) - 1) * Math.pow(2, 21)).toString(2)
-              // 11111 11111111 11111111 11111111 11100000 00000000 00000000
-              // ((Math.pow(2, 32) - 1) >>> 11).toString(2)
-              //                                     11111 11111111 11111111
-              // 0x20000 is 2^21.
-              v = a[i] * 0x20000 + (a[i + 1] >>> 11);
-
-              // Rejection sampling:
-              // 0 <= v < 9007199254740992
-              // Probability that v >= 9e15, is
-              // 7199254740992 / 9007199254740992 ~= 0.0008, i.e. 1 in 1251
-              if (v >= 9e15) {
-                b = crypto.getRandomValues(new Uint32Array(2));
-                a[i] = b[0];
-                a[i + 1] = b[1];
-              } else {
-
-                // 0 <= v <= 8999999999999999
-                // 0 <= (v % 1e14) <= 99999999999999
-                c.push(v % 1e14);
-                i += 2;
-              }
-            }
-            i = k / 2;
-
-          // Node.js supporting crypto.randomBytes.
-          } else if (crypto.randomBytes) {
-
-            // buffer
-            a = crypto.randomBytes(k *= 7);
-
-            for (; i < k;) {
-
-              // 0x1000000000000 is 2^48, 0x10000000000 is 2^40
-              // 0x100000000 is 2^32, 0x1000000 is 2^24
-              // 11111 11111111 11111111 11111111 11111111 11111111 11111111
-              // 0 <= v < 9007199254740992
-              v = ((a[i] & 31) * 0x1000000000000) + (a[i + 1] * 0x10000000000) +
-                 (a[i + 2] * 0x100000000) + (a[i + 3] * 0x1000000) +
-                 (a[i + 4] << 16) + (a[i + 5] << 8) + a[i + 6];
-
-              if (v >= 9e15) {
-                crypto.randomBytes(7).copy(a, i);
-              } else {
-
-                // 0 <= (v % 1e14) <= 99999999999999
-                c.push(v % 1e14);
-                i += 7;
-              }
-            }
-            i = k / 7;
-          } else {
-            CRYPTO = false;
-            throw Error
-             (bignumberError + 'crypto unavailable');
-          }
-        }
-
-        // Use Math.random.
-        if (!CRYPTO) {
-
-          for (; i < k;) {
-            v = random53bitInt();
-            if (v < 9e15) c[i++] = v % 1e14;
-          }
-        }
-
-        k = c[--i];
-        dp %= LOG_BASE;
-
-        // Convert trailing digits to zeros according to dp.
-        if (k && dp) {
-          v = POWS_TEN[LOG_BASE - dp];
-          c[i] = mathfloor(k / v) * v;
-        }
-
-        // Remove trailing elements which are zero.
-        for (; c[i] === 0; c.pop(), i--);
-
-        // Zero?
-        if (i < 0) {
-          c = [e = 0];
-        } else {
-
-          // Remove leading elements which are zero and adjust exponent accordingly.
-          for (e = -1 ; c[0] === 0; c.splice(0, 1), e -= LOG_BASE);
-
-          // Count the digits of the first element of c to determine leading zeros, and...
-          for (i = 1, v = c[0]; v >= 10; v /= 10, i++);
-
-          // adjust the exponent accordingly.
-          if (i < LOG_BASE) e -= LOG_BASE - i;
-        }
-
-        rand.e = e;
-        rand.c = c;
-        return rand;
-      };
-    })();
-
-
-    // PRIVATE FUNCTIONS
-
-
-    // Called by BigNumber and BigNumber.prototype.toString.
-    convertBase = (function () {
-      var decimal = '0123456789';
-
-      /*
-       * Convert string of baseIn to an array of numbers of baseOut.
-       * Eg. toBaseOut('255', 10, 16) returns [15, 15].
-       * Eg. toBaseOut('ff', 16, 10) returns [2, 5, 5].
-       */
-      function toBaseOut(str, baseIn, baseOut, alphabet) {
-        var j,
-          arr = [0],
-          arrL,
-          i = 0,
-          len = str.length;
-
-        for (; i < len;) {
-          for (arrL = arr.length; arrL--; arr[arrL] *= baseIn);
-
-          arr[0] += alphabet.indexOf(str.charAt(i++));
-
-          for (j = 0; j < arr.length; j++) {
-
-            if (arr[j] > baseOut - 1) {
-              if (arr[j + 1] == null) arr[j + 1] = 0;
-              arr[j + 1] += arr[j] / baseOut | 0;
-              arr[j] %= baseOut;
-            }
-          }
-        }
-
-        return arr.reverse();
-      }
-
-      // Convert a numeric string of baseIn to a numeric string of baseOut.
-      // If the caller is toString, we are converting from base 10 to baseOut.
-      // If the caller is BigNumber, we are converting from baseIn to base 10.
-      return function (str, baseIn, baseOut, sign, callerIsToString) {
-        var alphabet, d, e, k, r, x, xc, y,
-          i = str.indexOf('.'),
-          dp = DECIMAL_PLACES,
-          rm = ROUNDING_MODE;
-
-        // Non-integer.
-        if (i >= 0) {
-          k = POW_PRECISION;
-
-          // Unlimited precision.
-          POW_PRECISION = 0;
-          str = str.replace('.', '');
-          y = new BigNumber(baseIn);
-          x = y.pow(str.length - i);
-          POW_PRECISION = k;
-
-          // Convert str as if an integer, then restore the fraction part by dividing the
-          // result by its base raised to a power.
-
-          y.c = toBaseOut(toFixedPoint(coeffToString(x.c), x.e, '0'),
-           10, baseOut, decimal);
-          y.e = y.c.length;
-        }
-
-        // Convert the number as integer.
-
-        xc = toBaseOut(str, baseIn, baseOut, callerIsToString
-         ? (alphabet = ALPHABET, decimal)
-         : (alphabet = decimal, ALPHABET));
-
-        // xc now represents str as an integer and converted to baseOut. e is the exponent.
-        e = k = xc.length;
-
-        // Remove trailing zeros.
-        for (; xc[--k] == 0; xc.pop());
-
-        // Zero?
-        if (!xc[0]) return alphabet.charAt(0);
-
-        // Does str represent an integer? If so, no need for the division.
-        if (i < 0) {
-          --e;
-        } else {
-          x.c = xc;
-          x.e = e;
-
-          // The sign is needed for correct rounding.
-          x.s = sign;
-          x = div(x, y, dp, rm, baseOut);
-          xc = x.c;
-          r = x.r;
-          e = x.e;
-        }
-
-        // xc now represents str converted to baseOut.
-
-        // THe index of the rounding digit.
-        d = e + dp + 1;
-
-        // The rounding digit: the digit to the right of the digit that may be rounded up.
-        i = xc[d];
-
-        // Look at the rounding digits and mode to determine whether to round up.
-
-        k = baseOut / 2;
-        r = r || d < 0 || xc[d + 1] != null;
-
-        r = rm < 4 ? (i != null || r) && (rm == 0 || rm == (x.s < 0 ? 3 : 2))
-              : i > k || i == k &&(rm == 4 || r || rm == 6 && xc[d - 1] & 1 ||
-               rm == (x.s < 0 ? 8 : 7));
-
-        // If the index of the rounding digit is not greater than zero, or xc represents
-        // zero, then the result of the base conversion is zero or, if rounding up, a value
-        // such as 0.00001.
-        if (d < 1 || !xc[0]) {
-
-          // 1^-dp or 0
-          str = r ? toFixedPoint(alphabet.charAt(1), -dp, alphabet.charAt(0))
-              : alphabet.charAt(0);
-        } else {
-
-          // Truncate xc to the required number of decimal places.
-          xc.length = d;
-
-          // Round up?
-          if (r) {
-
-            // Rounding up may mean the previous digit has to be rounded up and so on.
-            for (--baseOut; ++xc[--d] > baseOut;) {
-              xc[d] = 0;
-
-              if (!d) {
-                ++e;
-                xc = [1].concat(xc);
-              }
-            }
-          }
-
-          // Determine trailing zeros.
-          for (k = xc.length; !xc[--k];);
-
-          // E.g. [4, 11, 15] becomes 4bf.
-          for (i = 0, str = ''; i <= k; str += alphabet.charAt(xc[i++]));
-
-          // Add leading zeros, decimal point and trailing zeros as required.
-          str = toFixedPoint(str, e, alphabet.charAt(0));
-        }
-
-        // The caller will add the sign.
-        return str;
-      };
-    })();
-
-
-    // Perform division in the specified base. Called by div and convertBase.
-    div = (function () {
-
-      // Assume non-zero x and k.
-      function multiply(x, k, base) {
-        var m, temp, xlo, xhi,
-          carry = 0,
-          i = x.length,
-          klo = k % SQRT_BASE,
-          khi = k / SQRT_BASE | 0;
-
-        for (x = x.slice(); i--;) {
-          xlo = x[i] % SQRT_BASE;
-          xhi = x[i] / SQRT_BASE | 0;
-          m = khi * xlo + xhi * klo;
-          temp = klo * xlo + ((m % SQRT_BASE) * SQRT_BASE) + carry;
-          carry = (temp / base | 0) + (m / SQRT_BASE | 0) + khi * xhi;
-          x[i] = temp % base;
-        }
-
-        if (carry) x = [carry].concat(x);
-
-        return x;
-      }
-
-      function compare(a, b, aL, bL) {
-        var i, cmp;
-
-        if (aL != bL) {
-          cmp = aL > bL ? 1 : -1;
-        } else {
-
-          for (i = cmp = 0; i < aL; i++) {
-
-            if (a[i] != b[i]) {
-              cmp = a[i] > b[i] ? 1 : -1;
-              break;
-            }
-          }
-        }
-
-        return cmp;
-      }
-
-      function subtract(a, b, aL, base) {
-        var i = 0;
-
-        // Subtract b from a.
-        for (; aL--;) {
-          a[aL] -= i;
-          i = a[aL] < b[aL] ? 1 : 0;
-          a[aL] = i * base + a[aL] - b[aL];
-        }
-
-        // Remove leading zeros.
-        for (; !a[0] && a.length > 1; a.splice(0, 1));
-      }
-
-      // x: dividend, y: divisor.
-      return function (x, y, dp, rm, base) {
-        var cmp, e, i, more, n, prod, prodL, q, qc, rem, remL, rem0, xi, xL, yc0,
-          yL, yz,
-          s = x.s == y.s ? 1 : -1,
-          xc = x.c,
-          yc = y.c;
-
-        // Either NaN, Infinity or 0?
-        if (!xc || !xc[0] || !yc || !yc[0]) {
-
-          return new BigNumber(
-
-           // Return NaN if either NaN, or both Infinity or 0.
-           !x.s || !y.s || (xc ? yc && xc[0] == yc[0] : !yc) ? NaN :
-
-            // Return ±0 if x is ±0 or y is ±Infinity, or return ±Infinity as y is ±0.
-            xc && xc[0] == 0 || !yc ? s * 0 : s / 0
-         );
-        }
-
-        q = new BigNumber(s);
-        qc = q.c = [];
-        e = x.e - y.e;
-        s = dp + e + 1;
-
-        if (!base) {
-          base = BASE;
-          e = bitFloor(x.e / LOG_BASE) - bitFloor(y.e / LOG_BASE);
-          s = s / LOG_BASE | 0;
-        }
-
-        // Result exponent may be one less then the current value of e.
-        // The coefficients of the BigNumbers from convertBase may have trailing zeros.
-        for (i = 0; yc[i] == (xc[i] || 0); i++);
-
-        if (yc[i] > (xc[i] || 0)) e--;
-
-        if (s < 0) {
-          qc.push(1);
-          more = true;
-        } else {
-          xL = xc.length;
-          yL = yc.length;
-          i = 0;
-          s += 2;
-
-          // Normalise xc and yc so highest order digit of yc is >= base / 2.
-
-          n = mathfloor(base / (yc[0] + 1));
-
-          // Not necessary, but to handle odd bases where yc[0] == (base / 2) - 1.
-          // if (n > 1 || n++ == 1 && yc[0] < base / 2) {
-          if (n > 1) {
-            yc = multiply(yc, n, base);
-            xc = multiply(xc, n, base);
-            yL = yc.length;
-            xL = xc.length;
-          }
-
-          xi = yL;
-          rem = xc.slice(0, yL);
-          remL = rem.length;
-
-          // Add zeros to make remainder as long as divisor.
-          for (; remL < yL; rem[remL++] = 0);
-          yz = yc.slice();
-          yz = [0].concat(yz);
-          yc0 = yc[0];
-          if (yc[1] >= base / 2) yc0++;
-          // Not necessary, but to prevent trial digit n > base, when using base 3.
-          // else if (base == 3 && yc0 == 1) yc0 = 1 + 1e-15;
-
-          do {
-            n = 0;
-
-            // Compare divisor and remainder.
-            cmp = compare(yc, rem, yL, remL);
-
-            // If divisor < remainder.
-            if (cmp < 0) {
-
-              // Calculate trial digit, n.
-
-              rem0 = rem[0];
-              if (yL != remL) rem0 = rem0 * base + (rem[1] || 0);
-
-              // n is how many times the divisor goes into the current remainder.
-              n = mathfloor(rem0 / yc0);
-
-              //  Algorithm:
-              //  product = divisor multiplied by trial digit (n).
-              //  Compare product and remainder.
-              //  If product is greater than remainder:
-              //    Subtract divisor from product, decrement trial digit.
-              //  Subtract product from remainder.
-              //  If product was less than remainder at the last compare:
-              //    Compare new remainder and divisor.
-              //    If remainder is greater than divisor:
-              //      Subtract divisor from remainder, increment trial digit.
-
-              if (n > 1) {
-
-                // n may be > base only when base is 3.
-                if (n >= base) n = base - 1;
-
-                // product = divisor * trial digit.
-                prod = multiply(yc, n, base);
-                prodL = prod.length;
-                remL = rem.length;
-
-                // Compare product and remainder.
-                // If product > remainder then trial digit n too high.
-                // n is 1 too high about 5% of the time, and is not known to have
-                // ever been more than 1 too high.
-                while (compare(prod, rem, prodL, remL) == 1) {
-                  n--;
-
-                  // Subtract divisor from product.
-                  subtract(prod, yL < prodL ? yz : yc, prodL, base);
-                  prodL = prod.length;
-                  cmp = 1;
-                }
-              } else {
-
-                // n is 0 or 1, cmp is -1.
-                // If n is 0, there is no need to compare yc and rem again below,
-                // so change cmp to 1 to avoid it.
-                // If n is 1, leave cmp as -1, so yc and rem are compared again.
-                if (n == 0) {
-
-                  // divisor < remainder, so n must be at least 1.
-                  cmp = n = 1;
-                }
-
-                // product = divisor
-                prod = yc.slice();
-                prodL = prod.length;
-              }
-
-              if (prodL < remL) prod = [0].concat(prod);
-
-              // Subtract product from remainder.
-              subtract(rem, prod, remL, base);
-              remL = rem.length;
-
-               // If product was < remainder.
-              if (cmp == -1) {
-
-                // Compare divisor and new remainder.
-                // If divisor < new remainder, subtract divisor from remainder.
-                // Trial digit n too low.
-                // n is 1 too low about 5% of the time, and very rarely 2 too low.
-                while (compare(yc, rem, yL, remL) < 1) {
-                  n++;
-
-                  // Subtract divisor from remainder.
-                  subtract(rem, yL < remL ? yz : yc, remL, base);
-                  remL = rem.length;
-                }
-              }
-            } else if (cmp === 0) {
-              n++;
-              rem = [0];
-            } // else cmp === 1 and n will be 0
-
-            // Add the next digit, n, to the result array.
-            qc[i++] = n;
-
-            // Update the remainder.
-            if (rem[0]) {
-              rem[remL++] = xc[xi] || 0;
-            } else {
-              rem = [xc[xi]];
-              remL = 1;
-            }
-          } while ((xi++ < xL || rem[0] != null) && s--);
-
-          more = rem[0] != null;
-
-          // Leading zero?
-          if (!qc[0]) qc.splice(0, 1);
-        }
-
-        if (base == BASE) {
-
-          // To calculate q.e, first get the number of digits of qc[0].
-          for (i = 1, s = qc[0]; s >= 10; s /= 10, i++);
-
-          round(q, dp + (q.e = i + e * LOG_BASE - 1) + 1, rm, more);
-
-        // Caller is convertBase.
-        } else {
-          q.e = e;
-          q.r = +more;
-        }
-
-        return q;
-      };
-    })();
-
-
-    /*
-     * Return a string representing the value of BigNumber n in fixed-point or exponential
-     * notation rounded to the specified decimal places or significant digits.
-     *
-     * n: a BigNumber.
-     * i: the index of the last digit required (i.e. the digit that may be rounded up).
-     * rm: the rounding mode.
-     * id: 1 (toExponential) or 2 (toPrecision).
-     */
-    function format(n, i, rm, id) {
-      var c0, e, ne, len, str;
-
-      if (rm == null) rm = ROUNDING_MODE;
-      else intCheck(rm, 0, 8);
-
-      if (!n.c) return n.toString();
-
-      c0 = n.c[0];
-      ne = n.e;
-
-      if (i == null) {
-        str = coeffToString(n.c);
-        str = id == 1 || id == 2 && ne <= TO_EXP_NEG
-         ? toExponential(str, ne)
-         : toFixedPoint(str, ne, '0');
-      } else {
-        n = round(new BigNumber(n), i, rm);
-
-        // n.e may have changed if the value was rounded up.
-        e = n.e;
-
-        str = coeffToString(n.c);
-        len = str.length;
-
-        // toPrecision returns exponential notation if the number of significant digits
-        // specified is less than the number of digits necessary to represent the integer
-        // part of the value in fixed-point notation.
-
-        // Exponential notation.
-        if (id == 1 || id == 2 && (i <= e || e <= TO_EXP_NEG)) {
-
-          // Append zeros?
-          for (; len < i; str += '0', len++);
-          str = toExponential(str, e);
-
-        // Fixed-point notation.
-        } else {
-          i -= ne;
-          str = toFixedPoint(str, e, '0');
-
-          // Append zeros?
-          if (e + 1 > len) {
-            if (--i > 0) for (str += '.'; i--; str += '0');
-          } else {
-            i += e - len;
-            if (i > 0) {
-              if (e + 1 == len) str += '.';
-              for (; i--; str += '0');
-            }
-          }
-        }
-      }
-
-      return n.s < 0 && c0 ? '-' + str : str;
-    }
-
-
-    // Handle BigNumber.max and BigNumber.min.
-    function maxOrMin(args, method) {
-      var m, n,
-        i = 0;
-
-      if (isArray(args[0])) args = args[0];
-      m = new BigNumber(args[0]);
-
-      for (; ++i < args.length;) {
-        n = new BigNumber(args[i]);
-
-        // If any number is NaN, return NaN.
-        if (!n.s) {
-          m = n;
-          break;
-        } else if (method.call(m, n)) {
-          m = n;
-        }
-      }
-
-      return m;
-    }
-
-
-    /*
-     * Strip trailing zeros, calculate base 10 exponent and check against MIN_EXP and MAX_EXP.
-     * Called by minus, plus and times.
-     */
-    function normalise(n, c, e) {
-      var i = 1,
-        j = c.length;
-
-       // Remove trailing zeros.
-      for (; !c[--j]; c.pop());
-
-      // Calculate the base 10 exponent. First get the number of digits of c[0].
-      for (j = c[0]; j >= 10; j /= 10, i++);
-
-      // Overflow?
-      if ((e = i + e * LOG_BASE - 1) > MAX_EXP) {
-
-        // Infinity.
-        n.c = n.e = null;
-
-      // Underflow?
-      } else if (e < MIN_EXP) {
-
-        // Zero.
-        n.c = [n.e = 0];
-      } else {
-        n.e = e;
-        n.c = c;
-      }
-
-      return n;
-    }
-
-
-    // Handle values that fail the validity test in BigNumber.
-    parseNumeric = (function () {
-      var basePrefix = /^(-?)0([xbo])(?=\w[\w.]*$)/i,
-        dotAfter = /^([^.]+)\.$/,
-        dotBefore = /^\.([^.]+)$/,
-        isInfinityOrNaN = /^-?(Infinity|NaN)$/,
-        whitespaceOrPlus = /^\s*\+(?=[\w.])|^\s+|\s+$/g;
-
-      return function (x, str, isNum, b) {
-        var base,
-          s = isNum ? str : str.replace(whitespaceOrPlus, '');
-
-        // No exception on ±Infinity or NaN.
-        if (isInfinityOrNaN.test(s)) {
-          x.s = isNaN(s) ? null : s < 0 ? -1 : 1;
-          x.c = x.e = null;
-        } else {
-          if (!isNum) {
-
-            // basePrefix = /^(-?)0([xbo])(?=\w[\w.]*$)/i
-            s = s.replace(basePrefix, function (m, p1, p2) {
-              base = (p2 = p2.toLowerCase()) == 'x' ? 16 : p2 == 'b' ? 2 : 8;
-              return !b || b == base ? p1 : m;
-            });
-
-            if (b) {
-              base = b;
-
-              // E.g. '1.' to '1', '.1' to '0.1'
-              s = s.replace(dotAfter, '$1').replace(dotBefore, '0.$1');
-            }
-
-            if (str != s) return new BigNumber(s, base);
-          }
-
-          // '[BigNumber Error] Not a number: {n}'
-          // '[BigNumber Error] Not a base {b} number: {n}'
-          if (BigNumber.DEBUG) {
-            throw Error
-              (bignumberError + 'Not a' + (b ? ' base ' + b : '') + ' number: ' + str);
-          }
-
-          // NaN
-          x.c = x.e = x.s = null;
-        }
-      }
-    })();
-
-
-    /*
-     * Round x to sd significant digits using rounding mode rm. Check for over/under-flow.
-     * If r is truthy, it is known that there are more digits after the rounding digit.
-     */
-    function round(x, sd, rm, r) {
-      var d, i, j, k, n, ni, rd,
-        xc = x.c,
-        pows10 = POWS_TEN;
-
-      // if x is not Infinity or NaN...
-      if (xc) {
-
-        // rd is the rounding digit, i.e. the digit after the digit that may be rounded up.
-        // n is a base 1e14 number, the value of the element of array x.c containing rd.
-        // ni is the index of n within x.c.
-        // d is the number of digits of n.
-        // i is the index of rd within n including leading zeros.
-        // j is the actual index of rd within n (if < 0, rd is a leading zero).
-        out: {
-
-          // Get the number of digits of the first element of xc.
-          for (d = 1, k = xc[0]; k >= 10; k /= 10, d++);
-          i = sd - d;
-
-          // If the rounding digit is in the first element of xc...
-          if (i < 0) {
-            i += LOG_BASE;
-            j = sd;
-            n = xc[ni = 0];
-
-            // Get the rounding digit at index j of n.
-            rd = n / pows10[d - j - 1] % 10 | 0;
-          } else {
-            ni = mathceil((i + 1) / LOG_BASE);
-
-            if (ni >= xc.length) {
-
-              if (r) {
-
-                // Needed by sqrt.
-                for (; xc.length <= ni; xc.push(0));
-                n = rd = 0;
-                d = 1;
-                i %= LOG_BASE;
-                j = i - LOG_BASE + 1;
-              } else {
-                break out;
-              }
-            } else {
-              n = k = xc[ni];
-
-              // Get the number of digits of n.
-              for (d = 1; k >= 10; k /= 10, d++);
-
-              // Get the index of rd within n.
-              i %= LOG_BASE;
-
-              // Get the index of rd within n, adjusted for leading zeros.
-              // The number of leading zeros of n is given by LOG_BASE - d.
-              j = i - LOG_BASE + d;
-
-              // Get the rounding digit at index j of n.
-              rd = j < 0 ? 0 : n / pows10[d - j - 1] % 10 | 0;
-            }
-          }
-
-          r = r || sd < 0 ||
-
-          // Are there any non-zero digits after the rounding digit?
-          // The expression  n % pows10[d - j - 1]  returns all digits of n to the right
-          // of the digit at j, e.g. if n is 908714 and j is 2, the expression gives 714.
-           xc[ni + 1] != null || (j < 0 ? n : n % pows10[d - j - 1]);
-
-          r = rm < 4
-           ? (rd || r) && (rm == 0 || rm == (x.s < 0 ? 3 : 2))
-           : rd > 5 || rd == 5 && (rm == 4 || r || rm == 6 &&
-
-            // Check whether the digit to the left of the rounding digit is odd.
-            ((i > 0 ? j > 0 ? n / pows10[d - j] : 0 : xc[ni - 1]) % 10) & 1 ||
-             rm == (x.s < 0 ? 8 : 7));
-
-          if (sd < 1 || !xc[0]) {
-            xc.length = 0;
-
-            if (r) {
-
-              // Convert sd to decimal places.
-              sd -= x.e + 1;
-
-              // 1, 0.1, 0.01, 0.001, 0.0001 etc.
-              xc[0] = pows10[(LOG_BASE - sd % LOG_BASE) % LOG_BASE];
-              x.e = -sd || 0;
-            } else {
-
-              // Zero.
-              xc[0] = x.e = 0;
-            }
-
-            return x;
-          }
-
-          // Remove excess digits.
-          if (i == 0) {
-            xc.length = ni;
-            k = 1;
-            ni--;
-          } else {
-            xc.length = ni + 1;
-            k = pows10[LOG_BASE - i];
-
-            // E.g. 56700 becomes 56000 if 7 is the rounding digit.
-            // j > 0 means i > number of leading zeros of n.
-            xc[ni] = j > 0 ? mathfloor(n / pows10[d - j] % pows10[j]) * k : 0;
-          }
-
-          // Round up?
-          if (r) {
-
-            for (; ;) {
-
-              // If the digit to be rounded up is in the first element of xc...
-              if (ni == 0) {
-
-                // i will be the length of xc[0] before k is added.
-                for (i = 1, j = xc[0]; j >= 10; j /= 10, i++);
-                j = xc[0] += k;
-                for (k = 1; j >= 10; j /= 10, k++);
-
-                // if i != k the length has increased.
-                if (i != k) {
-                  x.e++;
-                  if (xc[0] == BASE) xc[0] = 1;
-                }
-
-                break;
-              } else {
-                xc[ni] += k;
-                if (xc[ni] != BASE) break;
-                xc[ni--] = 0;
-                k = 1;
-              }
-            }
-          }
-
-          // Remove trailing zeros.
-          for (i = xc.length; xc[--i] === 0; xc.pop());
-        }
-
-        // Overflow? Infinity.
-        if (x.e > MAX_EXP) {
-          x.c = x.e = null;
-
-        // Underflow? Zero.
-        } else if (x.e < MIN_EXP) {
-          x.c = [x.e = 0];
-        }
-      }
-
-      return x;
-    }
-
-
-    // PROTOTYPE/INSTANCE METHODS
-
-
-    /*
-     * Return a new BigNumber whose value is the absolute value of this BigNumber.
-     */
-    P.absoluteValue = P.abs = function () {
-      var x = new BigNumber(this);
-      if (x.s < 0) x.s = 1;
-      return x;
-    };
-
-
-    /*
-     * Return
-     *   1 if the value of this BigNumber is greater than the value of BigNumber(y, b),
-     *   -1 if the value of this BigNumber is less than the value of BigNumber(y, b),
-     *   0 if they have the same value,
-     *   or null if the value of either is NaN.
-     */
-    P.comparedTo = function (y, b) {
-      return compare(this, new BigNumber(y, b));
-    };
-
-
-    /*
-     * If dp is undefined or null or true or false, return the number of decimal places of the
-     * value of this BigNumber, or null if the value of this BigNumber is ±Infinity or NaN.
-     *
-     * Otherwise, if dp is a number, return a new BigNumber whose value is the value of this
-     * BigNumber rounded to a maximum of dp decimal places using rounding mode rm, or
-     * ROUNDING_MODE if rm is omitted.
-     *
-     * [dp] {number} Decimal places: integer, 0 to MAX inclusive.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
-     */
-    P.decimalPlaces = P.dp = function (dp, rm) {
-      var c, n, v,
-        x = this;
-
-      if (dp != null) {
-        intCheck(dp, 0, MAX);
-        if (rm == null) rm = ROUNDING_MODE;
-        else intCheck(rm, 0, 8);
-
-        return round(new BigNumber(x), dp + x.e + 1, rm);
-      }
-
-      if (!(c = x.c)) return null;
-      n = ((v = c.length - 1) - bitFloor(this.e / LOG_BASE)) * LOG_BASE;
-
-      // Subtract the number of trailing zeros of the last number.
-      if (v = c[v]) for (; v % 10 == 0; v /= 10, n--);
-      if (n < 0) n = 0;
-
-      return n;
-    };
-
-
-    /*
-     *  n / 0 = I
-     *  n / N = N
-     *  n / I = 0
-     *  0 / n = 0
-     *  0 / 0 = N
-     *  0 / N = N
-     *  0 / I = 0
-     *  N / n = N
-     *  N / 0 = N
-     *  N / N = N
-     *  N / I = N
-     *  I / n = I
-     *  I / 0 = I
-     *  I / N = N
-     *  I / I = N
-     *
-     * Return a new BigNumber whose value is the value of this BigNumber divided by the value of
-     * BigNumber(y, b), rounded according to DECIMAL_PLACES and ROUNDING_MODE.
-     */
-    P.dividedBy = P.div = function (y, b) {
-      return div(this, new BigNumber(y, b), DECIMAL_PLACES, ROUNDING_MODE);
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the integer part of dividing the value of this
-     * BigNumber by the value of BigNumber(y, b).
-     */
-    P.dividedToIntegerBy = P.idiv = function (y, b) {
-      return div(this, new BigNumber(y, b), 0, 1);
-    };
-
-
-    /*
-     * Return a BigNumber whose value is the value of this BigNumber exponentiated by n.
-     *
-     * If m is present, return the result modulo m.
-     * If n is negative round according to DECIMAL_PLACES and ROUNDING_MODE.
-     * If POW_PRECISION is non-zero and m is not present, round to POW_PRECISION using ROUNDING_MODE.
-     *
-     * The modular power operation works efficiently when x, n, and m are integers, otherwise it
-     * is equivalent to calculating x.exponentiatedBy(n).modulo(m) with a POW_PRECISION of 0.
-     *
-     * n {number|string|BigNumber} The exponent. An integer.
-     * [m] {number|string|BigNumber} The modulus.
-     *
-     * '[BigNumber Error] Exponent not an integer: {n}'
-     */
-    P.exponentiatedBy = P.pow = function (n, m) {
-      var half, isModExp, k, more, nIsBig, nIsNeg, nIsOdd, y,
-        x = this;
-
-      n = new BigNumber(n);
-
-      // Allow NaN and ±Infinity, but not other non-integers.
-      if (n.c && !n.isInteger()) {
-        throw Error
-          (bignumberError + 'Exponent not an integer: ' + n);
-      }
-
-      if (m != null) m = new BigNumber(m);
-
-      // Exponent of MAX_SAFE_INTEGER is 15.
-      nIsBig = n.e > 14;
-
-      // If x is NaN, ±Infinity, ±0 or ±1, or n is ±Infinity, NaN or ±0.
-      if (!x.c || !x.c[0] || x.c[0] == 1 && !x.e && x.c.length == 1 || !n.c || !n.c[0]) {
-
-        // The sign of the result of pow when x is negative depends on the evenness of n.
-        // If +n overflows to ±Infinity, the evenness of n would be not be known.
-        y = new BigNumber(Math.pow(+x.valueOf(), nIsBig ? 2 - isOdd(n) : +n));
-        return m ? y.mod(m) : y;
-      }
-
-      nIsNeg = n.s < 0;
-
-      if (m) {
-
-        // x % m returns NaN if abs(m) is zero, or m is NaN.
-        if (m.c ? !m.c[0] : !m.s) return new BigNumber(NaN);
-
-        isModExp = !nIsNeg && x.isInteger() && m.isInteger();
-
-        if (isModExp) x = x.mod(m);
-
-      // Overflow to ±Infinity: >=2**1e10 or >=1.0000024**1e15.
-      // Underflow to ±0: <=0.79**1e10 or <=0.9999975**1e15.
-      } else if (n.e > 9 && (x.e > 0 || x.e < -1 || (x.e == 0
-        // [1, 240000000]
-        ? x.c[0] > 1 || nIsBig && x.c[1] >= 24e7
-        // [80000000000000]  [99999750000000]
-        : x.c[0] < 8e13 || nIsBig && x.c[0] <= 9999975e7))) {
-
-        // If x is negative and n is odd, k = -0, else k = 0.
-        k = x.s < 0 && isOdd(n) ? -0 : 0;
-
-        // If x >= 1, k = ±Infinity.
-        if (x.e > -1) k = 1 / k;
-
-        // If n is negative return ±0, else return ±Infinity.
-        return new BigNumber(nIsNeg ? 1 / k : k);
-
-      } else if (POW_PRECISION) {
-
-        // Truncating each coefficient array to a length of k after each multiplication
-        // equates to truncating significant digits to POW_PRECISION + [28, 41],
-        // i.e. there will be a minimum of 28 guard digits retained.
-        k = mathceil(POW_PRECISION / LOG_BASE + 2);
-      }
-
-      if (nIsBig) {
-        half = new BigNumber(0.5);
-        nIsOdd = isOdd(n);
-      } else {
-        nIsOdd = n % 2;
-      }
-
-      if (nIsNeg) n.s = 1;
-
-      y = new BigNumber(ONE);
-
-      // Performs 54 loop iterations for n of 9007199254740991.
-      for (; ;) {
-
-        if (nIsOdd) {
-          y = y.times(x);
-          if (!y.c) break;
-
-          if (k) {
-            if (y.c.length > k) y.c.length = k;
-          } else if (isModExp) {
-            y = y.mod(m);    //y = y.minus(div(y, m, 0, MODULO_MODE).times(m));
-          }
-        }
-
-        if (nIsBig) {
-          n = n.times(half);
-          round(n, n.e + 1, 1);
-          if (!n.c[0]) break;
-          nIsBig = n.e > 14;
-          nIsOdd = isOdd(n);
-        } else {
-          n = mathfloor(n / 2);
-          if (!n) break;
-          nIsOdd = n % 2;
-        }
-
-        x = x.times(x);
-
-        if (k) {
-          if (x.c && x.c.length > k) x.c.length = k;
-        } else if (isModExp) {
-          x = x.mod(m);    //x = x.minus(div(x, m, 0, MODULO_MODE).times(m));
-        }
-      }
-
-      if (isModExp) return y;
-      if (nIsNeg) y = ONE.div(y);
-
-      return m ? y.mod(m) : k ? round(y, POW_PRECISION, ROUNDING_MODE, more) : y;
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the value of this BigNumber rounded to an integer
-     * using rounding mode rm, or ROUNDING_MODE if rm is omitted.
-     *
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {rm}'
-     */
-    P.integerValue = function (rm) {
-      var n = new BigNumber(this);
-      if (rm == null) rm = ROUNDING_MODE;
-      else intCheck(rm, 0, 8);
-      return round(n, n.e + 1, rm);
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is equal to the value of BigNumber(y, b),
-     * otherwise return false.
-     */
-    P.isEqualTo = P.eq = function (y, b) {
-      return compare(this, new BigNumber(y, b)) === 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is a finite number, otherwise return false.
-     */
-    P.isFinite = function () {
-      return !!this.c;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is greater than the value of BigNumber(y, b),
-     * otherwise return false.
-     */
-    P.isGreaterThan = P.gt = function (y, b) {
-      return compare(this, new BigNumber(y, b)) > 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is greater than or equal to the value of
-     * BigNumber(y, b), otherwise return false.
-     */
-    P.isGreaterThanOrEqualTo = P.gte = function (y, b) {
-      return (b = compare(this, new BigNumber(y, b))) === 1 || b === 0;
-
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is an integer, otherwise return false.
-     */
-    P.isInteger = function () {
-      return !!this.c && bitFloor(this.e / LOG_BASE) > this.c.length - 2;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is less than the value of BigNumber(y, b),
-     * otherwise return false.
-     */
-    P.isLessThan = P.lt = function (y, b) {
-      return compare(this, new BigNumber(y, b)) < 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is less than or equal to the value of
-     * BigNumber(y, b), otherwise return false.
-     */
-    P.isLessThanOrEqualTo = P.lte = function (y, b) {
-      return (b = compare(this, new BigNumber(y, b))) === -1 || b === 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is NaN, otherwise return false.
-     */
-    P.isNaN = function () {
-      return !this.s;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is negative, otherwise return false.
-     */
-    P.isNegative = function () {
-      return this.s < 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is positive, otherwise return false.
-     */
-    P.isPositive = function () {
-      return this.s > 0;
-    };
-
-
-    /*
-     * Return true if the value of this BigNumber is 0 or -0, otherwise return false.
-     */
-    P.isZero = function () {
-      return !!this.c && this.c[0] == 0;
-    };
-
-
-    /*
-     *  n - 0 = n
-     *  n - N = N
-     *  n - I = -I
-     *  0 - n = -n
-     *  0 - 0 = 0
-     *  0 - N = N
-     *  0 - I = -I
-     *  N - n = N
-     *  N - 0 = N
-     *  N - N = N
-     *  N - I = N
-     *  I - n = I
-     *  I - 0 = I
-     *  I - N = N
-     *  I - I = N
-     *
-     * Return a new BigNumber whose value is the value of this BigNumber minus the value of
-     * BigNumber(y, b).
-     */
-    P.minus = function (y, b) {
-      var i, j, t, xLTy,
-        x = this,
-        a = x.s;
-
-      y = new BigNumber(y, b);
-      b = y.s;
-
-      // Either NaN?
-      if (!a || !b) return new BigNumber(NaN);
-
-      // Signs differ?
-      if (a != b) {
-        y.s = -b;
-        return x.plus(y);
-      }
-
-      var xe = x.e / LOG_BASE,
-        ye = y.e / LOG_BASE,
-        xc = x.c,
-        yc = y.c;
-
-      if (!xe || !ye) {
-
-        // Either Infinity?
-        if (!xc || !yc) return xc ? (y.s = -b, y) : new BigNumber(yc ? x : NaN);
-
-        // Either zero?
-        if (!xc[0] || !yc[0]) {
-
-          // Return y if y is non-zero, x if x is non-zero, or zero if both are zero.
-          return yc[0] ? (y.s = -b, y) : new BigNumber(xc[0] ? x :
-
-           // IEEE 754 (2008) 6.3: n - n = -0 when rounding to -Infinity
-           ROUNDING_MODE == 3 ? -0 : 0);
-        }
-      }
-
-      xe = bitFloor(xe);
-      ye = bitFloor(ye);
-      xc = xc.slice();
-
-      // Determine which is the bigger number.
-      if (a = xe - ye) {
-
-        if (xLTy = a < 0) {
-          a = -a;
-          t = xc;
-        } else {
-          ye = xe;
-          t = yc;
-        }
-
-        t.reverse();
-
-        // Prepend zeros to equalise exponents.
-        for (b = a; b--; t.push(0));
-        t.reverse();
-      } else {
-
-        // Exponents equal. Check digit by digit.
-        j = (xLTy = (a = xc.length) < (b = yc.length)) ? a : b;
-
-        for (a = b = 0; b < j; b++) {
-
-          if (xc[b] != yc[b]) {
-            xLTy = xc[b] < yc[b];
-            break;
-          }
-        }
-      }
-
-      // x < y? Point xc to the array of the bigger number.
-      if (xLTy) t = xc, xc = yc, yc = t, y.s = -y.s;
-
-      b = (j = yc.length) - (i = xc.length);
-
-      // Append zeros to xc if shorter.
-      // No need to add zeros to yc if shorter as subtract only needs to start at yc.length.
-      if (b > 0) for (; b--; xc[i++] = 0);
-      b = BASE - 1;
-
-      // Subtract yc from xc.
-      for (; j > a;) {
-
-        if (xc[--j] < yc[j]) {
-          for (i = j; i && !xc[--i]; xc[i] = b);
-          --xc[i];
-          xc[j] += BASE;
-        }
-
-        xc[j] -= yc[j];
-      }
-
-      // Remove leading zeros and adjust exponent accordingly.
-      for (; xc[0] == 0; xc.splice(0, 1), --ye);
-
-      // Zero?
-      if (!xc[0]) {
-
-        // Following IEEE 754 (2008) 6.3,
-        // n - n = +0  but  n - n = -0  when rounding towards -Infinity.
-        y.s = ROUNDING_MODE == 3 ? -1 : 1;
-        y.c = [y.e = 0];
-        return y;
-      }
-
-      // No need to check for Infinity as +x - +y != Infinity && -x - -y != Infinity
-      // for finite x and y.
-      return normalise(y, xc, ye);
-    };
-
-
-    /*
-     *   n % 0 =  N
-     *   n % N =  N
-     *   n % I =  n
-     *   0 % n =  0
-     *  -0 % n = -0
-     *   0 % 0 =  N
-     *   0 % N =  N
-     *   0 % I =  0
-     *   N % n =  N
-     *   N % 0 =  N
-     *   N % N =  N
-     *   N % I =  N
-     *   I % n =  N
-     *   I % 0 =  N
-     *   I % N =  N
-     *   I % I =  N
-     *
-     * Return a new BigNumber whose value is the value of this BigNumber modulo the value of
-     * BigNumber(y, b). The result depends on the value of MODULO_MODE.
-     */
-    P.modulo = P.mod = function (y, b) {
-      var q, s,
-        x = this;
-
-      y = new BigNumber(y, b);
-
-      // Return NaN if x is Infinity or NaN, or y is NaN or zero.
-      if (!x.c || !y.s || y.c && !y.c[0]) {
-        return new BigNumber(NaN);
-
-      // Return x if y is Infinity or x is zero.
-      } else if (!y.c || x.c && !x.c[0]) {
-        return new BigNumber(x);
-      }
-
-      if (MODULO_MODE == 9) {
-
-        // Euclidian division: q = sign(y) * floor(x / abs(y))
-        // r = x - qy    where  0 <= r < abs(y)
-        s = y.s;
-        y.s = 1;
-        q = div(x, y, 0, 3);
-        y.s = s;
-        q.s *= s;
-      } else {
-        q = div(x, y, 0, MODULO_MODE);
-      }
-
-      y = x.minus(q.times(y));
-
-      // To match JavaScript %, ensure sign of zero is sign of dividend.
-      if (!y.c[0] && MODULO_MODE == 1) y.s = x.s;
-
-      return y;
-    };
-
-
-    /*
-     *  n * 0 = 0
-     *  n * N = N
-     *  n * I = I
-     *  0 * n = 0
-     *  0 * 0 = 0
-     *  0 * N = N
-     *  0 * I = N
-     *  N * n = N
-     *  N * 0 = N
-     *  N * N = N
-     *  N * I = N
-     *  I * n = I
-     *  I * 0 = N
-     *  I * N = N
-     *  I * I = I
-     *
-     * Return a new BigNumber whose value is the value of this BigNumber multiplied by the value
-     * of BigNumber(y, b).
-     */
-    P.multipliedBy = P.times = function (y, b) {
-      var c, e, i, j, k, m, xcL, xlo, xhi, ycL, ylo, yhi, zc,
-        base, sqrtBase,
-        x = this,
-        xc = x.c,
-        yc = (y = new BigNumber(y, b)).c;
-
-      // Either NaN, ±Infinity or ±0?
-      if (!xc || !yc || !xc[0] || !yc[0]) {
-
-        // Return NaN if either is NaN, or one is 0 and the other is Infinity.
-        if (!x.s || !y.s || xc && !xc[0] && !yc || yc && !yc[0] && !xc) {
-          y.c = y.e = y.s = null;
-        } else {
-          y.s *= x.s;
-
-          // Return ±Infinity if either is ±Infinity.
-          if (!xc || !yc) {
-            y.c = y.e = null;
-
-          // Return ±0 if either is ±0.
-          } else {
-            y.c = [0];
-            y.e = 0;
-          }
-        }
-
-        return y;
-      }
-
-      e = bitFloor(x.e / LOG_BASE) + bitFloor(y.e / LOG_BASE);
-      y.s *= x.s;
-      xcL = xc.length;
-      ycL = yc.length;
-
-      // Ensure xc points to longer array and xcL to its length.
-      if (xcL < ycL) zc = xc, xc = yc, yc = zc, i = xcL, xcL = ycL, ycL = i;
-
-      // Initialise the result array with zeros.
-      for (i = xcL + ycL, zc = []; i--; zc.push(0));
-
-      base = BASE;
-      sqrtBase = SQRT_BASE;
-
-      for (i = ycL; --i >= 0;) {
-        c = 0;
-        ylo = yc[i] % sqrtBase;
-        yhi = yc[i] / sqrtBase | 0;
-
-        for (k = xcL, j = i + k; j > i;) {
-          xlo = xc[--k] % sqrtBase;
-          xhi = xc[k] / sqrtBase | 0;
-          m = yhi * xlo + xhi * ylo;
-          xlo = ylo * xlo + ((m % sqrtBase) * sqrtBase) + zc[j] + c;
-          c = (xlo / base | 0) + (m / sqrtBase | 0) + yhi * xhi;
-          zc[j--] = xlo % base;
-        }
-
-        zc[j] = c;
-      }
-
-      if (c) {
-        ++e;
-      } else {
-        zc.splice(0, 1);
-      }
-
-      return normalise(y, zc, e);
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the value of this BigNumber negated,
-     * i.e. multiplied by -1.
-     */
-    P.negated = function () {
-      var x = new BigNumber(this);
-      x.s = -x.s || null;
-      return x;
-    };
-
-
-    /*
-     *  n + 0 = n
-     *  n + N = N
-     *  n + I = I
-     *  0 + n = n
-     *  0 + 0 = 0
-     *  0 + N = N
-     *  0 + I = I
-     *  N + n = N
-     *  N + 0 = N
-     *  N + N = N
-     *  N + I = N
-     *  I + n = I
-     *  I + 0 = I
-     *  I + N = N
-     *  I + I = I
-     *
-     * Return a new BigNumber whose value is the value of this BigNumber plus the value of
-     * BigNumber(y, b).
-     */
-    P.plus = function (y, b) {
-      var t,
-        x = this,
-        a = x.s;
-
-      y = new BigNumber(y, b);
-      b = y.s;
-
-      // Either NaN?
-      if (!a || !b) return new BigNumber(NaN);
-
-      // Signs differ?
-       if (a != b) {
-        y.s = -b;
-        return x.minus(y);
-      }
-
-      var xe = x.e / LOG_BASE,
-        ye = y.e / LOG_BASE,
-        xc = x.c,
-        yc = y.c;
-
-      if (!xe || !ye) {
-
-        // Return ±Infinity if either ±Infinity.
-        if (!xc || !yc) return new BigNumber(a / 0);
-
-        // Either zero?
-        // Return y if y is non-zero, x if x is non-zero, or zero if both are zero.
-        if (!xc[0] || !yc[0]) return yc[0] ? y : new BigNumber(xc[0] ? x : a * 0);
-      }
-
-      xe = bitFloor(xe);
-      ye = bitFloor(ye);
-      xc = xc.slice();
-
-      // Prepend zeros to equalise exponents. Faster to use reverse then do unshifts.
-      if (a = xe - ye) {
-        if (a > 0) {
-          ye = xe;
-          t = yc;
-        } else {
-          a = -a;
-          t = xc;
-        }
-
-        t.reverse();
-        for (; a--; t.push(0));
-        t.reverse();
-      }
-
-      a = xc.length;
-      b = yc.length;
-
-      // Point xc to the longer array, and b to the shorter length.
-      if (a - b < 0) t = yc, yc = xc, xc = t, b = a;
-
-      // Only start adding at yc.length - 1 as the further digits of xc can be ignored.
-      for (a = 0; b;) {
-        a = (xc[--b] = xc[b] + yc[b] + a) / BASE | 0;
-        xc[b] = BASE === xc[b] ? 0 : xc[b] % BASE;
-      }
-
-      if (a) {
-        xc = [a].concat(xc);
-        ++ye;
-      }
-
-      // No need to check for zero, as +x + +y != 0 && -x + -y != 0
-      // ye = MAX_EXP + 1 possible
-      return normalise(y, xc, ye);
-    };
-
-
-    /*
-     * If sd is undefined or null or true or false, return the number of significant digits of
-     * the value of this BigNumber, or null if the value of this BigNumber is ±Infinity or NaN.
-     * If sd is true include integer-part trailing zeros in the count.
-     *
-     * Otherwise, if sd is a number, return a new BigNumber whose value is the value of this
-     * BigNumber rounded to a maximum of sd significant digits using rounding mode rm, or
-     * ROUNDING_MODE if rm is omitted.
-     *
-     * sd {number|boolean} number: significant digits: integer, 1 to MAX inclusive.
-     *                     boolean: whether to count integer-part trailing zeros: true or false.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {sd|rm}'
-     */
-    P.precision = P.sd = function (sd, rm) {
-      var c, n, v,
-        x = this;
-
-      if (sd != null && sd !== !!sd) {
-        intCheck(sd, 1, MAX);
-        if (rm == null) rm = ROUNDING_MODE;
-        else intCheck(rm, 0, 8);
-
-        return round(new BigNumber(x), sd, rm);
-      }
-
-      if (!(c = x.c)) return null;
-      v = c.length - 1;
-      n = v * LOG_BASE + 1;
-
-      if (v = c[v]) {
-
-        // Subtract the number of trailing zeros of the last element.
-        for (; v % 10 == 0; v /= 10, n--);
-
-        // Add the number of digits of the first element.
-        for (v = c[0]; v >= 10; v /= 10, n++);
-      }
-
-      if (sd && x.e + 1 > n) n = x.e + 1;
-
-      return n;
-    };
-
-
-    /*
-     * Return a new BigNumber whose value is the value of this BigNumber shifted by k places
-     * (powers of 10). Shift to the right if n > 0, and to the left if n < 0.
-     *
-     * k {number} Integer, -MAX_SAFE_INTEGER to MAX_SAFE_INTEGER inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {k}'
-     */
-    P.shiftedBy = function (k) {
-      intCheck(k, -MAX_SAFE_INTEGER, MAX_SAFE_INTEGER);
-      return this.times('1e' + k);
-    };
-
-
-    /*
-     *  sqrt(-n) =  N
-     *  sqrt(N) =  N
-     *  sqrt(-I) =  N
-     *  sqrt(I) =  I
-     *  sqrt(0) =  0
-     *  sqrt(-0) = -0
-     *
-     * Return a new BigNumber whose value is the square root of the value of this BigNumber,
-     * rounded according to DECIMAL_PLACES and ROUNDING_MODE.
-     */
-    P.squareRoot = P.sqrt = function () {
-      var m, n, r, rep, t,
-        x = this,
-        c = x.c,
-        s = x.s,
-        e = x.e,
-        dp = DECIMAL_PLACES + 4,
-        half = new BigNumber('0.5');
-
-      // Negative/NaN/Infinity/zero?
-      if (s !== 1 || !c || !c[0]) {
-        return new BigNumber(!s || s < 0 && (!c || c[0]) ? NaN : c ? x : 1 / 0);
-      }
-
-      // Initial estimate.
-      s = Math.sqrt(+x);
-
-      // Math.sqrt underflow/overflow?
-      // Pass x to Math.sqrt as integer, then adjust the exponent of the result.
-      if (s == 0 || s == 1 / 0) {
-        n = coeffToString(c);
-        if ((n.length + e) % 2 == 0) n += '0';
-        s = Math.sqrt(n);
-        e = bitFloor((e + 1) / 2) - (e < 0 || e % 2);
-
-        if (s == 1 / 0) {
-          n = '1e' + e;
-        } else {
-          n = s.toExponential();
-          n = n.slice(0, n.indexOf('e') + 1) + e;
-        }
-
-        r = new BigNumber(n);
-      } else {
-        r = new BigNumber(s + '');
-      }
-
-      // Check for zero.
-      // r could be zero if MIN_EXP is changed after the this value was created.
-      // This would cause a division by zero (x/t) and hence Infinity below, which would cause
-      // coeffToString to throw.
-      if (r.c[0]) {
-        e = r.e;
-        s = e + dp;
-        if (s < 3) s = 0;
-
-        // Newton-Raphson iteration.
-        for (; ;) {
-          t = r;
-          r = half.times(t.plus(div(x, t, dp, 1)));
-
-          if (coeffToString(t.c  ).slice(0, s) === (n =
-             coeffToString(r.c)).slice(0, s)) {
-
-            // The exponent of r may here be one less than the final result exponent,
-            // e.g 0.0009999 (e-4) --> 0.001 (e-3), so adjust s so the rounding digits
-            // are indexed correctly.
-            if (r.e < e) --s;
-            n = n.slice(s - 3, s + 1);
-
-            // The 4th rounding digit may be in error by -1 so if the 4 rounding digits
-            // are 9999 or 4999 (i.e. approaching a rounding boundary) continue the
-            // iteration.
-            if (n == '9999' || !rep && n == '4999') {
-
-              // On the first iteration only, check to see if rounding up gives the
-              // exact result as the nines may infinitely repeat.
-              if (!rep) {
-                round(t, t.e + DECIMAL_PLACES + 2, 0);
-
-                if (t.times(t).eq(x)) {
-                  r = t;
-                  break;
-                }
-              }
-
-              dp += 4;
-              s += 4;
-              rep = 1;
-            } else {
-
-              // If rounding digits are null, 0{0,4} or 50{0,3}, check for exact
-              // result. If not, then there are further digits and m will be truthy.
-              if (!+n || !+n.slice(1) && n.charAt(0) == '5') {
-
-                // Truncate to the first rounding digit.
-                round(r, r.e + DECIMAL_PLACES + 2, 1);
-                m = !r.times(r).eq(x);
-              }
-
-              break;
-            }
-          }
-        }
-      }
-
-      return round(r, r.e + DECIMAL_PLACES + 1, ROUNDING_MODE, m);
-    };
-
-
-    /*
-     * Return a string representing the value of this BigNumber in exponential notation and
-     * rounded using ROUNDING_MODE to dp fixed decimal places.
-     *
-     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
-     */
-    P.toExponential = function (dp, rm) {
-      if (dp != null) {
-        intCheck(dp, 0, MAX);
-        dp++;
-      }
-      return format(this, dp, rm, 1);
-    };
-
-
-    /*
-     * Return a string representing the value of this BigNumber in fixed-point notation rounding
-     * to dp fixed decimal places using rounding mode rm, or ROUNDING_MODE if rm is omitted.
-     *
-     * Note: as with JavaScript's number type, (-0).toFixed(0) is '0',
-     * but e.g. (-0.00001).toFixed(0) is '-0'.
-     *
-     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
-     */
-    P.toFixed = function (dp, rm) {
-      if (dp != null) {
-        intCheck(dp, 0, MAX);
-        dp = dp + this.e + 1;
-      }
-      return format(this, dp, rm);
-    };
-
-
-    /*
-     * Return a string representing the value of this BigNumber in fixed-point notation rounded
-     * using rm or ROUNDING_MODE to dp decimal places, and formatted according to the properties
-     * of the FORMAT object (see BigNumber.set).
-     *
-     * FORMAT = {
-     *      decimalSeparator : '.',
-     *      groupSeparator : ',',
-     *      groupSize : 3,
-     *      secondaryGroupSize : 0,
-     *      fractionGroupSeparator : '\xA0',    // non-breaking space
-     *      fractionGroupSize : 0
-     * };
-     *
-     * [dp] {number} Decimal places. Integer, 0 to MAX inclusive.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {dp|rm}'
-     */
-    P.toFormat = function (dp, rm) {
-      var str = this.toFixed(dp, rm);
-
-      if (this.c) {
-        var i,
-          arr = str.split('.'),
-          g1 = +FORMAT.groupSize,
-          g2 = +FORMAT.secondaryGroupSize,
-          groupSeparator = FORMAT.groupSeparator,
-          intPart = arr[0],
-          fractionPart = arr[1],
-          isNeg = this.s < 0,
-          intDigits = isNeg ? intPart.slice(1) : intPart,
-          len = intDigits.length;
-
-        if (g2) i = g1, g1 = g2, g2 = i, len -= i;
-
-        if (g1 > 0 && len > 0) {
-          i = len % g1 || g1;
-          intPart = intDigits.substr(0, i);
-
-          for (; i < len; i += g1) {
-            intPart += groupSeparator + intDigits.substr(i, g1);
-          }
-
-          if (g2 > 0) intPart += groupSeparator + intDigits.slice(i);
-          if (isNeg) intPart = '-' + intPart;
-        }
-
-        str = fractionPart
-         ? intPart + FORMAT.decimalSeparator + ((g2 = +FORMAT.fractionGroupSize)
-          ? fractionPart.replace(new RegExp('\\d{' + g2 + '}\\B', 'g'),
-           '$&' + FORMAT.fractionGroupSeparator)
-          : fractionPart)
-         : intPart;
-      }
-
-      return str;
-    };
-
-
-    /*
-     * Return a string array representing the value of this BigNumber as a simple fraction with
-     * an integer numerator and an integer denominator. The denominator will be a positive
-     * non-zero value less than or equal to the specified maximum denominator. If a maximum
-     * denominator is not specified, the denominator will be the lowest value necessary to
-     * represent the number exactly.
-     *
-     * [md] {number|string|BigNumber} Integer >= 1, or Infinity. The maximum denominator.
-     *
-     * '[BigNumber Error] Argument {not an integer|out of range} : {md}'
-     */
-    P.toFraction = function (md) {
-      var arr, d, d0, d1, d2, e, exp, n, n0, n1, q, s,
-        x = this,
-        xc = x.c;
-
-      if (md != null) {
-        n = new BigNumber(md);
-
-        // Throw if md is less than one or is not an integer, unless it is Infinity.
-        if (!n.isInteger() && (n.c || n.s !== 1) || n.lt(ONE)) {
-          throw Error
-            (bignumberError + 'Argument ' +
-              (n.isInteger() ? 'out of range: ' : 'not an integer: ') + md);
-        }
-      }
-
-      if (!xc) return x.toString();
-
-      d = new BigNumber(ONE);
-      n1 = d0 = new BigNumber(ONE);
-      d1 = n0 = new BigNumber(ONE);
-      s = coeffToString(xc);
-
-      // Determine initial denominator.
-      // d is a power of 10 and the minimum max denominator that specifies the value exactly.
-      e = d.e = s.length - x.e - 1;
-      d.c[0] = POWS_TEN[(exp = e % LOG_BASE) < 0 ? LOG_BASE + exp : exp];
-      md = !md || n.comparedTo(d) > 0 ? (e > 0 ? d : n1) : n;
-
-      exp = MAX_EXP;
-      MAX_EXP = 1 / 0;
-      n = new BigNumber(s);
-
-      // n0 = d1 = 0
-      n0.c[0] = 0;
-
-      for (; ;)  {
-        q = div(n, d, 0, 1);
-        d2 = d0.plus(q.times(d1));
-        if (d2.comparedTo(md) == 1) break;
-        d0 = d1;
-        d1 = d2;
-        n1 = n0.plus(q.times(d2 = n1));
-        n0 = d2;
-        d = n.minus(q.times(d2 = d));
-        n = d2;
-      }
-
-      d2 = div(md.minus(d0), d1, 0, 1);
-      n0 = n0.plus(d2.times(n1));
-      d0 = d0.plus(d2.times(d1));
-      n0.s = n1.s = x.s;
-      e *= 2;
-
-      // Determine which fraction is closer to x, n0/d0 or n1/d1
-      arr = div(n1, d1, e, ROUNDING_MODE).minus(x).abs().comparedTo(
-         div(n0, d0, e, ROUNDING_MODE).minus(x).abs()) < 1
-          ? [n1.toString(), d1.toString()]
-          : [n0.toString(), d0.toString()];
-
-      MAX_EXP = exp;
-      return arr;
-    };
-
-
-    /*
-     * Return the value of this BigNumber converted to a number primitive.
-     */
-    P.toNumber = function () {
-      return +this;
-    };
-
-
-    /*
-     * Return a string representing the value of this BigNumber rounded to sd significant digits
-     * using rounding mode rm or ROUNDING_MODE. If sd is less than the number of digits
-     * necessary to represent the integer part of the value in fixed-point notation, then use
-     * exponential notation.
-     *
-     * [sd] {number} Significant digits. Integer, 1 to MAX inclusive.
-     * [rm] {number} Rounding mode. Integer, 0 to 8 inclusive.
-     *
-     * '[BigNumber Error] Argument {not a primitive number|not an integer|out of range}: {sd|rm}'
-     */
-    P.toPrecision = function (sd, rm) {
-      if (sd != null) intCheck(sd, 1, MAX);
-      return format(this, sd, rm, 2);
-    };
-
-
-    /*
-     * Return a string representing the value of this BigNumber in base b, or base 10 if b is
-     * omitted. If a base is specified, including base 10, round according to DECIMAL_PLACES and
-     * ROUNDING_MODE. If a base is not specified, and this BigNumber has a positive exponent
-     * that is equal to or greater than TO_EXP_POS, or a negative exponent equal to or less than
-     * TO_EXP_NEG, return exponential notation.
-     *
-     * [b] {number} Integer, 2 to ALPHABET.length inclusive.
-     *
-     * '[BigNumber Error] Base {not a primitive number|not an integer|out of range}: {b}'
-     */
-    P.toString = function (b) {
-      var str,
-        n = this,
-        s = n.s,
-        e = n.e;
-
-      // Infinity or NaN?
-      if (e === null) {
-
-        if (s) {
-          str = 'Infinity';
-          if (s < 0) str = '-' + str;
-        } else {
-          str = 'NaN';
-        }
-      } else {
-        str = coeffToString(n.c);
-
-        if (b == null) {
-          str = e <= TO_EXP_NEG || e >= TO_EXP_POS
-           ? toExponential(str, e)
-           : toFixedPoint(str, e, '0');
-        } else {
-          intCheck(b, 2, ALPHABET.length, 'Base');
-          str = convertBase(toFixedPoint(str, e, '0'), 10, b, s, true);
-        }
-
-        if (s < 0 && n.c[0]) str = '-' + str;
-      }
-
-      return str;
-    };
-
-
-    /*
-     * Return as toString, but do not accept a base argument, and include the minus sign for
-     * negative zero.
-     */
-    P.valueOf = P.toJSON = function () {
-      var str,
-        n = this,
-        e = n.e;
-
-      if (e === null) return n.toString();
-
-      str = coeffToString(n.c);
-
-      str = e <= TO_EXP_NEG || e >= TO_EXP_POS
-        ? toExponential(str, e)
-        : toFixedPoint(str, e, '0');
-
-      return n.s < 0 ? '-' + str : str;
-    };
-
-
-    P._isBigNumber = true;
-
-    if (configObject != null) BigNumber.set(configObject);
-
-    return BigNumber;
-  }
-
-
-  // PRIVATE HELPER FUNCTIONS
-
-
-  function bitFloor(n) {
-    var i = n | 0;
-    return n > 0 || n === i ? i : i - 1;
-  }
-
-
-  // Return a coefficient array as a string of base 10 digits.
-  function coeffToString(a) {
-    var s, z,
-      i = 1,
-      j = a.length,
-      r = a[0] + '';
-
-    for (; i < j;) {
-      s = a[i++] + '';
-      z = LOG_BASE - s.length;
-      for (; z--; s = '0' + s);
-      r += s;
-    }
-
-    // Determine trailing zeros.
-    for (j = r.length; r.charCodeAt(--j) === 48;);
-    return r.slice(0, j + 1 || 1);
-  }
-
-
-  // Compare the value of BigNumbers x and y.
-  function compare(x, y) {
-    var a, b,
-      xc = x.c,
-      yc = y.c,
-      i = x.s,
-      j = y.s,
-      k = x.e,
-      l = y.e;
-
-    // Either NaN?
-    if (!i || !j) return null;
-
-    a = xc && !xc[0];
-    b = yc && !yc[0];
-
-    // Either zero?
-    if (a || b) return a ? b ? 0 : -j : i;
-
-    // Signs differ?
-    if (i != j) return i;
-
-    a = i < 0;
-    b = k == l;
-
-    // Either Infinity?
-    if (!xc || !yc) return b ? 0 : !xc ^ a ? 1 : -1;
-
-    // Compare exponents.
-    if (!b) return k > l ^ a ? 1 : -1;
-
-    j = (k = xc.length) < (l = yc.length) ? k : l;
-
-    // Compare digit by digit.
-    for (i = 0; i < j; i++) if (xc[i] != yc[i]) return xc[i] > yc[i] ^ a ? 1 : -1;
-
-    // Compare lengths.
-    return k == l ? 0 : k > l ^ a ? 1 : -1;
-  }
-
-
-  /*
-   * Check that n is a primitive number, an integer, and in range, otherwise throw.
-   */
-  function intCheck(n, min, max, name) {
-    if (n < min || n > max || n !== (n < 0 ? mathceil(n) : mathfloor(n))) {
-      throw Error
-       (bignumberError + (name || 'Argument') + (typeof n == 'number'
-         ? n < min || n > max ? ' out of range: ' : ' not an integer: '
-         : ' not a primitive number: ') + n);
-    }
-  }
-
-
-  function isArray(obj) {
-    return Object.prototype.toString.call(obj) == '[object Array]';
-  }
-
-
-  // Assumes finite n.
-  function isOdd(n) {
-    var k = n.c.length - 1;
-    return bitFloor(n.e / LOG_BASE) == k && n.c[k] % 2 != 0;
-  }
-
-
-  function toExponential(str, e) {
-    return (str.length > 1 ? str.charAt(0) + '.' + str.slice(1) : str) +
-     (e < 0 ? 'e' : 'e+') + e;
-  }
-
-
-  function toFixedPoint(str, e, z) {
-    var len, zs;
-
-    // Negative exponent?
-    if (e < 0) {
-
-      // Prepend zeros.
-      for (zs = z + '.'; ++e; zs += z);
-      str = zs + str;
-
-    // Positive exponent
-    } else {
-      len = str.length;
-
-      // Append zeros.
-      if (++e > len) {
-        for (zs = z, e -= len; --e; zs += z);
-        str += zs;
-      } else if (e < len) {
-        str = str.slice(0, e) + '.' + str.slice(e);
-      }
-    }
-
-    return str;
-  }
-
-
-  // EXPORT
-
-
-  BigNumber = clone();
-  BigNumber['default'] = BigNumber.BigNumber = BigNumber;
-
-  // AMD.
-  if (typeof define == 'function' && define.amd) {
-    define(function () { return BigNumber; });
-
-  // Node.js and other environments that support module.exports.
-  } else if (typeof module != 'undefined' && module.exports) {
-    module.exports = BigNumber;
-
-  // Browser.
-  } else {
-    if (!globalObject) {
-      globalObject = typeof self != 'undefined' && self ? self : window;
-    }
-
-    globalObject.BigNumber = BigNumber;
-  }
-})(this);
 
 },{}],90:[function(require,module,exports){
 // Reference https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki
@@ -16198,7 +16274,7 @@ module.exports = {
   toOutputScript: toOutputScript
 }
 
-},{"./networks":102,"./script":103,"./templates":105,"./types":129,"bech32":84,"bs58check":206,"safe-buffer":363,"typeforce":396}],94:[function(require,module,exports){
+},{"./networks":102,"./script":103,"./templates":105,"./types":129,"bech32":85,"bs58check":206,"safe-buffer":363,"typeforce":396}],94:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var fastMerkleRoot = require('merkle-lib/fastRoot')
@@ -16629,7 +16705,7 @@ module.exports = {
   __curve: secp256k1
 }
 
-},{"./ecsignature":99,"./types":129,"bigi":87,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],98:[function(require,module,exports){
+},{"./ecsignature":99,"./types":129,"bigi":88,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],98:[function(require,module,exports){
 var baddress = require('./address')
 var bcrypto = require('./crypto')
 var ecdsa = require('./ecdsa')
@@ -16762,7 +16838,7 @@ ECPair.prototype.verify = function (hash, signature) {
 
 module.exports = ECPair
 
-},{"./address":93,"./crypto":96,"./ecdsa":97,"./networks":102,"./types":129,"bigi":87,"ecurve":233,"randombytes":343,"typeforce":396,"wif":535}],99:[function(require,module,exports){
+},{"./address":93,"./crypto":96,"./ecdsa":97,"./networks":102,"./types":129,"bigi":88,"ecurve":233,"randombytes":343,"typeforce":396,"wif":535}],99:[function(require,module,exports){
 (function (Buffer){
 var bip66 = require('bip66')
 var typeforce = require('typeforce')
@@ -16863,7 +16939,7 @@ ECSignature.prototype.toScriptSignature = function (hashType) {
 module.exports = ECSignature
 
 }).call(this,require("buffer").Buffer)
-},{"./types":129,"bigi":87,"bip66":90,"buffer":208,"typeforce":396}],100:[function(require,module,exports){
+},{"./types":129,"bigi":88,"bip66":90,"buffer":208,"typeforce":396}],100:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var base58check = require('bs58check')
 var bcrypto = require('./crypto')
@@ -17184,7 +17260,7 @@ HDNode.prototype.derivePath = function (path) {
 
 module.exports = HDNode
 
-},{"./crypto":96,"./ecpair":98,"./networks":102,"./types":129,"bigi":87,"bs58check":206,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],101:[function(require,module,exports){
+},{"./crypto":96,"./ecpair":98,"./networks":102,"./types":129,"bigi":88,"bs58check":206,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],101:[function(require,module,exports){
 var script = require('./script')
 
 var templates = require('./templates')
@@ -20245,7 +20321,7 @@ module.exports = {
   toOutputScript: toOutputScript
 }
 
-},{"./networks":139,"./script":140,"./templates":142,"./types":166,"bech32":84,"bs58check":206,"safe-buffer":363,"typeforce":396}],131:[function(require,module,exports){
+},{"./networks":139,"./script":140,"./templates":142,"./types":166,"bech32":85,"bs58check":206,"safe-buffer":363,"typeforce":396}],131:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var fastMerkleRoot = require('merkle-lib/fastRoot')
@@ -20430,11 +20506,11 @@ arguments[4][95][0].apply(exports,arguments)
 arguments[4][96][0].apply(exports,arguments)
 },{"create-hash":214,"dup":96}],134:[function(require,module,exports){
 arguments[4][97][0].apply(exports,arguments)
-},{"./ecsignature":136,"./types":166,"bigi":87,"create-hmac":216,"dup":97,"ecurve":233,"safe-buffer":363,"typeforce":396}],135:[function(require,module,exports){
+},{"./ecsignature":136,"./types":166,"bigi":88,"create-hmac":216,"dup":97,"ecurve":233,"safe-buffer":363,"typeforce":396}],135:[function(require,module,exports){
 arguments[4][98][0].apply(exports,arguments)
-},{"./address":130,"./crypto":133,"./ecdsa":134,"./networks":139,"./types":166,"bigi":87,"dup":98,"ecurve":233,"randombytes":343,"typeforce":396,"wif":535}],136:[function(require,module,exports){
+},{"./address":130,"./crypto":133,"./ecdsa":134,"./networks":139,"./types":166,"bigi":88,"dup":98,"ecurve":233,"randombytes":343,"typeforce":396,"wif":535}],136:[function(require,module,exports){
 arguments[4][99][0].apply(exports,arguments)
-},{"./types":166,"bigi":87,"bip66":90,"buffer":208,"dup":99,"typeforce":396}],137:[function(require,module,exports){
+},{"./types":166,"bigi":88,"bip66":90,"buffer":208,"dup":99,"typeforce":396}],137:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var base58check = require('bs58check')
 var bcrypto = require('./crypto')
@@ -20752,7 +20828,7 @@ HDNode.prototype.derivePath = function (path) {
 
 module.exports = HDNode
 
-},{"./crypto":133,"./ecpair":135,"./networks":139,"./types":166,"bigi":87,"bs58check":206,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],138:[function(require,module,exports){
+},{"./crypto":133,"./ecpair":135,"./networks":139,"./types":166,"bigi":88,"bs58check":206,"create-hmac":216,"ecurve":233,"safe-buffer":363,"typeforce":396}],138:[function(require,module,exports){
 arguments[4][101][0].apply(exports,arguments)
 },{"./address":130,"./block":131,"./bufferutils":132,"./crypto":133,"./ecpair":135,"./ecsignature":136,"./hdnode":137,"./networks":139,"./script":140,"./templates":142,"./transaction":164,"./transaction_builder":165,"bitcoin-ops":91,"dup":101}],139:[function(require,module,exports){
 arguments[4][102][0].apply(exports,arguments)
@@ -28950,7 +29026,7 @@ var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
 module.exports = basex(ALPHABET)
 
-},{"base-x":82}],205:[function(require,module,exports){
+},{"base-x":83}],205:[function(require,module,exports){
 'use strict'
 
 var base58 = require('bs58')
@@ -30809,7 +30885,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":83,"ieee754":295}],209:[function(require,module,exports){
+},{"base64-js":84,"ieee754":295}],209:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -33093,7 +33169,7 @@ Curve.prototype.validate = function (Q) {
 
 module.exports = Curve
 
-},{"./point":235,"assert":53,"bigi":87}],232:[function(require,module,exports){
+},{"./point":235,"assert":54,"bigi":88}],232:[function(require,module,exports){
 module.exports={
   "secp128r1": {
     "p": "fffffffdffffffffffffffffffffffff",
@@ -33195,7 +33271,7 @@ function getCurveByName (name) {
 
 module.exports = getCurveByName
 
-},{"./curve":231,"./curves.json":232,"bigi":87}],235:[function(require,module,exports){
+},{"./curve":231,"./curves.json":232,"bigi":88}],235:[function(require,module,exports){
 var assert = require('assert')
 var Buffer = require('safe-buffer').Buffer
 var BigInteger = require('bigi')
@@ -33441,7 +33517,7 @@ Point.prototype.toString = function () {
 
 module.exports = Point
 
-},{"assert":53,"bigi":87,"safe-buffer":363}],236:[function(require,module,exports){
+},{"assert":54,"bigi":88,"safe-buffer":363}],236:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -39754,7 +39830,7 @@ exports.defineProperties = function (self, fields, data) {
     }
   }
 };
-},{"assert":53,"bn.js":170,"create-hash":214,"ethjs-util":273,"keccak":302,"rlp":362,"safe-buffer":363,"secp256k1":366}],260:[function(require,module,exports){
+},{"assert":54,"bn.js":170,"create-hash":214,"ethjs-util":273,"keccak":302,"rlp":362,"safe-buffer":363,"secp256k1":366}],260:[function(require,module,exports){
 arguments[4][253][0].apply(exports,arguments)
 },{"_process":201,"dup":253}],261:[function(require,module,exports){
 'use strict';
@@ -48370,8 +48446,8 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],296:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"dup":54}],297:[function(require,module,exports){
+arguments[4][55][0].apply(exports,arguments)
+},{"dup":55}],297:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -52347,7 +52423,7 @@ exports.signature = asn1.define('signature', function () {
   )
 })
 
-},{"./certificate":321,"asn1.js":39}],321:[function(require,module,exports){
+},{"./certificate":321,"asn1.js":40}],321:[function(require,module,exports){
 // from https://github.com/Rantanen/node-dtls/blob/25a7dc861bda38cfeac93a723500eea4f0ac2e86/Certificate.js
 // thanks to @Rantanen
 
@@ -52437,7 +52513,7 @@ var X509Certificate = asn.define('X509Certificate', function () {
 
 module.exports = X509Certificate
 
-},{"asn1.js":39}],322:[function(require,module,exports){
+},{"asn1.js":40}],322:[function(require,module,exports){
 (function (Buffer){
 // adapted from https://github.com/apatil/pemstrip
 var findProc = /Proc-Type: 4,ENCRYPTED[\n\r]+DEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)[\n\r]+([0-9A-z\n\r\+\/\=]+)[\n\r]+/m
@@ -57103,7 +57179,7 @@ function toBuffer (v) {
   return v
 }
 
-},{"assert":53,"safe-buffer":363}],363:[function(require,module,exports){
+},{"assert":54,"safe-buffer":363}],363:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -76203,7 +76279,7 @@ PromiEvent.resolve = function(value) {
 
 module.exports = PromiEvent;
 
-},{"any-promise":36,"eventemitter3":274}],449:[function(require,module,exports){
+},{"any-promise":37,"eventemitter3":274}],449:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -83960,7 +84036,7 @@ arguments[4][408][0].apply(exports,arguments)
 arguments[4][447][0].apply(exports,arguments)
 },{"dup":447,"underscore":398,"web3-core-helpers":498,"web3-core-promievent":500,"web3-core-subscriptions":505,"web3-utils":527}],500:[function(require,module,exports){
 arguments[4][448][0].apply(exports,arguments)
-},{"any-promise":36,"dup":448,"eventemitter3":274}],501:[function(require,module,exports){
+},{"any-promise":37,"dup":448,"eventemitter3":274}],501:[function(require,module,exports){
 arguments[4][449][0].apply(exports,arguments)
 },{"./jsonrpc":504,"dup":449,"web3-core-helpers":498}],502:[function(require,module,exports){
 arguments[4][413][0].apply(exports,arguments)
@@ -84528,7 +84604,7 @@ if (typeof localStorage === 'undefined') {
 module.exports = Accounts;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"any-promise":36,"buffer":208,"crypto":218,"crypto-browserify":218,"eth-lib/lib/account":510,"eth-lib/lib/bytes":512,"eth-lib/lib/hash":513,"eth-lib/lib/nat":514,"eth-lib/lib/rlp":515,"scrypt.js":364,"underscore":398,"uuid":494,"web3-core":508,"web3-core-helpers":498,"web3-core-method":499,"web3-utils":527}],517:[function(require,module,exports){
+},{"any-promise":37,"buffer":208,"crypto":218,"crypto-browserify":218,"eth-lib/lib/account":510,"eth-lib/lib/bytes":512,"eth-lib/lib/hash":513,"eth-lib/lib/nat":514,"eth-lib/lib/rlp":515,"scrypt.js":364,"underscore":398,"uuid":494,"web3-core":508,"web3-core-helpers":498,"web3-core-method":499,"web3-utils":527}],517:[function(require,module,exports){
 arguments[4][458][0].apply(exports,arguments)
 },{"dup":458,"underscore":398,"web3-core":508,"web3-core-helpers":498,"web3-core-method":499,"web3-core-promievent":500,"web3-core-subscriptions":505,"web3-eth-abi":509,"web3-utils":527}],518:[function(require,module,exports){
 arguments[4][459][0].apply(exports,arguments)
