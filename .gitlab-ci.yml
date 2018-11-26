@@ -47,7 +47,7 @@ build_android:
     - echo "$GITLAB_DEPLOY_SSH_KEY" > airgap_cordova_secure_storage_deploy
     - echo "$GITLAB_DEPLOY_SSH_KEY_PUB" > airgap_cordova_secure_storage_deploy.pub
   script:
-    - docker build -f build/android/Dockerfile -t $IMAGE_TAG_ANDROID_CURRENT --build-arg KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD" --build-arg KEYSTORE_ALIAS="$KEYSTORE_ALIAS" --build-arg BUILD_NR="$CI_PIPELINE_ID" .
+    - docker build -f build/android/Dockerfile -t $IMAGE_TAG_ANDROID_CURRENT --build-arg SENTRY_DSN=$SENTRY_DSN --build-arg BUILD_NR="$CI_PIPELINE_ID" .
     - docker run --name $CI_PIPELINE_ID $IMAGE_TAG_ANDROID_CURRENT echo "container ran."
     - docker cp $CI_PIPELINE_ID:/app/android-release-unsigned.apk android-release-unsigned-$CI_PIPELINE_ID.apk
     - docker cp $CI_PIPELINE_ID:/app/android-debug.apk android-debug-$CI_PIPELINE_ID.apk
@@ -55,9 +55,8 @@ build_android:
     - docker rm -f $CI_PIPELINE_ID || true
   artifacts:
     paths:
-    - android-release-unsigned-$CI_PIPELINE_ID.apk
-    - android-debug-$CI_PIPELINE_ID.apk
-
+      - android-release-unsigned-$CI_PIPELINE_ID.apk
+      - android-debug-$CI_PIPELINE_ID.apk
 
 build_ios:
   stage: native_build
@@ -78,4 +77,3 @@ build_ios:
       - app-release.ipa
   tags:
     - ios
-  
