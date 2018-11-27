@@ -8,6 +8,7 @@ import { WalletAddressPage } from '../wallet-address/wallet-address'
 import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover/wallet-edit-popover.component'
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { HttpClient } from '@angular/common/http'
+import { BigNumber } from 'bignumber.js'
 
 declare let cordova
 
@@ -23,6 +24,9 @@ export class CoinInfoPage {
   protocolIdentifier: string
   aeTxEnabled: boolean = false
   aeTxListEnabled: boolean = false
+  aeMigratedTokens: BigNumber = new BigNumber(0)
+  aeCurrentPhase: string = ''
+  aePhaseEnd: string = ''
 
   constructor(
     public navCtrl: NavController,
@@ -34,6 +38,40 @@ export class CoinInfoPage {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
+    if (this.protocolIdentifier === 'ae') {
+      this.http
+        .get(`http://ae-epoch-rpc-proxy.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
+        .subscribe((result: any) => {
+          this.aeMigratedTokens = new BigNumber(result.phase.balance)
+          this.aeCurrentPhase = result.phase.name
+          this.aePhaseEnd = result.phase.endTimestamp
+        })
+    }
+  }
+
+  /**
+   * This is the "small" banner on top of the transaction.
+   * This should be shown if the user has balance on mainnet,
+   * but also balance on the next migration phase.
+   */
+  showAeMigrationBanner() {
+    return this.walletIsAe() && (this.wallet.currentBalance.gt(0) || this.transactions.length > 0) && this.aeMigratedTokens.gt(0)
+  }
+
+  /**
+   * This is the full page screen informing the user about token migration
+   * It should be shown when the user has migration balance, but no mainnet balance.
+   */
+  showAeMigrationScreen() {
+    return this.walletIsAe() && (this.wallet.currentBalance.eq(0) && this.transactions.length === 0) && this.aeMigratedTokens.gt(0)
+  }
+
+  showNoTransactionScreen() {
+    return this.transactions.length === 0 && !this.showAeMigrationScreen()
+  }
+
+  walletIsAe() {
+    return this.wallet.protocolIdentifier === 'ae'
   }
 
   ionViewDidEnter() {

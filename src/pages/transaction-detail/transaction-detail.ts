@@ -28,7 +28,7 @@ export class TransactionDetailPage {
     } else if (this.transaction.protocolIdentifier === 'eth-erc20-ae') {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
     } else if (this.transaction.protocolIdentifier === 'ae') {
-      blockexplorer = 'https://ae-epoch-rpc-proxy.gke.papers.tech/v2/transactions/{{txId}}'
+      blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
     }
 
     if (hash && blockexplorer) {
@@ -36,7 +36,7 @@ export class TransactionDetailPage {
     } else {
       // TODO: Remove AE specific code, but add an alert that there was an error.
       if (this.transaction.protocolIdentifier === 'ae') {
-        this.openUrl('https://explorer.aepps.com/')
+        this.openUrl(`https://explorer.aepps.com/#/account/${this.transaction.isInbound ? this.transaction.to : this.transaction.from}`)
       }
     }
   }

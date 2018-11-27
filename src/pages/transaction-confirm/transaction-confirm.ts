@@ -50,7 +50,7 @@ export class TransactionConfirmPage {
     } else if (this.protocol.identifier === 'eth-erc20-ae') {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
     } else if (this.protocol.identifier === 'ae') {
-      blockexplorer = 'https://ae-epoch-rpc-proxy.gke.papers.tech/v2/transactions/{{txId}}'
+      blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
     }
 
     let interval = setTimeout(() => {

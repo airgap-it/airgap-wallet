@@ -15,23 +15,44 @@
   <div
     padding-horizontal
     class="empty-list"
-    *ngIf="transactions.length === 0 && !isRefreshing && protocolIdentifier === 'ae' && !aeTxEnabled"
+    *ngIf="
+      !isRefreshing && showAeMigrationScreen()
+    "
   >
     <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
     <h5 ion-text color="primary">
-      {{ wallet?.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+      {{ aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
     </h5>
     <p>
       Your tokens migrated during
-      <!-- TODO: set migration phase -->
-      <strong ion-text color="primary">Phase 1</strong>
+      <strong ion-text color="primary">{{ aeCurrentPhase }}</strong>
       will become available with the next hardfork at
-      <!-- TODO: set end date of phase -->
-      <strong ion-text color="primary">the end of May.</strong>
+      <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
     </p>
   </div>
 
-  <div padding-horizontal class="empty-list" *ngIf="transactions.length === 0 && !isRefreshing">
+  <ion-row
+    padding
+    justify-content-center
+    align-items-center
+    *ngIf="!isRefreshing && showAeMigrationBanner()"
+  >
+    <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
+    <ion-col col-1></ion-col>
+    <ion-col col-7>
+      <strong ion-text color="primary">{{ aeCurrentPhase }} Migration Successful</strong>
+      <p>
+        Your balance of
+        <strong ion-text color="primary">
+          {{ aeMigratedTokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+        </strong>
+        will become available with the next hardfork at
+        <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
+      </p>
+    </ion-col>
+  </ion-row>
+
+  <div padding-horizontal [ngClass]="{ smallTransaction:showAeMigrationBanner() }" class="empty-list" *ngIf="!isRefreshing && showNoTransactionScreen()">
     <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
     <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
       There are no transactions yet for this wallet.
@@ -44,26 +65,6 @@
       </button>
     </span>
   </div>
-
-  <!--
-    TODO: display only if balance address has already been migrated in an earlier phase
-    <ion-row padding justify-content-center align-items-center>
-      <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
-      <ion-col col-1></ion-col>
-      <ion-col col-7>
-        <- TODO: set current phase
-        <strong ion-text color="primary">Phase 1 Migration Succesful</strong>
-        <p>
-          Your balance of
-          <- TODO: set migration balance
-          <strong ion-text color="primary">2'123 AE</strong>
-          will become available with the next hardfork at
-          <- TODO: set end date of phase
-          <strong ion-text color="primary">the end of May.</strong>
-        </p>
-      </ion-col>
-    </ion-row>
-  -->
 
   <ion-list no-lines padding-bottom>
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
@@ -123,7 +124,7 @@
           ion-button
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="protocolIdentifier === 'ae' && !aeTxEnabled"
+          [disabled]="protocolIdentifier === 'ae' && (!aeTxEnabled || wallet.currentBalance.toNumber() === 0)"
           round
           icon-start
         >
