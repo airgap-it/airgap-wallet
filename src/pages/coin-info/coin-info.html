@@ -5,56 +5,88 @@
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <ion-row style="display: block"> <portfolio-item [wallet]="wallet"></portfolio-item> </ion-row>
-  <ion-row class="background--color__primary" padding>
-    <span ion-text color="white" class="font--weight__bold">Transactions</span>
-  </ion-row>
+  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+  <ion-row class="background--color__primary" padding><span ion-text color="white" class="font--weight__bold">Transactions</span></ion-row>
 </ion-header>
 
 <ion-content>
-  <ion-refresher (ionRefresh)="doRefresh($event)"> <ion-refresher-content></ion-refresher-content> </ion-refresher>
+  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <div
     padding-horizontal
     class="empty-list"
-    *ngIf="transactions.length === 0 && !isRefreshing && protocolIdentifier === 'ae' && !aeTxEnabled"
+    *ngIf="
+      !isRefreshing && showAeMigrationScreen()
+    "
   >
     <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
     <h5 ion-text color="primary">
-      {{ wallet?.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+      {{ aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
     </h5>
-    <p>Your tokens will become transferable after the æternity mainnet has launched.</p>
+    <p>
+      Your tokens migrated during
+      <strong ion-text color="primary">{{ aeCurrentPhase }}</strong>
+      will become available with the next hardfork at
+      <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
+    </p>
   </div>
 
-  <div
-    padding-horizontal
-    class="empty-list"
-    *ngIf="transactions.length === 0 && !isRefreshing && !(protocolIdentifier === 'ae' && !aeTxEnabled)"
+  <ion-row
+    padding
+    justify-content-center
+    align-items-center
+    *ngIf="!isRefreshing && showAeMigrationBanner()"
   >
+    <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
+    <ion-col col-1></ion-col>
+    <ion-col col-7>
+      <strong ion-text color="primary">{{ aeCurrentPhase }} Migration Successful</strong>
+      <p>
+        Your balance of
+        <strong ion-text color="primary">
+          {{ aeMigratedTokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+        </strong>
+        will become available with the next hardfork at
+        <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
+      </p>
+    </ion-col>
+  </ion-row>
+
+  <div padding-horizontal [ngClass]="{ smallTransaction:showAeMigrationBanner() }" class="empty-list" *ngIf="!isRefreshing && showNoTransactionScreen()">
     <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
-    <p>There are no transactions yet for this wallet.</p>
+    <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
+      There are no transactions yet for this wallet.
+    </p>
+    <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
+      <p>Currently unable to display the transaction history. Please refer to the Blockexplorer.</p>
+      <button default ion-button color="secondary" (click)="openBlockexplorer()" round icon-end>
+        Open Blockexplorer
+        <ion-icon md-name="open_in_new"></ion-icon>
+      </button>
+    </span>
   </div>
 
-  <ion-list no-lines>
+  <ion-list no-lines padding-bottom>
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar item-start>
-        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon> <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
+        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon>
+        <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
       </ion-avatar>
       <h2>
         <ion-icon *ngIf="t.isInbound" md-name="call_received"></ion-icon>
         <ion-icon *ngIf="!t.isInbound" md-name="call_made"></ion-icon>
-        <span class="font--weight__bold" ion-text color="black">{{
-          t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier }
-        }}</span>
+        <span class="font--weight__bold" ion-text color="black">
+          {{ t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}
+        </span>
       </h2>
       <h3 ion-text color="blackLight" class="typography--mono">
-        <ng-container *ngIf="t.isInbound"> {{ t.from[0] | shortenString }} </ng-container>
-        <ng-container *ngIf="!t.isInbound"> {{ t.to[0] | shortenString }} </ng-container>
+        <ng-container *ngIf="t.isInbound">{{ t.from[0] | shortenString }}</ng-container>
+        <ng-container *ngIf="!t.isInbound">{{ t.to[0] | shortenString }}</ng-container>
       </h3>
       <ion-row class="items--right" item-end>
         <ion-col no-padding>
           <ion-row justify-content-end>
-            <p ion-text color="blackLight">
+            <p ion-text color="blackLight" *ngIf="t.timestamp">
               {{
                 t.timestamp
                   | amFromUnix
@@ -63,7 +95,7 @@
             </p>
           </ion-row>
           <ion-row justify-content-end>
-            <p ion-text color="blackLight">
+            <p ion-text color="blackLight" *ngIf="t.timestamp">
               {{
                 t.timestamp
                   | amFromUnix
@@ -92,7 +124,7 @@
           ion-button
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="protocolIdentifier === 'ae' && !aeTxEnabled"
+          [disabled]="protocolIdentifier === 'ae' && (!aeTxEnabled || wallet.currentBalance.toNumber() === 0)"
           round
           icon-start
         >
