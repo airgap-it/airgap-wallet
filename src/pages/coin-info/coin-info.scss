@@ -12,9 +12,12 @@ page-coin-info {
     margin: 2px 0px 6px !important;
   }
 
-  .smallTransaction {
-    height: 15vh;
-    padding-top: 64px;
+  .empty--list__container {
+    height: 25vh;
+    padding-top: 48px;
+    .empty--list__image {
+      height: 30vh;
+    }
   }
 
   .loading-header {

@@ -52,8 +52,8 @@
     </ion-col>
   </ion-row>
 
-  <div padding-horizontal [ngClass]="{ smallTransaction:showAeMigrationBanner() }" class="empty-list" *ngIf="!isRefreshing && showNoTransactionScreen()">
-    <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
+  <div padding-horizontal [ngClass]="{ 'empty--list__container':showAeMigrationBanner() }" class="empty-list" *ngIf="!isRefreshing && showNoTransactionScreen()">
+    <img padding-vertical [ngClass]="{ 'empty--list__image':showAeMigrationBanner() }" src="../../assets/img/empty-state-no-transaction.svg" />
     <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
       There are no transactions yet for this wallet.
     </p>
