@@ -49,7 +49,7 @@ export class TransactionPreparePage {
 
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
-      this.http.get('http://ae-epoch-rpc-proxy.gke.papers.tech/fees').subscribe((result: any) => {
+      this.http.get('https://api-airgap.gke.papers.tech/fees').subscribe((result: any) => {
         if (result && result.low && result.medium && result.high) {
           this.wallet.coinProtocol.feeDefaults.low = new BigNumber(result.low)
           this.wallet.coinProtocol.feeDefaults.medium = new BigNumber(result.medium)

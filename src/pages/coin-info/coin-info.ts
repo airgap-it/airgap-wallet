@@ -40,7 +40,7 @@ export class CoinInfoPage {
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     if (this.protocolIdentifier === 'ae') {
       this.http
-        .get(`http://ae-epoch-rpc-proxy.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
+        .get(`https://api-airgap.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
         .subscribe((result: any) => {
           this.aeMigratedTokens = new BigNumber(result.phase.balance)
           this.aeCurrentPhase = result.phase.name
@@ -113,7 +113,7 @@ export class CoinInfoPage {
 
     // this can safely be removed after AE has made the switch to mainnet
     if (this.protocolIdentifier === 'ae') {
-      this.http.get('http://ae-epoch-rpc-proxy.gke.papers.tech/status').subscribe((result: any) => {
+      this.http.get('https://api-airgap.gke.papers.tech/status').subscribe((result: any) => {
         this.aeTxEnabled = result.transactionsEnabled
         this.aeTxListEnabled = result.txListEnabled
         if (this.aeTxListEnabled) {
