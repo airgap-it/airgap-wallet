@@ -47,6 +47,7 @@ import { Diagnostic } from '@ionic-native/diagnostic'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
 import { PermissionsProvider } from '../providers/permissions/permissions'
+import { LottieAnimationViewModule } from 'ng-lottie'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -78,6 +79,7 @@ export function createTranslateLoader(http: HttpClient) {
     HttpClientModule,
     MaterialIconsModule,
     MomentModule,
+    LottieAnimationViewModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

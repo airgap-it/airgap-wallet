@@ -11,9 +11,13 @@ declare let cordova
 })
 export class TransactionDetailPage {
   public transaction: Transaction
+  lottieConfig: any
 
   constructor(public navController: NavController, public navParams: NavParams, private platform: Platform) {
     this.transaction = this.navParams.get('transaction')
+    this.lottieConfig = {
+      path: '/assets/animations/confirmation-pending_1.json'
+    }
     console.log(this.transaction)
   }
 
