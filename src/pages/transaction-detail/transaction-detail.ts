@@ -16,7 +16,7 @@ export class TransactionDetailPage {
   constructor(public navController: NavController, public navParams: NavParams, private platform: Platform) {
     this.transaction = this.navParams.get('transaction')
     this.lottieConfig = {
-      path: '/assets/animations/confirmation-pending_1.json'
+      path: '/assets/animations/confirmation-pending.json'
     }
     console.log(this.transaction)
   }
