@@ -3,53 +3,45 @@ page-transaction-prepare {
     display: block;
     margin: auto;
   }
-  h2 {
-    color: color($colors, muted);
+  .label-md[stacked],
+  .label-ios[stacked],
+  .item-md.item-toggle ion-label,
+  .item-ios.item-toggle ion-label {
+    font-size: 14px;
   }
-  span {
-    font-weight: bold;
+  .font--size__large {
+    font-size: large;
   }
-  p {
-    color: color($colors, dark);
-    font-size: medium;
-    font-weight: bold;
-  }
-  .item p,
-  p {
-    color: color($colors, black);
-  }
-  .avatar--empty {
+  ion-avatar {
     background-color: color($colors, light);
     border-radius: 50%;
     height: 48px;
     width: 48px;
   }
-
-  /* TODO: remove if using component */
-  .symbol--icon {
-    position: absolute;
+  .divider--line {
+    background-color: color($colors, blackLightest);
+    height: 1px;
+    width: 100%;
+  }
+  .line--vertical {
+    background-color: color($colors, blackLightest);
     height: 24px;
-    width: 24px;
-    left: 40px;
-    top: 34px;
+    width: 1px;
+    margin: 8px 0;
   }
-  h2, .items--right ion-col:first-of-type {
-    margin: 2px 0px 6px!important;
+  .balance__container {
+    min-height: 60px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
   }
-  /* */
-
-  .input--help {
-    padding-top: 12px;
+  .to-address__item {
+    textarea {
+      font-size: 12px;
+    }
   }
-
-  .input--placeholder {
-    margin: 16px 0 0!important;
-  }
-  .label__fee {
-    padding-bottom: 4px;
-  }
-  .placeholder--icon {
-    font-size: 1.5em;
+  .address-to__buttons {
+    padding-top: 4px;
   }
   .identicon--container {
     display: flex;
@@ -58,8 +50,24 @@ page-transaction-prepare {
     background-color: color($colors, light);
     border-radius: 50%;
   }
-
-  .symbol--icon {
-    top: 48px;
+  .amount__container {
+    .item-inner {
+      border-bottom-color: transparent !important;
+      box-shadow: none !important;
+    }
+    input {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+  .fee-amount__help {
+    padding-top: 12px;
+  }
+  .fee--amount__label {
+    padding-top: 8px;
+    .item-inner {
+      padding: 0 !important;
+    }
   }
 }
