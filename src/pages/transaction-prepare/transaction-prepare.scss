@@ -13,8 +13,6 @@ page-transaction-prepare {
     font-size: large;
   }
   ion-avatar {
-    background-color: color($colors, light);
-    border-radius: 50%;
     height: 48px;
     width: 48px;
   }
@@ -42,13 +40,6 @@ page-transaction-prepare {
   }
   .address-to__buttons {
     padding-top: 4px;
-  }
-  .identicon--container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: color($colors, light);
-    border-radius: 50%;
   }
   .amount__container {
     .item-inner {

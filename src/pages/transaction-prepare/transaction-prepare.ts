@@ -35,7 +35,8 @@ export class TransactionPreparePage {
       address: ['', [Validators.required]],
       amount: [0, [Validators.required]],
       feeLevel: [0, [Validators.required]],
-      fee: ['0', [Validators.required]]
+      fee: ['0', [Validators.required]],
+      isAdvancedMode: [false]
     })
 
     this.useWallet(this.navParams.get('wallet'))
