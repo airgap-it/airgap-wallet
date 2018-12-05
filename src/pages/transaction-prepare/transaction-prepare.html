@@ -36,8 +36,11 @@
             </ion-row>
             <ion-row>
               <p ion-text no-margin color="blackLight">
-                ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
-                wallet.currentMarketPrice } | number: '1.2-2' }}
+                ${{
+                  wallet.currentBalance
+                    | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice }
+                    | number: '1.2-2'
+                }}
               </p>
             </ion-row>
           </ion-col>
@@ -45,12 +48,7 @@
         <ion-row>
           <ion-item no-padding class="content--align-vert__center to-address__item">
             <ion-label stacked>{{ 'Send To' | translate }}</ion-label>
-            <ion-textarea
-              placeholder="{{'0x..' | translate}}"
-              [(ngModel)]="address"
-              formControlName="address"
-              id="address-input"
-            ></ion-textarea>
+            <ion-textarea placeholder="{{'0x..' | translate}}" formControlName="address" id="address-input"></ion-textarea>
           </ion-item>
         </ion-row>
       </ion-col>
@@ -60,12 +58,12 @@
         </ion-row>
         <ion-row justify-content-center align-items-center><div class="line--vertical"></div></ion-row>
         <ion-row justify-content-center align-items-center>
-          <ion-avatar item-start><identicon [address]="address"></identicon></ion-avatar>
+          <ion-avatar item-start><identicon [address]="transactionForm.get('address').value"></identicon></ion-avatar>
         </ion-row>
       </ion-col>
     </ion-row>
     <ion-row padding-horizontal padding-bottom class="address-to__buttons">
-      <button outline small ion-button color="secondary" round>Paste</button>
+      <button outline small ion-button color="secondary" round (click)="pasteClipboard()">Paste</button>
       <button outline small ion-button color="secondary" round icon-left (click)="openScanner()">
         <ion-icon name="md-barcode"></ion-icon>
         Scan QR
@@ -76,19 +74,23 @@
       <ion-col col-8>
         <ion-item no-padding no-lines>
           <ion-label no-margin stacked>Amount</ion-label>
-          <ion-input [(ngModel)]="amount" formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
+          <ion-input formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
         </ion-item>
-        <p ion-text no-margin color="blackLight">${{ amount * wallet.currentMarketPrice | number: '1.2-2' }}</p>
+        <p ion-text no-margin color="blackLight">
+          ${{ transactionForm.get('amount').value * wallet.currentMarketPrice | number: '1.2-2' }}
+        </p>
       </ion-col>
       <ion-col col-4>
-        <ion-buttons end><button outline small ion-button color="secondary" round>MAX</button></ion-buttons>
+        <ion-buttons end>
+          <button [outline]="sendMaxAmount ? null : ''" small ion-button color="secondary" round (click)="toggleMaxAmount()">MAX</button>
+        </ion-buttons>
       </ion-col>
     </ion-row>
     <div class="divider--line"></div>
     <ion-row padding-horizontal class="fee--amount__label">
       <ion-item no-lines no-padding>
         <ion-label ion-text no-margin color="blackLight">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
-        <ion-toggle mode="md" [(ngModel)]="isAdvancedMode" formControlName="isAdvancedMode"></ion-toggle>
+        <ion-toggle mode="md" formControlName="isAdvancedMode"></ion-toggle>
       </ion-item>
     </ion-row>
     <ion-row padding-horizontal>
@@ -103,17 +105,19 @@
       <ion-col col-6 no-padding><small>slow & cheap</small></ion-col>
       <ion-col col-6 text-right no-padding><small>fast & expensive</small></ion-col>
     </ion-row>
-    <ion-row padding-horizontal *ngIf="isAdvancedMode">
+    <ion-row padding-horizontal *ngIf="transactionForm.get('isAdvancedMode').value">
       <ion-item no-padding no-lines>
         <ion-label stacked></ion-label>
-        <ion-input id="fee-input" [(ngModel)]="fee" formControlName="fee" type="string"></ion-input>
+        <ion-input id="fee-input" formControlName="fee" type="string"></ion-input>
         <span item-right class="input--placeholder">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
       </ion-item>
     </ion-row>
     <ion-row padding-horizontal class="fee-amount__help">
       <p ion-text no-margin color="blackLight" id="fee-amount">
-        ${{ fee * wallet.currentMarketPrice | number: '1.2-4' }}
-        <span *ngIf="!isAdvancedMode">({{ fee | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
+        ${{ transactionForm.get('fee').value * wallet.currentMarketPrice | number: '1.2-4' }}
+        <span *ngIf="!isAdvancedMode">
+          ({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+        </span>
       </p>
     </ion-row>
   </form>

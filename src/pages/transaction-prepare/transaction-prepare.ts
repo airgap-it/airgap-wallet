@@ -7,6 +7,7 @@ import { ScanAddressPage } from '../scan-address/scan-address'
 import { TransactionQrPage } from '../transaction-qr/transaction-qr'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
+import { Clipboard } from '@ionic-native/clipboard'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -16,11 +17,7 @@ export class TransactionPreparePage {
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
 
-  // form values
-  public address: string = ''
-  public amount: number = 0
-  public fee: string = '0'
-  public feeLevel: number = 0
+  public sendMaxAmount = false
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -29,24 +26,51 @@ export class TransactionPreparePage {
     private navController: NavController,
     private navParams: NavParams,
     private _ngZone: NgZone,
-    private http: HttpClient
+    private http: HttpClient,
+    private clipboard: Clipboard
   ) {
     this.transactionForm = formBuilder.group({
       address: ['', [Validators.required]],
-      amount: [0, [Validators.required]],
+      amount: ['0', [Validators.required]],
       feeLevel: [0, [Validators.required]],
       fee: ['0', [Validators.required]],
-      isAdvancedMode: [false]
+      isAdvancedMode: [false, []]
     })
 
     this.useWallet(this.navParams.get('wallet'))
+    this.onChanges()
+  }
+
+  onChanges(): void {
+    this.transactionForm.get('amount').valueChanges.subscribe(val => {
+      // Disable sendMax if user enters another value
+      const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      const amountWithoutFees = amount.minus(new BigNumber(this.transactionForm.value.fee))
+
+      if (val !== amountWithoutFees.toFixed()) {
+        this.sendMaxAmount = false
+      }
+    })
+
+    this.transactionForm.get('fee').valueChanges.subscribe(val => {
+      if (this.sendMaxAmount) {
+        setTimeout(() => {
+          // We need to do this async because if we don't then setMax will set trigger the amount change before the fee is set.
+          // This means that the calculated amount will not match and the "sendMax" variable will be disabled again. Adding this timeout
+          // makes sure that the amount is only updated after the fee has been set.
+          this.setMaxAmount(val)
+        }, 0)
+      }
+    })
   }
 
   useWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
 
     // set fee per default to low
-    this.fee = this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+    this.transactionForm.controls.fee.setValue(
+      this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+    )
 
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
@@ -55,22 +79,22 @@ export class TransactionPreparePage {
           this.wallet.coinProtocol.feeDefaults.low = new BigNumber(result.low)
           this.wallet.coinProtocol.feeDefaults.medium = new BigNumber(result.medium)
           this.wallet.coinProtocol.feeDefaults.high = new BigNumber(result.high)
-          this.fee = this.wallet.coinProtocol.feeDefaults.low.toFixed()
+          this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low.toFixed())
         }
         this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
           this._ngZone.run(() => {
             switch (val) {
               case 0:
-                this.fee = this.wallet.coinProtocol.feeDefaults.low.toFixed()
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low.toFixed())
                 break
               case 1:
-                this.fee = this.wallet.coinProtocol.feeDefaults.medium.toFixed()
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
                 break
               case 2:
-                this.fee = this.wallet.coinProtocol.feeDefaults.high.toFixed()
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.high.toFixed())
                 break
               default:
-                this.fee = this.wallet.coinProtocol.feeDefaults.medium.toFixed()
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
                 break
             }
           })
@@ -81,16 +105,24 @@ export class TransactionPreparePage {
         this._ngZone.run(() => {
           switch (val) {
             case 0:
-              this.fee = this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              this.transactionForm.controls.fee.setValue(
+                this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              )
               break
             case 1:
-              this.fee = this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              this.transactionForm.controls.fee.setValue(
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              )
               break
             case 2:
-              this.fee = this.wallet.coinProtocol.feeDefaults.high.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              this.transactionForm.controls.fee.setValue(
+                this.wallet.coinProtocol.feeDefaults.high.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              )
               break
             default:
-              this.fee = this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              this.transactionForm.controls.fee.setValue(
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+              )
               break
           }
         })
@@ -99,6 +131,9 @@ export class TransactionPreparePage {
   }
 
   public async prepareTransaction() {
+    /*
+    const { address, amount, fee } = this.transactionForm.value
+    */
     const transactionInfo = this.transactionForm.value
     const amount = new BigNumber(transactionInfo.amount).shiftedBy(this.wallet.coinProtocol.decimals)
     const fee = new BigNumber(transactionInfo.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
@@ -158,5 +193,30 @@ export class TransactionPreparePage {
     this.navController.push(ScanAddressPage, {
       callback: callback
     })
+  }
+
+  public toggleMaxAmount() {
+    this.sendMaxAmount = !this.sendMaxAmount
+    if (this.sendMaxAmount) {
+      this.setMaxAmount(this.transactionForm.value.fee)
+    }
+  }
+
+  private setMaxAmount(fee: string) {
+    // We need to pass the fee here because during the "valueChanges" call the form is not updated
+    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    const amountWithoutFees = amount.minus(new BigNumber(fee))
+    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed())
+  }
+
+  public pasteClipboard() {
+    this.clipboard.paste().then(
+      (text: string) => {
+        this.transactionForm.controls.address.setValue(text)
+      },
+      (err: string) => {
+        console.error('Error: ' + err)
+      }
+    )
   }
 }
