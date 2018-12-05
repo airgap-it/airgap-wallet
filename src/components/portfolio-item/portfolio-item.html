@@ -7,6 +7,8 @@
       {{ wallet.currentBalance?.toNumber() | amountConverter : { protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}
     </span>
   </h2>
+
+  <div class="skeleton--loading" *ngIf="!wallet.currentMarketPrice"><h2></h2></div>
   <small *ngIf="!wallet.currentMarketPrice">{{ 'portoflio-item.syncing_text' | translate }}</small>
 
   <h3 *ngIf="wallet.addresses.length > 0" ion-text color="blackLight" class="typography--mono">
@@ -21,6 +23,8 @@
           wallet.currentMarketPrice } | number: '1.2-2' }}
         </p>
       </strong>
+      <!-- TODO: display if value is loading
+         <div class="skeleton--loading"><p></p></div> -->
     </ion-col>
     <ion-col col-12 no-padding text-right>
       <p>
@@ -29,6 +33,8 @@
         </span>
         <!-- <span ion-text [ngClass]="wallet.change24hour >= 0 ? 'green' : 'red'">{{ wallet.change24hour }}%</span> -->
       </p>
+      <!-- TODO: display if value is loading
+ <div class="skeleton--loading"><p></p></div> -->
     </ion-col>
   </ion-row>
 </ion-item>
