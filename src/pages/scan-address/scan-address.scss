@@ -1,19 +1,29 @@
 page-scan-address {
-  ion-icon{
-    color: white;
-  }
   .transparent {
     background: none !important;
   }
 
   p {
-    background-color: rgba(color($colors, primary), 0.5);
-    color: color($colors, white);
+    background: rgba(color($colors, primary), 0.5);
   }
+
   .row--height__100 {
-    height:100%;
+    height: calc(100% - 48px);
+    img {
+      height: 45vh;
+    }
   }
-  h3{
-    color: color($colors, dark);
+  .guides--container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    .guides--container__img {
+      width: 60%;
+      max-width: 400px;
+      margin-top: 3em;
+      max-height: 50%;
+    }
   }
 }
