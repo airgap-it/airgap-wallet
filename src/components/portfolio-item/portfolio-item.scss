@@ -10,28 +10,38 @@ portfolio-item {
   .items--right ion-col:first-of-type {
     margin: 2px 0px 6px !important;
   }
-  .green {
-    color: #2ecc40;
-  }
-  .red {
-    color: #ff4136;
-  }
-  ion-avatar {
-    background-color: color($colors, light);
-    border-radius: 50%;
-  }
-  .skeleton--loading {
-    -webkit-animation: infinite bgcolorchange 4s;
-    animation: 4s infinite bgcolorchange;
-    opacity: 0.5;
+
+  .skeleton--loading,
+  .skeleton--loading__container {
+    h2,
+    h3,
+    p,
+    ion-avatar,
+    .symbol--icon {
+      -webkit-animation: infinite bgcolorchange 4s;
+      animation: 4s infinite bgcolorchange;
+      opacity: 0.5;
+    }
+    .symbol--icon {
+      border-radius: 50%;
+    }
     h2 {
       height: 19px;
       width: 80%;
     }
+    h3 {
+      height: 1.4rem;
+      width: 40%;
+    }
     p {
-      height: 17px;
+      height: 1.4rem;
       width: 80%;
       min-width: 25px;
+    }
+    ion-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
     }
   }
   @keyframes bgcolorchange {
