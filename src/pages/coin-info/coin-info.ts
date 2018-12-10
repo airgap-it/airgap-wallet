@@ -9,6 +9,7 @@ import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { HttpClient } from '@angular/common/http'
 import { BigNumber } from 'bignumber.js'
+import { SettingsProvider, SettingsKey } from '../../providers/settings/settings'
 
 declare let cordova
 
@@ -17,7 +18,10 @@ declare let cordova
   templateUrl: 'coin-info.html'
 })
 export class CoinInfoPage {
-  isRefreshing = true
+  isRefreshing = false
+  infiniteEnabled = false
+  TRANSACTION_LIMIT = 10
+  txOffset: number = 0
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
 
@@ -34,7 +38,8 @@ export class CoinInfoPage {
     public popoverCtrl: PopoverController,
     public walletProvider: WalletsProvider,
     public http: HttpClient,
-    private platform: Platform
+    private platform: Platform,
+    private settingsProvider: SettingsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -74,7 +79,7 @@ export class CoinInfoPage {
     return this.wallet.protocolIdentifier === 'ae'
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.doRefresh()
   }
 
@@ -109,6 +114,10 @@ export class CoinInfoPage {
   }
 
   doRefresh(refresher: any = null) {
+    if (refresher) {
+      refresher.complete()
+    }
+
     this.isRefreshing = true
 
     // this can safely be removed after AE has made the switch to mainnet
@@ -117,32 +126,78 @@ export class CoinInfoPage {
         this.aeTxEnabled = result.transactionsEnabled
         this.aeTxListEnabled = result.txListEnabled
         if (this.aeTxListEnabled) {
-          Promise.all([this.wallet.fetchTransactions(50, 0), this.wallet.synchronize()]).then(results => {
-            this.transactions = results[0]
-
-            this.isRefreshing = false
-            this.walletProvider.triggerWalletChanged()
-          })
+          this.loadInitialTransactions()
         } else {
           this.transactions = []
           this.isRefreshing = false
         }
-        if (refresher) {
-          refresher.complete()
-        }
       })
     } else {
-      Promise.all([this.wallet.fetchTransactions(50, 0), this.wallet.synchronize()]).then(results => {
-        this.transactions = results[0]
-
-        if (refresher) {
-          refresher.complete()
-        }
-
-        this.isRefreshing = false
-        this.walletProvider.triggerWalletChanged()
-      })
+      this.loadInitialTransactions()
     }
+  }
+
+  async doInfinite(infiniteScroll) {
+    if (!this.infiniteEnabled) {
+      return infiniteScroll.complete()
+    }
+
+    // TODO: If coinlib is updated, we need to remove `+ this.TRANSACTION_LIMIT`
+    const offset = this.txOffset + this.TRANSACTION_LIMIT - (this.txOffset % this.TRANSACTION_LIMIT)
+    const newTransactions = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
+
+    this.transactions = this.mergeTransactions(this.transactions, newTransactions)
+    this.txOffset = this.transactions.length
+
+    await this.settingsProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+
+    if (newTransactions.length < this.TRANSACTION_LIMIT) {
+      this.infiniteEnabled = false
+    }
+
+    infiniteScroll.complete()
+  }
+
+  async loadInitialTransactions(): Promise<void> {
+    if (this.transactions.length === 0) {
+      this.transactions = await this.settingsProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())
+    }
+
+    const transactions = await this.getTransactions()
+
+    this.transactions = this.mergeTransactions(this.transactions, transactions)
+
+    this.isRefreshing = false
+    this.walletProvider.triggerWalletChanged()
+
+    await this.settingsProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+
+    this.txOffset = this.transactions.length
+    this.infiniteEnabled = true
+  }
+
+  async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
+    const results = await Promise.all([this.wallet.fetchTransactions(limit, offset), this.wallet.synchronize()])
+    return results[0]
+  }
+
+  mergeTransactions(oldTransactions, newTransactions): IAirGapTransaction[] {
+    if (!oldTransactions) {
+      return newTransactions
+    }
+    let transactionMap = new Map<string, IAirGapTransaction>(
+      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
+    )
+
+    newTransactions.forEach(tx => {
+      transactionMap.set(tx.hash, tx)
+    })
+
+    return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
+  }
+
+  getWalletIdentifier(): string {
+    return `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}`
   }
 
   presentEditPopover(event) {

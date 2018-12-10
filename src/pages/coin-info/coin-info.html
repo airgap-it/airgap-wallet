@@ -13,6 +13,7 @@
 
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <ion-spinner *ngIf="isRefreshing" color="black"></ion-spinner>
 
   <div padding-horizontal class="empty-list" *ngIf="!isRefreshing && showAeMigrationScreen()">
     <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
@@ -128,6 +129,10 @@
     </ion-item>
     <div *ngIf="isRefreshing" class="loading-content"><ion-spinner color="black"></ion-spinner></div>
   </ion-list>
+
+  <ion-infinite-scroll [enabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
   <ion-fab bottom>
     <ion-row>
