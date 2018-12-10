@@ -4,6 +4,7 @@ import { Platform, NavController } from 'ionic-angular'
 import { ScannerProvider } from '../../providers/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { SchemeRoutingProvider } from '../../providers/scheme-routing/scheme-routing'
+import { PermissionsProvider, PermissionTypes, PermissionStatus } from '../../providers/permissions/permissions'
 
 @Component({
   selector: 'page-scan',
@@ -14,27 +15,50 @@ export class ScanPage {
   zxingScanner: ZXingScannerComponent
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
-  webScannerEnabled = true
+  scannerEnabled = true
+
+  public isBrowser = false
 
   hasCameras = false
 
-  hasCameraPermission = false
-  isWebScan = false
+  private webscanner: any
+  private selectedCamera
+
+  public hasCameraPermission = false
 
   constructor(
     private scanner: ScannerProvider,
     private navController: NavController,
     private platform: Platform,
-    private schemeRouting: SchemeRoutingProvider
-  ) {}
+    private schemeRouting: SchemeRoutingProvider,
+    private permissionsProvider: PermissionsProvider
+  ) {
+    this.isBrowser = !this.platform.is('cordova')
+  }
 
-  ionViewWillEnter() {
-    if (this.platform.is('android') && this.platform.is('cordova')) {
-      this.checkPermission()
-    } else if (this.platform.is('cordova')) {
-      this.initScan()
-    } else if (this.platform.is('core')) {
-      this.isWebScan = true
+  async ionViewWillEnter() {
+    if (this.platform.is('cordova')) {
+      await this.platform.ready()
+      await this.checkCameraPermissionsAndActivate()
+    }
+  }
+
+  async requestPermission() {
+    await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
+    await this.checkCameraPermissionsAndActivate()
+  }
+
+  async checkCameraPermissionsAndActivate() {
+    const permission = await this.permissionsProvider.hasCameraPermission()
+    if (permission === PermissionStatus.GRANTED) {
+      this.hasCameraPermission = true
+      this.startScan()
+    }
+  }
+
+  ionViewDidEnter() {
+    if (!this.platform.is('cordova')) {
+      this.hasCameraPermission = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
@@ -50,58 +74,34 @@ export class ScanPage {
     }
   }
 
-  public checkPermission(entering: boolean = true) {
-    console.log('checking permissions')
-    if (this.hasCameraPermission) {
-      console.log('has permissions, init scan')
-      this.initScan()
+  ionViewWillLeave() {
+    if (this.platform.is('cordova')) {
+      this.scanner.destroy()
     } else {
-      console.log('does not have permissions, requesting')
-      this.scanner
-        .hasPermission()
-        .then((permissions: boolean[]) => {
-          console.log('checked permissions', permissions)
-          if (permissions[0]) {
-            this.initScan()
-          } else if (!entering) {
-            // Permanent deny
-            console.log('bla', permissions)
-
-            if (permissions[1] && this.platform.is('android')) {
-              this.checkPermission()
-            } else {
-              this.scanner.askForPermission()
-            }
-          }
-        })
-        .catch(e => console.log('error!', e))
+      this.zxingScanner.resetCodeReader()
     }
   }
 
   public startScan() {
-    this.scanner.show()
-    this.scanner.scan(text => {
-      this.handleQrCodeResult(text)
-    }, console.error)
+    if (this.platform.is('cordova')) {
+      this.scanner.show()
+      this.scanner.scan(
+        text => {
+          this.checkScan(text)
+        },
+        error => {
+          console.warn(error)
+          this.startScan()
+        }
+      )
+    } else {
+      // We don't need to do anything in the browser because it keeps scanning
+    }
   }
 
-  ionViewWillLeave() {
-    this.scanner.destroy()
-  }
-
-  private initScan() {
-    this.hasCameraPermission = true
-    this.startScan()
-  }
-
-  handleQrCodeResult(resultString: string) {
+  checkScan(resultString: string) {
     console.log('got new text', resultString)
 
     this.schemeRouting.handleNewSyncRequest(this.navController, resultString)
-  }
-
-  ionViewDidLeave() {
-    this.zxingScanner.resetScan()
-    console.log('ionViewDidLeave')
   }
 }

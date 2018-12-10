@@ -3,6 +3,7 @@ import { NavController, NavParams, Platform } from 'ionic-angular'
 
 import { ScannerProvider } from '../../providers/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+import { PermissionsProvider, PermissionTypes, PermissionStatus } from '../../providers/permissions/permissions'
 
 @Component({
   selector: 'page-scan-address',
@@ -12,32 +13,55 @@ export class ScanAddressPage {
   private callback: (address: string) => void
   private callbackCalled: boolean = false
 
-  /* web scanner */
-  @ViewChild('scanner')
+  @ViewChild('addressScanner')
   zxingScanner: ZXingScannerComponent
   availableDevices: MediaDeviceInfo[]
   selectedDevice: MediaDeviceInfo
-  scannerEnabled = false
-  isWebScan = false
+  scannerEnabled = true
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private platform: Platform, private scanner: ScannerProvider) {
+  public isBrowser = false
+
+  hasCameras = false
+
+  private webscanner: any
+  private selectedCamera
+
+  public hasCameraPermission = false
+
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private platform: Platform,
+    private scanner: ScannerProvider,
+    private permissionsProvider: PermissionsProvider
+  ) {
+    this.isBrowser = !this.platform.is('cordova')
     this.callback = this.navParams.get('callback')
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     if (this.platform.is('cordova')) {
-      this.scanner.show()
-      this.scanner.scan(
-        text => {
-          this.handleQRScanned(text)
-        },
-        error => {
-          console.log(error)
-        }
-      )
-    } else if (this.platform.is('core')) {
-      this.isWebScan = true
-      this.scannerEnabled = true
+      await this.platform.ready()
+      await this.checkCameraPermissionsAndActivate()
+    }
+  }
+
+  async requestPermission() {
+    await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
+    await this.checkCameraPermissionsAndActivate()
+  }
+
+  async checkCameraPermissionsAndActivate() {
+    const permission = await this.permissionsProvider.hasCameraPermission()
+    if (permission === PermissionStatus.GRANTED) {
+      this.hasCameraPermission = true
+      this.startScan()
+    }
+  }
+
+  ionViewDidEnter() {
+    if (!this.platform.is('cordova')) {
+      this.hasCameraPermission = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
@@ -46,10 +70,42 @@ export class ScanAddressPage {
         this.zxingScanner.startScan(this.selectedDevice)
       }
       this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
+        this.hasCameras = true
         this.availableDevices = devices
         this.selectedDevice = devices[0]
       })
     }
+  }
+
+  ionViewWillLeave() {
+    if (this.platform.is('cordova')) {
+      this.scanner.destroy()
+    } else {
+      this.zxingScanner.resetCodeReader()
+    }
+  }
+
+  public startScan() {
+    if (this.platform.is('cordova')) {
+      this.scanner.show()
+      this.scanner.scan(
+        text => {
+          this.checkScan(text)
+        },
+        error => {
+          console.warn(error)
+          this.startScan()
+        }
+      )
+    } else {
+      // We don't need to do anything in the browser because it keeps scanning
+    }
+  }
+
+  checkScan(resultString: string) {
+    console.log('got new text', resultString)
+
+    this.handleQRScanned(resultString)
   }
 
   handleQRScanned(text: string) {
@@ -59,19 +115,11 @@ export class ScanAddressPage {
       if (this.platform.is('cordova')) {
         this.scanner.stopScan()
       } else {
-        this.zxingScanner.resetScan()
+        this.zxingScanner.resetCodeReader()
       }
       this.navCtrl.pop().then(() => {
         this.sendAddressToParent(text)
       })
-    }
-  }
-
-  ionViewWillLeave() {
-    if (this.platform.is('cordova')) {
-      this.scanner.destroy()
-    } else {
-      this.zxingScanner.resetScan()
     }
   }
 

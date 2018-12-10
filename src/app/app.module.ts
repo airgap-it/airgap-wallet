@@ -43,8 +43,10 @@ import { IonicStorageModule } from '@ionic/storage'
 import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wallet-edit-popover.component'
 import { SettingsProvider } from '../providers/settings/settings'
 import { Clipboard } from '@ionic-native/clipboard'
+import { Diagnostic } from '@ionic-native/diagnostic'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
+import { PermissionsProvider } from '../providers/permissions/permissions'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -125,6 +127,7 @@ export function createTranslateLoader(http: HttpClient) {
     { provide: ErrorHandler, useClass: SentryErrorHandler },
     ScannerProvider,
     AppVersion,
+    Diagnostic,
     WalletsProvider,
     SettingsProvider,
     {
@@ -133,7 +136,8 @@ export function createTranslateLoader(http: HttpClient) {
       deps: [Platform]
     },
     SchemeRoutingProvider,
-    ClipboardBrowserProvider
+    ClipboardBrowserProvider,
+    PermissionsProvider
   ]
 })
 export class AppModule {}
