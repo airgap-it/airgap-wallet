@@ -43,23 +43,12 @@ export class TransactionPreparePage {
 
   onChanges(): void {
     this.transactionForm.get('amount').valueChanges.subscribe(val => {
-      // Disable sendMax if user enters another value
-      const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-      const amountWithoutFees = amount.minus(new BigNumber(this.transactionForm.value.fee))
-
-      if (val !== amountWithoutFees.toFixed()) {
-        this.sendMaxAmount = false
-      }
+      this.sendMaxAmount = false
     })
 
     this.transactionForm.get('fee').valueChanges.subscribe(val => {
       if (this.sendMaxAmount) {
-        setTimeout(() => {
-          // We need to do this async because if we don't then setMax will set trigger the amount change before the fee is set.
-          // This means that the calculated amount will not match and the "sendMax" variable will be disabled again. Adding this timeout
-          // makes sure that the amount is only updated after the fee has been set.
-          this.setMaxAmount(val)
-        }, 0)
+        this.setMaxAmount(val)
       }
     })
   }
@@ -131,14 +120,11 @@ export class TransactionPreparePage {
   }
 
   public async prepareTransaction() {
-    /*
-    const { address, amount, fee } = this.transactionForm.value
-    */
-    const transactionInfo = this.transactionForm.value
-    const amount = new BigNumber(transactionInfo.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-    const fee = new BigNumber(transactionInfo.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const { address: formAddress, amount: formAmount, fee: formFee } = this.transactionForm.value
+    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
-    let loading = this.loadingCtrl.create({
+    const loading = this.loadingCtrl.create({
       content: 'Preparing TX...'
     })
 
@@ -146,7 +132,7 @@ export class TransactionPreparePage {
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      let rawUnsignedTx: any = await this.wallet.prepareTransaction([transactionInfo.address], [amount], fee)
+      let rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
 
       const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,
@@ -206,7 +192,7 @@ export class TransactionPreparePage {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
     const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
     const amountWithoutFees = amount.minus(new BigNumber(fee))
-    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed())
+    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), { emitEvent: false })
   }
 
   public pasteClipboard() {

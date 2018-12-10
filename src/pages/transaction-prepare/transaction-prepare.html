@@ -121,67 +121,6 @@
       </p>
     </ion-row>
   </form>
-  <!--
-    <form [formGroup]="transactionForm" padding-bottom>
-      <ion-row>
-        <ion-col *ngIf="address.length === 0" class="content--align__center-center" col-2 (click)="openScanner()">
-          <ion-avatar class="identicon--container placeholder--container">
-            <ion-icon class="placeholder--icon" name="md-barcode"></ion-icon>
-          </ion-avatar>
-        </ion-col>
-        <ion-col>
-          <ion-item no-padding class="content--align-vert__center">
-            <ion-avatar *ngIf="address.length > 0" class="identicon--container" item-start>
-              <identicon [address]="address"></identicon>
-            </ion-avatar>
-
-            <ion-label stacked>
-              {{'To Address' | translate}}</ion-label>
-            <ion-textarea placeholder="{{'To Address' | translate}}" [(ngModel)]="address" formControlName="address" id="address-input"></ion-textarea>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-
-      <ion-item no-padding no-lines>
-        <ion-label stacked>Amount</ion-label>
-        <ion-input [(ngModel)]="amount" formControlName="amount" type="number" id="amount-input"></ion-input>
-        <span item-right class="input--placeholder">{{wallet.coinProtocol.symbol | uppercase}}</span>
-      </ion-item>
-
-
-      <div class="input--help">$ {{ amount * wallet.currentMarketPrice | number : '1.2-2' }}</div>
-
-      <ion-item no-padding padding-top no-lines>
-        <ion-label class="label__fee" stacked>Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
-        <ion-range no-padding min="0" max="2" step="1" snaps="true" formControlName="feeLevel" id="feeLevel-input" color="primary">
-          <ion-icon range-left color="primary" md-name="hourglass_full"></ion-icon>
-          <ion-icon range-right color="primary" name="md-jet"></ion-icon>
-        </ion-range>
-      </ion-item>
-
-      <ion-row no-padding>
-        <ion-col no-padding>
-          <small>slow & cheap</small>
-        </ion-col>
-        <ion-col text-right no-padding>
-          <small>fast & expensive</small>
-        </ion-col>
-      </ion-row>
-
-      <ion-item no-padding no-lines>
-        <ion-label stacked></ion-label>
-        <ion-input id="fee-input" [(ngModel)]="fee" formControlName="fee" type="string"></ion-input>
-        <span item-right class="input--placeholder">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase}})</span>
-      </ion-item>
-
-      <div class="input--help">$ <span id="fee-amount">{{ fee * wallet.currentMarketPrice | number : '1.2-6' }}</span></div>
-    </form>
-  -->
-  <!--
-    TODO: error handling
-    <p *ngIf="transactionForm.invalid" padding-vertical>This is not a valid ethereum address!</p>
-  -->
   <ion-fab bottom right>
     <button default ion-button color="primary" (click)="prepareTransaction()" [disabled]="transactionForm.invalid" round icon-left>
       <ion-icon md-name="open_in_new"></ion-icon>
