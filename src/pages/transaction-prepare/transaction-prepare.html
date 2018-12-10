@@ -1,100 +1,128 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <ion-title>
-      Transaction
-    </ion-title>
-    <ion-buttons end>
-      <button (click)="openScanner()" ion-button icon-only>
-        <ion-icon name="md-barcode"></ion-icon>
-      </button>
-    </ion-buttons>
-  </ion-navbar>
-  <ion-item class="background--color__primary" no-lines text-wrap>
-    <img class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'">
-    <ion-avatar item-start>
-      <identicon [address]="wallet.receivingPublicAddress"></identicon>
-    </ion-avatar>
-    <ion-row no-padding>
-      <ion-col col-9 no-padding>
-        <h2>
-          <span class="font--weight__bold" ion-text color="white">{{wallet.currentBalance | amountConverter : { protocolIdentifier:
-            wallet.protocolIdentifier } }} </span>
-        </h2>
-      </ion-col>
-      <ion-col col-3 no-padding text-right>
-        <h2 ion-text color="whiteLight">${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier,
-          currentMarketPrice: wallet.currentMarketPrice } | number : '1.2-2' }}</h2>
-      </ion-col>
-    </ion-row>
-    <h3 ion-text color="whiteLight" class="typography--mono">{{ wallet.receivingPublicAddress }}</h3>
-  </ion-item>
+  <ion-navbar color="primary"><ion-title>Transaction</ion-title></ion-navbar>
+  <!--
+    <ion-item class="background--color__primary" no-lines text-wrap>
+      <img class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'">
+      <ion-avatar item-start>
+        <identicon [address]="wallet.receivingPublicAddress"></identicon>
+      </ion-avatar>
+      <ion-row no-padding>
+        <ion-col col-9 no-padding>
+          <h2>
+            <span class="font--weight__bold" ion-text color="white">{{wallet.currentBalance | amountConverter : { protocolIdentifier:
+              wallet.protocolIdentifier } }} </span>
+          </h2>
+        </ion-col>
+        <ion-col col-3 no-padding text-right>
+          <h2 ion-text color="whiteLight">${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier,
+            currentMarketPrice: wallet.currentMarketPrice } | number : '1.2-2' }}</h2>
+        </ion-col>
+      </ion-row>
+      <h3 ion-text color="whiteLight" class="typography--mono">{{ wallet.receivingPublicAddress }}</h3>
+    </ion-item>
+  -->
 </ion-header>
 
-<ion-content padding>
-
+<ion-content no-padding>
   <form [formGroup]="transactionForm" padding-bottom>
-    <ion-row>
-      <ion-col *ngIf="address.length === 0" class="content--align__center-center" col-2 (click)="openScanner()">
-        <ion-avatar class="identicon--container placeholder--container">
-          <ion-icon class="placeholder--icon" name="md-barcode"></ion-icon>
-        </ion-avatar>
+    <ion-row padding-horizontal padding-top>
+      <ion-col col-10 no-padding>
+        <ion-row>
+          <ion-col no-padding class="balance__container">
+            <ion-row>
+              <p no-margin class="font--size__large">
+                <strong>{{ wallet.currentBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}</strong>
+              </p>
+            </ion-row>
+            <ion-row>
+              <p ion-text no-margin color="blackLight">
+                ${{
+                  wallet.currentBalance
+                    | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice }
+                    | number: '1.2-2'
+                }}
+              </p>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-item no-padding class="content--align-vert__center to-address__item">
+            <ion-label stacked>{{ 'Send To' | translate }}</ion-label>
+            <ion-textarea placeholder="{{'0x..' | translate}}" formControlName="address" id="address-input"></ion-textarea>
+          </ion-item>
+        </ion-row>
       </ion-col>
-      <ion-col>
-        <ion-item no-padding class="content--align-vert__center">
-          <ion-avatar *ngIf="address.length > 0" class="identicon--container" item-start>
-            <identicon [address]="address"></identicon>
-          </ion-avatar>
-
-          <ion-label stacked>
-            {{'To Address' | translate}}</ion-label>
-          <ion-textarea placeholder="{{'To Address' | translate}}" [(ngModel)]="address" formControlName="address" id="address-input"></ion-textarea>
+      <ion-col col-2 no-padding>
+        <ion-row justify-content-center>
+          <ion-avatar item-start><identicon [address]="wallet.receivingPublicAddress"></identicon></ion-avatar>
+        </ion-row>
+        <ion-row justify-content-center align-items-center><div class="line--vertical"></div></ion-row>
+        <ion-row justify-content-center align-items-center>
+          <ion-avatar item-start><identicon [address]="transactionForm.get('address').value"></identicon></ion-avatar>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row padding-horizontal padding-bottom class="address-to__buttons">
+      <button outline small ion-button color="secondary" round (click)="pasteClipboard()">Paste</button>
+      <button outline small ion-button color="secondary" round icon-left (click)="openScanner()">
+        <ion-icon name="md-barcode"></ion-icon>
+        Scan QR
+      </button>
+    </ion-row>
+    <div class="divider--line"></div>
+    <ion-row padding align-items-center class="amount__container">
+      <ion-col col-8>
+        <ion-item no-padding no-lines>
+          <ion-label no-margin stacked>Amount</ion-label>
+          <ion-input formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
         </ion-item>
+        <p ion-text no-margin color="blackLight">
+          ${{ transactionForm.get('amount').value * wallet.currentMarketPrice | number: '1.2-2' }}
+        </p>
+      </ion-col>
+      <ion-col col-4>
+        <ion-buttons end>
+          <button [outline]="sendMaxAmount ? null : ''" small ion-button color="secondary" round (click)="toggleMaxAmount()">MAX</button>
+        </ion-buttons>
       </ion-col>
     </ion-row>
-
-
-    <ion-item no-padding no-lines>
-      <ion-label stacked>Amount</ion-label>
-      <ion-input [(ngModel)]="amount" formControlName="amount" type="number" id="amount-input"></ion-input>
-      <span item-right class="input--placeholder">{{wallet.coinProtocol.symbol | uppercase}}</span>
-    </ion-item>
-
-
-    <div class="input--help">$ {{ amount * wallet.currentMarketPrice | number : '1.2-2' }}</div>
-
-    <ion-item no-padding padding-top no-lines>
-      <ion-label class="label__fee" stacked>Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
-      <ion-range no-padding min="0" max="2" step="1" snaps="true" formControlName="feeLevel" id="feeLevel-input" color="primary">
-        <ion-icon range-left color="primary" md-name="hourglass_full"></ion-icon>
-        <ion-icon range-right color="primary" name="md-jet"></ion-icon>
-      </ion-range>
-    </ion-item>
-
-    <ion-row no-padding>
-      <ion-col no-padding>
-        <small>slow & cheap</small>
-      </ion-col>
-      <ion-col text-right no-padding>
-        <small>fast & expensive</small>
-      </ion-col>
+    <div class="divider--line"></div>
+    <ion-row padding-horizontal class="fee--amount__label">
+      <ion-item no-lines no-padding>
+        <ion-label ion-text no-margin color="blackLight">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+        <ion-toggle mode="md" formControlName="isAdvancedMode"></ion-toggle>
+      </ion-item>
     </ion-row>
-
-    <ion-item no-padding no-lines>
-      <ion-label stacked></ion-label>
-      <ion-input id="fee-input" [(ngModel)]="fee" formControlName="fee" type="string"></ion-input>
-      <span item-right class="input--placeholder">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase}})</span>
-    </ion-item>
-
-    <div class="input--help">$ <span id="fee-amount">{{ fee * wallet.currentMarketPrice | number : '1.2-6' }}</span></div>
+    <ion-row padding-horizontal>
+      <ion-item no-padding no-lines>
+        <ion-range no-padding min="0" max="2" step="1" snaps="true" formControlName="feeLevel" id="feeLevel-input" color="primary">
+          <ion-icon range-left color="black" md-name="hourglass_empty"></ion-icon>
+          <ion-icon range-right color="black" md-name="flight_takeoff"></ion-icon>
+        </ion-range>
+      </ion-item>
+    </ion-row>
+    <ion-row padding-horizontal>
+      <ion-col col-6 no-padding><small>slow & cheap</small></ion-col>
+      <ion-col col-6 text-right no-padding><small>fast & expensive</small></ion-col>
+    </ion-row>
+    <ion-row padding-horizontal *ngIf="transactionForm.get('isAdvancedMode').value">
+      <ion-item no-padding no-lines>
+        <ion-label stacked></ion-label>
+        <ion-input id="fee-input" formControlName="fee" type="string"></ion-input>
+        <span item-right class="input--placeholder">Fee ({{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
+      </ion-item>
+    </ion-row>
+    <ion-row padding-horizontal class="fee-amount__help">
+      <p ion-text no-margin color="blackLight">
+        <span id="fee-amount">${{ transactionForm.get('fee').value * wallet.currentMarketPrice | number: '1.2-4' }}</span>
+        <span id="fee-amount-advanced" *ngIf="!isAdvancedMode">({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
+      </p>
+    </ion-row>
   </form>
-
-  <!-- TODO: error handling
-  <p *ngIf="transactionForm.invalid" padding-vertical>This is not a valid ethereum address!</p>
-  -->
   <ion-fab bottom right>
-      <button default ion-button color="primary" (click)="prepareTransaction()" [disabled]="transactionForm.invalid" round icon-left>
+    <button default ion-button color="primary" (click)="prepareTransaction()" [disabled]="transactionForm.invalid" round icon-left>
       <ion-icon md-name="open_in_new"></ion-icon>
       Create Transaction
     </button>
-    </ion-fab>
+  </ion-fab>
 </ion-content>
