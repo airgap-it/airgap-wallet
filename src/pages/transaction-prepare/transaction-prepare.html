@@ -113,11 +113,9 @@
       </ion-item>
     </ion-row>
     <ion-row padding-horizontal class="fee-amount__help">
-      <p ion-text no-margin color="blackLight" id="fee-amount">
-        ${{ transactionForm.get('fee').value * wallet.currentMarketPrice | number: '1.2-4' }}
-        <span *ngIf="!isAdvancedMode">
-          ({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
-        </span>
+      <p ion-text no-margin color="blackLight">
+        <span id="fee-amount">${{ transactionForm.get('fee').value * wallet.currentMarketPrice | number: '1.2-4' }}</span>
+        <span id="fee-amount-advanced" *ngIf="!isAdvancedMode">({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
       </p>
     </ion-row>
   </form>
