@@ -3,27 +3,29 @@
 
   <ion-row align-items-center>
     <ion-col col-3 no-padding>
-      <ion-row justify-content-center>
-        <div class="line"></div>
-      </ion-row>
+      <ion-row justify-content-center><div class="line"></div></ion-row>
     </ion-col>
     <ion-col col-9 padding-bottom>
-      <ion-label stacked class="typography--uppercase">Amount</ion-label>
+      <ion-label stacked class="typography--uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="typography--mono" item-content>
-        <span class="typography--mono">{{ transaction.amount | amountConverter : { protocolIdentifier: transaction.protocolIdentifier } }}</span>
+        <span class="typography--mono">
+          {{ transaction.amount | amountConverter: { protocolIdentifier: transaction.protocolIdentifier } }}
+        </span>
       </div>
 
       <ng-container *ngIf="transaction.fee">
-        <ion-label stacked class="typography--uppercase">Fee</ion-label>
+        <ion-label stacked class="typography--uppercase">{{ 'from-to.fee_label' | translate }}</ion-label>
         <div class="typography--mono" item-content>
-          <span class="typography--mono">{{ transaction.fee | feeConverter : { protocolIdentifier: transaction.protocolIdentifier } }}</span>
+          <span class="typography--mono">
+            {{ transaction.fee | feeConverter: { protocolIdentifier: transaction.protocolIdentifier } }}
+          </span>
         </div>
       </ng-container>
 
       <ng-container *ngIf="transaction.timestamp">
-        <ion-label stacked class="typography--uppercase">Time</ion-label>
+        <ion-label stacked class="typography--uppercase">{{ 'from-to.time_label' | translate }}</ion-label>
         <div item-content>
-          {{ (transaction.timestamp | amFromUnix) | amCalendar: { sameDay: '[Today at] HH:mm', sameElse: 'HH:mm [on] LL' } }}
+          {{ transaction.timestamp | amFromUnix | amCalendar: { sameDay: '[Today at] HH:mm', sameElse: 'HH:mm [on] LL' } }}
         </div>
       </ng-container>
     </ion-col>

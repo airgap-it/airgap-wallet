@@ -1,30 +1,24 @@
 <ion-header no-border>
-  <ion-navbar color="primary">
-    <ion-title>Confirm Transaction</ion-title>
-  </ion-navbar>
+  <ion-navbar color="primary"><ion-title>{{ 'transaction-confirm.title' | translate }}</ion-title></ion-navbar>
 </ion-header>
 
-
-
 <ion-content padding>
-  <div *ngIf="airGapTx">
-    <from-to [transaction]="airGapTx"></from-to>
-  </div>
+  <div *ngIf="airGapTx"><from-to [transaction]="airGapTx"></from-to></div>
 
   <ion-fab bottom>
-      <ion-row>
-        <ion-col>
-            <button default full ion-button color="secondary" (click)="dismiss()" round icon-left>
-                <ion-icon md-name="close"></ion-icon>
-                Decline
-              </button>
-        </ion-col>
-        <ion-col>
-            <button default full ion-button color="primary" (click)="broadcastTransaction()" round icon-left>
-                <ion-icon md-name="check"></ion-icon>
-                Confirm
-              </button>
-        </ion-col>
-      </ion-row>
-    </ion-fab>
+    <ion-row>
+      <ion-col>
+        <button default full ion-button color="secondary" (click)="dismiss()" round icon-left>
+          <ion-icon md-name="close"></ion-icon>
+          {{ 'transaction-confirm.decline_label' | translate }}
+        </button>
+      </ion-col>
+      <ion-col>
+        <button default full ion-button color="primary" (click)="broadcastTransaction()" round icon-left>
+          <ion-icon md-name="check"></ion-icon>
+          {{ 'transaction-confirm.confirm_label' | translate }}
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-fab>
 </ion-content>

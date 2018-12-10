@@ -1,26 +1,21 @@
 <ion-header no-border>
-  <ion-navbar color="primary">
-    <ion-title>Transaction Detail</ion-title>
-  </ion-navbar>
+  <ion-navbar color="primary"><ion-title>{{ 'transaction-detail.title' | translate }}</ion-title></ion-navbar>
 </ion-header>
 
-
-
 <ion-content padding>
-
   <from-to [transaction]="transaction"></from-to>
 
   <ion-list margin-top>
     <ion-item no-lines *ngFor="let parameter of transaction.information">
-      <h2>{{parameter.label}}</h2>
-      <h3>{{parameter.value}}</h3>
+      <h2>{{ parameter.label }}</h2>
+      <h3>{{ parameter.value }}</h3>
     </ion-item>
   </ion-list>
 
   <ion-fab bottom right>
     <button ion-button color="primary" (click)="openBlockexplorer()" round icon-left>
       <ion-icon md-name="open_in_new"></ion-icon>
-      OPEN BLOCKEXPLORER
+      {{ 'transaction-detail.open-blockexplorer_label' | translate }}
     </button>
   </ion-fab>
 </ion-content>
