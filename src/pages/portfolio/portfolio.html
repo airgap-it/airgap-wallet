@@ -1,30 +1,24 @@
 <ion-header>
   <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
+    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
   </ion-navbar>
   <div>
     <div style="color: white; width: 100%; text-align:center; height: 150px; font-size: 40px; font-weight: 300; margin-top: 20px">
-      <div style="margin-top: 30px;">
-        ${{ total | number : '1.2-2' }}
-      </div>
+      <div style="margin-top: 30px;">${{ total | number: '1.2-2' }}</div>
       <!--
-      <div [ngClass]="percentageChangedClass" style="font-size: 20px;">
-        {{ winPercentage | number : '1.2-2' }}%
-      </div>
+        <div [ngClass]="percentageChangedClass" style="font-size: 20px;">
+          {{ winPercentage | number : '1.2-2' }}%
+        </div>
       -->
     </div>
   </div>
 </ion-header>
 
 <ion-content>
-  <ion-refresher (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="wallets | async as wallets; else loading">
-    <ng-container *ngIf="wallets.length; else noItems">
+  <ng-container *ngIf="(wallets | async) as wallets; else: loading">
+    <ng-container *ngIf="wallets.length; else: noItems">
       <ion-list no-lines margin-top *ngFor="let wallet of wallets">
         <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
       </ion-list>
@@ -32,17 +26,11 @@
     <ng-template #noItems>
       <ion-row class="container__empty" padding justify-content-center>
         <img src="assets/img/sync_wallet_onboarding_1.svg" />
-        <p>
-          To use the AirGap Wallet app you need to <strong>Sync with AirGap Vault</strong>. Select the wallet in AirGap
-          Vault and
-          display the sync QR code. Scan this code with AirGap Wallet.
-        </p>
+        <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
       </ion-row>
     </ng-template>
     <ng-template #loading>
-      <div class="loading-content">
-        <ion-spinner color="black"></ion-spinner>
-      </div>
+      <div class="loading-content"><ion-spinner color="black"></ion-spinner></div>
     </ng-template>
   </ng-container>
 
@@ -52,7 +40,7 @@
     </button>
     <button *ngIf="(wallets | async).length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
       <ion-icon md-name="vertical_align_bottom"></ion-icon>
-      Sync with AirGap Vault
+      {{ 'portfolio.sync_label' | translate }}
     </button>
   </ion-fab>
 </ion-content>

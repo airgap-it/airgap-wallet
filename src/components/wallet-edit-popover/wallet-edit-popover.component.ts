@@ -7,14 +7,14 @@ import { Clipboard } from '@ionic-native/clipboard'
 @Component({
   template: `
     <ion-list no-lines no-detail>
-      <ion-list-header>Wallet Settings</ion-list-header>
-      <button ion-item detail-none (click)='copyAddressToClipboard()'>
-        <ion-icon name='clipboard' color='dark' item-end></ion-icon>
-        Copy address
+      <ion-list-header>{{ 'wallet-edit-popover-component.settings_label' | translate }}</ion-list-header>
+      <button ion-item detail-none (click)="copyAddressToClipboard()">
+        <ion-icon name="clipboard" color="dark" item-end></ion-icon>
+        {{ 'wallet-edit-popover-component.copy-address_label' | translate }}
       </button>
-      <button ion-item detail-none (click)='delete()'>
-        <ion-icon name='trash' color='dark' item-end></ion-icon>
-        Delete
+      <button ion-item detail-none (click)="delete()">
+        <ion-icon name="trash" color="dark" item-end></ion-icon>
+        {{ 'wallet-edit-popover-component.delete_label' | translate }}
       </button>
     </ion-list>
   `

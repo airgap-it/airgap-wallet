@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core'
 import { IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
+import { TranslateModule } from '@ngx-translate/core'
 
 import { PipesModule } from '../pipes/pipes.module'
 
@@ -21,7 +22,7 @@ import { MomentModule } from 'ngx-moment'
     FromToComponent,
     WalletEditPopoverComponent
   ],
-  imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule],
+  imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
     PortfolioItemComponent,
     IdenticonComponent,

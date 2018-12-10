@@ -1,9 +1,9 @@
 <ion-header>
-  <ion-navbar color="primary"><ion-title>Scan Wallet Address</ion-title></ion-navbar>
+  <ion-navbar color="primary"><ion-title>{{ 'scan-address.title' | translate }}</ion-title></ion-navbar>
 </ion-header>
 
 <ion-content no-bounce [class.transparent]="hasCameraPermission">
-  <p ion-text color="white" padding no-margin text-center>Scan the QR code of a wallet address.</p>
+  <p ion-text color="white" padding no-margin text-center>{{ 'scan-address.text' | translate }}</p>
 
   <ion-row [hidden]="!hasCameraPermission" justify-content-center align-items-center class="row--height__100">
     <ion-col class="guides--container content--align__center-center">
@@ -21,12 +21,8 @@
   <ion-row [hidden]="hasCameraPermission" (click)="requestPermission()" justify-content-center align-items-center class="row--height__100">
     <ion-col text-center>
       <img src="../assets/img/permission_onboarding_camera.svg" />
-      <h3 padding-horizontal>
-        In order to scan QR codes, AirGap Wallet needs the
-        <span ion-text color="primary">camera permission</span>
-        .
-      </h3>
-      <button round ion-button color="primary">Grant permission</button>
+      <h3 padding-horizontal [innerHTML]="'scan.empty-state_heading' | translate"></h3>
+      <button round ion-button color="primary">{{ 'scan.grant-permission' | translate }}</button>
     </ion-col>
   </ion-row>
 </ion-content>

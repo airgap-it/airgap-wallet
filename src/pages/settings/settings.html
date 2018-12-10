@@ -1,86 +1,76 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <ion-title>{{'SETTINGS' | translate}}</ion-title>
-  </ion-navbar>
+  <ion-navbar color="primary"><ion-title>{{ 'settings.title' | translate }}</ion-title></ion-navbar>
 </ion-header>
 
 <ion-content padding>
   <ion-list no-border no-lines>
-    <ion-list-header no-margin no-lines>
-      {{'HELP_AND_SUPPORT' | translate}}
-    </ion-list-header>
+    <ion-list-header no-margin no-lines>{{ 'settings.help_label' | translate }}</ion-list-header>
     <ion-item (click)="introduction()">
       <ion-icon name="ios-bulb-outline" item-start></ion-icon>
-      {{'INTRODUCTION' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.introduction_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
     <ion-item (click)="faq()">
       <ion-icon name="ios-help-circle-outline" item-start></ion-icon>
-      {{'FAQ' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.faq_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
-  </ion-list>
-  <ion-list no-border no-lines>
-    <ion-list-header no-margin no-lines>
-      {{'HELP US' | translate}}
-    </ion-list-header>
-     <!-- Removed because of google policies
-    <ion-item (click)="donate()">
-      <ion-icon name="heart" item-start></ion-icon>
-      {{'DONATE' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
-    </ion-item>
+    <!--
+      Removed because of google policies
+      <ion-item (click)="donate()">
+        <ion-icon name="heart" item-start></ion-icon>
+        {{'DONATE' | translate}}
+        <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      </ion-item>
     -->
     <ion-item (click)="telegram()">
       <ion-icon name="md-chatboxes" item-start></ion-icon>
-      {{'Join Telegram' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.telegram_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
     <!--
-    <ion-item (click)="feedback()">
-      <ion-icon name="ios-megaphone" item-start></ion-icon>
-      {{'FEEDBACK' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
-    </ion-item>
+      <ion-item (click)="feedback()">
+        <ion-icon name="ios-megaphone" item-start></ion-icon>
+        {{'FEEDBACK' | translate}}
+        <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      </ion-item>
     -->
     <ion-item (click)="share()">
       <ion-icon name="ios-share-outline" item-start></ion-icon>
-      {{'SHARE_AIRGAP' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.share_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
     <!--
-    <ion-item (click)="translate()">
-      <ion-icon name="flag" item-start></ion-icon>
-      {{'HELP_TRANSLATE' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
-    </ion-item>
+      <ion-item (click)="translate()">
+        <ion-icon name="flag" item-start></ion-icon>
+        {{'HELP_TRANSLATE' | translate}}
+        <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      </ion-item>
     -->
   </ion-list>
   <ion-list no-border no-lines>
-    <ion-list-header no-margin no-lines>
-      {{'INFORMATION' | translate}}
-    </ion-list-header>
+    <ion-list-header no-margin no-lines>{{ 'settings.information_label' | translate }}</ion-list-header>
     <ion-item (click)="githubWallet()">
       <ion-icon name="logo-github" item-start></ion-icon>
-      {{'GitHub Repository' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.github_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
     <!--
-    <ion-item (click)="githubWebSigner()">
-      <ion-icon name="logo-github" item-start></ion-icon>
-      {{'GITHUB_REPOSITORY_CLIENT' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
-    </ion-item>
-    <ion-item (click)="githubDistro()">
-      <ion-icon name="logo-tux" item-start></ion-icon>
-      {{'AIRGAP_DISTRIBUTION' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
-    </ion-item>
+      <ion-item (click)="githubWebSigner()">
+        <ion-icon name="logo-github" item-start></ion-icon>
+        {{'GITHUB_REPOSITORY_CLIENT' | translate}}
+        <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      </ion-item>
+      <ion-item (click)="githubDistro()">
+        <ion-icon name="logo-tux" item-start></ion-icon>
+        {{'AIRGAP_DISTRIBUTION' | translate}}
+        <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      </ion-item>
     -->
     <ion-item (click)="about()">
       <ion-icon name="ios-information-circle-outline" item-start></ion-icon>
-      {{'ABOUT' | translate}}
-      <ion-icon name='ios-arrow-forward' item-end></ion-icon>
+      {{ 'settings.about_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
   </ion-list>
 </ion-content>

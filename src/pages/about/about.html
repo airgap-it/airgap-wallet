@@ -1,13 +1,10 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <ion-title>{{'ABOUT' | translate}}</ion-title>
-  </ion-navbar>
+  <ion-navbar color="primary"><ion-title>{{ 'about.title' | translate }}</ion-title></ion-navbar>
 </ion-header>
 
-
 <ion-content padding>
-  <ion-item>{{appName}}</ion-item>
-  <ion-item>{{packageName}}</ion-item>
-  <ion-item>{{versionCode}}</ion-item>
-  <ion-item>{{versionNumber}}</ion-item>
+  <ion-item>{{ appName }}</ion-item>
+  <ion-item>{{ packageName }}</ion-item>
+  <ion-item>{{ versionCode }}</ion-item>
+  <ion-item>{{ versionNumber }}</ion-item>
 </ion-content>
