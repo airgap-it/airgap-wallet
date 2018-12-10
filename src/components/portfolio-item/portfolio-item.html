@@ -1,4 +1,4 @@
-<ion-item *ngIf="wallet; else: skeletonWallet">
+<ion-item *ngIf="wallet; else: skeletonWallet" no-lines>
   <ion-avatar item-start><identicon [address]="wallet.receivingPublicAddress"></identicon></ion-avatar>
   <ion-label>
     <img class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'" />
@@ -53,7 +53,7 @@
 
 <ng-template #skeletonWallet>
   <ion-list>
-    <ion-item class="skeleton--loading__container">
+    <ion-item class="skeleton--loading__container" no-lines>
       <ion-avatar item-start></ion-avatar>
       <ion-label>
         <img class="symbol--icon" />
