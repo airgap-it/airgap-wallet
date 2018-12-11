@@ -13,7 +13,7 @@
 
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
-  <ion-spinner *ngIf="isRefreshing" color="black"></ion-spinner>
+  <lottie-animation-view *ngIf="showLoader" [options]="lottieConfig"></lottie-animation-view>
 
   <div padding-horizontal class="empty-list" *ngIf="!isRefreshing && showAeMigrationScreen()">
     <img padding-vertical src="../../assets/img/ae-token-migration.svg" />

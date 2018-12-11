@@ -9,7 +9,7 @@ import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { HttpClient } from '@angular/common/http'
 import { BigNumber } from 'bignumber.js'
-import { SettingsProvider, SettingsKey } from '../../providers/settings/settings'
+import { SettingsProvider } from '../../providers/settings/settings'
 
 declare let cordova
 
@@ -18,9 +18,27 @@ declare let cordova
   templateUrl: 'coin-info.html'
 })
 export class CoinInfoPage {
-  isRefreshing = false
+  private _isRefreshing: boolean = false
+  private refreshStarted: Date
+  set isRefreshing(refreshing) {
+    if (!this._isRefreshing && refreshing) {
+      this.refreshStarted = new Date()
+      this.showLoader = true
+    }
+    if (this._isRefreshing && !refreshing) {
+      if (this.refreshStarted.getTime() + this.MIN_LOADING_TIME < new Date().getTime()) {
+        this.showLoader = false
+      } else {
+        setTimeout(() => {
+          this.showLoader = false
+        }, this.MIN_LOADING_TIME + this.refreshStarted.getTime() - new Date().getTime())
+      }
+    }
+    this._isRefreshing = refreshing
+  }
+
+  showLoader = false
   infiniteEnabled = false
-  TRANSACTION_LIMIT = 10
   txOffset: number = 0
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
@@ -31,6 +49,13 @@ export class CoinInfoPage {
   aeMigratedTokens: BigNumber = new BigNumber(0)
   aeCurrentPhase: string = ''
   aePhaseEnd: string = ''
+
+  lottieConfig = {
+    path: '/assets/animations/loading.json'
+  }
+
+  private TRANSACTION_LIMIT = 10
+  private MIN_LOADING_TIME: number = 3000
 
   constructor(
     public navCtrl: NavController,
