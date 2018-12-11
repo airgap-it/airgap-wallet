@@ -25,11 +25,11 @@ describe('WalletsProvider', () => {
   })
 
   it('should successfully add and persist ETH wallets', async () => {
-    expect(walletsProvider.wallets.getValue().length).toEqual(1)
+    expect(walletsProvider.getWalletList().length).toEqual(0)
     await walletsProvider.addWallet(
       new AirGapMarketWallet('eth', '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996', false, `m/44'/60'/0'/0/0`)
     )
-    expect(walletsProvider.wallets.getValue().length).toEqual(2)
+    expect(walletsProvider.getWalletList().length).toEqual(1)
   })
 
   it('should successfully add and persist BTC wallets', async () => {
@@ -40,9 +40,9 @@ describe('WalletsProvider', () => {
       `m/44'/0'/0'`
     )
     await walletsProvider.removeWallet(wallet)
-    expect(walletsProvider.wallets.getValue().length).toEqual(0)
+    expect(walletsProvider.getWalletList().length).toEqual(0)
     await walletsProvider.addWallet(wallet)
-    expect(walletsProvider.wallets.getValue().length).toEqual(1)
+    expect(walletsProvider.getWalletList().length).toEqual(1)
   })
 
   it('should update wallet observalbe when adding a wallet', async done => {
@@ -66,8 +66,8 @@ describe('WalletsProvider', () => {
     })
 
     await walletsProvider.removeWallet(wallet)
-    expect(walletsProvider.wallets.getValue().length).toEqual(0)
+    expect(walletsProvider.getWalletList().length).toEqual(0)
     await walletsProvider.addWallet(wallet)
-    expect(walletsProvider.wallets.getValue().length).toEqual(1)
+    expect(walletsProvider.getWalletList().length).toEqual(1)
   })
 })
