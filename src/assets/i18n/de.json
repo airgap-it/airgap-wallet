@@ -101,6 +101,7 @@
     "to-address_label": "Empfangsadresse",
     "to-address_scan": "QR Code einlesen",
     "amount_label": "BETRAG",
+    "fee": {
       "label": "GEBÜHR",
       "slow_label": "langsam & günstig",
       "fast_label": "schnell & teuer",
