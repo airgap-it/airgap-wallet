@@ -52,6 +52,8 @@ COPY . /app
 ARG BUILD_NR
 RUN sed -i -e "s/android-versionCode=\"1\"/android-versionCode=\"$BUILD_NR\"/g" config.xml
 
+ARG SENTRY_DSN
+
 # build apk
 RUN ionic cordova build android --prod --release --no-interactive
 
