@@ -18,7 +18,8 @@ declare let cordova
   templateUrl: 'coin-info.html'
 })
 export class CoinInfoPage {
-  isRefreshing: boolean = false
+  isRefreshing = false
+  initialTransactionsLoaded = false
   infiniteEnabled = false
   txOffset: number = 0
   wallet: AirGapMarketWallet
@@ -174,11 +175,12 @@ export class CoinInfoPage {
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
     this.isRefreshing = false
+    this.initialTransactionsLoaded = true
+
     this.walletProvider.triggerWalletChanged()
-
     await this.settingsProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
-
     this.txOffset = this.transactions.length
+
     this.infiniteEnabled = true
   }
 

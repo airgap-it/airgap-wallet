@@ -6,11 +6,11 @@
     </ion-buttons>
   </ion-navbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
-  <ion-row class="transaction--label__container" align-items-end [ngClass]="{ 'background--color__primary': !isRefreshing }">
-    <lottie-animation-view *ngIf="isRefreshing" [options]="lottieConfig" height="35"></lottie-animation-view>
-    <span padding ion-text color="white" class="font--weight__bold" *ngIf="!isRefreshing">
-      {{ 'coin-info.transactions_label' | translate }}
-    </span>
+  <ion-row class="transaction--label__container background--color__primary" align-items-center>
+    <ion-col col-10 padding>
+      <span ion-text color="white" class="font--weight__bold">{{ 'coin-info.transactions_label' | translate }}</span>
+    </ion-col>
+    <ion-col col-2 no-padding padding-right class="justify--content__end"><ion-spinner *ngIf="isRefreshing" color="white" name="dots"></ion-spinner></ion-col>
   </ion-row>
 </ion-header>
 
@@ -129,7 +129,7 @@
         </ion-col>
       </ion-row>
     </ion-item>
-    <div *ngIf="isRefreshing" class="loading-content"><ion-spinner color="black"></ion-spinner></div>
+    <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content"><ion-spinner color="black"></ion-spinner></div>
   </ion-list>
 
   <ion-infinite-scroll [enabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
