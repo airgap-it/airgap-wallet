@@ -15,8 +15,8 @@ RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui 
 RUN mkdir /app
 WORKDIR /app
 
-# install npm 5.7.0 to fix https://github.com/npm/npm/issues/19356
-RUN npm install -g npm@5.7.0
+# using npm 6.4.1
+RUN npm install -g npm@6.4.1
 
 # install ionic
 RUN npm install -g ionic@3.20.0
