@@ -102,7 +102,18 @@
 
   "transaction-detail": {
     "title": "Transaction Detail",
-    "open-blockexplorer_label": "OPEN BLOCKEXPLORER"
+    "open-blockexplorer_label": "Open Blockexplorer",
+    "tx-broadcasting": {
+      "heading": "Status: Broadcasting..",
+      "text": "Your transaction is being broadcasted, this might take a few seconds."
+    },
+    "tx-pending": {
+      "heading": "Status: Pending..",
+      "text": "Depending on the fee you've set, it might take a few minutes until the transaction is confirmed."
+    },
+    "tx-success": {
+      "heading": "Status: Successful!"
+    }
   },
 
   "transaction-prepare": {
@@ -143,7 +154,9 @@
   "from-to": {
     "amount_label": "Amount",
     "fee_label": "Fee",
-    "time_label": "Time"
+    "time_label": "Time",
+    "from_label": "From",
+    "to_label": "To"
   },
 
   "wallet-edit-popover-component": {

@@ -133,7 +133,9 @@
   "from-to": {
     "amount_label": "Betrag",
     "fee_label": "Gebühr",
-    "time_label": "ZEIT"
+    "time_label": "ZEIT",
+    "from_label": "Von",
+    "to_label": "Zu"
   },
 
   "wallet-edit-popover-component": {
