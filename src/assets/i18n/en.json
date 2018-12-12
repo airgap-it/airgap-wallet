@@ -68,7 +68,7 @@
   },
 
   "scan-address": {
-    "title": "Scan Account Address",
+    "title": "Confirm Transaction",
     "text": "Scan the QR code of an account address."
   },
 
@@ -133,6 +133,7 @@
   },
 
   "transaction-qr": {
+    "title": "{{title}} Transaction QR",
     "text": "Open AirGap Vault and scan this transaction in order to sign it.",
     "sign-on-device_label": "Sign on this device",
     "done_label": "Done"

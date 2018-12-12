@@ -1,13 +1,15 @@
 <ion-header no-border>
   <ion-navbar color="primary">
     <ion-title>
-      <span ion-text color="white">{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'transaction-prepare' | translate }}</span>
+      <span ion-text color="white">{{ 'transaction-qr.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}</span>
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding class="colored-background">
-  <ion-row><h5>{{ 'transaction-qr.textt' | translate }}</h5></ion-row>
+  <ion-row>
+    <h5>{{ 'transaction-qr.text' | translate }}</h5>
+  </ion-row>
 
   <ion-row justify-content-center padding-top>
     <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
