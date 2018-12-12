@@ -95,24 +95,24 @@ describe('TransactionPrepare Page', () => {
     fixture.detectChanges()
 
     // check if fee gets properly displayed in $
-    expect(feeAmount.textContent).toEqual('$0.021')
-    expect(feeAmountAdvanced.textContent).toEqual('(0.00021 ETH)')
+    expect(feeAmount.textContent.trim()).toEqual('$0.021')
+    expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
 
     // check if fee changes if set to medium
     component.transactionForm.controls['feeLevel'].setValue(1)
     expect(component.transactionForm.value.fee).toEqual(
       ethWallet.coinProtocol.feeDefaults.medium.toFixed(-1 * ethWallet.coinProtocol.feeDefaults.low.e + 1)
     )
-    expect(feeAmount.textContent).toEqual('$0.021')
-    expect(feeAmountAdvanced.textContent).toEqual('(0.00021 ETH)')
+    expect(feeAmount.textContent.trim()).toEqual('$0.021')
+    expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
 
     // check if fee changes if set to high
     component.transactionForm.controls['feeLevel'].setValue(2)
     expect(component.transactionForm.value.fee).toEqual(
       ethWallet.coinProtocol.feeDefaults.high.toFixed(-1 * ethWallet.coinProtocol.feeDefaults.low.e + 1)
     )
-    expect(feeAmount.textContent).toEqual('$0.021')
-    expect(feeAmountAdvanced.textContent).toEqual('(0.00021 ETH)')
+    expect(feeAmount.textContent.trim()).toEqual('$0.021')
+    expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
 
     done()
   })
@@ -122,8 +122,8 @@ describe('TransactionPrepare Page', () => {
     let feeAmount = el.querySelector('#fee-amount')
     let feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
     component.useWallet(ethWallet)
-    expect(feeAmount.textContent).toEqual('$0.021')
-    expect(feeAmountAdvanced.textContent).toEqual('(0.00021 ETH)')
+    expect(feeAmount.textContent.trim()).toEqual('$0.021')
+    expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
   })
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
