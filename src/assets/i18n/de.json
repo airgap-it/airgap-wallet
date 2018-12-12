@@ -53,7 +53,7 @@
     "title": "QR Code einlesen",
     "text": "Lesen Sie einen Synchronisierungs QR Code ein um ein Konto hinzuzufügen, oder lesen Sie einen Transaktions QR Code ein um eine Transaktion zu bestätigen.",
     "empty-state_heading": "Un QR Codes einlesen zu können, benötigt AirGap Wallet die <span class=\"style__strong color__primary\">Kamera Berechtigung</span>.",
-    "grant_permission": "Berechtigung erteilen"
+    "grant-permission_label": "Berechtigung erteilen"
   },
 
   "scan-address": {
