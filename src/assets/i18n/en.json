@@ -127,6 +127,7 @@
   },
 
   "wallet-address": {
+    "title": "Account Address",
     "address_label": "Address",
     "done_label": "Done"
   },

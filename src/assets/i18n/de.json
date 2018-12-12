@@ -117,6 +117,7 @@
   },
 
   "wallet-address": {
+    "title": "Kontoadresse",
     "address_label": "Addresse",
     "done_label": "Fertig"
   },
