@@ -1,4 +1,7 @@
 page-coin-info {
+  .transaction--label__container {
+    height: 48px;
+  }
   /* TODO: remove if using component */
   .symbol--icon {
     position: absolute;
