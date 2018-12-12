@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { BehaviorSubject } from 'rxjs/BehaviorSubject'
+import { Subject, ReplaySubject, BehaviorSubject } from 'rxjs'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SettingsProvider, SettingsKey } from '../settings/settings'
-import { Subject } from 'rxjs'
 
 @Injectable()
 export class WalletsProvider {
   private walletList: AirGapMarketWallet[] = []
-  public wallets: BehaviorSubject<AirGapMarketWallet[]> = new BehaviorSubject(this.walletList)
+
+  public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   private walletChangedBehaviour: Subject<void> = new Subject()
 
   get walledChangedObservable() {
@@ -24,6 +24,11 @@ export class WalletsProvider {
   }
 
   private async loadWalletsFromStorage() {
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 2000)
+    })
     const rawWallets = await this.settingsProvider.get(SettingsKey.WALLET)
     let wallets = rawWallets
 
@@ -79,6 +84,12 @@ export class WalletsProvider {
 
       this.walletList.push(airGapWallet)
     })
+
+    this.wallets.next(this.walletList)
+  }
+
+  getWalletList(): AirGapMarketWallet[] {
+    return this.walletList
   }
 
   public addWallet(wallet: AirGapMarketWallet): Promise<any> {

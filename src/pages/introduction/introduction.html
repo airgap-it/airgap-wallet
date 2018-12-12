@@ -9,8 +9,8 @@
 
 <ion-content padding no-bounce>
   <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isBrowser">
-    <ion-segment-button value="highest">{{ 'introduction.highest' | translate }}</ion-segment-button>
-    <ion-segment-button value="medium">{{ 'introduction.medium' | translate }}</ion-segment-button>
+    <ion-segment-button value="highest">{{ 'introduction.highest.label' | translate }}</ion-segment-button>
+    <ion-segment-button value="medium">{{ 'introduction.medium.label' | translate }}</ion-segment-button>
   </ion-segment>
 
   <ng-container *ngIf="security === 'highest'">
@@ -27,7 +27,9 @@
 
     <ion-row padding-vertical align-items-center>
       <ion-col col-5 text-center><img class="connector--img" src="assets/img/qrcode.svg" /></ion-col>
-      <ion-col col-7><strong>{{ 'introduction.communication.highest_text' | translate }}</strong></ion-col>
+      <ion-col col-7>
+        <strong>{{ 'introduction.communication.highest_text' | translate }}</strong>
+      </ion-col>
     </ion-row>
 
     <ion-row align-items-center>
@@ -52,7 +54,9 @@
 
     <ion-row padding-vertical align-items-center>
       <ion-col col-5 text-center><img class="connector--img" src="assets/img/clone.svg" /></ion-col>
-      <ion-col col-7><strong>{{ 'introduction.communication.medium_text' | translate }}</strong></ion-col>
+      <ion-col col-7>
+        <strong>{{ 'introduction.communication.medium_text' | translate }}</strong>
+      </ion-col>
     </ion-row>
 
     <ion-row align-items-center>

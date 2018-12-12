@@ -1,5 +1,6 @@
 {
   "coin-info": {
+    "title": "Konto",
     "transactions_label": "Transaktionen",
     "ae-mainnet_text": "Ihre Token können nach dem æternity mainnet launch verschoben werden.",
     "no-transactions_text": "Es wurden noch keine Transaktionen mit diesem Konto durchgeführt.",
@@ -53,7 +54,7 @@
     "title": "QR Code einlesen",
     "text": "Lesen Sie einen Synchronisierungs QR Code ein um ein Konto hinzuzufügen, oder lesen Sie einen Transaktions QR Code ein um eine Transaktion zu bestätigen.",
     "empty-state_heading": "Un QR Codes einlesen zu können, benötigt AirGap Wallet die <span class=\"style__strong color__primary\">Kamera Berechtigung</span>.",
-    "grant_permission": "Berechtigung erteilen"
+    "grant-permission_label": "Berechtigung erteilen"
   },
 
   "scan-address": {
@@ -96,7 +97,7 @@
   },
 
   "transaction-prepare": {
-    "title": "Versenden",
+    "title": "{{title}} Versenden",
     "to-address_label": "Empfangsadresse",
     "to-address_scan": "QR Code einlesen",
     "amount_label": "BETRAG",
@@ -117,6 +118,7 @@
   },
 
   "wallet-address": {
+    "title": "Kontoadresse",
     "address_label": "Addresse",
     "done_label": "Fertig"
   },

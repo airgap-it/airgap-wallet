@@ -42,4 +42,12 @@ export class SettingsProvider {
   public async set<K extends SettingsKey>(key: K, value: any): Promise<any> {
     return this.storage.set(key, value)
   }
+
+  public async getCache<T>(key: string): Promise<T> {
+    return this.storage.get(key)
+  }
+
+  public async setCache<T>(key: string, value: T): Promise<T> {
+    return this.storage.set(key, value)
+  }
 }

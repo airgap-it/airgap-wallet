@@ -1,5 +1,6 @@
 {
   "coin-info": {
+    "title": "Account",
     "transactions_label": "Transactions",
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
@@ -63,7 +64,7 @@
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",
     "empty-state_heading": "In order to scan QR codes, AirGap Wallet needs the <span class=\"style__strong color__primary\">camera permission</span>.",
-    "grant_permission": "Grant permission"
+    "grant-permission_label": "Grant permission"
   },
 
   "scan-address": {
@@ -117,7 +118,7 @@
   },
 
   "transaction-prepare": {
-    "title": "Send",
+    "title": "Send {{title}}",
     "to-address_label": "To Address",
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
@@ -138,6 +139,7 @@
   },
 
   "wallet-address": {
+    "title": "Account Address",
     "address_label": "Address",
     "done_label": "Done"
   },

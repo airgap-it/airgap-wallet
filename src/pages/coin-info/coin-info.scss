@@ -1,4 +1,8 @@
 page-coin-info {
+  .justify--content__end {
+    display: flex;
+    justify-content: flex-end;
+  }
   /* TODO: remove if using component */
   .symbol--icon {
     position: absolute;

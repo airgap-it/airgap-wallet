@@ -27,7 +27,7 @@ export class PortfolioPage {
       this.calculateTotal(wallets)
     })
     this.walletsProvider.walledChangedObservable.subscribe(() => {
-      this.calculateTotal(this.walletsProvider.wallets.getValue())
+      this.calculateTotal(this.walletsProvider.getWalletList())
     })
   }
 
@@ -45,12 +45,12 @@ export class PortfolioPage {
 
   async doRefresh(refresher: any = null) {
     await Promise.all(
-      this.walletsProvider.wallets.getValue().map(wallet => {
+      this.walletsProvider.getWalletList().map(wallet => {
         return wallet.synchronize()
       })
     )
 
-    this.calculateTotal(this.walletsProvider.wallets.getValue(), refresher)
+    this.calculateTotal(this.walletsProvider.getWalletList(), refresher)
   }
 
   calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {

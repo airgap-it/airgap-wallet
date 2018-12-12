@@ -17,9 +17,9 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="(wallets | async) as wallets; else: loading">
-    <ng-container *ngIf="wallets.length; else: noItems">
-      <ion-list no-lines margin-top *ngFor="let wallet of wallets">
+  <ng-container *ngIf="wallets | async as walletsArray; else loading">
+    <ng-container *ngIf="walletsArray.length; else noItems">
+      <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
         <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
       </ion-list>
     </ng-container>
@@ -29,18 +29,25 @@
         <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
       </ion-row>
     </ng-template>
-    <ng-template #loading>
-      <div class="loading-content"><ion-spinner color="black"></ion-spinner></div>
-    </ng-template>
   </ng-container>
+  <ng-template #loading>
+    <ion-list no-lines margin-top>
+      <portfolio-item></portfolio-item>
+      <portfolio-item></portfolio-item>
+      <portfolio-item></portfolio-item>
+      <portfolio-item></portfolio-item>
+    </ion-list>
+  </ng-template>
 
   <ion-fab right bottom>
-    <button *ngIf="(wallets | async).length > 0" ion-fab color="secondary" (click)="openSyncPage()">
-      <ion-icon md-name="vertical_align_bottom"></ion-icon>
-    </button>
-    <button *ngIf="(wallets | async).length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
-      <ion-icon md-name="vertical_align_bottom"></ion-icon>
-      {{ 'portfolio.sync_label' | translate }}
-    </button>
+    <ng-container *ngIf="wallets | async as walletsArray">
+      <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openSyncPage()">
+        <ion-icon md-name="vertical_align_bottom"></ion-icon>
+      </button>
+      <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
+        <ion-icon md-name="vertical_align_bottom"></ion-icon>
+        Sync with AirGap Vault
+      </button>
+    </ng-container>
   </ion-fab>
 </ion-content>

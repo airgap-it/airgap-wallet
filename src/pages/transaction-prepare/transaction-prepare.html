@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="primary">
-    <ion-title>{{ 'transaction-prepare.title' | translate }}</ion-title>
+    <ion-title>{{ 'transaction-prepare.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -44,7 +44,9 @@
       </ion-col>
     </ion-row>
     <ion-row padding-horizontal padding-bottom class="address-to__buttons">
-      <button outline small ion-button color="secondary" round (click)="pasteClipboard()">{{ 'transaction-prepare.paste_label' | translate }}</button>
+      <button outline small ion-button color="secondary" round (click)="pasteClipboard()">
+        {{ 'transaction-prepare.paste_label' | translate }}
+      </button>
       <button outline small ion-button color="secondary" round icon-left (click)="openScanner()">
         <ion-icon name="md-barcode"></ion-icon>
         {{ 'transaction-prepare.to-address-scan_label' | translate }}
@@ -63,14 +65,18 @@
       </ion-col>
       <ion-col col-4>
         <ion-buttons end>
-          <button [outline]="sendMaxAmount ? null : ''" small ion-button color="secondary" round (click)="toggleMaxAmount()">{{ 'transaction-prepare.fee.max_label' | translate }}</button>
+          <button [outline]="sendMaxAmount ? null : ''" small ion-button color="secondary" round (click)="toggleMaxAmount()">
+            {{ 'transaction-prepare.fee.max_label' | translate }}
+          </button>
         </ion-buttons>
       </ion-col>
     </ion-row>
     <div class="divider--line"></div>
     <ion-row padding-horizontal class="fee--amount__label">
       <ion-item no-lines no-padding>
-        <ion-label ion-text no-margin color="blackLight">{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+        <ion-label ion-text no-margin color="blackLight">
+          {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
+        </ion-label>
         <ion-toggle mode="md" formControlName="isAdvancedMode"></ion-toggle>
       </ion-item>
     </ion-row>
@@ -83,20 +89,28 @@
       </ion-item>
     </ion-row>
     <ion-row padding-horizontal>
-      <ion-col col-6 no-padding><small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small></ion-col>
-      <ion-col col-6 text-right no-padding><small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small></ion-col>
+      <ion-col col-6 no-padding>
+        <small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small>
+      </ion-col>
+      <ion-col col-6 text-right no-padding>
+        <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
+      </ion-col>
     </ion-row>
     <ion-row padding-horizontal *ngIf="transactionForm.get('isAdvancedMode').value">
       <ion-item no-padding no-lines>
         <ion-label stacked></ion-label>
         <ion-input id="fee-input" formControlName="fee" type="string"></ion-input>
-        <span item-right class="input--placeholder">{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
+        <span item-right class="input--placeholder">
+          {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
+        </span>
       </ion-item>
     </ion-row>
     <ion-row padding-horizontal class="fee-amount__help">
       <p ion-text no-margin color="blackLight">
         <span id="fee-amount">${{ transactionForm.get('fee').value * wallet.currentMarketPrice | number: '1.2-4' }}</span>
-        <span id="fee-amount-advanced" *ngIf="!isAdvancedMode">({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})</span>
+        <span id="fee-amount-advanced" *ngIf="!isAdvancedMode">
+          ({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+        </span>
       </p>
     </ion-row>
   </form>
