@@ -18,32 +18,15 @@ declare let cordova
   templateUrl: 'coin-info.html'
 })
 export class CoinInfoPage {
-  private _isRefreshing: boolean = false
-  private refreshStarted: Date
-  set isRefreshing(refreshing) {
-    if (!this._isRefreshing && refreshing) {
-      this.refreshStarted = new Date()
-      this.showLoader = true
-    }
-    if (this._isRefreshing && !refreshing) {
-      if (this.refreshStarted.getTime() + this.MIN_LOADING_TIME < new Date().getTime()) {
-        this.showLoader = false
-      } else {
-        setTimeout(() => {
-          this.showLoader = false
-        }, this.MIN_LOADING_TIME + this.refreshStarted.getTime() - new Date().getTime())
-      }
-    }
-    this._isRefreshing = refreshing
-  }
-
-  showLoader = false
+  isRefreshing: boolean = false
   infiniteEnabled = false
   txOffset: number = 0
   wallet: AirGapMarketWallet
   transactions: IAirGapTransaction[] = []
 
   protocolIdentifier: string
+
+  // AE-Migration Stuff
   aeTxEnabled: boolean = false
   aeTxListEnabled: boolean = false
   aeMigratedTokens: BigNumber = new BigNumber(0)
@@ -55,7 +38,6 @@ export class CoinInfoPage {
   }
 
   private TRANSACTION_LIMIT = 10
-  private MIN_LOADING_TIME: number = 3000
 
   constructor(
     public navCtrl: NavController,
@@ -139,11 +121,11 @@ export class CoinInfoPage {
   }
 
   doRefresh(refresher: any = null) {
+    this.isRefreshing = true
+
     if (refresher) {
       refresher.complete()
     }
-
-    this.isRefreshing = true
 
     // this can safely be removed after AE has made the switch to mainnet
     if (this.protocolIdentifier === 'ae') {
