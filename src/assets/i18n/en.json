@@ -1,5 +1,6 @@
 {
   "coin-info": {
+    "title": "Account",
     "transactions_label": "Transactions",
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
@@ -106,7 +107,7 @@
   },
 
   "transaction-prepare": {
-    "title": "Send",
+    "title": "Send {{title}}",
     "to-address_label": "To Address",
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",

@@ -1,5 +1,6 @@
 {
   "coin-info": {
+    "title": "Konto",
     "transactions_label": "Transaktionen",
     "ae-mainnet_text": "Ihre Token können nach dem æternity mainnet launch verschoben werden.",
     "no-transactions_text": "Es wurden noch keine Transaktionen mit diesem Konto durchgeführt.",
@@ -96,7 +97,7 @@
   },
 
   "transaction-prepare": {
-    "title": "Versenden",
+    "title": "{{title}} Versenden",
     "to-address_label": "Empfangsadresse",
     "to-address_scan": "QR Code einlesen",
     "amount_label": "BETRAG",
