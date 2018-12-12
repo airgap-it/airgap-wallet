@@ -24,11 +24,6 @@ export class WalletsProvider {
   }
 
   private async loadWalletsFromStorage() {
-    await new Promise(resolve => {
-      setTimeout(() => {
-        resolve()
-      }, 2000)
-    })
     const rawWallets = await this.settingsProvider.get(SettingsKey.WALLET)
     let wallets = rawWallets
 
@@ -83,6 +78,12 @@ export class WalletsProvider {
       }
 
       this.walletList.push(airGapWallet)
+    })
+
+    await new Promise(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, 2000)
     })
 
     this.wallets.next(this.walletList)
