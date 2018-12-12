@@ -184,7 +184,7 @@ export class CoinInfoPage {
 
   async loadInitialTransactions(): Promise<void> {
     if (this.transactions.length === 0) {
-      this.transactions = await this.settingsProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())
+      this.transactions = (await this.settingsProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())) || []
     }
 
     const transactions = await this.getTransactions()
