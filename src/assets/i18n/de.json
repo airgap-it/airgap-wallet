@@ -58,7 +58,7 @@
   },
 
   "scan-address": {
-    "title": "Account Adresse einlesen",
+    "title": "Transaktion bestätigen",
     "text": "QR einer Wallet Adresse einlesen."
   },
 
@@ -101,7 +101,6 @@
     "to-address_label": "Empfangsadresse",
     "to-address_scan": "QR Code einlesen",
     "amount_label": "BETRAG",
-    "fee": {
       "label": "GEBÜHR",
       "slow_label": "langsam & günstig",
       "fast_label": "schnell & teuer",
@@ -112,6 +111,7 @@
   },
 
   "transaction-qr": {
+    "title": "{{title}} Transaktions QR",
     "text": "Öffnen Sie AirGap Vault und lesen Sie diesen Transaktions QR Code ein um die Transaktion zu signieren.",
     "sign-on-device_label": "gleiches-Gerät Signierung",
     "done_label": "Fertig"
