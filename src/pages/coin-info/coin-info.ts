@@ -167,8 +167,7 @@ export class CoinInfoPage {
       return infiniteScroll.complete()
     }
 
-    // TODO: If coinlib is updated, we need to remove `+ this.TRANSACTION_LIMIT`
-    const offset = this.txOffset + this.TRANSACTION_LIMIT - (this.txOffset % this.TRANSACTION_LIMIT)
+    const offset = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
     const newTransactions = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)

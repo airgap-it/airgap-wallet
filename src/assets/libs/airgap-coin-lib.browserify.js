@@ -209,7 +209,7 @@ module.exports={
   "_args": [
     [
       "web3@1.0.0-beta.30",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "web3@1.0.0-beta.30",
@@ -233,7 +233,7 @@ module.exports={
   ],
   "_resolved": "http://registry.npmjs.org/web3/-/web3-1.0.0-beta.30.tgz",
   "_spec": "1.0.0-beta.30",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "ethereum.org"
   },
@@ -2578,6 +2578,8 @@ var BitcoinProtocol = (function () {
                             }
                         }
                     }
+                    // deduct fee from amount
+                    amount = amount.minus(new bignumber_js_1.default(transaction.fees).shiftedBy(_this.feeDecimals));
                     var airGapTransaction = {
                         hash: transaction.txid,
                         from: tempAirGapTransactionFrom,
@@ -12935,7 +12937,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -12963,7 +12965,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -37354,7 +37356,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.1",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "elliptic@6.4.1",
@@ -37384,7 +37386,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.1.tgz",
   "_spec": "6.4.1",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -80584,7 +80586,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -82950,7 +82952,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -86036,7 +86038,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -86110,7 +86112,13 @@ module.exports={
 
 },{}],533:[function(require,module,exports){
 module.exports={
-  "_from": "web3@^1.0.0-beta.36",
+  "_args": [
+    [
+      "web3@1.0.0-beta.37",
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
+    ]
+  ],
+  "_from": "web3@1.0.0-beta.37",
   "_id": "web3@1.0.0-beta.37",
   "_inBundle": false,
   "_integrity": "sha512-8XLgUspdzicC/xHG82TLrcF/Fxzj2XYNJ1KTYnepOI77bj5rvpsxxwHYBWQ6/JOjk0HkZqoBfnXWgcIHCDhZhQ==",
@@ -86140,22 +86148,21 @@ module.exports={
     "yaeti": "0.0.6"
   },
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "web3@^1.0.0-beta.36",
+    "raw": "web3@1.0.0-beta.37",
     "name": "web3",
     "escapedName": "web3",
-    "rawSpec": "^1.0.0-beta.36",
+    "rawSpec": "1.0.0-beta.37",
     "saveSpec": null,
-    "fetchSpec": "^1.0.0-beta.36"
+    "fetchSpec": "1.0.0-beta.37"
   },
   "_requiredBy": [
     "/airgap-coin-lib"
   ],
   "_resolved": "https://registry.npmjs.org/web3/-/web3-1.0.0-beta.37.tgz",
-  "_shasum": "b42c30e67195f816cd19d048fda872f70eca7083",
-  "_spec": "web3@^1.0.0-beta.36",
-  "_where": "/Users/andreas/Programming/airgap-wallet/node_modules/airgap-coin-lib",
+  "_spec": "1.0.0-beta.37",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "ethereum.org"
   },
@@ -86188,7 +86195,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/ethereum/web3.js/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "web3-bzz": "1.0.0-beta.37",
     "web3-core": "1.0.0-beta.37",
@@ -86198,7 +86204,6 @@ module.exports={
     "web3-shh": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37"
   },
-  "deprecated": false,
   "description": "Ethereum JavaScript API",
   "keywords": [
     "Ethereum",
