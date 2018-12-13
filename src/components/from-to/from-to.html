@@ -2,10 +2,9 @@
   <address-row *ngFor="let address of transaction.from" [address]="address" label="{{ 'from-to.from_label' | translate }}"></address-row>
 
   <ion-row align-items-center>
-    <ion-col col-2 no-padding>
+    <ion-col col-3 no-padding>
       <ion-row justify-content-center><div class="line"></div></ion-row>
     </ion-col>
-    <ion-col col-1 no-padding></ion-col>
     <ion-col col-9 padding-bottom>
       <ion-label stacked class="typography--uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="typography--mono" item-content>
