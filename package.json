@@ -61,7 +61,7 @@
     "@sentry/browser": "^4.2.4",
     "@types/node": "8.0.31",
     "@zxing/ngx-scanner": "^1.3.0",
-    "airgap-coin-lib": "0.1.6",
+    "airgap-coin-lib": "^0.1.7",
     "angular2-qrcode": "2.0.1",
     "angular2-template-loader": "0.6.2",
     "angularx-qrcode": "^1.2.2",
