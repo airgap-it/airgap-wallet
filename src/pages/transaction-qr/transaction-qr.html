@@ -15,7 +15,7 @@
     <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
   </ion-row>
 
-  <ion-row padding-bottom margin-bottom><from-to [transaction]="airGapTx"></from-to></ion-row>
+  <from-to padding-horizontal [transaction]="airGapTx"></from-to>
 
   <ion-fab bottom right>
     <button *ngIf="!isBrowser" default ion-button color="white" (click)="sameDeviceSign()" round item-right>
