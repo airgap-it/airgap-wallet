@@ -48,6 +48,7 @@ import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-err
 import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
+import { ExchangePage } from '../pages/exchange/exchange'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -71,7 +72,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanAddressPage,
     ScanSyncPage,
     WalletImportPage,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    ExchangePage
   ],
   imports: [
     BrowserModule,
@@ -118,7 +120,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanSyncPage,
     WalletImportPage,
     WalletEditPopoverComponent,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    ExchangePage
   ],
   providers: [
     StatusBar,

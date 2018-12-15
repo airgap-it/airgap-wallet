@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-navbar color="primary"><ion-title>Exchange</ion-title></ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-row no-padding align-items-center class="amount__container border--vertical">
+    <ion-col padding col-8>
+      <ion-item no-padding no-lines>
+        <ion-label no-margin stacked>Sell</ion-label>
+        <ion-input type="number" id="buy-input" placeholder="0.0"></ion-input>
+      </ion-item>
+      <p ion-text no-margin color="blackLight">$123</p>
+    </ion-col>
+    <ion-col col-4 padding class="coin__selection ">
+      <ion-row><img src="../assets/symbols/eth.svg" /></ion-row>
+      <ion-row>
+        <h5>
+          ETH
+          <ion-icon
+            md-name="keyboard_arrow_down
+              "
+          ></ion-icon>
+        </h5>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-list no-margin>
+    <ion-item no-lines>
+      <ion-avatar item-start><img src="../assets/symbols/eth.svg" /></ion-avatar>
+      <h2>Ethereum</h2>
+      <button ion-button item-end clear color="black" icon-only>
+        <ion-icon
+          md-name="keyboard_arrow_down
+            "
+        ></ion-icon>
+      </button>
+    </ion-item>
+  </ion-list>
+  <ion-list no-margin>
+    <ion-item no-lines>
+      <ion-avatar item-start><img src="../assets/symbols/eth.svg" /></ion-avatar>
+      <h2>Ethereum</h2>
+      <button ion-button item-end clear color="black" icon-only>
+        <ion-icon
+          md-name="keyboard_arrow_down
+              "
+        ></ion-icon>
+      </button>
+    </ion-item>
+  </ion-list>
+  <ion-row no-padding align-items-center class="amount__container border--vertical">
+    <ion-col padding col-8>
+      <ion-item no-padding no-lines>
+        <ion-label no-margin stacked>Buy</ion-label>
+        <ion-input type="number" id="buy-input" placeholder="0.0"></ion-input>
+      </ion-item>
+      <p ion-text no-margin color="blackLight">$123</p>
+    </ion-col>
+    <ion-col col-4 padding class="coin__selection ">
+      <ion-row><img src="../assets/symbols/btc.svg" /></ion-row>
+      <ion-row>
+        <h5>
+          BTC
+          <ion-icon
+            md-name="keyboard_arrow_down
+                "
+          ></ion-icon>
+        </h5>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-row padding><p no-margin ion-text color="blackLight">Fee 0.000212 BTC</p></ion-row>
+  <ion-fab bottom right><button ion-button color="secondary" round>Exchange</button></ion-fab>
+</ion-content>

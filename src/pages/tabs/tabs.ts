@@ -5,6 +5,7 @@ import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
+import { ExchangePage } from '../exchange/exchange'
 
 import { SettingsProvider, SettingsKey } from '../../providers/settings/settings'
 @Component({
@@ -13,7 +14,8 @@ import { SettingsProvider, SettingsKey } from '../../providers/settings/settings
 export class TabsPage {
   tab1Root = PortfolioPage
   tab2Root = ScanPage
-  tab3Root = SettingsPage
+  tab3Root = ExchangePage
+  tab4Root = SettingsPage
 
   constructor(public modalController: ModalController, private settingsProvider: SettingsProvider, private events: Events) {
     this.showIntroduction().catch(console.error)
