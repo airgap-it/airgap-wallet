@@ -170,7 +170,8 @@
   "tabs": {
     "wallets": "Accounts",
     "scan": "Scan QRs",
-    "settings": "Settings"
+    "settings": "Settings",
+    "exchange": "Exchange"
   },
   "portfolio-item": {
     "syncing_label": "syncing with blockchain ... "
