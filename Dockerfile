@@ -1,4 +1,4 @@
-FROM node:8-slim
+FROM node:10
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
@@ -17,6 +17,12 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
     && apt-get purge --auto-remove -y curl \
     && rm -rf /src/*.deb
 
+# install npm
+RUN npm install -g npm@6.4.1
+
+# install static webserver
+RUN npm install -g node-static
+
 # create app directory
 RUN mkdir /app
 WORKDIR /app
@@ -25,24 +31,8 @@ WORKDIR /app
 COPY package.json /app
 COPY package-lock.json /app
 
-# copy deploy keys for pull-access
-RUN mkdir -p /root/.ssh
-
-COPY airgap_cordova_secure_storage_deploy /root/.ssh/id_rsa
-COPY airgap_cordova_secure_storage_deploy.pub /root/.ssh/id_rsa.pub
-
-RUN chmod 700 /root/.ssh/id_rsa
-
-RUN echo "Host gitlab.papers.tech\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-
 # install dependencies
 RUN npm install
-
-# Build fix
-RUN cd node_modules/airgap-coin-lib && npm i && npm run build && cd /app
-
-# install static webserver
-RUN npm install node-static -g
 
 # Bundle app source
 COPY . /app
