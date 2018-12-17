@@ -54,7 +54,7 @@
     </ion-row>
     <div class="divider--line"></div>
     <ion-row padding align-items-center class="amount__container">
-      <ion-col col-8>
+      <ion-col col-9 class="amount--container__input">
         <ion-item no-padding no-lines>
           <ion-label no-margin stacked>{{ 'transaction-prepare.amount_label' | translate }}</ion-label>
           <ion-input formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
@@ -63,7 +63,7 @@
           ${{ transactionForm.get('amount').value * wallet.currentMarketPrice | number: '1.2-2' }}
         </p>
       </ion-col>
-      <ion-col col-4>
+      <ion-col col-3 no-padding>
         <ion-buttons end>
           <button [outline]="sendMaxAmount ? null : ''" small ion-button color="secondary" round (click)="toggleMaxAmount()">
             {{ 'transaction-prepare.fee.max_label' | translate }}
