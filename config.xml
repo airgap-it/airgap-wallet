@@ -25,7 +25,7 @@
     <preference name="deployment-target" value="10.0" />
     <preference name="cordova.plugins.diagnostic.modules" value="CAMERA" />
     <preference name="UseScheme" value="true" />
-    <preference name="MixedContentMode" value="2" />
+    <preference name="MixedContentMode" value="1" />
     <platform name="android">
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
             <application allowBackup="false" />
