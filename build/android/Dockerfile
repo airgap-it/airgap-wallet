@@ -27,7 +27,7 @@ COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
 
 # install dependencies
-RUN npm install --no-optional
+RUN npm ci
 
 # copy config.xml, ionic configs and resources to allow plugin installation
 COPY config.xml /app/config.xml

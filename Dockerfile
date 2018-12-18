@@ -32,7 +32,7 @@ COPY package.json /app
 COPY package-lock.json /app
 
 # install dependencies
-RUN npm install
+RUN npm ci
 
 # Bundle app source
 COPY . /app
