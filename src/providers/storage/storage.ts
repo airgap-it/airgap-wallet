@@ -22,7 +22,7 @@ type SettingsKeyReturnType = {
 */
 
 @Injectable()
-export class SettingsProvider {
+export class StorageProvider {
   constructor(private storage: Storage) {}
 
   /* TS 2.7 feature

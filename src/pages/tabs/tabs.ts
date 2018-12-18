@@ -6,7 +6,7 @@ import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
 
-import { SettingsProvider, SettingsKey } from '../../providers/settings/settings'
+import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 @Component({
   templateUrl: 'tabs.html'
 })
@@ -15,15 +15,15 @@ export class TabsPage {
   tab2Root = ScanPage
   tab3Root = SettingsPage
 
-  constructor(public modalController: ModalController, private settingsProvider: SettingsProvider, private events: Events) {
+  constructor(public modalController: ModalController, private storageProvider: StorageProvider, private events: Events) {
     this.showIntroduction().catch(console.error)
   }
 
   private async showIntroduction() {
-    const introduction = await this.settingsProvider.get(SettingsKey.INTRODUCTION)
+    const introduction = await this.storageProvider.get(SettingsKey.INTRODUCTION)
     if (!introduction) {
       setTimeout(async () => {
-        await this.settingsProvider.set(SettingsKey.INTRODUCTION, true)
+        await this.storageProvider.set(SettingsKey.INTRODUCTION, true)
       }, 3000)
       const modal = this.modalController.create(IntroductionPage)
       modal.onDidDismiss(() => {

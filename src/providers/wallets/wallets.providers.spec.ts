@@ -4,15 +4,14 @@ import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { SettingsProvider } from '../settings/settings'
-import { doesNotThrow } from 'assert'
+import { StorageProvider } from '../storage/storage'
 
 describe('WalletsProvider', () => {
   let walletsProvider: WalletsProvider
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      providers: [WalletsProvider, SettingsProvider, { provide: Storage, useClass: StorageMock }]
+      providers: [WalletsProvider, StorageProvider, { provide: Storage, useClass: StorageMock }]
     })
   }))
 

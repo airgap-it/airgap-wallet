@@ -9,7 +9,7 @@ import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { HttpClient } from '@angular/common/http'
 import { BigNumber } from 'bignumber.js'
-import { SettingsProvider } from '../../providers/settings/settings'
+import { StorageProvider } from '../../providers/storage/storage'
 
 declare let cordova
 
@@ -47,7 +47,7 @@ export class CoinInfoPage {
     public walletProvider: WalletsProvider,
     public http: HttpClient,
     private platform: Platform,
-    private settingsProvider: SettingsProvider
+    private storageProvider: StorageProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -156,7 +156,7 @@ export class CoinInfoPage {
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
     this.txOffset = this.transactions.length
 
-    await this.settingsProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
       this.infiniteEnabled = false
@@ -167,7 +167,7 @@ export class CoinInfoPage {
 
   async loadInitialTransactions(): Promise<void> {
     if (this.transactions.length === 0) {
-      this.transactions = (await this.settingsProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())) || []
+      this.transactions = (await this.storageProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())) || []
     }
 
     const transactions = await this.getTransactions()
@@ -178,7 +178,7 @@ export class CoinInfoPage {
     this.initialTransactionsLoaded = true
 
     this.walletProvider.triggerWalletChanged()
-    await this.settingsProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
