@@ -41,7 +41,7 @@ import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routin
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
 import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wallet-edit-popover.component'
-import { SettingsProvider } from '../providers/settings/settings'
+import { StorageProvider } from '../providers/storage/storage'
 import { Clipboard } from '@ionic-native/clipboard'
 import { Diagnostic } from '@ionic-native/diagnostic'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
@@ -131,7 +131,7 @@ export function createTranslateLoader(http: HttpClient) {
     AppVersion,
     Diagnostic,
     WalletsProvider,
-    SettingsProvider,
+    StorageProvider,
     {
       provide: Clipboard,
       useFactory: (platform: Platform) => (platform.is('cordova') ? new Clipboard() : new ClipboardBrowserProvider()),

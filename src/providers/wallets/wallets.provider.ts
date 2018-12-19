@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage'
-import { Subject, ReplaySubject, BehaviorSubject } from 'rxjs'
+import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { SettingsProvider, SettingsKey } from '../settings/settings'
+import { StorageProvider, SettingsKey } from '../storage/storage'
 
 @Injectable()
 export class WalletsProvider {
@@ -15,7 +14,7 @@ export class WalletsProvider {
     return this.walletChangedBehaviour.asObservable().auditTime(50)
   }
 
-  constructor(private settingsProvider: SettingsProvider) {
+  constructor(private storageProvider: StorageProvider) {
     this.loadWalletsFromStorage().catch(console.error)
   }
 
@@ -24,7 +23,7 @@ export class WalletsProvider {
   }
 
   private async loadWalletsFromStorage() {
-    const rawWallets = await this.settingsProvider.get(SettingsKey.WALLET)
+    const rawWallets = await this.storageProvider.get(SettingsKey.WALLET)
     let wallets = rawWallets
 
     // migrating double-serialization
@@ -116,7 +115,7 @@ export class WalletsProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.settingsProvider.set(SettingsKey.WALLET, this.walletList)
+    return this.storageProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
   public walletByPublicKeyAndProtocol(publicKey: string, protocolIdentifier: string): AirGapMarketWallet {
