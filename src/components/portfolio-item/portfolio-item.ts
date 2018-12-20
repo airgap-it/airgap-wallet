@@ -11,4 +11,10 @@ export class PortfolioItemComponent {
 
   @Input()
   maxDigits: number = 0
+
+  @Input()
+  showBalances: boolean = true
+
+  @Input()
+  isExpendable: boolean = false
 }

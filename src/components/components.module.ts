@@ -12,6 +12,10 @@ import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { WalletEditPopoverComponent } from './wallet-edit-popover/wallet-edit-popover.component'
 import { MomentModule } from 'ngx-moment'
+import { ExchangeAmountComponent } from './exchange-amount/exchange-amount'
+import { ExchangeSelectCoinComponent } from './exchange-select-coin/exchange-select-coin'
+import { ExchangeSelectWalletComponent } from './exchange-select-wallet/exchange-select-wallet'
+import { ExchangeComponent } from './exchange/exchange'
 
 @NgModule({
   declarations: [
@@ -20,7 +24,11 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    WalletEditPopoverComponent
+    WalletEditPopoverComponent,
+    ExchangeAmountComponent,
+    ExchangeSelectCoinComponent,
+    ExchangeSelectWalletComponent,
+    ExchangeComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
@@ -29,7 +37,11 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    WalletEditPopoverComponent
+    WalletEditPopoverComponent,
+    ExchangeAmountComponent,
+    ExchangeSelectCoinComponent,
+    ExchangeSelectWalletComponent,
+    ExchangeComponent
   ]
 })
 export class ComponentsModule {}
