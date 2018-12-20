@@ -47,9 +47,13 @@ page-transaction-prepare {
       box-shadow: none !important;
     }
     input {
-      font-size: 1.5em;
+      font-size: 1.4em;
       font-weight: bold;
       margin: 0;
+    }
+    .amount--container__input,
+    .amount--container__input .item-inner {
+      padding-right: 0;
     }
   }
   .fee-amount__help {

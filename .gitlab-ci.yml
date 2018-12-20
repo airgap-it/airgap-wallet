@@ -46,7 +46,7 @@ build_android:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
-    - docker build -f build/android/Dockerfile -t $IMAGE_TAG_ANDROID_CURRENT --build-arg SENTRY_DSN=$SENTRY_DSN --build-arg BUILD_NR="$CI_PIPELINE_ID" .
+    - docker build -f build/android/Dockerfile -t $IMAGE_TAG_ANDROID_CURRENT --build-arg SENTRY_DSN=$SENTRY_DSN --build-arg BUILD_NR="$CI_PIPELINE_ID" --build-arg VERSION="$VERSION" .
     - docker run --name $CI_PIPELINE_ID $IMAGE_TAG_ANDROID_CURRENT echo "container ran."
     - docker cp $CI_PIPELINE_ID:/app/android-release-unsigned.apk android-release-unsigned-$CI_PIPELINE_ID.apk
     - docker cp $CI_PIPELINE_ID:/app/android-debug.apk android-debug-$CI_PIPELINE_ID.apk
