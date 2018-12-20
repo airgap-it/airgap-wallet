@@ -17,4 +17,7 @@ export class PortfolioItemComponent {
 
   @Input()
   isExpendable: boolean = false
+
+  @Input()
+  isExtended: boolean = false
 }

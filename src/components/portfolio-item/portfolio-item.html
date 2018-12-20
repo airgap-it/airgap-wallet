@@ -52,8 +52,9 @@
       </ng-template>
     </ion-col>
   </ion-row>
-  <ion-row class="items--right" item-end *ngIf="isExpendable">
+  <ion-row class="items--right" item-end *ngIf="isExpendable" class="expendable__container">
     <ion-icon
+      [ngClass]="{ 'icon--rotated': isExtended }"
       md-name="keyboard_arrow_down
         "
     ></ion-icon>
