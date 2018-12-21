@@ -26,11 +26,8 @@ page-exchange {
       }
     }
   }
+  .divider--line,
   .border--vertical {
-    border-top: 1px solid rgba(color($colors, primary), 0.24);
-    border-bottom: 1px solid rgba(color($colors, primary), 0.24);
-  }
-  .divider--line {
     border-top: 1px solid rgba(color($colors, primary), 0.24);
   }
 }
