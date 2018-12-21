@@ -29,8 +29,8 @@
       [wallet]="selectedWallet"
       tappable
       [isExpendable]="true"
-      (click)="(expandWalletSelection = !expandWalletSelection) && (isExtended = true)"
-      [isExtended]="isExtended"
+      (click)="expandWalletSelection = !expandWalletSelection"
+      [isExtended]="expandWalletSelection"
     ></portfolio-item>
     <ng-container *ngIf="(wallets | async) as walletsArray">
       <ng-container *ngIf="expandWalletSelection">
