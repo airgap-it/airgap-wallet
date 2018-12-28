@@ -17,7 +17,7 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="wallets | async as walletsArray; else loading">
+  <ng-container *ngIf="(wallets | async) as walletsArray; else loading">
     <ng-container *ngIf="walletsArray.length; else noItems">
       <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
         <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
@@ -40,13 +40,13 @@
   </ng-template>
 
   <ion-fab right bottom>
-    <ng-container *ngIf="wallets | async as walletsArray">
+    <ng-container *ngIf="(wallets | async) as walletsArray">
       <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openSyncPage()">
         <ion-icon md-name="vertical_align_bottom"></ion-icon>
       </button>
       <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
         <ion-icon md-name="vertical_align_bottom"></ion-icon>
-        Sync with AirGap Vault
+        {{ 'portfolio.sync_label' | translate }}
       </button>
     </ng-container>
   </ion-fab>
