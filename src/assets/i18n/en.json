@@ -175,5 +175,8 @@
   },
   "portfolio-item": {
     "syncing_label": "syncing with blockchain ... "
+  },
+  "exchange": {
+    "title": "Exchange"
   }
 }

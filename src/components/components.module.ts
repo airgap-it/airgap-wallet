@@ -16,6 +16,7 @@ import { ExchangeAmountComponent } from './exchange-amount/exchange-amount'
 import { ExchangeSelectCoinComponent } from './exchange-select-coin/exchange-select-coin'
 import { ExchangeSelectWalletComponent } from './exchange-select-wallet/exchange-select-wallet'
 import { ExchangeComponent } from './exchange/exchange'
+import { SwapComponent } from './swap/swap'
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { ExchangeComponent } from './exchange/exchange'
     ExchangeAmountComponent,
     ExchangeSelectCoinComponent,
     ExchangeSelectWalletComponent,
-    ExchangeComponent
+    ExchangeComponent,
+    SwapComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
@@ -41,7 +43,8 @@ import { ExchangeComponent } from './exchange/exchange'
     ExchangeAmountComponent,
     ExchangeSelectCoinComponent,
     ExchangeSelectWalletComponent,
-    ExchangeComponent
+    ExchangeComponent,
+    SwapComponent
   ]
 })
 export class ComponentsModule {}
