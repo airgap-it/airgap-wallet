@@ -34,7 +34,7 @@
     ></portfolio-item>
     <ng-container *ngIf="(wallets | async) as walletsArray">
       <ng-container *ngIf="expandWalletSelection">
-        <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
+        <ion-list no-lines margin-top *ngFor="let wallet of walletsArray" [@expandWalletAnimation]>
           <portfolio-item
             *ngIf="selectedWallet !== wallet"
             (click)="selectedWallet = wallet"

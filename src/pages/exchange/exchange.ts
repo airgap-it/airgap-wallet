@@ -4,10 +4,23 @@ import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { trigger, transition, style, animate } from '@angular/animations'
 
 @Component({
   selector: 'page-exchange',
-  templateUrl: 'exchange.html'
+  templateUrl: 'exchange.html',
+  animations: [
+    trigger('expandWalletAnimation', [
+      transition(':enter', [
+        style({ transform: 'translateY(-20%)', opacity: 0 }),
+        animate('500ms', style({ transform: 'translateY(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        style({ transform: 'translateY(0)', opacity: 1 }),
+        animate('500ms', style({ transform: 'translateY(-20%)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class ExchangePage {
   wallets: Observable<AirGapMarketWallet[]>
