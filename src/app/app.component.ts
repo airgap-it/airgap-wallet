@@ -53,6 +53,20 @@ export class MyApp {
             })
           })
         }
+
+        this.translate.setDefaultLang('en')
+
+        const supportedLanguages = ['en', 'de', 'zh-cn']
+        const language = this.translate.getBrowserLang()
+
+        if (language) {
+          const lowerCaseLanguage = language.toLowerCase()
+          supportedLanguages.forEach(supportedLanguage => {
+            if (supportedLanguage.startsWith(lowerCaseLanguage)) {
+              this.translate.use(supportedLanguage)
+            }
+          })
+        }
       })
       .catch(err => console.log(err))
   }
