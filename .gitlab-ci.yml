@@ -81,9 +81,9 @@ build_ios:
     - npm install
     - ionic cordova build ios --prod --release
     - find ./resources/ -name "*.png" -exec convert "{}" -alpha off "{}" \;
-    - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build
+    - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -sdk iphoneos -configuration AppStoreDistribution archive -archivePath platforms/ios/AirGap\ Wallet.xcarchive
-    - xcodebuild -exportArchive -archivePath platforms/ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath platforms/ios/ -allowProvisioningUpdates
+    - xcodebuild -exportArchive -archivePath platforms/ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath platforms/ios/
     - /Applications/Xcode_9.4.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   artifacts:
     paths:
