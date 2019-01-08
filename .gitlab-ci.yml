@@ -87,7 +87,7 @@ build_ios:
     - /Applications/Xcode_9.4.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   artifacts:
     paths:
-      - AirGap\ Wallet.ipa
+      - platforms/ios/AirGap\ Wallet.ipa
   tags:
     - ios
 
