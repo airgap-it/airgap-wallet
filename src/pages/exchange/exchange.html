@@ -4,6 +4,27 @@
   </ion-navbar>
 </ion-header>
 
+<!-- TODO: show first time & if only one currency 
+<ion-content padding class="onboarding__container">
+  <ion-row><h3 [innerHTML]="'exchange.heading' | translate"></h3></ion-row>
+  <ion-row justify-content-center><img src="assets/img/token_swap.svg" /></ion-row>
+  TODO: show if only one currency in wallet
+  <ng-container>
+    <ion-row padding-bottom>
+      <p no-margin>{{ 'exchange.onboarding.description' | translate }}</p>
+    </ion-row>
+    <button round ion-button color="primary" block>{{ 'exchange.onboarding.label' | translate }}</button>
+  </ng-container>
+  
+  TODO: show if more than one currency in wallet
+  <ng-container>
+    <ion-row padding-bottom>
+      <p no-margin>{{ 'exchange.swap.description' | translate }}</p>
+    </ion-row>
+    <button round ion-button color="primary" block>{{ 'exchange.swap.label' | translate }}</button>
+  </ng-container>
+</ion-content>
+-->
 <ion-content>
   <swap></swap>
   <swap [swapSell]="false"></swap>

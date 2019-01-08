@@ -30,4 +30,10 @@ page-exchange {
   .border--vertical {
     border-top: 1px solid rgba(color($colors, primary), 0.24);
   }
+  .onboarding__container {
+    img {
+      width: 50vh;
+      height: 50vh;
+    }
+  }
 }
