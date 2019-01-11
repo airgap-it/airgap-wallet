@@ -52,10 +52,7 @@
     </platform>
     <platform name="ios">
         <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
-            <string>AirGap uses your camera to scan QR Codes of transactions, and to generate entropy for the secure key generation.</string>
-        </edit-config>
-        <edit-config file="*-Info.plist" mode="merge" target="NSMicrophoneUsageDescription">
-            <string>AirGap uses your microphone to generate entropy for the secure key generation.</string>
+            <string>AirGap uses your camera to scan QR Codes of transactions.</string>
         </edit-config>
         <edit-config file="*-Info.plist" mode="merge" target="LSApplicationQueriesSchemes">
             <array>
