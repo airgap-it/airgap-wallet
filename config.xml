@@ -51,11 +51,14 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <platform name="ios">
-        <config-file parent="LSApplicationQueriesSchemes" target="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
+            <string>AirGap uses your camera to scan QR Codes of transactions.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="LSApplicationQueriesSchemes">
             <array>
                 <string>airgap-vault</string>
             </array>
-        </config-file>
+        </edit-config>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <allow-intent href="airgap-vault:*" />
