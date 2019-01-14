@@ -1,5 +1,11 @@
 page-transaction-qr {
-  ion-icon{
+  ion-icon {
     color: white;
+  }
+
+  qrcode {
+    img {
+      width: 100%;
+    }
   }
 }
