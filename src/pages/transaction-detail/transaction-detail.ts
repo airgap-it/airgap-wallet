@@ -33,6 +33,8 @@ export class TransactionDetailPage {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
     } else if (this.transaction.protocolIdentifier === 'ae') {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
+    } else if (this.transaction.protocolIdentifier === 'xtz') {
+      blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 
     if (hash && blockexplorer) {

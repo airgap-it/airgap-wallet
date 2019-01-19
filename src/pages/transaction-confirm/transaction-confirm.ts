@@ -51,6 +51,8 @@ export class TransactionConfirmPage {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
     } else if (this.protocol.identifier === 'ae') {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
+    } else if (this.protocol.identifier === 'xtz') {
+      blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 
     let interval = setTimeout(() => {
