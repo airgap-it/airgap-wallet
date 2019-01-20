@@ -1,7 +1,7 @@
 <!-- For translations to work, the "tabTitle" needs to start with a space. -->
 <!-- https://forum.ionicframework.com/t/tabs-tabtitle-not-translate/65923/6 -->
-<ion-tabs color="white" [selectedIndex]="0">
-  <ion-tab [root]="tab1Root" tabTitle=" {{'tabs.wallets'|translate}}" tabIcon="list"></ion-tab>
-  <ion-tab [root]="tab2Root" tabTitle=" {{'tabs.scan'|translate}}" tabIcon="barcode"></ion-tab>
-  <ion-tab [root]="tab3Root" tabTitle=" {{'tabs.settings'|translate}}" tabIcon="settings"></ion-tab>
+<ion-tabs no-shadow [selectedIndex]="0">
+  <ion-tab [root]="tab1Root" tabTitle=" {{ 'tabs.wallets' | translate }}" tabIcon="list"></ion-tab>
+  <ion-tab [root]="tab2Root" tabTitle=" {{ 'tabs.scan' | translate }}" tabIcon="barcode"></ion-tab>
+  <ion-tab [root]="tab3Root" tabTitle=" {{ 'tabs.settings' | translate }}" tabIcon="settings"></ion-tab>
 </ion-tabs>
