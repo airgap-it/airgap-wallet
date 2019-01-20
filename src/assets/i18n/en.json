@@ -68,7 +68,7 @@
   },
 
   "scan-address": {
-    "title": "Confirm Transaction",
+    "title": "Scan Account Address",
     "text": "Scan the QR code of an account address."
   },
 
@@ -96,7 +96,7 @@
   },
 
   "transaction-confirm": {
-    "title": "Scan Account Address",
+    "title": "Confirm Transaction",
     "decline_label": "Decline",
     "confirm_label": "Confirm"
   },
