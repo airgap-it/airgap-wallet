@@ -1,5 +1,5 @@
-<ion-header>
-  <ion-navbar color="primary">
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
     <ion-title>{{ 'transaction-prepare.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}</ion-title>
   </ion-navbar>
 </ion-header>
@@ -29,11 +29,7 @@
         <ion-row>
           <ion-item no-padding class="content--align-vert__center to-address__item">
             <ion-label stacked>{{ 'Send To' | translate }}</ion-label>
-            <ion-textarea
-              [placeholder]="wallet.coinProtocol.addressPlaceholder"
-              formControlName="address"
-              id="address-input"
-            ></ion-textarea>
+            <ion-textarea placeholder="{{ '0x..' | translate }}" formControlName="address" id="address-input"></ion-textarea>
           </ion-item>
         </ion-row>
       </ion-col>

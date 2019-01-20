@@ -1,10 +1,10 @@
-<ion-header no-border>
-  <ion-navbar color="primary">
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
     <ion-title>{{ 'account-import.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding class="colored-background">
+<ion-content padding>
   <ion-row *ngIf="!walletAlreadyExists">
     <p>{{ 'wallet-import.text' | translate }}</p>
   </ion-row>

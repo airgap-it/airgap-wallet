@@ -63,6 +63,9 @@ ion-app {
 .background--color__primary {
   background-color: color($colors, primary, base);
 }
+.background--color__white {
+  background-color: color($colors, white, base);
+}
 
 .colored-background {
   color: color($colors, white);
