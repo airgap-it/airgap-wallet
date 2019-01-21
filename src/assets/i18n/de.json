@@ -58,7 +58,7 @@
   },
 
   "scan-address": {
-    "title": "Transaktion bestätigen",
+    "title": "Kontoadresse einlesen",
     "text": "QR einer Wallet Adresse einlesen."
   },
 
@@ -86,7 +86,7 @@
   },
 
   "transaction-confirm": {
-    "title": "Kontoadresse einlesen",
+    "title": "Transaktion bestätigen",
     "decline_label": "Ablehnen",
     "confirm_label": "Bestätigen"
   },
