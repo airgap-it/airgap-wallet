@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
 import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
-import { WalletImportPage } from '../../pages/wallet-import/wallet-import'
+import { AccountImportPage } from '../../pages/account-import/account-import'
 import { TransactionConfirmPage } from '../../pages/transaction-confirm/transaction-confirm'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
@@ -69,7 +69,7 @@ export class SchemeRoutingProvider {
     )
     if (this.navController) {
       this.navController
-        .push(WalletImportPage, {
+        .push(AccountImportPage, {
           wallet: wallet
         })
         .then(v => {

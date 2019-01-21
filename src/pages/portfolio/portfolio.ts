@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { Observable } from 'rxjs'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
-import { CoinInfoPage } from '../coin-info/coin-info'
+import { AccountProvider } from '../../providers/account/account.provider'
+import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 import { ScanSyncPage } from '../scan-sync/scan-sync'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
@@ -21,7 +21,7 @@ export class PortfolioPage {
 
   wallets: Observable<AirGapMarketWallet[]>
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: WalletsProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: AccountProvider) {
     this.wallets = this.walletsProvider.wallets.asObservable()
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe(wallets => {
@@ -37,7 +37,7 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    this.navCtrl.push(CoinInfoPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openSyncPage() {

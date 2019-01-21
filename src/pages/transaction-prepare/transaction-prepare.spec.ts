@@ -12,7 +12,7 @@ import { PlatformMock, StatusBarMock, SplashScreenMock, NavParamsMock } from '..
 import { NavControllerMock, KeyboardMock, LoadingControllerMock, LoadingMock, ToastControllerMock } from 'ionic-mocks'
 
 import { ComponentsModule } from '../../components/components.module'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { WalletMock } from '../../../test-config/wallet-mock'
 import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
@@ -56,7 +56,7 @@ describe('TransactionPrepare Page', () => {
         })
       ],
       providers: [
-        WalletsProvider,
+        AccountProvider,
         { provide: Storage, useClass: StorageMock },
         { provide: NavController, useFactory: () => NavControllerMock.instance() },
         { provide: NavParams, useClass: NavParamsMock },
