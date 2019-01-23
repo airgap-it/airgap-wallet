@@ -1,0 +1,18 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>add-account</ion-title>
+  </ion-navbar>
+
+  <ion-searchbar></ion-searchbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item (click)="addAccount(protocol.identifier)" *ngFor="let protocol of supportedAccountProtocols">{{protocol.name}}</ion-item>
+    <ion-item (click)="addSubAccount(subProtocol.identifier)" *ngFor="let subProtocol of supportedSubAccountProtocols">{{subProtocol.name}}</ion-item>
+    <ion-item (click)="addSubAccount('gnt')">Golem</ion-item>
+  </ion-list>
+</ion-content>

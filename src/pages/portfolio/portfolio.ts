@@ -3,10 +3,10 @@ import { NavController, NavParams } from 'ionic-angular'
 import { Observable } from 'rxjs'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
-import { ScanSyncPage } from '../scan-sync/scan-sync'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { AddAccountPage } from '../add-account/add-account'
 
 @Component({
   selector: 'page-portfolio',
@@ -41,7 +41,7 @@ export class PortfolioPage {
   }
 
   openSyncPage() {
-    this.navCtrl.push(ScanSyncPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navCtrl.push(AddAccountPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async doRefresh(refresher: any = null) {
