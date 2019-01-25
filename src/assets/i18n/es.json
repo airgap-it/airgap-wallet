@@ -2,13 +2,13 @@
     "coin-info": {
       "title": "Cuenta",
       "transactions_label": "Transacciones",
-      "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
+      "ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity.",
       "receive_label": "Recibir",
       "send_label": "Enviar",
       "aeternity": {
         "same-phase": {
           "heading":"<span class=\"style__strong color__primary\">{{currentPhase}} Migración exitosa</span>",
-          "text":"Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
+          "text":"Tu saldo de <span class=\"style__strong color__primary\">{{migratedTokens}}</span> estará disponible con el próximo hardfork en <span class=\"style__strong color__primary\">el fin de {{phaseEnd}}</span>"
         },
         "no-transactions_text": "Aún no hay transacciones para esta cuenta.",
         "tx-list-disabled": {
