@@ -121,9 +121,9 @@
       "title": "Enviar {{title}}",
       "to-address_label": "A la dirección",
       "to-address-scan_label": "Escanear QR",
-      "amount_label": "cantidad",
+      "amount_label": "Monto",
       "fee": {
-        "label": "Cuota",
+        "label": "Tarifa",
         "slow_label": "lento y barato",
         "fast_label": "rapido y costoso",
         "max_label": "MAX"
@@ -155,7 +155,7 @@
     },
   
     "from-to": {
-      "amount_label": "Cantidad",
+      "amount_label": "Monto",
       "fee_label": "Cuota",
       "time_label": "Tiempo",
       "from_label": "De",
