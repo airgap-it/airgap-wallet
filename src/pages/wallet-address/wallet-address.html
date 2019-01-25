@@ -15,7 +15,7 @@
       </ion-avatar>
     </ion-col>
     <ion-col>
-      <h2>{{ wallet.coinProtocol.symbol | uppercase }}</h2>
+      <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol | uppercase }}</h2>
       <p>
         {{ 'wallet-address.address_label' | translate }}:
         <br />
@@ -25,14 +25,7 @@
   </ion-row>
 
   <ion-row (click)="copyAddressToClipboard()" justify-content-center padding-bottom>
-    <qrcode
-      [qrdata]="wallet.receivingPublicAddress"
-      backgroundAlpha="1"
-      foreground="black"
-      background="white"
-      level="L"
-      size="400"
-    ></qrcode>
+    <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="0" foreground="white" [size]="240"></qrcode>
   </ion-row>
 
   <ion-fab bottom right>
