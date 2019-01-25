@@ -8,5 +8,9 @@
 
 
 <ion-content padding>
+  <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+  </ion-list>
 
+  <button ion-button (click)="importWallets()">Import</button>
 </ion-content>

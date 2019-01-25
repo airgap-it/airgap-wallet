@@ -1,0 +1,20 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>account-detail</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list no-lines margin-top>
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+  </ion-list>
+
+  Tokens:
+
+  <ion-list no-lines margin-top>
+    <portfolio-item  *ngFor="let subWallet of subWallets" [wallet]="subWallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+  </ion-list>
+</ion-content>
