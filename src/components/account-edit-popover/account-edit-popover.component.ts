@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, ViewController, ToastController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { Clipboard } from '@ionic-native/clipboard'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
@@ -20,14 +20,14 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
     </ion-list>
   `
 })
-export class WalletEditPopoverComponent {
+export class AccountEditPopoverComponent {
   private wallet: AirGapMarketWallet
   private onDelete: Function
 
   constructor(
     private alertCtrl: AlertController,
     private navParams: NavParams,
-    private walletsProvider: WalletsProvider,
+    private walletsProvider: AccountProvider,
     private viewCtrl: ViewController,
     private clipboard: Clipboard,
     private toastController: ToastController

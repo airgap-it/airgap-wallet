@@ -1,15 +1,15 @@
 import { Component } from '@angular/core'
 import { NavParams, ViewController, LoadingController, Platform, NavController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
-  selector: 'page-wallet-import',
-  templateUrl: 'wallet-import.html'
+  selector: 'page-account-import',
+  templateUrl: 'account-import.html'
 })
-export class WalletImportPage {
+export class AccountImportPage {
   wallet: AirGapMarketWallet
 
   walletAlreadyExists = false
@@ -19,7 +19,7 @@ export class WalletImportPage {
     private loadingCtrl: LoadingController,
     private viewCtrl: ViewController,
     private navParams: NavParams,
-    private wallets: WalletsProvider,
+    private wallets: AccountProvider,
     public navCtrl: NavController
   ) {}
 

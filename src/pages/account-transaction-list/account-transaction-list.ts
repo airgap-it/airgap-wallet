@@ -4,21 +4,21 @@ import { Platform, NavController, NavParams, PopoverController } from 'ionic-ang
 
 import { TransactionDetailPage } from '../transaction-detail/transaction-detail'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-import { WalletAddressPage } from '../wallet-address/wallet-address'
-import { WalletEditPopoverComponent } from '../../components/wallet-edit-popover/wallet-edit-popover.component'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { HttpClient } from '@angular/common/http'
 import { BigNumber } from 'bignumber.js'
 import { StorageProvider } from '../../providers/storage/storage'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { AccountAddressPage } from '../account-address/account-address'
 
 declare let cordova
 
 @Component({
-  selector: 'page-coin-info',
-  templateUrl: 'coin-info.html'
+  selector: 'page-account-transaction-list',
+  templateUrl: 'account-transaction-list.html'
 })
-export class CoinInfoPage {
+export class AccountTransactionListPage {
   isRefreshing = false
   initialTransactionsLoaded = false
   infiniteEnabled = false
@@ -45,7 +45,7 @@ export class CoinInfoPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     public popoverCtrl: PopoverController,
-    public walletProvider: WalletsProvider,
+    public walletProvider: AccountProvider,
     public http: HttpClient,
     private platform: Platform,
     private storageProvider: StorageProvider
@@ -102,7 +102,7 @@ export class CoinInfoPage {
 
   openReceivePage() {
     this.navCtrl
-      .push(WalletAddressPage, {
+      .push(AccountAddressPage, {
         wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -216,7 +216,7 @@ export class CoinInfoPage {
   }
 
   presentEditPopover(event) {
-    let popover = this.popoverCtrl.create(WalletEditPopoverComponent, {
+    let popover = this.popoverCtrl.create(AccountEditPopoverComponent, {
       wallet: this.wallet,
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
