@@ -209,7 +209,7 @@ module.exports={
   "_args": [
     [
       "web3@1.0.0-beta.30",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "web3@1.0.0-beta.30",
@@ -233,7 +233,7 @@ module.exports={
   ],
   "_resolved": "http://registry.npmjs.org/web3/-/web3-1.0.0-beta.30.tgz",
   "_spec": "1.0.0-beta.30",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "ethereum.org"
   },
@@ -3052,7 +3052,9 @@ var AUTH_TOKEN_ABI = [
 abiDecoder.addABI(AUTH_TOKEN_ABI);
 var GenericERC20 = (function (_super) {
     __extends(GenericERC20, _super);
-    function GenericERC20(symbol, name, marketSymbol, identifier, contractAddress, jsonRPCAPI, infoAPI, chainId) {
+    function GenericERC20(symbol, name, marketSymbol, identifier, contractAddress, decimals, feeDecimals, jsonRPCAPI, infoAPI, chainId) {
+        if (decimals === void 0) { decimals = 18; }
+        if (feeDecimals === void 0) { feeDecimals = 18; }
         if (jsonRPCAPI === void 0) { jsonRPCAPI = 'https://mainnet.infura.io/'; }
         if (infoAPI === void 0) { infoAPI = 'https://api.trustwalletapp.com/'; }
         if (chainId === void 0) { chainId = 1; }
@@ -3065,6 +3067,8 @@ var GenericERC20 = (function (_super) {
         _this.name = name;
         _this.marketSymbol = marketSymbol;
         _this.identifier = identifier;
+        _this.decimals = decimals;
+        _this.feeDecimals = feeDecimals;
         return _this;
     }
     GenericERC20.prototype.getBalanceOfPublicKey = function (publicKey) {
@@ -4658,24 +4662,30 @@ exports.padStart = padStart;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var supportedProtocols_1 = require("./supportedProtocols");
+var errors_1 = require("../serializer/errors");
 var getProtocolByIdentifier = function (identifier) {
-    for (var _i = 0, _a = supportedProtocols_1.supportedProtocols(); _i < _a.length; _i++) {
-        var coinProtocol = _a[_i];
-        if (coinProtocol.identifier === identifier) {
-            return coinProtocol;
+    // create a complete list of all protocols and subprotocols
+    var candidates = [].concat.apply([], supportedProtocols_1.supportedProtocols().map(function (protocol) {
+        var protocols = [protocol];
+        if (protocol.subProtocols) {
+            protocols.push.apply(protocols, protocol.subProtocols);
         }
-        if (coinProtocol.subProtocols) {
-            var foundProtocol = coinProtocol.subProtocols.find(function (protocol) { return protocol.identifier === identifier; });
-            if (foundProtocol) {
-                return foundProtocol;
-            }
-        }
+        return protocols;
+    }));
+    // filter out potential candidates, those where our identifier startsWith the identifier of the protocol
+    candidates = candidates.filter(function (protocol) { return identifier.startsWith(protocol.identifier); });
+    if (candidates.length === 0) {
+        throw new errors_1.ProtocolNotSupported();
     }
-    throw new Error('protocol not supported');
+    // sort by length
+    candidates.sort(function (a, b) {
+        return b.identifier.length - a.identifier.length;
+    });
+    return candidates[0];
 };
 exports.getProtocolByIdentifier = getProtocolByIdentifier;
 
-},{"./supportedProtocols":41}],40:[function(require,module,exports){
+},{"../serializer/errors":22,"./supportedProtocols":41}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var protocolsByIdentifier_1 = require("./protocolsByIdentifier");
@@ -13788,7 +13798,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -13816,7 +13826,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -38207,7 +38217,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.1",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "elliptic@6.4.1",
@@ -38237,7 +38247,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.1.tgz",
   "_spec": "6.4.1",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -81673,7 +81683,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -84039,7 +84049,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -87125,7 +87135,7 @@ module.exports={
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -87202,7 +87212,7 @@ module.exports={
   "_args": [
     [
       "web3@1.0.0-beta.37",
-      "/Users/andreas/Programming/airgap-wallet"
+      "/mnt/d/Repos/Papers/Airgap/airgap-wallet"
     ]
   ],
   "_from": "web3@1.0.0-beta.37",
@@ -87249,7 +87259,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/web3/-/web3-1.0.0-beta.37.tgz",
   "_spec": "1.0.0-beta.37",
-  "_where": "/Users/andreas/Programming/airgap-wallet",
+  "_where": "/mnt/d/Repos/Papers/Airgap/airgap-wallet",
   "author": {
     "name": "ethereum.org"
   },

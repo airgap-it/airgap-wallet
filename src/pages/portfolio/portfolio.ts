@@ -40,7 +40,7 @@ export class PortfolioPage {
     this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openSyncPage() {
+  openAddAccountPage() {
     this.navCtrl.push(AddAccountPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
