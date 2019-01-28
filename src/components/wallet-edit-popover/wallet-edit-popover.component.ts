@@ -3,6 +3,7 @@ import { AlertController, NavParams, ViewController, ToastController } from 'ion
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { Clipboard } from '@ionic-native/clipboard'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   template: `
@@ -44,8 +45,8 @@ export class WalletEditPopoverComponent {
       showCloseButton: true,
       closeButtonText: 'Ok'
     })
-    await toast.present()
-    await this.viewCtrl.dismiss()
+    await toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   delete() {
@@ -57,23 +58,26 @@ export class WalletEditPopoverComponent {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.viewCtrl.dismiss()
+            this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           }
         },
         {
           text: 'Delete',
           handler: () => {
-            alert.present()
-            this.walletsProvider.removeWallet(this.wallet).then(() => {
-              this.viewCtrl.dismiss()
-              if (this.onDelete) {
-                this.onDelete()
-              }
-            })
+            alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.walletsProvider
+              .removeWallet(this.wallet)
+              .then(() => {
+                this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+                if (this.onDelete) {
+                  this.onDelete()
+                }
+              })
+              .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
           }
         }
       ]
     })
-    alert.present()
+    alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

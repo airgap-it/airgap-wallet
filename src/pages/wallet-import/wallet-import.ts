@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { NavParams, ViewController, LoadingController, Platform } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-wallet-import',
@@ -28,7 +29,7 @@ export class WalletImportPage {
           content: 'Syncing...'
         })
 
-        loading.present().catch(console.error)
+        loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
         this.walletAlreadyExists = false
         this.wallet = this.navParams.get('wallet') // TODO: Catch error if wallet cannot be imported
@@ -36,7 +37,7 @@ export class WalletImportPage {
         if (this.wallets.walletExists(this.wallet)) {
           this.wallet = this.wallets.walletByPublicKeyAndProtocol(this.wallet.publicKey, this.wallet.protocolIdentifier)
           this.walletAlreadyExists = true
-          loading.dismiss()
+          loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           return
         }
 
@@ -44,10 +45,13 @@ export class WalletImportPage {
 
         airGapWorker.onmessage = event => {
           this.wallet.addresses = event.data.addresses
-          this.wallet.synchronize().then(() => {
-            this.wallets.triggerWalletChanged()
-          })
-          loading.dismiss()
+          this.wallet
+            .synchronize()
+            .then(() => {
+              this.wallets.triggerWalletChanged()
+            })
+            .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+          loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         }
 
         airGapWorker.postMessage({
@@ -66,9 +70,7 @@ export class WalletImportPage {
       .then(v => {
         console.log('WalletImportPage dismissed')
       })
-      .catch(error => {
-        console.warn(error)
-      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async import() {
@@ -78,8 +80,6 @@ export class WalletImportPage {
       .then(v => {
         console.log('WalletImportPage dismissed')
       })
-      .catch(error => {
-        console.warn(error)
-      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

@@ -6,6 +6,7 @@ import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { SchemeRoutingProvider } from '../../providers/scheme-routing/scheme-routing'
 import { PermissionsProvider } from '../../providers/permissions/permissions'
 import { ScanBasePage } from '../scan-base/scan-base'
+import { ErrorCategory, handleErrorSentry } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan',
@@ -29,6 +30,6 @@ export class ScanPage extends ScanBasePage {
   checkScan(resultString: string) {
     console.log('got new text', resultString)
 
-    this.schemeRouting.handleNewSyncRequest(this.navCtrl, resultString)
+    this.schemeRouting.handleNewSyncRequest(this.navCtrl, resultString).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
   }
 }

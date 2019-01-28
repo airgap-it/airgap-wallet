@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { Platform, NavController, ViewController } from 'ionic-angular'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-introduction-download',
@@ -9,7 +10,7 @@ export class IntroductionDownloadPage {
   constructor(public navCtrl: NavController, private platform: Platform, public viewController: ViewController) {}
 
   public dismiss(shouldCloseAllModals = false) {
-    this.viewController.dismiss(shouldCloseAllModals)
+    this.viewController.dismiss(shouldCloseAllModals).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public downloadAndroid() {

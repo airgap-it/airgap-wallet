@@ -6,6 +6,7 @@ export enum SettingsKey {
   WALLET = 'wallets'
 }
 
+/* TS 2.7 feature
 interface IPartialAirGapWallet {
   protocolIdentifier: string
   publicKey: string
@@ -14,7 +15,6 @@ interface IPartialAirGapWallet {
   addresses: string[]
 }
 
-/* TS 2.7 feature
 type SettingsKeyReturnType = {
   [SettingsKey.INTRODUCTION]: boolean
   [SettingsKey.WALLET]: IPartialAirGapWallet[]

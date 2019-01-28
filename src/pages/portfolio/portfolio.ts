@@ -6,6 +6,7 @@ import { CoinInfoPage } from '../coin-info/coin-info'
 import { ScanSyncPage } from '../scan-sync/scan-sync'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-portfolio',
@@ -32,15 +33,15 @@ export class PortfolioPage {
   }
 
   ionViewDidEnter() {
-    this.doRefresh()
+    this.doRefresh().catch(handleErrorSentry())
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    this.navCtrl.push(CoinInfoPage, { wallet: wallet })
+    this.navCtrl.push(CoinInfoPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openSyncPage() {
-    this.navCtrl.push(ScanSyncPage)
+    this.navCtrl.push(ScanSyncPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async doRefresh(refresher: any = null) {

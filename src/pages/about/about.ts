@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { AppVersion } from '@ionic-native/app-version'
 import { NavController, NavParams } from 'ionic-angular'
+import { handleErrorSentry } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-about',
@@ -13,7 +14,7 @@ export class AboutPage {
   public versionCode = ''
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private app: AppVersion) {
-    this.updateVersions()
+    this.updateVersions().catch(handleErrorSentry())
   }
 
   async updateVersions() {
