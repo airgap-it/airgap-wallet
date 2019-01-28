@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { NavController, NavParams, Platform } from 'ionic-angular'
 import { Transaction } from '../../models/transaction.model'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 declare let window
 
@@ -23,7 +24,7 @@ export class TransactionQrPage {
   }
 
   done() {
-    this.navCtrl.popToRoot()
+    this.navCtrl.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   sameDeviceSign() {

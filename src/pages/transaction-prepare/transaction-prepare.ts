@@ -8,6 +8,7 @@ import { TransactionQrPage } from '../transaction-qr/transaction-qr'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
 import { Clipboard } from '@ionic-native/clipboard'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -128,7 +129,7 @@ export class TransactionPreparePage {
       content: 'Preparing TX...'
     })
 
-    await loading.present()
+    await loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
@@ -151,13 +152,15 @@ export class TransactionPreparePage {
         }
       })
 
-      this.navController.push(TransactionQrPage, {
-        wallet: this.wallet,
-        airGapTx: airGapTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      })
+      this.navController
+        .push(TransactionQrPage, {
+          wallet: this.wallet,
+          airGapTx: airGapTx,
+          data: 'airgap-vault://?d=' + serializedTx
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-      loading.dismiss()
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (e) {
       console.warn(e)
       this.toastController
@@ -167,8 +170,9 @@ export class TransactionPreparePage {
           position: 'bottom'
         })
         .present()
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } finally {
-      loading.dismiss()
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
@@ -176,9 +180,11 @@ export class TransactionPreparePage {
     let callback = address => {
       this.transactionForm.controls.address.setValue(address)
     }
-    this.navController.push(ScanAddressPage, {
-      callback: callback
-    })
+    this.navController
+      .push(ScanAddressPage, {
+        callback: callback
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public toggleMaxAmount() {

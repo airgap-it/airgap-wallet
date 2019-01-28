@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Diagnostic } from '@ionic-native/diagnostic'
 import { Platform, AlertController } from 'ionic-angular'
+import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',
@@ -36,6 +37,7 @@ export class PermissionsProvider {
         await this.diagnostic.requestCameraAuthorization(false)
       }
     } else {
+      console.warn('requesting permission in browser')
     }
   }
 
@@ -97,18 +99,17 @@ export class PermissionsProvider {
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel',
-          handler: () => {}
+          role: 'cancel'
         },
         {
           text: 'Open settings',
           handler: () => {
-            this.diagnostic.switchToSettings()
+            this.diagnostic.switchToSettings().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
           }
         }
       ]
     })
-    alert.present()
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
   private isGranted(permission: string): boolean {

@@ -5,8 +5,6 @@ init({
   dsn: process.env.SENTRY_DSN,
   release: 'unknown',
   beforeSend: data => {
-    console.log(data)
-
     let stacktrace = data.stacktrace || (data.exception && data.exception.values[0].stacktrace)
 
     if (stacktrace) {
@@ -18,15 +16,37 @@ init({
   }
 })
 
-export class SentryErrorHandler extends IonicErrorHandler {
-  handleError(error) {
-    console.log('sending error')
-    super.handleError(error)
+export enum ErrorCategory {
+  CORDOVA_PLUGIN = 'cordova_plugin',
+  IONIC_MODAL = 'ionic_modal',
+  IONIC_ALERT = 'ionic_alert',
+  NAVIGATION = 'navigation',
+  WALLET_PROVIDER = 'wallet_provider',
+  SCHEME_ROUTING = 'scheme_routing'
+}
 
+const handleErrorSentry = (category?: ErrorCategory) => {
+  return error => {
     try {
+      console.log('sending error to sentry, category', category)
+      console.error(error.originalError || error)
       captureException(error.originalError || error)
     } catch (e) {
       console.error('Error reporting exception to sentry: ', e)
     }
+  }
+}
+
+const handleErrorIgnore = error => {
+  console.log('ignoring error')
+  console.error(error.originalError || error)
+}
+
+export { handleErrorIgnore, handleErrorSentry }
+
+export class SentryErrorHandler extends IonicErrorHandler {
+  handleError(error) {
+    super.handleError(error)
+    handleErrorSentry(error)
   }
 }
