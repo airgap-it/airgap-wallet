@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
-import { NavParams, ViewController, LoadingController, Platform } from 'ionic-angular'
+import { NavParams, ViewController, LoadingController, Platform, NavController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
   selector: 'page-wallet-import',
@@ -18,7 +19,8 @@ export class WalletImportPage {
     private loadingCtrl: LoadingController,
     private viewCtrl: ViewController,
     private navParams: NavParams,
-    private wallets: WalletsProvider
+    private wallets: WalletsProvider,
+    public navCtrl: NavController
   ) {}
 
   ionViewWillEnter() {
@@ -79,6 +81,7 @@ export class WalletImportPage {
       .dismiss()
       .then(v => {
         console.log('WalletImportPage dismissed')
+        this.navCtrl.push(PortfolioPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
