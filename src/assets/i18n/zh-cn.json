@@ -57,7 +57,7 @@
 
   "portfolio": {
     "empty-state_text": " 要使用AirGap Wallet应用程序，你需要<strong>与AirGap 保险箱同步</strong>。选择AirGap Vault中的帐户并显示同步二维码。用AirGap Wallet扫描二维码。",
-    "sync_label": "与AirGap Vault同步"
+    "add-coins_label": "与AirGap Vault同步"
   },
 
   "scan": {

@@ -47,7 +47,7 @@
 
   "portfolio": {
     "empty-state_text": "Um AirGap Wallet benutzen zu können, müssen Sie mit <strong>AirGap Vault synchronisieren</strong>. Wählen Sie ein Konto in AirGap Vault aus und zeigen Sie den Synchronisierungs QR Code an. Lesen Sie diesen mit AirGap Wallet ein.",
-    "sync_label": "Mit AirGap Vault synchronisieren"
+    "add-coins_label": "Währungen hinzufügen"
   },
 
   "scan": {

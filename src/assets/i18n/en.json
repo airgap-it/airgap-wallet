@@ -57,7 +57,7 @@
 
   "portfolio": {
     "empty-state_text": "To use the AirGap Wallet app you need to <strong>Sync with AirGap Vault</strong>. Select the account in AirGap Vault and display the sync QR code. Scan this code with AirGap Wallet.",
-    "sync_label": "Sync with AirGap Vault"
+    "add-coins_label": "Add Coins"
   },
 
   "scan": {
