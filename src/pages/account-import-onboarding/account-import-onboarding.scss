@@ -5,6 +5,9 @@ page-account-import-onboarding {
   .swiper-pagination-progress .swiper-pagination-progressbar {
     background: color($colors, primary, base);
   }
+  .swiper-pagination-progress {
+    background: rgba(color($colors, dark), 0.12);
+  }
   .swiper-slide {
     font-size: 1.4rem;
   }
