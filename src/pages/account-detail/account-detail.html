@@ -27,4 +27,11 @@
       (click)="openDetail(wallet)"
     ></portfolio-item>
   </ion-list>
+  <ion-fab right bottom>
+    <!-- TODO: if Tezos show "account" 'account-detail.add-accounts_label' label if Ethereum show "tokens" -->
+    <button color="secondary" (click)="openAddAccountPage()" ion-button round icon-left>
+      <ion-icon md-name="add"></ion-icon>
+      {{ 'account-detail.add-tokens_label' | translate }}
+    </button>
+  </ion-fab>
 </ion-content>
