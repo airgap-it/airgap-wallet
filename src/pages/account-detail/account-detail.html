@@ -1,20 +1,30 @@
-<ion-header>
-
-  <ion-navbar>
-    <ion-title>account-detail</ion-title>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <!-- TODO: use protocol.name as title -->
+    <ion-title>Ethereum</ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
-<ion-content padding>
-  <ion-list no-lines margin-top>
+<ion-content>
+  <ion-list no-lines no-margin>
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
   </ion-list>
 
-  Tokens:
+  <ion-row class="transaction--label__container background--color__white" align-items-center>
+    <ion-col col-10 padding>
+      <!-- TODO: if Tezos show "account" 'account-detail.accounts_label' label if Ethereum show "tokens" -->
+      <span ion-text class="font--weight__bold" color="primary">{{ 'account-detail.tokens_label' | translate }}</span>
+    </ion-col>
+    <ion-col col-2 no-padding padding-right class="justify--content__end"><ion-spinner color="primary" name="dots"></ion-spinner></ion-col>
+  </ion-row>
 
-  <ion-list no-lines margin-top>
-    <portfolio-item  *ngFor="let subWallet of subWallets" [wallet]="subWallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+  <ion-list no-lines no-margin>
+    <portfolio-item
+      *ngFor="let subWallet of subWallets"
+      [wallet]="subWallet"
+      [maxDigits]="8"
+      tappable
+      (click)="openDetail(wallet)"
+    ></portfolio-item>
   </ion-list>
 </ion-content>

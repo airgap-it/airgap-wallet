@@ -49,7 +49,10 @@ ion-app {
 .content--align-vert__center {
   align-items: center !important;
 }
-
+.justify--content__end {
+  display: flex;
+  justify-content: flex-end;
+}
 .font--weight__light {
   font-weight: 200;
 }
