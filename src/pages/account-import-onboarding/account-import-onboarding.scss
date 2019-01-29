@@ -1,2 +1,8 @@
 page-account-import-onboarding {
+  ion-slides {
+    height: calc(100% - 72px);
+  }
+  .swiper-pagination-progress .swiper-pagination-progressbar {
+    background: color($colors, primary, base);
+  }
 }
