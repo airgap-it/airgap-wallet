@@ -1,18 +1,26 @@
-<ion-header>
-
-  <ion-navbar>
-    <ion-title>add-account</ion-title>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'add-account.title' | translate }}</ion-title>
   </ion-navbar>
-
-  <ion-searchbar></ion-searchbar>
-
+  <ion-searchbar mode="md"></ion-searchbar>
 </ion-header>
 
-
 <ion-content padding>
-  <ion-list>
-    <ion-item (click)="addAccount(protocol.identifier)" *ngFor="let protocol of supportedAccountProtocols">{{protocol.name}}</ion-item>
-    <ion-item (click)="addSubAccount(subProtocol.identifier)" *ngFor="let subProtocol of supportedSubAccountProtocols">{{subProtocol.name}}</ion-item>
+  <ion-list no-lines>
+    <ion-item (click)="addAccount(protocol.identifier)" *ngFor="let protocol of supportedAccountProtocols" no-padding>
+      <img class="item__image" [src]="'assets/symbols/' + protocol.symbol.toLowerCase() + '.svg'" item-start />
+      <h2>
+        <strong>{{ protocol.name }}</strong>
+        {{ protocol.symbol }}
+      </h2>
+    </ion-item>
+    <ion-item (click)="addSubAccount(subProtocol.identifier)" *ngFor="let subProtocol of supportedSubAccountProtocols" no-padding>
+      <img class="item__image" [src]="'assets/symbols/' + subProtocol.symbol.toLowerCase() + '.svg'" item-start />
+      <h2>
+        <strong>{{ subProtocol.name }}</strong>
+        {{ subProtocol.symbol }}
+      </h2>
+    </ion-item>
     <ion-item (click)="addSubAccount('gnt')">Golem</ion-item>
   </ion-list>
 </ion-content>
