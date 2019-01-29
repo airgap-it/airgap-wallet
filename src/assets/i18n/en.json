@@ -174,5 +174,20 @@
   },
   "portfolio-item": {
     "syncing_label": "syncing with blockchain ... "
+  },
+  "add-account": {
+    "title": "Add Coins"
+  },
+  "account-detail": {
+    "tokens_label": "Tokens",
+    "accounts_label": "Accounts"
+  },
+  "account-import-onboarding": {
+    "title": "Add {{title}}",
+    "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps."
+  },
+  "sub-account-import": {
+    "title": "Select Accounts",
+    "text": "Select the Account you want to add for <strong>{{subProtocolName}}</strong>."
   }
 }

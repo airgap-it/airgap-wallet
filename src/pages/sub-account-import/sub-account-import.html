@@ -1,16 +1,12 @@
-<ion-header>
-
-  <ion-navbar>
-    <ion-title>sub-account-import</ion-title>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'sub-account-import.title' | translate }}</ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
-<ion-content padding>
+<ion-content>
+  <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: subProtocol.name }"></p>
   <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
-    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="importWallets()"></portfolio-item>
   </ion-list>
-
-  <button ion-button (click)="importWallets()">Import</button>
 </ion-content>
