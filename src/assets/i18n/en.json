@@ -188,14 +188,16 @@
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
     "slides": {
-      "slide-1_text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
-      "slide-2_text": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>.",
-      "slide-3_text": "Select the created account and on the “Account Address” page choose <strong>“Sync Account”</strong>.",
-      "slide-4": {
+      "slide-1": {
+        "text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
+        "description": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>."
+      },       
+      "slide-2_text": "Select the created account and on the “Account Address” page choose <strong>“Sync Account”</strong>.",
+      "slide-3": {
         "text": "You need to sync the account from AirGap Vault to AirGap Wallet.",
         "description": "¬ If AirGap Vault is on an <strong>offline device</strong>, scan the <strong>QR code</strong> on the next page.<br>¬ If AirGap Vault is on the <strong>same device</strong>, use the same device <strong>sync button</strong>."
       },
-      "slide-5": {
+      "slide-4": {
         "text": "The account can now be imported to AirGap Wallet.",
         "description": "You’re now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
       }    
