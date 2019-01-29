@@ -34,7 +34,7 @@ export class TransactionPreparePage {
     const address = this.navParams.get('address') || ''
     this.transactionForm = formBuilder.group({
       address: [address, [Validators.required]],
-      amount: ['0', [Validators.required, new ForceRegexValidator(/^(?!^[0-9]+(\.[0-9]*)?$$).*$/g)]],
+      amount: ['0', [Validators.required, new ForceRegexValidator(/^[0-9]+((\.|,){1}[0-9]*)?$/g)]],
       feeLevel: [0, [Validators.required]],
       fee: ['0', [Validators.required]],
       isAdvancedMode: [false, []]
