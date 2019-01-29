@@ -1,26 +1,15 @@
-<ion-header>
-
-  <ion-navbar>
-    <ion-title>account-import-onboarding</ion-title>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title><span [innerHTML]="'account-import-onboarding.title' | translate: { title: protocol.name }"></span></ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
 <ion-content padding>
-  Add coin: {{protocol.name}}
+  <p [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }"></p>
 
-  <ion-slides>
-    <ion-slide>
-      <h1>Slide 1</h1>
-    </ion-slide>
-    <ion-slide>
-      <h1>Slide 2</h1>
-    </ion-slide>
-    <ion-slide>
-      <h1>Slide 3</h1>
-    </ion-slide>
+  <ion-slides pager>
+    <ion-slide><h1>Slide 1</h1></ion-slide>
+    <ion-slide><h1>Slide 2</h1></ion-slide>
+    <ion-slide><h1>Slide 3</h1></ion-slide>
   </ion-slides>
-  
-  <button ion-button (click)="openVault()">Open Vault</button>
 </ion-content>
