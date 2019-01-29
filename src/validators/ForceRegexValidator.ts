@@ -12,19 +12,19 @@ export class ForceRegexValidator implements Validator {
   }
 
   /**
-   * regExp has to be the negation of the regular expression
+   * regExp has to be the regular expression
    * we want our desired string to match against.
-   *
-   * Suppose we want only values which match /(.{0,4})/g
-   * regExp should match exactly all such values which are
-   * not matched by the above regular expression.
-   * regExp should thus be //g
    */
+
   forceRegexValidator(regExp: RegExp): ValidatorFn {
+    let inverseRegExpSource = '^(?!' + regExp.source + '$).*$'
+    let inverseRegExp = new RegExp(inverseRegExpSource)
     return (c: FormControl) => {
-      if (c.value && c.value.match(regExp) !== null) {
-        let tempValue = c.value
-        c.setValue(c.value.replace(regExp, tempValue.slice(0, -1)), { emitEvent: false })
+      if (c.value) {
+        if (String(c.value).match(inverseRegExp) !== null) {
+          let tempValue = c.value
+          c.setValue(Number(c.value.replace(inverseRegExp, tempValue.slice(0, -1))), { emitEvent: false })
+        }
       }
       return null
     }
