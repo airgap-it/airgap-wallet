@@ -179,6 +179,7 @@
     "title": "Add Coins"
   },
   "account-detail": {
+    "title": "{{protocolName}}",
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",

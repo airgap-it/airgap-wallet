@@ -131,7 +131,9 @@
     "paste_label": "粘贴",
     "create-transaction": "创建交易"
   },
-
+  "account-detail": {
+    "title": "{{protocolName}}"
+  },
   "transaction-qr": {
     "title": "{{title}} 交易二维码",
     "text": "打开AirGap Vault并扫描该交易，以便对其进行签名",

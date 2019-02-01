@@ -1,7 +1,6 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
-    <!-- TODO: use protocol.name as title -->
-    <ion-title>Ethereum</ion-title>
+    <ion-title><span [innerHTML]="'account-detail.title' | translate: { protocolName: wallet.coinProtocol.name }"></span></ion-title>
   </ion-navbar>
 </ion-header>
 

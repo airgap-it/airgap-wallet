@@ -95,7 +95,9 @@
     "title": "Transaktionsdetails",
     "open-blockexplorer_label": "Blockexplorer öffnen"
   },
-
+  "account-detail": {
+    "title": "{{protocolName}}"
+  },
   "transaction-prepare": {
     "title": "{{title}} Versenden",
     "to-address_label": "Empfangsadresse",
