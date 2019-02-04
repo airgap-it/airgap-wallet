@@ -10,7 +10,7 @@ import { FromToComponent } from './from-to/from-to'
 import { HexagonIconComponent } from './hexagon-icon/hexagon-icon'
 import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
-import { WalletEditPopoverComponent } from './wallet-edit-popover/wallet-edit-popover.component'
+import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { MomentModule } from 'ngx-moment'
 
 @NgModule({
@@ -20,7 +20,7 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    WalletEditPopoverComponent
+    AccountEditPopoverComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
@@ -29,7 +29,7 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    WalletEditPopoverComponent
+    AccountEditPopoverComponent
   ]
 })
 export class ComponentsModule {}

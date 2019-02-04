@@ -9,10 +9,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { Keyboard } from '@ionic-native/keyboard'
 
 import { PlatformMock, StatusBarMock, SplashScreenMock, NavParamsMock } from '../../../test-config/mocks-ionic'
-import { NavControllerMock, KeyboardMock, LoadingControllerMock, ToastControllerMock } from 'ionic-mocks'
+import { NavControllerMock, KeyboardMock, LoadingControllerMock, LoadingMock, ToastControllerMock } from 'ionic-mocks'
 
 import { ComponentsModule } from '../../components/components.module'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { WalletMock } from '../../../test-config/wallet-mock'
 import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
@@ -56,12 +56,19 @@ describe('TransactionPrepare Page', () => {
         })
       ],
       providers: [
-        WalletsProvider,
+        AccountProvider,
         { provide: Storage, useClass: StorageMock },
         { provide: NavController, useFactory: () => NavControllerMock.instance() },
         { provide: NavParams, useClass: NavParamsMock },
         { provide: StatusBar, useClass: StatusBarMock },
-        { provide: LoadingController, useFactory: () => LoadingControllerMock.instance() },
+        {
+          provide: LoadingController,
+          useFactory: () => {
+            const instance = LoadingMock.instance()
+            instance.dismiss.and.returnValue(Promise.resolve())
+            return LoadingControllerMock.instance(instance)
+          }
+        },
         { provide: ToastController, useFactory: () => ToastControllerMock.instance() },
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },

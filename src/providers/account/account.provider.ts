@@ -4,7 +4,7 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 
 @Injectable()
-export class WalletsProvider {
+export class AccountProvider {
   private walletList: AirGapMarketWallet[] = []
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)

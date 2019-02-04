@@ -1,35 +1,35 @@
 import { async, TestBed } from '@angular/core/testing'
 
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { StorageProvider } from '../storage/storage'
 
-describe('WalletsProvider', () => {
-  let walletsProvider: WalletsProvider
+describe('AccountProvider', () => {
+  let accountProvider: AccountProvider
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      providers: [WalletsProvider, StorageProvider, { provide: Storage, useClass: StorageMock }]
+      providers: [AccountProvider, StorageProvider, { provide: Storage, useClass: StorageMock }]
     })
   }))
 
   beforeEach(async () => {
-    walletsProvider = TestBed.get(WalletsProvider)
-    await walletsProvider.walledChangedObservable.take(0).toPromise() // Wait for initial load to be over
+    accountProvider = TestBed.get(AccountProvider)
+    await accountProvider.walledChangedObservable.take(0).toPromise() // Wait for initial load to be over
   })
 
   it('should be created', () => {
-    expect(walletsProvider instanceof WalletsProvider).toBe(true)
+    expect(accountProvider instanceof AccountProvider).toBe(true)
   })
 
   it('should successfully add and persist ETH wallets', async () => {
-    expect(walletsProvider.getWalletList().length).toEqual(1)
-    await walletsProvider.addWallet(
+    expect(accountProvider.getWalletList().length).toEqual(1)
+    await accountProvider.addWallet(
       new AirGapMarketWallet('eth', '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996', false, `m/44'/60'/0'/0/0`)
     )
-    expect(walletsProvider.getWalletList().length).toEqual(2)
+    expect(accountProvider.getWalletList().length).toEqual(2)
   })
 
   it('should successfully add and persist BTC wallets', async () => {
@@ -39,10 +39,10 @@ describe('WalletsProvider', () => {
       true,
       `m/44'/0'/0'`
     )
-    await walletsProvider.removeWallet(wallet)
-    expect(walletsProvider.getWalletList().length).toEqual(0)
-    await walletsProvider.addWallet(wallet)
-    expect(walletsProvider.getWalletList().length).toEqual(1)
+    await accountProvider.removeWallet(wallet)
+    expect(accountProvider.getWalletList().length).toEqual(0)
+    await accountProvider.addWallet(wallet)
+    expect(accountProvider.getWalletList().length).toEqual(1)
   })
 
   it('should update wallet observalbe when adding a wallet', async done => {
@@ -54,7 +54,7 @@ describe('WalletsProvider', () => {
     )
 
     let numOfTimesCalled = 0
-    walletsProvider.wallets.subscribe(values => {
+    accountProvider.wallets.subscribe(values => {
       numOfTimesCalled++
       if (numOfTimesCalled >= 3) {
         // Needs to be 3 times
@@ -65,9 +65,9 @@ describe('WalletsProvider', () => {
       }
     })
 
-    await walletsProvider.removeWallet(wallet)
-    expect(walletsProvider.getWalletList().length).toEqual(0)
-    await walletsProvider.addWallet(wallet)
-    expect(walletsProvider.getWalletList().length).toEqual(1)
+    await accountProvider.removeWallet(wallet)
+    expect(accountProvider.getWalletList().length).toEqual(0)
+    await accountProvider.addWallet(wallet)
+    expect(accountProvider.getWalletList().length).toEqual(1)
   })
 })

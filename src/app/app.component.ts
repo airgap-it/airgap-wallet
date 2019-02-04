@@ -6,12 +6,11 @@ import { TranslateService } from '@ngx-translate/core'
 import { Platform, Nav } from 'ionic-angular'
 
 import { TabsPage } from '../pages/tabs/tabs'
-import { TransactionConfirmPage } from '../pages/transaction-confirm/transaction-confirm'
-import { WalletImportPage } from '../pages/wallet-import/wallet-import'
 
 import { configureScope } from '@sentry/browser'
 import { AppVersion } from '@ionic-native/app-version'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
+import { handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   templateUrl: 'app.html'
@@ -53,6 +52,20 @@ export class MyApp {
             })
           })
         }
+
+        this.translate.setDefaultLang('en')
+
+        const supportedLanguages = ['en', 'de', 'zh-cn']
+        const language = this.translate.getBrowserLang()
+
+        if (language) {
+          const lowerCaseLanguage = language.toLowerCase()
+          supportedLanguages.forEach(supportedLanguage => {
+            if (supportedLanguage.startsWith(lowerCaseLanguage)) {
+              this.translate.use(supportedLanguage)
+            }
+          })
+        }
       })
       .catch(err => console.log(err))
   }
@@ -69,7 +82,7 @@ export class MyApp {
           // match.$args - the args passed in the link
           // match.$link - the full link data
           console.log('Successfully matched route', JSON.stringify(match))
-          this.schemeRoutingProvider.handleNewSyncRequest(this.nav, match.$link.url)
+          this.schemeRoutingProvider.handleNewSyncRequest(this.nav, match.$link.url).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         },
         nomatch => {
           // nomatch.$link - the full link data

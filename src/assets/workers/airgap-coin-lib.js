@@ -4,22 +4,21 @@ var window = self;
 self.importScripts("../libs/airgap-coin-lib.browserify.js");
 
 self.onmessage = function(event) {
-  console.log("start deriving addresses");
-  let wallet = event.data;
-  let airGapWallet = new airgapCoinLib.AirGapWallet(
-    wallet.protocolIdentifier,
-    wallet.publicKey,
-    wallet.isExtendedPublicKey,
-    wallet.derivationPath
-  );
+  airgapCoinLib.isCoinlibReady().then(function() {
+      console.log("start deriving addresses");
+  
+      var wallet = event.data;
+      var airGapWallet = new airgapCoinLib.AirGapWallet(
+        wallet.protocolIdentifier,
+        wallet.publicKey,
+        wallet.isExtendedPublicKey,
+        wallet.derivationPath
+      );
+    
+      var addresses = airGapWallet.deriveAddresses(50);
 
-  let addresses = airGapWallet.deriveAddresses(50);
-  console.log(
-    "derived addresses for",
-    wallet.protocolIdentifier,
-    wallet.publicKey,
-    addresses
-  );
-
-  self.postMessage({ addresses });
+      console.log("derived " + addresses.length + " addresses")
+    
+      self.postMessage({ addresses });
+  })
 };

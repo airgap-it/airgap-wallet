@@ -68,7 +68,7 @@
   },
 
   "scan-address": {
-    "title": "确认交易",
+    "title": "扫描账户地址",
     "text": "扫描账户地址的二维码"
   },
 
@@ -96,7 +96,7 @@
   },
 
   "transaction-confirm": {
-    "title": "扫描账户地址",
+    "title": "确认交易",
     "decline_label": "拒绝",
     "confirm_label": "确认"
   },

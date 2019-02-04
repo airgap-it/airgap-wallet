@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, ViewController, ToastController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { Clipboard } from '@ionic-native/clipboard'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   template: `
@@ -19,14 +20,14 @@ import { Clipboard } from '@ionic-native/clipboard'
     </ion-list>
   `
 })
-export class WalletEditPopoverComponent {
+export class AccountEditPopoverComponent {
   private wallet: AirGapMarketWallet
   private onDelete: Function
 
   constructor(
     private alertCtrl: AlertController,
     private navParams: NavParams,
-    private walletsProvider: WalletsProvider,
+    private walletsProvider: AccountProvider,
     private viewCtrl: ViewController,
     private clipboard: Clipboard,
     private toastController: ToastController
@@ -44,8 +45,8 @@ export class WalletEditPopoverComponent {
       showCloseButton: true,
       closeButtonText: 'Ok'
     })
-    await toast.present()
-    await this.viewCtrl.dismiss()
+    await toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   delete() {
@@ -57,23 +58,26 @@ export class WalletEditPopoverComponent {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.viewCtrl.dismiss()
+            this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           }
         },
         {
           text: 'Delete',
           handler: () => {
-            alert.present()
-            this.walletsProvider.removeWallet(this.wallet).then(() => {
-              this.viewCtrl.dismiss()
-              if (this.onDelete) {
-                this.onDelete()
-              }
-            })
+            alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.walletsProvider
+              .removeWallet(this.wallet)
+              .then(() => {
+                this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+                if (this.onDelete) {
+                  this.onDelete()
+                }
+              })
+              .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
           }
         }
       ]
     })
-    alert.present()
+    alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

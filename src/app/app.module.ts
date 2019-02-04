@@ -16,7 +16,7 @@ import { MaterialIconsModule } from 'ionic2-material-icons'
 
 import { ComponentsModule } from '../components/components.module'
 import { AboutPage } from '../pages/about/about'
-import { CoinInfoPage } from '../pages/coin-info/coin-info'
+import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { IntroductionPage } from '../pages/introduction/introduction'
 import { PortfolioPage } from '../pages/portfolio/portfolio'
 import { ScanAddressPage } from '../pages/scan-address/scan-address'
@@ -28,19 +28,19 @@ import { TransactionConfirmPage } from '../pages/transaction-confirm/transaction
 import { TransactionDetailPage } from '../pages/transaction-detail/transaction-detail'
 import { TransactionPreparePage } from '../pages/transaction-prepare/transaction-prepare'
 import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
-import { WalletAddressPage } from '../pages/wallet-address/wallet-address'
-import { WalletImportPage } from '../pages/wallet-import/wallet-import'
+import { AccountAddressPage } from '../pages/account-address/account-address'
+import { AccountImportPage } from '../pages/account-import/account-import'
 import { IntroductionDownloadPage } from '../pages/introduction-download/introduction-download'
 import { PipesModule } from '../pipes/pipes.module'
 import { ScannerProvider } from '../providers/scanner/scanner'
-import { WalletsProvider } from '../providers/wallets/wallets.provider'
+import { AccountProvider } from '../providers/account/account.provider'
 import { MomentModule } from 'ngx-moment'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 
 import { MyApp } from './app.component'
 import { IonicStorageModule } from '@ionic/storage'
-import { WalletEditPopoverComponent } from '../components/wallet-edit-popover/wallet-edit-popover.component'
+import { AccountEditPopoverComponent } from '../components/account-edit-popover/account-edit-popover.component'
 import { StorageProvider } from '../providers/storage/storage'
 import { Clipboard } from '@ionic-native/clipboard'
 import { Diagnostic } from '@ionic-native/diagnostic'
@@ -56,7 +56,7 @@ export function createTranslateLoader(http: HttpClient) {
 @NgModule({
   declarations: [
     MyApp,
-    CoinInfoPage,
+    AccountTransactionListPage,
     PortfolioPage,
     TransactionPreparePage,
     IntroductionPage,
@@ -64,13 +64,13 @@ export function createTranslateLoader(http: HttpClient) {
     ScanPage,
     TabsPage,
     AboutPage,
-    WalletAddressPage,
+    AccountAddressPage,
     TransactionConfirmPage,
     TransactionDetailPage,
     TransactionQrPage,
     ScanAddressPage,
     ScanSyncPage,
-    WalletImportPage,
+    AccountImportPage,
     IntroductionDownloadPage
   ],
   imports: [
@@ -102,7 +102,7 @@ export function createTranslateLoader(http: HttpClient) {
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    CoinInfoPage,
+    AccountTransactionListPage,
     PortfolioPage,
     TransactionPreparePage,
     SettingsPage,
@@ -110,14 +110,14 @@ export function createTranslateLoader(http: HttpClient) {
     IntroductionPage,
     TabsPage,
     AboutPage,
-    WalletAddressPage,
+    AccountAddressPage,
     TransactionConfirmPage,
     TransactionDetailPage,
     TransactionQrPage,
     ScanAddressPage,
     ScanSyncPage,
-    WalletImportPage,
-    WalletEditPopoverComponent,
+    AccountImportPage,
+    AccountEditPopoverComponent,
     IntroductionDownloadPage
   ],
   providers: [
@@ -130,7 +130,7 @@ export function createTranslateLoader(http: HttpClient) {
     ScannerProvider,
     AppVersion,
     Diagnostic,
-    WalletsProvider,
+    AccountProvider,
     StorageProvider,
     {
       provide: Clipboard,

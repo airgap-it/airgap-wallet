@@ -4,10 +4,10 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Clipboard } from '@ionic-native/clipboard'
 
 @Component({
-  selector: 'page-wallet-address',
-  templateUrl: 'wallet-address.html'
+  selector: 'page-account-address',
+  templateUrl: 'account-address.html'
 })
-export class WalletAddressPage {
+export class AccountAddressPage {
   public wallet: AirGapMarketWallet
 
   constructor(

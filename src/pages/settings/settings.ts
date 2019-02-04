@@ -3,6 +3,7 @@ import { ModalController, NavController, Platform } from 'ionic-angular'
 
 import { AboutPage } from '../about/about'
 import { IntroductionPage } from '../introduction/introduction'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 declare var window: any
 declare var cordova: any
@@ -15,7 +16,7 @@ export class SettingsPage {
   constructor(public navCtrl: NavController, private modalController: ModalController, public platform: Platform) {}
 
   public about() {
-    this.navCtrl.push(AboutPage)
+    this.navCtrl.push(AboutPage).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
   }
 
   public share() {
@@ -41,7 +42,10 @@ export class SettingsPage {
   }
 
   public introduction() {
-    this.modalController.create(IntroductionPage).present()
+    this.modalController
+      .create(IntroductionPage)
+      .present()
+      .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
   }
 
   public feedback() {

@@ -29,7 +29,11 @@
         <ion-row>
           <ion-item no-padding class="content--align-vert__center to-address__item">
             <ion-label stacked>{{ 'Send To' | translate }}</ion-label>
-            <ion-textarea placeholder="{{'0x..' | translate}}" formControlName="address" id="address-input"></ion-textarea>
+            <ion-textarea
+              [placeholder]="wallet.coinProtocol.addressPlaceholder"
+              formControlName="address"
+              id="address-input"
+            ></ion-textarea>
           </ion-item>
         </ion-row>
       </ion-col>
