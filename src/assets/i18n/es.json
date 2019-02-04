@@ -2,7 +2,7 @@
     "coin-info": {
       "title": "Cuenta",
       "transactions_label": "Transacciones",
-      "ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity.",
+      "ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity",
       "receive_label": "Recibir",
       "send_label": "Enviar",
       "aeternity": {
@@ -22,11 +22,11 @@
       "title": "El nuevo estandar de billetera crypto",
       "highest": {
         "label": "Seguridad alta",
-        "text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap, el manejo seguro de claves se vuelve más accesible."
+        "text": "Con el <b>enfoque de dos dispositivos</b> de AirGap el manejo seguro de claves se vuelve más accesible.</p>"
       },
       "medium": {
         "label": "Seguridad media",
-        "text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap, el manejo seguro de claves se vuelve más accesible."
+        "text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap el manejo seguro de claves se vuelve más accesible."
       },
       "vault": {
         "heading": "AirGap Vault",
@@ -34,7 +34,7 @@
       },
       "wallet": {
         "heading": "AirGap Wallet",
-        "text": "<b>Esta es la aplicacción de AirGap Wallet/b>, que trata solo con información pública y es responsable de transmitir las transacciones a la cadena de bloques."  
+        "text": "<b>Esta es la aplicacción de AirGap Wallet</b>, que trata solo con información pública y es responsable de transmitir las transacciones a la cadena de bloques."  
       },
       "communication": {
         "highest_text": "Comunicación de unico sentido con códigos QR.",
@@ -69,7 +69,7 @@
   
     "scan-address": {
       "title": "Confirmar transacción",
-      "text": "Escanea el codigo QR de una cuenta"
+      "text": "Escanea el codigo QR de una cuenta."
     },
   
     "scan-sync": {
