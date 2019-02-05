@@ -1,179 +1,100 @@
 {
-    "coin-info": {
-      "title": "Cuenta",
-      "transactions_label": "Transacciones",
-      "ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity.",
-      "receive_label": "Recibir",
-      "send_label": "Enviar",
-      "aeternity": {
-        "same-phase": {
-          "heading":"<span class=\"style__strong color__primary\">{{currentPhase}} Migración exitosa</span>",
-          "text":"Tu saldo de <span class=\"style__strong color__primary\">{{migratedTokens}}</span> estará disponible con el próximo hardfork en <span class=\"style__strong color__primary\">el fin de {{phaseEnd}}</span>"
-        },
-        "no-transactions_text": "Aún no hay transacciones para esta cuenta.",
-        "tx-list-disabled": {
-          "text": "Actualmente no se puede mostrar el historial de transacciones. por favor refiérase al explorador de bloques.",
-          "blockexplorer_label": "Abrir explorador de bloques"
-        }
-      }
-    },
-  
-    "introduction": {
-      "title": "El nuevo estandar de billetera crypto",
-      "highest": {
-        "label": "Seguridad alta",
-        "text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap, el manejo seguro de claves se vuelve más accesible."
-      },
-      "medium": {
-        "label": "Seguridad media",
-        "text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap, el manejo seguro de claves se vuelve más accesible."
-      },
-      "vault": {
-        "heading": "AirGap Vault",
-        "text": "La clave privada se genera y se almacena de manera segura en otro dispositivo con la aplicación AirGap Vault. <b>Tienes que instalar AirGap Vault para usar AirGap Wallet</b>"  
-      },
-      "wallet": {
-        "heading": "AirGap Wallet",
-        "text": "<b>Esta es la aplicacción de AirGap Wallet/b>, que trata solo con información pública y es responsable de transmitir las transacciones a la cadena de bloques."  
-      },
-      "communication": {
-        "highest_text": "Comunicación de unico sentido con códigos QR.",
-        "medium_text": "Comunicación segura a través de cambio de aplicación."
-      },
-      "vault-install_label": "Instalar AirGap Vault",
-      "continue_label": "Vamos"
-    },
-  
-    "introduction-download": {
-      "title": "Instalar AirGap Vault",
-      "heading": "Instalemos AirGap Vault!",
-      "text": "Hay algunas formas de instalar AirGap Vault, elija la que mejor se adapte a usted.",
-      "play-store_text": "Instale AirGap Vault directamente desde Google Play Store para este o un dispositivo dedicado.",
-      "app-store_text": "Instale AirGap Vault directamente desde la App Store para este o un dispositivo dedicado.",
-      "linux-distro_label": "Distribución de Linux",
-      "install-distro_text": "Instale AirGap Vault Distribution en una computadora dedicada para firmar transacciones.",
-      "go_label": "Vamos"
-    },
-  
-    "portfolio": {
-      "empty-state_text": "Para utilizar la aplicación AirGap Wallet, debes <strong>sincronizar con AirGap Vault</strong>. Seleccione la cuenta en AirGap Vault y visualice el código QR de sincronización. Escanea este código con AirGap Wallet.",
-      "sync_label": "Sincronizar con AirGap Vault"
-    },
-  
-    "scan": {
-      "title": "Escanear QR",
-      "text": "Escanee un QR de sincronización para agregar una cuenta o escanee un QR de transacción para confirmar y enviarla.",
-      "empty-state_heading": "Para escanear códigos QR, AirGap Wallet necesita el <span class=\"style__strong color__primary\">permiso camara</span>.",
-      "grant-permission_label": "Conceder permiso"
-    },
-  
-    "scan-address": {
-      "title": "Confirmar transacción",
-      "text": "Escanea el codigo QR de una cuenta"
-    },
-  
-    "scan-sync": {
-      "title": "Sincronizar datos de la cuenta",
-      "text": "Abre AirGap Vault, selecciona una <span ion-text color='white'>cuenta</span> y luego <span ion-text color='white'>sincroniza</span>, escanee el código QR Sync con AirGap Wallet.",
-      "description": "No se compartirán claves privadas ni datos no públicos durante este proceso.",
-      "scan_label": "Escanear código Sync QR"
-    },
-  
-    "settings": {
-      "title": "Ajustes",
-      "help_label": "Ayuda y Soporte",
-      "introduction_label": "Introducción",
-      "faq_label": "FAQ",
-      "telegram_label": "Unete a Telegram",
-      "share_label": "Compartir AirGap",
-      "information_label": "Información",
-      "github_label": "Repositorio de GitHub",
-      "about_label": "Acerca de"
-    },
-  
-    "about": {
-      "title": "Acerca de"
-    },
-  
-    "transaction-confirm": {
-      "title": "Escanear direccion de cuenta",
-      "decline_label": "Descartar",
-      "confirm_label": "Confirmar"
-    },
-  
-    "transaction-detail": {
-      "title": "Detalle de la transacción",
-      "open-blockexplorer_label": "Abrir explorador de bloques",
-      "tx-broadcasting": {
-        "heading": "Estado: Transmitiendo...",
-        "text": "Tu transacción esta siendo transmitida, esto podría tomar unos segundos."
-      },
-      "tx-pending": {
-        "heading": "Estado: Pendiente...",
-        "text": "Dependiendo de la cuota que hallas establecido, puede tardar unos minutos hasta que se confirme la transacción."
-      },
-      "tx-success": {
-        "heading": "Estado: exitoso!"
-      }
-    },
-  
-    "transaction-prepare": {
-      "title": "Enviar {{title}}",
-      "to-address_label": "A la dirección",
-      "to-address-scan_label": "Escanear QR",
-      "amount_label": "Monto",
-      "fee": {
-        "label": "Tarifa",
-        "slow_label": "lento y barato",
-        "fast_label": "rapido y costoso",
-        "max_label": "MAX"
-      },
-      "paste_label": "Pegar",
-      "create-transaction": "Crear transacción"
-    },
-  
-    "transaction-qr": {
-      "title": "{{title}} Transacción QR",
-      "text": "Abre AirGap Vault y escanea esta transacción para firmarla.",
-      "sign-on-device_label": "Iniciar sesión en este dispositivo",
-      "done_label": "Hecho"
-    },
-  
-    "wallet-address": {
-      "title": "Direccion de cuenta",
-      "address_label": "Dirección",
-      "done_label": "Hecho"
-    },
-  
-    "wallet-import": {
-      "title": "Confirmar importación",
-      "text": "Te gustaría importar las siguientes cuentas?",
-      "warning": "Ya has añadido esta cuenta en AirGap.",
-      "syncing_label": "Sincronizando...",
-      "cancel_label": "Cancelar",
-      "import_label": "Importar"
-    },
-  
-    "from-to": {
-      "amount_label": "Monto",
-      "fee_label": "Cuota",
-      "time_label": "Tiempo",
-      "from_label": "De",
-      "to_label": "A"
-    },
-  
-    "wallet-edit-popover-component": {
-      "settings_label": "Ajustes de cuenta",
-      "copy-address_label": "Copiar dirección",
-      "delete_label": "Borrar"
-    },
-    "tabs": {
-      "wallets": "Cuentas",
-      "scan": "Escanear QRs",
-      "settings": "Ajustes"
-    },
-    "portfolio-item": {
-      "syncing_label": "Sincronizando con blockchain... "
-    }
-  }
-  
+    "coin-info.title": "Cuenta",
+    "coin-info.transactions_label": "Transacciones",
+    "coin-info.ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity",
+    "coin-info.receive_label": "Recibir",
+    "coin-info.send_label": "Enviar",
+    "coin-info.aeternity.same-phase.heading": "<span class=\"style__strong color__primary\">{{currentPhase}} Migración exitosa</span>",
+    "coin-info.aeternity.same-phase.text": "Tu saldo de <span class=\"style__strong color__primary\">{{migratedTokens}}</span> estará disponible con el próximo hardfork en <span class=\"style__strong color__primary\">el fin de {{phaseEnd}}</span>",
+    "coin-info.aeternity.no-transactions_text": "Aún no hay transacciones para esta cuenta.",
+    "coin-info.aeternity.tx-list-disabled.text": "Actualmente no se puede mostrar el historial de transacciones. por favor refiérase al explorador de bloques.",
+    "coin-info.aeternity.tx-list-disabled.blockexplorer_label": "Abrir explorador de bloques",
+    "introduction.title": "El nuevo estandar de billetera crypto",
+    "introduction.highest.label": "Seguridad alta",
+    "introduction.highest.text": "Con el <b>enfoque de dos dispositivos</b> de AirGap el manejo seguro de claves se vuelve más accesible.</p>",
+    "introduction.medium.label": "Seguridad media",
+    "introduction.medium.text": "Con el <b>enfoque de dos aplicaciones</b> de AirGap, el manejo seguro de claves se vuelve más accesible.",
+    "introduction.vault.heading": "AirGap Vault",
+    "introduction.vault.text": "La clave privada se genera y se almacena de manera segura en otro dispositivo con la aplicación AirGap Vault. <b>Tienes que instalar AirGap Vault para usar AirGap Wallet</b>",
+    "introduction.wallet.heading": "AirGap Wallet",
+    "introduction.wallet.text": "<b>Esta es la aplicacción de AirGap Wallet</b>, que trata solo con información pública y es responsable de transmitir las transacciones a la cadena de bloques.",
+    "introduction.communication.highest_text": "Comunicación de unico sentido con códigos QR.",
+    "introduction.communication.medium_text": "Comunicación segura a través de cambio de aplicación.",
+    "introduction.vault-install_label": "Instalar AirGap Vault",
+    "introduction.continue_label": "Vamos",
+    "introduction-download.title": "Instalar AirGap Vault",
+    "introduction-download.heading": "Instalemos AirGap Vault!",
+    "introduction-download.text": "Hay algunas formas de instalar AirGap Vault, elija la que mejor se adapte a usted.",
+    "introduction-download.play-store_text": "Instale AirGap Vault directamente desde Google Play Store para este o un dispositivo dedicado.",
+    "introduction-download.app-store_text": "Instale AirGap Vault directamente desde la App Store para este o un dispositivo dedicado.",
+    "introduction-download.linux-distro_label": "Distribución de Linux",
+    "introduction-download.install-distro_text": "Instale AirGap Vault Distribution en una computadora dedicada para firmar transacciones.",
+    "introduction-download.go_label": "Vamos",
+    "portfolio.empty-state_text": "Para utilizar la aplicación AirGap Wallet, debes <strong>sincronizar con AirGap Vault</strong>. Seleccione la cuenta en AirGap Vault y visualice el código QR de sincronización. Escanea este código con AirGap Wallet.",
+    "portfolio.sync_label": "Sincronizar con AirGap Vault",
+    "scan.title": "Escanear QR",
+    "scan.text": "Escanee un QR de sincronización para agregar una cuenta o escanee un QR de transacción para confirmar y enviarla.",
+    "scan.empty-state_heading": "Para escanear códigos QR, AirGap Wallet necesita el <span class=\"style__strong color__primary\">permiso camara</span>.",
+    "scan.grant-permission_label": "Conceder permiso",
+    "scan-address.title": "Confirmar transacción",
+    "scan-address.text": "Escanea el codigo QR de una cuenta.",
+    "scan-sync.title": "Sincronizar datos de la cuenta",
+    "scan-sync.text": "Abre AirGap Vault, selecciona una <span ion-text color='white'>cuenta</span> y luego <span ion-text color='white'>sincroniza</span>, escanee el código QR Sync con AirGap Wallet.",
+    "scan-sync.description": "No se compartirán claves privadas ni datos no públicos durante este proceso.",
+    "scan-sync.scan_label": "Escanear código Sync QR",
+    "settings.title": "Ajustes",
+    "settings.help_label": "Ayuda y Soporte",
+    "settings.introduction_label": "Introducción",
+    "settings.faq_label": "FAQ",
+    "settings.telegram_label": "Unete a Telegram",
+    "settings.share_label": "Compartir AirGap",
+    "settings.information_label": "Información",
+    "settings.github_label": "Repositorio de GitHub",
+    "settings.about_label": "Acerca de",
+    "about.title": "Acerca de",
+    "transaction-confirm.title": "Escanear direccion de cuenta",
+    "transaction-confirm.decline_label": "Descartar",
+    "transaction-confirm.confirm_label": "Confirmar",
+    "transaction-detail.title": "Detalle de la transacción",
+    "transaction-detail.open-blockexplorer_label": "Abrir explorador de bloques",
+    "transaction-detail.tx-broadcasting.heading": "Estado: Transmitiendo...",
+    "transaction-detail.tx-broadcasting.text": "Tu transacción esta siendo transmitida, esto podría tomar unos segundos.",
+    "transaction-detail.tx-pending.heading": "Estado: Pendiente...",
+    "transaction-detail.tx-pending.text": "Dependiendo de la cuota que hallas establecido, puede tardar unos minutos hasta que se confirme la transacción.",
+    "transaction-detail.tx-success.heading": "Estado: exitoso!",
+    "transaction-prepare.title": "Enviar {{title}}",
+    "transaction-prepare.to-address_label": "A la dirección",
+    "transaction-prepare.to-address-scan_label": "Escanear QR",
+    "transaction-prepare.amount_label": "Monto",
+    "transaction-prepare.fee.label": "Tarifa",
+    "transaction-prepare.fee.slow_label": "lento y barato",
+    "transaction-prepare.fee.fast_label": "rapido y costoso",
+    "transaction-prepare.fee.max_label": "MAX",
+    "transaction-prepare.paste_label": "Pegar",
+    "transaction-prepare.create-transaction": "Crear transacción",
+    "transaction-qr.title": "{{title}} Transacción QR",
+    "transaction-qr.text": "Abre AirGap Vault y escanea esta transacción para firmarla.",
+    "transaction-qr.sign-on-device_label": "Iniciar sesión en este dispositivo",
+    "transaction-qr.done_label": "Hecho",
+    "wallet-address.title": "Direccion de cuenta",
+    "wallet-address.address_label": "Dirección",
+    "wallet-address.done_label": "Hecho",
+    "wallet-import.title": "Confirmar importación",
+    "wallet-import.text": "Te gustaría importar las siguientes cuentas?",
+    "wallet-import.warning": "Ya has añadido esta cuenta en AirGap.",
+    "wallet-import.syncing_label": "Sincronizando...",
+    "wallet-import.cancel_label": "Cancelar",
+    "wallet-import.import_label": "Importar",
+    "from-to.amount_label": "Monto",
+    "from-to.fee_label": "Cuota",
+    "from-to.time_label": "Tiempo",
+    "from-to.from_label": "De",
+    "from-to.to_label": "A",
+    "wallet-edit-popover-component.settings_label": "Ajustes de cuenta",
+    "wallet-edit-popover-component.copy-address_label": "Copiar dirección",
+    "wallet-edit-popover-component.delete_label": "Borrar",
+    "tabs.wallets": "Cuentas",
+    "tabs.scan": "Escanear QRs",
+    "tabs.settings": "Ajustes",
+    "portfolio-item.syncing_label": "Sincronizando con blockchain... "
+}
