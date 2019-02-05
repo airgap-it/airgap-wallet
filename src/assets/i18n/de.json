@@ -20,11 +20,11 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App. <b>AirGap Vault muss instaliert und mit AirGap Wallet verwendet werden.</b>"  
+      "text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App. <b>AirGap Vault muss instaliert und mit AirGap Wallet verwendet werden.</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
-      "text": "Die Wallet App kommt nur in Kontakt mit öffentlichen Informationen und ist für die Übermittlung von Transaktionen an die Blockchain zuständig."    
+      "text": "Die Wallet App kommt nur in Kontakt mit öffentlichen Informationen und ist für die Übermittlung von Transaktionen an die Blockchain zuständig."
     },
     "communication": {
       "highest_text": "Einweg-Kommunikation mit QR Codes.",
@@ -78,7 +78,13 @@
     "share_label": "AirGap teilen",
     "information_label": "Informationen",
     "github_label": "GitHub Repository",
-    "about_label": "Über AirGap"
+    "about_label": "Über AirGap",
+    "alert_title": "Wähle einen Kanal",
+    "alert_cancel": "Abbrechen",
+    "channel": {
+      "international": "International",
+      "chinese": "Chinesisch"
+    }
   },
 
   "about": {
