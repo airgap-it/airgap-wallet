@@ -1,17 +1,18 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>add-sub-account</ion-title>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'add-account.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
-
-<ion-content padding>
-  <ion-list>
-    <ion-item *ngFor="let subAccount of subAccounts; let i = index">
-      <ion-label>
-        <portfolio-item [wallet]="subAccount.wallet" [maxDigits]="8"></portfolio-item>
-      </ion-label>
-      <ion-checkbox [(ngModel)]="subAccounts[i].selected" color="dark"></ion-checkbox>
-    </ion-item>
-  </ion-list>
-  <button ion-button (click)="addSubAccounts()">Add Account</button>
+<ion-content>
+  <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
+    <ion-col col-10 no-padding>
+      <portfolio-item [wallet]="subAccount.wallet" [maxDigits]="8"></portfolio-item>
+    </ion-col>
+    <ion-col col-2 class="content--align__center-center" no-padding>
+      <ion-checkbox [(ngModel)]="subAccounts[i].selected" color="primary"></ion-checkbox>
+    </ion-col>
+  </ion-row>
+  <ion-row padding justify-content-end>
+    <button ion-button round (click)="addSubAccounts()">Add Account</button>
+  </ion-row>
 </ion-content>
