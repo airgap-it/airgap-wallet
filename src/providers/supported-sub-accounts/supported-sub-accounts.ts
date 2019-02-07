@@ -46,7 +46,19 @@ export class SupportedSubAccountsProvider {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         addSubProtocol(
           supportedSubAccount.protocol,
-          new GenericERC20(subProtocol.symbol, subProtocol.name, subProtocol.marketSymbol, subProtocol.identifier, subProtocol.data[0])
+          new GenericERC20({
+            symbol: subProtocol.symbol,
+            name: subProtocol.name,
+            marketSymbol: subProtocol.marketSymbol,
+            identifier: subProtocol.identifier,
+            contractAddress: subProtocol.data[0],
+            decimals: 18
+          })
+          /*
+            jsonRPCAPI?: string;
+            infoAPI?: string;
+            chainId?: number;
+          */
         )
       })
     })

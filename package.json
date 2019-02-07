@@ -63,7 +63,7 @@
     "@sentry/browser": "^4.2.4",
     "@types/node": "8.0.31",
     "@zxing/ngx-scanner": "^1.3.0",
-    "airgap-coin-lib": "git+ssh://git@gitlab.papers.tech:10022/papers/airgap/airgap-coin-lib.git#46ada4523ae1fcda36c8d2cf35081a25252e4bbe",
+    "airgap-coin-lib": "git+ssh://git@gitlab.papers.tech:10022/papers/airgap/airgap-coin-lib.git#556504b623fa109354a90ec771a5510d3a023936",
     "angular2-template-loader": "0.6.2",
     "angularx-qrcode": "^1.2.2",
     "bignumber.js": "^8.0.0",
@@ -112,7 +112,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.9",
-    "@types/jasmine": "^2.8.6",
+    "@types/jasmine": "2.8.9",
     "browserify": "^16.2.2",
     "ionic": "3.6.0",
     "ionic-mocks": "1.3.0",

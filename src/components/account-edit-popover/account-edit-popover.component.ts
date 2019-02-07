@@ -4,6 +4,7 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { Clipboard } from '@ionic-native/clipboard'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 
 @Component({
   template: `
@@ -28,6 +29,7 @@ export class AccountEditPopoverComponent {
     private alertCtrl: AlertController,
     private navParams: NavParams,
     private walletsProvider: AccountProvider,
+    private subWalletsProvider: SubAccountProvider,
     private viewCtrl: ViewController,
     private clipboard: Clipboard,
     private toastController: ToastController
@@ -66,6 +68,16 @@ export class AccountEditPopoverComponent {
           handler: () => {
             alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             this.walletsProvider
+              .removeWallet(this.wallet)
+              .then(() => {
+                this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+                if (this.onDelete) {
+                  this.onDelete()
+                }
+              })
+              .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+            // TODO: Remove this, once subWallets are included in the walletsProvider
+            this.subWalletsProvider
               .removeWallet(this.wallet)
               .then(() => {
                 this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))

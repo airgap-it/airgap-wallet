@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 
 @Component({
@@ -10,7 +10,8 @@ import { SubAccountProvider } from '../../providers/account/sub-account.provider
 })
 export class SubAccountImportPage {
   private mainAccounts: AirGapMarketWallet[]
-  private subProtocolIdentifier: string
+  private protocolIdentifier: string
+  public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
   constructor(
@@ -20,13 +21,14 @@ export class SubAccountImportPage {
     private subAccountProvier: SubAccountProvider
   ) {
     this.subWallets = []
-    this.subProtocolIdentifier = this.navParams.get('subProtocolIdentifier')
+    this.protocolIdentifier = this.navParams.get('subProtocolIdentifier')
+    this.protocol = getProtocolByIdentifier(this.protocolIdentifier)
 
     // TODO: Use observable
     this.mainAccounts = this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === 'eth')
     this.mainAccounts.forEach(mainAccount => {
       const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
-        this.subProtocolIdentifier,
+        this.protocolIdentifier,
         mainAccount.publicKey,
         mainAccount.isExtendedPublicKey,
         mainAccount.derivationPath

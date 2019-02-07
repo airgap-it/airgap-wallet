@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: subProtocol.name }"></p>
+  <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: protocol.name }"></p>
   <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="importWallets()"></portfolio-item>
   </ion-list>

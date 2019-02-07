@@ -33,7 +33,7 @@ export class TransactionConfirmPage {
     const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
     this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
     this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
-    this.airGapTx = this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
+    this.airGapTx = await this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
   }
 
   broadcastTransaction() {

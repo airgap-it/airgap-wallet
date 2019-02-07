@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { supportedProtocols, ICoinProtocol, getSubProtocolByIdentifier } from 'airgap-coin-lib'
+import { supportedProtocols, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { AccountImportOnboardingPage } from '../account-import-onboarding/account-import-onboarding'
 import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
 import { SupportedSubAccountsProvider } from '../../providers/supported-sub-accounts/supported-sub-accounts'
@@ -16,9 +16,9 @@ export class AddAccountPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, private supportedTokenProvider: SupportedSubAccountsProvider) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
-      return pv.concat(...getSubProtocolByIdentifier(cv.identifier))
+      return pv.concat(...cv.subProtocols)
     }, [])
-    console.log('subProtocols', getSubProtocolByIdentifier('eth'))
+    console.log('subProtocols', this.supportedSubAccountProtocols)
   }
 
   addAccount(protocolIdentifier: string) {

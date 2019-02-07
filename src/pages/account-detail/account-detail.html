@@ -6,7 +6,7 @@
 
 <ion-content>
   <ion-list no-lines no-margin>
-    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openTransactionPage(wallet)"></portfolio-item>
   </ion-list>
 
   <ion-row class="transaction--label__container background--color__white" align-items-center>
@@ -23,7 +23,7 @@
       [wallet]="subWallet"
       [maxDigits]="8"
       tappable
-      (click)="openDetail(wallet)"
+      (click)="openTransactionPage(subWallet)"
     ></portfolio-item>
   </ion-list>
   <ion-fab right bottom>
