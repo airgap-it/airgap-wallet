@@ -45,7 +45,8 @@ export class AccountProviderBase {
         wallet.protocolIdentifier,
         wallet.publicKey,
         wallet.isExtendedPublicKey,
-        wallet.derivationPath
+        wallet.derivationPath,
+        wallet.addressIndex
       )
 
       // add derived addresses
@@ -69,7 +70,8 @@ export class AccountProviderBase {
           protocolIdentifier: airGapWallet.protocolIdentifier,
           publicKey: airGapWallet.publicKey,
           isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
-          derivationPath: airGapWallet.derivationPath
+          derivationPath: airGapWallet.derivationPath,
+          addressIndex: airGapWallet.addressIndex
         })
       } else {
         airGapWallet
@@ -107,9 +109,7 @@ export class AccountProviderBase {
   }
 
   public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(
-      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
-    )
+    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
@@ -122,13 +122,25 @@ export class AccountProviderBase {
     return this.storageProvider.set(this.settingsKeyWallet, this.walletList)
   }
 
-  public walletByPublicKeyAndProtocol(publicKey: string, protocolIdentifier: string): AirGapMarketWallet {
-    return this.walletList.find(wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier)
+  public walletByPublicKeyAndProtocolAndAddressIndex(
+    publicKey: string,
+    protocolIdentifier: string,
+    addressIndex?: number
+  ): AirGapMarketWallet {
+    return this.walletList.find(
+      wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier && wallet.addressIndex === addressIndex
+    )
   }
 
   public walletExists(testWallet: AirGapMarketWallet): boolean {
-    return this.walletList.some(
-      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+    return this.walletList.some(wallet => this.isSameWallet(wallet, testWallet))
+  }
+
+  public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {
+    return (
+      wallet1.publicKey === wallet2.publicKey &&
+      wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
+      wallet1.addressIndex === wallet2.addressIndex
     )
   }
 }

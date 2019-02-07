@@ -37,7 +37,11 @@ export class AccountImportPage {
         this.wallet = this.navParams.get('wallet') // TODO: Catch error if wallet cannot be imported
 
         if (this.wallets.walletExists(this.wallet)) {
-          this.wallet = this.wallets.walletByPublicKeyAndProtocol(this.wallet.publicKey, this.wallet.protocolIdentifier)
+          this.wallet = this.wallets.walletByPublicKeyAndProtocolAndAddressIndex(
+            this.wallet.publicKey,
+            this.wallet.protocolIdentifier,
+            this.wallet.addressIndex
+          )
           this.walletAlreadyExists = true
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           return

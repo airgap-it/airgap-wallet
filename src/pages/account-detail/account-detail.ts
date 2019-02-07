@@ -28,7 +28,7 @@ export class AccountDetailPage {
     this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAddAccountPage() {
-    this.navCtrl.push(AddSubAccountPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  openAddAccountPage(wallet: AirGapMarketWallet) {
+    this.navCtrl.push(AddSubAccountPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

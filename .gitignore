@@ -37,6 +37,6 @@ airgap_cordova_secure_storage_deploy.pub
 Thumbs.db
 UserInterfaceState.xcuserstate
 
-src/assets/lib/airgap-coin-lib.browserify.js
+src/assets/libs/airgap-coin-lib.browserify.js
 
 .env
