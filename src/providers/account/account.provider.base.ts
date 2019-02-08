@@ -85,11 +85,13 @@ export class AccountProviderBase {
       this.walletList.push(airGapWallet)
     })
 
+    /* Use for Testing of Skeleton
     await new Promise(resolve => {
       setTimeout(() => {
         resolve()
       }, 2000)
     })
+    */
 
     this.wallets.next(this.walletList)
   }
