@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
-import { handleErrorSentry, ErrorCategory } from 'src/providers/sentry-error-handler/sentry-error-handler'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 enum SubAccountType {
   TOKEN = 'token',
@@ -60,9 +60,12 @@ export class AddSubAccountPage {
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath
         )
-        wallet.addresses = this.wallet.addresses
-        wallet.synchronize()
-        this.subAccounts.push({ selected: false, wallet: wallet })
+        const exists = this.subAccountProvider.walletExists(wallet)
+        if (!exists) {
+          wallet.addresses = this.wallet.addresses
+          wallet.synchronize()
+          this.subAccounts.push({ selected: false, wallet: wallet })
+        }
       })
     }
   }
