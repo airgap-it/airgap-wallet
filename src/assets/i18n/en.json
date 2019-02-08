@@ -145,7 +145,7 @@
     "done_label": "Done"
   },
 
-  "wallet-import": {
+  "account-import": {
     "title": "Confirm Import",
     "text": "Would you like to import the following account?",
     "warning": "You have already added this account in AirGap.",
