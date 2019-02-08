@@ -1,17 +1,4 @@
 page-account-transaction-list {
-  /* TODO: remove if using component */
-  .symbol--icon {
-    position: absolute;
-    height: 24px;
-    width: 24px;
-    left: 40px;
-    top: 34px;
-  }
-  h2,
-  .items--right ion-row {
-    margin: 2px 0px 6px !important;
-  }
-
   .empty--list__container {
     height: 25vh;
     padding-top: 48px;
