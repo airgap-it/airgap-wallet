@@ -1,5 +1,5 @@
-import { Component } from '@angular/core'
-import { NavController, NavParams, Platform } from 'ionic-angular'
+import { Component, ViewChild } from '@angular/core'
+import { NavController, NavParams, Platform, Slides } from 'ionic-angular'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 declare let window
@@ -9,6 +9,9 @@ declare let window
   templateUrl: 'account-import-onboarding.html'
 })
 export class AccountImportOnboardingPage {
+  @ViewChild(Slides)
+  slides: Slides
+
   public protocol: ICoinProtocol
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public platform: Platform) {

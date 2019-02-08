@@ -31,15 +31,21 @@
 </ion-content>
 <ion-footer no-border no-shadow>
   <ion-toolbar color="whitePrimaryContrast" no-padding>
-    <ion-buttons start>
-      <button ion-button flat color="primary" click="slideNext()">
+    <ion-buttons *ngIf="!slides.isBeginning()" start>
+      <button ion-button flat color="primary" (click)="slides.slidePrev()">
         <ion-icon md-name="keyboard_arrow_left"></ion-icon>
         Back
       </button>
     </ion-buttons>
-    <ion-buttons end>
-      <button ion-button flat color="primary" click="nextSlide()">
+    <ion-buttons *ngIf="!slides.isEnd()" end>
+      <button ion-button flat color="primary" (click)="slides.slideNext()">
         Next
+        <ion-icon md-name="keyboard_arrow_right"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons *ngIf="slides.isEnd()" end>
+      <button ion-button flat color="primary" (click)="openVault()">
+        Open Vault
         <ion-icon md-name="keyboard_arrow_right"></ion-icon>
       </button>
     </ion-buttons>
