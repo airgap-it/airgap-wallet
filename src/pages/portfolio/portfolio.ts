@@ -7,6 +7,7 @@ import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AddAccountPage } from '../add-account/add-account'
 import { AccountDetailPage } from '../account-detail/account-detail'
+import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 
 @Component({
   selector: 'page-portfolio',
@@ -37,7 +38,11 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    if (wallet.coinProtocol.subProtocols && wallet.coinProtocol.subProtocols.length > 0) {
+      this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } else {
+      this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
   openAddAccountPage() {
