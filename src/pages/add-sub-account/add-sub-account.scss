@@ -1,2 +1,5 @@
 page-add-sub-account {
+  .background--color__gradient {
+    background: linear-gradient(90deg, color($colors, primary, base), 75%, #440094) !important;
+  }
 }

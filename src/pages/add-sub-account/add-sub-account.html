@@ -1,9 +1,29 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
-    <ion-title>{{ 'add-account.title' | translate }}</ion-title>
+    <ion-title>{{ 'add-sub-account.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
+  <ion-row padding-bottom>
+    <!-- TODO: add originate -->
+    <ion-card class="background--color__gradient">
+      <ion-row align-items-center padding-horizontal>
+        <ion-col col-5>
+          <img src="/assets/img/add-account-placeholder.svg" />
+        </ion-col>
+        <ion-col col-7>
+          <ion-card-title ion-text color="white" no-padding>
+            {{ 'add-sub-account.add-account_card.heading' | translate }}
+          </ion-card-title>
+          <p ion-text color="white" [innerHTML]="'add-sub-account.add-account_card.text' | translate" padding-top></p>
+        </ion-col>
+      </ion-row>
+    </ion-card>
+  </ion-row>
+  <ion-row padding-horizontal>
+    <span ion-text class="font--weight__bold" color="primary">{{ 'add-sub-account.accounts_label' | translate }}</span>
+  </ion-row>
+
   <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
     <ion-col col-10 no-padding>
       <portfolio-item [wallet]="subAccount.wallet" [maxDigits]="8" tappable (click)="toggleAccount(subAccount)"></portfolio-item>
@@ -13,6 +33,6 @@
     </ion-col>
   </ion-row>
   <ion-row padding justify-content-end>
-    <button ion-button round (click)="addSubAccounts()">Add Account</button>
+    <button ion-button round (click)="addSubAccounts()" color="secondary">{{ 'add-sub-account.add-accounts_label' | translate }}</button>
   </ion-row>
 </ion-content>

@@ -178,12 +178,21 @@
   "add-account": {
     "title": "Add Coins"
   },
+  "add-sub-account": {
+    "title": "Add Accounts",
+    "accounts_label": "Accounts",
+    "add-account_card": {
+      "heading": "Create Account",
+      "text": "If you want to add a new Tezos Account, a fee of <strong>~0.260 XTZ</strong> has to be paid."
+    },
+    "add-accounts_label": "Add Accounts"
+  },
   "account-detail": {
     "title": "{{protocolName}}",
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",
-    "add-accounts_label": "Add Accounts"
+    "add-account_label": "Add Accounts"
   },
   "account-import-onboarding": {
     "title": "Add {{protocolName}}",
