@@ -98,7 +98,7 @@ export class AccountProviderBase {
     return this.walletList
   }
 
-  public addWallet(wallet: AirGapMarketWallet): Promise<any> {
+  public async addWallet(wallet: AirGapMarketWallet): Promise<void> {
     if (this.walletExists(wallet)) {
       throw new Error('wallet already exists')
     }

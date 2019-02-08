@@ -81,9 +81,6 @@ export class AccountEditPopoverComponent {
               .removeWallet(this.wallet)
               .then(() => {
                 this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-                if (this.onDelete) {
-                  this.onDelete()
-                }
               })
               .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
           }

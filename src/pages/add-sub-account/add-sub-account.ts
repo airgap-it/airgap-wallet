@@ -2,10 +2,16 @@ import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
+import { handleErrorSentry, ErrorCategory } from 'src/providers/sentry-error-handler/sentry-error-handler'
 
 enum SubAccountType {
   TOKEN = 'token',
   ACCOUNT = 'account'
+}
+
+interface IAccountWrapper {
+  selected: boolean
+  wallet: AirGapMarketWallet
 }
 
 @Component({
@@ -15,7 +21,7 @@ enum SubAccountType {
 export class AddSubAccountPage {
   private subAccountType: SubAccountType
   private wallet: AirGapMarketWallet
-  public subAccounts: { selected: boolean; wallet: AirGapMarketWallet }[] = []
+  public subAccounts: IAccountWrapper[] = []
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private subAccountProvider: SubAccountProvider) {
     this.wallet = this.navParams.get('wallet')
@@ -36,9 +42,12 @@ export class AddSubAccountPage {
               this.wallet.derivationPath,
               index
             )
-            wallet.addresses = res
-            wallet.synchronize()
-            this.subAccounts.push({ selected: false, wallet: wallet })
+            const exists = this.subAccountProvider.walletExists(wallet)
+            if (!exists) {
+              wallet.addresses = res
+              wallet.synchronize()
+              this.subAccounts.push({ selected: false, wallet: wallet })
+            }
           })
         })
         .catch(console.error)
@@ -58,14 +67,18 @@ export class AddSubAccountPage {
     }
   }
 
+  toggleAccount(account: IAccountWrapper) {
+    account.selected = !account.selected
+  }
+
   addSubAccounts() {
     console.log(this.subAccounts.filter(account => account.selected).map(account => account.wallet))
     this.subAccounts
       .filter(account => account.selected)
       .map(account => account.wallet)
       .forEach(wallet => {
-        this.subAccountProvider.addWallet(wallet)
+        this.subAccountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
-    this.navCtrl.popToRoot()
+    this.navCtrl.pop()
   }
 }
