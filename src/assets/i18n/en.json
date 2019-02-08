@@ -192,7 +192,8 @@
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",
-    "add-account_label": "Add Accounts"
+    "add-account_label": "Add Accounts",
+    "no-accounts_text": "No Accounts added yet, you can create or import existing Accounts."
   },
   "account-import-onboarding": {
     "title": "Add {{protocolName}}",

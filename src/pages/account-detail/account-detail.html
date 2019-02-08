@@ -21,7 +21,12 @@
       <span ion-text class="font--weight__bold" color="primary">{{ 'account-detail.tokens_label' | translate }}</span>
     </ion-col>
   </ion-row>
-
+  <div padding-horizontal class="empty-list" *ngIf="!subWallets.length">
+    <img padding-vertical src="../../assets/img/empty-state-no-transaction.svg" />
+    <p>
+      {{ 'account-detail.no-accounts_text' | translate }}
+    </p>
+  </div>
   <ion-list no-lines no-margin>
     <portfolio-item
       [isToken]="true"
