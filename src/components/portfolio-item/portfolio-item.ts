@@ -11,4 +11,7 @@ export class PortfolioItemComponent {
 
   @Input()
   maxDigits: number = 0
+
+  @Input()
+  isToken: boolean = false
 }

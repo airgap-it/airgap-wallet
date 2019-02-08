@@ -24,6 +24,7 @@
 
   <ion-list no-lines no-margin>
     <portfolio-item
+      [isToken]="true"
       *ngFor="let subWallet of subWallets"
       [wallet]="subWallet"
       [maxDigits]="8"
