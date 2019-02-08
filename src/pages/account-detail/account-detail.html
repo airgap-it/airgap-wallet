@@ -1,7 +1,10 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
     <ion-title><span [innerHTML]="'account-detail.title' | translate: { protocolName: wallet.coinProtocol.name }"></span></ion-title>
+
     <ion-buttons end>
+      <button ion-button color="primary" (click)="openPreparePage()">Send {{ wallet.coinProtocol.symbol | uppercase }}</button>
+
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>

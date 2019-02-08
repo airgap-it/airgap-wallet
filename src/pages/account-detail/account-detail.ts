@@ -6,6 +6,7 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 import { AddSubAccountPage } from '../add-sub-account/add-sub-account'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
+import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 
 @Component({
   selector: 'page-account-detail',
@@ -36,6 +37,14 @@ export class AccountDetailPage {
 
   openAddAccountPage(wallet: AirGapMarketWallet) {
     this.navCtrl.push(AddSubAccountPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  openPreparePage() {
+    this.navCtrl
+      .push(TransactionPreparePage, {
+        wallet: this.wallet
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   presentEditPopover(event) {
