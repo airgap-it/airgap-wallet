@@ -136,7 +136,7 @@ export class TransactionPreparePage {
       console.log('preparing wallet tx', this.wallet)
       let rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
 
-      const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
+      const airGapTx = await this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,
         transaction: rawUnsignedTx
       })
