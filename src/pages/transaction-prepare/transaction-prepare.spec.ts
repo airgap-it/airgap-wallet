@@ -78,8 +78,8 @@ describe('TransactionPrepare Page', () => {
     })
   }))
 
-  beforeEach(() => {
-    ethWallet.addresses = ethWallet.deriveAddresses(1)
+  beforeEach(async () => {
+    ethWallet.addresses = await ethWallet.deriveAddresses(1)
     fixture = TestBed.createComponent(TransactionPreparePage)
     component = fixture.componentInstance
     fixture.detectChanges()
