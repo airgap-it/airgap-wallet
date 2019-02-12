@@ -14,9 +14,9 @@
   <ion-row justify-content-center padding-top>
     <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
   </ion-row>
-
+  <!-- TODO: Reactivate once unforging is implemented
   <from-to padding-horizontal [transaction]="airGapTx"></from-to>
-
+-->
   <ion-fab bottom right>
     <button *ngIf="!isBrowser" default ion-button color="white" (click)="sameDeviceSign()" round item-right>
       {{ 'transaction-qr.sign-on-device_label' | translate }}

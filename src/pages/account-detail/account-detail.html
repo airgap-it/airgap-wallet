@@ -22,6 +22,8 @@
       [imageName]="'currencies-empty.svg'"
       [text]="'account-detail.delegate_card.text' | translate"
       [heading]="'account-detail.delegate_card.heading' | translate"
+      tappable
+      (click)="prepareOriginate()"
     ></card-actionable>
   </ion-row>
 
