@@ -1,0 +1,16 @@
+<ion-card class="background--color__gradient">
+  <ion-row align-items-center padding-horizontal>
+    <ion-col col-5 *ngIf="imageLeft">
+      <img src="/assets/img/{{ imageName }}" />
+    </ion-col>
+    <ion-col col-7>
+      <ion-card-title ion-text color="white" no-padding>
+        {{ heading }}
+      </ion-card-title>
+      <p ion-text color="white" [innerHTML]="text" padding-top></p>
+    </ion-col>
+    <ion-col col-5 *ngIf="!imageLeft">
+      <img src="/assets/img/{{ imageName }}" />
+    </ion-col>
+  </ion-row>
+</ion-card>

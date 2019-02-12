@@ -12,6 +12,7 @@ import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { MomentModule } from 'ngx-moment'
+import { CardActionableComponent } from './card-actionable/card-actionable'
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    AccountEditPopoverComponent
+    AccountEditPopoverComponent,
+    CardActionableComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
@@ -29,7 +31,8 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    AccountEditPopoverComponent
+    AccountEditPopoverComponent,
+    CardActionableComponent
   ]
 })
 export class ComponentsModule {}

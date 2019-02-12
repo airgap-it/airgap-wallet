@@ -6,19 +6,11 @@
 <ion-content>
   <ion-row>
     <!-- TODO: add originate -->
-    <ion-card class="background--color__gradient">
-      <ion-row align-items-center padding-horizontal>
-        <ion-col col-5>
-          <img src="/assets/img/add-account.svg" />
-        </ion-col>
-        <ion-col col-7>
-          <ion-card-title ion-text color="white" no-padding>
-            {{ 'add-sub-account.add-account_card.heading' | translate }}
-          </ion-card-title>
-          <p ion-text color="white" [innerHTML]="'add-sub-account.add-account_card.text' | translate" padding-top></p>
-        </ion-col>
-      </ion-row>
-    </ion-card>
+    <card-actionable
+      [imageName]="'add-account.svg'"
+      [text]="'add-sub-account.add-account_card.text' | translate"
+      [heading]="'add-sub-account.add-account_card.heading' | translate"
+    ></card-actionable>
   </ion-row>
   <ion-row padding>
     <span ion-text class="font--weight__bold" color="primary">{{ 'add-sub-account.accounts_label' | translate }}</span>

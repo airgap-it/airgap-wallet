@@ -15,6 +15,16 @@
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openTransactionPage(wallet)"></portfolio-item>
   </ion-list>
 
+  <!-- TODO: show only if Tezos and add delegate -->
+  <ion-row>
+    <card-actionable
+      [imageLeft]="false"
+      [imageName]="'currencies-empty.svg'"
+      [text]="'account-detail.delegate_card.text' | translate"
+      [heading]="'account-detail.delegate_card.heading' | translate"
+    ></card-actionable>
+  </ion-row>
+
   <ion-row class="transaction--label__container background--color__white" align-items-center>
     <ion-col col-10 padding>
       <!-- TODO: if Tezos show "account" 'account-detail.accounts_label' label if Ethereum show "tokens" -->

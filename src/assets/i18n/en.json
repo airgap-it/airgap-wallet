@@ -193,8 +193,12 @@
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",
     "add-account_label": "Add Accounts",
-    "no-accounts_text": "No Accounts added yet, you can create or import existing Accounts."
-  },
+    "no-accounts_text": "No Accounts added yet, you can create or import existing Accounts.",
+    "delegate_card": {
+      "heading": "Delegate Tezos",
+      "text": "You have <strong>1481 XTZ</strong> undelegated. If you delegate now you can earn a share each cycle."
+    }
+    },
   "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
