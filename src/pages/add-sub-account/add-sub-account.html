@@ -16,6 +16,13 @@
     <span ion-text class="font--weight__bold" color="primary">{{ 'add-sub-account.accounts_label' | translate }}</span>
   </ion-row>
 
+  <div padding-horizontal class="empty-list" *ngIf="!subAccounts.length">
+    <img padding-vertical src="../../assets/img/no-imports.svg" />
+    <p>
+      {{ 'add-sub-account.no-imports_text' | translate }}
+    </p>
+  </div>
+
   <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
     <ion-col col-10 no-padding>
       <portfolio-item [wallet]="subAccount.wallet" [maxDigits]="8" tappable (click)="toggleAccount(subAccount)"></portfolio-item>
@@ -24,7 +31,12 @@
       <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
     </ion-col>
   </ion-row>
-  <ion-row padding justify-content-end>
-    <button ion-button round (click)="addSubAccounts()" color="secondary">{{ 'add-sub-account.add-accounts_label' | translate }}</button>
-  </ion-row>
+
+  <ion-fab right bottom>
+    <!-- TODO: if Tezos show "account" 'account-detail.add-accounts_label' label if Ethereum show "tokens" -->
+    <button ion-button round (click)="addSubAccounts()" color="secondary" icon-left [disabled]="!subAccounts.length">
+      <ion-icon md-name="add"></ion-icon>
+      {{ 'add-sub-account.add-accounts_label' | translate }}
+    </button>
+  </ion-fab>
 </ion-content>

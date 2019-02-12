@@ -200,7 +200,8 @@
       "heading": "Create Account",
       "text": "If you want to add a new Tezos Account, a fee of <strong>~0.260 XTZ</strong> has to be paid."
     },
-    "add-accounts_label": "Add Accounts"
+    "add-accounts_label": "Add Accounts",
+    "no-imports_text": "No Accounts found to import, you can create a new one."
   },
   "account-detail": {
     "title": "{{protocolName}}",
