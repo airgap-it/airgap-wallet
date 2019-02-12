@@ -1,10 +1,10 @@
+import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { BigNumber } from 'bignumber.js'
 import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular'
 
 import { ScanAddressPage } from '../scan-address/scan-address'
-import { TransactionQrPage } from '../transaction-qr/transaction-qr'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
 import { Clipboard } from '@ionic-native/clipboard'
@@ -153,7 +153,7 @@ export class TransactionPreparePage {
       })
 
       this.navController
-        .push(TransactionQrPage, {
+        .push(InteractionSelectionPage, {
           wallet: this.wallet,
           airGapTx: airGapTx,
           data: 'airgap-vault://?d=' + serializedTx

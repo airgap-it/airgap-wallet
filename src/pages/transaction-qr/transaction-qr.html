@@ -18,9 +18,6 @@
   <from-to padding-horizontal [transaction]="airGapTx"></from-to>
 
   <ion-fab bottom right>
-    <button *ngIf="!isBrowser" default ion-button color="white" (click)="sameDeviceSign()" round item-right>
-      {{ 'transaction-qr.sign-on-device_label' | translate }}
-    </button>
     <button default ion-button color="secondary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>
   </ion-fab>
 </ion-content>
