@@ -1,3 +1,4 @@
+import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ErrorHandler, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
@@ -48,6 +49,7 @@ import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-err
 import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
+import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -71,7 +73,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanAddressPage,
     ScanSyncPage,
     AccountImportPage,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    InteractionSelectionPage
   ],
   imports: [
     BrowserModule,
@@ -118,7 +121,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanSyncPage,
     AccountImportPage,
     AccountEditPopoverComponent,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    InteractionSelectionPage
   ],
   providers: [
     StatusBar,
@@ -139,7 +143,8 @@ export function createTranslateLoader(http: HttpClient) {
     },
     SchemeRoutingProvider,
     ClipboardBrowserProvider,
-    PermissionsProvider
+    PermissionsProvider,
+    DeepLinkProvider
   ]
 })
 export class AppModule {}

@@ -145,6 +145,15 @@
     "done_label": "Done"
   },
 
+  "interaction-selection": {
+    "title": "Sign Transaction",
+    "heading": "How do you want to sign this transaction with <span class=\"style__strong color__primary\">AirGap Vault</span>?",
+    "same-device_label": "Same Device",
+    "same-device_info": "AirGap Vault and AirGap Wallet are installed on the same device.",
+    "offline-device_label": "Offline Device",
+    "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Vault."
+  },
+
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",

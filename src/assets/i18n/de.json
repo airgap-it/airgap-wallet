@@ -123,6 +123,15 @@
     "sign-on-device_label": "gleiches-Gerät Signierung",
     "done_label": "Fertig"
   },
+  
+  "interaction-selection": {
+    "title": "Transaktion signieren",
+    "heading": "Wie möchten Sie die Transaktion mit <span class=\"style__strong color__primary\">AirGap Vault</span> signieren?",
+    "same-device_label": "Gleiches Gerät",
+    "same-device_info": "AirGap Vault und AirGap Wallet sind auf dem gleichen Gerät installiert.",
+    "offline-device_label": "Offline Gerät",
+    "offline-device_info": "AirGap Vault ist auf einem offline Gerät installiert, lesen Sie den QR Code mit AirGap Vault ein."
+  },
 
   "wallet-address": {
     "title": "Kontoadresse",
