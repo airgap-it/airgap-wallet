@@ -30,11 +30,11 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>"  
+      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
-      "text": "<b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting transactions to the blockchain."  
+      "text": "<b>This is the AirGap Wallet application</b>, that deals with only public information and is responsible for broadcasting transactions to the blockchain."
     },
     "communication": {
       "highest_text": "One-way communication with QR codes.",
@@ -88,7 +88,13 @@
     "share_label": "Share AirGap",
     "information_label": "Information",
     "github_label": "GitHub Repository",
-    "about_label": "About"
+    "about_label": "About",
+    "alert_title": "select a channel",
+    "alert_cancel": "cancel",
+    "channel": {
+      "international": "International",
+      "chinese": "Chinese"
+    }
   },
 
   "about": {
@@ -137,6 +143,15 @@
     "text": "Open AirGap Vault and scan this transaction in order to sign it.",
     "sign-on-device_label": "Sign on this device",
     "done_label": "Done"
+  },
+
+  "interaction-selection": {
+    "title": "Sign Transaction",
+    "heading": "How do you want to sign this transaction with <span class=\"style__strong color__primary\">AirGap Vault</span>?",
+    "same-device_label": "Same Device",
+    "same-device_info": "AirGap Vault and AirGap Wallet are installed on the same device.",
+    "offline-device_label": "Offline Device",
+    "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Vault."
   },
 
   "wallet-address": {
