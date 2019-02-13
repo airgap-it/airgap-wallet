@@ -7,7 +7,7 @@ import { AccountTransactionListPage } from '../account-transaction-list/account-
 import { AddSubAccountPage } from '../add-sub-account/add-sub-account'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-import { TransactionQrPage } from '../transaction-qr/transaction-qr'
+import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 
 @Component({
   selector: 'page-account-detail',
@@ -80,7 +80,7 @@ export class AccountDetailPage {
     })
 
     this.navCtrl
-      .push(TransactionQrPage, {
+      .push(InteractionSelectionPage, {
         wallet: this.wallet,
         airGapTx: originateTx,
         data: 'airgap-vault://?d=' + serializedTx

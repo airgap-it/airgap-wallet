@@ -1,4 +1,5 @@
 import { AmountConverterPipe } from './amount-converter.pipe'
+import { SupportedSubAccountsProvider } from '../../providers/supported-sub-accounts/supported-sub-accounts'
 import { BigNumber } from 'bignumber.js'
 const BN = BigNumber.clone({
   FORMAT: {
@@ -10,6 +11,11 @@ const BN = BigNumber.clone({
 
 describe('AmountConverter Pipe', () => {
   let amountConverterPipe: AmountConverterPipe
+
+  beforeAll(() => {
+    const supportedSubAccountsProvider = new SupportedSubAccountsProvider()
+    supportedSubAccountsProvider.addSupportedSubAccounts()
+  })
 
   beforeEach(() => {
     amountConverterPipe = new AmountConverterPipe()

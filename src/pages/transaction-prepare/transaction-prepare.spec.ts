@@ -145,7 +145,7 @@ describe('TransactionPrepare Page', () => {
 
     // should create a toastCtrl
     expect((component as any).toastController.create).toHaveBeenCalledWith({
-      message: 'not enough balance',
+      message: new Error('not enough balance'),
       duration: 3000,
       position: 'bottom'
     })
