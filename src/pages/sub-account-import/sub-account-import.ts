@@ -18,7 +18,7 @@ export class SubAccountImportPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private accountProvider: AccountProvider,
-    private subAccountProvier: SubAccountProvider
+    private subAccountProvider: SubAccountProvider
   ) {
     this.subWallets = []
     this.protocolIdentifier = this.navParams.get('subProtocolIdentifier')
@@ -41,7 +41,7 @@ export class SubAccountImportPage {
 
   importWallets() {
     this.subWallets.forEach(subWallet => {
-      this.subAccountProvier.addWallet(subWallet)
+      this.subAccountProvider.addWallet(subWallet)
     })
   }
 }

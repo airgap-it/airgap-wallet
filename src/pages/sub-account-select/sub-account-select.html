@@ -1,0 +1,11 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>sub-account-select</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="delegate()"></portfolio-item>
+  </ion-list>
+</ion-content>

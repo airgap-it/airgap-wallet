@@ -57,6 +57,7 @@ import { SubAccountProvider } from '../providers/account/sub-account.provider'
 import { AccountDetailPage } from '../pages/account-detail/account-detail'
 import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
+import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -86,7 +87,8 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountImportPage,
     AccountImportOnboardingPage,
     AccountDetailPage,
-    InteractionSelectionPage
+    InteractionSelectionPage,
+    SubAccountSelectPage
   ],
   imports: [
     BrowserModule,
@@ -139,7 +141,8 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountImportPage,
     AccountImportOnboardingPage,
     AccountDetailPage,
-    InteractionSelectionPage
+    InteractionSelectionPage,
+    SubAccountSelectPage
   ],
   providers: [
     StatusBar,

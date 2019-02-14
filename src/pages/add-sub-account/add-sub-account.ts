@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
+import { TezosKtProtocol, AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 
 enum SubAccountType {
   TOKEN = 'token',
@@ -83,5 +84,42 @@ export class AddSubAccountPage {
         this.subAccountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
     this.navCtrl.pop()
+  }
+
+  async prepareOriginate() {
+    console.log(this.wallet)
+    const protocol = new TezosKtProtocol()
+    const originateTx = await protocol.originate(this.wallet.publicKey)
+
+    /*
+    console.log(
+      protocol.getTransactionDetails({
+        publicKey: this.wallet.publicKey,
+        transaction: originateTx,
+        callback: 'airgap-wallet://?d='
+      })
+    )
+*/
+    const syncProtocol = new SyncProtocolUtils()
+    const serializedTx = await syncProtocol.serialize({
+      version: 1,
+      protocol: this.wallet.coinProtocol.identifier,
+      type: EncodedType.UNSIGNED_TRANSACTION,
+      payload: {
+        publicKey: this.wallet.publicKey,
+        transaction: originateTx,
+        callback: 'airgap-wallet://?d='
+      }
+    })
+
+    this.navCtrl
+      .push(InteractionSelectionPage, {
+        wallet: this.wallet,
+        airGapTx: originateTx,
+        data: 'airgap-vault://?d=' + serializedTx
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+    console.log('originate', originateTx)
   }
 }

@@ -5,11 +5,12 @@
 </ion-header>
 <ion-content>
   <ion-row>
-    <!-- TODO: add originate -->
     <card-actionable
       [imageName]="'add-account.svg'"
       [text]="'add-sub-account.add-account_card.text' | translate"
       [heading]="'add-sub-account.add-account_card.heading' | translate"
+      tappable
+      (click)="prepareOriginate()"
     ></card-actionable>
   </ion-row>
   <ion-row padding>

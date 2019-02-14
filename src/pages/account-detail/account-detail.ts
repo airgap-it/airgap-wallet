@@ -8,6 +8,7 @@ import { AddSubAccountPage } from '../add-sub-account/add-sub-account'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
+import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 
 @Component({
   selector: 'page-account-detail',
@@ -62,31 +63,11 @@ export class AccountDetailPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  async prepareOriginate() {
-    console.log(this.wallet)
-    const protocol = new TezosKtProtocol()
-    const originateTx = await protocol.originate(this.wallet.publicKey)
-
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: this.wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: this.wallet.publicKey,
-        transaction: originateTx,
-        callback: 'airgap-wallet://?d='
-      }
-    })
-
+  goToDelegateSelection() {
     this.navCtrl
-      .push(InteractionSelectionPage, {
-        wallet: this.wallet,
-        airGapTx: originateTx,
-        data: 'airgap-vault://?d=' + serializedTx
+      .push(SubAccountSelectPage, {
+        wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-    console.log('originate', originateTx)
   }
 }
