@@ -1,9 +1,8 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { TezosKtProtocol, AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { OperationsProvider } from '../../providers/operations/operations'
 
 enum SubAccountType {

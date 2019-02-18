@@ -1,14 +1,6 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import {
-  AirGapMarketWallet,
-  ICoinProtocol,
-  getProtocolByIdentifier,
-  TezosKtProtocol,
-  SyncProtocolUtils,
-  EncodedType
-} from 'airgap-coin-lib'
-import { AccountProvider } from '../../providers/account/account.provider'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
@@ -19,14 +11,12 @@ import { OperationsProvider } from '../../providers/operations/operations'
 })
 export class SubAccountSelectPage {
   private wallet: AirGapMarketWallet
-  private protocolIdentifier: string
   public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private accountProvider: AccountProvider,
     private subAccountProvider: SubAccountProvider,
     private operationsProvider: OperationsProvider
   ) {

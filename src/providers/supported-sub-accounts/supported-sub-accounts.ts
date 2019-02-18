@@ -39,7 +39,9 @@ export class SupportedSubAccountsProvider {
     }
   ]
 
-  constructor() {}
+  constructor() {
+    /* */
+  }
 
   addSupportedSubAccounts() {
     addSubProtocol('xtz', new TezosKtProtocol())

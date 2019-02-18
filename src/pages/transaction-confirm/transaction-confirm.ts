@@ -31,6 +31,7 @@ export class TransactionConfirmPage {
   async ionViewWillEnter() {
     await this.platform.ready()
     const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
+    // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
     this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
     try {
