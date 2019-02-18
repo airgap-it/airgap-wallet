@@ -41,10 +41,10 @@
 
   <ion-fab right bottom>
     <ng-container *ngIf="(wallets | async) as walletsArray">
-      <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openAddAccountPage()">
+      <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openAccountAddPage()">
         <ion-icon md-name="add"></ion-icon>
       </button>
-      <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openAddAccountPage()" ion-button round icon-left>
+      <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openAccountAddPage()" ion-button round icon-left>
         <ion-icon md-name="add"></ion-icon>
         {{ 'portfolio.add-coins_label' | translate }}
       </button>

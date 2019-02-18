@@ -5,7 +5,7 @@ import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { AddAccountPage } from '../add-account/add-account'
+import { AccountAddPage } from '../account-add/account-add'
 import { AccountDetailPage } from '../account-detail/account-detail'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 
@@ -45,8 +45,8 @@ export class PortfolioPage {
     }
   }
 
-  openAddAccountPage() {
-    this.navCtrl.push(AddAccountPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  openAccountAddPage() {
+    this.navCtrl.push(AccountAddPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async doRefresh(refresher: any = null) {

@@ -10,8 +10,8 @@ import {
 } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { OperationsProvider } from '../../providers/operations/operations'
 
 @Component({
   selector: 'page-sub-account-select',
@@ -27,7 +27,8 @@ export class SubAccountSelectPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private accountProvider: AccountProvider,
-    private subAccountProvider: SubAccountProvider
+    private subAccountProvider: SubAccountProvider,
+    private operationsProvider: OperationsProvider
   ) {
     this.subWallets = []
     this.wallet = this.navParams.get('wallet')
@@ -37,40 +38,9 @@ export class SubAccountSelectPage {
     })
   }
 
-  async delegate() {
-    console.log(this.wallet)
-    const protocol = new TezosKtProtocol()
-    const delegateTx = await protocol.delegate(this.wallet.publicKey, 'tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8')
+  async prepareDelegate() {
+    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, 'tz1YvE7Sfo92ueEPEdZceNWd5MWNeMNSt16L')
 
-    /*
-      console.log(
-        protocol.getTransactionDetails({
-          publicKey: this.wallet.publicKey,
-          transaction: originateTx,
-          callback: 'airgap-wallet://?d='
-        })
-      )
-  */
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: this.wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: this.wallet.publicKey,
-        transaction: delegateTx,
-        callback: 'airgap-wallet://?d='
-      }
-    })
-
-    this.navCtrl
-      .push(InteractionSelectionPage, {
-        wallet: this.wallet,
-        airGapTx: delegateTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-    console.log('originate', delegateTx)
+    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

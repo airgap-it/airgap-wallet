@@ -7,10 +7,10 @@ import { SupportedSubAccountsProvider } from '../../providers/supported-sub-acco
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 @Component({
-  selector: 'page-add-account',
-  templateUrl: 'add-account.html'
+  selector: 'page-account-add',
+  templateUrl: 'account-add.html'
 })
-export class AddAccountPage {
+export class AccountAddPage {
   searchTerm: string = ''
   supportedAccountProtocols: ICoinProtocol[] = []
   supportedSubAccountProtocols: ICoinProtocol[] = []

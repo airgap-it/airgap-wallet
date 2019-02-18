@@ -49,8 +49,8 @@ import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboa
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
 import { SupportedSubAccountsProvider } from '../providers/supported-sub-accounts/supported-sub-accounts'
-import { AddAccountPage } from '../pages/add-account/add-account'
-import { AddSubAccountPage } from '../pages/add-sub-account/add-sub-account'
+import { AccountAddPage } from '../pages/account-add/account-add'
+import { SubAccountAddPage } from '../pages/sub-account-add/sub-account-add'
 import { SubAccountImportPage } from '../pages/sub-account-import/sub-account-import'
 import { AccountImportOnboardingPage } from '../pages/account-import-onboarding/account-import-onboarding'
 import { SubAccountProvider } from '../providers/account/sub-account.provider'
@@ -58,6 +58,7 @@ import { AccountDetailPage } from '../pages/account-detail/account-detail'
 import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
+import { OperationsProvider } from '../providers/operations/operations'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -82,8 +83,8 @@ export function createTranslateLoader(http: HttpClient) {
     ScanSyncPage,
     AccountImportPage,
     IntroductionDownloadPage,
-    AddAccountPage,
-    AddSubAccountPage,
+    AccountAddPage,
+    SubAccountAddPage,
     SubAccountImportPage,
     AccountImportOnboardingPage,
     AccountDetailPage,
@@ -136,8 +137,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountImportPage,
     AccountEditPopoverComponent,
     IntroductionDownloadPage,
-    AddAccountPage,
-    AddSubAccountPage,
+    AccountAddPage,
+    SubAccountAddPage,
     SubAccountImportPage,
     AccountImportOnboardingPage,
     AccountDetailPage,
@@ -166,7 +167,8 @@ export function createTranslateLoader(http: HttpClient) {
     PermissionsProvider,
     SupportedSubAccountsProvider,
     SubAccountProvider,
-    DeepLinkProvider
+    DeepLinkProvider,
+    OperationsProvider
   ]
 })
 export class AppModule {}

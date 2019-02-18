@@ -4,6 +4,7 @@ import { TezosKtProtocol, AirGapMarketWallet, EncodedType, SyncProtocolUtils } f
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
+import { OperationsProvider } from '../../providers/operations/operations'
 
 enum SubAccountType {
   TOKEN = 'token',
@@ -16,15 +17,20 @@ interface IAccountWrapper {
 }
 
 @Component({
-  selector: 'page-add-sub-account',
-  templateUrl: 'add-sub-account.html'
+  selector: 'page-sub-account-add',
+  templateUrl: 'sub-account-add.html'
 })
-export class AddSubAccountPage {
+export class SubAccountAddPage {
   private subAccountType: SubAccountType
   private wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private subAccountProvider: SubAccountProvider) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private subAccountProvider: SubAccountProvider,
+    private operationsProvider: OperationsProvider
+  ) {
     this.wallet = this.navParams.get('wallet')
 
     // TODO: Make generic
@@ -87,39 +93,8 @@ export class AddSubAccountPage {
   }
 
   async prepareOriginate() {
-    console.log(this.wallet)
-    const protocol = new TezosKtProtocol()
-    const originateTx = await protocol.originate(this.wallet.publicKey)
+    const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet)
 
-    /*
-    console.log(
-      protocol.getTransactionDetails({
-        publicKey: this.wallet.publicKey,
-        transaction: originateTx,
-        callback: 'airgap-wallet://?d='
-      })
-    )
-*/
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: this.wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: this.wallet.publicKey,
-        transaction: originateTx,
-        callback: 'airgap-wallet://?d='
-      }
-    })
-
-    this.navCtrl
-      .push(InteractionSelectionPage, {
-        wallet: this.wallet,
-        airGapTx: originateTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-    console.log('originate', originateTx)
+    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

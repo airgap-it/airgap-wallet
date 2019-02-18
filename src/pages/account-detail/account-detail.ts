@@ -1,13 +1,12 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams, PopoverController } from 'ionic-angular'
-import { AirGapMarketWallet, TezosKtProtocol, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
-import { AddSubAccountPage } from '../add-sub-account/add-sub-account'
+import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 
 @Component({
@@ -37,8 +36,8 @@ export class AccountDetailPage {
     this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAddAccountPage(wallet: AirGapMarketWallet) {
-    this.navCtrl.push(AddSubAccountPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  openAccountAddPage(wallet: AirGapMarketWallet) {
+    this.navCtrl.push(SubAccountAddPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openPreparePage() {
