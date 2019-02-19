@@ -8,7 +8,7 @@
 <ion-content padding>
   <ion-list no-lines>
     <ion-item (click)="addAccount(protocol.identifier)" *ngFor="let protocol of filteredAccountProtocols" no-padding>
-      <currency-symbol class="item__image" [symbol]="subProtocol.symbol" item-start></currency-symbol>
+      <currency-symbol class="item__image" [symbol]="protocol.symbol" item-start></currency-symbol>
       <h2>
         <strong>{{ protocol.name }}</strong>
         {{ protocol.symbol }}
