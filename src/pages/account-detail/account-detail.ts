@@ -9,6 +9,7 @@ import { AccountEditPopoverComponent } from '../../components/account-edit-popov
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'page-account-detail',
@@ -23,6 +24,8 @@ export class AccountDetailPage {
   subWalletGroups: Map<SubProtocolType, AirGapMarketWallet[]> = new Map()
   supportedSubProtocolTypes: Map<SubProtocolType, boolean> = new Map()
 
+  public translatedLabel: string = '???' // TODO find default
+
   // Tezos
   public undelegatedAmount: number = 0
 
@@ -30,8 +33,18 @@ export class AccountDetailPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private popoverCtrl: PopoverController,
-    private subAccountProvider: SubAccountProvider
+    private subAccountProvider: SubAccountProvider,
+    private translateService: TranslateService
   ) {
+    let labelTranslations
+    this.translateService
+      .get('account_detail.accounts_label', 'account_detail.tokens_label')
+      .toPromise()
+      .then(res => {
+        labelTranslations = res
+      })
+      .catch(console.error)
+
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     this.subAccountProvider.wallets.subscribe(subWallets => {

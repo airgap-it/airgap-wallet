@@ -27,12 +27,12 @@
   </ion-row>
 
   <empty-state
-    *ngIf="!subWallets.length"
-    [text]="'account-detail.no-accounts_text' | translate"
+    *ngIf="!hasSubAccounts"
+    [text]="'account-detail.no-accounts_text' | translate: { label: 'asdf' }"
     [imageName]="'currencies-empty.svg'"
   ></empty-state>
   <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
-    <ng-container *ngIf="supportedSubProtocolTypes.get(subProtocolType)">
+    <ng-container *ngIf="subWalletGroups.get(subProtocolType).length > 0">
       <ion-row class="transaction--label__container background--color__white" align-items-center>
         <ion-col col-10 padding>
           <span ion-text class="font--weight__bold" color="primary">

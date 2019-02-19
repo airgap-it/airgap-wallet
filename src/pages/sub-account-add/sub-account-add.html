@@ -1,6 +1,6 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
-    <ion-title>{{ 'add-sub-account.title' | translate }}</ion-title>
+    <ion-title>{{ 'add-sub-account.title' | translate: { typeLabel: typeLabel | translate } }}</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
@@ -14,13 +14,13 @@
     ></card-actionable>
   </ion-row>
   <ion-row padding>
-    <span ion-text class="font--weight__bold" color="primary">{{ 'add-sub-account.accounts_label' | translate }}</span>
+    <span ion-text class="font--weight__bold" color="primary">{{ typeLabel | translate }}</span>
   </ion-row>
 
   <div padding-horizontal class="empty-list" *ngIf="!subAccounts.length">
     <img padding-vertical src="../../assets/img/no-imports.svg" />
     <p>
-      {{ 'add-sub-account.no-imports_text' | translate }}
+      {{ 'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate } }}
     </p>
   </div>
 
@@ -34,27 +34,9 @@
   </ion-row>
 
   <ion-fab right bottom>
-    <!-- TODO: if Tezos show "account" 'account-detail.add-accounts_label' label if Ethereum show "tokens" -->
     <button ion-button round (click)="addSubAccounts()" color="secondary" icon-left [disabled]="!subAccounts.length">
       <ion-icon md-name="add"></ion-icon>
-      {{ 'add-sub-account.add-accounts_label' | translate }}
+      {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
     </button>
-    <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
-      <button
-        *ngIf="supportedSubProtocolTypes.get(subProtocolType)"
-        ion-button
-        round
-        (click)="addSubAccounts()"
-        color="secondary"
-        icon-left
-        [disabled]="!subAccounts.length"
-      >
-        <ion-icon md-name="add"></ion-icon>
-        <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
-          {{ 'account-detail.add-accounts_label' | translate }}
-        </ng-container>
-        <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.add-tokens_label' | translate }}</ng-container>
-      </button>
-    </ng-container>
   </ion-fab>
 </ion-content>

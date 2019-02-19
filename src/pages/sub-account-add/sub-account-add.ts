@@ -18,12 +18,10 @@ interface IAccountWrapper {
 export class SubAccountAddPage {
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
-  public subProtocolTypes = SubProtocolType
-  public subProtocolTypesArray = Object.keys(SubProtocolType).map(key => SubProtocolType[key])
-  public subWalletGroups: Map<SubProtocolType, AirGapMarketWallet[]> = new Map()
-  public supportedSubProtocolTypes: Map<SubProtocolType, boolean> = new Map()
 
   public subAccountType: SubProtocolType
+
+  public typeLabel: string = ''
 
   constructor(
     public navCtrl: NavController,
@@ -32,6 +30,19 @@ export class SubAccountAddPage {
     private operationsProvider: OperationsProvider
   ) {
     this.subAccountType = this.navParams.get('subAccountType')
+
+    function assertUnreachable(x: never): void {
+      /* */
+    }
+
+    if (this.subAccountType === SubProtocolType.ACCOUNT) {
+      this.typeLabel = 'add-sub-account.accounts_label'
+    } else if (this.subAccountType === SubProtocolType.TOKEN) {
+      this.typeLabel = 'add-sub-account.tokens_label'
+    } else {
+      assertUnreachable(this.subAccountType)
+    }
+
     this.wallet = this.navParams.get('wallet')
 
     // TODO: Make generic

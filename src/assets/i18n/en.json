@@ -194,22 +194,23 @@
     "title": "Add Coins"
   },
   "add-sub-account": {
-    "title": "Add Accounts",
+    "title": "Add {{ typeLabel }}",
+    "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-account_card": {
       "heading": "Create Account",
       "text": "If you want to add a new Tezos Account, a fee of <strong>~0.260 XTZ</strong> has to be paid."
     },
-    "add-accounts_label": "Add Accounts",
-    "no-imports_text": "No Accounts found to import, you can create a new one."
+    "add-accounts_label": "Add {{ typeLabel }}",
+    "no-imports_text": "No {{ typeLabel }} found to import."
   },
   "account-detail": {
     "title": "{{protocolName}}",
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",
-    "add-account_label": "Add Accounts",
-    "no-accounts_text": "No Accounts added yet, you can create or import existing Accounts.",
+    "add-accounts_label": "Add Accounts",
+    "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
     "delegate_card": {
       "heading": "Delegate Tezos",
       "text": "You have <strong>{{amount}} XTZ</strong> undelegated. If you delegate now you can earn a share each cycle."
