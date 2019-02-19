@@ -4,11 +4,7 @@ import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
-
-enum SubAccountType {
-  TOKEN = 'token',
-  ACCOUNT = 'account'
-}
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 interface IAccountWrapper {
   selected: boolean
@@ -20,9 +16,14 @@ interface IAccountWrapper {
   templateUrl: 'sub-account-add.html'
 })
 export class SubAccountAddPage {
-  private subAccountType: SubAccountType
-  private wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
+  public subProtocolTypes = SubProtocolType
+  public subProtocolTypesArray = Object.keys(SubProtocolType).map(key => SubProtocolType[key])
+  public subWalletGroups: Map<SubProtocolType, AirGapMarketWallet[]> = new Map()
+  public supportedSubProtocolTypes: Map<SubProtocolType, boolean> = new Map()
+
+  public subAccountType: SubProtocolType
 
   constructor(
     public navCtrl: NavController,
@@ -30,12 +31,11 @@ export class SubAccountAddPage {
     private subAccountProvider: SubAccountProvider,
     private operationsProvider: OperationsProvider
   ) {
+    this.subAccountType = this.navParams.get('subAccountType')
     this.wallet = this.navParams.get('wallet')
 
     // TODO: Make generic
-    if (this.wallet.protocolIdentifier === 'xtz') {
-      this.subAccountType = SubAccountType.ACCOUNT
-
+    if (this.subAccountType === SubProtocolType.ACCOUNT && this.wallet.protocolIdentifier === 'xtz') {
       const protocol = new TezosKtProtocol()
       protocol
         .getAddressesFromPublicKey(this.wallet.publicKey)
@@ -51,14 +51,13 @@ export class SubAccountAddPage {
             const exists = this.subAccountProvider.walletExists(wallet)
             if (!exists) {
               wallet.addresses = res
-              wallet.synchronize()
+              wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
               this.subAccounts.push({ selected: false, wallet: wallet })
             }
           })
         })
         .catch(console.error)
     } else {
-      this.subAccountType = SubAccountType.TOKEN
       this.wallet.coinProtocol.subProtocols.forEach(protocol => {
         const wallet = new AirGapMarketWallet(
           protocol.identifier,
@@ -69,7 +68,7 @@ export class SubAccountAddPage {
         const exists = this.subAccountProvider.walletExists(wallet)
         if (!exists) {
           wallet.addresses = this.wallet.addresses
-          wallet.synchronize()
+          wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
           this.subAccounts.push({ selected: false, wallet: wallet })
         }
       })
@@ -88,7 +87,7 @@ export class SubAccountAddPage {
       .forEach(wallet => {
         this.subAccountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
-    this.navCtrl.pop()
+    this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async prepareOriginate() {

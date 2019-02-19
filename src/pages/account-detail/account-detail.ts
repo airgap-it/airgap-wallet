@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams, PopoverController } from 'ionic-angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
 import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
@@ -8,6 +8,7 @@ import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 @Component({
   selector: 'page-account-detail',
@@ -16,7 +17,14 @@ import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 export class AccountDetailPage {
   wallet: AirGapMarketWallet
   protocolIdentifier: string
-  subWallets: AirGapMarketWallet[]
+  hasSubAccounts: boolean = false
+  subProtocolTypes = SubProtocolType
+  subProtocolTypesArray = Object.keys(SubProtocolType).map(key => SubProtocolType[key])
+  subWalletGroups: Map<SubProtocolType, AirGapMarketWallet[]> = new Map()
+  supportedSubProtocolTypes: Map<SubProtocolType, boolean> = new Map()
+
+  // Tezos
+  public undelegatedAmount: number = 0
 
   constructor(
     public navCtrl: NavController,
@@ -27,17 +35,45 @@ export class AccountDetailPage {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     this.subAccountProvider.wallets.subscribe(subWallets => {
-      this.subWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
+      const filteredSubWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
+      this.subProtocolTypesArray.forEach(type => {
+        const groupSubWallets = filteredSubWallets.filter(subWallet => {
+          console.log(((subWallet.coinProtocol as any) as ICoinSubProtocol).subProtocolType, type)
+          return ((subWallet.coinProtocol as any) as ICoinSubProtocol).subProtocolType === type
+        })
+        this.subWalletGroups.set(type, groupSubWallets)
+        this.hasSubAccounts = this.hasSubAccounts || groupSubWallets.length > 0
+      })
+      console.log(this.subWalletGroups)
+
+      this.subProtocolTypesArray.forEach(type => {
+        this.supportedSubProtocolTypes.set(
+          type,
+          this.wallet.coinProtocol.subProtocols.some(protocol => {
+            return ((protocol as any) as ICoinSubProtocol).subProtocolType === type
+          })
+        )
+      })
+
+      console.log(this.supportedSubProtocolTypes)
     })
   }
 
+  async ionViewWillEnter() {
+    // Get amount of undelegated Tezos
+    if (this.wallet.protocolIdentifier === 'xtz') {
+      this.undelegatedAmount = 100
+    }
+  }
+
   openTransactionPage(wallet: AirGapMarketWallet) {
-    console.log('wallet', wallet)
     this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAccountAddPage(wallet: AirGapMarketWallet) {
-    this.navCtrl.push(SubAccountAddPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
+    this.navCtrl
+      .push(SubAccountAddPage, { subAccountType: subProtocolType, wallet: wallet })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openPreparePage() {

@@ -16,6 +16,10 @@
   </ion-row>
 
   <from-to padding-horizontal [transaction]="airGapTx"></from-to>
+  <div *ngIf="!airGapTx">
+    <!-- TODO: translate; TODO: styling -->
+    We could not read the data of this transaction. This is the raw transaction data: Signed transaction: {{ preparedDataQR }}
+  </div>
 
   <ion-fab bottom right>
     <button default ion-button color="secondary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>

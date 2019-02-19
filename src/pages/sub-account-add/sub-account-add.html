@@ -4,7 +4,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-row>
+  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
     <card-actionable
       [imageName]="'add-account.svg'"
       [text]="'add-sub-account.add-account_card.text' | translate"
@@ -39,5 +39,22 @@
       <ion-icon md-name="add"></ion-icon>
       {{ 'add-sub-account.add-accounts_label' | translate }}
     </button>
+    <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
+      <button
+        *ngIf="supportedSubProtocolTypes.get(subProtocolType)"
+        ion-button
+        round
+        (click)="addSubAccounts()"
+        color="secondary"
+        icon-left
+        [disabled]="!subAccounts.length"
+      >
+        <ion-icon md-name="add"></ion-icon>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
+          {{ 'account-detail.add-accounts_label' | translate }}
+        </ng-container>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.add-tokens_label' | translate }}</ng-container>
+      </button>
+    </ng-container>
   </ion-fab>
 </ion-content>
