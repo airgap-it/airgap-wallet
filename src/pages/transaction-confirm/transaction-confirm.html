@@ -6,6 +6,10 @@
 
 <ion-content padding>
   <div *ngIf="airGapTx"><from-to [transaction]="airGapTx"></from-to></div>
+  <div *ngIf="!airGapTx">
+    <!-- TODO: translate; TODO: styling -->
+    We could not read the data of this transaction. This is the raw transaction data: Signed transaction: {{ signedTx }}
+  </div>
 
   <ion-fab bottom>
     <ion-row>

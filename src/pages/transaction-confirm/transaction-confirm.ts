@@ -37,7 +37,7 @@ export class TransactionConfirmPage {
     try {
       this.airGapTx = await this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
     } catch (e) {
-      console.log(e)
+      handleErrorSentry(ErrorCategory.COINLIB)(e)
     }
   }
 

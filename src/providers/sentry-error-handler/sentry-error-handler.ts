@@ -20,9 +20,11 @@ export enum ErrorCategory {
   CORDOVA_PLUGIN = 'cordova_plugin',
   IONIC_MODAL = 'ionic_modal',
   IONIC_ALERT = 'ionic_alert',
+  IONIC_LOADER = 'ionic_loader',
   NAVIGATION = 'navigation',
   WALLET_PROVIDER = 'wallet_provider',
-  SCHEME_ROUTING = 'scheme_routing'
+  SCHEME_ROUTING = 'scheme_routing',
+  COINLIB = 'coinlib'
 }
 
 const handleErrorSentry = (category?: ErrorCategory) => {

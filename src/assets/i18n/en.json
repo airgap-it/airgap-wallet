@@ -212,7 +212,7 @@
     "no-accounts_text": "No Accounts added yet, you can create or import existing Accounts.",
     "delegate_card": {
       "heading": "Delegate Tezos",
-      "text": "You have <strong>1481 XTZ</strong> undelegated. If you delegate now you can earn a share each cycle."
+      "text": "You have <strong>{{amount}} XTZ</strong> undelegated. If you delegate now you can earn a share each cycle."
     }
     },
   "account-import-onboarding": {

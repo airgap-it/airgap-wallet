@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
-    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="prepareDelegate()"></portfolio-item>
+  <ion-list no-lines margin-top *ngFor="let subWallet of subWallets">
+    <portfolio-item [wallet]="subWallet" [maxDigits]="8" tappable (click)="prepareDelegate(subWallet)"></portfolio-item>
   </ion-list>
 </ion-content>

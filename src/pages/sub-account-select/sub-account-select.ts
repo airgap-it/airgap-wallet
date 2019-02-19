@@ -28,8 +28,13 @@ export class SubAccountSelectPage {
     })
   }
 
-  async prepareDelegate() {
-    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, 'tz1YvE7Sfo92ueEPEdZceNWd5MWNeMNSt16L')
+  async prepareDelegate(subWallet: AirGapMarketWallet) {
+    console.log(this.wallet)
+    const pageOptions = await this.operationsProvider.prepareDelegate(
+      this.wallet,
+      subWallet.receivingPublicAddress,
+      'tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8'
+    )
 
     this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

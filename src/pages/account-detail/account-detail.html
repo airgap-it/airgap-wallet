@@ -15,45 +15,63 @@
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openTransactionPage(wallet)"></portfolio-item>
   </ion-list>
 
-  <!-- TODO: show only if Tezos and add delegate -->
-  <ion-row>
+  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
     <card-actionable
       [imageLeft]="false"
       [imageName]="'currencies-empty.svg'"
-      [text]="'account-detail.delegate_card.text' | translate"
+      [text]="'account-detail.delegate_card.text' | translate: { amount: undelegatedAmount }"
       [heading]="'account-detail.delegate_card.heading' | translate"
       tappable
       (click)="goToDelegateSelection()"
     ></card-actionable>
   </ion-row>
 
-  <ion-row class="transaction--label__container background--color__white" align-items-center>
-    <ion-col col-10 padding>
-      <!-- TODO: if Tezos show "account" 'account-detail.accounts_label' label if Ethereum show "tokens" -->
-      <span ion-text class="font--weight__bold" color="primary">{{ 'account-detail.tokens_label' | translate }}</span>
-    </ion-col>
-  </ion-row>
-  <div padding-horizontal class="empty-list" *ngIf="!subWallets.length">
+  <div padding-horizontal class="empty-list" *ngIf="!hasSubAccounts">
     <img padding-vertical src="../../assets/img/currencies-empty.svg" />
     <p>
       {{ 'account-detail.no-accounts_text' | translate }}
     </p>
   </div>
-  <ion-list no-lines no-margin>
-    <portfolio-item
-      [isToken]="true"
-      *ngFor="let subWallet of subWallets"
-      [wallet]="subWallet"
-      [maxDigits]="8"
-      tappable
-      (click)="openTransactionPage(subWallet)"
-    ></portfolio-item>
-  </ion-list>
+  <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
+    <ng-container *ngIf="supportedSubProtocolTypes.get(subProtocolType)">
+      <ion-row class="transaction--label__container background--color__white" align-items-center>
+        <ion-col col-10 padding>
+          <span ion-text class="font--weight__bold" color="primary">
+            <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
+              {{ 'account-detail.accounts_label' | translate }}
+            </ng-container>
+            <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.tokens_label' | translate }}</ng-container>
+          </span>
+        </ion-col>
+      </ion-row>
+      <ion-list no-lines no-margin>
+        <portfolio-item
+          [isToken]="true"
+          *ngFor="let subWallet of subWalletGroups.get(subProtocolType)"
+          [wallet]="subWallet"
+          [maxDigits]="8"
+          tappable
+          (click)="openTransactionPage(subWallet)"
+        ></portfolio-item>
+      </ion-list>
+    </ng-container>
+  </ng-container>
   <ion-fab right bottom>
-    <!-- TODO: if Tezos show "account" 'account-detail.add-accounts_label' label if Ethereum show "tokens" -->
-    <button color="secondary" (click)="openAccountAddPage(wallet)" ion-button round icon-left>
-      <ion-icon md-name="add"></ion-icon>
-      {{ 'account-detail.add-tokens_label' | translate }}
-    </button>
+    <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
+      <button
+        *ngIf="supportedSubProtocolTypes.get(subProtocolType)"
+        color="secondary"
+        (click)="openAccountAddPage(subProtocolType, wallet)"
+        ion-button
+        round
+        icon-left
+      >
+        <ion-icon md-name="add"></ion-icon>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
+          {{ 'account-detail.add-accounts_label' | translate }}
+        </ng-container>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.add-tokens_label' | translate }}</ng-container>
+      </button>
+    </ng-container>
   </ion-fab>
 </ion-content>

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, TezosKtProtocol, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol, SyncProtocolUtils, EncodedType, UnsignedTransaction } from 'airgap-coin-lib'
 import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
 import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
 import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
 import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/bitcoin-transactions.serializer'
 import { RawAeternityTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/aeternity-transactions.serializer'
 import { LoadingController, Loading } from 'ionic-angular'
+import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable()
 export class OperationsProvider {
@@ -29,11 +30,12 @@ export class OperationsProvider {
     return this.getPageDetails(wallet, originateTx, serializedTx)
   }
 
-  public async prepareDelegate(wallet: AirGapMarketWallet, delegateTarget: string) {
+  public async prepareDelegate(wallet: AirGapMarketWallet, sourceAddress: string, delegateTargetAddress: string) {
     this.showLoader()
 
     const protocol = new TezosKtProtocol()
-    const delegateTx = await protocol.delegate(wallet.publicKey, delegateTarget)
+    console.log('input', wallet.publicKey, sourceAddress, delegateTargetAddress)
+    const delegateTx = await protocol.delegate(wallet.publicKey, sourceAddress)
     const serializedTx = await this.serializeTx(wallet, delegateTx)
 
     this.hideLoader()
@@ -58,22 +60,40 @@ export class OperationsProvider {
     })
   }
 
-  private async getPageDetails(wallet, transaction, serializedTx) {
+  private async getPageDetails(
+    wallet: AirGapMarketWallet,
+    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction,
+    serializedTx: string
+  ) {
+    let airGapTx
+
+    try {
+      airGapTx = await wallet.coinProtocol.getTransactionDetails({
+        publicKey: wallet.publicKey,
+        transaction: transaction
+      })
+    } catch (e) {
+      console.log('CAUGHT')
+      handleErrorSentry(ErrorCategory.COINLIB)(e)
+    }
+
+    console.log('output', airGapTx)
+
     return {
       page: InteractionSelectionPage,
       params: {
         wallet: wallet,
-        airGapTx: transaction,
+        airGapTx: airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
     }
   }
 
   private showLoader() {
-    this.loader.present()
+    this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
   }
 
   private hideLoader() {
-    this.loader.dismiss()
+    this.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
   }
 }
