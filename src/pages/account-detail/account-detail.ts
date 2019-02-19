@@ -8,7 +8,6 @@ import { AccountEditPopoverComponent } from '../../components/account-edit-popov
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { TranslateService } from '@ngx-translate/core'
 import { AccountProvider } from '../../providers/account/account.provider'
 
 @Component({
@@ -33,18 +32,8 @@ export class AccountDetailPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private popoverCtrl: PopoverController,
-    private accountProvider: AccountProvider,
-    private translateService: TranslateService
+    private accountProvider: AccountProvider
   ) {
-    let labelTranslations
-    this.translateService
-      .get('account_detail.accounts_label', 'account_detail.tokens_label')
-      .toPromise()
-      .then(res => {
-        labelTranslations = res
-      })
-      .catch(console.error)
-
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     this.accountProvider.subWallets.subscribe(subWallets => {
@@ -56,7 +45,6 @@ export class AccountDetailPage {
         this.subWalletGroups.set(type, groupSubWallets)
         this.hasSubAccounts = this.hasSubAccounts || groupSubWallets.length > 0
       })
-      console.log(this.subWalletGroups)
 
       this.subProtocolTypesArray.forEach(type => {
         this.supportedSubProtocolTypes.set(
@@ -66,8 +54,6 @@ export class AccountDetailPage {
           })
         )
       })
-
-      console.log(this.supportedSubProtocolTypes)
     })
   }
 

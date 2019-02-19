@@ -29,7 +29,6 @@ export class SubAccountSelectPage {
   }
 
   async prepareDelegate(subWallet: AirGapMarketWallet) {
-    console.log(this.wallet)
     const pageOptions = await this.operationsProvider.prepareDelegate(
       this.wallet,
       subWallet.receivingPublicAddress,

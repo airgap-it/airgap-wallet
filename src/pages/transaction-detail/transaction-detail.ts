@@ -18,7 +18,6 @@ export class TransactionDetailPage {
     this.lottieConfig = {
       path: '/assets/animations/pending.json'
     }
-    console.log(this.transaction)
   }
 
   openBlockexplorer() {

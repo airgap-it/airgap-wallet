@@ -91,7 +91,6 @@ export class SubAccountAddPage {
   }
 
   addSubAccounts() {
-    console.log(this.subAccounts.filter(account => account.selected).map(account => account.wallet))
     this.subAccounts
       .filter(account => account.selected)
       .map(account => account.wallet)
