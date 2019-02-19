@@ -1,10 +1,10 @@
 <ion-item *ngIf="wallet; else skeletonWallet" no-lines>
   <ion-avatar item-start>
-    <identicon *ngIf="isToken == false" [address]="wallet.receivingPublicAddress"></identicon>
-    <img *ngIf="isToken" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'" />
+    <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="isToken"></currency-symbol>
   </ion-avatar>
   <ion-label>
-    <img *ngIf="isToken == false" class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'" />
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading">
       {{
         wallet.currentBalance?.toNumber()
@@ -18,7 +18,7 @@
     <ng-template #syncingHeading>
       <div class="skeleton--loading"><h2></h2></div>
     </ng-template>
-    <ng-container *ngIf="isToken == false">
+    <ng-container *ngIf="!isToken">
       <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" ion-text color="blackLight" class="typography--mono">
         {{ wallet.receivingPublicAddress | shortenString }}
       </h3>

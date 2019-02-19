@@ -14,6 +14,7 @@ import { AccountEditPopoverComponent } from './account-edit-popover/account-edit
 import { MomentModule } from 'ngx-moment'
 import { CardActionableComponent } from './card-actionable/card-actionable'
 import { EmptyStateComponent } from './empty-state/empty-state'
+import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { EmptyStateComponent } from './empty-state/empty-state'
     FromToComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    CurrencySymbolComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
   exports: [
@@ -35,7 +37,8 @@ import { EmptyStateComponent } from './empty-state/empty-state'
     FromToComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    CurrencySymbolComponent
   ]
 })
 export class ComponentsModule {}
