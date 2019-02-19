@@ -29,7 +29,7 @@ export class SubAccountImportPage {
         mainAccount.derivationPath
       )
       airGapMarketWallet.addresses = mainAccount.addresses
-      airGapMarketWallet.synchronize()
+      airGapMarketWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
       this.subWallets.push(airGapMarketWallet)
     })
   }

@@ -70,7 +70,7 @@ export class AccountDetailPage {
 
   openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
     this.navCtrl
-      .push(SubAccountAddPage, { subAccountType: subProtocolType, wallet: wallet })
+      .push(SubAccountAddPage, { subProtocolType: subProtocolType, wallet: wallet })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 

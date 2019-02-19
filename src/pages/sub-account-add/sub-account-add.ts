@@ -19,7 +19,8 @@ export class SubAccountAddPage {
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
 
-  public subAccountType: SubProtocolType
+  public subProtocolType: SubProtocolType
+  public subProtocolTypes = SubProtocolType
 
   public typeLabel: string = ''
 
@@ -29,24 +30,24 @@ export class SubAccountAddPage {
     private accountProvider: AccountProvider,
     private operationsProvider: OperationsProvider
   ) {
-    this.subAccountType = this.navParams.get('subAccountType')
+    this.subProtocolType = this.navParams.get('subProtocolType')
 
     function assertUnreachable(x: never): void {
       /* */
     }
 
-    if (this.subAccountType === SubProtocolType.ACCOUNT) {
+    if (this.subProtocolType === SubProtocolType.ACCOUNT) {
       this.typeLabel = 'add-sub-account.accounts_label'
-    } else if (this.subAccountType === SubProtocolType.TOKEN) {
+    } else if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.typeLabel = 'add-sub-account.tokens_label'
     } else {
-      assertUnreachable(this.subAccountType)
+      assertUnreachable(this.subProtocolType)
     }
 
     this.wallet = this.navParams.get('wallet')
 
     // TODO: Make generic
-    if (this.subAccountType === SubProtocolType.ACCOUNT && this.wallet.protocolIdentifier === 'xtz') {
+    if (this.subProtocolType === SubProtocolType.ACCOUNT && this.wallet.protocolIdentifier === 'xtz') {
       const protocol = new TezosKtProtocol()
       protocol
         .getAddressesFromPublicKey(this.wallet.publicKey)

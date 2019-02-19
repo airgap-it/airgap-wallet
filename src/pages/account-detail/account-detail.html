@@ -45,7 +45,7 @@
       </ion-row>
       <ion-list no-lines no-margin>
         <portfolio-item
-          [isToken]="true"
+          [isToken]="subProtocolType === subProtocolTypes.TOKEN"
           *ngFor="let subWallet of subWalletGroups.get(subProtocolType)"
           [wallet]="subWallet"
           [maxDigits]="8"

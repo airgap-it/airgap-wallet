@@ -26,7 +26,13 @@
 
   <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
     <ion-col col-10 no-padding>
-      <portfolio-item [wallet]="subAccount.wallet" [maxDigits]="8" tappable (click)="toggleAccount(subAccount)"></portfolio-item>
+      <portfolio-item
+        [isToken]="subProtocolType === subProtocolTypes.TOKEN"
+        [wallet]="subAccount.wallet"
+        [maxDigits]="8"
+        tappable
+        (click)="toggleAccount(subAccount)"
+      ></portfolio-item>
     </ion-col>
     <ion-col col-2 class="content--align__center-center" no-padding>
       <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
