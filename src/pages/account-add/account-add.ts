@@ -3,8 +3,8 @@ import { NavController, NavParams } from 'ionic-angular'
 import { supportedProtocols, ICoinProtocol } from 'airgap-coin-lib'
 import { AccountImportOnboardingPage } from '../account-import-onboarding/account-import-onboarding'
 import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
-import { SupportedSubAccountsProvider } from '../../providers/supported-sub-accounts/supported-sub-accounts'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-account-add',
@@ -17,7 +17,7 @@ export class AccountAddPage {
   filteredAccountProtocols: ICoinProtocol[] = []
   filteredSubAccountProtocols: ICoinProtocol[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private supportedTokenProvider: SupportedSubAccountsProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
       if (cv.subProtocols) {
@@ -44,10 +44,14 @@ export class AccountAddPage {
   }
 
   addAccount(protocolIdentifier: string) {
-    this.navCtrl.push(AccountImportOnboardingPage, { protocolIdentifier: protocolIdentifier })
+    this.navCtrl
+      .push(AccountImportOnboardingPage, { protocolIdentifier: protocolIdentifier })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   addSubAccount(subProtocolIdentifier: string) {
-    this.navCtrl.push(SubAccountImportPage, { subProtocolIdentifier: subProtocolIdentifier })
+    this.navCtrl
+      .push(SubAccountImportPage, { subProtocolIdentifier: subProtocolIdentifier })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

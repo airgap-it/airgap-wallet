@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams, PopoverController } from 'ionic-angular'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
-import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
@@ -10,6 +9,7 @@ import { TransactionPreparePage } from '../transaction-prepare/transaction-prepa
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { TranslateService } from '@ngx-translate/core'
+import { AccountProvider } from '../../providers/account/account.provider'
 
 @Component({
   selector: 'page-account-detail',
@@ -33,7 +33,7 @@ export class AccountDetailPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private popoverCtrl: PopoverController,
-    private subAccountProvider: SubAccountProvider,
+    private accountProvider: AccountProvider,
     private translateService: TranslateService
   ) {
     let labelTranslations
@@ -47,11 +47,10 @@ export class AccountDetailPage {
 
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
-    this.subAccountProvider.wallets.subscribe(subWallets => {
+    this.accountProvider.subWallets.subscribe(subWallets => {
       const filteredSubWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
       this.subProtocolTypesArray.forEach(type => {
         const groupSubWallets = filteredSubWallets.filter(subWallet => {
-          console.log(((subWallet.coinProtocol as any) as ICoinSubProtocol).subProtocolType, type)
           return ((subWallet.coinProtocol as any) as ICoinSubProtocol).subProtocolType === type
         })
         this.subWalletGroups.set(type, groupSubWallets)

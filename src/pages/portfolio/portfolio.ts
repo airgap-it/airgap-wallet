@@ -21,9 +21,11 @@ export class PortfolioPage {
   changePercentage: number = 0
 
   wallets: Observable<AirGapMarketWallet[]>
+  subWallets: Observable<AirGapMarketWallet[]>
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: AccountProvider) {
     this.wallets = this.walletsProvider.wallets.asObservable()
+
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe(wallets => {
       this.calculateTotal(wallets)
@@ -38,6 +40,10 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
+    if ('subProtocolType' in wallet.coinProtocol) {
+      console.log('YES')
+    }
+
     if (wallet.coinProtocol.subProtocols && wallet.coinProtocol.subProtocols.length > 0) {
       this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
@@ -50,11 +56,11 @@ export class PortfolioPage {
   }
 
   async doRefresh(refresher: any = null) {
-    await Promise.all(
+    await Promise.all([
       this.walletsProvider.getWalletList().map(wallet => {
         return wallet.synchronize()
       })
-    )
+    ])
 
     this.calculateTotal(this.walletsProvider.getWalletList(), refresher)
   }

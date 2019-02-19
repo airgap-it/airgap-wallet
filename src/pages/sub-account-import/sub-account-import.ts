@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { SubAccountProvider } from '../../providers/account/sub-account.provider'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -14,12 +14,7 @@ export class SubAccountImportPage {
   public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
-  constructor(
-    public navCtrl: NavController,
-    public navParams: NavParams,
-    private accountProvider: AccountProvider,
-    private subAccountProvider: SubAccountProvider
-  ) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private accountProvider: AccountProvider) {
     this.subWallets = []
     this.protocolIdentifier = this.navParams.get('subProtocolIdentifier')
     this.protocol = getProtocolByIdentifier(this.protocolIdentifier)
@@ -41,7 +36,7 @@ export class SubAccountImportPage {
 
   importWallets() {
     this.subWallets.forEach(subWallet => {
-      this.subAccountProvider.addWallet(subWallet)
+      this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     })
   }
 }

@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core'
 import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
+import { map } from 'rxjs/operators'
 
 @Injectable()
 export class AccountProviderBase {
   private walletList: AirGapMarketWallet[] = []
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+  public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+
   private walletChangedBehaviour: Subject<void> = new Subject()
 
   protected settingsKeyWallet: SettingsKey = SettingsKey.WALLET
@@ -19,6 +22,7 @@ export class AccountProviderBase {
   constructor(private storageProvider: StorageProvider, settingsKeyWallet: SettingsKey) {
     this.settingsKeyWallet = settingsKeyWallet
     this.loadWalletsFromStorage().catch(console.error)
+    this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
   }
 
   public triggerWalletChanged() {

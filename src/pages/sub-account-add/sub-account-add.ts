@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { AccountProvider } from '../../providers/account/account.provider'
 
 interface IAccountWrapper {
   selected: boolean
@@ -26,7 +26,7 @@ export class SubAccountAddPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private subAccountProvider: SubAccountProvider,
+    private accountProvider: AccountProvider,
     private operationsProvider: OperationsProvider
   ) {
     this.subAccountType = this.navParams.get('subAccountType')
@@ -59,7 +59,7 @@ export class SubAccountAddPage {
               this.wallet.derivationPath,
               index
             )
-            const exists = this.subAccountProvider.walletExists(wallet)
+            const exists = this.accountProvider.walletExists(wallet)
             if (!exists) {
               wallet.addresses = res
               wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
@@ -76,7 +76,7 @@ export class SubAccountAddPage {
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath
         )
-        const exists = this.subAccountProvider.walletExists(wallet)
+        const exists = this.accountProvider.walletExists(wallet)
         if (!exists) {
           wallet.addresses = this.wallet.addresses
           wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
@@ -96,7 +96,7 @@ export class SubAccountAddPage {
       .filter(account => account.selected)
       .map(account => account.wallet)
       .forEach(wallet => {
-        this.subAccountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+        this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
     this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

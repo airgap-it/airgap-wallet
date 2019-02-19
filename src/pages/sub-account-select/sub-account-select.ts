@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { SubAccountProvider } from '../../providers/account/sub-account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
+import { AccountProvider } from '../../providers/account/account.provider'
 
 @Component({
   selector: 'page-sub-account-select',
@@ -17,13 +17,13 @@ export class SubAccountSelectPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private subAccountProvider: SubAccountProvider,
+    private accountProvider: AccountProvider,
     private operationsProvider: OperationsProvider
   ) {
     this.subWallets = []
     this.wallet = this.navParams.get('wallet')
 
-    this.subAccountProvider.wallets.subscribe(subWallets => {
+    this.accountProvider.subWallets.subscribe(subWallets => {
       this.subWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
     })
   }

@@ -53,7 +53,6 @@ import { AccountAddPage } from '../pages/account-add/account-add'
 import { SubAccountAddPage } from '../pages/sub-account-add/sub-account-add'
 import { SubAccountImportPage } from '../pages/sub-account-import/sub-account-import'
 import { AccountImportOnboardingPage } from '../pages/account-import-onboarding/account-import-onboarding'
-import { SubAccountProvider } from '../providers/account/sub-account.provider'
 import { AccountDetailPage } from '../pages/account-detail/account-detail'
 import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
@@ -166,7 +165,6 @@ export function createTranslateLoader(http: HttpClient) {
     ClipboardBrowserProvider,
     PermissionsProvider,
     SupportedSubAccountsProvider,
-    SubAccountProvider,
     DeepLinkProvider,
     OperationsProvider
   ]

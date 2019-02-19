@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, TezosKtProtocol, SyncProtocolUtils, EncodedType, UnsignedTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
 import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
 import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
