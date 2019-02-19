@@ -10,35 +10,28 @@ import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry
 
 @Injectable()
 export class OperationsProvider {
-  private loader: Loading
-
-  constructor(private readonly loadingController: LoadingController) {
-    this.loader = this.loadingController.create({
-      content: 'Preparing transaction...'
-    })
-  }
+  constructor(private readonly loadingController: LoadingController) {}
 
   public async prepareOriginate(wallet: AirGapMarketWallet) {
-    this.showLoader()
+    const loader = this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
     const originateTx = await protocol.originate(wallet.publicKey)
     const serializedTx = await this.serializeTx(wallet, originateTx)
 
-    this.hideLoader()
+    this.hideLoader(loader)
 
     return this.getPageDetails(wallet, originateTx, serializedTx)
   }
 
   public async prepareDelegate(wallet: AirGapMarketWallet, sourceAddress: string, delegateTargetAddress: string) {
-    this.showLoader()
+    const loader = this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
-    console.log('input', wallet.publicKey, sourceAddress, delegateTargetAddress)
     const delegateTx = await protocol.delegate(wallet.publicKey, sourceAddress)
     const serializedTx = await this.serializeTx(wallet, delegateTx)
 
-    this.hideLoader()
+    this.hideLoader(loader)
 
     return this.getPageDetails(wallet, delegateTx, serializedTx)
   }
@@ -89,11 +82,16 @@ export class OperationsProvider {
     }
   }
 
-  private showLoader() {
-    this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+  private getAndShowLoader() {
+    const loader = this.loadingController.create({
+      content: 'Preparing transaction...'
+    })
+    loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+
+    return loader
   }
 
-  private hideLoader() {
-    this.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+  private hideLoader(loader: Loading) {
+    loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
   }
 }
