@@ -30,18 +30,18 @@ export enum ErrorCategory {
 const handleErrorSentry = (category?: ErrorCategory) => {
   return error => {
     try {
-      console.log('sending error to sentry, category', category)
-      console.error(error.originalError || error)
+      console.debug('sending error to sentry, category', category)
+      console.debug(error.originalError || error)
       captureException(error.originalError || error)
     } catch (e) {
-      console.error('Error reporting exception to sentry: ', e)
+      console.debug('Error reporting exception to sentry: ', e)
     }
   }
 }
 
 const handleErrorIgnore = error => {
-  console.log('ignoring error')
-  console.error(error.originalError || error)
+  console.debug('ignoring error')
+  console.debug(error.originalError || error)
 }
 
 export { handleErrorIgnore, handleErrorSentry }
