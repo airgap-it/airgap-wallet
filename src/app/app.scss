@@ -95,17 +95,6 @@ ion-app {
   text-transform: uppercase;
 }
 
-.empty-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  font-weight: 100;
-  font-size: 1.4rem;
-  height: 75%;
-}
-
 .text--selectable {
   user-select: text;
   -webkit-user-select: text;
@@ -130,10 +119,4 @@ qrcode {
 }
 ion-fab .col {
   padding: 0 10px;
-}
-
-.empty-list {
-  img {
-    height: 40vh;
-  }
 }
