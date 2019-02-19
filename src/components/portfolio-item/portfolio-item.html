@@ -46,7 +46,7 @@
     </ion-col>
     <ion-col col-12 no-padding text-right>
       <p *ngIf="wallet.currentBalance; else syncingPrice">
-        <span *ngIf="wallet.currentBalance > 0" ion-text color="blackLight">
+        <span *ngIf="wallet.currentBalance?.toNumber() > 0" ion-text color="blackLight">
           ${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}
         </span>
         <!-- <span ion-text [ngClass]="wallet.change24hour >= 0 ? 'green' : 'red'">{{ wallet.change24hour }}%</span> -->

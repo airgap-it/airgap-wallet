@@ -24,11 +24,11 @@ export class OperationsProvider {
     return this.getPageDetails(wallet, originateTx, serializedTx)
   }
 
-  public async prepareDelegate(wallet: AirGapMarketWallet, sourceAddress: string, delegateTargetAddress: string) {
+  public async prepareDelegate(wallet: AirGapMarketWallet, sourceAddress: string, delegateTargetAddress?: string) {
     const loader = this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
-    const delegateTx = await protocol.delegate(wallet.publicKey, sourceAddress)
+    const delegateTx = await protocol.delegate(wallet.publicKey, sourceAddress, delegateTargetAddress)
     const serializedTx = await this.serializeTx(wallet, delegateTx)
 
     this.hideLoader(loader)
@@ -51,6 +51,18 @@ export class OperationsProvider {
         callback: 'airgap-wallet://?d='
       }
     })
+  }
+
+  public async checkDelegated(
+    address: string
+  ): Promise<{
+    isDelegated: boolean
+    setable: boolean
+    value?: string
+  }> {
+    const protocol = new TezosKtProtocol()
+
+    return protocol.isAddressDelegated(address)
   }
 
   private async getPageDetails(

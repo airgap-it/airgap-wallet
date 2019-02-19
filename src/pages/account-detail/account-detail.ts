@@ -9,6 +9,8 @@ import { TransactionPreparePage } from '../transaction-prepare/transaction-prepa
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { OperationsProvider } from '../../providers/operations/operations'
+import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'page-account-detail',
@@ -26,13 +28,14 @@ export class AccountDetailPage {
   public translatedLabel: string = '???' // TODO find default
 
   // Tezos
-  public undelegatedAmount: number = 0
+  public undelegatedAmount: BigNumber = new BigNumber(0)
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     private popoverCtrl: PopoverController,
-    private accountProvider: AccountProvider
+    private accountProvider: AccountProvider,
+    private operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -60,7 +63,13 @@ export class AccountDetailPage {
   async ionViewWillEnter() {
     // Get amount of undelegated Tezos
     if (this.wallet.protocolIdentifier === 'xtz') {
-      this.undelegatedAmount = 100
+      this.undelegatedAmount = new BigNumber(0)
+      this.subWalletGroups.get(SubProtocolType.ACCOUNT).forEach(async wallet => {
+        const delegatedResult = await this.operationsProvider.checkDelegated(wallet.receivingPublicAddress)
+        if (!delegatedResult.isDelegated && delegatedResult.setable) {
+          this.undelegatedAmount = this.undelegatedAmount.plus(wallet.currentBalance)
+        }
+      })
     }
   }
 
