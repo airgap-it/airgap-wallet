@@ -16,8 +16,8 @@ interface SubAccount {
 }
 
 @Injectable()
-export class SupportedSubAccountsProvider {
-  public supportedSubAccounts: SubAccount[] = [
+export class ProtocolsProvider {
+  public subProtocols: SubAccount[] = [
     {
       protocol: 'eth',
       subProtocols: [
@@ -43,10 +43,10 @@ export class SupportedSubAccountsProvider {
     /* */
   }
 
-  addSupportedSubAccounts() {
+  addProtocols() {
     addSubProtocol('xtz', new TezosKtProtocol())
 
-    this.supportedSubAccounts.forEach(supportedSubAccount => {
+    this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         addSubProtocol(
           supportedSubAccount.protocol,

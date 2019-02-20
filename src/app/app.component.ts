@@ -11,7 +11,7 @@ import { configureScope } from '@sentry/browser'
 import { AppVersion } from '@ionic-native/app-version'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 import { handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
-import { SupportedSubAccountsProvider } from '../providers/supported-sub-accounts/supported-sub-accounts'
+import { ProtocolsProvider } from '../providers/protocols/protocols'
 
 @Component({
   templateUrl: 'app.html'
@@ -30,11 +30,11 @@ export class MyApp {
     private deeplinks: Deeplinks,
     private appVersion: AppVersion,
     private schemeRoutingProvider: SchemeRoutingProvider,
-    private supportedTokenProtocols: SupportedSubAccountsProvider
+    private protocolsProvider: ProtocolsProvider
   ) {
     this.translate.setDefaultLang('en')
 
-    this.supportedTokenProtocols.addSupportedSubAccounts()
+    this.protocolsProvider.addProtocols()
 
     this.platform
       .ready()

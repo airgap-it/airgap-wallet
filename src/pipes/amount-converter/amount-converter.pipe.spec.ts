@@ -1,5 +1,5 @@
 import { AmountConverterPipe } from './amount-converter.pipe'
-import { SupportedSubAccountsProvider } from '../../providers/supported-sub-accounts/supported-sub-accounts'
+import { ProtocolsProvider } from '../../providers/protocols/protocols'
 import { BigNumber } from 'bignumber.js'
 const BN = BigNumber.clone({
   FORMAT: {
@@ -13,8 +13,8 @@ describe('AmountConverter Pipe', () => {
   let amountConverterPipe: AmountConverterPipe
 
   beforeAll(() => {
-    const supportedSubAccountsProvider = new SupportedSubAccountsProvider()
-    supportedSubAccountsProvider.addSupportedSubAccounts()
+    const protocolsProvider = new ProtocolsProvider()
+    protocolsProvider.addProtocols()
   })
 
   beforeEach(() => {

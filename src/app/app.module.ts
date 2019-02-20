@@ -48,7 +48,7 @@ import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-err
 import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
-import { SupportedSubAccountsProvider } from '../providers/supported-sub-accounts/supported-sub-accounts'
+import { ProtocolsProvider } from '../providers/protocols/protocols'
 import { AccountAddPage } from '../pages/account-add/account-add'
 import { SubAccountAddPage } from '../pages/sub-account-add/sub-account-add'
 import { SubAccountImportPage } from '../pages/sub-account-import/sub-account-import'
@@ -164,7 +164,7 @@ export function createTranslateLoader(http: HttpClient) {
     SchemeRoutingProvider,
     ClipboardBrowserProvider,
     PermissionsProvider,
-    SupportedSubAccountsProvider,
+    ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider
   ]
