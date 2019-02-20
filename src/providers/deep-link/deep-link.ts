@@ -8,7 +8,7 @@ declare let window: any
 export class DeepLinkProvider {
   constructor(private platform: Platform, private alertCtrl: AlertController) {}
 
-  sameDeviceDeeplink(url: string) {
+  sameDeviceDeeplink(url: string = 'airgap-vault://') {
     let sApp
 
     if (this.platform.is('android')) {
@@ -41,6 +41,7 @@ export class DeepLinkProvider {
         console.log('OK')
       },
       error => {
+        console.error('deeplink used', url)
         console.error(error)
         alert('Oops. Something went wrong here. Do you have AirGap Wallet installed on the same Device?')
       }
