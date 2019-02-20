@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core'
 import { NavController, NavParams, Platform, Slides } from 'ionic-angular'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { DeepLinkProvider } from 'src/providers/deep-link/deep-link'
+import { DeepLinkProvider } from '../../providers/deep-link/deep-link'
 
 @Component({
   selector: 'page-account-import-onboarding',

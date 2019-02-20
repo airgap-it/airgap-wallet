@@ -3,7 +3,7 @@ import { NavController, NavParams, Platform } from 'ionic-angular'
 import { Transaction } from '../../models/transaction.model'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { DeepLinkProvider } from 'src/providers/deep-link/deep-link'
+import { DeepLinkProvider } from '../../providers/deep-link/deep-link'
 
 @Component({
   selector: 'page-transaction-qr',
