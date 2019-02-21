@@ -29,7 +29,7 @@ export class SubAccountSelectPage {
   }
 
   async prepareDelegate(subWallet: AirGapMarketWallet) {
-    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, subWallet.receivingPublicAddress)
+    const pageOptions = await this.operationsProvider.prepareDelegate(subWallet, 'tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8')
 
     this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

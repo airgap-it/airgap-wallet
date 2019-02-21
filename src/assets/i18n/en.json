@@ -178,6 +178,8 @@
   },
 
   "wallet-edit-popover-component": {
+    "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
     "delete_label": "Delete"
