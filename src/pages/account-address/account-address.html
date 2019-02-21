@@ -24,8 +24,8 @@
     </ion-col>
   </ion-row>
 
-  <ion-row (click)="copyAddressToClipboard()" justify-content-center padding-bottom>
-    <qrcode [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="0" foreground="white" [size]="240"></qrcode>
+  <ion-row justify-content-center padding-bottom>
+    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" backgroundAlpha="0" foreground="white" [size]="240"></qr-clipboard>
   </ion-row>
 
   <ion-fab bottom right>

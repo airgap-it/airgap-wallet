@@ -12,7 +12,7 @@
   </ion-row>
 
   <ion-row justify-content-center padding-top>
-    <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
+    <qr-clipboard [qrdata]="preparedDataQR" level="L" size="400"></qr-clipboard>
   </ion-row>
 
   <from-to padding-horizontal [transaction]="airGapTx"></from-to>
