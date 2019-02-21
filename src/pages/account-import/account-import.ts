@@ -3,7 +3,6 @@ import { NavParams, ViewController, LoadingController, Platform, NavController }
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
   selector: 'page-account-import',

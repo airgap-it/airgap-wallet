@@ -66,7 +66,8 @@ export class SettingsPage {
     alert.addInput({
       type: 'radio',
       label: this.pipe.instant('settings.channel.international'),
-      value: 'International'
+      value: 'International',
+      checked: true
     })
     alert.addInput({
       type: 'radio',
