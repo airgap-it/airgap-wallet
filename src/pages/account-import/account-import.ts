@@ -83,9 +83,13 @@ export class AccountImportPage {
     await this.wallets.addWallet(this.wallet)
     this.viewCtrl
       .dismiss()
-      .then(v => {
+      .then(async v => {
         console.log('WalletImportPage dismissed')
-        this.navCtrl.push(PortfolioPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        await this.navCtrl.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        const tabs = this.navCtrl.parent
+        if (tabs) {
+          tabs.select(0)
+        }
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
