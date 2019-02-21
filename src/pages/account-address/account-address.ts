@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavController, NavParams, ToastController } from 'ionic-angular'
+import { NavController, NavParams } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 

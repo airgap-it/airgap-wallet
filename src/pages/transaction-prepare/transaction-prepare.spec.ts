@@ -57,6 +57,7 @@ describe('TransactionPrepare Page', () => {
       ],
       providers: [
         AccountProvider,
+        Clipboard,
         { provide: Storage, useClass: StorageMock },
         { provide: NavController, useFactory: () => NavControllerMock.instance() },
         { provide: NavParams, useClass: NavParamsMock },
@@ -73,7 +74,7 @@ describe('TransactionPrepare Page', () => {
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },
         { provide: Keyboard, useClass: KeyboardMock },
-        { provide: Clipboard, useClass: ClipboardProvider }
+        ClipboardProvider
       ]
     })
   }))
