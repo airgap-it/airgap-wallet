@@ -18,7 +18,7 @@ import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { PipesModule } from '../../pipes/pipes.module'
 import { Clipboard } from '@ionic-native/clipboard'
-import { ClipboardBrowserProvider } from '../../providers/clipboard-browser/clipboard-browser'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -73,7 +73,7 @@ describe('TransactionPrepare Page', () => {
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },
         { provide: Keyboard, useClass: KeyboardMock },
-        { provide: Clipboard, useClass: ClipboardBrowserProvider }
+        { provide: Clipboard, useClass: ClipboardProvider }
       ]
     })
   }))

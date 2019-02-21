@@ -11,7 +11,7 @@ import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { QRCodeModule } from 'angularx-qrcode'
-import { IonicApp, IonicModule, Platform } from 'ionic-angular'
+import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
 import { ComponentsModule } from '../components/components.module'
@@ -45,7 +45,7 @@ import { StorageProvider } from '../providers/storage/storage'
 import { Clipboard } from '@ionic-native/clipboard'
 import { Diagnostic } from '@ionic-native/diagnostic'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
-import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
+import { ClipboardProvider } from '../providers/clipboard/clipboard'
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
@@ -150,19 +150,15 @@ export function createTranslateLoader(http: HttpClient) {
     BarcodeScanner,
     Keyboard,
     Deeplinks,
+    Clipboard,
     { provide: ErrorHandler, useClass: SentryErrorHandler },
     ScannerProvider,
     AppVersion,
     Diagnostic,
     AccountProvider,
     StorageProvider,
-    {
-      provide: Clipboard,
-      useFactory: (platform: Platform) => (platform.is('cordova') ? new Clipboard() : new ClipboardBrowserProvider()),
-      deps: [Platform]
-    },
     SchemeRoutingProvider,
-    ClipboardBrowserProvider,
+    ClipboardProvider,
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,
