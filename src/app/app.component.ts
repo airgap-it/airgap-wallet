@@ -34,8 +34,6 @@ export class MyApp {
   ) {
     this.translate.setDefaultLang('en')
 
-    this.addPasteListener()
-
     this.protocolsProvider.addProtocols()
 
     this.platform
@@ -96,13 +94,5 @@ export class MyApp {
           console.error("Got a deeplink that didn't match", JSON.stringify(nomatch))
         }
       )
-  }
-
-  private addPasteListener() {
-    window.addEventListener('paste', (event: any) => {
-      const pasteText = event.clipboardData.getData('text/plain')
-      console.log('received paste data', pasteText)
-      this.schemeRoutingProvider.handleNewSyncRequest(this.nav, pasteText).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-    })
   }
 }
