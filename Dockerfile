@@ -34,6 +34,9 @@ COPY package-lock.json /app
 # install dependencies
 RUN npm ci
 
+# browserify coin-lib
+RUN npm run browserify-coinlib
+
 # Bundle app source
 COPY . /app
 
