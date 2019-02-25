@@ -1,5 +1,5 @@
 import { IonicErrorHandler } from 'ionic-angular'
-import { init, captureException } from '@sentry/browser'
+import { init, captureException, configureScope } from '@sentry/browser'
 
 init({
   dsn: process.env.SENTRY_DSN,
@@ -25,7 +25,8 @@ export enum ErrorCategory {
   WALLET_PROVIDER = 'wallet_provider',
   SCHEME_ROUTING = 'scheme_routing',
   COINLIB = 'coinlib',
-  DEEPLINK_PROVIDER = 'deeplink_provider'
+  DEEPLINK_PROVIDER = 'deeplink_provider',
+  OTHER = 'other'
 }
 
 const handleErrorSentry = (category?: ErrorCategory) => {
@@ -45,7 +46,16 @@ const handleErrorIgnore = error => {
   console.debug(error.originalError || error)
 }
 
-export { handleErrorIgnore, handleErrorSentry }
+const setSentryRelease = (release: string) => {
+  configureScope(scope => {
+    scope.addEventProcessor(async event => {
+      event.release = release
+      return event
+    })
+  })
+}
+
+export { setSentryRelease, handleErrorIgnore, handleErrorSentry }
 
 export class SentryErrorHandler extends IonicErrorHandler {
   handleError(error) {

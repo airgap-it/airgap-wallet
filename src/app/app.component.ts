@@ -7,10 +7,9 @@ import { Platform, Nav } from 'ionic-angular'
 
 import { TabsPage } from '../pages/tabs/tabs'
 
-import { configureScope } from '@sentry/browser'
 import { AppVersion } from '@ionic-native/app-version'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
-import { handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
+import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
 
 @Component({
@@ -32,47 +31,40 @@ export class MyApp {
     private schemeRoutingProvider: SchemeRoutingProvider,
     private protocolsProvider: ProtocolsProvider
   ) {
-    this.translate.setDefaultLang('en')
+    this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
+  }
 
+  async initializeApp() {
+    const supportedLanguages = ['en', 'de', 'zh-cn']
+
+    this.loadLanguages(supportedLanguages)
     this.protocolsProvider.addProtocols()
 
-    this.platform
-      .ready()
-      .then(() => {
-        if (platform.is('cordova')) {
-          this.statusBar.styleLightContent()
-          this.statusBar.backgroundColorByHexString('#00e8cc')
-          this.splashScreen.hide()
-          configureScope(scope => {
-            scope.addEventProcessor(async event => {
-              event.release = await this.appVersion.getVersionNumber()
-              return event
-            })
-          })
-        } else {
-          configureScope(scope => {
-            scope.addEventProcessor(async event => {
-              event.release = 'browser'
-              return event
-            })
-          })
-        }
+    await this.platform.ready()
 
-        this.translate.setDefaultLang('en')
+    if (this.platform.is('cordova')) {
+      this.statusBar.styleLightContent()
+      this.statusBar.backgroundColorByHexString('#ffffff')
+      this.splashScreen.hide()
+      setSentryRelease(await this.appVersion.getVersionNumber())
+    } else {
+      setSentryRelease('browser') // TODO: Set version in CI once we have browser version
+    }
+  }
 
-        const supportedLanguages = ['en', 'de', 'zh-cn']
-        const language = this.translate.getBrowserLang()
+  loadLanguages(supportedLanguages: string[]) {
+    this.translate.setDefaultLang('en')
 
-        if (language) {
-          const lowerCaseLanguage = language.toLowerCase()
-          supportedLanguages.forEach(supportedLanguage => {
-            if (supportedLanguage.startsWith(lowerCaseLanguage)) {
-              this.translate.use(supportedLanguage)
-            }
-          })
+    const language = this.translate.getBrowserLang()
+
+    if (language) {
+      const lowerCaseLanguage = language.toLowerCase()
+      supportedLanguages.forEach(supportedLanguage => {
+        if (supportedLanguage.startsWith(lowerCaseLanguage)) {
+          this.translate.use(supportedLanguage)
         }
       })
-      .catch(err => console.log(err))
+    }
   }
 
   async ngAfterViewInit() {
