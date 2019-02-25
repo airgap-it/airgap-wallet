@@ -33,6 +33,11 @@ export class InteractionSelectionPage {
   }
 
   sameDeviceSign() {
-    this.deepLinkProvider.sameDeviceDeeplink(this.preparedDataQR)
+    this.deepLinkProvider
+      .sameDeviceDeeplink(this.preparedDataQR)
+      .then(() => {
+        this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      })
+      .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))
   }
 }
