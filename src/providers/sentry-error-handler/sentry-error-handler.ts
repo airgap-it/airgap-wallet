@@ -24,7 +24,8 @@ export enum ErrorCategory {
   NAVIGATION = 'navigation',
   WALLET_PROVIDER = 'wallet_provider',
   SCHEME_ROUTING = 'scheme_routing',
-  COINLIB = 'coinlib'
+  COINLIB = 'coinlib',
+  DEEPLINK_PROVIDER = 'deeplink_provider'
 }
 
 const handleErrorSentry = (category?: ErrorCategory) => {

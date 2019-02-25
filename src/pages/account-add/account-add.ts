@@ -5,6 +5,7 @@ import { AccountImportOnboardingPage } from '../account-import-onboarding/accoun
 import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from '../../providers/account/account.provider'
 
 @Component({
   selector: 'page-account-add',
@@ -17,7 +18,7 @@ export class AccountAddPage {
   filteredAccountProtocols: ICoinProtocol[] = []
   filteredSubAccountProtocols: ICoinProtocol[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private accountProvider: AccountProvider) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
       if (cv.subProtocols) {
@@ -50,8 +51,15 @@ export class AccountAddPage {
   }
 
   addSubAccount(subProtocolIdentifier: string) {
-    this.navCtrl
-      .push(SubAccountImportPage, { subProtocolIdentifier: subProtocolIdentifier })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
+    if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
+      this.navCtrl
+        .push(SubAccountImportPage, { subProtocolIdentifier: subProtocolIdentifier })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } else {
+      this.navCtrl
+        .push(AccountImportOnboardingPage, { protocolIdentifier: mainProtocolIdentifier })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 }
