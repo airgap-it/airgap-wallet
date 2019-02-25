@@ -158,6 +158,10 @@
     "to_label": "Zu"
   },
 
+  "signed-transaction": {
+    "transaction-unreadable": "Wir konnten die Daten in dieser Transaktion nicht lesen. Dies bedeutet nicht, dass sie nicht gültig ist - Allerdings solltest du diese Transaktion nur bestätigen falls du dir über die Risiken und deren Inhalt im klaren bist."
+  },
+
   "wallet-edit-popover-component": {
     "settings_label": "Kontoeinstellungen",
     "copy-address_label": "Addresse kopieren",

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { getProtocolByIdentifier, IAirGapTransaction, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 declare var cordova: any
@@ -11,8 +11,8 @@ declare var cordova: any
   templateUrl: 'transaction-confirm.html'
 })
 export class TransactionConfirmPage {
-  public signedTx: string
-  public airGapTx: IAirGapTransaction
+  signedTransactionSync: DeserializedSyncProtocol
+  private signedTx: string
   public protocol: ICoinProtocol
 
   constructor(
@@ -30,15 +30,10 @@ export class TransactionConfirmPage {
 
   async ionViewWillEnter() {
     await this.platform.ready()
-    const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
+    this.signedTransactionSync = this.navParams.get('signedTransactionSync')
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
-    this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
-    try {
-      this.airGapTx = await this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
-    } catch (e) {
-      handleErrorSentry(ErrorCategory.COINLIB)(e)
-    }
+    this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
+    this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
   broadcastTransaction() {

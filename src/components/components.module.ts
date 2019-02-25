@@ -17,6 +17,7 @@ import { EmptyStateComponent } from './empty-state/empty-state'
 import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
 import { QRCodeModule } from 'angularx-qrcode'
+import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { QRCodeModule } from 'angularx-qrcode'
     CardActionableComponent,
     EmptyStateComponent,
     CurrencySymbolComponent,
-    QrClipboardComponent
+    QrClipboardComponent,
+    SignedTransactionComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule, QRCodeModule],
   exports: [
@@ -42,7 +44,8 @@ import { QRCodeModule } from 'angularx-qrcode'
     CardActionableComponent,
     EmptyStateComponent,
     CurrencySymbolComponent,
-    QrClipboardComponent
+    QrClipboardComponent,
+    SignedTransactionComponent
   ]
 })
 export class ComponentsModule {}
