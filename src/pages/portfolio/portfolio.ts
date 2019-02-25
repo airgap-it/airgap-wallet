@@ -40,10 +40,6 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    if ('subProtocolType' in wallet.coinProtocol) {
-      console.log('YES')
-    }
-
     if (wallet.coinProtocol.subProtocols && wallet.coinProtocol.subProtocols.length > 0) {
       this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
