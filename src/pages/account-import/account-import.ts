@@ -26,7 +26,7 @@ export class AccountImportPage {
     this.platform
       .ready()
       .then(() => {
-        let loading = this.loadingCtrl.create({
+        const loading = this.loadingCtrl.create({
           content: 'Syncing...'
         })
 
