@@ -8,7 +8,7 @@ export class CurrencySymbolComponent {
   @Input()
   private symbol: string
 
-  public symbolURL: string = 'assets/symbols/btc.svg' // TODO: Add fallback image
+  public symbolURL: string = 'assets/symbols/generic-coin.svg'
 
   constructor() {
     /* */
