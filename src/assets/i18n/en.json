@@ -206,6 +206,9 @@
     "add-accounts_label": "Add {{ typeLabel }}",
     "no-imports_text": "No {{ typeLabel }} found to import."
   },
+  "sub-account-select": {
+    "title": "Select Account"
+  },
   "account-detail": {
     "title": "{{protocolName}}",
     "tokens_label": "Tokens",
