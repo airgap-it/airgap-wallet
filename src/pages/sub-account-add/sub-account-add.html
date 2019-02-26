@@ -17,12 +17,12 @@
     <span ion-text class="font--weight__bold" color="primary">{{ typeLabel | translate }}</span>
   </ion-row>
 
-  <div padding-horizontal class="empty-list" *ngIf="!subAccounts.length">
-    <img padding-vertical src="../../assets/img/no-imports.svg" />
-    <p>
-      {{ 'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate } }}
-    </p>
-  </div>
+  <empty-state
+    *ngIf="!subAccounts.length"
+    [text]="'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate }"
+    [imageName]="wallet.protocolIdentifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
+    [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
+  ></empty-state>
 
   <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
     <ion-col col-10 no-padding>
