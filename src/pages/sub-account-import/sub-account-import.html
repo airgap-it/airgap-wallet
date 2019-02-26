@@ -9,11 +9,15 @@
   <ion-list no-lines margin-top *ngFor="let wallet of subWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="importWallet(wallet)"></portfolio-item>
   </ion-list>
-  <!-- TODO: Add "no wallets" screen. This only happens if we have ETH addresses, but all of their tokens are already added -->
+  <empty-state
+    *ngIf="subWallets.length === 0"
+    [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol.name }"
+    [imageName]="'no-imports.svg'"
+  ></empty-state>
   <ion-fab right bottom>
     <button ion-button round (click)="importWallets()" color="secondary" icon-left [disabled]="subWallets.length === 0">
       <ion-icon md-name="add"></ion-icon>
-      {{ 'sub-account-import.import-all' | translate: { typeLabel: typeLabel | translate } }}
+      {{ 'sub-account-import.import-all_label' | translate: { typeLabel: typeLabel | translate } }}
     </button>
   </ion-fab>
 </ion-content>

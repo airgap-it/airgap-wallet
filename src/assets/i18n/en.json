@@ -247,7 +247,8 @@
   "sub-account-import": {
     "title": "Select Accounts",
     "text": "Select the Account you want to add for <strong>{{subProtocolName}}</strong>.",
-    "import-all": "Import All"
+    "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
+    "import-all_label": "Import All"
   },
   "deep-link": {
     "not-supported-alert": {
