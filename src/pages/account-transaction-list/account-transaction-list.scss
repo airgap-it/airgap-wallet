@@ -6,7 +6,16 @@ page-account-transaction-list {
       height: 30vh;
     }
   }
-
+  .empty-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    font-weight: 100;
+    font-size: 1.4rem;
+    height: 75%;
+  }
   .loading-header {
     color: white;
     font-weight: 300;
