@@ -6,6 +6,7 @@ import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { ProtocolsProvider } from '../../providers/protocols/protocols'
 
 @Component({
   selector: 'page-account-add',
@@ -18,11 +19,20 @@ export class AccountAddPage {
   filteredAccountProtocols: ICoinProtocol[] = []
   filteredSubAccountProtocols: ICoinProtocol[] = []
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private accountProvider: AccountProvider) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private accountProvider: AccountProvider,
+    private protocolsProvider: ProtocolsProvider
+  ) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
       if (cv.subProtocols) {
-        const subProtocols = cv.subProtocols.filter(subProtocol => subProtocol.subProtocolType === SubProtocolType.TOKEN)
+        const subProtocols = cv.subProtocols.filter(
+          subProtocol =>
+            subProtocol.subProtocolType === SubProtocolType.TOKEN &&
+            this.protocolsProvider.getEnabledProtocols().indexOf(subProtocol.identifier) >= 0
+        )
         return pv.concat(...subProtocols)
       }
       return pv

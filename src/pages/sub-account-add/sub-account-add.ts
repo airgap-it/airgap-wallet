@@ -5,6 +5,7 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { OperationsProvider } from '../../providers/operations/operations'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { ProtocolsProvider } from '../../providers/protocols/protocols'
 
 interface IAccountWrapper {
   selected: boolean
@@ -28,7 +29,8 @@ export class SubAccountAddPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private accountProvider: AccountProvider,
-    private operationsProvider: OperationsProvider
+    private operationsProvider: OperationsProvider,
+    private protocolsProvider: ProtocolsProvider
   ) {
     this.subProtocolType = this.navParams.get('subProtocolType')
 
@@ -70,18 +72,20 @@ export class SubAccountAddPage {
         })
         .catch(console.error)
     } else {
-      this.wallet.coinProtocol.subProtocols.forEach(protocol => {
-        const wallet = new AirGapMarketWallet(
-          protocol.identifier,
-          this.wallet.publicKey,
-          this.wallet.isExtendedPublicKey,
-          this.wallet.derivationPath
-        )
-        const exists = this.accountProvider.walletExists(wallet)
-        if (!exists) {
-          wallet.addresses = this.wallet.addresses
-          wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-          this.subAccounts.push({ selected: false, wallet: wallet })
+      this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
+        if (this.protocolsProvider.getEnabledProtocols().indexOf(subProtocol.identifier) >= 0) {
+          const wallet = new AirGapMarketWallet(
+            subProtocol.identifier,
+            this.wallet.publicKey,
+            this.wallet.isExtendedPublicKey,
+            this.wallet.derivationPath
+          )
+          const exists = this.accountProvider.walletExists(wallet)
+          if (!exists) {
+            wallet.addresses = this.wallet.addresses
+            wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+            this.subAccounts.push({ selected: false, wallet: wallet })
+          }
         }
       })
     }

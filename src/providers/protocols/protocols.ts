@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core'
 import { GenericERC20, addSubProtocol, TezosKtProtocol, GenericERC20Configuration } from 'airgap-coin-lib'
 
+import { tokens } from './tokens'
+
 interface SubProtocolInfo {
   symbol: string
   name: string
@@ -37,6 +39,10 @@ export class ProtocolsProvider {
     /* */
   }
 
+  getEnabledProtocols() {
+    return ['eth-erc20-ae']
+  }
+
   addProtocols() {
     addSubProtocol('xtz', new TezosKtProtocol())
 
@@ -54,6 +60,19 @@ export class ProtocolsProvider {
           })
         )
       })
+    })
+    tokens.forEach(token => {
+      addSubProtocol(
+        'eth',
+        new GenericERC20({
+          symbol: token.symbol,
+          name: token.name,
+          marketSymbol: token.marketSymbol,
+          identifier: token.identifier,
+          contractAddress: token.contractAddress,
+          decimals: token.decimals
+        })
+      )
     })
   }
 }
