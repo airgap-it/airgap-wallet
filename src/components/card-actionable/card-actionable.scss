@@ -5,7 +5,4 @@ card-actionable {
   .background--color__gradient--reverse {
     background: linear-gradient(90deg, color($colors, secondaryLight, base), 45%, color($colors, primary, base));
   }
-  ion-card {
-    padding: 8px 0;
-  }
 }

@@ -120,3 +120,11 @@ qr-clipboard {
 ion-fab .col {
   padding: 0 10px;
 }
+/* Fixes card padding & margin */
+ion-card {
+  padding: 8px 0;
+}
+.card-ios,
+.card-md {
+  margin: 0 10px !important;
+}

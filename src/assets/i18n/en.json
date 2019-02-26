@@ -219,6 +219,9 @@
     "accounts_label": "Accounts",
     "add-tokens_label": "Add Tokens",
     "add-accounts_label": "Add Accounts",
+    "send_label": "Send {{protocolSymbol}}",
+    "receive_label": "Receive",
+    "details_label": "Details",
     "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
     "delegate_card": {
       "heading": "Delegate Tezos",

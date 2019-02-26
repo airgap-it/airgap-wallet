@@ -3,8 +3,6 @@
     <ion-title><span [innerHTML]="'account-detail.title' | translate: { protocolName: wallet.coinProtocol.name }"></span></ion-title>
 
     <ion-buttons end>
-      <button ion-button color="primary" (click)="openPreparePage()">Send {{ wallet.coinProtocol.symbol | uppercase }}</button>
-
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
@@ -14,6 +12,22 @@
   <ion-list no-lines no-margin>
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openTransactionPage(wallet)"></portfolio-item>
   </ion-list>
+
+  <ion-row justify-content-center padding-vertical>
+    <button color="secondary" (click)="openPreparePage()" ion-button round icon-left small outline>
+      <ion-icon md-name="send"></ion-icon>
+      <span [innerHTML]="'account-detail.send_label' | translate: { protocolSymbol: wallet.coinProtocol.symbol | uppercase }"></span>
+    </button>
+    <!-- TODO: navigate to Receive -->
+    <button color="secondary" (click)="openPreparePage()" ion-button round icon-left small outline>
+      <ion-icon md-name="call_received"></ion-icon>
+      {{ 'account-detail.receive_label' | translate }}
+    </button>
+    <button color="secondary" (click)="openTransactionPage(wallet)" ion-button round icon-left small outline>
+      <ion-icon name="md-list-box"></ion-icon>
+      {{ 'account-detail.details_label' | translate }}
+    </button>
+  </ion-row>
 
   <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
     <card-actionable
