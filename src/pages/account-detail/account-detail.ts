@@ -21,11 +21,11 @@ export class AccountDetailPage {
   protocolIdentifier: string
   hasSubAccounts: boolean = false
   subProtocolTypes = SubProtocolType
-  subProtocolTypesArray = Object.keys(SubProtocolType).map(key => SubProtocolType[key])
+  subProtocolTypesArray: SubProtocolType[] = Object.keys(SubProtocolType).map(key => SubProtocolType[key])
   subWalletGroups: Map<SubProtocolType, AirGapMarketWallet[]> = new Map()
   supportedSubProtocolTypes: Map<SubProtocolType, boolean> = new Map()
 
-  public translatedLabel: string = '???' // TODO find default
+  public translatedLabel: string = 'account-detail.tokens_label'
 
   // Tezos
   public undelegatedAmount: BigNumber = new BigNumber(0)
@@ -37,6 +37,10 @@ export class AccountDetailPage {
     private accountProvider: AccountProvider,
     private operationsProvider: OperationsProvider
   ) {
+    function assertUnreachable(x: never): void {
+      /* */
+    }
+
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     this.accountProvider.subWallets.subscribe(subWallets => {
@@ -47,15 +51,21 @@ export class AccountDetailPage {
         })
         this.subWalletGroups.set(type, groupSubWallets)
         this.hasSubAccounts = this.hasSubAccounts || groupSubWallets.length > 0
-      })
 
-      this.subProtocolTypesArray.forEach(type => {
-        this.supportedSubProtocolTypes.set(
-          type,
-          this.wallet.coinProtocol.subProtocols.some(protocol => {
-            return ((protocol as any) as ICoinSubProtocol).subProtocolType === type
-          })
-        )
+        const subProtocolSupported = this.wallet.coinProtocol.subProtocols.some(protocol => {
+          return ((protocol as any) as ICoinSubProtocol).subProtocolType === type
+        })
+
+        if (subProtocolSupported) {
+          if (type === SubProtocolType.ACCOUNT) {
+            this.translatedLabel = 'account-detail.accounts_label'
+          } else if (type === SubProtocolType.TOKEN) {
+            this.translatedLabel = 'account-detail.tokens_label'
+          } else {
+            assertUnreachable(type)
+          }
+        }
+        this.supportedSubProtocolTypes.set(type, subProtocolSupported)
       })
     })
   }

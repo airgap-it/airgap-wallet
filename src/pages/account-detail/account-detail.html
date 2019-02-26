@@ -32,7 +32,7 @@
 
   <empty-state
     *ngIf="!hasSubAccounts"
-    [text]="'account-detail.no-accounts_text' | translate: { label: 'asdf' }"
+    [text]="'account-detail.no-accounts_text' | translate: { label: translatedLabel | translate }"
     [imageName]="'currencies-empty.svg'"
   ></empty-state>
   <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
