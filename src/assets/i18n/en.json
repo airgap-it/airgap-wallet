@@ -56,7 +56,7 @@
   },
 
   "portfolio": {
-    "empty-state_text": "To use the AirGap Wallet app you need to <strong>Sync with AirGap Vault</strong>. Select the account in AirGap Vault and display the sync QR code. Scan this code with AirGap Wallet.",
+    "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
     "add-coins_label": "Add Coins"
   },
 
@@ -192,9 +192,6 @@
     "wallets": "Accounts",
     "scan": "Scan QRs",
     "settings": "Settings"
-  },
-  "portfolio-item": {
-    "syncing_label": "syncing with blockchain ... "
   },
   "add-account": {
     "title": "Add Coins"

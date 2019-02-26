@@ -171,8 +171,5 @@
     "wallets": "Konten",
     "scan": "QRs einlesen",
     "settings": "Einstellungen"
-  },
-  "portfolio-item": {
-    "syncing_label": "Blockchain Synchronisierung ... "
   }
 }

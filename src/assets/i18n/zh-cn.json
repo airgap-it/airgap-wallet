@@ -173,8 +173,5 @@
     "wallets": "账户",
     "scan": "扫描二维码",
     "settings": "设置"
-  },
-  "portfolio-item": {
-    "syncing_label": "与区块链同步中"
   }
 }

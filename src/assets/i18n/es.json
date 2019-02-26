@@ -95,6 +95,5 @@
     "wallet-edit-popover-component.delete_label": "Borrar",
     "tabs.wallets": "Cuentas",
     "tabs.scan": "Escanear QRs",
-    "tabs.settings": "Ajustes",
-    "portfolio-item.syncing_label": "Sincronizando con blockchain... "
+    "tabs.settings": "Ajustes"
 }
