@@ -1,4 +1,4 @@
-<ion-row padding-horizontal align-items-center justify-content-center>
-  <img padding-vertical src="/assets/img/{{ imageName }}" />
+<ion-row padding-horizontal align-items-end justify-content-center [ngClass]="fullHeight ? 'height__full' : 'height__content'">
+  <img src="/assets/img/{{ imageName }}" />
   <p text-center [innerHTML]="text"></p>
 </ion-row>

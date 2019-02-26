@@ -10,4 +10,7 @@ export class EmptyStateComponent {
 
   @Input()
   text: string
+
+  @Input()
+  fullHeight: boolean = true
 }

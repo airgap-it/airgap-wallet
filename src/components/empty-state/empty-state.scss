@@ -2,9 +2,17 @@ empty-state {
   ion-row {
     font-weight: 100;
     font-size: 1.4rem;
+  }
+  .height__full {
     height: 75%;
     img {
       height: 40vh;
+    }
+  }
+  .height__content {
+    height: 50%;
+    img {
+      height: 30vh;
     }
   }
 }

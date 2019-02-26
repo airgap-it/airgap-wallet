@@ -34,6 +34,7 @@
     *ngIf="!hasSubAccounts"
     [text]="'account-detail.no-accounts_text' | translate: { label: translatedLabel | translate }"
     [imageName]="'currencies-empty.svg'"
+    [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
   ></empty-state>
   <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
     <ng-container *ngIf="subWalletGroups.get(subProtocolType).length > 0">
