@@ -1,20 +1,7 @@
-<ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
-  </ion-navbar>
-  <div>
-    <div style="color: white; width: 100%; text-align:center; height: 150px; font-size: 40px; font-weight: 300; margin-top: 20px">
-      <div style="margin-top: 30px;">${{ total | number: '1.2-2' }}</div>
-      <!--
-        <div [ngClass]="percentageChangedClass" style="font-size: 20px;">
-          {{ winPercentage | number : '1.2-2' }}%
-        </div>
-      -->
-    </div>
-  </div>
-</ion-header>
-
 <ion-content>
+  <ion-row class="portfolio--hero" justify-content-center align-items-center>
+    <h1 no-margin>${{ total | number: '1.2-2' }}</h1>
+  </ion-row>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <ng-container *ngIf="(wallets | async) as walletsArray; else loading">
