@@ -208,7 +208,10 @@
     "no-imports_text": "No {{ typeLabel }} found to import."
   },
   "sub-account-select": {
-    "title": "Select Account"
+    "title": "Select Account",
+    "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
+    "accounts_label": "Accounts"
+
   },
   "account-detail": {
     "title": "{{protocolName}}",
