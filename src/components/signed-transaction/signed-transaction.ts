@@ -34,8 +34,9 @@ export class SignedTransactionComponent {
         const syncUtils = new SyncProtocolUtils()
         const parts = this.syncProtocolString.split('?d=')
         this.signedTx = await syncUtils.deserialize(parts[parts.length - 1])
-      } catch (err) {
+      } catch (e) {
         this.fallbackActivated = true
+        handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
 
