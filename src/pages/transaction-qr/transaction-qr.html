@@ -15,11 +15,8 @@
     <qr-clipboard [qrdata]="preparedDataQR" level="L" size="400"></qr-clipboard>
   </ion-row>
 
-  <from-to padding-horizontal [transaction]="airGapTx"></from-to>
-  <div *ngIf="!airGapTx">
-    <!-- TODO: translate; TODO: styling -->
-    We could not read the data of this transaction. This is the raw transaction data: Signed transaction: {{ preparedDataQR }}
-  </div>
+  <from-to *ngIf="airGapTx" padding-horizontal [transaction]="airGapTx"></from-to>
+  <signed-transaction *ngIf="!airGapTx" [syncProtocolString]="preparedDataQR"></signed-transaction>
 
   <ion-fab bottom right>
     <button default ion-button color="secondary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>
