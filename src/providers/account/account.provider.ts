@@ -27,7 +27,6 @@ export class AccountProvider {
   }
 
   private async loadWalletsFromStorage() {
-    console.log('reading from storage: ', SettingsKey.WALLET)
     const rawWallets = await this.storageProvider.get(SettingsKey.WALLET)
     let wallets = rawWallets
 
