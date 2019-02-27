@@ -1,5 +1,5 @@
 import { IonicErrorHandler } from 'ionic-angular'
-import { init, captureException } from '@sentry/browser'
+import { init, captureException, configureScope } from '@sentry/browser'
 
 init({
   dsn: process.env.SENTRY_DSN,
@@ -20,29 +20,42 @@ export enum ErrorCategory {
   CORDOVA_PLUGIN = 'cordova_plugin',
   IONIC_MODAL = 'ionic_modal',
   IONIC_ALERT = 'ionic_alert',
+  IONIC_LOADER = 'ionic_loader',
   NAVIGATION = 'navigation',
   WALLET_PROVIDER = 'wallet_provider',
-  SCHEME_ROUTING = 'scheme_routing'
+  SCHEME_ROUTING = 'scheme_routing',
+  COINLIB = 'coinlib',
+  DEEPLINK_PROVIDER = 'deeplink_provider',
+  OTHER = 'other'
 }
 
 const handleErrorSentry = (category?: ErrorCategory) => {
   return error => {
     try {
-      console.log('sending error to sentry, category', category)
-      console.error(error.originalError || error)
+      console.debug('sending error to sentry, category', category)
+      console.debug(error.originalError || error)
       captureException(error.originalError || error)
     } catch (e) {
-      console.error('Error reporting exception to sentry: ', e)
+      console.debug('Error reporting exception to sentry: ', e)
     }
   }
 }
 
 const handleErrorIgnore = error => {
-  console.log('ignoring error')
-  console.error(error.originalError || error)
+  console.debug('ignoring error')
+  console.debug(error.originalError || error)
 }
 
-export { handleErrorIgnore, handleErrorSentry }
+const setSentryRelease = (release: string) => {
+  configureScope(scope => {
+    scope.addEventProcessor(async event => {
+      event.release = release
+      return event
+    })
+  })
+}
+
+export { setSentryRelease, handleErrorIgnore, handleErrorSentry }
 
 export class SentryErrorHandler extends IonicErrorHandler {
   handleError(error) {

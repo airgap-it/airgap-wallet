@@ -47,7 +47,7 @@
 
   "portfolio": {
     "empty-state_text": "Um AirGap Wallet benutzen zu können, müssen Sie mit <strong>AirGap Vault synchronisieren</strong>. Wählen Sie ein Konto in AirGap Vault aus und zeigen Sie den Synchronisierungs QR Code an. Lesen Sie diesen mit AirGap Wallet ein.",
-    "sync_label": "Mit AirGap Vault synchronisieren"
+    "add-coins_label": "Währungen hinzufügen"
   },
 
   "scan": {
@@ -101,7 +101,9 @@
     "title": "Transaktionsdetails",
     "open-blockexplorer_label": "Blockexplorer öffnen"
   },
-
+  "account-detail": {
+    "title": "{{protocolName}}"
+  },
   "transaction-prepare": {
     "title": "{{title}} Versenden",
     "to-address_label": "Empfangsadresse",
@@ -156,6 +158,10 @@
     "to_label": "Zu"
   },
 
+  "signed-transaction": {
+    "transaction-unreadable": "Wir konnten die Daten in dieser Transaktion nicht lesen. Dies bedeutet nicht, dass sie nicht gültig ist - Allerdings solltest du diese Transaktion nur bestätigen falls du dir über die Risiken und deren Inhalt im klaren bist."
+  },
+
   "wallet-edit-popover-component": {
     "settings_label": "Kontoeinstellungen",
     "copy-address_label": "Addresse kopieren",
@@ -165,8 +171,5 @@
     "wallets": "Konten",
     "scan": "QRs einlesen",
     "settings": "Einstellungen"
-  },
-  "portfolio-item": {
-    "syncing_label": "Blockchain Synchronisierung ... "
   }
 }

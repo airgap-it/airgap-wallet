@@ -1,0 +1,18 @@
+page-account-import-onboarding {
+  ion-slides {
+    height: calc(100% - 72px);
+  }
+  .swiper-pagination-progress .swiper-pagination-progressbar {
+    background: color($colors, primary, base);
+  }
+  .swiper-pagination-progress {
+    background: rgba(color($colors, dark), 0.12);
+  }
+  .swiper-slide {
+    font-size: 1.4rem;
+  }
+  .slide-zoom {
+    height: 100%;
+    padding: 64px 0 0;
+  }
+}

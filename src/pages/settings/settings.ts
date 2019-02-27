@@ -17,7 +17,7 @@ export class SettingsPage {
   constructor(
     public navCtrl: NavController,
     private modalController: ModalController,
-    private pipe: TranslateService,
+    private translateService: TranslateService,
     public platform: Platform,
     public alertCtrl: AlertController
   ) {}
@@ -61,21 +61,22 @@ export class SettingsPage {
 
   public telegram() {
     let alert = this.alertCtrl.create({
-      title: this.pipe.instant('settings.alert_title')
+      title: this.translateService.instant('settings.alert_title')
     })
     alert.addInput({
       type: 'radio',
-      label: this.pipe.instant('settings.channel.international'),
-      value: 'International'
+      label: this.translateService.instant('settings.channel.international'),
+      value: 'International',
+      checked: true
     })
     alert.addInput({
       type: 'radio',
-      label: this.pipe.instant('settings.channel.chinese'),
+      label: this.translateService.instant('settings.channel.chinese'),
       value: 'Chinese'
     })
-    alert.addButton(this.pipe.instant('settings.alert_cancel'))
+    alert.addButton(this.translateService.instant('settings.alert_cancel'))
     alert.addButton({
-      text: this.pipe.instant('settings.telegram_label'),
+      text: this.translateService.instant('settings.telegram_label'),
       handler: data => {
         switch (data) {
           case 'International':

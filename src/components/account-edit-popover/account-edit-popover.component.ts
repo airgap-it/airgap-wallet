@@ -1,9 +1,10 @@
 import { Component } from '@angular/core'
-import { AlertController, NavParams, ViewController, ToastController } from 'ionic-angular'
+import { AlertController, NavParams, ViewController, ToastController, NavController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { Clipboard } from '@ionic-native/clipboard'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { OperationsProvider } from '../../providers/operations/operations'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 @Component({
   template: `
@@ -26,27 +27,20 @@ export class AccountEditPopoverComponent {
 
   constructor(
     private alertCtrl: AlertController,
+    private navCtrl: NavController,
     private navParams: NavParams,
     private walletsProvider: AccountProvider,
     private viewCtrl: ViewController,
-    private clipboard: Clipboard,
-    private toastController: ToastController
+    private clipboardProvider: ClipboardProvider,
+    private operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
   }
 
   async copyAddressToClipboard() {
-    await this.clipboard.copy(this.wallet.receivingPublicAddress)
-    let toast = this.toastController.create({
-      message: 'Address was copied to your clipboard',
-      duration: 2000,
-      position: 'top',
-      showCloseButton: true,
-      closeButtonText: 'Ok'
-    })
-    await toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    await this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
+    this.dismissPopover()
   }
 
   delete() {
@@ -58,17 +52,16 @@ export class AccountEditPopoverComponent {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.dismissPopover()
           }
         },
         {
           text: 'Delete',
           handler: () => {
-            alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             this.walletsProvider
               .removeWallet(this.wallet)
               .then(() => {
-                this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+                this.dismissPopover()
                 if (this.onDelete) {
                   this.onDelete()
                 }
@@ -79,5 +72,9 @@ export class AccountEditPopoverComponent {
       ]
     })
     alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  dismissPopover() {
+    this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

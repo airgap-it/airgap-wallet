@@ -12,10 +12,11 @@
   </ion-row>
 
   <ion-row justify-content-center padding-top>
-    <qrcode [qrdata]="preparedDataQR" backgroundAlpha="1" foreground="black" background="white" level="L" size="400"></qrcode>
+    <qr-clipboard [qrdata]="preparedDataQR" level="L" size="400"></qr-clipboard>
   </ion-row>
 
-  <from-to padding-horizontal [transaction]="airGapTx"></from-to>
+  <from-to *ngIf="airGapTx" padding-horizontal [transaction]="airGapTx"></from-to>
+  <signed-transaction *ngIf="!airGapTx" [syncProtocolString]="preparedDataQR"></signed-transaction>
 
   <ion-fab bottom right>
     <button default ion-button color="secondary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>

@@ -1,5 +1,5 @@
-<ion-header>
-  <ion-navbar color="primary">
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
     <ion-title>{{ 'transaction-prepare.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}</ion-title>
   </ion-navbar>
 </ion-header>
@@ -17,11 +17,8 @@
             </ion-row>
             <ion-row>
               <p ion-text no-margin color="blackLight">
-                ${{
-                  wallet.currentBalance
-                    | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice }
-                    | number: '1.2-2'
-                }}
+                ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+                wallet.currentMarketPrice } | number: '1.2-2' }}
               </p>
             </ion-row>
           </ion-col>

@@ -1,0 +1,53 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title><span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: protocol.name }"></span></ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <p [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }" padding-horizontal></p>
+
+  <ion-slides pager paginationType="progress" padding-horizontal #slides>
+    <ion-slide>
+      <img src="/assets/img/account-import-onboarding-slide_1.png" />
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-1.text' | translate"></p>
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-1.description' | translate"></p>
+    </ion-slide>
+    <ion-slide>
+      <img src="/assets/img/account-import-onboarding-slide_2.png" />
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
+    </ion-slide>
+    <ion-slide>
+      <img src="/assets/img/account-import-onboarding-slide_3.png" />
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
+    </ion-slide>
+    <ion-slide>
+      <img src="/assets/img/account-import-onboarding-slide_4.png" />
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
+      <p text-left [innerHTML]="'account-import-onboarding.slides.slide-4.description' | translate: { protocolName: protocol.name }"></p>
+    </ion-slide>
+  </ion-slides>
+</ion-content>
+<ion-footer no-border no-shadow>
+  <ion-toolbar color="whitePrimaryContrast" no-padding>
+    <ion-buttons *ngIf="!slides.isBeginning()" start>
+      <button ion-button flat color="primary" (click)="slides.slidePrev()">
+        <ion-icon md-name="keyboard_arrow_left"></ion-icon>
+        Back
+      </button>
+    </ion-buttons>
+    <ion-buttons *ngIf="!slides.isEnd()" end>
+      <button ion-button flat color="primary" (click)="slides.slideNext()">
+        Next
+        <ion-icon md-name="keyboard_arrow_right"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons *ngIf="slides.isEnd()" end>
+      <button ion-button flat color="primary" (click)="openVault()">
+        Open Vault
+        <ion-icon md-name="keyboard_arrow_right"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -60,6 +60,7 @@ export class SchemeRoutingProvider {
   }
 
   async handleWalletSync(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
+    // tslint:disable-next-line:no-unnecessary-type-assertion
     const walletSync = deserializedSync.payload as SyncWalletRequest
     const wallet = new AirGapMarketWallet(
       deserializedSync.protocol,
@@ -160,7 +161,7 @@ export class SchemeRoutingProvider {
     )
   }
 
-  private async showAlert(title: string, message: string, buttons: AlertButton[]) {
+  public async showAlert(title: string, message: string, buttons: AlertButton[]) {
     let alert = this.alertController.create({
       title,
       message,

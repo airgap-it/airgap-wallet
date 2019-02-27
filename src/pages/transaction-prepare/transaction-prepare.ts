@@ -7,8 +7,8 @@ import { NavController, NavParams, ToastController, LoadingController } from 'io
 import { ScanAddressPage } from '../scan-address/scan-address'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
-import { Clipboard } from '@ionic-native/clipboard'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -28,7 +28,7 @@ export class TransactionPreparePage {
     private navParams: NavParams,
     private _ngZone: NgZone,
     private http: HttpClient,
-    private clipboard: Clipboard
+    private clipboardProvider: ClipboardProvider
   ) {
     this.transactionForm = formBuilder.group({
       address: ['', [Validators.required]],
@@ -133,9 +133,10 @@ export class TransactionPreparePage {
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      let rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
+      console.log('preparing wallet tx', this.wallet)
+      const rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
 
-      const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
+      const airGapTx = await this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,
         transaction: rawUnsignedTx
       })
@@ -202,7 +203,7 @@ export class TransactionPreparePage {
   }
 
   public pasteClipboard() {
-    this.clipboard.paste().then(
+    this.clipboardProvider.paste().then(
       (text: string) => {
         this.transactionForm.controls.address.setValue(text)
       },

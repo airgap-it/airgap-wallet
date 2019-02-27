@@ -3,7 +3,6 @@ import { NavParams, ViewController, LoadingController, Platform, NavController }
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { PortfolioPage } from '../portfolio/portfolio'
 
 @Component({
   selector: 'page-account-import',
@@ -27,7 +26,7 @@ export class AccountImportPage {
     this.platform
       .ready()
       .then(() => {
-        let loading = this.loadingCtrl.create({
+        const loading = this.loadingCtrl.create({
           content: 'Syncing...'
         })
 
@@ -37,7 +36,11 @@ export class AccountImportPage {
         this.wallet = this.navParams.get('wallet') // TODO: Catch error if wallet cannot be imported
 
         if (this.wallets.walletExists(this.wallet)) {
-          this.wallet = this.wallets.walletByPublicKeyAndProtocol(this.wallet.publicKey, this.wallet.protocolIdentifier)
+          this.wallet = this.wallets.walletByPublicKeyAndProtocolAndAddressIndex(
+            this.wallet.publicKey,
+            this.wallet.protocolIdentifier,
+            this.wallet.addressIndex
+          )
           this.walletAlreadyExists = true
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           return
@@ -79,9 +82,13 @@ export class AccountImportPage {
     await this.wallets.addWallet(this.wallet)
     this.viewCtrl
       .dismiss()
-      .then(v => {
+      .then(async v => {
         console.log('WalletImportPage dismissed')
-        this.navCtrl.push(PortfolioPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        await this.navCtrl.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        const tabs = this.navCtrl.parent
+        if (tabs) {
+          tabs.select(0)
+        }
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

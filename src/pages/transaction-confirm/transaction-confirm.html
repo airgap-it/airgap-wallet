@@ -1,9 +1,11 @@
-<ion-header no-border>
-  <ion-navbar color="primary"><ion-title>{{ 'transaction-confirm.title' | translate }}</ion-title></ion-navbar>
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'transaction-confirm.title' | translate }}</ion-title>
+  </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <div *ngIf="airGapTx"><from-to [transaction]="airGapTx"></from-to></div>
+  <signed-transaction [signedTx]="signedTransactionSync"></signed-transaction>
 
   <ion-fab bottom>
     <ion-row>

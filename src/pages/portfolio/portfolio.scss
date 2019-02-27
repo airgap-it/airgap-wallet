@@ -21,39 +21,6 @@ page-portfolio {
       height: 28px;
     }
   }
-  .green {
-    color: #2ecc40;
-  }
-  .red {
-    color: #ff4136;
-  }
-  $transparent-white: rgba(255, 255, 255, 0.6); // This is just to make the header transparent and button/icon with white color
-  .toolbar-content,
-  span {
-    color: white;
-  }
-  .toolbar-background,
-  ion-navbar {
-    background-color: transparent !important;
-  }
-  ion-header {
-    background: linear-gradient(90deg, #00e7bf, 50%, #440094) !important;
-  }
-  .header-md::after,
-  .toolbar-background-ios {
-    background-image: none;
-    border-bottom: 0;
-  } // Footer
-  ion-card {
-    background-color: #dddddd;
-  }
-  .flip-list-move {
-    transition: transform 1s;
-  }
-
-  ion-header {
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.12), 0 4px 4px 0 rgba(0, 0, 0, 0.24);
-  }
   .container__empty {
     img {
       height: 30vh;
@@ -62,5 +29,14 @@ page-portfolio {
   /* FAB with a button, bottom padding fix for ios devices, reset for FAB on page with bottom navigation */
   .content-ios ion-fab[bottom] {
     bottom: 10px;
+  }
+  .portfolio--hero {
+    background: url('/assets/img/portfolio-lines.svg') no-repeat;
+    height: 25vh;
+    background-position: bottom;
+    h1 {
+      margin-bottom: 48px;
+      font-weight: bold;
+    }
   }
 }

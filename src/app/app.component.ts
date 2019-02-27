@@ -7,10 +7,10 @@ import { Platform, Nav } from 'ionic-angular'
 
 import { TabsPage } from '../pages/tabs/tabs'
 
-import { configureScope } from '@sentry/browser'
 import { AppVersion } from '@ionic-native/app-version'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
-import { handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
+import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
+import { ProtocolsProvider } from '../providers/protocols/protocols'
 
 @Component({
   templateUrl: 'app.html'
@@ -28,66 +28,67 @@ export class MyApp {
     private translate: TranslateService,
     private deeplinks: Deeplinks,
     private appVersion: AppVersion,
-    private schemeRoutingProvider: SchemeRoutingProvider
+    private schemeRoutingProvider: SchemeRoutingProvider,
+    private protocolsProvider: ProtocolsProvider
   ) {
+    this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
+  }
+
+  async initializeApp() {
+    const supportedLanguages = ['en', 'de', 'zh-cn']
+
+    this.loadLanguages(supportedLanguages)
+    this.protocolsProvider.addProtocols()
+
+    await this.platform.ready()
+
+    if (this.platform.is('cordova')) {
+      this.statusBar.styleDefault()
+      this.statusBar.backgroundColorByHexString('#FFFFFF')
+      this.splashScreen.hide()
+      setSentryRelease(await this.appVersion.getVersionNumber())
+    } else {
+      setSentryRelease('browser') // TODO: Set version in CI once we have browser version
+    }
+  }
+
+  loadLanguages(supportedLanguages: string[]) {
     this.translate.setDefaultLang('en')
-    this.platform
-      .ready()
-      .then(() => {
-        if (platform.is('cordova')) {
-          this.statusBar.styleLightContent()
-          this.statusBar.backgroundColorByHexString('#00e8cc')
-          this.splashScreen.hide()
-          configureScope(scope => {
-            scope.addEventProcessor(async event => {
-              event.release = await this.appVersion.getVersionNumber()
-              return event
-            })
-          })
-        } else {
-          configureScope(scope => {
-            scope.addEventProcessor(async event => {
-              event.release = 'browser'
-              return event
-            })
-          })
-        }
 
-        this.translate.setDefaultLang('en')
+    const language = this.translate.getBrowserLang()
 
-        const supportedLanguages = ['en', 'de', 'zh-cn']
-        const language = this.translate.getBrowserLang()
-
-        if (language) {
-          const lowerCaseLanguage = language.toLowerCase()
-          supportedLanguages.forEach(supportedLanguage => {
-            if (supportedLanguage.startsWith(lowerCaseLanguage)) {
-              this.translate.use(supportedLanguage)
-            }
-          })
+    if (language) {
+      const lowerCaseLanguage = language.toLowerCase()
+      supportedLanguages.forEach(supportedLanguage => {
+        if (supportedLanguage.startsWith(lowerCaseLanguage)) {
+          this.translate.use(supportedLanguage)
         }
       })
-      .catch(err => console.log(err))
+    }
   }
 
   async ngAfterViewInit() {
     await this.platform.ready()
-    this.deeplinks
-      .route({
-        '/': null
-      })
-      .subscribe(
-        match => {
-          // match.$route - the route we matched, which is the matched entry from the arguments to route()
-          // match.$args - the args passed in the link
-          // match.$link - the full link data
-          console.log('Successfully matched route', JSON.stringify(match))
-          this.schemeRoutingProvider.handleNewSyncRequest(this.nav, match.$link.url).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-        },
-        nomatch => {
-          // nomatch.$link - the full link data
-          console.error("Got a deeplink that didn't match", JSON.stringify(nomatch))
-        }
-      )
+    if (this.platform.is('cordova')) {
+      this.deeplinks
+        .route({
+          '/': null
+        })
+        .subscribe(
+          match => {
+            // match.$route - the route we matched, which is the matched entry from the arguments to route()
+            // match.$args - the args passed in the link
+            // match.$link - the full link data
+            console.log('Successfully matched route', JSON.stringify(match))
+            this.schemeRoutingProvider
+              .handleNewSyncRequest(this.nav, match.$link.url)
+              .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+          },
+          nomatch => {
+            // nomatch.$link - the full link data
+            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)('route not matched: ' + JSON.stringify(nomatch))
+          }
+        )
+    }
   }
 }

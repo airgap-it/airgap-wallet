@@ -5,20 +5,20 @@ self.importScripts("../libs/airgap-coin-lib.browserify.js");
 
 self.onmessage = function(event) {
   airgapCoinLib.isCoinlibReady().then(function() {
-      console.log("start deriving addresses");
-  
-      var wallet = event.data;
-      var airGapWallet = new airgapCoinLib.AirGapWallet(
-        wallet.protocolIdentifier,
-        wallet.publicKey,
-        wallet.isExtendedPublicKey,
-        wallet.derivationPath
-      );
-    
-      var addresses = airGapWallet.deriveAddresses(50);
+    console.log("start deriving addresses");
 
-      console.log("derived " + addresses.length + " addresses")
+    var wallet = event.data;
+    var airGapWallet = new airgapCoinLib.AirGapWallet(
+      wallet.protocolIdentifier,
+      wallet.publicKey,
+      wallet.isExtendedPublicKey,
+      wallet.derivationPath
+    );
     
+    airGapWallet.deriveAddresses(50).then(addresses => {
+      console.log("derived " + addresses.length + " addresses")
+  
       self.postMessage({ addresses });
+    })
   })
 };
