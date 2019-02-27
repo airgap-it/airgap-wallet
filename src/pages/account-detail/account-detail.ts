@@ -45,6 +45,7 @@ export class AccountDetailPage {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
     this.accountProvider.subWallets.subscribe(subWallets => {
+      this.hasSubAccounts = false
       const filteredSubWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
       this.subProtocolTypesArray.forEach(type => {
         const groupSubWallets = filteredSubWallets.filter(subWallet => {
