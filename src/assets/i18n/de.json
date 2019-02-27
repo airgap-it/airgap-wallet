@@ -20,11 +20,11 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App. <b>AirGap Vault muss instaliert und mit AirGap Wallet verwendet werden.</b>"  
+      "text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App. <b>AirGap Vault muss instaliert und mit AirGap Wallet verwendet werden.</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
-      "text": "Die Wallet App kommt nur in Kontakt mit öffentlichen Informationen und ist für die Übermittlung von Transaktionen an die Blockchain zuständig."    
+      "text": "Die Wallet App kommt nur in Kontakt mit öffentlichen Informationen und ist für die Übermittlung von Transaktionen an die Blockchain zuständig."
     },
     "communication": {
       "highest_text": "Einweg-Kommunikation mit QR Codes.",
@@ -47,7 +47,7 @@
 
   "portfolio": {
     "empty-state_text": "Um AirGap Wallet benutzen zu können, müssen Sie mit <strong>AirGap Vault synchronisieren</strong>. Wählen Sie ein Konto in AirGap Vault aus und zeigen Sie den Synchronisierungs QR Code an. Lesen Sie diesen mit AirGap Wallet ein.",
-    "sync_label": "Mit AirGap Vault synchronisieren"
+    "add-coins_label": "Währungen hinzufügen"
   },
 
   "scan": {
@@ -58,7 +58,7 @@
   },
 
   "scan-address": {
-    "title": "Transaktion bestätigen",
+    "title": "Kontoadresse einlesen",
     "text": "QR einer Wallet Adresse einlesen."
   },
 
@@ -78,7 +78,13 @@
     "share_label": "AirGap teilen",
     "information_label": "Informationen",
     "github_label": "GitHub Repository",
-    "about_label": "Über AirGap"
+    "about_label": "Über AirGap",
+    "alert_title": "Wähle einen Kanal",
+    "alert_cancel": "Abbrechen",
+    "channel": {
+      "international": "International",
+      "chinese": "Chinesisch"
+    }
   },
 
   "about": {
@@ -86,7 +92,7 @@
   },
 
   "transaction-confirm": {
-    "title": "Kontoadresse einlesen",
+    "title": "Transaktion bestätigen",
     "decline_label": "Ablehnen",
     "confirm_label": "Bestätigen"
   },
@@ -95,7 +101,9 @@
     "title": "Transaktionsdetails",
     "open-blockexplorer_label": "Blockexplorer öffnen"
   },
-
+  "account-detail": {
+    "title": "{{protocolName}}"
+  },
   "transaction-prepare": {
     "title": "{{title}} Versenden",
     "to-address_label": "Empfangsadresse",
@@ -116,6 +124,15 @@
     "text": "Öffnen Sie AirGap Vault und lesen Sie diesen Transaktions QR Code ein um die Transaktion zu signieren.",
     "sign-on-device_label": "gleiches-Gerät Signierung",
     "done_label": "Fertig"
+  },
+  
+  "interaction-selection": {
+    "title": "Transaktion signieren",
+    "heading": "Wie möchten Sie die Transaktion mit <span class=\"style__strong color__primary\">AirGap Vault</span> signieren?",
+    "same-device_label": "Gleiches Gerät",
+    "same-device_info": "AirGap Vault und AirGap Wallet sind auf dem gleichen Gerät installiert.",
+    "offline-device_label": "Offline Gerät",
+    "offline-device_info": "AirGap Vault ist auf einem offline Gerät installiert, lesen Sie den QR Code mit AirGap Vault ein."
   },
 
   "wallet-address": {
@@ -141,6 +158,10 @@
     "to_label": "Zu"
   },
 
+  "signed-transaction": {
+    "transaction-unreadable": "Wir konnten die Daten in dieser Transaktion nicht lesen. Dies bedeutet nicht, dass sie nicht gültig ist - Allerdings solltest du diese Transaktion nur bestätigen falls du dir über die Risiken und deren Inhalt im klaren bist."
+  },
+
   "wallet-edit-popover-component": {
     "settings_label": "Kontoeinstellungen",
     "copy-address_label": "Addresse kopieren",
@@ -150,11 +171,5 @@
     "wallets": "Konten",
     "scan": "QRs einlesen",
     "settings": "Einstellungen"
-  },
-  "portfolio-item": {
-    "syncing_label": "Blockchain Synchronisierung ... "
-  },
-  "exchange": {
-    "title": "Exchange"
   }
 }

@@ -5,6 +5,7 @@ import { ScannerProvider } from '../../providers/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { PermissionsProvider } from '../../providers/permissions/permissions'
 import { ScanBasePage } from '../scan-base/scan-base'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan-address',
@@ -44,9 +45,12 @@ export class ScanAddressPage extends ScanBasePage {
       } else {
         this.zxingScanner.resetCodeReader()
       }
-      this.navCtrl.pop().then(() => {
-        this.sendAddressToParent(text)
-      })
+      this.navCtrl
+        .pop()
+        .then(() => {
+          this.sendAddressToParent(text)
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 

@@ -9,16 +9,16 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { Keyboard } from '@ionic-native/keyboard'
 
 import { PlatformMock, StatusBarMock, SplashScreenMock, NavParamsMock } from '../../../test-config/mocks-ionic'
-import { NavControllerMock, KeyboardMock, LoadingControllerMock, ToastControllerMock } from 'ionic-mocks'
+import { NavControllerMock, KeyboardMock, LoadingControllerMock, LoadingMock, ToastControllerMock } from 'ionic-mocks'
 
 import { ComponentsModule } from '../../components/components.module'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { WalletMock } from '../../../test-config/wallet-mock'
 import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { PipesModule } from '../../pipes/pipes.module'
 import { Clipboard } from '@ionic-native/clipboard'
-import { ClipboardBrowserProvider } from '../../providers/clipboard-browser/clipboard-browser'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -56,23 +56,31 @@ describe('TransactionPrepare Page', () => {
         })
       ],
       providers: [
-        WalletsProvider,
+        AccountProvider,
+        Clipboard,
         { provide: Storage, useClass: StorageMock },
         { provide: NavController, useFactory: () => NavControllerMock.instance() },
         { provide: NavParams, useClass: NavParamsMock },
         { provide: StatusBar, useClass: StatusBarMock },
-        { provide: LoadingController, useFactory: () => LoadingControllerMock.instance() },
+        {
+          provide: LoadingController,
+          useFactory: () => {
+            const instance = LoadingMock.instance()
+            instance.dismiss.and.returnValue(Promise.resolve())
+            return LoadingControllerMock.instance(instance)
+          }
+        },
         { provide: ToastController, useFactory: () => ToastControllerMock.instance() },
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },
         { provide: Keyboard, useClass: KeyboardMock },
-        { provide: Clipboard, useClass: ClipboardBrowserProvider }
+        ClipboardProvider
       ]
     })
   }))
 
-  beforeEach(() => {
-    ethWallet.addresses = ethWallet.deriveAddresses(1)
+  beforeEach(async () => {
+    ethWallet.addresses = await ethWallet.deriveAddresses(1)
     fixture = TestBed.createComponent(TransactionPreparePage)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -138,7 +146,7 @@ describe('TransactionPrepare Page', () => {
 
     // should create a toastCtrl
     expect((component as any).toastController.create).toHaveBeenCalledWith({
-      message: 'not enough balance',
+      message: new Error('not enough balance'),
       duration: 3000,
       position: 'bottom'
     })

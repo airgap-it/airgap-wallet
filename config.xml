@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="1" id="it.airgap.wallet" version="0.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="1" id="it.airgap.wallet" ios-CFBundleVersion="0.0.0" version="0.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AirGap Wallet</name>
     <description>The most secure way to transact crypto</description>
     <author email="contact@papers.ch" href="http://www.papers.ch/">Papers.ch</author>
@@ -51,11 +51,14 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <platform name="ios">
-        <config-file parent="LSApplicationQueriesSchemes" target="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
+            <string>AirGap uses your camera to scan QR Codes of transactions.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="LSApplicationQueriesSchemes">
             <array>
                 <string>airgap-vault</string>
             </array>
-        </config-file>
+        </edit-config>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <allow-intent href="airgap-vault:*" />
@@ -123,7 +126,6 @@
     <plugin name="com.lampa.startapp" spec="^6.1.6" />
     <plugin name="cordova-plugin-qrscanner" spec="^2.6.0" />
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
-    <plugin name="cordova-plugin-queries-schemes" spec="git+https://github.com/rjhilgefort/cordova-plugin-queries-schemes.git" />
     <plugin name="cordova-sqlite-storage" spec="^2.4.0" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.1.3" />
     <plugin name="cordova-clipboard" spec="^1.2.1" />

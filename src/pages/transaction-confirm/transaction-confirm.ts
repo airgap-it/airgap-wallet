@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { getProtocolByIdentifier, IAirGapTransaction, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 declare var cordova: any
 
@@ -10,8 +11,8 @@ declare var cordova: any
   templateUrl: 'transaction-confirm.html'
 })
 export class TransactionConfirmPage {
-  public signedTx: string
-  public airGapTx: IAirGapTransaction
+  signedTransactionSync: DeserializedSyncProtocol
+  private signedTx: string
   public protocol: ICoinProtocol
 
   constructor(
@@ -24,15 +25,15 @@ export class TransactionConfirmPage {
   ) {}
 
   dismiss() {
-    this.navController.popToRoot()
+    this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   async ionViewWillEnter() {
     await this.platform.ready()
-    const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
-    this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
-    this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
-    this.airGapTx = this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
+    this.signedTransactionSync = this.navParams.get('signedTransactionSync')
+    // tslint:disable-next-line:no-unnecessary-type-assertion
+    this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
+    this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
   broadcastTransaction() {
@@ -40,29 +41,29 @@ export class TransactionConfirmPage {
       content: 'Broadcasting...'
     })
 
-    loading.present()
+    loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     let blockexplorer = '' // TODO: Move to coinlib
-    if (this.protocol.identifier === 'btc') {
+    if (this.protocol.identifier.startsWith('btc')) {
       blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.protocol.identifier === 'eth') {
+    } else if (this.protocol.identifier.startsWith('eth')) {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'eth-erc20-ae') {
-      blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'ae') {
+    } else if (this.protocol.identifier.startsWith('ae')) {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
+    } else if (this.protocol.identifier.startsWith('xtz')) {
+      blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 
     let interval = setTimeout(() => {
-      loading.dismiss()
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       let toast = this.toastCtrl.create({
         duration: 3000,
         message: 'Transaction queued. It might take some time until your TX shows up!',
         showCloseButton: true,
         position: 'bottom'
       })
-      toast.present()
-      this.navController.popToRoot()
+      toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, 20 * 1000)
 
     this.protocol
@@ -71,7 +72,7 @@ export class TransactionConfirmPage {
         if (interval) {
           clearInterval(interval)
         }
-        loading.dismiss()
+        loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         let alert = this.alertCtrl.create({
           title: 'Transaction broadcasted!',
           message: 'Your transaction has been successfully broadcasted',
@@ -88,26 +89,26 @@ export class TransactionConfirmPage {
                     showCloseButton: true,
                     position: 'bottom'
                   })
-                  toast.present()
+                  toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
                 }
-                this.navController.popToRoot()
+                this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
               }
             },
             {
               text: 'Ok',
               handler: () => {
-                this.navController.popToRoot()
+                this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
               }
             }
           ]
         })
-        alert.present()
+        alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
       .catch(e => {
         if (interval) {
           clearInterval(interval)
         }
-        loading.dismiss()
+        loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         console.warn(e)
         let toast = this.toastCtrl.create({
           duration: 5000,
@@ -115,8 +116,8 @@ export class TransactionConfirmPage {
           showCloseButton: true,
           position: 'bottom'
         })
-        toast.present()
-        this.navController.popToRoot()
+        toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
   }
 

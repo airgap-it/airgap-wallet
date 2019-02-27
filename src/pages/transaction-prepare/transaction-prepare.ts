@@ -1,13 +1,14 @@
+import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { BigNumber } from 'bignumber.js'
 import { NavController, NavParams, ToastController, LoadingController } from 'ionic-angular'
 
 import { ScanAddressPage } from '../scan-address/scan-address'
-import { TransactionQrPage } from '../transaction-qr/transaction-qr'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
-import { Clipboard } from '@ionic-native/clipboard'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -27,7 +28,7 @@ export class TransactionPreparePage {
     private navParams: NavParams,
     private _ngZone: NgZone,
     private http: HttpClient,
-    private clipboard: Clipboard
+    private clipboardProvider: ClipboardProvider
   ) {
     this.transactionForm = formBuilder.group({
       address: ['', [Validators.required]],
@@ -128,13 +129,14 @@ export class TransactionPreparePage {
       content: 'Preparing TX...'
     })
 
-    await loading.present()
+    await loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      let rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
+      console.log('preparing wallet tx', this.wallet)
+      const rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
 
-      const airGapTx = this.wallet.coinProtocol.getTransactionDetails({
+      const airGapTx = await this.wallet.coinProtocol.getTransactionDetails({
         publicKey: this.wallet.publicKey,
         transaction: rawUnsignedTx
       })
@@ -151,13 +153,15 @@ export class TransactionPreparePage {
         }
       })
 
-      this.navController.push(TransactionQrPage, {
-        wallet: this.wallet,
-        airGapTx: airGapTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      })
+      this.navController
+        .push(InteractionSelectionPage, {
+          wallet: this.wallet,
+          airGapTx: airGapTx,
+          data: 'airgap-vault://?d=' + serializedTx
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-      loading.dismiss()
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (e) {
       console.warn(e)
       this.toastController
@@ -167,8 +171,9 @@ export class TransactionPreparePage {
           position: 'bottom'
         })
         .present()
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } finally {
-      loading.dismiss()
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
@@ -176,9 +181,11 @@ export class TransactionPreparePage {
     let callback = address => {
       this.transactionForm.controls.address.setValue(address)
     }
-    this.navController.push(ScanAddressPage, {
-      callback: callback
-    })
+    this.navController
+      .push(ScanAddressPage, {
+        callback: callback
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public toggleMaxAmount() {
@@ -196,7 +203,7 @@ export class TransactionPreparePage {
   }
 
   public pasteClipboard() {
-    this.clipboard.paste().then(
+    this.clipboardProvider.paste().then(
       (text: string) => {
         this.transactionForm.controls.address.setValue(text)
       },

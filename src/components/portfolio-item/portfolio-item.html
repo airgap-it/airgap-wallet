@@ -1,7 +1,10 @@
 <ion-item *ngIf="wallet; else skeletonWallet" no-lines>
-  <ion-avatar item-start><identicon [address]="wallet.receivingPublicAddress"></identicon></ion-avatar>
+  <ion-avatar item-start>
+    <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="isToken"></currency-symbol>
+  </ion-avatar>
   <ion-label>
-    <img class="symbol--icon" [src]="'assets/symbols/' + wallet.coinProtocol.symbol.toLowerCase() + '.svg'" />
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading">
       {{
         wallet.currentBalance?.toNumber()
@@ -15,10 +18,11 @@
     <ng-template #syncingHeading>
       <div class="skeleton--loading"><h2></h2></div>
     </ng-template>
-
-    <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" ion-text color="blackLight" class="typography--mono">
-      {{ wallet.receivingPublicAddress | shortenString }}
-    </h3>
+    <ng-container *ngIf="!isToken">
+      <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" ion-text color="blackLight" class="typography--mono">
+        {{ wallet.receivingPublicAddress | shortenString }}
+      </h3>
+    </ng-container>
 
     <ng-template #syncingHeadingLow>
       <div class="skeleton--loading"><h3></h3></div>
@@ -42,7 +46,7 @@
     </ion-col>
     <ion-col col-12 no-padding text-right>
       <p *ngIf="wallet.currentBalance; else syncingPrice">
-        <span *ngIf="wallet.currentBalance > 0" ion-text color="blackLight">
+        <span *ngIf="wallet.currentBalance?.toNumber() > 0" ion-text color="blackLight">
           ${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}
         </span>
         <!-- <span ion-text [ngClass]="wallet.change24hour >= 0 ? 'green' : 'red'">{{ wallet.change24hour }}%</span> -->
@@ -69,7 +73,7 @@
         <div class="symbol--icon"></div>
         <h2></h2>
 
-        <h3></h3>
+        <h3 *ngIf="!isToken"></h3>
       </ion-label>
 
       <ion-row class="items--right" item-end>

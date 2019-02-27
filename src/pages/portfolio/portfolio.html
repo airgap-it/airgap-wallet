@@ -1,23 +1,10 @@
-<ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle><ion-icon name="menu"></ion-icon></button>
-  </ion-navbar>
-  <div>
-    <div style="color: white; width: 100%; text-align:center; height: 150px; font-size: 40px; font-weight: 300; margin-top: 20px">
-      <div style="margin-top: 30px;">${{ total | number: '1.2-2' }}</div>
-      <!--
-        <div [ngClass]="percentageChangedClass" style="font-size: 20px;">
-          {{ winPercentage | number : '1.2-2' }}%
-        </div>
-      -->
-    </div>
-  </div>
-</ion-header>
-
 <ion-content>
+  <ion-row class="portfolio--hero" justify-content-center align-items-center>
+    <h1 no-margin>${{ total | number: '1.2-2' }}</h1>
+  </ion-row>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="wallets | async as walletsArray; else loading">
+  <ng-container *ngIf="(wallets | async) as walletsArray; else loading">
     <ng-container *ngIf="walletsArray.length; else noItems">
       <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
         <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
@@ -40,13 +27,13 @@
   </ng-template>
 
   <ion-fab right bottom>
-    <ng-container *ngIf="wallets | async as walletsArray">
-      <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openSyncPage()">
-        <ion-icon md-name="vertical_align_bottom"></ion-icon>
+    <ng-container *ngIf="(wallets | async) as walletsArray">
+      <button *ngIf="walletsArray.length > 0" ion-fab color="secondary" (click)="openAccountAddPage()">
+        <ion-icon md-name="add"></ion-icon>
       </button>
-      <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openSyncPage()" ion-button round icon-left>
-        <ion-icon md-name="vertical_align_bottom"></ion-icon>
-        Sync with AirGap Vault
+      <button *ngIf="walletsArray.length === 0" color="secondary" (click)="openAccountAddPage()" ion-button round icon-left>
+        <ion-icon md-name="add"></ion-icon>
+        {{ 'portfolio.add-coins_label' | translate }}
       </button>
     </ng-container>
   </ion-fab>

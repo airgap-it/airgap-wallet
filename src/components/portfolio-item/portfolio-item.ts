@@ -20,4 +20,7 @@ export class PortfolioItemComponent {
 
   @Input()
   isExtended: boolean = false
+
+  @Input()
+  isToken: boolean = false
 }

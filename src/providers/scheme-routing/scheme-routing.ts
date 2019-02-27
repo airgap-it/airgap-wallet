@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
 import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
-import { WalletImportPage } from '../../pages/wallet-import/wallet-import'
+import { AccountImportPage } from '../../pages/account-import/account-import'
 import { TransactionConfirmPage } from '../../pages/transaction-confirm/transaction-confirm'
+import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable()
 export class SchemeRoutingProvider {
@@ -59,6 +60,7 @@ export class SchemeRoutingProvider {
   }
 
   async handleWalletSync(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
+    // tslint:disable-next-line:no-unnecessary-type-assertion
     const walletSync = deserializedSync.payload as SyncWalletRequest
     const wallet = new AirGapMarketWallet(
       deserializedSync.protocol,
@@ -68,16 +70,14 @@ export class SchemeRoutingProvider {
     )
     if (this.navController) {
       this.navController
-        .push(WalletImportPage, {
+        .push(AccountImportPage, {
           wallet: wallet
         })
         .then(v => {
           console.log('WalletImportPage openend', v)
           // this.navController.push(PortfolioPage)
         })
-        .catch(e => {
-          console.log('WalletImportPage failed to open', e)
-        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       /*
         const cancelButton = {
@@ -105,9 +105,7 @@ export class SchemeRoutingProvider {
         .then(v => {
           console.log('TransactionConfirmPage opened', v)
         })
-        .catch(e => {
-          console.log('TransactionConfirmPage failed to open', e)
-        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
@@ -158,16 +156,18 @@ export class SchemeRoutingProvider {
         scanAgainCallback()
       }
     }
-    this.showAlert('Sync type not supported', 'Please use another app to scan this QR.', [cancelButton])
+    this.showAlert('Sync type not supported', 'Please use another app to scan this QR.', [cancelButton]).catch(
+      handleErrorSentry(ErrorCategory.NAVIGATION)
+    )
   }
 
-  private async showAlert(title: string, message: string, buttons: AlertButton[]) {
+  public async showAlert(title: string, message: string, buttons: AlertButton[]) {
     let alert = this.alertController.create({
       title,
       message,
       enableBackdropDismiss: false,
       buttons
     })
-    alert.present()
+    alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

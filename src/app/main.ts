@@ -5,4 +5,6 @@ import { AppModule } from './app.module'
 
 enableProdMode()
 
-platformBrowserDynamic().bootstrapModule(AppModule)
+platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  .catch(console.error)

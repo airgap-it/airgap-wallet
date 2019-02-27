@@ -49,7 +49,10 @@ ion-app {
 .content--align-vert__center {
   align-items: center !important;
 }
-
+.justify--content__end {
+  display: flex;
+  justify-content: flex-end;
+}
 .font--weight__light {
   font-weight: 200;
 }
@@ -59,6 +62,9 @@ ion-app {
 
 .background--color__primary {
   background-color: color($colors, primary, base);
+}
+.background--color__white {
+  background-color: color($colors, white, base);
 }
 
 .colored-background {
@@ -89,17 +95,6 @@ ion-app {
   text-transform: uppercase;
 }
 
-.empty-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  font-weight: 100;
-  font-size: 1.4rem;
-  height: 75%;
-}
-
 .text--selectable {
   user-select: text;
   -webkit-user-select: text;
@@ -107,8 +102,8 @@ ion-app {
   -ms-user-select: text;
 }
 
-qrcode {
-  padding: 40px;
+qr-clipboard {
+  padding: 20px;
   background-color: white;
 }
 
@@ -124,4 +119,12 @@ qrcode {
 }
 ion-fab .col {
   padding: 0 10px;
+}
+/* Fixes card padding & margin */
+ion-card {
+  padding: 8px 0;
+}
+.card-ios,
+.card-md {
+  margin: 0 10px !important;
 }

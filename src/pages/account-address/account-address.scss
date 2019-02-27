@@ -1,0 +1,20 @@
+page-account-address {
+  ion-icon {
+    color: white;
+  }
+  ion-avatar {
+    width: 64px;
+    height: 64px;
+    img {
+      width: 64px;
+      height: 64px;
+    }
+  }
+  .symbol--icon {
+    position: absolute;
+    height: 32px;
+    width: 32px;
+    left: 40px;
+    top: 40px;
+  }
+}

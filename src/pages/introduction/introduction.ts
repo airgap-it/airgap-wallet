@@ -1,8 +1,7 @@
 import { Component } from '@angular/core'
 import { ViewController, ModalController, Platform } from 'ionic-angular'
 import { IntroductionDownloadPage } from '../introduction-download/introduction-download'
-
-declare var cordova: any
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-introduction',
@@ -17,7 +16,7 @@ export class IntroductionPage {
   }
 
   public dismiss() {
-    this.viewController.dismiss()
+    this.viewController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openIntroductionDownloadPage() {
@@ -29,6 +28,6 @@ export class IntroductionPage {
       }
     })
 
-    modal.present()
+    modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }
 }
