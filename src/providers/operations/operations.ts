@@ -78,7 +78,6 @@ export class OperationsProvider {
         transaction: transaction
       })
     } catch (e) {
-      console.log('CAUGHT')
       handleErrorSentry(ErrorCategory.COINLIB)(e)
     }
 
