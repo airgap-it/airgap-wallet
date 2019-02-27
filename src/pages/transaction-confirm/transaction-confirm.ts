@@ -44,15 +44,13 @@ export class TransactionConfirmPage {
     loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     let blockexplorer = '' // TODO: Move to coinlib
-    if (this.protocol.identifier === 'btc') {
+    if (this.protocol.identifier.startsWith('btc')) {
       blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.protocol.identifier === 'eth') {
+    } else if (this.protocol.identifier.startsWith('eth')) {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'eth-erc20-ae') {
-      blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'ae') {
+    } else if (this.protocol.identifier.startsWith('ae')) {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'xtz') {
+    } else if (this.protocol.identifier.startsWith('xtz')) {
       blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 

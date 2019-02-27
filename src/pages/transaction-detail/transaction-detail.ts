@@ -24,15 +24,13 @@ export class TransactionDetailPage {
     let transaction: any = this.transaction
     let hash = transaction.hash
     let blockexplorer = '' // TODO: Move to coinlib
-    if (this.transaction.protocolIdentifier === 'btc') {
+    if (this.transaction.protocolIdentifier.startsWith('btc')) {
       blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.transaction.protocolIdentifier === 'eth') {
+    } else if (this.transaction.protocolIdentifier.startsWith('eth')) {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier === 'eth-erc20-ae') {
-      blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier === 'ae') {
+    } else if (this.transaction.protocolIdentifier.startsWith('ae')) {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier === 'xtz') {
+    } else if (this.transaction.protocolIdentifier.startsWith('xtz')) {
       blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 
@@ -40,7 +38,7 @@ export class TransactionDetailPage {
       this.openUrl(blockexplorer.replace('{{txId}}', hash))
     } else {
       // TODO: Remove AE specific code, but add an alert that there was an error.
-      if (this.transaction.protocolIdentifier === 'ae') {
+      if (this.transaction.protocolIdentifier.startsWith('ae')) {
         this.openUrl(`https://explorer.aepps.com/#/account/${this.transaction.isInbound ? this.transaction.to : this.transaction.from}`)
       }
     }
