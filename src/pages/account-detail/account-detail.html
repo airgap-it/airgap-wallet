@@ -18,8 +18,7 @@
       <ion-icon md-name="send"></ion-icon>
       <span [innerHTML]="'account-detail.send_label' | translate: { protocolSymbol: wallet.coinProtocol.symbol | uppercase }"></span>
     </button>
-    <!-- TODO: navigate to Receive -->
-    <button color="secondary" (click)="openPreparePage()" ion-button round icon-left small outline>
+    <button color="secondary" (click)="openReceivePage()" ion-button round icon-left small outline>
       <ion-icon md-name="call_received"></ion-icon>
       {{ 'account-detail.receive_label' | translate }}
     </button>

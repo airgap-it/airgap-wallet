@@ -7,6 +7,7 @@ import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
+import { AccountAddressPage } from '../account-address/account-address'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { OperationsProvider } from '../../providers/operations/operations'
@@ -96,6 +97,14 @@ export class AccountDetailPage {
   openPreparePage() {
     this.navCtrl
       .push(TransactionPreparePage, {
+        wallet: this.wallet
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  openReceivePage() {
+    this.navCtrl
+      .push(AccountAddressPage, {
         wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
