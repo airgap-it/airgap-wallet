@@ -43,12 +43,8 @@ export class MyApp {
     await this.platform.ready()
 
     if (this.platform.is('cordova')) {
-      this.statusBar.styleLightContent()
-      if (this.platform.is('ios')) {
-        this.statusBar.backgroundColorByHexString('#00E8CC')
-      } else if (this.platform.is('android')) {
-        this.statusBar.backgroundColorByHexString('#FFFFFF')
-      }
+      this.statusBar.styleDefault()
+      this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
       setSentryRelease(await this.appVersion.getVersionNumber())
     } else {
@@ -74,24 +70,25 @@ export class MyApp {
   async ngAfterViewInit() {
     await this.platform.ready()
     if (this.platform.is('cordova')) {
-      const handleMatch = match => {
-        // match.$route - the route we matched, which is the matched entry from the arguments to route()
-        // match.$args - the args passed in the link
-        // match.$link - the full link data
-        console.log('Successfully matched route', JSON.stringify(match))
-        this.schemeRoutingProvider.handleNewSyncRequest(this.nav, match.$link.url).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-      }
-
-      const handleNoMatch = nomatch => {
-        // nomatch.$link - the full link data
-        handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)('route not matched: ' + JSON.stringify(nomatch))
-      }
-
       this.deeplinks
         .route({
           '/': null
         })
-        .subscribe(handleMatch, handleNoMatch)
+        .subscribe(
+          match => {
+            // match.$route - the route we matched, which is the matched entry from the arguments to route()
+            // match.$args - the args passed in the link
+            // match.$link - the full link data
+            console.log('Successfully matched route', JSON.stringify(match))
+            this.schemeRoutingProvider
+              .handleNewSyncRequest(this.nav, match.$link.url)
+              .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+          },
+          nomatch => {
+            // nomatch.$link - the full link data
+            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)('route not matched: ' + JSON.stringify(nomatch))
+          }
+        )
     }
   }
 }
