@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'

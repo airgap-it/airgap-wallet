@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { NavController, NavParams, AlertController } from 'ionic-angular'
-import { WalletsProvider } from '../../providers/wallets/wallets.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -32,7 +32,7 @@ export class SwapComponent {
     public navCtrl: NavController,
     public alertCtrl: AlertController,
     public navParams: NavParams,
-    private walletsProvider: WalletsProvider
+    private walletsProvider: AccountProvider
   ) {
     this.wallets = this.walletsProvider.wallets
       .asObservable()
