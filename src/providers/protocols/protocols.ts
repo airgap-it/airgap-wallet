@@ -39,7 +39,7 @@ export class ProtocolsProvider {
     /* */
   }
 
-  getEnabledProtocols() {
+  getEnabledSubProtocols() {
     return ['eth-erc20-ae']
   }
 

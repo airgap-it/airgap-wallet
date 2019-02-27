@@ -73,7 +73,7 @@ export class SubAccountAddPage {
         .catch(console.error)
     } else {
       this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
-        if (this.protocolsProvider.getEnabledProtocols().indexOf(subProtocol.identifier) >= 0) {
+        if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
           const wallet = new AirGapMarketWallet(
             subProtocol.identifier,
             this.wallet.publicKey,

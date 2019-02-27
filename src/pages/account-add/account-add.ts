@@ -31,7 +31,7 @@ export class AccountAddPage {
         const subProtocols = cv.subProtocols.filter(
           subProtocol =>
             subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-            this.protocolsProvider.getEnabledProtocols().indexOf(subProtocol.identifier) >= 0
+            this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
         )
         return pv.concat(...subProtocols)
       }
