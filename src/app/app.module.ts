@@ -11,7 +11,7 @@ import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { QRCodeModule } from 'angularx-qrcode'
-import { IonicApp, IonicModule, Platform } from 'ionic-angular'
+import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
 import { ComponentsModule } from '../components/components.module'
@@ -45,9 +45,19 @@ import { StorageProvider } from '../providers/storage/storage'
 import { Clipboard } from '@ionic-native/clipboard'
 import { Diagnostic } from '@ionic-native/diagnostic'
 import { SentryErrorHandler } from '../providers/sentry-error-handler/sentry-error-handler'
-import { ClipboardBrowserProvider } from '../providers/clipboard-browser/clipboard-browser'
+import { ClipboardProvider } from '../providers/clipboard/clipboard'
 import { PermissionsProvider } from '../providers/permissions/permissions'
 import { LottieAnimationViewModule } from 'ng-lottie'
+import { ProtocolsProvider } from '../providers/protocols/protocols'
+import { AccountAddPage } from '../pages/account-add/account-add'
+import { SubAccountAddPage } from '../pages/sub-account-add/sub-account-add'
+import { SubAccountImportPage } from '../pages/sub-account-import/sub-account-import'
+import { AccountImportOnboardingPage } from '../pages/account-import-onboarding/account-import-onboarding'
+import { AccountDetailPage } from '../pages/account-detail/account-detail'
+import { DeepLinkProvider } from '../providers/deep-link/deep-link'
+import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
+import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
+import { OperationsProvider } from '../providers/operations/operations'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -71,7 +81,14 @@ export function createTranslateLoader(http: HttpClient) {
     ScanAddressPage,
     ScanSyncPage,
     AccountImportPage,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    AccountAddPage,
+    SubAccountAddPage,
+    SubAccountImportPage,
+    AccountImportOnboardingPage,
+    AccountDetailPage,
+    InteractionSelectionPage,
+    SubAccountSelectPage
   ],
   imports: [
     BrowserModule,
@@ -87,7 +104,6 @@ export function createTranslateLoader(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
-    QRCodeModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(MyApp, {
       tabsHideOnSubPages: true
@@ -118,7 +134,14 @@ export function createTranslateLoader(http: HttpClient) {
     ScanSyncPage,
     AccountImportPage,
     AccountEditPopoverComponent,
-    IntroductionDownloadPage
+    IntroductionDownloadPage,
+    AccountAddPage,
+    SubAccountAddPage,
+    SubAccountImportPage,
+    AccountImportOnboardingPage,
+    AccountDetailPage,
+    InteractionSelectionPage,
+    SubAccountSelectPage
   ],
   providers: [
     StatusBar,
@@ -126,20 +149,19 @@ export function createTranslateLoader(http: HttpClient) {
     BarcodeScanner,
     Keyboard,
     Deeplinks,
+    Clipboard,
     { provide: ErrorHandler, useClass: SentryErrorHandler },
     ScannerProvider,
     AppVersion,
     Diagnostic,
     AccountProvider,
     StorageProvider,
-    {
-      provide: Clipboard,
-      useFactory: (platform: Platform) => (platform.is('cordova') ? new Clipboard() : new ClipboardBrowserProvider()),
-      deps: [Platform]
-    },
     SchemeRoutingProvider,
-    ClipboardBrowserProvider,
-    PermissionsProvider
+    ClipboardProvider,
+    PermissionsProvider,
+    ProtocolsProvider,
+    DeepLinkProvider,
+    OperationsProvider
   ]
 })
 export class AppModule {}

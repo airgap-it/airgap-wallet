@@ -1,17 +1,17 @@
-<ion-header>
-  <ion-navbar color="primary">
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
     <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'coin-info.title' | translate }}</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
-  <ion-row class="transaction--label__container background--color__primary" align-items-center>
+  <ion-row class="transaction--label__container background--color__white" align-items-center>
     <ion-col col-10 padding>
-      <span ion-text color="white" class="font--weight__bold">{{ 'coin-info.transactions_label' | translate }}</span>
+      <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.transactions_label' | translate }}</span>
     </ion-col>
     <ion-col col-2 no-padding padding-right class="justify--content__end">
-      <ion-spinner *ngIf="isRefreshing" color="white" name="dots"></ion-spinner>
+      <ion-spinner *ngIf="isRefreshing" color="primary" name="dots"></ion-spinner>
     </ion-col>
   </ion-row>
 </ion-header>

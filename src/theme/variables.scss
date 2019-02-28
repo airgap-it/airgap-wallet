@@ -30,13 +30,21 @@ $app-direction: ltr;
 $colors: (
   primary: #00e8cc,
   secondary: #311b58,
+  secondaryLight: #440094,
   secondarydDark: #2d53a1,
   danger: #f53d3d,
   light: #f4f4f4,
   gray: #d3d3d3,
   dark: #222,
   muted: #999,
-  white: #fff,
+  whitePrimaryContrast: (
+    base: #fff,
+    contrast: #00e8cc
+  ),
+  white: (
+    base: #fff,
+    contrast: #000
+  ),
   whiteLight: rgba(255, 255, 255, 0.84),
   black: #000,
   blackLight: rgba(0, 0, 0, 0.54),
@@ -80,3 +88,5 @@ $colors: (
 
 $item-md-avatar-size: 48px;
 $item-ios-avatar-size: 48px;
+$tabs-tab-color-active: color($colors, primary);
+$tabs-background: color($colors, white);

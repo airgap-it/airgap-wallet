@@ -212,7 +212,10 @@ export class AccountTransactionListPage {
   }
 
   getWalletIdentifier(): string {
-    return `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}`
+    const identifier = this.wallet.addressIndex
+      ? `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}-${this.wallet.addressIndex}`
+      : `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}`
+    return identifier
   }
 
   presentEditPopover(event) {

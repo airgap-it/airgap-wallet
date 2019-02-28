@@ -1,21 +1,4 @@
 page-account-transaction-list {
-  .justify--content__end {
-    display: flex;
-    justify-content: flex-end;
-  }
-  /* TODO: remove if using component */
-  .symbol--icon {
-    position: absolute;
-    height: 24px;
-    width: 24px;
-    left: 40px;
-    top: 34px;
-  }
-  h2,
-  .items--right ion-row {
-    margin: 2px 0px 6px !important;
-  }
-
   .empty--list__container {
     height: 25vh;
     padding-top: 48px;
@@ -23,7 +6,16 @@ page-account-transaction-list {
       height: 30vh;
     }
   }
-
+  .empty-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    font-weight: 100;
+    font-size: 1.4rem;
+    height: 75%;
+  }
   .loading-header {
     color: white;
     font-weight: 300;
@@ -48,10 +40,5 @@ page-account-transaction-list {
   }
   ion-fab {
     width: 100%;
-  }
-  .empty-list {
-    img {
-      height: 40vh;
-    }
   }
 }

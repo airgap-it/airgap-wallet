@@ -12,6 +12,12 @@ import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { MomentModule } from 'ngx-moment'
+import { CardActionableComponent } from './card-actionable/card-actionable'
+import { EmptyStateComponent } from './empty-state/empty-state'
+import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
+import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
+import { QRCodeModule } from 'angularx-qrcode'
+import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 
 @NgModule({
   declarations: [
@@ -20,16 +26,26 @@ import { MomentModule } from 'ngx-moment'
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    AccountEditPopoverComponent
+    AccountEditPopoverComponent,
+    CardActionableComponent,
+    EmptyStateComponent,
+    CurrencySymbolComponent,
+    QrClipboardComponent,
+    SignedTransactionComponent
   ],
-  imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule],
+  imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule, QRCodeModule],
   exports: [
     PortfolioItemComponent,
     IdenticonComponent,
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
-    AccountEditPopoverComponent
+    AccountEditPopoverComponent,
+    CardActionableComponent,
+    EmptyStateComponent,
+    CurrencySymbolComponent,
+    QrClipboardComponent,
+    SignedTransactionComponent
   ]
 })
 export class ComponentsModule {}

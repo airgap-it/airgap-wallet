@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { getProtocolByIdentifier, IAirGapTransaction, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 declare var cordova: any
@@ -11,8 +11,8 @@ declare var cordova: any
   templateUrl: 'transaction-confirm.html'
 })
 export class TransactionConfirmPage {
-  public signedTx: string
-  public airGapTx: IAirGapTransaction
+  signedTransactionSync: DeserializedSyncProtocol
+  private signedTx: string
   public protocol: ICoinProtocol
 
   constructor(
@@ -30,10 +30,10 @@ export class TransactionConfirmPage {
 
   async ionViewWillEnter() {
     await this.platform.ready()
-    const signedTransactionSync: DeserializedSyncProtocol = this.navParams.get('signedTransactionSync')
-    this.signedTx = (signedTransactionSync.payload as SignedTransaction).transaction
-    this.protocol = getProtocolByIdentifier(signedTransactionSync.protocol)
-    this.airGapTx = this.protocol.getTransactionDetailsFromSigned(this.navParams.get('signedTransactionSync').payload)
+    this.signedTransactionSync = this.navParams.get('signedTransactionSync')
+    // tslint:disable-next-line:no-unnecessary-type-assertion
+    this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
+    this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
   broadcastTransaction() {
@@ -44,15 +44,13 @@ export class TransactionConfirmPage {
     loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     let blockexplorer = '' // TODO: Move to coinlib
-    if (this.protocol.identifier === 'btc') {
+    if (this.protocol.identifier.startsWith('btc')) {
       blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.protocol.identifier === 'eth') {
+    } else if (this.protocol.identifier.startsWith('eth')) {
       blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'eth-erc20-ae') {
-      blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'ae') {
+    } else if (this.protocol.identifier.startsWith('ae')) {
       blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
-    } else if (this.protocol.identifier === 'xtz') {
+    } else if (this.protocol.identifier.startsWith('xtz')) {
       blockexplorer = 'https://tzscan.io/{{txId}}'
     }
 

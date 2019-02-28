@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core'
 import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
+import { map } from 'rxjs/operators'
 
 @Injectable()
 export class AccountProvider {
   private walletList: AirGapMarketWallet[] = []
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+  public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+
   private walletChangedBehaviour: Subject<void> = new Subject()
 
   get walledChangedObservable() {
@@ -16,6 +19,7 @@ export class AccountProvider {
 
   constructor(private storageProvider: StorageProvider) {
     this.loadWalletsFromStorage().catch(console.error)
+    this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
   }
 
   public triggerWalletChanged() {
@@ -41,7 +45,8 @@ export class AccountProvider {
         wallet.protocolIdentifier,
         wallet.publicKey,
         wallet.isExtendedPublicKey,
-        wallet.derivationPath
+        wallet.derivationPath,
+        wallet.addressIndex
       )
 
       // add derived addresses
@@ -65,7 +70,8 @@ export class AccountProvider {
           protocolIdentifier: airGapWallet.protocolIdentifier,
           publicKey: airGapWallet.publicKey,
           isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
-          derivationPath: airGapWallet.derivationPath
+          derivationPath: airGapWallet.derivationPath,
+          addressIndex: airGapWallet.addressIndex
         })
       } else {
         airGapWallet
@@ -79,11 +85,13 @@ export class AccountProvider {
       this.walletList.push(airGapWallet)
     })
 
+    /* Use for Testing of Skeleton
     await new Promise(resolve => {
       setTimeout(() => {
         resolve()
       }, 2000)
     })
+    */
 
     this.wallets.next(this.walletList)
   }
@@ -92,7 +100,7 @@ export class AccountProvider {
     return this.walletList
   }
 
-  public addWallet(wallet: AirGapMarketWallet): Promise<any> {
+  public async addWallet(wallet: AirGapMarketWallet): Promise<void> {
     if (this.walletExists(wallet)) {
       throw new Error('wallet already exists')
     }
@@ -103,9 +111,7 @@ export class AccountProvider {
   }
 
   public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(
-      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
-    )
+    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
@@ -118,13 +124,25 @@ export class AccountProvider {
     return this.storageProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
-  public walletByPublicKeyAndProtocol(publicKey: string, protocolIdentifier: string): AirGapMarketWallet {
-    return this.walletList.find(wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier)
+  public walletByPublicKeyAndProtocolAndAddressIndex(
+    publicKey: string,
+    protocolIdentifier: string,
+    addressIndex?: number
+  ): AirGapMarketWallet {
+    return this.walletList.find(
+      wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier && wallet.addressIndex === addressIndex
+    )
   }
 
   public walletExists(testWallet: AirGapMarketWallet): boolean {
-    return this.walletList.some(
-      wallet => wallet.publicKey === testWallet.publicKey && wallet.protocolIdentifier === testWallet.protocolIdentifier
+    return this.walletList.some(wallet => this.isSameWallet(wallet, testWallet))
+  }
+
+  public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {
+    return (
+      wallet1.publicKey === wallet2.publicKey &&
+      wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
+      wallet1.addressIndex === wallet2.addressIndex
     )
   }
 }

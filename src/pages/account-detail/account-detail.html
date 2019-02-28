@@ -1,0 +1,98 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title><span [innerHTML]="'account-detail.title' | translate: { protocolName: wallet.coinProtocol.name }"></span></ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list no-lines no-margin>
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openTransactionPage(wallet)"></portfolio-item>
+  </ion-list>
+
+  <ion-row justify-content-center padding-vertical>
+    <button color="secondary" (click)="openPreparePage()" ion-button round icon-left small outline>
+      <ion-icon md-name="send"></ion-icon>
+      <span [innerHTML]="'account-detail.send_label' | translate: { protocolSymbol: wallet.coinProtocol.symbol | uppercase }"></span>
+    </button>
+    <button color="secondary" (click)="openReceivePage()" ion-button round icon-left small outline>
+      <ion-icon md-name="call_received"></ion-icon>
+      {{ 'account-detail.receive_label' | translate }}
+    </button>
+    <button color="secondary" (click)="openTransactionPage(wallet)" ion-button round icon-left small outline>
+      <ion-icon name="md-list-box"></ion-icon>
+      {{ 'account-detail.details_label' | translate }}
+    </button>
+  </ion-row>
+
+  <!-- TODO: Enable delegate -->
+  <!--
+  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
+    <card-actionable
+      [imageLeft]="false"
+      [imageName]="'currencies-empty.svg'"
+      [text]="
+        'account-detail.delegate_card.text'
+          | translate
+            : { amount: undelegatedAmount.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
+      "
+      [heading]="'account-detail.delegate_card.heading' | translate"
+      tappable
+      (click)="goToDelegateSelection()"
+    ></card-actionable>
+  </ion-row>
+  -->
+  <!-- END: Enable delegate -->
+
+  <empty-state
+    *ngIf="!hasSubAccounts"
+    [text]="'account-detail.no-accounts_text' | translate: { label: translatedLabel | translate }"
+    [imageName]="wallet.protocolIdentifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
+    [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
+  ></empty-state>
+  <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
+    <ng-container *ngIf="subWalletGroups.get(subProtocolType).length > 0">
+      <ion-row class="transaction--label__container background--color__white" align-items-center>
+        <ion-col col-10 padding>
+          <span ion-text class="font--weight__bold" color="primary">
+            <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
+              {{ 'account-detail.accounts_label' | translate }}
+            </ng-container>
+            <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.tokens_label' | translate }}</ng-container>
+          </span>
+        </ion-col>
+      </ion-row>
+      <ion-list no-lines no-margin>
+        <portfolio-item
+          [isToken]="subProtocolType === subProtocolTypes.TOKEN"
+          *ngFor="let subWallet of subWalletGroups.get(subProtocolType)"
+          [wallet]="subWallet"
+          [maxDigits]="8"
+          tappable
+          (click)="openTransactionPage(subWallet)"
+        ></portfolio-item>
+      </ion-list>
+    </ng-container>
+  </ng-container>
+  <ion-fab right bottom>
+    <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
+      <button
+        *ngIf="supportedSubProtocolTypes.get(subProtocolType)"
+        color="secondary"
+        (click)="openAccountAddPage(subProtocolType, wallet)"
+        ion-button
+        round
+        icon-left
+      >
+        <ion-icon md-name="add"></ion-icon>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
+          {{ 'account-detail.add-accounts_label' | translate }}
+        </ng-container>
+        <ng-container *ngIf="subProtocolType === subProtocolTypes.TOKEN">{{ 'account-detail.add-tokens_label' | translate }}</ng-container>
+      </button>
+    </ng-container>
+  </ion-fab>
+</ion-content>

@@ -54,6 +54,9 @@ RUN sed -i -e "s/android-versionCode=\"1\"/android-versionCode=\"$BUILD_NR\"/g" 
 
 ARG SENTRY_DSN
 
+# browserify coin-lib
+RUN npm run browserify-coinlib
+
 # build apk
 RUN ionic cordova build android --prod --release --no-interactive
 

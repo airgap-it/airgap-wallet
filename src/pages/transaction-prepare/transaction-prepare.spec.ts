@@ -18,7 +18,7 @@ import { StorageMock } from '../../../test-config/storage-mock'
 import { Storage } from '@ionic/storage'
 import { PipesModule } from '../../pipes/pipes.module'
 import { Clipboard } from '@ionic-native/clipboard'
-import { ClipboardBrowserProvider } from '../../providers/clipboard-browser/clipboard-browser'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -57,6 +57,7 @@ describe('TransactionPrepare Page', () => {
       ],
       providers: [
         AccountProvider,
+        Clipboard,
         { provide: Storage, useClass: StorageMock },
         { provide: NavController, useFactory: () => NavControllerMock.instance() },
         { provide: NavParams, useClass: NavParamsMock },
@@ -73,13 +74,13 @@ describe('TransactionPrepare Page', () => {
         { provide: SplashScreen, useClass: SplashScreenMock },
         { provide: Platform, useClass: PlatformMock },
         { provide: Keyboard, useClass: KeyboardMock },
-        { provide: Clipboard, useClass: ClipboardBrowserProvider }
+        ClipboardProvider
       ]
     })
   }))
 
-  beforeEach(() => {
-    ethWallet.addresses = ethWallet.deriveAddresses(1)
+  beforeEach(async () => {
+    ethWallet.addresses = await ethWallet.deriveAddresses(1)
     fixture = TestBed.createComponent(TransactionPreparePage)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -145,7 +146,7 @@ describe('TransactionPrepare Page', () => {
 
     // should create a toastCtrl
     expect((component as any).toastController.create).toHaveBeenCalledWith({
-      message: 'not enough balance',
+      message: new Error('not enough balance'),
       duration: 3000,
       position: 'bottom'
     })
