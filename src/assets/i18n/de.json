@@ -142,5 +142,21 @@
     "account-detail.delegate_card.text": "<strong>{{amount}}</strong> undelegiert. Jetzt delegieren und einen Anteil pro Zyklus erhalten.",
     "account-import-onboarding.title": "{{protocolName}} hinzufügen",
     "account-import-onboarding.text": "Sie benötigen Die AirGap Vault Ap­pli­ka­ti­on um <strong>{{protocolName}}</strong> hinzuzufügen. Folgen Sie dazu den nächsten Schritten.",
-    "account-import-onboarding.slides.slide-1.text": "Öffnen Sie Ihre <strong>AirGap Vault</strong> Applikation auf dem gleichen oder auf dem offline Gerät."
+    "account-import-onboarding.slides.slide-1.text": "Öffnen Sie Ihre <strong>AirGap Vault</strong> Applikation auf dem gleichen oder auf dem offline Gerät.",
+    "account-import-onboarding.slides.slide-1.description": "Im <strong>“Konto”</strong> Tab <strong>“Account hinzufügen”</strong> auswählen.",
+    "account-import-onboarding.slides.slide-2_text": "Wählen Sie das erstellte Konto aus und auf der Seite \"Kontoadresse\" wählen Sie <strong>\"Account Synchronisieren\"</strong>.",
+    "account-import-onboarding.slides.slide-3.text": "Sie müssen das Konto von AirGap Vault nach AirGap Wallet synchronisieren.",
+    "account-import-onboarding.slides.slide-3.description": "¬ Wenn AirGap Vault auf einem <strong>offline Gerät</strong> ist, lesen Sie den <strong>QR Code</strong> ein auf der nächsten Seite.<br>¬ Wenn AirGap Vault auf dem <strong>gleichen Gerät</strong> ist, benutzen Sie den Button <strong>gleiches Gerät</strong>.",
+    "account-import-onboarding.slides.slide-4.text": "Das Konto kann jetzt nach AirGap Wallet importiert werden.",
+    "account-import-onboarding.slides.slide-4.description": "Sie sind jetzt bereit <strong>{{protocolName}}</strong> Transaktionen mit AirGap Vault und AirGap Wallet zu erstellen.",
+    "sub-account-import.title": "Konto auswählen",
+    "sub-account-import.text": "Wählen Sie das Konto aus welches Sie für <strong>{{subProtocolName}}</strong> hinzufügen möchten.",
+    "sub-account-import.empty_text": "Sie haben alle <strong>{{tokenName}}</strong> Kontos hinzugefügt.",
+    "sub-account-import.import-all_label": "Alle importieren",
+    "deep-link.not-supported-alert.title": "Hoppla",
+    "deep-link.not-supported-alert.message": "Deeplinking ist nur unterstützt auf mobilen Geräten.",
+    "deep-link.not-supported-alert.ok": "Verstanden",
+    "deep-link.app-not-found.title": "Hoppla",
+    "deep-link.app-not-found.message": "Es sieht so aus als ob Sie {{otherAppName}} nicht auf diesem Gerät installiert haben.",
+    "deep-link.app-not-found.ok": "Verstanden"
 }
