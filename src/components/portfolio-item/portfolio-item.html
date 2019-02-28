@@ -6,20 +6,14 @@
   <ion-label>
     <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading">
-      {{
-        wallet.currentBalance?.toNumber()
-          | amountConverter
-            : {
-                protocolIdentifier: wallet.protocolIdentifier,
-                maxDigits: maxDigits
-              }
-      }}
+      {{ wallet.currentBalance?.toNumber() | amountConverter : { protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}
     </h2>
     <ng-template #syncingHeading>
       <div class="skeleton--loading"><h2></h2></div>
     </ng-template>
     <ng-container *ngIf="!isToken">
       <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" ion-text color="blackLight" class="typography--mono">
+        <ion-badge *ngIf="isDelegated !== undefined" item-end color="secondary">{{ isDelegated ? 'delegated' : 'undelegated' }}</ion-badge>
         {{ wallet.receivingPublicAddress | shortenString }}
       </h3>
     </ng-container>
@@ -33,11 +27,8 @@
     <ion-col col-12 no-padding text-right>
       <strong *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
         <p ion-text color="black">
-          ${{
-            wallet.currentBalance
-              | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice: wallet.currentMarketPrice }
-              | number: '1.2-2'
-          }}
+          ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+          wallet.currentMarketPrice } | number: '1.2-2' }}
         </p>
       </strong>
       <ng-template #syncingBalance>
