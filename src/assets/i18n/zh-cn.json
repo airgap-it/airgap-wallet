@@ -1,177 +1,159 @@
 {
-  "coin-info": {
-    "title": "账户",
-    "transactions_label": "交易",
-    "ae-mainnet_text": "主网启动后，您将可以转移您的代币",
-    "receive_label": "收款",
-    "send_label": "付款",
-    "aeternity": {
-      "same-phase": {
-        "heading":"<span class=\"style__strong color__primary\">{{currentPhase}} 成功迁移</span>",
-        "text":"您的金额 <span class=\"style__strong color__primary\">{{migratedTokens}}</span>将在下一个硬分叉 <span class=\"style__strong color__primary\">结束后 {{phaseEnd}}</span>可用"
-      },
-      "no-transactions_text": "本账户尚无转账记录",
-      "tx-list-disabled": {
-        "text": "当前无法展示转账历史，请移步区块浏览器",
-        "blockexplorer_label": "打开区块浏览器"
-      }
-    }
-  },
-
-  "introduction": {
-    "title": "新加密钱包标准",
-    "highest": {
-      "label": "最高安全级别",
-      "text": "用AirGap<b>两套设备配合使用</b>的方式使得安全密钥的处理更便捷。</p>"
-    },
-    "medium": {
-      "label": "中等安全级别",
-      "text": "用AirGap<b>两种应用程序</b>的配合使得安全密钥的处理更便捷"
-    },
-    "vault": {
-      "heading": "AirGap Vault",
-      "text": "私钥是由AirGap Vault应用程序生成并安全地存储在另一个设备上的。<b>您必须安装AirGap Vault才能使用AirGap Wallet</b>"  
-    },
-    "wallet": {
-      "heading": "AirGap Wallet",
-      "text": "<b>这是AirGap Wallet应用程序</b>，只处理公开信息并负责向主链广播交易"  
-    },
-    "communication": {
-      "highest_text": "通过二维码的单向通信。",
-      "medium_text": "通通过应用切换实现安全通信"
-    },
-    "vault-install_label": "安装AirGap Vault",
-    "continue_label": "开始吧"
-  },
-
-  "introduction-download": {
-    "title": "安装AirGap Vault",
-    "heading": "开始安装AirGap Vault吧！",
-    "text": "有几种方法可以安装AirGap Vault，选择一个最适合您的。",
-    "play-store_text": "直接从Google Play Store为本机或者其他专用设备安装AirGap Vault",
-    "app-store_text": "直接从APP Store为本机或者其他专用设备安装AirGap Vault。",
-    "linux-distro_label": "Linux发行版本",
-    "install-distro_text": "在专用计算机上安装AirGap Vault，用于签署安全的交易。",
-    "go_label": "开始"
-  },
-
-  "portfolio": {
-    "empty-state_text": " 要使用AirGap Wallet应用程序，你需要<strong>与AirGap 保险箱同步</strong>。选择AirGap Vault中的帐户并显示同步二维码。用AirGap Wallet扫描二维码。",
-    "add-coins_label": "与AirGap Vault同步"
-  },
-
-  "scan": {
-    "title": "扫描二维码",
-    "text": "扫描同步二维码以添加帐户或扫描交易二维码以确认并发送交易。",
-    "empty-state_heading": "为了扫描二维码，AirGap Wallet需要<span class=\"style__strong color__primary\">允许使用相机</span>的手机权限",
-    "grant-permission_label": "允许"
-  },
-
-  "scan-address": {
-    "title": "扫描账户地址",
-    "text": "扫描账户地址的二维码"
-  },
-
-  "scan-sync": {
-    "title": "同步账户数据",
-    "text": "打开AirGap Vault，选择<span ion-text color='white'>z账户</span>，然后<span ion-text color='white'>同步</span>，用AirGap Wallet扫描同步二维码",
-    "description": "此过程中将不会泄露私钥或任何非公开数据",
-    "scan_label": "扫描同步二维码"
-  },
-
-  "settings": {
-    "title": "设置",
-    "help_label": "帮助&支持",
-    "introduction_label": "介绍",
-    "faq_label": "常见问题回答",
-    "telegram_label": "加入电报群",
-    "share_label": "分享AirGap",
-    "information_label": "信息",
-    "github_label": "Github库",
-    "about_label": "关于"
-  },
-
-  "about": {
-    "title": "关于"
-  },
-
-  "transaction-confirm": {
-    "title": "确认交易",
-    "decline_label": "拒绝",
-    "confirm_label": "确认"
-  },
-
-  "transaction-detail": {
-    "title": "交易详情",
-    "open-blockexplorer_label": "打开区块浏览器",
-    "tx-broadcasting": {
-      "heading": "状态：广播中...",
-      "text": "您的交易正在广播，可能需要几秒钟"
-    },
-    "tx-pending": {
-      "heading": "状态：等待中...",
-      "text": "根据您设定的费用，可能需要几分钟才能确认交易"
-    },
-    "tx-success": {
-      "heading": "状态：成功！"
-    }
-  },
-
-  "transaction-prepare": {
-    "title": "发送 {{title}}",
-    "to-address_label": "发送到地址",
-    "to-address-scan_label": "扫描二维码",
-    "amount_label": "金额",
-    "fee": {
-      "label": "费用",
-      "slow_label": "慢 & 便宜",
-      "fast_label": "快 & 贵",
-      "max_label": "最大"
-    },
-    "paste_label": "粘贴",
-    "create-transaction": "创建交易"
-  },
-  "account-detail": {
-    "title": "{{protocolName}}"
-  },
-  "transaction-qr": {
-    "title": "{{title}} 交易二维码",
-    "text": "打开AirGap Vault并扫描该交易，以便对其进行签名",
-    "sign-on-device_label": "本机签名",
-    "done_label": "完成"
-  },
-
-  "wallet-address": {
-    "title": "账户地址",
-    "address_label": "地址",
-    "done_label": "完成"
-  },
-
-  "wallet-import": {
-    "title": "确认导入",
-    "text": "您想导入以下帐户吗？" ,
-    "warning": "您已经在AirGap中添加过该账户",
-    "syncing_label": "同步中...",
-    "cancel_label": "取消",
-    "import_label": "导入"
-  },
-
-  "from-to": {
-    "amount_label": "金额",
-    "fee_label": "费用",
-    "time_label": "时间",
-    "from_label": "从",
-    "to_label": "到"
-  },
-
-  "wallet-edit-popover-component": {
-    "settings_label": "账户设置",
-    "copy-address_label": "复制地址",
-    "delete_label": "删除"
-  },
-  "tabs": {
-    "wallets": "账户",
-    "scan": "扫描二维码",
-    "settings": "设置"
-  }
+    "coin-info.title": "账户",
+    "coin-info.transactions_label": "交易",
+    "coin-info.ae-mainnet_text": "主网启动后，您将可以转移您的代币",
+    "coin-info.receive_label": "收款",
+    "coin-info.send_label": "付款",
+    "coin-info.aeternity.same-phase.heading": "<span class=\"style__strong color__primary\">{{currentPhase}} 成功迁移</span>",
+    "coin-info.aeternity.same-phase.text": "您的金额 <span class=\"style__strong color__primary\">{{migratedTokens}}</span>将在下一个硬分叉 <span class=\"style__strong color__primary\">结束后 {{phaseEnd}}</span>可用",
+    "coin-info.aeternity.no-transactions_text": "本账户尚无转账记录",
+    "coin-info.aeternity.tx-list-disabled.text": "当前无法展示转账历史，请移步区块浏览器",
+    "coin-info.aeternity.tx-list-disabled.blockexplorer_label": "打开区块浏览器",
+    "introduction.title": "新加密钱包标准",
+    "introduction.highest.label": "最高安全级别",
+    "introduction.highest.text": "AirGap的<b>两套设备结合使用</b>的方法，使得安全密钥操作更便捷。",
+    "introduction.medium.label": "中等安全级别",
+    "introduction.medium.text": "AirGap的<b>两种应用程序结合</b>的方式，使得安全密钥操作更便捷。",
+    "introduction.vault.heading": "AirGap Vault",
+    "introduction.vault.text": "助记词生成并安全存储在Air Gap Vault应用程序中。<b>您必须安装Air Gap Vault才能使用AirGap Wallet</b>",
+    "introduction.wallet.heading": "AirGap Wallet",
+    "introduction.wallet.text": "钱包应用程序仅处理公共信息，并负责向区块链广播交易。",
+    "introduction.communication.highest_text": "通过二维码的单向通信",
+    "introduction.communication.medium_text": "通过应用切换实现安全通信",
+    "introduction.vault-install_label": "安装AirGap Vault",
+    "introduction.continue_label": "开始吧",
+    "introduction-download.title": "安装AirGap Vault",
+    "introduction-download.heading": "开始安装AirGap Vault吧！",
+    "introduction-download.text": "有几种方法可以安装AirGap Vault，选择一个最适合您的。",
+    "introduction-download.play-store_text": "直接从Google Play Store为本机或者其他专用设备安装AirGap Vault",
+    "introduction-download.app-store_text": "直接从APP Store为本机或者其他专用设备安装AirGap Vault。",
+    "introduction-download.linux-distro_label": "Linux发行版本",
+    "introduction-download.install-distro_text": "在专用计算机上安装AirGap Vault，用于签署安全的交易。",
+    "introduction-download.go_label": "开始吧",
+    "portfolio.empty-state_text": "首先向AirGap钱包添加硬币，您还需要AirGap Vault应用程序，您的秘密将被安全存储。",
+    "portfolio.add-coins_label": "添加硬币",
+    "scan.title": "扫描二维码",
+    "scan.text": "扫描同步二维码以添加帐户或扫描交易二维码以确认并发送交易。",
+    "scan.empty-state_heading": "为了扫描二维码，AirGap Wallet需要<span class=\"style__strong color__primary\">允许使用相机</span>的手机权限",
+    "scan.grant-permission_label": "授予权限",
+    "scan-address.title": "扫描账户地址",
+    "scan-address.text": "扫描账户地址的二维码",
+    "scan-sync.title": "同步账户数据",
+    "scan-sync.text": "打开AirGap Vault，选择<span ion-text color='white'>z账户</span>，然后<span ion-text color='white'>同步</span>，用AirGap Wallet扫描同步二维码",
+    "scan-sync.description": "此过程中将不会泄露私钥或任何非公开数据",
+    "scan-sync.scan_label": "扫描同步二维码",
+    "settings.title": "设置",
+    "settings.help_label": "帮助&支持",
+    "settings.introduction_label": "介绍",
+    "settings.faq_label": "常见问题回答",
+    "settings.telegram_label": "加入电报群",
+    "settings.share_label": "分享AirGap",
+    "settings.information_label": "信息",
+    "settings.github_label": "Github库",
+    "settings.about_label": "关于",
+    "about.title": "关于",
+    "transaction-confirm.title": "确认交易",
+    "transaction-confirm.decline_label": "拒绝",
+    "transaction-confirm.confirm_label": "确认",
+    "transaction-detail.title": "交易详情",
+    "transaction-detail.open-blockexplorer_label": "打开区块浏览器",
+    "transaction-detail.tx-broadcasting.heading": "状态：广播中...",
+    "transaction-detail.tx-broadcasting.text": "您的交易正在广播，可能需要几秒钟",
+    "transaction-detail.tx-pending.heading": "状态：等待中...",
+    "transaction-detail.tx-pending.text": "根据您设定的费用，可能需要几分钟才能确认交易",
+    "transaction-detail.tx-success.heading": "状态：成功！",
+    "transaction-prepare.title": "发送 {{title}}",
+    "transaction-prepare.to-address_label": "发送到地址",
+    "transaction-prepare.to-address-scan_label": "扫描二维码",
+    "transaction-prepare.amount_label": "金额",
+    "transaction-prepare.fee.label": "费用",
+    "transaction-prepare.fee.slow_label": "慢 & 便宜",
+    "transaction-prepare.fee.fast_label": "快 & 贵",
+    "transaction-prepare.fee.max_label": "最大",
+    "transaction-prepare.paste_label": "粘贴",
+    "transaction-prepare.create-transaction": "创建交易",
+    "account-detail.title": "{{protocolName}}",
+    "transaction-qr.title": "{{title}} 交易二维码",
+    "transaction-qr.text": "打开AirGap Vault并扫描该交易，以便对其进行签名",
+    "transaction-qr.sign-on-device_label": "本机签名",
+    "transaction-qr.done_label": "完成",
+    "wallet-address.title": "账户地址",
+    "wallet-address.address_label": "地址：",
+    "wallet-address.done_label": "完成",
+    "wallet-import.title": "确认导入",
+    "wallet-import.text": "您想导入以下帐户吗？",
+    "wallet-import.warning": "您已经在AirGap中添加过该账户",
+    "wallet-import.syncing_label": "同步中...",
+    "wallet-import.cancel_label": "取消",
+    "wallet-import.import_label": "导入",
+    "from-to.amount_label": "数量",
+    "from-to.fee_label": "手续费",
+    "from-to.time_label": "时间",
+    "from-to.from_label": "从",
+    "from-to.to_label": "到",
+    "wallet-edit-popover-component.settings_label": "账户设定",
+    "wallet-edit-popover-component.copy-address_label": "复制地址",
+    "wallet-edit-popover-component.delete_label": "删除",
+    "tabs.wallets": "账户",
+    "tabs.scan": "扫描二维码",
+    "tabs.settings": "设置",
+    "settings.alert_title": "选择一个频道",
+    "settings.alert_cancel": "取消",
+    "settings.channel.international": "国际化",
+    "settings.channel.chinese": "中文",
+    "interaction-selection.title": "集成保险箱",
+    "interaction-selection.heading": "你想如何与<span class=\"style__strong color__primary\">AirGap保险箱</span>互动",
+    "interaction-selection.same-device_label": "同一台设备",
+    "interaction-selection.same-device_info": "AirGap保险线与AirGap钱包安装在同一设备。",
+    "interaction-selection.offline-device_label": "离线设备",
+    "interaction-selection.offline-device_info": "AirGap保险箱安装在离线设备上，用AirGap钱包扫描二维码",
+    "account-import.title": "确认导入",
+    "account-import.text": "您将导入下面账号吗？",
+    "account-import.warning": "您已在AirGap中添加本账号",
+    "account-import.syncing_label": "同步中...",
+    "account-import.cancel_label": "取消",
+    "account-import.import_label": "导入",
+    "signed-transaction.transaction-unreadable": "我们无法从这个交易中提取信息。但是这不意味交易无效，请确定您的操作，并确保所包含交易数据正常。",
+    "wallet-edit-popover-component.delegate_label": "代表",
+    "wallet-edit-popover-component.undelegate_label": "取消代表",
+    "add-account.title": "增加币",
+    "add-sub-account.title": "添加 {{ typeLabel }}",
+    "add-sub-account.tokens_label": "代币",
+    "add-sub-account.accounts_label": "账号",
+    "add-sub-account.add-account_card.heading": "创建账号",
+    "add-sub-account.add-account_card.text": "如果您想添加Tezos账号，大约需要消耗<strong>~0.260 XTZ</strong>的费用。",
+    "add-sub-account.add-accounts_label": "添加 {{ typeLabel }}",
+    "add-sub-account.no-imports_text": "导入时找不到 {{ typeLabel }} 。",
+    "sub-account-select.title": "选择账号",
+    "sub-account-select.text": "选择您打算授权的<strong>账号</strong>。您将需要签署一个交易用来授权。",
+    "sub-account-select.accounts_label": "账号",
+    "account-detail.tokens_label": "代币",
+    "account-detail.accounts_label": "账号",
+    "account-detail.add-tokens_label": "添加代币",
+    "account-detail.add-accounts_label": "添加账号",
+    "account-detail.send_label": "发送{{protocolSymbol}}",
+    "account-detail.receive_label": "接收",
+    "account-detail.details_label": "细节",
+    "account-detail.no-accounts_text": "任然没有添加{{ label }}，您可以创建或者导入现存的 {{ label }}.",
+    "account-detail.delegate_card.heading": "授权Tezos",
+    "account-detail.delegate_card.text": "您有<strong>{{amount}}</strong>个未授权。如果您现在授权可以分摊费用。",
+    "account-import-onboarding.title": "添加 {{protocolName}}",
+    "account-import-onboarding.text": "你需要AirGap保险箱程序添加<strong>{{protocolName}}</strong>。按指令执行接下来的几步操作。",
+    "account-import-onboarding.slides.slide-1.text": "在同一台设备或者您的离线设备上打开<strong>AirGap保险箱</strong>程序。",
+    "account-import-onboarding.slides.slide-1.description": "到<strong>“账号”</strong>标签选择<strong>“添加账号”</strong>",
+    "account-import-onboarding.slides.slide-2_text": "选择创建的账号，然后在 “账号地址”页面选择<strong>“同步账号”</strong>",
+    "account-import-onboarding.slides.slide-3.text": "您需要同步AirGap保险箱与AirGap钱包的账号。",
+    "account-import-onboarding.slides.slide-3.description": "¬ 如果AirGap保险箱在<strong>离线设备</strong>上, 扫面下一页的<strong>二维码</strong> <br>¬ 如果AirGap保险箱在<strong>同一台设备</strong>上，请使用同一台设备的<strong>同步按钮</strong>.",
+    "account-import-onboarding.slides.slide-4.text": "账号现在可以导入到AirGap钱包",
+    "account-import-onboarding.slides.slide-4.description": "您现在可以用AirGap保险箱和AirGap钱包创建一个<strong>{{protocolName}}</strong>。",
+    "sub-account-import.title": "选择账号",
+    "sub-account-import.text": "为<strong>{{subProtocolName}}</strong>选择您想添加的账号。",
+    "sub-account-import.empty_text": "您已在您的账号中添加 <strong>{{tokenName}}</strong> 账号。",
+    "sub-account-import.import-all_label": "导入所有",
+    "deep-link.not-supported-alert.title": "啊哦",
+    "deep-link.not-supported-alert.message": "只有移动设备支持Deeplinking。",
+    "deep-link.not-supported-alert.ok": "好",
+    "deep-link.app-not-found.title": "啊哦",
+    "deep-link.app-not-found.message": "看起来您在本设备上没有安装 {{otherAppName}}。",
+    "deep-link.app-not-found.ok": "好"
 }
