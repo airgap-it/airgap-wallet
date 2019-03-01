@@ -1,4 +1,5 @@
 import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
+import { AddressValidator } from './../../validators/AddressValidator'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { RegexValidator } from '../../validators/RegexValidator'
@@ -33,15 +34,11 @@ export class TransactionPreparePage {
   ) {
     const address = this.navParams.get('address') || ''
     this.transactionForm = formBuilder.group({
-      address: [address, [Validators.required]],
+      address: [address, Validators.compose([Validators.required, AddressValidator.validate(this.navParams.get('wallet').coinProtocol)])],
       amount: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])],
       feeLevel: [0, [Validators.required]],
       fee: ['0', [Validators.required]],
       isAdvancedMode: [false, []]
-    })
-
-    this.amountForm = formBuilder.group({
-      transactionAmount: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])]
     })
 
     this.useWallet(this.navParams.get('wallet'))
