@@ -58,7 +58,7 @@
       <ion-col col-9 class="amount--container__input">
         <ion-item no-padding no-lines>
           <ion-label no-margin stacked>{{ 'transaction-prepare.amount_label' | translate }}</ion-label>
-          <ion-input formControlName="amount" type="text" id="amount-input" placeholder="0.0"></ion-input>
+          <ion-input formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
         </ion-item>
         <p ion-text no-margin color="blackLight">
           ${{ transactionForm.get('amount').value * wallet.currentMarketPrice | number: '1.2-2' }}
@@ -71,6 +71,10 @@
           </button>
         </ion-buttons>
       </ion-col>
+
+      <p *ngIf="!transactionForm.controls['amount'].valid" color="primary" margin-top text-wrap>
+        {{ 'transaction-prepare.amount-invalid' | translate }}
+      </p>
     </ion-row>
     <div class="divider--line"></div>
     <ion-row padding-horizontal class="fee--amount__label">

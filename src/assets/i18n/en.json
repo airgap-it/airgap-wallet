@@ -142,7 +142,8 @@
       "max_label": "MAX"
     },
     "paste_label": "Paste",
-    "create-transaction": "Create Transaction"
+    "create-transaction": "Create Transaction", 
+    "amount-invalid": "please enter a valid amount"
   },
 
   "transaction-qr": {
