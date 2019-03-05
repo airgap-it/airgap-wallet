@@ -37,7 +37,7 @@ export class TransactionPreparePage {
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(this.navParams.get('wallet').coinProtocol)])],
       amount: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])],
       feeLevel: [0, [Validators.required]],
-      fee: ['0', [Validators.required]],
+      fee: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])],
       isAdvancedMode: [false, []]
     })
 

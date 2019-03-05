@@ -143,7 +143,7 @@
     },
     "paste_label": "Paste",
     "create-transaction": "Create Transaction", 
-    "amount_invalid": "Please enter a valid amount",
+    "number_invalid": "Please enter a valid number",
     "address_invalid": "You entered the wrong address format, it should start with"
     },
 

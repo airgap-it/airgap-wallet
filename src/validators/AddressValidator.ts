@@ -3,14 +3,12 @@ import { FormControl } from '@angular/forms'
 
 export class AddressValidator {
   static validate(protocol: ICoinProtocol): any {
-    let regExp = protocol.addressValidationPattern
+    const regExp = protocol.addressValidationPattern
     return (control: FormControl) => {
       if (String(control.value).match(regExp) === null) {
-        console.log(control.value, 'address invalid')
-        return false
+        return { addressFormat: 'Address format is unknown.' }
       }
-      console.log(control, 'address valid')
-      return true
+      return null
     }
   }
 }
