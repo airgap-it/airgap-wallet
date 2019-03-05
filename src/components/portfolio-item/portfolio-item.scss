@@ -1,4 +1,8 @@
 portfolio-item {
+  ion-badge,
+  ion-label {
+    margin: 0 !important;
+  }
   .symbol--icon {
     position: absolute;
     height: 24px;
@@ -33,7 +37,7 @@ portfolio-item {
       width: 80%;
     }
     h3 {
-      height: 1.4rem;
+      height: 40px;
       width: 40%;
     }
     p {
