@@ -1,0 +1,48 @@
+{
+  "name": "AirGap Wallet (Alpha)",
+  "version": "0.0.1",
+  "description": "Create crypto transactions from your browser and sign it offline with the AirGap Vault mobile application for Ethereum.",
+  "content_security_policy": "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'sha256-lG4v70824YB45U1RBIea+APGH4NCk0TKCr0fQRbsjik='; object-src 'self'; default-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';",
+
+  "content_scripts": [
+    {
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "js": ["dist/contentscript.js"],
+
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": ["dist/injection.js"],
+
+  "background": {
+    "scripts": ["dist/background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_icon": "assets/icons/logo_wallet-white-32.png"
+  },
+  "manifest_version": 2,
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "unlimitedStorage",
+    "clipboardWrite",
+    "http://localhost:8545/",
+    "https://*.infura.io/",
+    "webRequest",
+    "*://*.eth/",
+    "notifications"
+  ],
+  "icons": {
+    "16": "assets/icons/logo_wallet-white-16.png",
+    "19": "assets/icons/logo_wallet-white-19.png",
+    "32": "assets/icons/logo_wallet-white-32.png",
+    "48": "assets/icons/logo_wallet-white-48.png",
+    "64": "assets/icons/logo_wallet-white-64.png",
+    "128": "assets/icons/logo_wallet-white-128.png",
+    "512": "assets/icons/logo_wallet-white-512.png"
+  }
+}

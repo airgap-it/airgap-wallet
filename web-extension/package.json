@@ -1,0 +1,20 @@
+{
+  "name": "airgap-web-extension",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc && webpack"
+  },
+  "dependencies": {
+    "web3": "^1.0.0-beta.36",
+    "web3-provider-engine": "^14.0.6"
+  },
+  "devDependencies": {
+    "raw-loader": "^0.5.1",
+    "string-replace-loader": "^2.1.1",
+    "transform-loader": "^0.2.4",
+    "typescript": "^3.2.2",
+    "webpack": "^4.17.3",
+    "webpack-cli": "^3.1.2"
+  }
+}

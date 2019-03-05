@@ -24,7 +24,10 @@
     "e2e-update": "webdriver-manager update --standalone false --gecko false",
     "postinstall": "npm run browserify-coinlib",
     "browserify-coinlib": "browserify ./node_modules/airgap-coin-lib/dist/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\""
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\"",
+    "extension:prepare": "cd web-extension && npm install",
+    "extension:build:extension-only": "cd web-extension && tsc && webpack && cd .. && node ./scripts/copy-extension-files.js",
+    "extension:build:all": "npm run build --prod && npm run extension:build:extension-only"
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
