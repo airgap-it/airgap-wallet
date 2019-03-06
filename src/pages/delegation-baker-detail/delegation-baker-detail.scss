@@ -1,0 +1,22 @@
+page-delegation-baker-detail {
+  .progress--container {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(color($colors, primary), 0.12);
+  }
+  .progress--current {
+    width: 50%;
+    height: inherit;
+    background-color: color($colors, primary, base);
+  }
+  .border--container {
+    border: 1px solid color($colors, secondary, base);
+    border-radius: 50%;
+  }
+  .card-ios,
+  .card-md {
+    padding: 8px 0;
+    box-shadow: 0 10px 20px 0 rgba(color($colors, secondary), 0.12);
+    border: 1px solid rgba(color($colors, primary), 0.08);
+  }
+}
