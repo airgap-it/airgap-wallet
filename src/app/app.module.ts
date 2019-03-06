@@ -59,6 +59,7 @@ import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
 import { OperationsProvider } from '../providers/operations/operations'
+import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -90,7 +91,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountDetailPage,
     InteractionSelectionPage,
     SubAccountSelectPage,
-    SelectWalletPage
+    SelectWalletPage,
+    DelegationBakerDetailPage
   ],
   imports: [
     BrowserModule,
@@ -144,7 +146,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountDetailPage,
     InteractionSelectionPage,
     SelectWalletPage,
-    SubAccountSelectPage
+    SubAccountSelectPage,
+    DelegationBakerDetailPage
   ],
   providers: [
     StatusBar,

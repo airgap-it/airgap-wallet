@@ -7,9 +7,9 @@
 <ion-content>
   <ion-row padding-horizontal>
     <ion-item no-lines no-padding>
-      <ion-avatar item-start><identicon [address]="'KT1RBMUbb7QSD46VXhAvaMiyVSoys6QZiTxN'"></identicon></ion-avatar>
+      <ion-avatar item-start><identicon [address]="bakerAddress"></identicon></ion-avatar>
       <h2 class="font--weight__bold" ion-text color="black">tezosAirGap</h2>
-      <p>KT1RBMUbb7QSD46VXhAvaMiyVSoys6QZiTxN</p>
+      <p>{{ bakerAddress }}</p>
     </ion-item>
   </ion-row>
   <ion-row padding-horizontal padding-bottom>
@@ -24,10 +24,10 @@
     <ion-col col-12 no-padding>
       <ion-row>
         <ion-col col-6 no-padding>
-          <small>50%</small>
+          <small>{{ bakerInfo?.bakerUsage * 100 | number }} %</small>
         </ion-col>
         <ion-col col-6 text-right no-padding>
-          <small>70'123 / 80'000 XTZ</small>
+          <small>{{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} / {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}</small>
         </ion-col>
       </ion-row>
     </ion-col>
