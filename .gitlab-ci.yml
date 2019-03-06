@@ -99,6 +99,7 @@ build_chrome_extension:
     - sed -i -e "s/VERSION_NUMBER/$VERSION/g" src/providers/app-info/app-info.ts
     - sed -i -e "s/VERSION_CODE/$CI_PIPELINE_ID/g" src/providers/app-info/app-info.ts
     - npm install
+    - npm run browserify-coinlib
     - npm run extension:prepare
     - npm run extension:build:all
     - sed -i -e "/\"version\"/c\ \"version\" :\"$VERSION\"," extension/manifest.json
