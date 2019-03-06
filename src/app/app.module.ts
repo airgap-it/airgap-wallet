@@ -120,7 +120,7 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
     }),
     ComponentsModule,
     PipesModule
