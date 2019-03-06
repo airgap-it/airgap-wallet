@@ -26,4 +26,10 @@ page-scan {
       max-height: 50%;
     }
   }
+
+  video {
+    min-height: 705px;
+    min-width: 100vw;
+    object-fit: contain;
+  }
 }

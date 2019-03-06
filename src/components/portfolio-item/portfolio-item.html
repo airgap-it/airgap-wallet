@@ -13,6 +13,7 @@
     </ng-template>
     <ng-container *ngIf="!isToken">
       <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" ion-text color="blackLight" class="typography--mono">
+        <ion-badge item-end color="secondary" *ngIf="isActive">active</ion-badge>
         {{ wallet.receivingPublicAddress | shortenString }}
       </h3>
     </ng-container>

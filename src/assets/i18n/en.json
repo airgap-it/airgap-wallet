@@ -94,6 +94,10 @@
     "channel": {
       "international": "International",
       "chinese": "Chinese"
+    },
+    "select-account": {
+      "title": "Select Account",
+      "text": "Select an account for the Chrome Extension"
     }
   },
 
@@ -104,6 +108,17 @@
     "incompatible_label": "These accounts appear to be incompatible"
   },
 
+  "web-extension-disclaimer": {
+    "heading": "This is a <span class=\"style__strong color__primary\">ALPHA</span> version, only use with small amounts of funds.", 
+    "text": "The extesion has been currently tested with.",
+    "list": {
+      "item-1_text": "MyEtherWallet",
+      "item-2_text": "MyCrypto"
+    },
+    "description": "Other platforms or dapps might work, we would be really grateful for every input, issue report or feature request.",
+    "accept_label": "I understand"
+  },
+
   "about": {
     "title": "About"
   },
@@ -111,7 +126,8 @@
   "transaction-confirm": {
     "title": "Confirm Transaction",
     "decline_label": "Decline",
-    "confirm_label": "Confirm"
+    "confirm_label": "Confirm",
+    "qr-data-too-big_warning": "The QR code could not be created, the transaction's data is too big"
   },
 
   "transaction-detail": {

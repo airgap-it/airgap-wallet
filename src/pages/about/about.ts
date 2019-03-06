@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
-import { AppVersion } from '@ionic-native/app-version'
 import { NavController, NavParams } from 'ionic-angular'
-import { handleErrorSentry } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { AppInfoProvider } from '../../providers/app-info/app-info'
 
 @Component({
   selector: 'page-about',
@@ -13,14 +13,14 @@ export class AboutPage {
   public versionNumber = ''
   public versionCode = ''
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private app: AppVersion) {
-    this.updateVersions().catch(handleErrorSentry())
+  constructor(public navCtrl: NavController, public navParams: NavParams, private appInfoProvider: AppInfoProvider) {
+    this.updateVersions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
   async updateVersions() {
-    this.appName = await this.app.getAppName()
-    this.packageName = await this.app.getPackageName()
-    this.versionNumber = await this.app.getVersionNumber()
-    this.versionCode = await this.app.getVersionCode()
+    this.appName = this.appInfoProvider.getAppName()
+    this.packageName = this.appInfoProvider.getPackageName()
+    this.versionNumber = this.appInfoProvider.getVersionNumber()
+    this.versionCode = this.appInfoProvider.getVersionCode()
   }
 }

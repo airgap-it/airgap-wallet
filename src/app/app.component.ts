@@ -7,10 +7,16 @@ import { Platform, Nav } from 'ionic-angular'
 
 import { TabsPage } from '../pages/tabs/tabs'
 
-import { AppVersion } from '@ionic-native/app-version'
+import { Storage } from '@ionic/storage'
+
+import { AccountProvider } from '../providers/account/account.provider'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
+import { WebExtensionProvider } from '../providers/web-extension/web-extension'
+import { AppInfoProvider } from '../providers/app-info/app-info'
+import { SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
+import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
 
 @Component({
   templateUrl: 'app.html'
@@ -27,9 +33,12 @@ export class MyApp {
     private splashScreen: SplashScreen,
     private translate: TranslateService,
     private deeplinks: Deeplinks,
-    private appVersion: AppVersion,
     private schemeRoutingProvider: SchemeRoutingProvider,
-    private protocolsProvider: ProtocolsProvider
+    private protocolsProvider: ProtocolsProvider,
+    private storage: Storage, // TODO remove
+    private webExtensionProvider: WebExtensionProvider,
+    private appInfoProvider: AppInfoProvider,
+    private accountProvider: AccountProvider
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -42,13 +51,27 @@ export class MyApp {
 
     await this.platform.ready()
 
+    console.log(this.storage) // TODO: Remove
+
     if (this.platform.is('cordova')) {
       this.statusBar.styleDefault()
       this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
-      setSentryRelease(await this.appVersion.getVersionNumber())
+      setSentryRelease('app_' + this.appInfoProvider.getVersionNumber())
+    } else if (this.webExtensionProvider.isWebExtension()) {
+      setSentryRelease('ext_' + this.appInfoProvider.getVersionNumber())
     } else {
-      setSentryRelease('browser') // TODO: Set version in CI once we have browser version
+      setSentryRelease('browser_' + this.appInfoProvider.getVersionNumber()) // TODO: Set version in CI once we have browser version
+    }
+
+    let url = new URL(location.href)
+
+    if (url.searchParams.get('rawUnsignedTx')) {
+      // Wait until wallets are initialized
+      let sub = this.accountProvider.wallets.subscribe(wallets => {
+        this.walletDeeplink()
+        sub.unsubscribe()
+      })
     }
   }
 
@@ -90,5 +113,40 @@ export class MyApp {
           }
         )
     }
+  }
+
+  // TODO: Move to provider
+  async walletDeeplink() {
+    let url = new URL(location.href)
+    let publicKey = url.searchParams.get('publicKey')
+    let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
+    let identifier = url.searchParams.get('identifier')
+    console.log('publicKey', publicKey)
+    console.log('rawUnsignedTx', rawUnsignedTx)
+    console.log('identifier', identifier)
+
+    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
+    const airGapTx = wallet.coinProtocol.getTransactionDetails({
+      publicKey: wallet.publicKey,
+      transaction: rawUnsignedTx
+    })
+
+    const syncProtocol = new SyncProtocolUtils()
+    const serializedTx = await syncProtocol.serialize({
+      version: 1,
+      protocol: wallet.coinProtocol.identifier,
+      type: EncodedType.UNSIGNED_TRANSACTION,
+      payload: {
+        publicKey: wallet.publicKey,
+        transaction: rawUnsignedTx,
+        callback: 'airgap-wallet://?d='
+      }
+    })
+
+    this.nav.push(TransactionQrPage, {
+      wallet: wallet,
+      airGapTx: airGapTx,
+      data: 'airgap-vault://?d=' + serializedTx
+    })
   }
 }

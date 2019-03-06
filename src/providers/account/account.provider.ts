@@ -3,6 +3,7 @@ import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 import { map } from 'rxjs/operators'
+import { ActiveAccountProvider } from '../active-account/active-account'
 
 @Injectable()
 export class AccountProvider {
@@ -18,7 +19,7 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().auditTime(50)
   }
 
-  constructor(private storageProvider: StorageProvider) {
+  constructor(private storageProvider: StorageProvider, private activeAccountProvider: ActiveAccountProvider) {
     this.loadWalletsFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
@@ -41,7 +42,8 @@ export class AccountProvider {
 
   private async loadWalletsFromStorage() {
     const rawWallets = await this.storageProvider.get(SettingsKey.WALLET)
-    let wallets = rawWallets
+
+    let wallets = rawWallets || []
 
     // migrating double-serialization
     if (!(rawWallets instanceof Array)) {
@@ -118,6 +120,11 @@ export class AccountProvider {
       throw new Error('wallet already exists')
     }
 
+    // WebExtension: Add as active wallet if it's the first wallet
+    if (this.walletList.length === 0) {
+      this.activeAccountProvider.changeActiveAccount(wallet)
+    }
+
     this.walletList.push(wallet)
     this.wallets.next(this.walletList)
     return this.persist()
@@ -125,6 +132,15 @@ export class AccountProvider {
 
   public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
     let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
+
+    if (this.isSameWallet(testWallet, this.activeAccountProvider.getActiveAccount())) {
+      if (this.walletList.length > 1) {
+        this.activeAccountProvider.changeActiveAccount(this.walletList[0])
+      } else if (this.walletList.length === 1) {
+        this.activeAccountProvider.resetActiveAccount()
+      }
+    }
+
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
