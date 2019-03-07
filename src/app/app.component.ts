@@ -70,7 +70,9 @@ export class MyApp {
       // Wait until wallets are initialized
       let sub = this.accountProvider.wallets.subscribe(wallets => {
         this.walletDeeplink()
-        sub.unsubscribe()
+        if (sub) {
+          sub.unsubscribe()
+        }
       })
     }
   }
