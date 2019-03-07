@@ -126,7 +126,7 @@ export class MyApp {
     console.log('identifier', identifier)
 
     let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
-    const airGapTx = wallet.coinProtocol.getTransactionDetails({
+    const airGapTx = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
     })
