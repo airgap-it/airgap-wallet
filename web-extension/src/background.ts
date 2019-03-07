@@ -1,8 +1,8 @@
 import { Transactions } from './constants'
 
 declare let chrome
-const height = 500
-const width = 333
+const height = 900
+const width = 600
 
 chrome.runtime.onMessage.addListener(async function(request) {
   if (request.data.type === Transactions.OUTGOING_TRANSACTION) {
