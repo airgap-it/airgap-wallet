@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener(async function(request) {
       console.log('JSON.stringify(rawUnsignedTx): ', JSON.stringify(rawUnsignedTx))
 
       chrome.windows.create({
-        url: `html/notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
+        url: `index.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
         type: 'popup',
         width,
         height
