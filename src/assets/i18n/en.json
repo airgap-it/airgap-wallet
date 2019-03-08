@@ -90,9 +90,10 @@
     }
   },
   "select-wallet": {
-    "title": "Select a wallet",
-    "compatible": "Select one of these wallet which seem compatible to send a transaction from",
-    "incompatible": "These wallets appear to be incompatible"
+    "title": "Select Account",
+    "text": "You've scanned an address. Select one of the following accounts, if you want to <strong>send to this address</strong>.",
+    "compatible_label": "These accounts appear to be compatible",
+    "incompatible_label": "These accounts appear to be incompatible"
   },
   "about": {
     "title": "About"

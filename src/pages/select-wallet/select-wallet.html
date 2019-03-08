@@ -4,21 +4,18 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <span ion-text class="font--weight__bold" color="primary">
-    <ng-container>
-      {{ 'select-wallet.compatible' | translate }}
-    </ng-container>
-  </span>
+<ion-content>
+  <p [innerHTML]="'select-wallet.text' | translate" padding-horizontal></p>
+  <p ion-text class="font--weight__bold" color="primary" padding-horizontal>
+    {{ 'select-wallet.compatible_label' | translate }}
+  </p>
   <ion-list no-lines margin-top *ngFor="let wallet of wallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
   </ion-list>
 
-  <span ion-text class="font--weight__bold" color="primary">
-    <ng-container>
-      {{ 'select-wallet.incompatible' | translate }}
-    </ng-container>
-  </span>
+  <p ion-text class="font--weight__bold" color="primary" padding-horizontal>
+    {{ 'select-wallet.incompatible_label' | translate }}
+  </p>
 
   <ion-list no-lines margin-top *ngFor="let wallet of incompatibleWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
