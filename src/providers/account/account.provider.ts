@@ -3,11 +3,14 @@ import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 import { map } from 'rxjs/operators'
-import { ActiveAccountProvider } from '../active-account/active-account'
 
 @Injectable()
 export class AccountProvider {
   private walletList: AirGapMarketWallet[] = []
+  public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
+  public refreshPageSubject: Subject<void> = new Subject()
+
+  private activeAccount: AirGapMarketWallet
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -19,8 +22,9 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().auditTime(50)
   }
 
-  constructor(private storageProvider: StorageProvider, private activeAccountProvider: ActiveAccountProvider) {
+  constructor(private storageProvider: StorageProvider) {
     this.loadWalletsFromStorage().catch(console.error)
+    this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
   }
@@ -122,7 +126,7 @@ export class AccountProvider {
 
     // WebExtension: Add as active wallet if it's the first wallet
     if (this.walletList.length === 0) {
-      this.activeAccountProvider.changeActiveAccount(wallet)
+      this.changeActiveAccount(wallet)
     }
 
     this.walletList.push(wallet)
@@ -133,11 +137,11 @@ export class AccountProvider {
   public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
     let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
 
-    if (this.isSameWallet(testWallet, this.activeAccountProvider.getActiveAccount())) {
+    if (this.isSameWallet(testWallet, this.getActiveAccount())) {
       if (this.walletList.length > 1) {
-        this.activeAccountProvider.changeActiveAccount(this.walletList[0])
+        this.changeActiveAccount(this.walletList[0])
       } else if (this.walletList.length === 1) {
-        this.activeAccountProvider.resetActiveAccount()
+        this.resetActiveAccount()
       }
     }
 
@@ -212,5 +216,41 @@ export class AccountProvider {
         })
       )
       .toPromise()
+  }
+
+  private async loadActiveAccountFromStorage() {
+    let publicKey = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
+    this.activeAccount = publicKey
+    this.persistActiveAccount(publicKey)
+    this.publish(publicKey)
+  }
+
+  public changeActiveAccount(wallet: AirGapMarketWallet) {
+    this.activeAccount = wallet
+    this.persistActiveAccount(wallet)
+    this.publish(wallet)
+    this.refreshPage()
+  }
+
+  private publish(wallet: AirGapMarketWallet) {
+    this.activeAccountSubject.next(wallet)
+  }
+
+  private refreshPage() {
+    this.refreshPageSubject.next()
+  }
+
+  public getActiveAccount(): AirGapMarketWallet {
+    return this.activeAccount
+  }
+
+  public resetActiveAccount() {
+    this.activeAccount = undefined
+    this.persistActiveAccount(this.activeAccount)
+    this.refreshPage()
+  }
+
+  private async persistActiveAccount(wallet: AirGapMarketWallet): Promise<void> {
+    return this.storageProvider.set(SettingsKey.SELECTED_ACCOUNT, wallet)
   }
 }

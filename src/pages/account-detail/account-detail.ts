@@ -13,7 +13,6 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import BigNumber from 'bignumber.js'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
-import { ActiveAccountProvider } from '../../providers/active-account/active-account'
 
 @Component({
   selector: 'page-account-detail',
@@ -43,8 +42,7 @@ export class AccountDetailPage {
     private popoverCtrl: PopoverController,
     private accountProvider: AccountProvider,
     private operationsProvider: OperationsProvider,
-    private webExtensionProvider: WebExtensionProvider,
-    private activeAccountProvider: ActiveAccountProvider
+    private webExtensionProvider: WebExtensionProvider
   ) {
     function assertUnreachable(x: never): void {
       /* */
@@ -83,7 +81,7 @@ export class AccountDetailPage {
   }
 
   ngOnInit(): void {
-    this.activeAccountProvider.activeAccountSubject.subscribe(activeAccount => {
+    this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
       if (this.wallet && activeAccount) {
         this.isActive = this.accountProvider.isSameWallet(this.wallet, activeAccount)
       }
@@ -152,6 +150,6 @@ export class AccountDetailPage {
   }
 
   public activateAccount() {
-    this.activeAccountProvider.changeActiveAccount(this.wallet)
+    this.accountProvider.changeActiveAccount(this.wallet)
   }
 }

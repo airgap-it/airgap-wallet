@@ -3,7 +3,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { ActiveAccountProvider } from '../../providers/active-account/active-account'
 
 @Component({
   selector: 'portfolio-item',
@@ -27,13 +26,12 @@ export class PortfolioItemComponent {
   constructor(
     private readonly operationsProvider: OperationsProvider,
     public webExtensionProvider: WebExtensionProvider,
-    public accountProvider: AccountProvider,
-    public activeAccountProvider: ActiveAccountProvider
+    public accountProvider: AccountProvider
   ) {}
 
   ngOnInit(): void {
     if (this.webExtensionProvider.isWebExtension()) {
-      this.activeAccountProvider.activeAccountSubject.subscribe(activeAccount => {
+      this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
         if (this.wallet && activeAccount) {
           this.isActive = this.accountProvider.isSameWallet(this.wallet, activeAccount)
         }
