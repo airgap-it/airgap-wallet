@@ -7,8 +7,8 @@
     "send_label": "Send",
     "aeternity": {
       "same-phase": {
-        "heading":"<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
-        "text":"Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
+        "heading": "<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
+        "text": "Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
       },
       "no-transactions_text": "There are no transactions yet for this account.",
       "tx-list-disabled": {
@@ -17,7 +17,6 @@
       }
     }
   },
-
   "introduction": {
     "title": "The New Crypto Wallet Standard",
     "highest": {
@@ -43,7 +42,6 @@
     "vault-install_label": "Install AirGap Vault",
     "continue_label": "Let's Go"
   },
-
   "introduction-download": {
     "title": "Install AirGap Vault",
     "heading": "Let's install AirGap Vault!",
@@ -54,31 +52,26 @@
     "install-distro_text": "Install AirGap Vault Distribution on a dedicated computer for signing transactions air gapped.",
     "go_label": "Let's Go"
   },
-
   "portfolio": {
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
     "add-coins_label": "Add Coins"
   },
-
   "scan": {
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",
     "empty-state_heading": "In order to scan QR codes, AirGap Wallet needs the <span class=\"style__strong color__primary\">camera permission</span>.",
     "grant-permission_label": "Grant permission"
   },
-
   "scan-address": {
     "title": "Scan Account Address",
     "text": "Scan the QR code of an account address."
   },
-
   "scan-sync": {
     "title": "Sync Account Data",
     "text": "Open AirGap Vault, select an <span ion-text color='white'>account</span> and then <span ion-text color='white'>Sync</span>, scan the Sync QR code with AirGap Wallet.",
     "description": "No private keys or any non-public data will be shared during this process.",
     "scan_label": "Scan Sync QR Code"
   },
-
   "settings": {
     "title": "Settings",
     "help_label": "Help & Support",
@@ -96,17 +89,19 @@
       "chinese": "Chinese"
     }
   },
-
+  "select-wallet": {
+    "title": "Select a wallet",
+    "compatible": "Select one of these wallet which seem compatible to send a transaction from",
+    "incompatible": "These wallets appear to be incompatible"
+  },
   "about": {
     "title": "About"
   },
-
   "transaction-confirm": {
     "title": "Confirm Transaction",
     "decline_label": "Decline",
     "confirm_label": "Confirm"
   },
-
   "transaction-detail": {
     "title": "Transaction Detail",
     "open-blockexplorer_label": "Open Blockexplorer",
@@ -122,7 +117,6 @@
       "heading": "Status: Successful!"
     }
   },
-
   "transaction-prepare": {
     "title": "Send {{title}}",
     "to-address_label": "To Address",
@@ -137,14 +131,12 @@
     "paste_label": "Paste",
     "create-transaction": "Create Transaction"
   },
-
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
     "text": "Open AirGap Vault and scan this transaction in order to sign it.",
     "sign-on-device_label": "Sign on this device",
     "done_label": "Done"
   },
-
   "interaction-selection": {
     "title": "Vault Interaction",
     "heading": "How would you like to interact with <span class=\"style__strong color__primary\">AirGap Vault</span>?",
@@ -153,13 +145,11 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
     "done_label": "Done"
   },
-
   "account-import": {
     "title": "Confirm Import",
     "text": "Would you like to import the following account?",
@@ -168,7 +158,6 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-
   "from-to": {
     "amount_label": "Amount",
     "fee_label": "Fee",
@@ -176,11 +165,9 @@
     "from_label": "From",
     "to_label": "To"
   },
-
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
-
   "wallet-edit-popover-component": {
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
@@ -211,7 +198,6 @@
     "title": "Select Account",
     "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
     "accounts_label": "Accounts"
-
   },
   "account-detail": {
     "title": "{{protocolName}}",
@@ -227,7 +213,7 @@
       "heading": "Delegate Tezos",
       "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
     }
-    },
+  },
   "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
@@ -235,7 +221,7 @@
       "slide-1": {
         "text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
         "description": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>."
-      },       
+      },
       "slide-2_text": "Select the created account and on the “Account Address” page choose <strong>“Sync Account”</strong>.",
       "slide-3": {
         "text": "You need to sync the account from AirGap Vault to AirGap Wallet.",
@@ -244,7 +230,7 @@
       "slide-4": {
         "text": "The account can now be imported to AirGap Wallet.",
         "description": "You’re now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
-      }    
+      }
     }
   },
   "sub-account-import": {

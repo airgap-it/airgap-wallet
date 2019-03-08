@@ -1,3 +1,4 @@
+import { SelectWalletPage } from './../pages/select-wallet/select-wallet'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ErrorHandler, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
@@ -88,7 +89,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountImportOnboardingPage,
     AccountDetailPage,
     InteractionSelectionPage,
-    SubAccountSelectPage
+    SubAccountSelectPage,
+    SelectWalletPage
   ],
   imports: [
     BrowserModule,
@@ -141,6 +143,7 @@ export function createTranslateLoader(http: HttpClient) {
     AccountImportOnboardingPage,
     AccountDetailPage,
     InteractionSelectionPage,
+    SelectWalletPage,
     SubAccountSelectPage
   ],
   providers: [

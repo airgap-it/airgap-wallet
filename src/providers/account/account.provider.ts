@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators'
 @Injectable()
 export class AccountProvider {
   private walletList: AirGapMarketWallet[] = []
+  private compatibleWallets: AirGapMarketWallet[] = []
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -144,5 +145,33 @@ export class AccountProvider {
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
       wallet1.addressIndex === wallet2.addressIndex
     )
+  }
+
+  public getCompatibleWallets() {
+    return this.compatibleWallets
+  }
+
+  public addWalletSelection(wallet: AirGapMarketWallet) {
+    this.compatibleWallets.push(wallet)
+  }
+
+  public getIncompatibleWallets() {
+    let incompatibleWallets = []
+    this.getWalletList().forEach(wallet => {
+      let count = 0
+      this.getCompatibleWallets().forEach(compatibleWallet => {
+        if (wallet.publicKey === compatibleWallet.publicKey && wallet.coinProtocol === wallet.coinProtocol) {
+          count++
+        }
+      })
+      if (count === 0) {
+        incompatibleWallets.push(wallet)
+      }
+    })
+    return incompatibleWallets
+  }
+
+  public clearWalletSelection() {
+    this.compatibleWallets = []
   }
 }

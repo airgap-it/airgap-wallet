@@ -30,8 +30,9 @@ export class TransactionPreparePage {
     private http: HttpClient,
     private clipboardProvider: ClipboardProvider
   ) {
+    const address = this.navParams.get('address') || ''
     this.transactionForm = formBuilder.group({
-      address: ['', [Validators.required]],
+      address: [address, [Validators.required]],
       amount: ['0', [Validators.required]],
       feeLevel: [0, [Validators.required]],
       fee: ['0', [Validators.required]],
