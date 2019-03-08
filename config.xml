@@ -59,6 +59,9 @@
                 <string>airgap-vault</string>
             </array>
         </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="ITSAppUsesNonExemptEncryption">
+            <false/>
+        </edit-config>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <allow-intent href="airgap-vault:*" />
