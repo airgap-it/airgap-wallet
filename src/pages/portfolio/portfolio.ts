@@ -1,3 +1,4 @@
+import { PushProvider } from '../../providers/push/push'
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { Observable } from 'rxjs'
@@ -28,7 +29,8 @@ export class PortfolioPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private walletsProvider: AccountProvider,
-    private operationsProvider: OperationsProvider
+    private operationsProvider: OperationsProvider,
+    private pushProvider: PushProvider
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
@@ -54,6 +56,7 @@ export class PortfolioPage {
   }
 
   openAccountAddPage() {
+    this.pushProvider.initPush()
     this.navCtrl.push(AccountAddPage).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 

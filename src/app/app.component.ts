@@ -1,4 +1,6 @@
 import { DeepLinkProvider } from './../providers/deep-link/deep-link'
+import { PushProvider } from './../providers/push/push'
+
 import { Component, ViewChild } from '@angular/core'
 import { Deeplinks } from '@ionic-native/deeplinks'
 import { SplashScreen } from '@ionic-native/splash-screen'
@@ -37,7 +39,8 @@ export class MyApp {
     private webExtensionProvider: WebExtensionProvider,
     private appInfoProvider: AppInfoProvider,
     private accountProvider: AccountProvider,
-    private deepLinkProvider: DeepLinkProvider
+    private deepLinkProvider: DeepLinkProvider,
+    private pushProvider: PushProvider
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -98,6 +101,8 @@ export class MyApp {
 
   async ngAfterViewInit() {
     await this.platform.ready()
+    this.pushProvider.initPush()
+    this
     if (this.platform.is('cordova')) {
       this.deeplinks
         .route({
