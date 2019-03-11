@@ -140,19 +140,16 @@ export class AccountProvider {
 
   public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
     let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
-
-    if (this.isSameWallet(testWallet, this.getActiveAccount())) {
-      if (this.walletList.length > 1) {
-        this.changeActiveAccount(this.walletList[0])
-      } else if (this.walletList.length === 1) {
-        this.resetActiveAccount()
-      }
-    }
-
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
-
+    if (this.isSameWallet(testWallet, this.getActiveAccount())) {
+      if (this.walletList.length > 0) {
+        this.changeActiveAccount(this.walletList[0])
+      } else if (this.walletList.length === 0) {
+        this.resetActiveAccount()
+      }
+    }
     this.wallets.next(this.walletList)
     return this.persist()
   }

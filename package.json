@@ -27,6 +27,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\"",
     "extension:prepare": "cd web-extension && npm install",
     "extension:build:extension-only": "cd web-extension && tsc && webpack && cd .. && node ./scripts/copy-extension-files.js",
+    "extension:build:dev": "npm run build && npm run extension:build:extension-only",
     "extension:build:all": "npm run build --prod && npm run extension:build:extension-only"
   },
   "config": {
