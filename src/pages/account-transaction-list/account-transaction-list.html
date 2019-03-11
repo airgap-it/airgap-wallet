@@ -5,10 +5,30 @@
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <portfolio-item [wallet]="wallet"></portfolio-item>
+  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
 </ion-header>
 
 <ion-content>
+  <!-- TODO: show for 5 mins if transaction has been broadcasted
+  <ng-container>
+    <ion-row padding-horizontal>
+      <ion-col col-12 no-padding padding-top>
+        <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.pending-transactions.label' | translate }}</span>
+      </ion-col>
+      <ion-col col-12 no-padding>
+        <p>{{ 'coin-info.pending-transactions.text' | translate }}</p>
+      </ion-col>
+      <ion-col col-12 no-padding>
+      TODO: open blockexplorer of account
+        <button outline ion-button color="secondary" round icon-start small>
+          <ion-icon md-name="open_in_new"></ion-icon>
+          {{ 'coin-info.pending-transactions.open-blockexplorer_label' | translate }}
+        </button>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+  -->
+
   <tezos-delegation-card
     *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
     [wallet]="wallet"
@@ -120,14 +140,20 @@
         <ion-col no-padding>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
-              'HH:mm' } }}
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
+              }}
             </p>
           </ion-row>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
-              'L' } }}
+              {{
+                t.timestamp
+                  | amFromUnix
+                  | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
+              }}
             </p>
           </ion-row>
         </ion-col>
