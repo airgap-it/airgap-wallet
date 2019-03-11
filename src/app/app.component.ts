@@ -1,21 +1,18 @@
+import { DeepLinkProvider } from './../providers/deep-link/deep-link'
 import { Component, ViewChild } from '@angular/core'
 import { Deeplinks } from '@ionic-native/deeplinks'
 import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateService } from '@ngx-translate/core'
 import { Platform, Nav } from 'ionic-angular'
-
 import { TabsPage } from '../pages/tabs/tabs'
-
 import { Storage } from '@ionic/storage'
-
 import { AccountProvider } from '../providers/account/account.provider'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
 import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
-import { SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
 
 @Component({
@@ -38,7 +35,8 @@ export class MyApp {
     private storage: Storage, // TODO remove
     private webExtensionProvider: WebExtensionProvider,
     private appInfoProvider: AppInfoProvider,
-    private accountProvider: AccountProvider
+    private accountProvider: AccountProvider,
+    private deepLinkProvider: DeepLinkProvider
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -119,36 +117,11 @@ export class MyApp {
 
   // TODO: Move to provider
   async walletDeeplink() {
-    let url = new URL(location.href)
-    let publicKey = url.searchParams.get('publicKey')
-    let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
-    let identifier = url.searchParams.get('identifier')
-    console.log('publicKey', publicKey)
-    console.log('rawUnsignedTx', rawUnsignedTx)
-    console.log('identifier', identifier)
-
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
-    const airGapTx = await wallet.coinProtocol.getTransactionDetails({
-      publicKey: wallet.publicKey,
-      transaction: rawUnsignedTx
-    })
-
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: wallet.publicKey,
-        transaction: rawUnsignedTx,
-        callback: 'airgap-wallet://?d='
-      }
-    })
-
+    let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     this.nav.push(TransactionQrPage, {
-      wallet: wallet,
-      airGapTx: airGapTx,
-      data: 'airgap-vault://?d=' + serializedTx
+      wallet: deeplinkInfo.wallet,
+      airGapTx: deeplinkInfo.airGapTx,
+      data: 'airgap-vault://?d=' + deeplinkInfo.serializedTx
     })
   }
 }
