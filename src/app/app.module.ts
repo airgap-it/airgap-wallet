@@ -63,7 +63,6 @@ import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/dele
 import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
-import { ActiveAccountProvider } from '../providers/active-account/active-account'
 import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
 
 export function createTranslateLoader(http: HttpClient) {
@@ -178,8 +177,7 @@ export function createTranslateLoader(http: HttpClient) {
     OperationsProvider,
     RemoteConfigProvider,
     WebExtensionProvider,
-    AppInfoProvider,
-    ActiveAccountProvider
+    AppInfoProvider
   ]
 })
 export class AppModule {}
