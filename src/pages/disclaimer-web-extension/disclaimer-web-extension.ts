@@ -1,3 +1,4 @@
+import { SettingsKey } from './../../providers/storage/storage'
 import { Storage } from '@ionic/storage'
 import { ViewController } from 'ionic-angular'
 import { Component } from '@angular/core'
@@ -10,7 +11,7 @@ export class DisclaimerWebExtensionPage {
   constructor(private viewController: ViewController, private storage: Storage) {}
 
   async accept() {
-    await this.storage.set('CHROME_EXTENSION_INTRODUCTION', true)
+    await this.storage.set(SettingsKey.WEB_EXTENSION_DISCLAIMER, true)
     this.viewController.dismiss()
   }
 }
