@@ -51,7 +51,11 @@ export class AccountProvider {
 
     // migrating double-serialization
     if (!(rawWallets instanceof Array)) {
-      wallets = JSON.parse(rawWallets)
+      try {
+        wallets = JSON.parse(rawWallets)
+      } catch (e) {
+        wallets = []
+      }
     }
 
     // "wallets" can be undefined here
