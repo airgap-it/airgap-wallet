@@ -1,8 +1,18 @@
 <ion-row no-padding align-items-center class="amount__container border--vertical">
   <ion-col padding col-8>
     <ion-item no-padding no-lines>
-      <ion-label no-margin stacked>{{ swapSell ? 'Sell' : 'Buy' }}</ion-label>
-      <ion-input type="number" id="buy-input" placeholder="0.0"></ion-input>
+      <ion-label no-margin stacked>
+        {{ swapSell ? 'Sell' : 'Buy' }}
+        <span *ngIf="minExchangeAmount">(minimum amount: {{ minExchangeAmount }})</span>
+      </ion-label>
+      <ion-input
+        [disabled]="exchangeAmount"
+        type="number"
+        id="buy-input"
+        [ngModel]="exchangeAmount"
+        (input)="amountChanged($event.target.value)"
+        placeholder="0.0"
+      ></ion-input>
     </ion-item>
     <p ion-text no-margin color="blackLight"></p>
   </ion-col>
@@ -33,7 +43,7 @@
         <ng-container *ngFor="let wallet of walletsArray">
           <portfolio-item
             *ngIf="selectedWallet !== wallet"
-            (click)="selectedWallet = wallet"
+            (click)="selectWallet(wallet)"
             [wallet]="wallet"
             tappable
             [isExpendable]="false"

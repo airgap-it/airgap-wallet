@@ -26,7 +26,23 @@
 </ion-content>
 -->
 <ion-content>
-  <swap></swap>
-  <swap [swapSell]="false"></swap>
+  <swap
+    [supportedProtocols]="supportedProtocols"
+    [minExchangeAmount]="minExchangeAmount"
+    (walletSelectedEmitter)="walletSelected('from', $event)"
+    (amountSetEmitter)="amountSet($event)"
+  ></swap>
+  <swap
+    [supportedProtocols]="supportedProtocols"
+    [exchangeAmount]="exchangeAmount"
+    (walletSelectedEmitter)="walletSelected('to', $event)"
+    [swapSell]="false"
+  ></swap>
   <div class="divider--line"></div>
+  <ion-fab right bottom>
+    <button color="secondary" (click)="startExchange()" ion-button round icon-left>
+      <ion-icon md-name="add"></ion-icon>
+      Exchange
+    </button>
+  </ion-fab>
 </ion-content>

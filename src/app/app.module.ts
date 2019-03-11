@@ -10,7 +10,6 @@ import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import { QRCodeModule } from 'angularx-qrcode'
 import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
@@ -59,6 +58,8 @@ import { InteractionSelectionPage } from '../pages/interaction-selection/interac
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
 import { ExchangePage } from '../pages/exchange/exchange'
 import { OperationsProvider } from '../providers/operations/operations'
+import { ExchangeProvider } from '../providers/exchange/exchange'
+import { ExchangeConfirmPage } from '../pages/exchange-confirm/exchange-confirm'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -90,7 +91,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountDetailPage,
     InteractionSelectionPage,
     SubAccountSelectPage,
-    ExchangePage
+    ExchangePage,
+    ExchangeConfirmPage
   ],
   imports: [
     BrowserModule,
@@ -144,7 +146,8 @@ export function createTranslateLoader(http: HttpClient) {
     AccountDetailPage,
     InteractionSelectionPage,
     SubAccountSelectPage,
-    ExchangePage
+    ExchangePage,
+    ExchangeConfirmPage
   ],
   providers: [
     StatusBar,
@@ -164,7 +167,8 @@ export function createTranslateLoader(http: HttpClient) {
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,
-    OperationsProvider
+    OperationsProvider,
+    ExchangeProvider
   ]
 })
 export class AppModule {}

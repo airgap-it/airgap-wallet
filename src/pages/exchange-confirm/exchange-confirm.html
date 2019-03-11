@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>{{ 'exchange-confirm.title' | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <portfolio-item [wallet]="fromWallet"></portfolio-item>
+  <br />
+  From Amount: {{ exchangeResult.amountExpectedFrom }}
+  <br />
+  To Address: {{ exchangeResult.payinAddress }}
+  <br />
+  <portfolio-item [wallet]="toWallet"></portfolio-item>
+</ion-content>

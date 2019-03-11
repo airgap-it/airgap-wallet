@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { NavController, NavParams, AlertController } from 'ionic-angular'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
@@ -23,10 +23,25 @@ import { trigger, transition, style, animate } from '@angular/animations'
   ]
 })
 export class SwapComponent {
-  wallets: Observable<AirGapMarketWallet[]>
+  public wallets: Observable<AirGapMarketWallet[]>
   public selectedProtocol: ICoinProtocol = getProtocolByIdentifier('eth')
   public selectedWallet: AirGapMarketWallet
   public expandWalletSelection: boolean = false
+
+  @Input()
+  public supportedProtocols: string[] = []
+
+  @Input()
+  public minExchangeAmount: string
+
+  @Input()
+  public exchangeAmount: string
+
+  @Output()
+  walletSelectedEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter()
+
+  @Output()
+  amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
   constructor(
     public navCtrl: NavController,
@@ -50,6 +65,16 @@ export class SwapComponent {
       )
   }
 
+  amountChanged(amount: string) {
+    this.amountSetEmitter.emit(amount)
+  }
+
+  selectWallet(wallet: AirGapMarketWallet) {
+    this.selectedWallet = wallet
+    console.log('wallet selected')
+    this.walletSelectedEmitter.emit(wallet)
+  }
+
   async doRefresh(refresher: any = null) {
     await Promise.all(
       this.walletsProvider.getWalletList().map(wallet => {
@@ -62,7 +87,9 @@ export class SwapComponent {
     const wallets = this.walletsProvider.getWalletList()
     const protocols: Map<string, ICoinProtocol> = new Map()
     wallets.forEach(wallet => {
-      protocols.set(wallet.coinProtocol.identifier, wallet.coinProtocol)
+      if (this.supportedProtocols.indexOf(wallet.coinProtocol.identifier) >= 0) {
+        protocols.set(wallet.coinProtocol.identifier, wallet.coinProtocol)
+      }
     })
 
     let alert = this.alertCtrl.create()
