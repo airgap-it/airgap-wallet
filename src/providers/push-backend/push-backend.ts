@@ -8,6 +8,7 @@ export class PushBackendProvider {
   constructor(private http: HttpClient) {}
 
   async registerPush(protocolIdentifier: string, address: string, pushToken: string, languageCode: string = 'en') {
+    console.log(`Registered to push service for wallet ${protocolIdentifier} ${address}`)
     const body = {
       address: address,
       identifier: protocolIdentifier,

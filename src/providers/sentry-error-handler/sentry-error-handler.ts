@@ -29,6 +29,7 @@ export enum ErrorCategory {
   DEEPLINK_PROVIDER = 'deeplink_provider',
   STORAGE = 'storage',
   OPERATIONS_PROVIDER = 'operations_provider',
+  PUSH = 'push',
   OTHER = 'other'
 }
 

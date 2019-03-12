@@ -3,7 +3,7 @@ import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable()
 export class PushProvider {
@@ -58,12 +58,11 @@ export class PushProvider {
       const wallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier.startsWith('eth'))
       const languageCode: string = this.translate.getBrowserCultureLang()
       if (wallets.length > 0) {
-        await this.pushBackendProvider.registerPush(
-          wallets[0].protocolIdentifier,
-          wallets[0].receivingPublicAddress,
-          registration.registrationId,
-          languageCode
-        )
+        wallets.forEach(wallet => {
+          this.pushBackendProvider
+            .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registration.registrationId, languageCode)
+            .catch(handleErrorSentry(ErrorCategory.PUSH))
+        })
       }
       console.log('device registered', registration)
       alert(registration.registrationId)
