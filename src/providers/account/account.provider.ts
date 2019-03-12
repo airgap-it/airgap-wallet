@@ -220,20 +220,20 @@ export class AccountProvider {
   }
 
   private async loadActiveAccountFromStorage() {
-    let publicKey = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
-    this.activeAccount = publicKey
-    this.persistActiveAccount(publicKey)
-    this.publish(publicKey)
+    const wallet = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
+    this.activeAccount = wallet
+    this.persistActiveAccount()
+    this.publishActiveAccount(wallet)
   }
 
   public changeActiveAccount(wallet: AirGapMarketWallet) {
     this.activeAccount = wallet
-    this.persistActiveAccount(wallet)
-    this.publish(wallet)
+    this.persistActiveAccount()
+    this.publishActiveAccount(wallet)
     this.refreshPage()
   }
 
-  private publish(wallet: AirGapMarketWallet) {
+  private publishActiveAccount(wallet: AirGapMarketWallet) {
     this.activeAccountSubject.next(wallet)
   }
 
@@ -247,11 +247,11 @@ export class AccountProvider {
 
   public resetActiveAccount() {
     this.activeAccount = undefined
-    this.persistActiveAccount(this.activeAccount)
+    this.persistActiveAccount()
     this.refreshPage()
   }
 
-  private async persistActiveAccount(wallet: AirGapMarketWallet): Promise<void> {
-    return this.storageProvider.set(SettingsKey.SELECTED_ACCOUNT, wallet)
+  private async persistActiveAccount(): Promise<void> {
+    return this.storageProvider.set(SettingsKey.SELECTED_ACCOUNT, this.activeAccount)
   }
 }
