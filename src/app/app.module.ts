@@ -60,6 +60,7 @@ import { InteractionSelectionPage } from '../pages/interaction-selection/interac
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
 import { OperationsProvider } from '../providers/operations/operations'
 import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
+import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -167,7 +168,8 @@ export function createTranslateLoader(http: HttpClient) {
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,
-    OperationsProvider
+    OperationsProvider,
+    RemoteConfigProvider
   ]
 })
 export class AppModule {}

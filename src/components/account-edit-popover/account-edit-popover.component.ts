@@ -18,12 +18,20 @@ import { ClipboardProvider } from '../../providers/clipboard/clipboard'
         <ion-icon name="trash" color="dark" item-end></ion-icon>
         {{ 'wallet-edit-popover-component.delete_label' | translate }}
       </button>
+      <button *ngIf="isTezosKT && isDelegated" ion-item detail-none (click)="undelegate()">
+        <ion-icon name="close" color="dark" item-end></ion-icon>
+        {{ 'wallet-edit-popover-component.undelegate_label' | translate }}
+      </button>
     </ion-list>
   `
 })
 export class AccountEditPopoverComponent {
   private wallet: AirGapMarketWallet
   private onDelete: Function
+
+  // Tezos
+  public isTezosKT: boolean = false
+  public isDelegated: boolean = false
 
   constructor(
     private alertCtrl: AlertController,
@@ -40,6 +48,22 @@ export class AccountEditPopoverComponent {
 
   async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
+    this.dismissPopover()
+  }
+
+  async ngOnInit() {
+    // tezos
+    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+      this.isTezosKT = true
+      const delegatedResult = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+      this.isDelegated = delegatedResult.isDelegated
+    }
+    // tezos end
+  }
+
+  async undelegate() {
+    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
+    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     this.dismissPopover()
   }
 

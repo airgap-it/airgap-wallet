@@ -37,6 +37,21 @@
     ></p>
   </div>
 
+  <ion-row *ngIf="wallet.currentBalance.toNumber() > 0 && wallet.protocolIdentifier === 'xtz-kt' && !isKtDelegated">
+    <card-actionable
+      [imageLeft]="false"
+      [imageName]="'currencies-empty.svg'"
+      [text]="
+        'account-detail.delegate_card.text'
+          | translate
+            : { amount: wallet.currentBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
+      "
+      [heading]="'account-detail.delegate_card.heading' | translate"
+      tappable
+      (click)="goToDelegateSelection()"
+    ></card-actionable>
+  </ion-row>
+
   <ion-row padding justify-content-center align-items-center *ngIf="!isRefreshing && showAeMigrationBanner()">
     <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
     <ion-col col-1></ion-col>

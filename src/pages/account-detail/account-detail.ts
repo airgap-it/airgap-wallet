@@ -11,7 +11,7 @@ import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol
 import { AccountProvider } from '../../providers/account/account.provider'
 import { OperationsProvider } from '../../providers/operations/operations'
 import BigNumber from 'bignumber.js'
-import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
+import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 
 @Component({
   selector: 'page-account-detail',
@@ -127,7 +127,7 @@ export class AccountDetailPage {
 
   goToDelegateSelection() {
     this.navCtrl
-      .push(DelegationBakerDetailPage, {
+      .push(SubAccountSelectPage, {
         wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))

@@ -7,9 +7,9 @@
 <ion-content>
   <ion-row padding-horizontal>
     <ion-item no-lines no-padding>
-      <ion-avatar item-start><identicon [address]="bakerAddress"></identicon></ion-avatar>
-      <h2 class="font--weight__bold" ion-text color="black">tezosAirGap</h2>
-      <p>{{ bakerAddress }}</p>
+      <ion-avatar item-start><identicon [address]="bakerConfig?.address"></identicon></ion-avatar>
+      <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.name }}</h2>
+      <p>{{ bakerConfig?.address }}</p>
     </ion-item>
   </ion-row>
   <ion-row padding-horizontal padding-bottom>
@@ -38,7 +38,7 @@
         <ion-avatar item-start class="content--align__center-center border--container">
           <ion-icon md-name="attach_money"></ion-icon>
         </ion-avatar>
-        <h2 class="font--weight__bold" ion-text color="black">10%</h2>
+        <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</h2>
         <h3>Baker Fee</h3>
       </ion-item>
       <ion-item no-lines>
@@ -62,17 +62,20 @@
         <ion-avatar item-start class="content--align__center-center border--container">
           <ion-icon md-name="account_balance_wallet"></ion-icon>
         </ion-avatar>
-        <h2 class="font--weight__bold" ion-text color="black">12'100 XTZ</h2>
+        <h2 class="font--weight__bold" ion-text color="black">{{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}</h2>
         <h3>Your Balance</h3>
       </ion-item>
       <ion-item no-lines>
         <ion-avatar item-start class="content--align__center-center border--container">
           <ion-icon md-name="monetization_on"></ion-icon>
         </ion-avatar>
-        <h2 class="font--weight__bold" ion-text color="black">
-          192 XTZ
+        <h2 class="font--weight__bold" ion-text color="black" *ngIf="avgRoIPerCycle; else avgRoiSkeleton">
+          {{ avgRoIPerCycle?.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
         </h2>
-        <h3>Estimated Return</h3>
+        <ng-template #avgRoiSkeleton>
+          <div class="skeleton--loading"><h2></h2></div>
+        </ng-template>
+        <h3>Estimated Return per Cycle</h3>
       </ion-item>
       <ion-item no-lines>
         <ion-avatar item-start class="content--align__center-center border--container"><ion-icon md-name="update"></ion-icon></ion-avatar>
@@ -85,7 +88,7 @@
     </ion-card>
   </ion-row>
   <ion-fab bottom right>
-    <button ion-button round color="secondary">
+    <button ion-button round color="secondary" (click)="delegate()" [disabled]="!bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1">
       Delegate
     </button>
   </ion-fab>
