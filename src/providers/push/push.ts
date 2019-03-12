@@ -9,12 +9,7 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 export class PushProvider {
   private isRegistered: boolean = false
   private readonly options: PushOptions = {
-    android: {
-      senderID: '',
-      sound: false,
-      icon: 'notification',
-      clearBadge: true
-    },
+    android: {},
     ios: {
       alert: 'true',
       badge: true,
@@ -43,7 +38,7 @@ export class PushProvider {
       alert('We have permission to send push notifications')
       this.register()
     } else {
-      this.register()
+      this.register() // TODO: Place register in UI Flow
       alert('We do not have permission to send push notifications')
     }
   }
@@ -59,19 +54,19 @@ export class PushProvider {
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      // TODO implement communication with backend
-      /*
-      this.accountProvider.wallets.subscribe(async (wallets: AirGapMarketWallet[]) => {
-        const languageCode: string = this.translate.getBrowserCultureLang()
+      // TODO: Enable other currencies
+      const wallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier.startsWith('eth'))
+      const languageCode: string = this.translate.getBrowserCultureLang()
+      if (wallets.length > 0) {
         await this.pushBackendProvider.registerPush(
           wallets[0].protocolIdentifier,
           wallets[0].receivingPublicAddress,
           registration.registrationId,
           languageCode
         )
-      })
-      */
+      }
       console.log('device registered', registration)
+      alert(registration.registrationId)
     })
 
     pushObject.on('error').subscribe((error: Error) => {

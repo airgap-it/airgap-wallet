@@ -59,6 +59,7 @@
     "@ionic-native/deeplinks": "^4.7.0",
     "@ionic-native/diagnostic": "^4.18.0",
     "@ionic-native/keyboard": "^4.5.3",
+    "@ionic-native/push": "^4.20.0",
     "@ionic-native/qr-scanner": "^4.7.0",
     "@ionic-native/splash-screen": "4.5.3",
     "@ionic-native/status-bar": "4.5.3",
