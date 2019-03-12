@@ -1,0 +1,31 @@
+<ion-row>
+    <card-actionable
+        *ngIf="isDelegated"
+        [imageLeft]="false"
+        [imageName]="'currencies-empty.svg'"
+        [text]="
+        'account-detail.not_delegated_card.text'
+            | translate
+            : { amount: wallet.currentBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
+        "
+        [heading]="'account-detail.not_delegated_card.heading' | translate"
+        tappable
+        (click)="undelegatedClick()"
+    >
+    </card-actionable>
+
+    <card-actionable
+        *ngIf="!isDelegated"
+        [imageLeft]="false"
+        [imageName]="'currencies-empty.svg'"
+        [text]="
+        'account-detail.has_delegated_card.text'
+            | translate
+            : { amount: wallet.currentBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
+        "
+        [heading]="'account-detail.has_delegated_card.heading' | translate"
+        tappable
+        (click)="delegatedClick()"
+    >
+</card-actionable>
+</ion-row>

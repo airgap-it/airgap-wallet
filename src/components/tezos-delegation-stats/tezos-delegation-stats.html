@@ -1,0 +1,13 @@
+<ion-card>
+    <ion-row justify-content-center padding-vertical *ngFor="let reward of delegationRewards">
+        <ion-col>
+            #{{ reward.cycle }}
+        </ion-col>
+        <ion-col>
+            ~{{ reward.reward?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}
+        </ion-col>
+        <ion-col>
+            {{ reward.payout }}
+        </ion-col>
+    </ion-row>
+</ion-card>

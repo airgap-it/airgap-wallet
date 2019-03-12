@@ -38,7 +38,7 @@ export class AccountTransactionListPage {
   aePhaseEnd: string = ''
 
   // XTZ
-  isKtDelegated: boolean = true
+  isKtDelegated: boolean = false
 
   lottieConfig = {
     path: '/assets/animations/loading.json'

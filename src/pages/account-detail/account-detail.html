@@ -28,20 +28,7 @@
     </button>
   </ion-row>
 
-  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
-    <card-actionable
-      [imageLeft]="false"
-      [imageName]="'currencies-empty.svg'"
-      [text]="
-        'account-detail.delegate_card.text'
-          | translate
-            : { amount: undelegatedAmount.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
-      "
-      [heading]="'account-detail.delegate_card.heading' | translate"
-      tappable
-      (click)="goToDelegateSelection()"
-    ></card-actionable>
-  </ion-row>
+  <tezos-delegation-card *ngIf="wallet.protocolIdentifier === 'xtz'" [wallet]="wallet" [isDelegated]="undelegatedAmount?.toNumber() === 0" (onDelegatedClick)="goToDelegateSelection()" (onUndelegatedClick)="goToDelegateSelection()"></tezos-delegation-card>
 
   <empty-state
     *ngIf="!hasSubAccounts"

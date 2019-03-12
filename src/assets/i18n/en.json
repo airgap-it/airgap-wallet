@@ -234,9 +234,13 @@
     "receive_label": "Receive",
     "details_label": "Details",
     "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
-    "delegate_card": {
+    "has_delegated_card": {
       "heading": "Delegate Tezos",
       "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
+    },
+    "not_delegated_card": {
+      "heading": "Delegate Tezos",
+      "text": "You have <strong>{{amount}}</strong> delegated. Click here to check your rewards per cycle."
     }
   },
 

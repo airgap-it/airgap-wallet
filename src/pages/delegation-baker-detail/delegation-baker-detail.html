@@ -87,6 +87,9 @@
       </ion-item>
     </ion-card>
   </ion-row>
+
+  <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
+
   <ion-fab bottom right>
     <button ion-button round color="secondary" (click)="delegate()" [disabled]="!bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1">
       Delegate
