@@ -91,7 +91,7 @@ build_ios:
   tags:
     - ios
 
-build_chrome_extension:
+build_web_extension:
   image: $IMAGE_TAG_CURRENT
   stage: native_build
   when: manual
@@ -105,7 +105,7 @@ build_chrome_extension:
     - sed -i -e "/\"version\"/c\ \"version\" :\"$VERSION\"," extension/manifest.json
 
   artifacts:
-    name: 'chrome_extension'
+    name: 'web_extension'
     paths:
       - extension/
   tags:
