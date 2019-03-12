@@ -31,6 +31,7 @@
             <application allowBackup="false" />
         </edit-config>
         <allow-intent href="market:*" />
+        <resource-file src="google-services.json" target="app/google-services.json" />
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
         <icon density="mdpi" src="resources/android/icon/drawable-mdpi-icon.png" />
         <icon density="hdpi" src="resources/android/icon/drawable-hdpi-icon.png" />
@@ -65,6 +66,7 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <allow-intent href="airgap-vault:*" />
+        <resource-file src="GoogleService-Info.plist" />
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
         <icon height="114" src="resources/ios/icon/icon@2x.png" width="114" />
         <icon height="40" src="resources/ios/icon/icon-40.png" width="40" />

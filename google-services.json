@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "214244309595",
+    "firebase_url": "https://airgap-wallet.firebaseio.com",
+    "project_id": "airgap-wallet",
+    "storage_bucket": "airgap-wallet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214244309595:android:a63700f158ed0afa",
+        "android_client_info": {
+          "package_name": "it.airgap.wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214244309595-6kqbgta1armnou1vcbgla60nvkk51m9v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9D7mR0L5HTuX-2vTTnVwKHkefcvpjt04"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

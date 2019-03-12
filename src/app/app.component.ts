@@ -1,5 +1,5 @@
 import { DeepLinkProvider } from './../providers/deep-link/deep-link'
-import { PushProvider } from './../providers/push/push'
+import { PushProvider } from '../providers/push/push'
 
 import { Component, ViewChild } from '@angular/core'
 import { Deeplinks } from '@ionic-native/deeplinks'
@@ -58,6 +58,8 @@ export class MyApp {
       this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
       setSentryRelease('app_' + this.appInfoProvider.getVersionNumber())
+
+      this.pushProvider.initPush()
     } else if (this.webExtensionProvider.isWebExtension()) {
       setSentryRelease('ext_' + this.appInfoProvider.getVersionNumber())
     } else {
@@ -101,8 +103,6 @@ export class MyApp {
 
   async ngAfterViewInit() {
     await this.platform.ready()
-    this.pushProvider.initPush()
-    this
     if (this.platform.is('cordova')) {
       this.deeplinks
         .route({
