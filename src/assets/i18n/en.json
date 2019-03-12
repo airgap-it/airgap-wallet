@@ -99,7 +99,7 @@
 
   "select-wallet": {
     "title": "Select Account",
-    "text": "You've scanned an address. Select one of the following accounts, if you want to <strong>send to this address</strong>.",
+    "text": "You've scanned an address. Select one of the following accounts to send from.",
     "compatible_label": "These accounts appear to be compatible",
     "incompatible_label": "These accounts appear to be incompatible"
   },
