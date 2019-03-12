@@ -9,7 +9,7 @@
   <p ion-text class="font--weight__bold" color="primary" padding-horizontal>
     {{ 'select-wallet.compatible_label' | translate }}
   </p>
-  <ion-list no-lines margin-top *ngFor="let wallet of wallets">
+  <ion-list no-lines margin-top *ngFor="let wallet of compatibleWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
   </ion-list>
 
