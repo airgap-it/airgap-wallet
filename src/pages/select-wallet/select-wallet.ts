@@ -17,10 +17,10 @@ export class SelectWalletPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public accountProvider: AccountProvider) {}
 
-  ionViewDidLoad() {
+  async ionViewWillLoad() {
     this.address = this.navParams.get('address')
-    this.compatibleWallets = this.accountProvider.getCompatibleWallets()
-    this.incompatibleWallets = this.accountProvider.getIncompatibleWallets()
+    this.compatibleWallets = this.navParams.get('compatibleWallets')
+    this.incompatibleWallets = this.navParams.get('incompatibleWallets')
   }
 
   openPreparePage(wallet: AirGapMarketWallet) {
@@ -30,9 +30,5 @@ export class SelectWalletPage {
         address: this.address
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  ionViewWillLeave() {
-    this.accountProvider.clearWalletSelection()
   }
 }

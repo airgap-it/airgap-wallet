@@ -42,14 +42,11 @@ export class SchemeRoutingProvider {
 
     try {
       let url = new URL(rawString)
-      let d = url.searchParams.get('d')
-
-      if (d.length === 0) {
-        d = rawString // Fallback to support raw data QRs
-      }
+      let data = rawString // Fallback to support raw data QRs
+      data = url.searchParams.get('d')
 
       try {
-        const deserializedSync = await syncProtocol.deserialize(d)
+        const deserializedSync = await syncProtocol.deserialize(data)
 
         if (deserializedSync.type in EncodedType) {
           // Only handle types that we know
@@ -57,20 +54,17 @@ export class SchemeRoutingProvider {
         } else {
           return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
         }
-      } catch (e) {
-        console.error('Deserialization of sync failed', e)
+      } catch (error) {
+        console.error('Deserialization of sync failed', error)
       }
-    } catch (e) {
-      // maybe we received an address
-      let walletsMatched = 0
-      this.accountProvider.getWalletList().forEach(wallet => {
-        if (rawString.match(wallet.coinProtocol.addressValidationPattern)) {
-          walletsMatched++
-          this.accountProvider.addWalletSelection(wallet)
-        }
-      })
-      if (walletsMatched > 0) {
-        this.navController.push(SelectWalletPage, { address: rawString }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      console.warn(error)
+
+      const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(rawString)
+      if (compatibleWallets.length > 0) {
+        this.navController
+          .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
+          .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     }
   }
