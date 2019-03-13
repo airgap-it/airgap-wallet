@@ -72,7 +72,7 @@
     "com.lampa.startapp": "^6.1.6",
     "cordova-android": "7.1.0",
     "cordova-clipboard": "^1.2.1",
-    "cordova-ios": "4.5.5",
+    "cordova-ios": "^5.0.0",
     "cordova-plugin-add-swift-support": "^1.7.2",
     "cordova-plugin-app-version": "^0.1.9",
     "cordova-plugin-compat": "1.1.0",
