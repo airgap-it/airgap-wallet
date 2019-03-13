@@ -55,8 +55,8 @@ export class AccountEditPopoverComponent {
     // tezos
     if (this.wallet.protocolIdentifier === 'xtz-kt') {
       this.isTezosKT = true
-      const delegatedResult = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-      this.isDelegated = delegatedResult.isDelegated
+      const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+      this.isDelegated = isDelegated
     }
     // tezos end
   }
