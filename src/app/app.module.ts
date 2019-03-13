@@ -61,6 +61,9 @@ import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-se
 import { OperationsProvider } from '../providers/operations/operations'
 import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
 import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
+import { WebExtensionProvider } from '../providers/web-extension/web-extension'
+import { AppInfoProvider } from '../providers/app-info/app-info'
+import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -93,7 +96,8 @@ export function createTranslateLoader(http: HttpClient) {
     InteractionSelectionPage,
     SubAccountSelectPage,
     SelectWalletPage,
-    DelegationBakerDetailPage
+    DelegationBakerDetailPage,
+    DisclaimerWebExtensionPage
   ],
   imports: [
     BrowserModule,
@@ -115,7 +119,7 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
     }),
     ComponentsModule,
     PipesModule
@@ -148,7 +152,9 @@ export function createTranslateLoader(http: HttpClient) {
     InteractionSelectionPage,
     SelectWalletPage,
     SubAccountSelectPage,
-    DelegationBakerDetailPage
+    DelegationBakerDetailPage,
+    SubAccountSelectPage,
+    DisclaimerWebExtensionPage
   ],
   providers: [
     StatusBar,
@@ -169,7 +175,9 @@ export function createTranslateLoader(http: HttpClient) {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
-    RemoteConfigProvider
+    RemoteConfigProvider,
+    WebExtensionProvider,
+    AppInfoProvider
   ]
 })
 export class AppModule {}

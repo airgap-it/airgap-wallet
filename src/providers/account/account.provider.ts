@@ -7,6 +7,10 @@ import { map } from 'rxjs/operators'
 @Injectable()
 export class AccountProvider {
   private walletList: AirGapMarketWallet[] = []
+  public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
+  public refreshPageSubject: Subject<void> = new Subject()
+
+  private activeAccount: AirGapMarketWallet
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -20,6 +24,7 @@ export class AccountProvider {
 
   constructor(private storageProvider: StorageProvider) {
     this.loadWalletsFromStorage().catch(console.error)
+    this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
   }
@@ -41,11 +46,16 @@ export class AccountProvider {
 
   private async loadWalletsFromStorage() {
     const rawWallets = await this.storageProvider.get(SettingsKey.WALLET)
-    let wallets = rawWallets
+
+    let wallets = rawWallets || []
 
     // migrating double-serialization
     if (!(rawWallets instanceof Array)) {
-      wallets = JSON.parse(rawWallets)
+      try {
+        wallets = JSON.parse(rawWallets)
+      } catch (e) {
+        wallets = []
+      }
     }
 
     // "wallets" can be undefined here
@@ -118,6 +128,11 @@ export class AccountProvider {
       throw new Error('wallet already exists')
     }
 
+    // WebExtension: Add as active wallet if it's the first wallet
+    if (this.walletList.length === 0) {
+      this.changeActiveAccount(wallet)
+    }
+
     this.walletList.push(wallet)
     this.wallets.next(this.walletList)
     return this.persist()
@@ -128,7 +143,13 @@ export class AccountProvider {
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
-
+    if (this.isSameWallet(testWallet, this.getActiveAccount())) {
+      if (this.walletList.length > 0) {
+        this.changeActiveAccount(this.walletList[0])
+      } else if (this.walletList.length === 0) {
+        this.resetActiveAccount()
+      }
+    }
     this.wallets.next(this.walletList)
     return this.persist()
   }
@@ -196,5 +217,41 @@ export class AccountProvider {
         })
       )
       .toPromise()
+  }
+
+  private async loadActiveAccountFromStorage() {
+    const wallet = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
+    this.activeAccount = wallet
+    this.persistActiveAccount()
+    this.publishActiveAccount(wallet)
+  }
+
+  public changeActiveAccount(wallet: AirGapMarketWallet) {
+    this.activeAccount = wallet
+    this.persistActiveAccount()
+    this.publishActiveAccount(wallet)
+    this.refreshPage()
+  }
+
+  private publishActiveAccount(wallet: AirGapMarketWallet) {
+    this.activeAccountSubject.next(wallet)
+  }
+
+  private refreshPage() {
+    this.refreshPageSubject.next()
+  }
+
+  public getActiveAccount(): AirGapMarketWallet {
+    return this.activeAccount
+  }
+
+  public resetActiveAccount() {
+    this.activeAccount = undefined
+    this.persistActiveAccount()
+    this.refreshPage()
+  }
+
+  private async persistActiveAccount(): Promise<void> {
+    return this.storageProvider.set(SettingsKey.SELECTED_ACCOUNT, this.activeAccount)
   }
 }

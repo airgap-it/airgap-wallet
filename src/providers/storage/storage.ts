@@ -3,7 +3,10 @@ import { Storage } from '@ionic/storage'
 
 export enum SettingsKey {
   INTRODUCTION = 'introduction',
-  WALLET = 'wallets'
+  WALLET = 'wallets',
+  WALLET_INTRODUCTION = 'walletIntroduction',
+  WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
+  SELECTED_ACCOUNT = 'selectedAccount'
 }
 
 /* TS 2.7 feature
