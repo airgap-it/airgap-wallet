@@ -7,8 +7,8 @@
     "send_label": "Send",
     "aeternity": {
       "same-phase": {
-        "heading":"<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
-        "text":"Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
+        "heading": "<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
+        "text": "Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
       },
       "no-transactions_text": "There are no transactions yet for this account.",
       "tx-list-disabled": {
@@ -88,13 +88,37 @@
     "share_label": "Share AirGap",
     "information_label": "Information",
     "github_label": "GitHub Repository",
+    "other_label": "Other",
+    "paste-from-clipboard_label": "Paste code from clipboard",
     "about_label": "About",
     "alert_title": "select a channel",
     "alert_cancel": "cancel",
     "channel": {
       "international": "International",
       "chinese": "Chinese"
+    },
+    "select-account": {
+      "title": "Select Account",
+      "text": "Select an account for the Chrome Extension"
     }
+  },
+
+  "select-wallet": {
+    "title": "Select Account",
+    "text": "You've scanned an address. Select one of the following accounts to send from.",
+    "compatible_label": "These accounts appear to be compatible",
+    "incompatible_label": "These accounts appear to be incompatible"
+  },
+
+  "web-extension-disclaimer": {
+    "heading": "This is a <span class=\"style__strong color__primary\">ALPHA</span> version, only use with small amounts of funds.", 
+    "text": "The extesion has been currently tested with.",
+    "list": {
+      "item-1_text": "MyEtherWallet",
+      "item-2_text": "MyCrypto"
+    },
+    "description": "Other platforms or dapps might work, we would be really grateful for every input, issue report or feature request.",
+    "accept_label": "I understand"
   },
 
   "about": {
@@ -104,7 +128,8 @@
   "transaction-confirm": {
     "title": "Confirm Transaction",
     "decline_label": "Decline",
-    "confirm_label": "Confirm"
+    "confirm_label": "Confirm",
+    "qr-data-too-big_warning": "The QR code could not be created, the transaction's data is too big"
   },
 
   "transaction-detail": {
@@ -135,8 +160,12 @@
       "max_label": "MAX"
     },
     "paste_label": "Paste",
-    "create-transaction": "Create Transaction"
-  },
+    "create-transaction": "Create Transaction",
+    "error": {
+      "amount_label": "Please enter a valid number",
+      "address_label": "Looks like a wrong address format, it should start with <strong>{{addressPlaceholder}}</strong>"
+    } 
+    },
 
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
@@ -188,15 +217,18 @@
     "copy-address_label": "Copy Address",
     "delete_label": "Delete"
   },
+
   "tabs": {
     "wallets": "Accounts",
     "scan": "Scan QRs",
     "settings": "Settings",
     "exchange": "Exchange"
   },
+
   "add-account": {
     "title": "Add Coins"
   },
+
   "add-sub-account": {
     "title": "Add {{ typeLabel }}",
     "tokens_label": "Tokens",
@@ -208,12 +240,13 @@
     "add-accounts_label": "Add {{ typeLabel }}",
     "no-imports_text": "No {{ typeLabel }} found to import."
   },
+
   "sub-account-select": {
     "title": "Select Account",
     "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
     "accounts_label": "Accounts"
-
   },
+
   "account-detail": {
     "title": "{{protocolName}}",
     "tokens_label": "Tokens",
@@ -224,11 +257,16 @@
     "receive_label": "Receive",
     "details_label": "Details",
     "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
-    "delegate_card": {
+    "has-delegated_card": {
+      "heading": "<strong>{{amount}}</strong>",
+      "text": "You have <strong>{{amount}}</strong> delegated. You can check your rewards for each cycle."
+    },
+    "not-delegated_card": {
       "heading": "Delegate Tezos",
       "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
     }
-    },
+  },
+
   "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
@@ -236,7 +274,7 @@
       "slide-1": {
         "text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
         "description": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>."
-      },       
+      },
       "slide-2_text": "Select the created account and on the “Account Address” page choose <strong>“Sync Account”</strong>.",
       "slide-3": {
         "text": "You need to sync the account from AirGap Vault to AirGap Wallet.",
@@ -245,15 +283,17 @@
       "slide-4": {
         "text": "The account can now be imported to AirGap Wallet.",
         "description": "You’re now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
-      }    
+      }
     }
   },
+
   "sub-account-import": {
     "title": "Select Accounts",
     "text": "Select the Account you want to add for <strong>{{subProtocolName}}</strong>.",
     "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
     "import-all_label": "Import All"
   },
+
   "deep-link": {
     "not-supported-alert": {
       "title": "Oops",

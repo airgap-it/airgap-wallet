@@ -5,6 +5,8 @@ import { AboutPage } from '../about/about'
 import { IntroductionPage } from '../introduction/introduction'
 import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { ClipboardProvider } from '../../providers/clipboard/clipboard'
+import { SchemeRoutingProvider } from '../../providers/scheme-routing/scheme-routing'
 
 declare var window: any
 declare var cordova: any
@@ -19,7 +21,9 @@ export class SettingsPage {
     private modalController: ModalController,
     private translateService: TranslateService,
     public platform: Platform,
-    public alertCtrl: AlertController
+    public alertCtrl: AlertController,
+    private clipboardProvider: ClipboardProvider,
+    private schemeRoutingProvider: SchemeRoutingProvider
   ) {}
 
   public about() {
@@ -124,5 +128,16 @@ export class SettingsPage {
     } else {
       window.open(url, '_blank')
     }
+  }
+
+  public pasteClipboard() {
+    this.clipboardProvider.paste().then(
+      (text: string) => {
+        this.schemeRoutingProvider.handleNewSyncRequest(this.navCtrl, text).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+      },
+      (err: string) => {
+        console.error('Error: ' + err)
+      }
+    )
   }
 }

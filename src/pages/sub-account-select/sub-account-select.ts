@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { AirGapMarketWallet, ICoinProtocol, addSubProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
-import { OperationsProvider } from '../../providers/operations/operations'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
 
 @Component({
   selector: 'page-sub-account-select',
@@ -14,12 +14,7 @@ export class SubAccountSelectPage {
   public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
-  constructor(
-    public navCtrl: NavController,
-    public navParams: NavParams,
-    private accountProvider: AccountProvider,
-    private operationsProvider: OperationsProvider
-  ) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private accountProvider: AccountProvider) {
     this.subWallets = []
     this.wallet = this.navParams.get('wallet')
 
@@ -28,9 +23,11 @@ export class SubAccountSelectPage {
     })
   }
 
-  async prepareDelegate(subWallet: AirGapMarketWallet) {
-    const pageOptions = await this.operationsProvider.prepareDelegate(subWallet, 'tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8')
-
-    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  async goToDelegateSelection(subWallet: AirGapMarketWallet) {
+    this.navCtrl
+      .push(DelegationBakerDetailPage, {
+        wallet: subWallet
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

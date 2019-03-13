@@ -3,6 +3,7 @@
     <ion-title><span [innerHTML]="'account-detail.title' | translate: { protocolName: wallet.coinProtocol.name }"></span></ion-title>
 
     <ion-buttons end>
+      <button ion-button full *ngIf="isWebExtension && !isActive" (click)="activateAccount()" color="secondary">Activate</button>
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
@@ -28,24 +29,13 @@
     </button>
   </ion-row>
 
-  <!-- TODO: Enable delegate -->
-  <!--
-  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
-    <card-actionable
-      [imageLeft]="false"
-      [imageName]="'currencies-empty.svg'"
-      [text]="
-        'account-detail.delegate_card.text'
-          | translate
-            : { amount: undelegatedAmount.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }
-      "
-      [heading]="'account-detail.delegate_card.heading' | translate"
-      tappable
-      (click)="goToDelegateSelection()"
-    ></card-actionable>
-  </ion-row>
-  -->
-  <!-- END: Enable delegate -->
+  <tezos-delegation-card
+    *ngIf="wallet.protocolIdentifier === 'xtz'"
+    [wallet]="wallet"
+    [isDelegated]="undelegatedAmount?.toNumber() === 0"
+    (onDelegatedClick)="goToDelegateSelection()"
+    (onUndelegatedClick)="goToDelegateSelection()"
+  ></tezos-delegation-card>
 
   <empty-state
     *ngIf="!hasSubAccounts"
@@ -55,7 +45,7 @@
   ></empty-state>
   <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
     <ng-container *ngIf="subWalletGroups.get(subProtocolType).length > 0">
-      <ion-row class="transaction--label__container background--color__white" align-items-center>
+      <ion-row align-items-center>
         <ion-col col-10 padding>
           <span ion-text class="font--weight__bold" color="primary">
             <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
