@@ -3,6 +3,11 @@ page-transaction-prepare {
     display: block;
     margin: auto;
   }
+  .error--address {
+    ion-col {
+      padding: 8px 0 0;
+    }
+  }
   .label-md[stacked],
   .label-ios[stacked],
   .item-md.item-toggle ion-label,

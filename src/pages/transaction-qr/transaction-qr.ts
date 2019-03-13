@@ -14,6 +14,7 @@ export class TransactionQrPage {
   public wallet: AirGapMarketWallet = null
   public airGapTx: Transaction = null
   public isBrowser: boolean = false
+  public qrDataTooBig: boolean = false
 
   constructor(
     public navCtrl: NavController,
@@ -25,6 +26,7 @@ export class TransactionQrPage {
     this.airGapTx = this.navParams.get('airGapTx')
     this.preparedDataQR = this.navParams.get('data')
     this.isBrowser = !this.platform.is('cordova')
+    this.qrDataTooBig = this.preparedDataQR.length > 2800
   }
 
   done() {

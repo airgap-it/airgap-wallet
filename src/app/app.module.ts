@@ -1,3 +1,4 @@
+import { SelectWalletPage } from './../pages/select-wallet/select-wallet'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ErrorHandler, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
@@ -60,6 +61,11 @@ import { ExchangePage } from '../pages/exchange/exchange'
 import { OperationsProvider } from '../providers/operations/operations'
 import { ExchangeProvider } from '../providers/exchange/exchange'
 import { ExchangeConfirmPage } from '../pages/exchange-confirm/exchange-confirm'
+import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
+import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
+import { WebExtensionProvider } from '../providers/web-extension/web-extension'
+import { AppInfoProvider } from '../providers/app-info/app-info'
+import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -92,7 +98,10 @@ export function createTranslateLoader(http: HttpClient) {
     InteractionSelectionPage,
     SubAccountSelectPage,
     ExchangePage,
-    ExchangeConfirmPage
+    ExchangeConfirmPage,
+    SelectWalletPage,
+    DelegationBakerDetailPage,
+    DisclaimerWebExtensionPage
   ],
   imports: [
     BrowserModule,
@@ -114,7 +123,7 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
     }),
     ComponentsModule,
     PipesModule
@@ -147,7 +156,12 @@ export function createTranslateLoader(http: HttpClient) {
     InteractionSelectionPage,
     SubAccountSelectPage,
     ExchangePage,
-    ExchangeConfirmPage
+    ExchangeConfirmPage,
+    SelectWalletPage,
+    SubAccountSelectPage,
+    DelegationBakerDetailPage,
+    SubAccountSelectPage,
+    DisclaimerWebExtensionPage
   ],
   providers: [
     StatusBar,
@@ -168,7 +182,10 @@ export function createTranslateLoader(http: HttpClient) {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
-    ExchangeProvider
+    ExchangeProvider,
+    RemoteConfigProvider,
+    WebExtensionProvider,
+    AppInfoProvider
   ]
 })
 export class AppModule {}

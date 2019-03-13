@@ -1,0 +1,108 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>Baker Detail</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-row padding-horizontal>
+    <ion-item no-lines no-padding>
+      <ion-avatar item-start><identicon [address]="bakerConfig?.address"></identicon></ion-avatar>
+      <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.name }}</h2>
+      <p>{{ bakerConfig?.address }}</p>
+    </ion-item>
+  </ion-row>
+  <ion-row padding-horizontal padding-bottom>
+    <ion-col col-12 no-padding>
+      <p>Accepts Delegation</p>
+    </ion-col>
+    <ion-col col-12 no-padding>
+      <div class="progress--container">
+        <div class="progress--current"></div>
+      </div>
+    </ion-col>
+    <ion-col col-12 no-padding>
+      <ion-row>
+        <ion-col col-6 no-padding>
+          <small>{{ bakerInfo?.bakerUsage * 100 | number }} %</small>
+        </ion-col>
+        <ion-col col-6 text-right no-padding>
+          <small>
+            {{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} /
+            {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}
+          </small>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-row padding-bottom>
+    <ion-card>
+      <ion-item no-lines>
+        <ion-avatar item-start class="content--align__center-center border--container">
+          <ion-icon md-name="attach_money"></ion-icon>
+        </ion-avatar>
+        <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</h2>
+        <h3>Baker Fee</h3>
+      </ion-item>
+      <ion-item no-lines>
+        <ion-avatar item-start class="content--align__center-center border--container"><ion-icon md-name="replay"></ion-icon></ion-avatar>
+        <h2 class="font--weight__bold" ion-text color="black">
+          0 Cycles
+          <small>2d 10h 12m</small>
+        </h2>
+        <h3>Payouts</h3>
+      </ion-item>
+    </ion-card>
+  </ion-row>
+  <ion-row padding>
+    <span ion-text class="font--weight__bold" color="primary">
+      Your Delegation
+    </span>
+  </ion-row>
+  <ion-row padding-bottom>
+    <ion-card>
+      <ion-item no-lines>
+        <ion-avatar item-start class="content--align__center-center border--container">
+          <ion-icon md-name="account_balance_wallet"></ion-icon>
+        </ion-avatar>
+        <h2 class="font--weight__bold" ion-text color="black">
+          {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}
+        </h2>
+        <h3>Your Balance</h3>
+      </ion-item>
+      <ion-item no-lines>
+        <ion-avatar item-start class="content--align__center-center border--container">
+          <ion-icon md-name="monetization_on"></ion-icon>
+        </ion-avatar>
+        <h2 class="font--weight__bold" ion-text color="black" *ngIf="avgRoIPerCycle; else avgRoiSkeleton">
+          {{ avgRoIPerCycle?.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '10' } }}
+        </h2>
+        <ng-template #avgRoiSkeleton>
+          <div class="skeleton--loading"><h2></h2></div>
+        </ng-template>
+        <h3>Estimated Return per Cycle</h3>
+      </ion-item>
+      <ion-item no-lines>
+        <ion-avatar item-start class="content--align__center-center border--container"><ion-icon md-name="update"></ion-icon></ion-avatar>
+        <h2 class="font--weight__bold" ion-text color="black">
+          7 Cycles
+          <small>2d 10h 12m</small>
+        </h2>
+        <h3>First Payout</h3>
+      </ion-item>
+    </ion-card>
+  </ion-row>
+
+  <ion-row padding>
+    <span ion-text class="font--weight__bold" color="primary">
+      Your Rewards
+    </span>
+  </ion-row>
+  <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
+
+  <ion-fab bottom right>
+    <button ion-button round color="secondary" (click)="delegate()" [disabled]="!bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1">
+      Delegate
+    </button>
+  </ion-fab>
+</ion-content>

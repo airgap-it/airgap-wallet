@@ -1,3 +1,5 @@
+import { SelectWalletPage } from '../../pages/select-wallet/select-wallet'
+import { AccountProvider } from '../account/account.provider'
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
 import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
@@ -15,7 +17,7 @@ export class SchemeRoutingProvider {
   */
   private syncSchemeHandlers: ((deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>)[] = []
 
-  constructor(protected app: App, private alertController: AlertController) {
+  constructor(protected app: App, private alertController: AlertController, private accountProvider: AccountProvider) {
     /* TS 2.7 feature
     this.syncSchemeHandlers = {
       [EncodedType.WALLET_SYNC]: this.handleWalletSync.bind(this),
@@ -38,24 +40,32 @@ export class SchemeRoutingProvider {
     this.navController = navCtrl
     const syncProtocol = new SyncProtocolUtils()
 
-    let url = new URL(rawString)
-    let d = url.searchParams.get('d')
-
-    if (d.length === 0) {
-      d = rawString // Fallback to support raw data QRs
-    }
-
     try {
-      const deserializedSync = await syncProtocol.deserialize(d)
+      let url = new URL(rawString)
+      let data = rawString // Fallback to support raw data QRs
+      data = url.searchParams.get('d')
 
-      if (deserializedSync.type in EncodedType) {
-        // Only handle types that we know
-        return this.syncSchemeHandlers[deserializedSync.type](deserializedSync, scanAgainCallback)
-      } else {
-        return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
+      try {
+        const deserializedSync = await syncProtocol.deserialize(data)
+
+        if (deserializedSync.type in EncodedType) {
+          // Only handle types that we know
+          return this.syncSchemeHandlers[deserializedSync.type](deserializedSync, scanAgainCallback)
+        } else {
+          return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
+        }
+      } catch (error) {
+        console.error('Deserialization of sync failed', error)
       }
-    } catch (e) {
-      console.error('Deserialization of sync failed', e)
+    } catch (error) {
+      console.warn(error)
+
+      const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(rawString)
+      if (compatibleWallets.length > 0) {
+        this.navController
+          .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
+          .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
     }
   }
 

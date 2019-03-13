@@ -74,7 +74,7 @@ build_ios:
     - echo "$IOS_BUILD_JSON" > build.json
     - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
-    - sudo xcode-select -s /Applications/Xcode_9.4.app/Contents/Developer
+    - sudo xcode-select -s /Applications/Xcode_10.1.app/Contents/Developer
     - sed -i -e "s/ios-CFBundleVersion=\"0.0.0\"/ios-CFBundleVersion=\"1.0.$CI_PIPELINE_ID\"/g" config.xml
     - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
     - nvm use v10.13.0
@@ -84,12 +84,32 @@ build_ios:
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -sdk iphoneos -configuration AppStoreDistribution archive -archivePath platforms/ios/AirGap\ Wallet.xcarchive
     - xcodebuild -exportArchive -archivePath platforms/ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath platforms/ios/
-    - /Applications/Xcode_9.4.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
+    - /Applications/Xcode_10.1.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   artifacts:
     paths:
       - platforms/ios/AirGap\ Wallet.ipa
   tags:
     - ios
+
+build_web_extension:
+  image: $IMAGE_TAG_CURRENT
+  stage: native_build
+  when: manual
+  script:
+    - sed -i -e "s/VERSION_NUMBER/$VERSION/g" src/providers/app-info/app-info.ts
+    - sed -i -e "s/VERSION_CODE/$CI_PIPELINE_ID/g" src/providers/app-info/app-info.ts
+    - npm install
+    - npm run browserify-coinlib
+    - npm run extension:prepare
+    - npm run extension:build:all
+    - sed -i -e "/\"version\"/c\ \"version\" :\"$VERSION\"," extension/manifest.json
+
+  artifacts:
+    name: 'web_extension'
+    paths:
+      - extension/
+  tags:
+    - docker
 
 qa:
   stage: qa

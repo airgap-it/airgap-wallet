@@ -6,12 +6,13 @@ import { AccountTransactionListPage } from '../account-transaction-list/account-
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { AccountAddressPage } from '../account-address/account-address'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { OperationsProvider } from '../../providers/operations/operations'
 import BigNumber from 'bignumber.js'
+import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
+import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 
 @Component({
   selector: 'page-account-detail',
@@ -31,16 +32,23 @@ export class AccountDetailPage {
   // Tezos
   public undelegatedAmount: BigNumber = new BigNumber(0)
 
+  // Web Extension
+  isWebExtension: boolean = false
+  isActive: boolean = false
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     private popoverCtrl: PopoverController,
     private accountProvider: AccountProvider,
-    private operationsProvider: OperationsProvider
+    private operationsProvider: OperationsProvider,
+    private webExtensionProvider: WebExtensionProvider
   ) {
     function assertUnreachable(x: never): void {
       /* */
     }
+
+    this.isWebExtension = this.webExtensionProvider.isWebExtension()
 
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -69,6 +77,14 @@ export class AccountDetailPage {
         }
         this.supportedSubProtocolTypes.set(type, subProtocolSupported)
       })
+    })
+  }
+
+  ngOnInit(): void {
+    this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
+      if (this.wallet && activeAccount) {
+        this.isActive = this.accountProvider.isSameWallet(this.wallet, activeAccount)
+      }
     })
   }
 
@@ -131,5 +147,9 @@ export class AccountDetailPage {
         wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public activateAccount() {
+    this.accountProvider.changeActiveAccount(this.wallet)
   }
 }
