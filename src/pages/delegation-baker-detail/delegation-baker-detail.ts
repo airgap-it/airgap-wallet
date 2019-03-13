@@ -7,13 +7,6 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
 
-/**
- * Generated class for the DelegationBakerDetailPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-delegation-baker-detail',
