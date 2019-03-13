@@ -27,7 +27,10 @@
           <small>{{ bakerInfo?.bakerUsage * 100 | number }} %</small>
         </ion-col>
         <ion-col col-6 text-right no-padding>
-          <small>{{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} / {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}</small>
+          <small>
+            {{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} /
+            {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}
+          </small>
         </ion-col>
       </ion-row>
     </ion-col>
@@ -56,13 +59,15 @@
       Your Delegation
     </span>
   </ion-row>
-  <ion-row>
+  <ion-row padding-bottom>
     <ion-card>
       <ion-item no-lines>
         <ion-avatar item-start class="content--align__center-center border--container">
           <ion-icon md-name="account_balance_wallet"></ion-icon>
         </ion-avatar>
-        <h2 class="font--weight__bold" ion-text color="black">{{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}</h2>
+        <h2 class="font--weight__bold" ion-text color="black">
+          {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier } }}
+        </h2>
         <h3>Your Balance</h3>
       </ion-item>
       <ion-item no-lines>
@@ -88,6 +93,11 @@
     </ion-card>
   </ion-row>
 
+  <ion-row padding>
+    <span ion-text class="font--weight__bold" color="primary">
+      Your Rewards
+    </span>
+  </ion-row>
   <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
 
   <ion-fab bottom right>
