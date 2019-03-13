@@ -142,8 +142,12 @@
       "max_label": "MAX"
     },
     "paste_label": "Paste",
-    "create-transaction": "Create Transaction"
-  },
+    "create-transaction": "Create Transaction",
+    "error": {
+      "amount_label": "Please enter a valid number",
+      "address_label": "Looks like a wrong address format, it should start with <strong>{{addressPlaceholder}}</strong>"
+    } 
+    },
 
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
