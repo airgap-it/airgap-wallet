@@ -1,5 +1,5 @@
-import { SelectWalletPage } from './../../pages/select-wallet/select-wallet'
-import { AccountProvider } from './../account/account.provider'
+import { SelectWalletPage } from '../../pages/select-wallet/select-wallet'
+import { AccountProvider } from '../account/account.provider'
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
 import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
