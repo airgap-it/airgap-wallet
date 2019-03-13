@@ -80,7 +80,7 @@ build_ios:
     - nvm use v10.13.0
     - npm install
     - ionic cordova platform add ios
-    - cd platforms/ios/ && pod install && cd ../../ # Push plugin pod dependencies don't get installed sometimes
+    - pushd platforms/ios/ && pod install && popd # Push plugin pod dependencies don't get installed sometimes
     - ionic cordova build ios --prod --release
     - find ./resources/ -name "*.png" -exec convert "{}" -alpha off "{}" \;
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates
