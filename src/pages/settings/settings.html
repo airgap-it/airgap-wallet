@@ -75,4 +75,12 @@
       <ion-icon name="ios-arrow-forward" item-end></ion-icon>
     </ion-item>
   </ion-list>
+  <ion-list no-border no-lines>
+    <ion-list-header no-margin no-lines>{{ 'settings.other_label' | translate }}</ion-list-header>
+    <ion-item (click)="pasteClipboard()">
+      <ion-icon name="return-right" item-start></ion-icon>
+      {{ 'settings.paste-from-clipboard_label' | translate }}
+      <ion-icon name="ios-arrow-forward" item-end></ion-icon>
+    </ion-item>
+  </ion-list>
 </ion-content>

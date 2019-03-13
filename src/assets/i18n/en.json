@@ -88,6 +88,8 @@
     "share_label": "Share AirGap",
     "information_label": "Information",
     "github_label": "GitHub Repository",
+    "other_label": "Other",
+    "paste-from-clipboard_label": "Paste code from clipboard",
     "about_label": "About",
     "alert_title": "select a channel",
     "alert_cancel": "cancel",
