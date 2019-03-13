@@ -142,9 +142,11 @@
       "max_label": "MAX"
     },
     "paste_label": "Paste",
-    "create-transaction": "Create Transaction", 
-    "number_invalid": "Please enter a valid number",
-    "address_invalid": "You entered the wrong address format, it should start with"
+    "create-transaction": "Create Transaction",
+    "error": {
+      "amount_label": "Please enter a valid number",
+      "address_label": "Looks like a wrong address format, it should start with <strong>{{addressPlaceholder}}</strong>"
+    } 
     },
 
   "transaction-qr": {

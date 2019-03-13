@@ -33,9 +33,6 @@
             ></ion-textarea>
           </ion-item>
         </ion-row>
-        <p *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid" color="primary">
-          {{ 'transaction-prepare.address_invalid' | translate }} {{ this.wallet.coinProtocol.addressPlaceholder }}
-        </p>
       </ion-col>
       <ion-col col-2 no-padding>
         <ion-row justify-content-center>
@@ -45,6 +42,22 @@
         <ion-row justify-content-center align-items-center>
           <ion-avatar item-start><identicon [address]="transactionForm.get('address').value"></identicon></ion-avatar>
         </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row
+      padding-horizontal
+      class="error--address"
+      *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
+    >
+      <ion-col>
+        <p
+          ion-text
+          no-margin
+          color="danger"
+          [innerHTML]="
+            'transaction-prepare.error.address_label' | translate: { addressPlaceholder: this.wallet.coinProtocol.addressPlaceholder }
+          "
+        ></p>
       </ion-col>
     </ion-row>
     <ion-row padding-horizontal padding-bottom class="address-to__buttons">
@@ -57,7 +70,7 @@
       </button>
     </ion-row>
     <div class="divider--line"></div>
-    <ion-row padding align-items-center class="amount__container">
+    <ion-row padding-horizontal padding-top align-items-center class="amount__container">
       <ion-col col-9 class="amount--container__input">
         <ion-item no-padding no-lines>
           <ion-label no-margin stacked>{{ 'transaction-prepare.amount_label' | translate }}</ion-label>
@@ -74,10 +87,13 @@
           </button>
         </ion-buttons>
       </ion-col>
-
-      <p *ngIf="!transactionForm.controls['amount'].valid" color="primary" margin-top text-wrap>
-        {{ 'transaction-prepare.number_invalid' | translate }}
-      </p>
+    </ion-row>
+    <ion-row padding-horizontal padding-bottom>
+      <ion-col *ngIf="!transactionForm.controls['amount'].valid">
+        <p no-margin color="danger" ion-text>
+          {{ 'transaction-prepare.error.amount_label' | translate }}
+        </p>
+      </ion-col>
     </ion-row>
     <div class="divider--line"></div>
     <ion-row padding-horizontal class="fee--amount__label">
@@ -117,7 +133,7 @@
       <p ion-text no-margin color="blackLight">
         <span id="fee-amount">
           <ng-container *ngIf="transactionForm.controls['fee'].invalid" color="primary">
-            {{ 'transaction-prepare.number_invalid' | translate }}
+            {{ 'transaction-prepare.amount_label' | translate }}
           </ng-container>
           <ng-container *ngIf="transactionForm.controls['fee'].valid" color="primary">
             ${{ transactionForm.get('fee').value * wallet.currentMarketPrice.toNumber() | number: '1.2-4' }}
