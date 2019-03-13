@@ -10,6 +10,6 @@
     <span ion-text class="font--weight__bold" color="primary">{{ 'sub-account-select.accounts_label' | translate }}</span>
   </ion-row>
   <ng-container *ngFor="let subWallet of subWallets">
-    <portfolio-item no-lines [wallet]="subWallet" [maxDigits]="8" tappable (click)="prepareDelegate(subWallet)"></portfolio-item>
+    <portfolio-item no-lines [wallet]="subWallet" [maxDigits]="8" tappable (click)="goToDelegateSelection(subWallet)"></portfolio-item>
   </ng-container>
 </ion-content>

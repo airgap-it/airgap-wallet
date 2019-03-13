@@ -11,6 +11,8 @@ import { BigNumber } from 'bignumber.js'
 import { StorageProvider } from '../../providers/storage/storage'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountAddressPage } from '../account-address/account-address'
+import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
+import { OperationsProvider } from '../../providers/operations/operations'
 
 declare let cordova
 
@@ -35,6 +37,9 @@ export class AccountTransactionListPage {
   aeCurrentPhase: string = ''
   aePhaseEnd: string = ''
 
+  // XTZ
+  isKtDelegated: boolean = false
+
   lottieConfig = {
     path: '/assets/animations/loading.json'
   }
@@ -48,6 +53,7 @@ export class AccountTransactionListPage {
     public walletProvider: AccountProvider,
     public http: HttpClient,
     private platform: Platform,
+    private operationsProvider: OperationsProvider,
     private storageProvider: StorageProvider
   ) {
     this.wallet = this.navParams.get('wallet')
@@ -60,6 +66,10 @@ export class AccountTransactionListPage {
           this.aeCurrentPhase = result.phase.name
           this.aePhaseEnd = result.phase.endTimestamp
         })
+    }
+
+    if (this.protocolIdentifier === 'xtz-kt') {
+      this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
   }
 
@@ -228,6 +238,20 @@ export class AccountTransactionListPage {
     popover
       .present({
         ev: event
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  // Tezos
+  async isDelegated(): Promise<void> {
+    const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    this.isKtDelegated = isDelegated
+  }
+
+  goToDelegateSelection() {
+    this.navCtrl
+      .push(DelegationBakerDetailPage, {
+        wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

@@ -18,6 +18,8 @@ import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
 import { QRCodeModule } from 'angularx-qrcode'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
+import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
+import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import { SignedTransactionComponent } from './signed-transaction/signed-transact
     EmptyStateComponent,
     CurrencySymbolComponent,
     QrClipboardComponent,
-    SignedTransactionComponent
+    SignedTransactionComponent,
+    TezosDelegationStats,
+    TezosDelegationCard
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule, QRCodeModule],
   exports: [
@@ -45,7 +49,9 @@ import { SignedTransactionComponent } from './signed-transaction/signed-transact
     EmptyStateComponent,
     CurrencySymbolComponent,
     QrClipboardComponent,
-    SignedTransactionComponent
+    SignedTransactionComponent,
+    TezosDelegationStats,
+    TezosDelegationCard
   ]
 })
 export class ComponentsModule {}

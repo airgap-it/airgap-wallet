@@ -6,12 +6,12 @@ import { AccountTransactionListPage } from '../account-transaction-list/account-
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { AccountAddressPage } from '../account-address/account-address'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { OperationsProvider } from '../../providers/operations/operations'
 import BigNumber from 'bignumber.js'
+import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 
 @Component({
   selector: 'page-account-detail',
