@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Subject, ReplaySubject } from 'rxjs'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 import { map } from 'rxjs/operators'
 
@@ -10,6 +10,7 @@ export class AccountProvider {
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+  public usedProtocols: ReplaySubject<ICoinProtocol[]> = new ReplaySubject(1)
 
   private walletChangedBehaviour: Subject<void> = new Subject()
 
@@ -20,10 +21,22 @@ export class AccountProvider {
   constructor(private storageProvider: StorageProvider) {
     this.loadWalletsFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
+    this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
   }
 
   public triggerWalletChanged() {
     this.walletChangedBehaviour.next()
+  }
+
+  private getProtocolsFromWallets(wallets: AirGapMarketWallet[]) {
+    const protocols: Map<string, ICoinProtocol> = new Map()
+    wallets.forEach(wallet => {
+      if (!protocols.has(wallet.protocolIdentifier)) {
+        protocols.set(wallet.protocolIdentifier, wallet.coinProtocol)
+      }
+    })
+
+    return Array.from(protocols.values())
   }
 
   private async loadWalletsFromStorage() {
@@ -144,5 +157,44 @@ export class AccountProvider {
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
       wallet1.addressIndex === wallet2.addressIndex
     )
+  }
+
+  public async getCompatibleAndIncompatibleWalletsForAddress(
+    address: string
+  ): Promise<{
+    compatibleWallets: AirGapMarketWallet[]
+    incompatibleWallets: AirGapMarketWallet[]
+  }> {
+    return this.usedProtocols
+      .take(1)
+      .pipe(
+        map(protocols => {
+          const compatibleProtocols: Map<string, ICoinProtocol> = new Map()
+
+          protocols.forEach(protocol => {
+            const match = address.match(protocol.addressValidationPattern)
+            if (match && match.length > 0) {
+              compatibleProtocols.set(protocol.identifier, protocol)
+            }
+          })
+
+          const compatibleWallets: AirGapMarketWallet[] = []
+          const incompatibleWallets: AirGapMarketWallet[] = []
+
+          this.walletList.forEach(wallet => {
+            if (compatibleProtocols.has(wallet.protocolIdentifier)) {
+              compatibleWallets.push(wallet)
+            } else {
+              incompatibleWallets.push(wallet)
+            }
+          })
+
+          return {
+            compatibleWallets,
+            incompatibleWallets
+          }
+        })
+      )
+      .toPromise()
   }
 }
