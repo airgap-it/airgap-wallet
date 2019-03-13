@@ -265,5 +265,11 @@
       "message": "It looks like you don't have {{otherAppName}} installed on this device.",
       "ok": "Ok"
     }
+  },
+  "exchange": {
+    "title": "Exchange"
+  },
+  "exchange-confirm": {
+    "title": "Confirm Exchange"
   }
 }
