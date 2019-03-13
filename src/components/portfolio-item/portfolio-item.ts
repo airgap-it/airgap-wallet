@@ -22,7 +22,7 @@ export class PortfolioItemComponent {
   constructor(private readonly operationsProvider: OperationsProvider) {}
 
   async ngOnChanges() {
-    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+    if (this.wallet && this.wallet.protocolIdentifier === 'xtz-kt') {
       const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
       this.isDelegated = isDelegated
     }
