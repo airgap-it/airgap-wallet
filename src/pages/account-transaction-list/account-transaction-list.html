@@ -5,8 +5,19 @@
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
-  <ion-row class="transaction--label__container background--color__white" align-items-center>
+  <portfolio-item [wallet]="wallet"></portfolio-item>
+</ion-header>
+
+<ion-content>
+  <tezos-delegation-card
+    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
+    [wallet]="wallet"
+    [isDelegated]="isKtDelegated"
+    (onDelegatedClick)="goToDelegateSelection()"
+    (onUndelegatedClick)="goToDelegateSelection()"
+  ></tezos-delegation-card>
+
+  <ion-row align-items-center>
     <ion-col col-10 padding>
       <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.transactions_label' | translate }}</span>
     </ion-col>
@@ -14,9 +25,6 @@
       <ion-spinner *ngIf="isRefreshing" color="primary" name="dots"></ion-spinner>
     </ion-col>
   </ion-row>
-</ion-header>
-
-<ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <div padding-horizontal class="empty-list" *ngIf="!isRefreshing && showAeMigrationScreen()">
@@ -36,8 +44,6 @@
       "
     ></p>
   </div>
-
-  <tezos-delegation-card *ngIf="wallet.protocolIdentifier === 'xtz-kt'" [wallet]="wallet" [isDelegated]="isKtDelegated" (onDelegatedClick)="goToDelegateSelection()" (onUndelegatedClick)="goToDelegateSelection()"></tezos-delegation-card>
 
   <ion-row padding justify-content-center align-items-center *ngIf="!isRefreshing && showAeMigrationBanner()">
     <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
@@ -114,20 +120,14 @@
         <ion-col no-padding>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{
-                t.timestamp
-                  | amFromUnix
-                  | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
-              }}
+              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
+              'HH:mm' } }}
             </p>
           </ion-row>
           <ion-row justify-content-end>
             <p ion-text color="blackLight" *ngIf="t.timestamp">
-              {{
-                t.timestamp
-                  | amFromUnix
-                  | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
-              }}
+              {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
+              'L' } }}
             </p>
           </ion-row>
         </ion-col>

@@ -28,7 +28,13 @@
     </button>
   </ion-row>
 
-  <tezos-delegation-card *ngIf="wallet.protocolIdentifier === 'xtz'" [wallet]="wallet" [isDelegated]="undelegatedAmount?.toNumber() === 0" (onDelegatedClick)="goToDelegateSelection()" (onUndelegatedClick)="goToDelegateSelection()"></tezos-delegation-card>
+  <tezos-delegation-card
+    *ngIf="wallet.protocolIdentifier === 'xtz'"
+    [wallet]="wallet"
+    [isDelegated]="undelegatedAmount?.toNumber() === 0"
+    (onDelegatedClick)="goToDelegateSelection()"
+    (onUndelegatedClick)="goToDelegateSelection()"
+  ></tezos-delegation-card>
 
   <empty-state
     *ngIf="!hasSubAccounts"
@@ -38,7 +44,7 @@
   ></empty-state>
   <ng-container *ngFor="let subProtocolType of subProtocolTypesArray">
     <ng-container *ngIf="subWalletGroups.get(subProtocolType).length > 0">
-      <ion-row class="transaction--label__container background--color__white" align-items-center>
+      <ion-row align-items-center>
         <ion-col col-10 padding>
           <span ion-text class="font--weight__bold" color="primary">
             <ng-container *ngIf="subProtocolType === subProtocolTypes.ACCOUNT">
