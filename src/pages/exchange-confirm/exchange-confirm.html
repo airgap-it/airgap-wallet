@@ -4,7 +4,67 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding-right>
+  <h3 padding-bottom padding-left [innerHTML]="'exchange-confirm.heading' | translate"></h3>
+  <address-row
+    [address]="exchangeResult.payinAddress"
+    label="{{ 'exchange-confirm.sell_label' | translate }}"
+    [hasSymbol]="true"
+    [symbol]="'XTZ'"
+  ></address-row>
+
+  <ion-row align-items-center>
+    <ion-col col-3 no-padding>
+      <ion-row justify-content-center><div class="line--first"></div></ion-row>
+    </ion-col>
+    <ion-col col-9 padding-bottom>
+      <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.sell-amount_label' | translate }}</ion-label>
+      <div class="typography--mono" item-content>
+        <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }}</span>
+      </div>
+
+      <ng-container>
+        <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.fee_label' | translate }}</ion-label>
+        <div class="typography--mono" item-content>
+          <span class="typography--mono">123</span>
+        </div>
+      </ng-container>
+    </ion-col>
+  </ion-row>
+
+  <address-row
+    [address]="exchangeResult.payinAddress"
+    label="{{ 'exchange-confirm.changellgy-address_label' | translate }}"
+    [hasSymbol]="true"
+    [symbol]="'XTZ'"
+  ></address-row>
+
+  <ion-row align-items-center>
+    <ion-col col-3 no-padding>
+      <ion-row justify-content-center><div class="line--second"></div></ion-row>
+    </ion-col>
+    <ion-col col-9 padding-bottom>
+      <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.buy-amount_label' | translate }}</ion-label>
+      <div class="typography--mono" item-content>
+        <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }}</span>
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <address-row
+    [address]="exchangeResult.payinAddress"
+    label="{{ 'exchange-confirm.receiving-to_label' | translate }}"
+    [hasSymbol]="true"
+    [symbol]="'XTZ'"
+  ></address-row>
+
+  <ion-fab right bottom>
+    <button color="secondary" ion-button round>
+      Confirm Exchange
+    </button>
+  </ion-fab>
+
+  <!--
   <portfolio-item [wallet]="fromWallet"></portfolio-item>
   <br />
   From Amount: {{ exchangeResult.amountExpectedFrom }}
@@ -12,4 +72,5 @@
   To Address: {{ exchangeResult.payinAddress }}
   <br />
   <portfolio-item [wallet]="toWallet"></portfolio-item>
+  -->
 </ion-content>
