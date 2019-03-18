@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
+import moment from 'moment'
 
 @Component({
   selector: 'page-delegation-baker-detail',
@@ -22,6 +23,14 @@ export class DelegationBakerDetailPage {
   public avgRoIPerCyclePercentage: BigNumber
   public avgRoIPerCycle: BigNumber
 
+  public isDelegated: boolean
+  public nextPayout: Date = moment()
+    .add(476, 'h')
+    .toDate()
+  public firstPayout: Date = moment()
+    .add(476, 'h')
+    .toDate()
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -35,9 +44,15 @@ export class DelegationBakerDetailPage {
     // get baker 0, always airgap for now
     this.bakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
+    const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    this.isDelegated = isDelegated
+
     const kt = new TezosKtProtocol()
     this.bakerInfo = await kt.bakerInfo(this.bakerConfig.address)
     this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
+
+    this.nextPayout = this.delegationRewards[0].payout
+    this.firstPayout = this.delegationRewards[this.delegationRewards.length - 1].payout
 
     this.avgRoIPerCyclePercentage = this.delegationRewards
       .map(delegationInfo => {

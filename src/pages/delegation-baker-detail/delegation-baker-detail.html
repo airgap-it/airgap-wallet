@@ -85,23 +85,31 @@
       <ion-item no-lines>
         <ion-avatar item-start class="content--align__center-center border--container"><ion-icon md-name="update"></ion-icon></ion-avatar>
         <h2 class="font--weight__bold" ion-text color="black">
-          7 Cycles
-          <small>2d 10h 12m</small>
+          {{ (isDelegated ? nextPayout : firstPayout) | amTimeAgo }}
+          <small>7 Cycles</small>
         </h2>
-        <h3>First Payout</h3>
+        <h3>{{ isDelegated ? 'Next Payout' : 'First Payout' }}</h3>
       </ion-item>
     </ion-card>
   </ion-row>
 
-  <ion-row padding>
-    <span ion-text class="font--weight__bold" color="primary">
-      Your Rewards
-    </span>
-  </ion-row>
-  <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
+  <ng-container *ngIf="isDelegated">
+    <ion-row padding>
+      <span ion-text class="font--weight__bold" color="primary">
+        Your Rewards
+      </span>
+    </ion-row>
+    <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
+  </ng-container>
 
-  <ion-fab bottom right>
-    <button ion-button round color="secondary" (click)="delegate()" [disabled]="!bakerConfig?.enabled || !bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1">
+  <ion-fab *ngIf="!isDelegated" bottom right>
+    <button
+      ion-button
+      round
+      color="secondary"
+      (click)="delegate()"
+      [disabled]="!bakerConfig?.enabled || !bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1"
+    >
       Delegate
     </button>
   </ion-fab>
