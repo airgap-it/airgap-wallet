@@ -9,6 +9,7 @@ export interface BakerConfig {
   name: string
   address: string
   fee: BigNumber
+  enabled: boolean
 }
 
 @Injectable()
@@ -23,7 +24,8 @@ export class RemoteConfigProvider {
       return {
         name: config.name,
         address: config.address,
-        fee: new BigNumber(config.fee)
+        fee: new BigNumber(config.fee),
+        enabled: config.enabled
       }
     })
   }
