@@ -62,7 +62,7 @@
     "@ionic-native/qr-scanner": "^4.7.0",
     "@ionic-native/splash-screen": "4.5.3",
     "@ionic-native/status-bar": "4.5.3",
-    "@ionic/storage": "https://github.com/bb4L/ionic-storage.git#1499e2d3d81626ca61793b01a66b12a9494137bf",
+    "@ionic/storage": "git+https://github.com/bb4L/ionic-storage.git#1499e2d3d81626ca61793b01a66b12a9494137bf",
     "@ngx-translate/core": "9.1.1",
     "@ngx-translate/http-loader": "2.0.1",
     "@sentry/browser": "^4.2.4",

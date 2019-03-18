@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { IonicPage, NavController, NavParams } from 'ionic-angular'
+import { NavController, NavParams } from 'ionic-angular'
 import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { BakerInfo, DelegationInfo } from 'airgap-coin-lib/dist/protocols/tezos/kt/TezosKtProtocol'
 import BigNumber from 'bignumber.js'
@@ -7,7 +7,6 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
 
-@IonicPage()
 @Component({
   selector: 'page-delegation-baker-detail',
   templateUrl: 'delegation-baker-detail.html'
