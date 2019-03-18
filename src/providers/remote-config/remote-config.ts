@@ -3,7 +3,7 @@ import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry
 import { HttpClient } from '@angular/common/http'
 import BigNumber from 'bignumber.js'
 
-const CONFIG_BACKEND = 'http://config.airgap.gke.papers.tech/'
+const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
 
 export interface BakerConfig {
   name: string
