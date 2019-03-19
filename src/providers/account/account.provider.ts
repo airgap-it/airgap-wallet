@@ -158,6 +158,12 @@ export class AccountProvider {
     return this.storageProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
+  public getAccountIdentifier(wallet: AirGapMarketWallet): string {
+    return wallet.addressIndex
+      ? `${wallet.protocolIdentifier}-${wallet.publicKey}-${wallet.addressIndex}`
+      : `${wallet.protocolIdentifier}-${wallet.publicKey}`
+  }
+
   public walletByPublicKeyAndProtocolAndAddressIndex(
     publicKey: string,
     protocolIdentifier: string,
