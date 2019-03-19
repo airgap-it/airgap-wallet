@@ -6,7 +6,8 @@ export enum SettingsKey {
   WALLET = 'wallets',
   WALLET_INTRODUCTION = 'walletIntroduction',
   WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
-  SELECTED_ACCOUNT = 'selectedAccount'
+  SELECTED_ACCOUNT = 'selectedAccount',
+  LAST_TX_BROADCAST = 'lastTxBroadcast'
 }
 
 /* TS 2.7 feature

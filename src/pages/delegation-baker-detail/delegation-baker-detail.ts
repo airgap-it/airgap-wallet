@@ -64,8 +64,6 @@ export class DelegationBakerDetailPage {
         .toDate()
     }
 
-    console.log(this.delegationRewards)
-
     this.avgRoIPerCyclePercentage = this.delegationRewards
       .map(delegationInfo => {
         return delegationInfo.totalRewards.plus(delegationInfo.totalFees).div(delegationInfo.stakingBalance)
