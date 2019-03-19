@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-const transactionBackendUrl = 'http://tx.airgap.gke.papers.tech/'
+const transactionBackendUrl = 'https://tx.airgap.prod.gke.papers.tech/'
 
 @Injectable()
 export class PushBackendProvider {

@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push'
 import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { Platform } from 'ionic-angular'
+import { take } from 'rxjs/operators'
 
 @Injectable()
 export class PushProvider {
@@ -19,15 +21,20 @@ export class PushProvider {
   }
 
   constructor(
+    private readonly platform: Platform,
     private readonly push: Push,
     private readonly translate: TranslateService,
-    private accountProvider: AccountProvider,
-    private pushBackendProvider: PushBackendProvider
+    private readonly accountProvider: AccountProvider,
+    private readonly pushBackendProvider: PushBackendProvider
   ) {
     this.initPush()
   }
 
   public async initPush(): Promise<void> {
+    if (!this.platform.is('cordova')) {
+      return
+    }
+
     if (this.isRegistered) {
       return
     }
@@ -54,17 +61,8 @@ export class PushProvider {
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      // TODO: Enable other currencies
-      const wallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier.startsWith('eth'))
-      const languageCode: string = this.translate.getBrowserCultureLang()
-      if (wallets.length > 0) {
-        wallets.forEach(wallet => {
-          this.pushBackendProvider
-            .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registration.registrationId, languageCode)
-            .catch(handleErrorSentry(ErrorCategory.PUSH))
-        })
-      }
       console.log('device registered', registration)
+      await this.registerWallets(registration.registrationId)
       alert(registration.registrationId)
     })
 
@@ -74,5 +72,21 @@ export class PushProvider {
     })
 
     this.isRegistered = true
+  }
+
+  async registerWallets(registrationId: string) {
+    console.log('register wallets')
+    // TODO: Enable other currencies
+    const languageCode: string = this.translate.getBrowserCultureLang()
+
+    this.accountProvider.wallets.pipe(take(1)).subscribe(wallets => {
+      if (wallets.length > 0) {
+        wallets.forEach(wallet => {
+          this.pushBackendProvider
+            .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId, languageCode)
+            .catch(handleErrorSentry(ErrorCategory.PUSH))
+        })
+      }
+    })
   }
 }
