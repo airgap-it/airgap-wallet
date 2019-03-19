@@ -2,6 +2,11 @@
   "coin-info": {
     "title": "Account",
     "transactions_label": "Transactions",
+    "pending-transactions": {
+      "label":  "Pending Transactions",
+      "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",
+      "open-blockexplorer_label":  "Open Blockexplorer"
+    },
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
     "send_label": "Send",

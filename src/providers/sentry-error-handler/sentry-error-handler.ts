@@ -26,6 +26,7 @@ export enum ErrorCategory {
   SCHEME_ROUTING = 'scheme_routing',
   COINLIB = 'coinlib',
   DEEPLINK_PROVIDER = 'deeplink_provider',
+  STORAGE = 'storage',
   OTHER = 'other'
 }
 

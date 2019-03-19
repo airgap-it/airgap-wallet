@@ -3,6 +3,7 @@ import { LoadingController, NavController, NavParams, ToastController, AlertCont
 
 import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 
 declare var cordova: any
 
@@ -21,7 +22,8 @@ export class TransactionConfirmPage {
     public navController: NavController,
     public navParams: NavParams,
     private alertCtrl: AlertController,
-    private platform: Platform
+    private platform: Platform,
+    private storageProvider: StorageProvider
   ) {}
 
   dismiss() {
@@ -72,6 +74,20 @@ export class TransactionConfirmPage {
         if (interval) {
           clearInterval(interval)
         }
+        // TODO: Remove once we introduce pending transaction handling
+        // tslint:disable-next-line:no-unnecessary-type-assertion
+        const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
+        const lastTx: {
+          protocol: string
+          accountIdentifier: string
+          date: number
+        } = {
+          protocol: this.signedTransactionSync.protocol,
+          accountIdentifier: signedTxWrapper.accountIdentifier,
+          date: new Date().getTime()
+        }
+        this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
+
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         let alert = this.alertCtrl.create({
           title: 'Transaction broadcasted!',
