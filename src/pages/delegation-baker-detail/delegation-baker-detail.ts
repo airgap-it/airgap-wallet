@@ -8,6 +8,8 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
 import moment from 'moment'
 
+const hoursPerCycle = 68
+
 @Component({
   selector: 'page-delegation-baker-detail',
   templateUrl: 'delegation-baker-detail.html'
@@ -24,12 +26,7 @@ export class DelegationBakerDetailPage {
   public avgRoIPerCycle: BigNumber
 
   public isDelegated: boolean
-  public nextPayout: Date = moment()
-    .add(476, 'h')
-    .toDate()
-  public firstPayout: Date = moment()
-    .add(476, 'h')
-    .toDate()
+  public nextPayout: Date
 
   constructor(
     public navCtrl: NavController,
@@ -44,15 +41,30 @@ export class DelegationBakerDetailPage {
     // get baker 0, always airgap for now
     this.bakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
-    const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    const { isDelegated, value } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isDelegated = isDelegated
 
     const kt = new TezosKtProtocol()
+
     this.bakerInfo = await kt.bakerInfo(this.bakerConfig.address)
     this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
 
-    this.nextPayout = this.delegationRewards[0].payout
-    this.firstPayout = this.delegationRewards[this.delegationRewards.length - 1].payout
+    // we are already delegating, and to this address
+    if (isDelegated && value && value === this.bakerConfig.address) {
+      const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
+      this.nextPayout =
+        delegatedCycles.length > 0
+          ? delegatedCycles[0].payout
+          : moment()
+              .add(hoursPerCycle * 7, 'h')
+              .toDate()
+    } else {
+      this.nextPayout = moment()
+        .add(hoursPerCycle * 7, 'h')
+        .toDate()
+    }
+
+    console.log(this.delegationRewards)
 
     this.avgRoIPerCyclePercentage = this.delegationRewards
       .map(delegationInfo => {
