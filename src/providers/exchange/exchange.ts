@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Exchange } from './exchange.interface'
 
-const CHANGELLY_BASE_URL = 'http://swap.airgap.gke.papers.tech/'
+const CHANGELLY_BASE_URL = 'https://swap.airgap.prod.gke.papers.tech/'
 
 export interface CreateTransactionResponse {
   amountExpectedFrom: string
