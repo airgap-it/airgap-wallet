@@ -10,7 +10,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 @Injectable()
 export class PushProvider {
-  private isRegistered: boolean = false
   private registrationId: string = ''
 
   private readonly options: PushOptions = {
@@ -73,8 +72,6 @@ export class PushProvider {
       console.error('Error with Push plugin', error)
       // TODO: Send error to sentry?
     })
-
-    this.isRegistered = true
   }
 
   async registerWallets() {
