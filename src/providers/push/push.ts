@@ -1,16 +1,16 @@
 import { PushBackendProvider } from './../push-backend/push-backend'
-import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push'
 import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 import { Platform } from 'ionic-angular'
-import { take } from 'rxjs/operators'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { ReplaySubject } from 'rxjs'
+import { take } from 'rxjs/operators'
 
 @Injectable()
 export class PushProvider {
-  private registrationId: string = ''
+  private registrationId: ReplaySubject<string> = new ReplaySubject(1)
 
   private readonly options: PushOptions = {
     android: {},
@@ -26,7 +26,6 @@ export class PushProvider {
     private readonly platform: Platform,
     private readonly push: Push,
     private readonly translate: TranslateService,
-    private readonly accountProvider: AccountProvider,
     private readonly pushBackendProvider: PushBackendProvider
   ) {
     this.initPush()
@@ -64,8 +63,7 @@ export class PushProvider {
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
       console.log('device registered', registration)
-      this.registrationId = registration.registrationId
-      await this.registerWallets()
+      this.registrationId.next(registration.registrationId)
     })
 
     pushObject.on('error').subscribe((error: Error) => {
@@ -74,38 +72,46 @@ export class PushProvider {
     })
   }
 
-  async registerWallets() {
+  async registerWallets(wallets: AirGapMarketWallet[]) {
     console.log('register wallets')
-    this.accountProvider.wallets.pipe(take(1)).subscribe(wallets => {
-      if (wallets.length > 0) {
-        wallets.forEach(wallet => {
-          this.registerWallet(wallet)
-        })
-      }
+
+    this.registrationId.pipe(take(1)).subscribe(registrationId => {
+      const languageCode: string = this.translate.getBrowserCultureLang()
+
+      wallets.forEach(wallet => {
+        this.registerWallet(wallet, registrationId, languageCode)
+      })
     })
   }
 
-  async registerWallet(wallet: AirGapMarketWallet) {
-    if (!this.registrationId) {
-      console.error('No registration token found')
-      return
-    }
+  async unregisterWallets(wallets: AirGapMarketWallet[]) {
+    console.log('register wallets')
 
-    const languageCode: string = this.translate.getBrowserCultureLang()
-
-    this.pushBackendProvider
-      .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, this.registrationId, languageCode)
-      .catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.registrationId.pipe(take(1)).subscribe(registrationId => {
+      wallets.forEach(wallet => {
+        this.unregisterWallet(wallet, registrationId)
+      })
+    })
   }
 
-  async unregisterWallet(wallet: AirGapMarketWallet) {
+  private async registerWallet(wallet: AirGapMarketWallet, registrationId: string, languageCode: string) {
+    this.pushBackendProvider
+      .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId, languageCode)
+      .catch(handleErrorSentry(ErrorCategory.PUSH))
+    if (!this.registrationId) {
+      console.error('No registration token found')
+      return
+    }
+  }
+
+  private async unregisterWallet(wallet: AirGapMarketWallet, registrationId: string) {
     if (!this.registrationId) {
       console.error('No registration token found')
       return
     }
 
     this.pushBackendProvider
-      .unregisterPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, this.registrationId)
+      .unregisterPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId)
       .catch(handleErrorSentry(ErrorCategory.PUSH))
   }
 }

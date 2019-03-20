@@ -119,6 +119,7 @@ export class AccountProvider {
     */
 
     this.wallets.next(this.walletList)
+    this.pushProvider.registerWallets(this.walletList)
   }
 
   getWalletList(): AirGapMarketWallet[] {
@@ -136,7 +137,7 @@ export class AccountProvider {
     }
 
     // Register address with push backend
-    this.pushProvider.registerWallet(wallet).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
     return this.persist()
@@ -156,7 +157,7 @@ export class AccountProvider {
     }
 
     // Unregister address from push backend
-    this.pushProvider.unregisterWallet(walletToRemove).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.pushProvider.unregisterWallets([walletToRemove]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
     return this.persist()
