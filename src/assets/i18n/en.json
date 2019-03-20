@@ -235,6 +235,7 @@
 
   "add-sub-account": {
     "title": "Add {{ typeLabel }}",
+    "delegation_heading": "In order to <span class=\"style__strong color__primary\">delegate</span> your XTZ, you have to import or create a new account first before you can delegate.",
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-account_card": {
