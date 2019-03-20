@@ -6,10 +6,13 @@ import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 import { Platform } from 'ionic-angular'
 import { take } from 'rxjs/operators'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 @Injectable()
 export class PushProvider {
   private isRegistered: boolean = false
+  private registrationId: string = ''
+
   private readonly options: PushOptions = {
     android: {},
     ios: {
@@ -35,7 +38,7 @@ export class PushProvider {
       return
     }
 
-    if (this.isRegistered) {
+    if (this.registrationId) {
       return
     }
 
@@ -62,8 +65,8 @@ export class PushProvider {
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
       console.log('device registered', registration)
-      await this.registerWallets(registration.registrationId)
-      alert(registration.registrationId)
+      this.registrationId = registration.registrationId
+      await this.registerWallets()
     })
 
     pushObject.on('error').subscribe((error: Error) => {
@@ -74,19 +77,38 @@ export class PushProvider {
     this.isRegistered = true
   }
 
-  async registerWallets(registrationId: string) {
+  async registerWallets() {
     console.log('register wallets')
-    // TODO: Enable other currencies
-    const languageCode: string = this.translate.getBrowserCultureLang()
-
     this.accountProvider.wallets.pipe(take(1)).subscribe(wallets => {
       if (wallets.length > 0) {
         wallets.forEach(wallet => {
-          this.pushBackendProvider
-            .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId, languageCode)
-            .catch(handleErrorSentry(ErrorCategory.PUSH))
+          this.registerWallet(wallet)
         })
       }
     })
+  }
+
+  async registerWallet(wallet: AirGapMarketWallet) {
+    if (!this.registrationId) {
+      console.error('No registration token found')
+      return
+    }
+
+    const languageCode: string = this.translate.getBrowserCultureLang()
+
+    this.pushBackendProvider
+      .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, this.registrationId, languageCode)
+      .catch(handleErrorSentry(ErrorCategory.PUSH))
+  }
+
+  async unregisterWallet(wallet: AirGapMarketWallet) {
+    if (!this.registrationId) {
+      console.error('No registration token found')
+      return
+    }
+
+    this.pushBackendProvider
+      .unregisterPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, this.registrationId)
+      .catch(handleErrorSentry(ErrorCategory.PUSH))
   }
 }

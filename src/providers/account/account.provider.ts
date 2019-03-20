@@ -3,6 +3,8 @@ import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 import { map } from 'rxjs/operators'
+import { PushProvider } from '../push/push'
+import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable()
 export class AccountProvider {
@@ -22,7 +24,7 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().auditTime(50)
   }
 
-  constructor(private storageProvider: StorageProvider) {
+  constructor(private storageProvider: StorageProvider, private pushProvider: PushProvider) {
     this.loadWalletsFromStorage().catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
@@ -133,23 +135,29 @@ export class AccountProvider {
       this.changeActiveAccount(wallet)
     }
 
-    this.walletList.push(wallet)
+    // Register address with push backend
+    this.pushProvider.registerWallet(wallet).catch(handleErrorSentry(ErrorCategory.PUSH))
+
     this.wallets.next(this.walletList)
     return this.persist()
   }
 
-  public removeWallet(testWallet: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, testWallet))
+  public removeWallet(wallet: AirGapMarketWallet): Promise<void> {
+    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, wallet))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
-    if (this.isSameWallet(testWallet, this.getActiveAccount())) {
+    if (this.isSameWallet(wallet, this.getActiveAccount())) {
       if (this.walletList.length > 0) {
         this.changeActiveAccount(this.walletList[0])
       } else if (this.walletList.length === 0) {
         this.resetActiveAccount()
       }
     }
+
+    // Unregister address from push backend
+    this.pushProvider.unregisterWallet(wallet).catch(handleErrorSentry(ErrorCategory.PUSH))
+
     this.wallets.next(this.walletList)
     return this.persist()
   }

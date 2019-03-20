@@ -8,7 +8,7 @@ export class PushBackendProvider {
   constructor(private http: HttpClient) {}
 
   async registerPush(protocolIdentifier: string, address: string, pushToken: string, languageCode: string = 'en') {
-    console.log(`Registered to push service for wallet ${protocolIdentifier} ${address}`)
+    console.log(`PushService: Registering wallet ${protocolIdentifier}-${address}`)
     const body = {
       address: address,
       identifier: protocolIdentifier,
@@ -17,5 +17,16 @@ export class PushBackendProvider {
     }
 
     return this.http.post<any>(`${transactionBackendUrl}api/v1/push_notifications/register/`, body).toPromise()
+  }
+
+  async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
+    console.log(`PushService: Unregistering wallet ${protocolIdentifier}-${address}`)
+    const body = {
+      address: address,
+      identifier: protocolIdentifier,
+      pushToken: pushToken
+    }
+
+    return this.http.post<any>(`${transactionBackendUrl}api/v1/push_notifications/unregister/`, body).toPromise()
   }
 }
