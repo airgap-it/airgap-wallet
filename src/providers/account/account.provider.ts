@@ -142,12 +142,12 @@ export class AccountProvider {
     return this.persist()
   }
 
-  public removeWallet(wallet: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, wallet))
+  public removeWallet(walletToRemove: AirGapMarketWallet): Promise<void> {
+    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
-    if (this.isSameWallet(wallet, this.getActiveAccount())) {
+    if (this.isSameWallet(walletToRemove, this.getActiveAccount())) {
       if (this.walletList.length > 0) {
         this.changeActiveAccount(this.walletList[0])
       } else if (this.walletList.length === 0) {
@@ -156,7 +156,7 @@ export class AccountProvider {
     }
 
     // Unregister address from push backend
-    this.pushProvider.unregisterWallet(wallet).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.pushProvider.unregisterWallet(walletToRemove).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
     return this.persist()
@@ -258,7 +258,7 @@ export class AccountProvider {
     this.refreshPageSubject.next()
   }
 
-  public getActiveAccount(): AirGapMarketWallet {
+  public getActiveAccount(): AirGapMarketWallet | undefined {
     return this.activeAccount
   }
 
