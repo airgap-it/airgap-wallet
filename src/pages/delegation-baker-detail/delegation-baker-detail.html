@@ -94,7 +94,6 @@
         <ion-avatar item-start class="content--align__center-center border--container"><ion-icon md-name="update"></ion-icon></ion-avatar>
         <h2 class="font--weight__bold" ion-text color="black" *ngIf="nextPayout; else nextPayoutSkeleton">
           {{ nextPayout | amTimeAgo }}
-          <small>{{ 'delegation-baker-detail.cycles' | translate: { cycles: 7 } }}</small>
         </h2>
         <ng-template #nextPayoutSkeleton>
           <div class="skeleton--loading"><h2></h2></div>

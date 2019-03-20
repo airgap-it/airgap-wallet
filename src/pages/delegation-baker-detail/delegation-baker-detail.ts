@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { BakerInfo, DelegationInfo } from 'airgap-coin-lib/dist/protocols/tezos/kt/TezosKtProtocol'
+import { BakerInfo, DelegationRewardInfo, TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
@@ -20,7 +19,7 @@ export class DelegationBakerDetailPage {
   public wallet: AirGapMarketWallet
 
   public bakerInfo: BakerInfo
-  public delegationRewards: DelegationInfo[]
+  public delegationRewards: DelegationRewardInfo[]
 
   public avgRoIPerCyclePercentage: BigNumber
   public avgRoIPerCycle: BigNumber
@@ -41,8 +40,8 @@ export class DelegationBakerDetailPage {
     // get baker 0, always airgap for now
     this.bakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
-    const { isDelegated, value } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-    this.isDelegated = isDelegated
+    const delegationCheck = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    this.isDelegated = delegationCheck.isDelegated
 
     const kt = new TezosKtProtocol()
 
@@ -50,17 +49,30 @@ export class DelegationBakerDetailPage {
     this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
 
     // we are already delegating, and to this address
-    if (isDelegated && value && value === this.bakerConfig.address) {
+    if (delegationCheck.isDelegated && delegationCheck.value === this.bakerConfig.address) {
       const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
+
       this.nextPayout =
         delegatedCycles.length > 0
           ? delegatedCycles[0].payout
           : moment()
-              .add(hoursPerCycle * 7, 'h')
+              .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
               .toDate()
+
+      // make sure there are at least 7 cycles to wait
+      if (
+        moment(delegationCheck.delegatedDate)
+          .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+          .isAfter(this.nextPayout)
+      ) {
+        this.nextPayout = moment(delegationCheck.delegatedDate)
+          .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+          .toDate()
+      }
     } else {
+      // if we are currently delegated, but to someone else, first payout is in 7 cycles, same for if we are undelegated
       this.nextPayout = moment()
-        .add(hoursPerCycle * 7, 'h')
+        .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
         .toDate()
     }
 
