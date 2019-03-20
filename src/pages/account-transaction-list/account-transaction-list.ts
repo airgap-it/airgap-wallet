@@ -85,6 +85,7 @@ export class AccountTransactionListPage {
     } = await this.storageProvider.get(SettingsKey.LAST_TX_BROADCAST)
 
     if (
+      lastTx &&
       lastTx.protocol === this.wallet.protocolIdentifier &&
       lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
       lastTx.date > new Date().getTime() - 5 * 60 * 1000

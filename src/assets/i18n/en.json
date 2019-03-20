@@ -309,5 +309,20 @@
       "message": "It looks like you don't have {{otherAppName}} installed on this device.",
       "ok": "Ok"
     }
+  },
+
+  "delegation-baker-detail": {
+    "title": "Baker Detail",
+    "accepts-delegation": "Accepts Delegation",
+    "fee": "Fee",
+    "payout-schedule": "Payout Schedule",
+    "your-delegation": "Your Delegation",
+    "your-balance": "Your Balance",
+    "estimated-return": "Estimated Return per Cycle",
+    "first-payout": "First Payout",
+    "next-payout": "Next Payout",
+    "your-rewards": "Your Rewards",
+    "cycles": "{{cycles}} Cycles",
+    "delegate": "Delegate"
   }
 }
