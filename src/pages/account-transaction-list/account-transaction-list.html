@@ -9,6 +9,14 @@
 </ion-header>
 
 <ion-content>
+  <tezos-delegation-card
+    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
+    [wallet]="wallet"
+    [isDelegated]="isKtDelegated"
+    (onDelegatedClick)="goToDelegateSelection()"
+    (onUndelegatedClick)="goToDelegateSelection()"
+  ></tezos-delegation-card>
+
   <ng-container *ngIf="hasPendingTransactions">
     <ion-row padding-horizontal>
       <ion-col col-12 no-padding padding-top>
@@ -25,14 +33,6 @@
       </ion-col>
     </ion-row>
   </ng-container>
-
-  <tezos-delegation-card
-    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
-    [wallet]="wallet"
-    [isDelegated]="isKtDelegated"
-    (onDelegatedClick)="goToDelegateSelection()"
-    (onUndelegatedClick)="goToDelegateSelection()"
-  ></tezos-delegation-card>
 
   <ion-row align-items-center>
     <ion-col col-10 padding>
