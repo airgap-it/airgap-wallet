@@ -165,11 +165,12 @@ export class TransactionPreparePage {
         .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } catch (e) {
-      console.warn(e)
+    } catch (error) {
+      handleErrorSentry(ErrorCategory.COINLIB)(error)
+
       this.toastController
         .create({
-          message: e,
+          message: error,
           duration: 3000,
           position: 'bottom'
         })
