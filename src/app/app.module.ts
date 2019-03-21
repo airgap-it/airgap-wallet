@@ -11,7 +11,6 @@ import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import { QRCodeModule } from 'angularx-qrcode'
 import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 

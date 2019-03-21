@@ -1,5 +1,5 @@
 import { IonicErrorHandler } from 'ionic-angular'
-import { init, captureException, configureScope } from '@sentry/browser'
+import { init, captureException, configureScope, withScope } from '@sentry/browser'
 
 init({
   dsn: process.env.SENTRY_DSN,
@@ -30,12 +30,15 @@ export enum ErrorCategory {
   OTHER = 'other'
 }
 
-const handleErrorSentry = (category?: ErrorCategory) => {
+const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
   return error => {
     try {
       console.debug('sending error to sentry, category', category)
       console.debug(error.originalError || error)
-      captureException(error.originalError || error)
+      withScope(scope => {
+        scope.setTag('airgap-error-category', category)
+        captureException(error.originalError || error)
+      })
     } catch (e) {
       console.debug('Error reporting exception to sentry: ', e)
     }
@@ -56,7 +59,13 @@ const setSentryRelease = (release: string) => {
   })
 }
 
-export { setSentryRelease, handleErrorIgnore, handleErrorSentry }
+const setSentryUser = (UUID: string) => {
+  configureScope(scope => {
+    scope.setUser({ id: UUID })
+  })
+}
+
+export { setSentryRelease, setSentryUser, handleErrorIgnore, handleErrorSentry }
 
 export class SentryErrorHandler extends IonicErrorHandler {
   handleError(error) {
