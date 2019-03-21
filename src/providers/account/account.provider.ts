@@ -179,6 +179,9 @@ export class AccountProvider {
   }
 
   public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {
+    if (!(wallet1 instanceof AirGapMarketWallet) || !(wallet2 instanceof AirGapMarketWallet)) {
+      return false
+    }
     return (
       wallet1.publicKey === wallet2.publicKey &&
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
