@@ -142,11 +142,20 @@ export class AccountDetailPage {
   }
 
   goToDelegateSelection() {
-    this.navCtrl
-      .push(SubAccountSelectPage, {
-        wallet: this.wallet
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    if (this.hasSubAccounts) {
+      this.navCtrl
+        .push(SubAccountSelectPage, {
+          wallet: this.wallet
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } else {
+      this.navCtrl
+        .push(SubAccountAddPage, {
+          subProtocolType: this.subProtocolTypes.ACCOUNT,
+          wallet: this.wallet
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
   public activateAccount() {
