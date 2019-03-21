@@ -30,6 +30,7 @@ export class AccountDetailPage {
   public translatedLabel: string = 'account-detail.tokens_label'
 
   // Tezos
+  public delegatedAmount: BigNumber = new BigNumber(0)
   public undelegatedAmount: BigNumber = new BigNumber(0)
 
   // Web Extension
@@ -91,9 +92,13 @@ export class AccountDetailPage {
   async ionViewWillEnter() {
     // Get amount of undelegated Tezos
     if (this.wallet.protocolIdentifier === 'xtz') {
+      this.delegatedAmount = new BigNumber(0)
       this.undelegatedAmount = new BigNumber(0)
       this.subWalletGroups.get(SubProtocolType.ACCOUNT).forEach(async wallet => {
         const delegatedResult = await this.operationsProvider.checkDelegated(wallet.receivingPublicAddress)
+        if (delegatedResult.isDelegated) {
+          this.delegatedAmount = this.delegatedAmount.plus(wallet.currentBalance)
+        }
         if (!delegatedResult.isDelegated && delegatedResult.setable) {
           this.undelegatedAmount = this.undelegatedAmount.plus(wallet.currentBalance)
         }

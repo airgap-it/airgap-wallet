@@ -13,6 +13,7 @@
     *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
+    [delegateAmount]="wallet.currentBalance"
     (onDelegatedClick)="goToDelegateSelection()"
     (onUndelegatedClick)="goToDelegateSelection()"
   ></tezos-delegation-card>
