@@ -7,10 +7,41 @@ import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-
 import { RawAeternityTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/aeternity-transactions.serializer'
 import { LoadingController, Loading } from 'ionic-angular'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { BehaviorSubject } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 @Injectable()
 export class OperationsProvider {
-  constructor(private readonly loadingController: LoadingController) {}
+  private delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
+
+  public setDelegationStatusOfAddress(address: string, delegated: boolean) {
+    this.delegationStatuses.next(this.delegationStatuses.getValue().set(address, delegated))
+  }
+
+  public async getDelegationStatusOfAddress(address: string, refresh: boolean = false) {
+    const delegationStatus = this.delegationStatuses.getValue().get(address)
+    if (refresh || delegationStatus === undefined) {
+      const { isDelegated } = await this.checkDelegated(address)
+      this.setDelegationStatusOfAddress(address, isDelegated)
+      return isDelegated
+    } else {
+      return delegationStatus
+    }
+  }
+
+  public async getDelegationStatusObservableOfAddress(address) {
+    await this.getDelegationStatusOfAddress(address)
+    return this.delegationStatuses.pipe(map(delegationStatuses => delegationStatuses.get(address)))
+  }
+
+  constructor(private readonly loadingController: LoadingController) {
+    // TODO: We should probably find a better way to do it
+    setInterval(() => {
+      Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
+        this.getDelegationStatusOfAddress(entry[0], true)
+      })
+    }, 10000)
+  }
 
   public async prepareOriginate(wallet: AirGapMarketWallet) {
     const loader = this.getAndShowLoader()
