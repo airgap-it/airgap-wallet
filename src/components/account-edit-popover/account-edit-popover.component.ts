@@ -28,6 +28,7 @@ import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 export class AccountEditPopoverComponent {
   private wallet: AirGapMarketWallet
   private onDelete: Function
+  private onUndelegate: Function
 
   // Tezos
   public isTezosKT: boolean = false
@@ -44,11 +45,12 @@ export class AccountEditPopoverComponent {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
+    this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
   async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
-    this.dismissPopover()
+    await this.dismissPopover()
   }
 
   async ngOnInit() {
@@ -61,9 +63,14 @@ export class AccountEditPopoverComponent {
   }
 
   async undelegate() {
+    await this.dismissPopover()
     const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
-    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    this.dismissPopover()
+    if (this.onUndelegate) {
+      console.log('calling onUndelegate')
+      this.onUndelegate(pageOptions)
+    } else {
+      console.log('onUndelegate not defined')
+    }
   }
 
   delete() {
@@ -98,6 +105,6 @@ export class AccountEditPopoverComponent {
   }
 
   dismissPopover() {
-    this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

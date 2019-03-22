@@ -108,8 +108,6 @@ export class OperationsProvider {
       handleErrorSentry(ErrorCategory.COINLIB)(e)
     }
 
-    console.log('output', airGapTx)
-
     return {
       page: InteractionSelectionPage,
       params: {

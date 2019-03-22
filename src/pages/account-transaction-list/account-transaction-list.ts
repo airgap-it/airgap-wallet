@@ -262,6 +262,9 @@ export class AccountTransactionListPage {
       wallet: this.wallet,
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      },
+      onUndelegate: pageOptions => {
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     })
     popover
