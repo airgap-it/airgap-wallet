@@ -90,6 +90,10 @@ export class AccountDetailPage {
   }
 
   async ionViewWillEnter() {
+    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+      this.operationsProvider.refreshAllDelegationStatuses()
+    }
+
     // Get amount of undelegated Tezos
     if (this.wallet.protocolIdentifier === 'xtz') {
       this.delegatedAmount = new BigNumber(0)

@@ -170,6 +170,10 @@ export class AccountTransactionListPage {
   }
 
   doRefresh(refresher: any = null) {
+    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+      this.operationsProvider.refreshAllDelegationStatuses()
+    }
+
     this.isRefreshing = true
 
     if (refresher) {

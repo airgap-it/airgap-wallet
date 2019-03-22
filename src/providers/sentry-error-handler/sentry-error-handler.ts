@@ -27,6 +27,7 @@ export enum ErrorCategory {
   COINLIB = 'coinlib',
   DEEPLINK_PROVIDER = 'deeplink_provider',
   STORAGE = 'storage',
+  OPERATIONS_PROVIDER = 'operations_provider',
   OTHER = 'other'
 }
 

@@ -34,14 +34,13 @@ export class OperationsProvider {
     return this.delegationStatuses.pipe(map(delegationStatuses => delegationStatuses.get(address)))
   }
 
-  constructor(private readonly loadingController: LoadingController) {
-    // TODO: We should probably find a better way to do it
-    setInterval(() => {
-      Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
-        this.getDelegationStatusOfAddress(entry[0], true)
-      })
-    }, 10000)
+  public refreshAllDelegationStatuses() {
+    Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
+      this.getDelegationStatusOfAddress(entry[0], true).catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
+    })
   }
+
+  constructor(private readonly loadingController: LoadingController) {}
 
   public async prepareOriginate(wallet: AirGapMarketWallet) {
     const loader = this.getAndShowLoader()
