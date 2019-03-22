@@ -21,6 +21,7 @@ export enum ErrorCategory {
   IONIC_MODAL = 'ionic_modal',
   IONIC_ALERT = 'ionic_alert',
   IONIC_LOADER = 'ionic_loader',
+  IONIC_TOAST = 'ionic_toast',
   NAVIGATION = 'navigation',
   WALLET_PROVIDER = 'wallet_provider',
   SCHEME_ROUTING = 'scheme_routing',

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavController, NavParams } from 'ionic-angular'
+import { NavController, NavParams, ToastController } from 'ionic-angular'
 import { BakerInfo, DelegationRewardInfo, TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import { OperationsProvider } from '../../providers/operations/operations'
@@ -30,6 +30,7 @@ export class DelegationBakerDetailPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
+    public toastController: ToastController,
     public operationsProvider: OperationsProvider,
     public remoteConfigProvider: RemoteConfigProvider
   ) {
@@ -89,7 +90,20 @@ export class DelegationBakerDetailPage {
   }
 
   async delegate() {
-    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, this.bakerConfig.address)
-    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    try {
+      const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, this.bakerConfig.address)
+      this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)(error)
+
+      this.toastController
+        .create({
+          message: error,
+          duration: 3000,
+          position: 'bottom'
+        })
+        .present()
+        .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+    }
   }
 }

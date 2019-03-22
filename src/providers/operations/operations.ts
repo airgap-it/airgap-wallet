@@ -46,24 +46,28 @@ export class OperationsProvider {
     const loader = this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
-    const originateTx = await protocol.originate(wallet.publicKey)
-    const serializedTx = await this.serializeTx(wallet, originateTx)
 
-    this.hideLoader(loader)
-
-    return this.getPageDetails(wallet, originateTx, serializedTx)
+    try {
+      const originateTx = await protocol.originate(wallet.publicKey)
+      const serializedTx = await this.serializeTx(wallet, originateTx)
+      return this.getPageDetails(wallet, originateTx, serializedTx)
+    } finally {
+      this.hideLoader(loader)
+    }
   }
 
   public async prepareDelegate(wallet: AirGapMarketWallet, delegateTargetAddress?: string) {
     const loader = this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
-    const delegateTx = await protocol.delegate(wallet.publicKey, wallet.receivingPublicAddress, delegateTargetAddress)
-    const serializedTx = await this.serializeTx(wallet, delegateTx)
 
-    this.hideLoader(loader)
-
-    return this.getPageDetails(wallet, delegateTx, serializedTx)
+    try {
+      const delegateTx = await protocol.delegate(wallet.publicKey, wallet.receivingPublicAddress, delegateTargetAddress)
+      const serializedTx = await this.serializeTx(wallet, delegateTx)
+      return this.getPageDetails(wallet, delegateTx, serializedTx)
+    } finally {
+      this.hideLoader(loader)
+    }
   }
 
   private async serializeTx(
