@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, NavParams, ViewController, ToastController, NavController } from 'ionic-angular'
+import { AlertController, NavParams, ViewController, NavController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
@@ -55,8 +55,7 @@ export class AccountEditPopoverComponent {
     // tezos
     if (this.wallet.protocolIdentifier === 'xtz-kt') {
       this.isTezosKT = true
-      const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-      this.isDelegated = isDelegated
+      this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }
     // tezos end
   }
