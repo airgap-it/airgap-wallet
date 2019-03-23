@@ -128,7 +128,7 @@ export class TransactionConfirmPage {
         handleErrorSentry(ErrorCategory.COINLIB)(error)
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        console.warn(error)
+
         let toast = this.toastCtrl.create({
           duration: 5000,
           message: 'Transaction broadcasting failed: ' + error,

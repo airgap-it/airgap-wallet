@@ -14,6 +14,9 @@ import BigNumber from 'bignumber.js'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 
+const XTZ = 'xtz'
+const XTZ_KT = 'xtz-kt'
+
 @Component({
   selector: 'page-account-detail',
   templateUrl: 'account-detail.html'
@@ -90,12 +93,12 @@ export class AccountDetailPage {
   }
 
   async ionViewWillEnter() {
-    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+    if (this.wallet.protocolIdentifier === XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
 
     // Get amount of undelegated Tezos
-    if (this.wallet.protocolIdentifier === 'xtz') {
+    if (this.wallet.protocolIdentifier === XTZ) {
       this.delegatedAmount = new BigNumber(0)
       this.undelegatedAmount = new BigNumber(0)
       this.subWalletGroups.get(SubProtocolType.ACCOUNT).forEach(async wallet => {

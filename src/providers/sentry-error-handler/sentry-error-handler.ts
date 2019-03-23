@@ -32,13 +32,15 @@ export enum ErrorCategory {
   OTHER = 'other'
 }
 
+const AIRGAP_ERROR_CATEGORY = 'airgap-error-category'
+
 const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
   return error => {
     try {
       console.debug('sending error to sentry, category', category)
       console.debug(error.originalError || error)
       withScope(scope => {
-        scope.setTag('airgap-error-category', category)
+        scope.setTag(AIRGAP_ERROR_CATEGORY, category)
         captureException(error.originalError || error)
       })
     } catch (e) {

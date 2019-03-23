@@ -7,6 +7,8 @@ import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol
 import { AccountProvider } from '../../providers/account/account.provider'
 import { ProtocolsProvider } from '../../providers/protocols/protocols'
 
+const XTZ_KT = 'xtz-kt'
+
 interface IAccountWrapper {
   selected: boolean
   wallet: AirGapMarketWallet
@@ -56,7 +58,7 @@ export class SubAccountAddPage {
         .then(res => {
           res.forEach((_value, index) => {
             const wallet = new AirGapMarketWallet(
-              'xtz-kt',
+              XTZ_KT,
               this.wallet.publicKey,
               this.wallet.isExtendedPublicKey,
               this.wallet.derivationPath,
