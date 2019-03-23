@@ -163,20 +163,19 @@ export class TransactionPreparePage {
           data: 'airgap-vault://?d=' + serializedTx
         })
         .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      handleErrorSentry(ErrorCategory.COINLIB)(error)
 
-      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } catch (e) {
-      console.warn(e)
       this.toastController
         .create({
-          message: e,
+          message: error,
           duration: 3000,
           position: 'bottom'
         })
         .present()
-        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
     } finally {
-      loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      loading.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     }
   }
 

@@ -6,14 +6,15 @@ import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateService } from '@ngx-translate/core'
 import { Platform, Nav } from 'ionic-angular'
 import { TabsPage } from '../pages/tabs/tabs'
-import { Storage } from '@ionic/storage'
 import { AccountProvider } from '../providers/account/account.provider'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
-import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
+import { setSentryRelease, handleErrorSentry, ErrorCategory, setSentryUser } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
 import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
+import { StorageProvider, SettingsKey } from '../providers/storage/storage'
+import { generateGUID } from '../utils/utils'
 
 @Component({
   templateUrl: 'app.html'
@@ -32,7 +33,7 @@ export class MyApp {
     private deeplinks: Deeplinks,
     private schemeRoutingProvider: SchemeRoutingProvider,
     private protocolsProvider: ProtocolsProvider,
-    private storage: Storage, // TODO remove
+    private storageProvider: StorageProvider,
     private webExtensionProvider: WebExtensionProvider,
     private appInfoProvider: AppInfoProvider,
     private accountProvider: AccountProvider,
@@ -49,8 +50,6 @@ export class MyApp {
 
     await this.platform.ready()
 
-    console.log(this.storage) // TODO: Remove
-
     if (this.platform.is('cordova')) {
       this.statusBar.styleDefault()
       this.statusBar.backgroundColorByHexString('#FFFFFF')
@@ -61,6 +60,13 @@ export class MyApp {
     } else {
       setSentryRelease('browser_' + this.appInfoProvider.getVersionNumber()) // TODO: Set version in CI once we have browser version
     }
+
+    let userId = await this.storageProvider.get(SettingsKey.USER_ID)
+    if (!userId) {
+      userId = generateGUID()
+      this.storageProvider.set(SettingsKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    }
+    setSentryUser(userId)
 
     let url = new URL(location.href)
 

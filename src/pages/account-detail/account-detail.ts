@@ -14,6 +14,9 @@ import BigNumber from 'bignumber.js'
 import { SubAccountSelectPage } from '../sub-account-select/sub-account-select'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 
+const XTZ = 'xtz'
+const XTZ_KT = 'xtz-kt'
+
 @Component({
   selector: 'page-account-detail',
   templateUrl: 'account-detail.html'
@@ -30,6 +33,7 @@ export class AccountDetailPage {
   public translatedLabel: string = 'account-detail.tokens_label'
 
   // Tezos
+  public delegatedAmount: BigNumber = new BigNumber(0)
   public undelegatedAmount: BigNumber = new BigNumber(0)
 
   // Web Extension
@@ -89,11 +93,19 @@ export class AccountDetailPage {
   }
 
   async ionViewWillEnter() {
+    if (this.wallet.protocolIdentifier === XTZ_KT) {
+      this.operationsProvider.refreshAllDelegationStatuses()
+    }
+
     // Get amount of undelegated Tezos
-    if (this.wallet.protocolIdentifier === 'xtz') {
+    if (this.wallet.protocolIdentifier === XTZ) {
+      this.delegatedAmount = new BigNumber(0)
       this.undelegatedAmount = new BigNumber(0)
       this.subWalletGroups.get(SubProtocolType.ACCOUNT).forEach(async wallet => {
         const delegatedResult = await this.operationsProvider.checkDelegated(wallet.receivingPublicAddress)
+        if (delegatedResult.isDelegated) {
+          this.delegatedAmount = this.delegatedAmount.plus(wallet.currentBalance)
+        }
         if (!delegatedResult.isDelegated && delegatedResult.setable) {
           this.undelegatedAmount = this.undelegatedAmount.plus(wallet.currentBalance)
         }
@@ -132,6 +144,9 @@ export class AccountDetailPage {
       wallet: this.wallet,
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      },
+      onUndelegate: pageOptions => {
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     })
     popover
@@ -142,11 +157,20 @@ export class AccountDetailPage {
   }
 
   goToDelegateSelection() {
-    this.navCtrl
-      .push(SubAccountSelectPage, {
-        wallet: this.wallet
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    if (this.hasSubAccounts) {
+      this.navCtrl
+        .push(SubAccountSelectPage, {
+          wallet: this.wallet
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } else {
+      this.navCtrl
+        .push(SubAccountAddPage, {
+          subProtocolType: this.subProtocolTypes.ACCOUNT,
+          wallet: this.wallet
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
   public activateAccount() {

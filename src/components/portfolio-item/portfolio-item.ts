@@ -3,6 +3,9 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { Observable } from 'rxjs'
+
+const XTZ_KT = 'xtz-kt'
 
 @Component({
   selector: 'portfolio-item',
@@ -21,7 +24,7 @@ export class PortfolioItemComponent {
   isToken: boolean = false
 
   @Input()
-  isDelegated: boolean | undefined
+  isDelegated: Observable<boolean>
 
   constructor(
     private readonly operationsProvider: OperationsProvider,
@@ -40,9 +43,8 @@ export class PortfolioItemComponent {
   }
 
   async ngOnChanges() {
-    if (this.wallet && this.wallet.protocolIdentifier === 'xtz-kt') {
-      const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-      this.isDelegated = isDelegated
+    if (this.wallet && this.wallet.protocolIdentifier === XTZ_KT) {
+      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(this.wallet.receivingPublicAddress)
     }
   }
 }

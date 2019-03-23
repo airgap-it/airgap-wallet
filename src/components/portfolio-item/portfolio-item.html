@@ -18,7 +18,9 @@
       </h3>
     </ng-container>
 
-    <ion-badge *ngIf="isDelegated !== undefined" color="secondary">{{ isDelegated ? 'delegated' : 'undelegated' }}</ion-badge>
+    <ion-badge *ngIf="(isDelegated | async) !== null" color="secondary">
+      {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
+    </ion-badge>
 
     <ng-template #syncingHeadingLow>
       <div class="skeleton--loading"><h3></h3></div>

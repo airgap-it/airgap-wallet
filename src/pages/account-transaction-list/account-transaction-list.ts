@@ -16,6 +16,9 @@ import { OperationsProvider } from '../../providers/operations/operations'
 
 declare let cordova
 
+const AE = 'ae'
+const XTZ_KT = 'xtz-kt'
+
 @Component({
   selector: 'page-account-transaction-list',
   templateUrl: 'account-transaction-list.html'
@@ -60,7 +63,7 @@ export class AccountTransactionListPage {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
-    if (this.protocolIdentifier === 'ae') {
+    if (this.protocolIdentifier === AE) {
       this.http
         .get(`https://api-airgap.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
         .subscribe((result: any) => {
@@ -70,7 +73,7 @@ export class AccountTransactionListPage {
         })
     }
 
-    if (this.protocolIdentifier === 'xtz-kt') {
+    if (this.protocolIdentifier === XTZ_KT) {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
 
@@ -116,7 +119,7 @@ export class AccountTransactionListPage {
   }
 
   walletIsAe() {
-    return this.wallet.protocolIdentifier === 'ae'
+    return this.wallet.protocolIdentifier === AE
   }
 
   ionViewWillEnter() {
@@ -170,6 +173,10 @@ export class AccountTransactionListPage {
   }
 
   doRefresh(refresher: any = null) {
+    if (this.wallet.protocolIdentifier === XTZ_KT) {
+      this.operationsProvider.refreshAllDelegationStatuses()
+    }
+
     this.isRefreshing = true
 
     if (refresher) {
@@ -177,7 +184,7 @@ export class AccountTransactionListPage {
     }
 
     // this can safely be removed after AE has made the switch to mainnet
-    if (this.protocolIdentifier === 'ae') {
+    if (this.protocolIdentifier === AE) {
       this.http.get('https://api-airgap.gke.papers.tech/status').subscribe((result: any) => {
         this.aeTxEnabled = result.transactionsEnabled
         this.aeTxListEnabled = result.txListEnabled
@@ -258,6 +265,9 @@ export class AccountTransactionListPage {
       wallet: this.wallet,
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      },
+      onUndelegate: pageOptions => {
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     })
     popover

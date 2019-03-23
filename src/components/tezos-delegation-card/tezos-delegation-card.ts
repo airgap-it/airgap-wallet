@@ -12,6 +12,9 @@ export class TezosDelegationCard {
   @Input()
   isDelegated: boolean = false
 
+  @Input()
+  delegateAmount: number = 0
+
   @Output()
   onDelegatedClick: EventEmitter<void> = new EventEmitter<void>()
 
