@@ -36,29 +36,28 @@ export class PushProvider {
       return
     }
 
-    if (this.registrationId) {
-      return
-    }
-
     const { isEnabled }: { isEnabled: boolean } = await this.push.hasPermission()
 
     if (isEnabled) {
-      alert('We have permission to send push notifications')
       this.register()
     } else {
-      this.register() // TODO: Place register in UI Flow
-      alert('We do not have permission to send push notifications')
+      this.register()
     }
   }
 
   private async register(): Promise<void> {
+    const hasRegistrationId = !(await this.registrationId.isEmpty().toPromise())
+    console.log('hasRegistrationId', hasRegistrationId)
+
+    if (hasRegistrationId) {
+      return
+    }
+
     const pushObject: PushObject = this.push.init(this.options)
 
     pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
       console.log('Received a notification', notification)
-
       // TODO: Handle push inside app?
-      alert(notification.message)
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
@@ -68,7 +67,7 @@ export class PushProvider {
 
     pushObject.on('error').subscribe((error: Error) => {
       console.error('Error with Push plugin', error)
-      // TODO: Send error to sentry?
+      handleErrorSentry(ErrorCategory.PUSH)(error)
     })
   }
 
@@ -78,30 +77,29 @@ export class PushProvider {
     this.registrationId.pipe(take(1)).subscribe(registrationId => {
       const languageCode: string = this.translate.getBrowserCultureLang()
 
-      wallets.forEach(wallet => {
-        this.registerWallet(wallet, registrationId, languageCode)
-      })
+      const pushRegisterRequests = wallets.map(wallet => ({
+        address: wallet.receivingPublicAddress,
+        identifier: wallet.protocolIdentifier,
+        pushToken: registrationId,
+        languageCode: languageCode
+      }))
+
+      this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
+      if (!this.registrationId) {
+        console.error('No registration token found')
+        return
+      }
     })
   }
 
   async unregisterWallets(wallets: AirGapMarketWallet[]) {
-    console.log('register wallets')
+    console.log('unregister wallets')
 
     this.registrationId.pipe(take(1)).subscribe(registrationId => {
       wallets.forEach(wallet => {
         this.unregisterWallet(wallet, registrationId)
       })
     })
-  }
-
-  private async registerWallet(wallet: AirGapMarketWallet, registrationId: string, languageCode: string) {
-    this.pushBackendProvider
-      .registerPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId, languageCode)
-      .catch(handleErrorSentry(ErrorCategory.PUSH))
-    if (!this.registrationId) {
-      console.error('No registration token found')
-      return
-    }
   }
 
   private async unregisterWallet(wallet: AirGapMarketWallet, registrationId: string) {

@@ -3,20 +3,21 @@ import { Injectable } from '@angular/core'
 
 const transactionBackendUrl = 'https://tx.airgap.prod.gke.papers.tech/'
 
+export interface PushAddressRequest {
+  address: string
+  identifier: string
+  pushToken: string
+  languageCode: string
+}
+
 @Injectable()
 export class PushBackendProvider {
   constructor(private http: HttpClient) {}
 
-  async registerPush(protocolIdentifier: string, address: string, pushToken: string, languageCode: string = 'en') {
-    console.log(`PushService: Registering wallet ${protocolIdentifier}-${address}`)
-    const body = {
-      address: address,
-      identifier: protocolIdentifier,
-      pushToken: pushToken,
-      languageCode: languageCode
-    }
+  async registerPushMany(pushRequests: PushAddressRequest[]) {
+    console.log(`PushService: Registering ${pushRequests.length} wallets`)
 
-    return this.http.post<any>(`${transactionBackendUrl}api/v1/push_notifications/register/`, body).toPromise()
+    return this.http.post(`${transactionBackendUrl}api/v1/push_notifications/register/`, pushRequests, { responseType: 'text' }).toPromise()
   }
 
   async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
@@ -27,6 +28,6 @@ export class PushBackendProvider {
       pushToken: pushToken
     }
 
-    return this.http.post<any>(`${transactionBackendUrl}api/v1/push_notifications/unregister/`, body).toPromise()
+    return this.http.post(`${transactionBackendUrl}api/v1/push_notifications/unregister/`, body, { responseType: 'text' }).toPromise()
   }
 }
