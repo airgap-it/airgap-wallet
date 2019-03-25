@@ -139,6 +139,8 @@ export class AccountProvider {
     // Register address with push backend
     this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
+    this.walletList.push(wallet)
+
     this.wallets.next(this.walletList)
     return this.persist()
   }
