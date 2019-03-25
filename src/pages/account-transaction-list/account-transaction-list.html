@@ -5,7 +5,7 @@
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
-  <portfolio-item [wallet]="wallet"></portfolio-item>
+  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
 </ion-header>
 
 <ion-content>
@@ -13,9 +13,27 @@
     *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
+    [delegateAmount]="wallet.currentBalance"
     (onDelegatedClick)="goToDelegateSelection()"
     (onUndelegatedClick)="goToDelegateSelection()"
   ></tezos-delegation-card>
+
+  <ng-container *ngIf="hasPendingTransactions">
+    <ion-row padding-horizontal>
+      <ion-col col-12 no-padding padding-top>
+        <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.pending-transactions.label' | translate }}</span>
+      </ion-col>
+      <ion-col col-12 no-padding>
+        <p>{{ 'coin-info.pending-transactions.text' | translate }}</p>
+      </ion-col>
+      <ion-col col-12 no-padding>
+        <button (click)="openBlockexplorer()" outline ion-button color="secondary" round icon-start small>
+          <ion-icon md-name="open_in_new"></ion-icon>
+          {{ 'coin-info.pending-transactions.open-blockexplorer_label' | translate }}
+        </button>
+      </ion-col>
+    </ion-row>
+  </ng-container>
 
   <ion-row align-items-center>
     <ion-col col-10 padding>

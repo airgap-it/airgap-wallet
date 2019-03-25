@@ -8,6 +8,7 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { AccountAddPage } from '../account-add/account-add'
 import { AccountDetailPage } from '../account-detail/account-detail'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
+import { OperationsProvider } from '../../providers/operations/operations'
 
 @Component({
   selector: 'page-portfolio',
@@ -23,7 +24,12 @@ export class PortfolioPage {
   wallets: Observable<AirGapMarketWallet[]>
   subWallets: Observable<AirGapMarketWallet[]>
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: AccountProvider) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private walletsProvider: AccountProvider,
+    private operationsProvider: OperationsProvider
+  ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
@@ -52,6 +58,9 @@ export class PortfolioPage {
   }
 
   async doRefresh(refresher: any = null) {
+    // XTZ: Refresh delegation status
+    this.operationsProvider.refreshAllDelegationStatuses()
+
     await Promise.all([
       this.walletsProvider.getWalletList().map(wallet => {
         return wallet.synchronize()

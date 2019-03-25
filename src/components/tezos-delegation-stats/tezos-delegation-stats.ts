@@ -1,6 +1,6 @@
 import { Input, Component } from '@angular/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { DelegationInfo, TezosKtProtocol } from 'airgap-coin-lib/dist/protocols/tezos/kt/TezosKtProtocol'
+import { DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import { handleErrorIgnore } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 const ktProtocol = new TezosKtProtocol()
@@ -13,7 +13,7 @@ export class TezosDelegationStats {
   @Input()
   wallet: AirGapMarketWallet
 
-  delegationRewards: DelegationInfo[] | void
+  delegationRewards: DelegationRewardInfo[] | void
 
   async ngOnChanges() {
     if (this.wallet) {

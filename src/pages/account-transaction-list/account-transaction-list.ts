@@ -8,13 +8,16 @@ import { AccountEditPopoverComponent } from '../../components/account-edit-popov
 import { AccountProvider } from '../../providers/account/account.provider'
 import { HttpClient } from '@angular/common/http'
 import { BigNumber } from 'bignumber.js'
-import { StorageProvider } from '../../providers/storage/storage'
+import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountAddressPage } from '../account-address/account-address'
 import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
 import { OperationsProvider } from '../../providers/operations/operations'
 
 declare let cordova
+
+const AE = 'ae'
+const XTZ_KT = 'xtz-kt'
 
 @Component({
   selector: 'page-account-transaction-list',
@@ -29,6 +32,8 @@ export class AccountTransactionListPage {
   transactions: IAirGapTransaction[] = []
 
   protocolIdentifier: string
+
+  hasPendingTransactions: boolean = false
 
   // AE-Migration Stuff
   aeTxEnabled: boolean = false
@@ -50,7 +55,7 @@ export class AccountTransactionListPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     public popoverCtrl: PopoverController,
-    public walletProvider: AccountProvider,
+    public accountProvider: AccountProvider,
     public http: HttpClient,
     private platform: Platform,
     private operationsProvider: OperationsProvider,
@@ -58,7 +63,7 @@ export class AccountTransactionListPage {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
-    if (this.protocolIdentifier === 'ae') {
+    if (this.protocolIdentifier === AE) {
       this.http
         .get(`https://api-airgap.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
         .subscribe((result: any) => {
@@ -68,8 +73,27 @@ export class AccountTransactionListPage {
         })
     }
 
-    if (this.protocolIdentifier === 'xtz-kt') {
+    if (this.protocolIdentifier === XTZ_KT) {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    }
+
+    this.init()
+  }
+
+  async init() {
+    const lastTx: {
+      protocol: string
+      accountIdentifier: string
+      date: number
+    } = await this.storageProvider.get(SettingsKey.LAST_TX_BROADCAST)
+
+    if (
+      lastTx &&
+      lastTx.protocol === this.wallet.protocolIdentifier &&
+      lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
+      lastTx.date > new Date().getTime() - 5 * 60 * 1000
+    ) {
+      this.hasPendingTransactions = true
     }
   }
 
@@ -95,7 +119,7 @@ export class AccountTransactionListPage {
   }
 
   walletIsAe() {
-    return this.wallet.protocolIdentifier === 'ae'
+    return this.wallet.protocolIdentifier === AE
   }
 
   ionViewWillEnter() {
@@ -127,7 +151,17 @@ export class AccountTransactionListPage {
   }
 
   openBlockexplorer() {
-    this.openUrl(`https://explorer.aepps.com/#/account/${this.wallet.addresses[0]}`)
+    let blockexplorer = ''
+    if (this.protocolIdentifier.startsWith('btc')) {
+      blockexplorer = 'https://live.blockcypher.com/btc/address/{{address}}/'
+    } else if (this.protocolIdentifier.startsWith('eth')) {
+      blockexplorer = 'https://etherscan.io/address/{{address}}'
+    } else if (this.protocolIdentifier.startsWith('ae')) {
+      blockexplorer = 'https://explorer.aepps.com/#/account/{{address}}'
+    } else if (this.protocolIdentifier.startsWith('xtz')) {
+      blockexplorer = 'https://tzscan.io/{{address}}'
+    }
+    this.openUrl(blockexplorer.replace('{{address}}', this.wallet.addresses[0]))
   }
 
   private openUrl(url: string) {
@@ -139,6 +173,10 @@ export class AccountTransactionListPage {
   }
 
   doRefresh(refresher: any = null) {
+    if (this.wallet.protocolIdentifier === XTZ_KT) {
+      this.operationsProvider.refreshAllDelegationStatuses()
+    }
+
     this.isRefreshing = true
 
     if (refresher) {
@@ -146,7 +184,7 @@ export class AccountTransactionListPage {
     }
 
     // this can safely be removed after AE has made the switch to mainnet
-    if (this.protocolIdentifier === 'ae') {
+    if (this.protocolIdentifier === AE) {
       this.http.get('https://api-airgap.gke.papers.tech/status').subscribe((result: any) => {
         this.aeTxEnabled = result.transactionsEnabled
         this.aeTxListEnabled = result.txListEnabled
@@ -173,7 +211,7 @@ export class AccountTransactionListPage {
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
     this.txOffset = this.transactions.length
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
       this.infiniteEnabled = false
@@ -184,7 +222,8 @@ export class AccountTransactionListPage {
 
   async loadInitialTransactions(): Promise<void> {
     if (this.transactions.length === 0) {
-      this.transactions = (await this.storageProvider.getCache<IAirGapTransaction[]>(this.getWalletIdentifier())) || []
+      this.transactions =
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
 
     const transactions = await this.getTransactions()
@@ -194,8 +233,8 @@ export class AccountTransactionListPage {
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
 
-    this.walletProvider.triggerWalletChanged()
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.getWalletIdentifier(), this.transactions)
+    this.accountProvider.triggerWalletChanged()
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
@@ -221,18 +260,14 @@ export class AccountTransactionListPage {
     return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
   }
 
-  getWalletIdentifier(): string {
-    const identifier = this.wallet.addressIndex
-      ? `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}-${this.wallet.addressIndex}`
-      : `${this.wallet.protocolIdentifier}-${this.wallet.publicKey}`
-    return identifier
-  }
-
   presentEditPopover(event) {
     let popover = this.popoverCtrl.create(AccountEditPopoverComponent, {
       wallet: this.wallet,
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      },
+      onUndelegate: pageOptions => {
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     })
     popover

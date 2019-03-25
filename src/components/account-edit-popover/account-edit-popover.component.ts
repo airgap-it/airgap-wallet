@@ -1,10 +1,12 @@
 import { Component } from '@angular/core'
-import { AlertController, NavParams, ViewController, ToastController, NavController } from 'ionic-angular'
+import { AlertController, NavParams, ViewController, NavController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
+
+const XTZ_KT = 'xtz-kt'
 
 @Component({
   template: `
@@ -28,6 +30,7 @@ import { ClipboardProvider } from '../../providers/clipboard/clipboard'
 export class AccountEditPopoverComponent {
   private wallet: AirGapMarketWallet
   private onDelete: Function
+  private onUndelegate: Function
 
   // Tezos
   public isTezosKT: boolean = false
@@ -44,27 +47,31 @@ export class AccountEditPopoverComponent {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
+    this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
   async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
-    this.dismissPopover()
+    await this.dismissPopover()
   }
 
   async ngOnInit() {
     // tezos
-    if (this.wallet.protocolIdentifier === 'xtz-kt') {
+    if (this.wallet.protocolIdentifier === XTZ_KT) {
       this.isTezosKT = true
-      const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-      this.isDelegated = isDelegated
+      this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }
     // tezos end
   }
 
   async undelegate() {
+    await this.dismissPopover()
     const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
-    this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    this.dismissPopover()
+    if (this.onUndelegate) {
+      this.onUndelegate(pageOptions)
+    } else {
+      handleErrorSentry(ErrorCategory.OTHER)('onUndelegate not defined')
+    }
   }
 
   delete() {
@@ -99,6 +106,6 @@ export class AccountEditPopoverComponent {
   }
 
   dismissPopover() {
-    this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

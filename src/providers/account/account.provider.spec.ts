@@ -32,6 +32,34 @@ describe('AccountProvider', () => {
     expect(accountProvider.getWalletList().length).toEqual(2)
   })
 
+  it('should be able to compare wallets', async () => {
+    const wallet1 = new AirGapMarketWallet(
+      'eth',
+      '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
+      false,
+      `m/44'/60'/0'/0/0`
+    )
+    const wallet1Same = new AirGapMarketWallet(
+      'eth',
+      '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
+      false,
+      `m/44'/60'/0'/0/0`
+    )
+    const wallet2 = new AirGapMarketWallet(
+      'btc',
+      '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
+      false,
+      `m/44'/60'/0'/0/0`
+    )
+    const wallet1Plain = JSON.parse(JSON.stringify(wallet1))
+
+    expect(accountProvider.isSameWallet(wallet1, wallet1Same)).toEqual(true)
+    expect(accountProvider.isSameWallet(wallet1, wallet2)).toEqual(false)
+    expect(accountProvider.isSameWallet(wallet1, undefined)).toEqual(false)
+    expect(accountProvider.isSameWallet(wallet1, 'test' as any)).toEqual(false)
+    expect(accountProvider.isSameWallet(wallet1, wallet1Plain)).toEqual(false)
+  })
+
   it('should successfully add and persist BTC wallets', async () => {
     let wallet = new AirGapMarketWallet(
       'btc',

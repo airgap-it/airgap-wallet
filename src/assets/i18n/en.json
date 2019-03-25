@@ -2,6 +2,11 @@
   "coin-info": {
     "title": "Account",
     "transactions_label": "Transactions",
+    "pending-transactions": {
+      "label":  "Pending Transactions",
+      "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",
+      "open-blockexplorer_label":  "Open Blockexplorer"
+    },
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
     "send_label": "Send",
@@ -231,6 +236,7 @@
 
   "add-sub-account": {
     "title": "Add {{ typeLabel }}",
+    "delegation_heading": "In order to <span class=\"style__strong color__primary\">delegate</span> your XTZ, you have to import or create a new account first before you can delegate.",
     "tokens_label": "Tokens",
     "accounts_label": "Accounts",
     "add-account_card": {
@@ -318,5 +324,19 @@
     "changellgy-address_label": "Changelly Address",
     "buy-amount_label": "Buy Amount",
     "receiving-to_label": "Receiving to"
+  },
+  "delegation-baker-detail": {
+    "title": "Baker Detail",
+    "accepts-delegation": "Accepts Delegation",
+    "fee": "Fee",
+    "payout-schedule": "Payout Schedule",
+    "your-delegation": "Your Delegation",
+    "your-balance": "Your Balance",
+    "estimated-return": "Estimated Return per Cycle",
+    "first-payout": "First Payout",
+    "next-payout": "Next Payout",
+    "your-rewards": "Your Rewards",
+    "cycles": "{{cycles}} Cycles",
+    "delegate": "Delegate"
   }
 }

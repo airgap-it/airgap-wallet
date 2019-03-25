@@ -3,12 +3,17 @@ import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry
 import { HttpClient } from '@angular/common/http'
 import BigNumber from 'bignumber.js'
 
-const CONFIG_BACKEND = 'http://config.airgap.gke.papers.tech/'
+const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
 
 export interface BakerConfig {
   name: string
   address: string
   fee: BigNumber
+  enabled: boolean
+  payout: {
+    cycles: number
+    time: string
+  }
 }
 
 @Injectable()
@@ -23,7 +28,12 @@ export class RemoteConfigProvider {
       return {
         name: config.name,
         address: config.address,
-        fee: new BigNumber(config.fee)
+        fee: new BigNumber(config.fee),
+        enabled: config.enabled,
+        payout: {
+          cycles: config.payout.cycles,
+          time: config.payout.time
+        }
       }
     })
   }

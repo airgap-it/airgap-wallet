@@ -1,6 +1,8 @@
 import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
+
 declare let chrome
+declare let window
 
 @Injectable()
 export class WebExtensionProvider {
@@ -13,7 +15,7 @@ export class WebExtensionProvider {
   }
 
   isWebExtension() {
-    if (chrome.runtime && chrome.runtime.id) {
+    if (window.chrome && chrome.runtime && chrome.runtime.id) {
       // Code running in a Chrome extension (content script, background page, etc.)
       return true
     }

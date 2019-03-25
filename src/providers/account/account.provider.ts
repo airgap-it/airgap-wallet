@@ -158,6 +158,12 @@ export class AccountProvider {
     return this.storageProvider.set(SettingsKey.WALLET, this.walletList)
   }
 
+  public getAccountIdentifier(wallet: AirGapMarketWallet): string {
+    return wallet.addressIndex
+      ? `${wallet.protocolIdentifier}-${wallet.publicKey}-${wallet.addressIndex}`
+      : `${wallet.protocolIdentifier}-${wallet.publicKey}`
+  }
+
   public walletByPublicKeyAndProtocolAndAddressIndex(
     publicKey: string,
     protocolIdentifier: string,
@@ -173,6 +179,9 @@ export class AccountProvider {
   }
 
   public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {
+    if (!(wallet1 instanceof AirGapMarketWallet) || !(wallet2 instanceof AirGapMarketWallet)) {
+      return false
+    }
     return (
       wallet1.publicKey === wallet2.publicKey &&
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&

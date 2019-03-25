@@ -32,7 +32,8 @@
   <tezos-delegation-card
     *ngIf="wallet.protocolIdentifier === 'xtz'"
     [wallet]="wallet"
-    [isDelegated]="undelegatedAmount?.toNumber() === 0"
+    [isDelegated]="undelegatedAmount.toNumber() === 0"
+    [delegateAmount]="undelegatedAmount.toNumber() === 0 ? delegatedAmount : undelegatedAmount"
     (onDelegatedClick)="goToDelegateSelection()"
     (onUndelegatedClick)="goToDelegateSelection()"
   ></tezos-delegation-card>
