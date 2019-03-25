@@ -5,12 +5,14 @@ import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 import { Platform } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { ReplaySubject } from 'rxjs'
-import { take } from 'rxjs/operators'
+import { BehaviorSubject } from 'rxjs'
+import { take, filter } from 'rxjs/operators'
+
+const DEFAULT_REGISTRATION_ID = ''
 
 @Injectable()
 export class PushProvider {
-  private registrationId: ReplaySubject<string> = new ReplaySubject(1)
+  private registrationId: BehaviorSubject<string> = new BehaviorSubject(DEFAULT_REGISTRATION_ID)
 
   private readonly options: PushOptions = {
     android: {},
@@ -46,10 +48,7 @@ export class PushProvider {
   }
 
   private async register(): Promise<void> {
-    const hasRegistrationId = !(await this.registrationId.isEmpty().toPromise())
-    console.log('hasRegistrationId', hasRegistrationId)
-
-    if (hasRegistrationId) {
+    if (this.registrationId.getValue() !== '') {
       return
     }
 
@@ -74,32 +73,42 @@ export class PushProvider {
   async registerWallets(wallets: AirGapMarketWallet[]) {
     console.log('register wallets')
 
-    this.registrationId.pipe(take(1)).subscribe(registrationId => {
-      const languageCode: string = this.translate.getBrowserCultureLang()
+    this.registrationId
+      .pipe(
+        filter(registrationId => registrationId !== DEFAULT_REGISTRATION_ID),
+        take(1)
+      )
+      .subscribe(registrationId => {
+        const languageCode: string = this.translate.getBrowserCultureLang()
 
-      const pushRegisterRequests = wallets.map(wallet => ({
-        address: wallet.receivingPublicAddress,
-        identifier: wallet.protocolIdentifier,
-        pushToken: registrationId,
-        languageCode: languageCode
-      }))
+        const pushRegisterRequests = wallets.map(wallet => ({
+          address: wallet.receivingPublicAddress,
+          identifier: wallet.protocolIdentifier,
+          pushToken: registrationId,
+          languageCode: languageCode
+        }))
 
-      this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
-      if (!this.registrationId) {
-        console.error('No registration token found')
-        return
-      }
-    })
+        this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
+        if (!this.registrationId) {
+          console.error('No registration token found')
+          return
+        }
+      })
   }
 
   async unregisterWallets(wallets: AirGapMarketWallet[]) {
     console.log('unregister wallets')
 
-    this.registrationId.pipe(take(1)).subscribe(registrationId => {
-      wallets.forEach(wallet => {
-        this.unregisterWallet(wallet, registrationId)
+    this.registrationId
+      .pipe(
+        filter(registrationId => registrationId !== DEFAULT_REGISTRATION_ID),
+        take(1)
+      )
+      .subscribe(registrationId => {
+        wallets.forEach(wallet => {
+          this.unregisterWallet(wallet, registrationId)
+        })
       })
-    })
   }
 
   private async unregisterWallet(wallet: AirGapMarketWallet, registrationId: string) {
