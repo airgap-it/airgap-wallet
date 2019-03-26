@@ -58,7 +58,7 @@ export class SwapComponent {
         map(wallets => {
           const filteredWallets = wallets.filter(wallet => wallet.coinProtocol.identifier === this.selectedProtocol.identifier)
           if (filteredWallets.length > 0) {
-            this.selectedWallet = filteredWallets[0]
+            this.selectWallet(filteredWallets[0])
           }
           return filteredWallets
         })

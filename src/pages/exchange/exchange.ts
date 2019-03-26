@@ -2,26 +2,51 @@ import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
 import { ExchangeProvider } from '../../providers/exchange/exchange'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
+import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
+
+enum ExchangePageState {
+  LOADING,
+  ONBOARDING,
+  ONLY_ONE_CURRENCY,
+  EXCHANGE
+}
 
 @Component({
   selector: 'page-exchange',
   templateUrl: 'exchange.html'
 })
 export class ExchangePage {
-  public supportedProtocols: string[] = []
+  public supportedProtocolsFrom: string[] = []
+  public supportedProtocolsTo: string[] = []
   public fromWallet: AirGapMarketWallet
   public toWallet: AirGapMarketWallet
   public amount: string = '0.00001'
   public minExchangeAmount: string
   public exchangeAmount: string
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private exchangeProvider: ExchangeProvider) {}
+  public exchangePageStates = ExchangePageState
+  public exchangePageState: ExchangePageState = ExchangePageState.LOADING
+
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private exchangeProvider: ExchangeProvider,
+    private storageProvider: StorageProvider
+  ) {
+    this.storageProvider
+      .get(SettingsKey.EXCHANGE_INTEGRATION)
+      .then(value => {
+        this.exchangePageState = value === null ? ExchangePageState.ONBOARDING : ExchangePageState.EXCHANGE
+      })
+      .catch(handleErrorSentry(ErrorCategory.STORAGE))
+  }
 
   async ngOnInit() {
-    this.supportedProtocols = await this.exchangeProvider.getAvailableCurrencies()
+    const supportedProtocols = await this.exchangeProvider.getAvailableCurrencies()
+    this.supportedProtocolsFrom = supportedProtocols
+    this.supportedProtocolsTo = supportedProtocols
   }
 
   async walletSelected(fromOrTo: string, wallet: AirGapMarketWallet) {
@@ -100,5 +125,9 @@ export class ExchangePage {
         console.log('message', error.error.message)
       }
     }
+  }
+
+  dismissExchangeOnboarding() {
+    this.exchangePageState = ExchangePageState.EXCHANGE
   }
 }
