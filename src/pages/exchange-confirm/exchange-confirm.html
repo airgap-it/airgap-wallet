@@ -7,10 +7,10 @@
 <ion-content padding-right>
   <h3 padding-bottom padding-left [innerHTML]="'exchange-confirm.heading' | translate"></h3>
   <address-row
-    [address]="exchangeResult.payinAddress"
+    [address]="fromWallet.receivingPublicAddress"
     label="{{ 'exchange-confirm.sell_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="'XTZ'"
+    [symbol]="exchangeResult.currencyFrom"
   ></address-row>
 
   <ion-row align-items-center>
@@ -36,7 +36,7 @@
     [address]="exchangeResult.payinAddress"
     label="{{ 'exchange-confirm.changellgy-address_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="'XTZ'"
+    [symbol]="exchangeResult.currencyFrom"
   ></address-row>
 
   <ion-row align-items-center>
@@ -52,10 +52,10 @@
   </ion-row>
 
   <address-row
-    [address]="exchangeResult.payinAddress"
+    [address]="toWallet.receivingPublicAddress"
     label="{{ 'exchange-confirm.receiving-to_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="'XTZ'"
+    [symbol]="exchangeResult.currencyTo"
   ></address-row>
 
   <ion-fab right bottom>
@@ -63,14 +63,4 @@
       Confirm Exchange
     </button>
   </ion-fab>
-
-  <!--
-  <portfolio-item [wallet]="fromWallet"></portfolio-item>
-  <br />
-  From Amount: {{ exchangeResult.amountExpectedFrom }}
-  <br />
-  To Address: {{ exchangeResult.payinAddress }}
-  <br />
-  <portfolio-item [wallet]="toWallet"></portfolio-item>
-  -->
 </ion-content>
