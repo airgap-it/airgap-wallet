@@ -79,6 +79,8 @@ build_ios:
     - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
     - nvm use v10.13.0
     - npm install
+    - ionic cordova platform add ios
+    - pushd platforms/ios/ && pod install && popd # Push plugin pod dependencies don't get installed sometimes
     - ionic cordova build ios --prod --release
     - find ./resources/ -name "*.png" -exec convert "{}" -alpha off "{}" \;
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates

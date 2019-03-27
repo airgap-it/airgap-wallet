@@ -1,4 +1,6 @@
 import { DeepLinkProvider } from './../providers/deep-link/deep-link'
+import { PushProvider } from '../providers/push/push'
+
 import { Component, ViewChild } from '@angular/core'
 import { Deeplinks } from '@ionic-native/deeplinks'
 import { SplashScreen } from '@ionic-native/splash-screen'
@@ -37,7 +39,8 @@ export class MyApp {
     private webExtensionProvider: WebExtensionProvider,
     private appInfoProvider: AppInfoProvider,
     private accountProvider: AccountProvider,
-    private deepLinkProvider: DeepLinkProvider
+    private deepLinkProvider: DeepLinkProvider,
+    private pushProvider: PushProvider
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -55,6 +58,8 @@ export class MyApp {
       this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
       setSentryRelease('app_' + this.appInfoProvider.getVersionNumber())
+
+      this.pushProvider.initPush()
     } else if (this.webExtensionProvider.isWebExtension()) {
       setSentryRelease('ext_' + this.appInfoProvider.getVersionNumber())
     } else {
