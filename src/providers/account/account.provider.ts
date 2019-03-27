@@ -118,6 +118,10 @@ export class AccountProvider {
     })
     */
 
+    if (this.walletList.length > 0) {
+      this.pushProvider.register()
+    }
+
     this.wallets.next(this.walletList)
     this.pushProvider.registerWallets(this.walletList)
   }
@@ -137,6 +141,7 @@ export class AccountProvider {
     }
 
     // Register address with push backend
+    this.pushProvider.register()
     this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.walletList.push(wallet)
