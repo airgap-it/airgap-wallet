@@ -32,8 +32,8 @@
   <portfolio-item
     [wallet]="selectedWallet"
     tappable
-    [isExpendable]="true"
-    (click)="expandWalletSelection = !expandWalletSelection"
+    [isExpendable]="supportedWallets?.length > 1"
+    (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
   ></portfolio-item>
   <ng-container *ngIf="expandWalletSelection">

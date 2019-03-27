@@ -11,7 +11,7 @@ import { BigNumber } from 'bignumber.js'
 enum ExchangePageState {
   LOADING,
   ONBOARDING,
-  ONLY_ONE_CURRENCY,
+  NOT_ENOUGH_CURRENCIES,
   EXCHANGE
 }
 
@@ -45,30 +45,43 @@ export class ExchangePage {
     this.storageProvider
       .get(SettingsKey.EXCHANGE_INTEGRATION)
       .then(value => {
-        this.exchangePageState = value === null ? ExchangePageState.ONBOARDING : ExchangePageState.EXCHANGE
+        if (value !== null) {
+          this.initExchangePage()
+        }
       })
       .catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
-  async ngOnInit() {
-    this.initExchangePage()
+  public async filterValidWallets(protocols: string[]): Promise<string[]> {
+    const walletList = this.accountProvider.getWalletList()
+
+    return protocols.filter(supportedProtocol =>
+      walletList.some(wallet => wallet.protocolIdentifier === supportedProtocol && wallet.currentBalance.isGreaterThan(0))
+    )
   }
 
   public async initExchangePage() {
-    this.supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies() // TODO: Filter for wallets we have
+    const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
+    this.supportedProtocolsFrom = await this.filterValidWallets(supportedProtocolsFrom)
+    if (this.supportedProtocolsFrom.length <= 1) {
+      return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+    }
+    this.exchangePageState = ExchangePageState.EXCHANGE
+
     this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
   }
 
   async protocolSet(fromOrTo: string, protocol: ICoinProtocol) {
     if (fromOrTo === 'from') {
       this.selectedFromProtocol = protocol
-
-      if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
-        this.supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier) // TODO: Filter for wallets we have
-        this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
-      }
     } else {
       this.selectedToProtocol = protocol
+    }
+
+    if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
+      const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
+      this.supportedProtocolsTo = await this.filterValidWallets(supportedProtocolsTo)
+      this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
     }
 
     await this.loadWalletsForSelectedProtocol(fromOrTo)
@@ -173,6 +186,7 @@ export class ExchangePage {
   }
 
   dismissExchangeOnboarding() {
-    this.exchangePageState = ExchangePageState.EXCHANGE
+    this.initExchangePage()
+    this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 }
