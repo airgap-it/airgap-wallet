@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
-const transactionBackendUrl = 'https://tx.airgap.prod.gke.papers.tech/'
+const TRANSACTION_BACKEND_URL = 'https://tx.airgap.prod.gke.papers.tech/'
 
 export interface PushAddressRequest {
   address: string
@@ -17,7 +17,9 @@ export class PushBackendProvider {
   async registerPushMany(pushRequests: PushAddressRequest[]) {
     console.log(`PushService: Registering ${pushRequests.length} wallets`)
 
-    return this.http.post(`${transactionBackendUrl}api/v1/push_notifications/register/`, pushRequests, { responseType: 'text' }).toPromise()
+    return this.http
+      .post(`${TRANSACTION_BACKEND_URL}api/v1/push_notifications/register/`, pushRequests, { responseType: 'text' })
+      .toPromise()
   }
 
   async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
@@ -28,6 +30,6 @@ export class PushBackendProvider {
       pushToken: pushToken
     }
 
-    return this.http.post(`${transactionBackendUrl}api/v1/push_notifications/unregister/`, body, { responseType: 'text' }).toPromise()
+    return this.http.post(`${TRANSACTION_BACKEND_URL}api/v1/push_notifications/unregister/`, body, { responseType: 'text' }).toPromise()
   }
 }

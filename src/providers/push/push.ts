@@ -8,8 +8,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take, filter } from 'rxjs/operators'
 
-const DEFAULT_REGISTRATION_ID = ''
-
 @Injectable()
 export class PushProvider {
   private registrationId: ReplaySubject<string> = new ReplaySubject(1)
