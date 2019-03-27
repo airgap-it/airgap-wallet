@@ -1,4 +1,5 @@
-import { SelectWalletPage } from './../pages/select-wallet/select-wallet'
+import { SelectWalletPage } from '../pages/select-wallet/select-wallet'
+import { Push } from '@ionic-native/push'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ErrorHandler, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
@@ -66,6 +67,8 @@ import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
 import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
+import { PushProvider } from '../providers/push/push'
+import { PushBackendProvider } from '../providers/push-backend/push-backend'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -185,7 +188,10 @@ export function createTranslateLoader(http: HttpClient) {
     ExchangeProvider,
     RemoteConfigProvider,
     WebExtensionProvider,
-    AppInfoProvider
+    AppInfoProvider,
+    PushProvider,
+    Push,
+    PushBackendProvider
   ]
 })
 export class AppModule {}

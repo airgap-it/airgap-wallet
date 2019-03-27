@@ -22,6 +22,9 @@ RUN npm install -g ionic@3.20.0
 # install cordova
 RUN npm install -g cordova@8.1.2
 
+# add google-services.json
+COPY google-services.json /app/google-services.json 
+
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
