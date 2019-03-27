@@ -27,15 +27,24 @@
 
   <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
     <swap
+      [selectedWallet]="fromWallet"
+      [supportedWallets]="supportedFromWallets"
+      [selectedProtocol]="selectedFromProtocol"
       [supportedProtocols]="supportedProtocolsFrom"
+      [exchangeAmount]="amount"
       [minExchangeAmount]="minExchangeAmount"
-      (walletSelectedEmitter)="walletSelected('from', $event)"
+      (protocolSetEmitter)="protocolSet('from', $event)"
+      (walletSetEmitter)="walletSet('from', $event)"
       (amountSetEmitter)="amountSet($event)"
     ></swap>
     <swap
+      [selectedWallet]="toWallet"
+      [supportedWallets]="supportedToWallets"
+      [selectedProtocol]="selectedToProtocol"
       [supportedProtocols]="supportedProtocolsTo"
       [exchangeAmount]="exchangeAmount"
-      (walletSelectedEmitter)="walletSelected('to', $event)"
+      (protocolSetEmitter)="protocolSet('to', $event)"
+      (walletSetEmitter)="walletSet('to', $event)"
       [swapSell]="false"
     ></swap>
     <div class="divider--line"></div>

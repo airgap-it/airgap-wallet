@@ -2,9 +2,10 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { NavController, NavParams, AlertController } from 'ionic-angular'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { Observable, ReplaySubject } from 'rxjs'
+import { map, take } from 'rxjs/operators'
 import { trigger, transition, style, animate } from '@angular/animations'
+import { BigNumber } from 'bignumber.js'
 
 @Component({
   selector: 'swap',
@@ -23,84 +24,72 @@ import { trigger, transition, style, animate } from '@angular/animations'
   ]
 })
 export class SwapComponent {
-  public wallets: Observable<AirGapMarketWallet[]>
-  public selectedProtocol: ICoinProtocol = getProtocolByIdentifier('eth')
-  public selectedWallet: AirGapMarketWallet
   public expandWalletSelection: boolean = false
 
   @Input()
-  public supportedProtocols: string[] = []
+  public readonly swapSell: boolean = true
 
   @Input()
-  public minExchangeAmount: string
+  public readonly selectedWallet: AirGapMarketWallet
 
   @Input()
-  public exchangeAmount: string
+  public readonly supportedWallets: AirGapMarketWallet[]
+
+  @Input()
+  public readonly selectedProtocol: ICoinProtocol
+
+  @Input()
+  public readonly supportedProtocols: string[] = []
+
+  @Input()
+  public readonly minExchangeAmount: string
+
+  @Input()
+  public exchangeAmount: BigNumber
+
+  protected _amount: string
 
   @Output()
-  walletSelectedEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter()
+  private readonly protocolSetEmitter: EventEmitter<ICoinProtocol> = new EventEmitter()
 
   @Output()
-  amountSetEmitter: EventEmitter<string> = new EventEmitter()
+  private readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter()
+
+  @Output()
+  private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
   constructor(
     public navCtrl: NavController,
     public alertCtrl: AlertController,
     public navParams: NavParams,
     private walletsProvider: AccountProvider
-  ) {
-    this.wallets = this.walletsProvider.wallets
-      .asObservable()
-      .combineLatest(this.walletsProvider.walledChangedObservable, function(s1, s2) {
-        return s1
-      })
-      .pipe(
-        map(wallets => {
-          const filteredWallets = wallets.filter(wallet => wallet.coinProtocol.identifier === this.selectedProtocol.identifier)
-          if (filteredWallets.length > 0) {
-            this.selectWallet(filteredWallets[0])
-          }
-          return filteredWallets
-        })
-      )
-  }
+  ) {}
 
-  amountChanged(amount: string) {
+  amountSet(amount: string) {
+    this._amount = amount
     this.amountSetEmitter.emit(amount)
   }
 
-  selectWallet(wallet: AirGapMarketWallet) {
-    this.selectedWallet = wallet
-    console.log('wallet selected')
-    this.walletSelectedEmitter.emit(wallet)
-  }
-
-  async doRefresh(refresher: any = null) {
-    await Promise.all(
-      this.walletsProvider.getWalletList().map(wallet => {
-        return wallet.synchronize()
-      })
-    )
+  walletSet(wallet: AirGapMarketWallet) {
+    console.log('asdf')
+    this.walletSetEmitter.emit(wallet)
   }
 
   doRadio() {
-    const wallets = this.walletsProvider.getWalletList()
-    const protocols: Map<string, ICoinProtocol> = new Map()
-    wallets.forEach(wallet => {
-      if (this.supportedProtocols.indexOf(wallet.coinProtocol.identifier) >= 0) {
-        protocols.set(wallet.coinProtocol.identifier, wallet.coinProtocol)
-      }
-    })
-
     let alert = this.alertCtrl.create()
     alert.setTitle('Select Currency')
 
-    protocols.forEach((protocol: ICoinProtocol) => {
-      alert.addInput({
-        type: 'radio',
-        label: protocol.name,
-        value: protocol.identifier
-      })
+    this.supportedProtocols.forEach((identifier: string) => {
+      try {
+        const protocol = getProtocolByIdentifier(identifier)
+        alert.addInput({
+          type: 'radio',
+          label: protocol.name,
+          value: protocol.identifier
+        })
+      } catch (error) {
+        // We ignore it, error is thrown if protocol is unknown
+      }
     })
 
     alert.addButton('Cancel')
@@ -108,13 +97,10 @@ export class SwapComponent {
       text: 'Ok',
       handler: (data: any) => {
         console.log('Radio data:', data)
-        this.selectedProtocol = getProtocolByIdentifier(data)
-        this.walletsProvider.triggerWalletChanged() // TODO make better
+        this.protocolSetEmitter.emit(getProtocolByIdentifier(data))
       }
     })
 
     alert.present()
   }
-  @Input()
-  public swapSell: boolean = true
 }

@@ -4,27 +4,26 @@
       <ion-label no-margin stacked>
         {{ swapSell ? 'Sell' : 'Buy' }}
         <span *ngIf="minExchangeAmount">(minimum amount: {{ minExchangeAmount }})</span>
+
+        <span>${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}</span>
       </ion-label>
       <ion-input
-        [disabled]="exchangeAmount"
+        [disabled]="!swapSell"
         type="number"
         id="buy-input"
-        [ngModel]="exchangeAmount"
-        (input)="amountChanged($event.target.value)"
+        [ngModel]="exchangeAmount?.toString()"
+        (input)="amountSet($event.target.value)"
         placeholder="0.0"
       ></ion-input>
     </ion-item>
     <p ion-text no-margin color="blackLight"></p>
   </ion-col>
   <ion-col (click)="doRadio()" col-4 padding class="coin__selection ">
-    <ion-row><img [src]="'assets/symbols/' + selectedProtocol.symbol.toLowerCase() + '.svg'" /></ion-row>
+    <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
     <ion-row>
       <h5>
-        {{ selectedProtocol.identifier | uppercase }}
-        <ion-icon
-          md-name="keyboard_arrow_down
-            "
-        ></ion-icon>
+        {{ selectedProtocol?.identifier | uppercase }}
+        <ion-icon md-name="keyboard_arrow_down"></ion-icon>
       </h5>
     </ion-row>
   </ion-col>
@@ -37,19 +36,17 @@
     (click)="expandWalletSelection = !expandWalletSelection"
     [isExtended]="expandWalletSelection"
   ></portfolio-item>
-  <ng-container *ngIf="(wallets | async) as walletsArray">
-    <ng-container *ngIf="expandWalletSelection">
-      <ion-list no-lines margin-top [@expandWalletAnimation]>
-        <ng-container *ngFor="let wallet of walletsArray">
-          <portfolio-item
-            *ngIf="selectedWallet !== wallet"
-            (click)="selectWallet(wallet)"
-            [wallet]="wallet"
-            tappable
-            [isExpendable]="false"
-          ></portfolio-item>
-        </ng-container>
-      </ion-list>
-    </ng-container>
+  <ng-container *ngIf="expandWalletSelection">
+    <ion-list no-lines margin-top [@expandWalletAnimation]>
+      <ng-container *ngFor="let wallet of supportedWallets">
+        <portfolio-item
+          *ngIf="selectedWallet !== wallet"
+          (click)="walletSet(wallet)"
+          [wallet]="wallet"
+          tappable
+          [isExpendable]="false"
+        ></portfolio-item>
+      </ng-container>
+    </ion-list>
   </ng-container>
 </ion-list>
