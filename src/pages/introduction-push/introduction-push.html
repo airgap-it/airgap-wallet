@@ -1,0 +1,19 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'introduction-push.title' | translate }}</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()" clear icon-only><ion-icon name="md-close"></ion-icon></button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-row justify-content-center align-items-center class="row--height__100">
+    <ion-col text-center>
+      <h3 padding-horizontal [innerHTML]="'introduction-push.heading' | translate"></h3>
+      <img src="../assets/img/permission_onboarding_camera.svg" />
+      <p padding-horizontal>{{ 'introduction-push.description' | translate }}</p>
+      <button round ion-button color="primary">{{ 'introduction-push.grant-permission_label' | translate }}</button>
+    </ion-col>
+  </ion-row>
+</ion-content>
