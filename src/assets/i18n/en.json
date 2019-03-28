@@ -332,6 +332,9 @@
     "buy_label": "Buy",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}"
   },
+  "protocol-select": {
+    "title": "Select Coin"
+  },
   "exchange-confirm": {
     "title": "Confirm Exchange",
     "heading": "This is your Exchange summary, you need to sign it with <span class=\"style__strong color__primary\">AirGap Vault</span> to complete the exchange.",

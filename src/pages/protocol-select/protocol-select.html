@@ -1,11 +1,12 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
-    <ion-title>protocol-select</ion-title>
+    <ion-title>{{ 'protocol-select.title' | translate }}</ion-title>
   </ion-navbar>
+  <ion-searchbar mode="md"></ion-searchbar>
 </ion-header>
 
 <ion-content padding>
-  <ion-list radio-group>
+  <ion-list radio-group no-lines>
     <currency-item
       *ngFor="let protocol of protocols"
       [protocolSymbol]="protocol.symbol"
