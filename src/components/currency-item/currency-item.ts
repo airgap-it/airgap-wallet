@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core'
+import { ICoinProtocol } from 'airgap-coin-lib'
 
 @Component({
   selector: 'currency-item',
@@ -6,10 +7,10 @@ import { Component, Input } from '@angular/core'
 })
 export class CurrencyItemComponent {
   @Input()
-  public protocolSymbol: string
+  public isSelected: boolean
 
   @Input()
-  public protocolName: string
+  public protocol: ICoinProtocol
 
   @Input()
   public radioList: boolean = false

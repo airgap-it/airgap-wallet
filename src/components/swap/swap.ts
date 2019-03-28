@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { NavController, NavParams, AlertController } from 'ionic-angular'
+import { NavController, ModalController, NavParams, AlertController } from 'ionic-angular'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { Observable, ReplaySubject } from 'rxjs'
@@ -7,6 +7,7 @@ import { map, take } from 'rxjs/operators'
 import { trigger, transition, style, animate } from '@angular/animations'
 import { BigNumber } from 'bignumber.js'
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'swap',
@@ -63,6 +64,7 @@ export class SwapComponent {
     public navCtrl: NavController,
     public alertCtrl: AlertController,
     public navParams: NavParams,
+    public modalController: ModalController,
     private walletsProvider: AccountProvider
   ) {}
 
@@ -80,12 +82,23 @@ export class SwapComponent {
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
         protocols.push(getProtocolByIdentifier(supportedProtocol))
-      } catch (e) {}
+      } catch (e) {
+        /* */
+      }
     })
 
-    this.navCtrl.push(ProtocolSelectPage, {
+    const modal = this.modalController.create(ProtocolSelectPage, {
       selectedProtocol: this.selectedProtocol,
       protocols: protocols
     })
+
+    modal.onDidDismiss((protocolIdentifier: string) => {
+      console.log('dismiss', protocolIdentifier)
+      if (protocolIdentifier) {
+        this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier))
+      }
+    })
+
+    modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }
 }

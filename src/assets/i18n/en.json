@@ -337,13 +337,15 @@
   },
   "exchange-confirm": {
     "title": "Confirm Exchange",
+    "confirm-exchange_label": "Confirm Exchange",
     "heading": "This is your Exchange summary, you need to sign it with <span class=\"style__strong color__primary\">AirGap Vault</span> to complete the exchange.",
     "sell_label": "From",
     "sell-amount_label": "Amount",
     "fee_label": "Fee",
     "changellgy-address_label": "Changelly Address",
     "buy-amount_label": "Buy Amount",
-    "receiving-to_label": "Receiving to"
+    "receiving-to_label": "Receiving to",
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
   },
   "delegation-baker-detail": {
     "title": "Baker Detail",

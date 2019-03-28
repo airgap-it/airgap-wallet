@@ -58,9 +58,13 @@
     [symbol]="exchangeResult.currencyTo"
   ></address-row>
 
+  <ion-row padding (click)="changellyUrl()">
+    <small [innerHTML]="'exchange-confirm.disclaimer' | translate"></small>
+  </ion-row>
+
   <ion-fab right bottom>
     <button color="secondary" ion-button round>
-      Confirm Exchange
+      {{ 'exchange-confirm.confirm-exchange_label' | translate }}
     </button>
   </ion-fab>
 </ion-content>
