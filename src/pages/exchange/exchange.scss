@@ -5,4 +5,7 @@ page-exchange {
       height: 50vh;
     }
   }
+  .divider--line {
+    border-top: 1px solid rgba(color($colors, primary), 0.24);
+  }
 }
