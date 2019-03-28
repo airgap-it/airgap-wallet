@@ -41,17 +41,12 @@ export class ExchangePage {
     private exchangeProvider: ExchangeProvider,
     private storageProvider: StorageProvider,
     private accountProvider: AccountProvider
-  ) {
-    this.storageProvider
-      .get(SettingsKey.EXCHANGE_INTEGRATION)
-      .then(hasShownOnboarding => {
-        if (hasShownOnboarding) {
-          this.initExchangePage()
-        } else {
-          this.exchangePageState = ExchangePageState.ONBOARDING
-        }
-      })
-      .catch(handleErrorSentry(ErrorCategory.STORAGE))
+  ) {}
+
+  ionViewWillEnter() {
+    if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
+      this.initExchangePage()
+    }
   }
 
   public async filterValidWallets(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
@@ -73,6 +68,13 @@ export class ExchangePage {
     if (this.supportedProtocolsFrom.length <= 1) {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
     }
+
+    const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
+
+    if (!hasShownOnboarding) {
+      return (this.exchangePageState = ExchangePageState.ONBOARDING)
+    }
+
     this.exchangePageState = ExchangePageState.EXCHANGE
 
     this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
