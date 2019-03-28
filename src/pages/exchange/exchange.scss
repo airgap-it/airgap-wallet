@@ -1,35 +1,4 @@
 page-exchange {
-  .amount__container {
-    .item-inner {
-      border-bottom-color: transparent !important;
-      box-shadow: none !important;
-    }
-
-    input {
-      font-size: 1.5em;
-      font-weight: bold;
-      margin: 0;
-    }
-    .coin__selection {
-      background-color: rgba(color($colors, primary), 0.24);
-      img {
-        width: 40px;
-        height: 40px;
-      }
-      ion-row {
-        justify-content: center;
-        h5 {
-          margin: 8px 0;
-          display: flex;
-          align-items: center;
-        }
-      }
-    }
-  }
-  .divider--line,
-  .border--vertical {
-    border-top: 1px solid rgba(color($colors, primary), 0.24);
-  }
   .onboarding__container {
     img {
       width: 50vh;

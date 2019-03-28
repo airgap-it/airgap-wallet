@@ -1,4 +1,4 @@
-<ion-row no-padding align-items-center class="amount__container border--vertical">
+<ion-row no-padding align-items-stretch class="amount__container border--vertical">
   <ion-col padding col-8>
     <ion-item no-padding no-lines>
       <ion-label no-margin stacked>
@@ -17,6 +17,16 @@
     <p ion-text no-margin color="blackLight">
       ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
     </p>
+    <!-- TODO: display if amount is lower than min amount 
+    <ion-row padding-top>
+      <p
+        ion-text
+        no-margin
+        color="danger"
+        [innerHTML]="'swap.min-amount-error_label' | translate: { minExchangeAmount: minExchangeAmount }"
+      ></p>
+    </ion-row>
+    -->
   </ion-col>
   <ion-col (click)="doRadio()" col-4 padding class="coin__selection ">
     <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>

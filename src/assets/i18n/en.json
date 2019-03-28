@@ -328,7 +328,8 @@
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
-    "buy_label": "Buy"
+    "buy_label": "Buy",
+    "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}"
   },
   "exchange-confirm": {
     "title": "Confirm Exchange",
