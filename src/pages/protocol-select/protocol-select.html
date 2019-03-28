@@ -1,16 +1,15 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whitePrimaryContrast">
     <ion-title>{{ 'protocol-select.title' | translate }}</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()" clear icon-only><ion-icon name="md-close"></ion-icon></button>
+    </ion-buttons>
   </ion-navbar>
   <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
-  <ion-buttons end>
-    <button ion-button (click)="dismiss()"><ion-icon name="md-close"></ion-icon></button>
-  </ion-buttons>
 </ion-header>
 
 <ion-content padding>
-  <ion-list radio-group [(ngModel)]="selectedProtocol">
-    <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true"></currency-item>
+  <ion-list radio-group [(ngModel)]="selectedProtocol" no-lines>
+    <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true" (click)="select()"></currency-item>
   </ion-list>
-  <button ion-button (click)="select()">Add</button>
 </ion-content>
