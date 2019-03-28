@@ -7,19 +7,17 @@
 
 <ion-content padding>
   <ion-list no-lines>
-    <ion-item (click)="addAccount(protocol.identifier)" *ngFor="let protocol of filteredAccountProtocols" no-padding>
-      <currency-symbol class="item__image" [symbol]="protocol.symbol" item-start></currency-symbol>
-      <h2>
-        <strong>{{ protocol.name }}</strong>
-        {{ protocol.symbol }}
-      </h2>
-    </ion-item>
-    <ion-item (click)="addSubAccount(subProtocol.identifier)" *ngFor="let subProtocol of filteredSubAccountProtocols" no-padding>
-      <currency-symbol class="item__image" [symbol]="subProtocol.symbol" item-start></currency-symbol>
-      <h2>
-        <strong>{{ subProtocol.name }}</strong>
-        {{ subProtocol.symbol }}
-      </h2>
-    </ion-item>
+    <currency-item
+      (click)="addAccount(protocol.identifier)"
+      *ngFor="let protocol of filteredAccountProtocols"
+      [protocolName]="protocol.name"
+      [protocolSymbol]="protocol.symbol"
+    ></currency-item>
+    <currency-item
+      (click)="addSubAccount(subProtocol.identifier)"
+      *ngFor="let subProtocol of filteredSubAccountProtocols"
+      [protocolName]="subProtocol.name"
+      [protocolSymbol]="subProtocol.symbol"
+    ></currency-item>
   </ion-list>
 </ion-content>
