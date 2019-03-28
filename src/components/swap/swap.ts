@@ -88,7 +88,7 @@ export class SwapComponent {
     })
 
     const modal = this.modalController.create(ProtocolSelectPage, {
-      selectedProtocol: this.selectedProtocol,
+      selectedProtocol: this.selectedProtocol.identifier,
       protocols: protocols
     })
 

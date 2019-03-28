@@ -17,7 +17,7 @@
     <p ion-text no-margin color="blackLight">
       ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
     </p>
-    <ion-row padding-top *ngIf="exchangeAmount?.isLessThan(minExchangeAmount)">
+    <ion-row padding-top *ngIf="!exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
       <p
         ion-text
         no-margin

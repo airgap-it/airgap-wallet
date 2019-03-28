@@ -7,9 +7,6 @@ import { ICoinProtocol } from 'airgap-coin-lib'
 })
 export class CurrencyItemComponent {
   @Input()
-  public isSelected: boolean
-
-  @Input()
   public protocol: ICoinProtocol
 
   @Input()

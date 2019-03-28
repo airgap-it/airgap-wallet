@@ -10,12 +10,7 @@
 
 <ion-content padding>
   <ion-list radio-group [(ngModel)]="selectedProtocol">
-    <currency-item
-      *ngFor="let protocol of filteredProtocols"
-      [isSelected]="protocol.identifier === selectedProtocol.identifier"
-      [protocol]="protocol"
-      [radioList]="true"
-    ></currency-item>
+    <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true"></currency-item>
   </ion-list>
   <button ion-button (click)="select()">Add</button>
 </ion-content>

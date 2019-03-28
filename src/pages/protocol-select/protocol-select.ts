@@ -9,7 +9,7 @@ import { ICoinProtocol } from 'airgap-coin-lib'
 export class ProtocolSelectPage {
   searchTerm: string = ''
 
-  selectedProtocol: ICoinProtocol
+  selectedProtocol: string
   protocols: ICoinProtocol[]
   filteredProtocols: ICoinProtocol[]
 

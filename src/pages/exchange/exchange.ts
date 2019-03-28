@@ -28,7 +28,7 @@ export class ExchangePage {
   public supportedFromWallets: AirGapMarketWallet[]
   public toWallet: AirGapMarketWallet
   public supportedToWallets: AirGapMarketWallet[]
-  public amount: BigNumber = new BigNumber('0.00001')
+  public amount: BigNumber = new BigNumber(0)
   public minExchangeAmount: string
   public exchangeAmount: BigNumber
 
@@ -145,8 +145,9 @@ export class ExchangePage {
           this.amount.toString()
         )
       )
+    } else {
+      this.exchangeAmount = new BigNumber(0)
     }
-    console.log(this.minExchangeAmount, this.exchangeAmount.toFixed())
   }
 
   async startExchange() {
