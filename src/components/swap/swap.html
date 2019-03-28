@@ -43,6 +43,7 @@
     [wallet]="selectedWallet"
     tappable
     [isExpendable]="supportedWallets?.length > 1"
+    [hideFiatAmounts]="true"
     (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
     [maxDigits]="8"
@@ -55,6 +56,7 @@
           (click)="walletSet(wallet)"
           [wallet]="wallet"
           tappable
+          [hideFiatAmounts]="true"
           [isExpendable]="false"
           [maxDigits]="8"
         ></portfolio-item>

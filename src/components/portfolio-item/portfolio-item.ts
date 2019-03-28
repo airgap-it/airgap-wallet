@@ -30,6 +30,9 @@ export class PortfolioItemComponent {
   isExtended: boolean = false
 
   @Input()
+  hideFiatAmounts: boolean = false
+
+  @Input()
   isToken: boolean = false
 
   @Input()

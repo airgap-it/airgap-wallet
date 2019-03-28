@@ -27,7 +27,7 @@
     </ng-template>
   </ion-label>
 
-  <ion-row class="items--right" item-end *ngIf="!isExpendable">
+  <ion-row class="items--right" item-end *ngIf="!isExpendable && !hideFiatAmounts">
     <ion-col col-12 no-padding text-right>
       <strong *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
         <p ion-text color="black">
