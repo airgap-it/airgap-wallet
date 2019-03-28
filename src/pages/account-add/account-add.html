@@ -10,14 +10,12 @@
     <currency-item
       (click)="addAccount(protocol.identifier)"
       *ngFor="let protocol of filteredAccountProtocols"
-      [protocolName]="protocol.name"
-      [protocolSymbol]="protocol.symbol"
+      [protocol]="protocol"
     ></currency-item>
     <currency-item
       (click)="addSubAccount(subProtocol.identifier)"
       *ngFor="let subProtocol of filteredSubAccountProtocols"
-      [protocolName]="subProtocol.name"
-      [protocolSymbol]="subProtocol.symbol"
+      [protocol]="subProtocol"
     ></currency-item>
   </ion-list>
 </ion-content>
