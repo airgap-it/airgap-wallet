@@ -65,7 +65,9 @@ export class ExchangePage {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
     this.supportedProtocolsFrom = await this.filterValidWallets(supportedProtocolsFrom)
 
-    if (this.supportedProtocolsFrom.length <= 1) {
+    await this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
+
+    if (this.supportedProtocolsTo.length === 0) {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
     }
 
@@ -76,8 +78,6 @@ export class ExchangePage {
     }
 
     this.exchangePageState = ExchangePageState.EXCHANGE
-
-    this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
   }
 
   async protocolSet(fromOrTo: string, protocol: ICoinProtocol) {
