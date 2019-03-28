@@ -67,6 +67,7 @@ import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
 import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
+import { ProtocolSelectPage } from '../pages/protocol-select/protocol-select'
 import { PushProvider } from '../providers/push/push'
 import { PushBackendProvider } from '../providers/push-backend/push-backend'
 
@@ -104,7 +105,8 @@ export function createTranslateLoader(http: HttpClient) {
     ExchangeConfirmPage,
     SelectWalletPage,
     DelegationBakerDetailPage,
-    DisclaimerWebExtensionPage
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage
   ],
   imports: [
     BrowserModule,
@@ -164,7 +166,8 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountSelectPage,
     DelegationBakerDetailPage,
     SubAccountSelectPage,
-    DisclaimerWebExtensionPage
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage
   ],
   providers: [
     StatusBar,

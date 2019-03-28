@@ -1,0 +1,16 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>protocol-select</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list radio-group>
+    <currency-item
+      *ngFor="let protocol of protocols"
+      [protocolSymbol]="protocol.symbol"
+      [protocolName]="protocol.name"
+      [radioList]="true"
+    ></currency-item>
+  </ion-list>
+</ion-content>

@@ -6,6 +6,7 @@ import { Observable, ReplaySubject } from 'rxjs'
 import { map, take } from 'rxjs/operators'
 import { trigger, transition, style, animate } from '@angular/animations'
 import { BigNumber } from 'bignumber.js'
+import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 
 @Component({
   selector: 'swap',
@@ -71,36 +72,20 @@ export class SwapComponent {
   }
 
   walletSet(wallet: AirGapMarketWallet) {
-    console.log('asdf')
     this.walletSetEmitter.emit(wallet)
   }
 
   doRadio() {
-    let alert = this.alertCtrl.create()
-    alert.setTitle('Select Currency')
-
-    this.supportedProtocols.forEach((identifier: string) => {
+    const protocols = []
+    this.supportedProtocols.forEach(supportedProtocol => {
       try {
-        const protocol = getProtocolByIdentifier(identifier)
-        alert.addInput({
-          type: 'radio',
-          label: protocol.name,
-          value: protocol.identifier
-        })
-      } catch (error) {
-        // We ignore it, error is thrown if protocol is unknown
-      }
+        protocols.push(getProtocolByIdentifier(supportedProtocol))
+      } catch (e) {}
     })
 
-    alert.addButton('Cancel')
-    alert.addButton({
-      text: 'Ok',
-      handler: (data: any) => {
-        console.log('Radio data:', data)
-        this.protocolSetEmitter.emit(getProtocolByIdentifier(data))
-      }
+    this.navCtrl.push(ProtocolSelectPage, {
+      selectedProtocol: this.selectedProtocol,
+      protocols: protocols
     })
-
-    alert.present()
   }
 }
