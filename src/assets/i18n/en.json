@@ -315,6 +315,11 @@
   "exchange": {
     "title": "Exchange"
   },
+  "swap": {
+    "min-amount_label": "(min. {{minExchangeAmount}})",
+    "sell_label": "Sell",
+    "buy_label": "Buy"
+  },
   "exchange-confirm": {
     "title": "Confirm Exchange",
     "heading": "This is your Exchange summary, you need to sign it with <span class=\"style__strong color__primary\">AirGap Vault</span> to complete the exchange.",

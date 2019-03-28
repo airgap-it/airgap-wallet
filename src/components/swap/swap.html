@@ -2,8 +2,8 @@
   <ion-col padding col-8>
     <ion-item no-padding no-lines>
       <ion-label no-margin stacked>
-        {{ swapSell ? 'Sell' : 'Buy' }}
-        <span *ngIf="minExchangeAmount">(minimum amount: {{ minExchangeAmount }})</span>
+        {{ (swapSell ? 'swap.sell_label' : 'swap.buy_label') | translate }}
+        <span *ngIf="minExchangeAmount" [innerHTML]="'swap.min-amount_label' | translate: { minExchangeAmount: minExchangeAmount }"></span>
       </ion-label>
       <ion-input
         [disabled]="!swapSell"
