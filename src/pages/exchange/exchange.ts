@@ -152,31 +152,12 @@ export class ExchangePage {
 
   async startExchange() {
     try {
-      /*
       const result = await this.exchangeProvider.createTransaction(
         this.fromWallet.protocolIdentifier,
         this.toWallet.protocolIdentifier,
         this.toWallet.receivingPublicAddress,
-        this.amount
+        this.amount.toFixed()
       )
-*/
-      // Sample response
-      const result = {
-        amountExpectedFrom: '1',
-        amountExpectedTo: '28.114919',
-        amountTo: 0,
-        apiExtraFee: '0',
-        changellyFee: '0.5',
-        createdAt: '2019-03-07T15:04:19.000Z',
-        currencyFrom: 'btc',
-        currencyTo: 'eth',
-        id: 'oy3n6t5n7moizfn4',
-        kycRequired: false,
-        payinAddress: '3QcdRcZf6y38TSas5qP4V49uwp5rokPLUn',
-        payinExtraId: null,
-        payoutAddress: '0xAEbF2f073d3FF1c510f2E79784848b3d8E4B1DEE',
-        status: 'new'
-      }
 
       this.navCtrl
         .push(ExchangeConfirmPage, {

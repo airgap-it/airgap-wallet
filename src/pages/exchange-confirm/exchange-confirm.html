@@ -26,7 +26,7 @@
       <ng-container>
         <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.fee_label' | translate }}</ion-label>
         <div class="typography--mono" item-content>
-          <span class="typography--mono">123</span>
+          <span class="typography--mono">{{ fee }}</span>
         </div>
       </ng-container>
     </ion-col>
@@ -46,7 +46,7 @@
     <ion-col col-9 padding-bottom>
       <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.buy-amount_label' | translate }}</ion-label>
       <div class="typography--mono" item-content>
-        <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }}</span>
+        <span class="typography--mono">{{ exchangeResult.amountExpectedTo }}</span>
       </div>
     </ion-col>
   </ion-row>
@@ -63,7 +63,7 @@
   </ion-row>
 
   <ion-fab right bottom>
-    <button color="secondary" ion-button round>
+    <button color="secondary" ion-button round (click)="prepareTransaction()">
       {{ 'exchange-confirm.confirm-exchange_label' | translate }}
     </button>
   </ion-fab>
