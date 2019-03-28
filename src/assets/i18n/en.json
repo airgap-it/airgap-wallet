@@ -361,5 +361,11 @@
     "your-rewards": "Your Rewards",
     "cycles": "{{cycles}} Cycles",
     "delegate": "Delegate"
+  },
+  "introduction-push": {
+    "title": "Push Notifications",
+    "heading": "You can receive push notifications if your accounts has a new transaction.",
+    "description": "First you have to grant AirGap Wallet the push notification permission.",
+    "grant-permission_label": "Grant Permission"
   }
 }
