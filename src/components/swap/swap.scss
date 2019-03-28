@@ -20,6 +20,7 @@ swap {
         width: 40px;
         height: 40px;
       }
+
       ion-row {
         justify-content: center;
         h5 {
@@ -33,5 +34,10 @@ swap {
   .divider--line,
   .border--vertical {
     border-top: 1px solid rgba(color($colors, primary), 0.24);
+  }
+  .expendable__container {
+    ion-icon {
+      font-size: 1.8em;
+    }
   }
 }

@@ -45,6 +45,7 @@
     [isExpendable]="supportedWallets?.length > 1"
     (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
+    [maxDigits]="8"
   ></portfolio-item>
   <ng-container *ngIf="expandWalletSelection">
     <ion-list no-lines margin-top [@expandWalletAnimation]>
@@ -55,6 +56,7 @@
           [wallet]="wallet"
           tappable
           [isExpendable]="false"
+          [maxDigits]="8"
         ></portfolio-item>
       </ng-container>
     </ion-list>
