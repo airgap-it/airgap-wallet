@@ -4,25 +4,27 @@
   </ion-navbar>
 </ion-header>
 
-<!-- Add class="onboarding__container" for -->
-<ion-content padding>
+<ion-content>
   <ng-container *ngIf="exchangePageState === exchangePageStates.ONBOARDING">
-    <ion-row><h3 [innerHTML]="'exchange.heading' | translate"></h3></ion-row>
-    <ion-row justify-content-center><img src="assets/img/token_swap.svg" /></ion-row>
-    <ion-row padding-bottom>
-      <p no-margin>{{ 'exchange.swap.description' | translate }}</p>
+    <ion-row padding class="onboarding__container">
+      <h3 [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
+      <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
+      <p no-margin padding-bottom>{{ 'exchange.onboarding.description' | translate }}</p>
+      <button (click)="dismissExchangeOnboarding()" round ion-button color="primary" block>
+        {{ 'exchange.onboarding.exchange_label' | translate }}
+      </button>
     </ion-row>
-    <button (click)="dismissExchangeOnboarding()" round ion-button color="primary" block>{{ 'exchange.swap.label' | translate }}</button>
   </ng-container>
 
   <ng-container *ngIf="exchangePageState === exchangePageStates.NOT_ENOUGH_CURRENCIES">
-    <ion-row><h3 [innerHTML]="'exchange.heading' | translate"></h3></ion-row>
-    <ion-row justify-content-center><img src="assets/img/token_swap.svg" /></ion-row>
-
-    <ion-row padding-bottom>
-      <p no-margin>{{ 'exchange.onboarding.description' | translate }}</p>
+    <ion-row padding class="onboarding__container">
+      <h3 [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
+      <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
+      <p no-margin padding-bottom>{{ 'exchange.no-currencies.description' | translate }}</p>
+      <button (click)="dismissExchangeOnboarding()" round ion-button color="primary" block>
+        {{ 'exchange.no-currencies.exchange_label' | translate }}
+      </button>
     </ion-row>
-    <button round ion-button color="primary" block>{{ 'exchange.onboarding.label' | translate }}</button>
   </ng-container>
 
   <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">

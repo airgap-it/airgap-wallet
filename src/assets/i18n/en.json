@@ -313,7 +313,17 @@
     }
   },
   "exchange": {
-    "title": "Exchange"
+    "title": "Exchange",
+    "onboarding": {
+      "heading": "You can exchange your <span class=\"style__strong color__primary\">Ethereum</span> to <span class=\"style__strong color__primary\">Bitcoin</span> and do other exchanges.",
+      "description": "Easily swap all supported crypto currencies directly inside AirGap.",
+      "exchange_label": "Start Exchanging"
+    },
+    "no-currencies": {
+      "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
+      "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
+      "exchange_label": "Add Coins"
+    }
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
