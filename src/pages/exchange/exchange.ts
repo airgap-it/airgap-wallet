@@ -44,25 +44,32 @@ export class ExchangePage {
   ) {
     this.storageProvider
       .get(SettingsKey.EXCHANGE_INTEGRATION)
-      .then(value => {
-        if (value !== null) {
+      .then(hasShownOnboarding => {
+        if (hasShownOnboarding) {
           this.initExchangePage()
+        } else {
+          this.exchangePageState = ExchangePageState.ONBOARDING
         }
       })
       .catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
-  public async filterValidWallets(protocols: string[]): Promise<string[]> {
+  public async filterValidWallets(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
 
     return protocols.filter(supportedProtocol =>
-      walletList.some(wallet => wallet.protocolIdentifier === supportedProtocol && wallet.currentBalance.isGreaterThan(0))
+      walletList.some(
+        wallet =>
+          wallet.protocolIdentifier === supportedProtocol &&
+          (!filterZeroBalance || (filterZeroBalance && wallet.currentBalance.isGreaterThan(0)))
+      )
     )
   }
 
   public async initExchangePage() {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
     this.supportedProtocolsFrom = await this.filterValidWallets(supportedProtocolsFrom)
+
     if (this.supportedProtocolsFrom.length <= 1) {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
     }
@@ -80,7 +87,7 @@ export class ExchangePage {
 
     if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
-      this.supportedProtocolsTo = await this.filterValidWallets(supportedProtocolsTo)
+      this.supportedProtocolsTo = await this.filterValidWallets(supportedProtocolsTo, false)
       this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
     }
 
@@ -94,7 +101,7 @@ export class ExchangePage {
     if (fromOrTo === 'from') {
       this.supportedFromWallets = this.accountProvider
         .getWalletList()
-        .filter(wallet => wallet.protocolIdentifier === this.selectedFromProtocol.identifier)
+        .filter(wallet => wallet.protocolIdentifier === this.selectedFromProtocol.identifier && wallet.currentBalance.isGreaterThan(0))
       this.fromWallet = this.supportedFromWallets[0]
     } else {
       this.supportedToWallets = this.accountProvider
