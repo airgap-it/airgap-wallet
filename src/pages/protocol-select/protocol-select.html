@@ -9,7 +9,7 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-list radio-group [(ngModel)]="selectedProtocol" no-lines>
-    <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true" (click)="select()"></currency-item>
+  <ion-list radio-group [(ngModel)]="selectedProtocol" (ngModelChange)="onModelChange($event)" no-lines>
+    <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true"></currency-item>
   </ion-list>
 </ion-content>
