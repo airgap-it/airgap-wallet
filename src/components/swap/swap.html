@@ -4,8 +4,6 @@
       <ion-label no-margin stacked>
         {{ swapSell ? 'Sell' : 'Buy' }}
         <span *ngIf="minExchangeAmount">(minimum amount: {{ minExchangeAmount }})</span>
-
-        <span>${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}</span>
       </ion-label>
       <ion-input
         [disabled]="!swapSell"
@@ -16,7 +14,9 @@
         placeholder="0.0"
       ></ion-input>
     </ion-item>
-    <p ion-text no-margin color="blackLight"></p>
+    <p ion-text no-margin color="blackLight">
+      ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
+    </p>
   </ion-col>
   <ion-col (click)="doRadio()" col-4 padding class="coin__selection ">
     <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
@@ -28,7 +28,7 @@
     </ion-row>
   </ion-col>
 </ion-row>
-<ion-list no-margin [@expandWalletAnimation]>
+<ion-list no-margin [@expandWalletAnimation] padding-bottom>
   <portfolio-item
     [wallet]="selectedWallet"
     tappable
