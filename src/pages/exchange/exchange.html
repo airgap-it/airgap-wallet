@@ -50,6 +50,12 @@
       [swapSell]="false"
     ></swap>
     <div class="divider--line"></div>
+    <ion-row padding align-items-center class="powered__container">
+      <span ion-text color="blackLight">
+        {{ 'exchange.powered-by_label' | translate }}
+      </span>
+      <img src="assets/img/changelly_logo.svg" />
+    </ion-row>
     <ion-fab right bottom>
       <button color="secondary" (click)="startExchange()" ion-button round icon-left>
         {{ 'exchange.exchange_label' | translate }}
