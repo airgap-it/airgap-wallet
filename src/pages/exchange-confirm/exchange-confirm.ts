@@ -15,18 +15,29 @@ export class ExchangeConfirmPage {
   public fromWallet: AirGapMarketWallet
   public toWallet: AirGapMarketWallet
   public fee: BigNumber
+
+  public fromFiatAmount: number
+  public feeFiatAmount: number
+  public toFiatAmount: number
+
   public exchangeResult: CreateTransactionResponse
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public platform: Platform) {
     this.fromWallet = this.navParams.get('fromWallet')
     this.toWallet = this.navParams.get('toWallet')
     this.exchangeResult = this.navParams.get('exchangeResult')
+
     const fromAmount = new BigNumber(this.exchangeResult.amountExpectedFrom)
     const changellyFee = new BigNumber(this.exchangeResult.changellyFee)
     const apiExtraFee = new BigNumber(this.exchangeResult.apiExtraFee)
     const totalFeeInPercent = changellyFee.plus(apiExtraFee)
     const txFee = this.fromWallet.coinProtocol.feeDefaults.medium
-    this.fee = fromAmount.multipliedBy(totalFeeInPercent.dividedBy(100)).plus(txFee)
+    const exchangeTotalFee = fromAmount.multipliedBy(totalFeeInPercent.dividedBy(100))
+    this.fee = exchangeTotalFee.plus(txFee)
+
+    this.fromFiatAmount = new BigNumber(this.exchangeResult.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
+    this.feeFiatAmount = this.fee.multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
+    this.toFiatAmount = new BigNumber(this.exchangeResult.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
   }
 
   public async prepareTransaction() {

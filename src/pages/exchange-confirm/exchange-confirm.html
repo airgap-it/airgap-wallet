@@ -20,13 +20,13 @@
     <ion-col col-9 padding-bottom>
       <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.sell-amount_label' | translate }}</ion-label>
       <div class="typography--mono" item-content>
-        <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }}</span>
+        <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }} (~${{ fromFiatAmount | number: '1.2-2' }})</span>
       </div>
 
       <ng-container>
         <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.fee_label' | translate }}</ion-label>
         <div class="typography--mono" item-content>
-          <span class="typography--mono">{{ fee }}</span>
+          <span class="typography--mono">{{ fee }} (~${{ feeFiatAmount | number: '1.2-2' }})</span>
         </div>
       </ng-container>
     </ion-col>
@@ -46,7 +46,7 @@
     <ion-col col-9 padding-bottom>
       <ion-label stacked class="typography--uppercase">{{ 'exchange-confirm.buy-amount_label' | translate }}</ion-label>
       <div class="typography--mono" item-content>
-        <span class="typography--mono">{{ exchangeResult.amountExpectedTo }}</span>
+        <span class="typography--mono">{{ exchangeResult.amountExpectedTo }} (~${{ toFiatAmount | number: '1.2-2' }})</span>
       </div>
     </ion-col>
   </ion-row>
