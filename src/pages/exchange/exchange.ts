@@ -44,9 +44,15 @@ export class ExchangePage {
     private accountProvider: AccountProvider
   ) {}
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
       this.initExchangePage()
+    } else {
+      const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
+      this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
+
+      const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
+      this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
     }
   }
 
