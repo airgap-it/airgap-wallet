@@ -21,7 +21,7 @@
       <h3 [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
       <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
       <p no-margin padding-bottom>{{ 'exchange.no-currencies.description' | translate }}</p>
-      <button (click)="dismissExchangeOnboarding()" round ion-button color="primary" block>
+      <button (click)="goToAddCoinPage()" round ion-button color="primary" block>
         {{ 'exchange.no-currencies.exchange_label' | translate }}
       </button>
     </ion-row>

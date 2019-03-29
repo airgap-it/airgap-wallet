@@ -7,6 +7,7 @@ import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { BigNumber } from 'bignumber.js'
+import { AccountAddPage } from '../account-add/account-add'
 
 enum ExchangePageState {
   LOADING,
@@ -65,6 +66,10 @@ export class ExchangePage {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
     this.supportedProtocolsFrom = await this.filterValidWallets(supportedProtocolsFrom)
 
+    if (this.supportedProtocolsFrom.length === 0) {
+      return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+    }
+
     await this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
 
     if (this.supportedProtocolsTo.length === 0) {
@@ -90,7 +95,11 @@ export class ExchangePage {
     if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidWallets(supportedProtocolsTo, false)
-      this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
+      if (this.supportedProtocolsTo.length > 0) {
+        this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
+      } else {
+        return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+      }
     }
 
     await this.loadWalletsForSelectedProtocol(fromOrTo)
@@ -179,5 +188,9 @@ export class ExchangePage {
   dismissExchangeOnboarding() {
     this.initExchangePage()
     this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+  }
+
+  goToAddCoinPage() {
+    this.navCtrl.push(AccountAddPage)
   }
 }
