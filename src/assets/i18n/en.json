@@ -331,7 +331,8 @@
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
     "buy_label": "Buy",
-    "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}"
+    "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
+    "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
   "protocol-select": {
     "title": "Select Coin"
