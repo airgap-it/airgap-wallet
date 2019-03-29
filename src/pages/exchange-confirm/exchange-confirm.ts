@@ -21,7 +21,12 @@ export class ExchangeConfirmPage {
     this.fromWallet = this.navParams.get('fromWallet')
     this.toWallet = this.navParams.get('toWallet')
     this.exchangeResult = this.navParams.get('exchangeResult')
-    this.fee = this.fromWallet.coinProtocol.feeDefaults.medium
+    const fromAmount = new BigNumber(this.exchangeResult.amountExpectedFrom)
+    const changellyFee = new BigNumber(this.exchangeResult.changellyFee)
+    const apiExtraFee = new BigNumber(this.exchangeResult.apiExtraFee)
+    const totalFeeInPercent = changellyFee.plus(apiExtraFee)
+    const txFee = this.fromWallet.coinProtocol.feeDefaults.medium
+    this.fee = fromAmount.multipliedBy(totalFeeInPercent.dividedBy(100)).plus(txFee)
   }
 
   public async prepareTransaction() {
