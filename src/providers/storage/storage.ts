@@ -9,7 +9,8 @@ export enum SettingsKey {
   SELECTED_ACCOUNT = 'selectedAccount',
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
-  EXCHANGE_INTEGRATION = 'exchangeIntroduction'
+  EXCHANGE_INTEGRATION = 'exchangeIntroduction',
+  PUSH_INTRODUCTION = 'pushIntroduction'
 }
 
 /* TS 2.7 feature

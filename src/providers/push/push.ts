@@ -3,10 +3,12 @@ import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push'
 import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
-import { Platform } from 'ionic-angular'
+import { Platform, ModalController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take, filter } from 'rxjs/operators'
+import { StorageProvider, SettingsKey } from '../storage/storage'
+import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 
 @Injectable()
 export class PushProvider {
@@ -27,7 +29,9 @@ export class PushProvider {
     private readonly platform: Platform,
     private readonly push: Push,
     private readonly translate: TranslateService,
-    private readonly pushBackendProvider: PushBackendProvider
+    private readonly pushBackendProvider: PushBackendProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly modalController: ModalController
   ) {
     this.initPush()
   }
@@ -40,32 +44,29 @@ export class PushProvider {
     const { isEnabled }: { isEnabled: boolean } = await this.push.hasPermission()
 
     if (isEnabled) {
-      this.register()
+      await this.register()
     }
   }
 
-  public async register(): Promise<void> {
-    if (this.registerCalled) {
-      return
+  public async setupPush() {
+    if (this.platform.is('android')) {
+      this.register()
+    } else if (this.platform.is('ios')) {
+      // On iOS, show a modal why we need permissions
+      const hasShownPushModal = this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
+      if (!hasShownPushModal) {
+        await this.storageProvider.set(SettingsKey.PUSH_INTRODUCTION, true)
+        const modal = this.modalController.create(IntroductionPushPage)
+
+        modal.onDidDismiss(() => {
+          this.register()
+        })
+
+        modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+      } else {
+        this.register()
+      }
     }
-    this.registerCalled = true
-
-    const pushObject: PushObject = this.push.init(this.options)
-
-    pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
-      console.log('Received a notification', notification)
-      // TODO: Handle push inside app?
-    })
-
-    pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      console.log('device registered', registration)
-      this.registrationId.next(registration.registrationId)
-    })
-
-    pushObject.on('error').subscribe((error: Error) => {
-      console.error('Error with Push plugin', error)
-      handleErrorSentry(ErrorCategory.PUSH)(error)
-    })
   }
 
   async registerWallets(wallets: AirGapMarketWallet[]) {
@@ -108,5 +109,30 @@ export class PushProvider {
     this.pushBackendProvider
       .unregisterPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId)
       .catch(handleErrorSentry(ErrorCategory.PUSH))
+  }
+
+  private async register(): Promise<void> {
+    if (this.registerCalled) {
+      return
+    }
+
+    this.registerCalled = true
+
+    const pushObject: PushObject = this.push.init(this.options)
+
+    pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
+      console.log('Received a notification', notification)
+      // TODO: Handle push inside app?
+    })
+
+    pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
+      console.log('device registered', registration)
+      this.registrationId.next(registration.registrationId)
+    })
+
+    pushObject.on('error').subscribe((error: Error) => {
+      console.error('Error with Push plugin', error)
+      handleErrorSentry(ErrorCategory.PUSH)(error)
+    })
   }
 }
