@@ -53,18 +53,18 @@ export class PushProvider {
       this.register()
     } else if (this.platform.is('ios')) {
       // On iOS, show a modal why we need permissions
-      const hasShownPushModal = this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
+      const hasShownPushModal = await this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
       if (!hasShownPushModal) {
         await this.storageProvider.set(SettingsKey.PUSH_INTRODUCTION, true)
         const modal = this.modalController.create(IntroductionPushPage)
 
-        modal.onDidDismiss(() => {
-          this.register()
+        modal.onDidDismiss(askForPermissions => {
+          if (askForPermissions) {
+            this.register()
+          }
         })
 
         modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
-      } else {
-        this.register()
       }
     }
   }

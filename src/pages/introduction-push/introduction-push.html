@@ -13,7 +13,9 @@
       <h3 padding-horizontal [innerHTML]="'introduction-push.heading' | translate"></h3>
       <img src="../assets/img/permission_onboarding_camera.svg" />
       <p padding-horizontal>{{ 'introduction-push.description' | translate }}</p>
-      <button round ion-button color="primary">{{ 'introduction-push.grant-permission_label' | translate }}</button>
+      <button round ion-button color="primary" (click)="promptForPushPermission()">
+        {{ 'introduction-push.grant-permission_label' | translate }}
+      </button>
     </ion-col>
   </ion-row>
 </ion-content>

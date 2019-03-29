@@ -9,11 +9,11 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 export class IntroductionPushPage {
   constructor(public viewCtrl: ViewController) {}
 
-  dismiss() {
-    this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  dismiss(askForPermissions: boolean = false) {
+    this.viewCtrl.dismiss(askForPermissions).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   promptForPushPermission() {
-    this.dismiss()
+    this.dismiss(true)
   }
 }
