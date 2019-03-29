@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push'
 import { TranslateService } from '@ngx-translate/core'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
-import { Platform, ModalController } from 'ionic-angular'
+import { Platform, ModalController, ToastController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take, filter } from 'rxjs/operators'
@@ -31,7 +31,8 @@ export class PushProvider {
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly storageProvider: StorageProvider,
-    private readonly modalController: ModalController
+    private readonly modalController: ModalController,
+    private readonly toastController: ToastController
   ) {
     this.initPush()
   }
@@ -122,7 +123,15 @@ export class PushProvider {
 
     pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
       console.log('Received a notification', notification)
-      // TODO: Handle push inside app?
+      this.toastController
+        .create({
+          message: `${notification.title}: ${notification.message}`,
+          showCloseButton: true,
+          duration: 3000,
+          position: 'top'
+        })
+        .present()
+        .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
