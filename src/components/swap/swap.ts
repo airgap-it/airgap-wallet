@@ -44,7 +44,7 @@ export class SwapComponent {
   public readonly supportedProtocols: string[] = []
 
   @Input()
-  public readonly minExchangeAmount: string
+  public readonly minExchangeAmount: BigNumber
 
   @Input()
   public exchangeAmount: BigNumber

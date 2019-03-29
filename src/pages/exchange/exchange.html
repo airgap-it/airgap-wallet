@@ -57,7 +57,19 @@
       <img src="assets/img/changelly_logo.svg" />
     </ion-row>
     <ion-fab right bottom>
-      <button color="secondary" (click)="startExchange()" ion-button round icon-left>
+      <button
+        color="secondary"
+        [disabled]="
+          amount?.isNaN() ||
+          amount?.isZero() ||
+          amount?.isLessThan(minExchangeAmount) ||
+          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.coinProtocol.decimals))
+        "
+        (click)="startExchange()"
+        ion-button
+        round
+        icon-left
+      >
         {{ 'exchange.exchange_label' | translate }}
       </button>
     </ion-fab>
