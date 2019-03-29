@@ -68,6 +68,7 @@ import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
 import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
 import { ProtocolSelectPage } from '../pages/protocol-select/protocol-select'
+import { IntroductionPushPage } from '../pages/introduction-push/introduction-push'
 import { PushProvider } from '../providers/push/push'
 import { PushBackendProvider } from '../providers/push-backend/push-backend'
 
@@ -106,7 +107,8 @@ export function createTranslateLoader(http: HttpClient) {
     SelectWalletPage,
     DelegationBakerDetailPage,
     DisclaimerWebExtensionPage,
-    ProtocolSelectPage
+    ProtocolSelectPage,
+    IntroductionPushPage
   ],
   imports: [
     BrowserModule,
@@ -167,7 +169,8 @@ export function createTranslateLoader(http: HttpClient) {
     DelegationBakerDetailPage,
     SubAccountSelectPage,
     DisclaimerWebExtensionPage,
-    ProtocolSelectPage
+    ProtocolSelectPage,
+    IntroductionPushPage
   ],
   providers: [
     StatusBar,
