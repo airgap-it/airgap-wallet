@@ -9,7 +9,7 @@
         [disabled]="!swapSell"
         type="number"
         id="buy-input"
-        [ngModel]="exchangeAmount?.toString()"
+        [ngModel]="exchangeAmount?.toFixed()"
         (input)="amountSet($event.target.value)"
         placeholder="0.0"
       ></ion-input>
@@ -17,12 +17,26 @@
     <p ion-text no-margin color="blackLight">
       ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
     </p>
-    <ion-row padding-top *ngIf="!exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
+    <ion-row padding-top *ngIf="swapSell && !exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
       <p
         ion-text
         no-margin
         color="danger"
         [innerHTML]="'swap.min-amount-error_label' | translate: { minExchangeAmount: minExchangeAmount }"
+      ></p>
+    </ion-row>
+    <ion-row
+      padding-top
+      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals))"
+    >
+      <p
+        ion-text
+        no-margin
+        color="danger"
+        [innerHTML]="
+          'swap.amount-higher-than-balance-error_label'
+            | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals) }
+        "
       ></p>
     </ion-row>
   </ion-col>
