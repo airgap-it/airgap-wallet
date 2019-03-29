@@ -44,7 +44,7 @@ export class OperationsProvider {
   }
 
   public async prepareOriginate(wallet: AirGapMarketWallet) {
-    const loader = this.getAndShowLoader()
+    const loader = await this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
 
@@ -58,7 +58,7 @@ export class OperationsProvider {
   }
 
   public async prepareDelegate(wallet: AirGapMarketWallet, delegateTargetAddress?: string) {
-    const loader = this.getAndShowLoader()
+    const loader = await this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
 
@@ -99,7 +99,7 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber
   ): Promise<{ airGapTx: IAirGapTransaction; serializedTx: string }> {
-    const loader = this.getAndShowLoader()
+    const loader = await this.getAndShowLoader()
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
@@ -111,17 +111,7 @@ export class OperationsProvider {
         transaction: rawUnsignedTx
       })
 
-      const syncProtocol = new SyncProtocolUtils()
-      const serializedTx = await syncProtocol.serialize({
-        version: 1,
-        protocol: wallet.coinProtocol.identifier,
-        type: EncodedType.UNSIGNED_TRANSACTION,
-        payload: {
-          publicKey: wallet.publicKey,
-          transaction: rawUnsignedTx,
-          callback: 'airgap-wallet://?d='
-        }
-      })
+      const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
 
       return { airGapTx, serializedTx }
     } catch (error) {
@@ -168,11 +158,11 @@ export class OperationsProvider {
     }
   }
 
-  private getAndShowLoader() {
+  private async getAndShowLoader() {
     const loader = this.loadingController.create({
       content: 'Preparing transaction...'
     })
-    loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+    await loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
 
     return loader
   }
