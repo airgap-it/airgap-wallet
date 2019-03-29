@@ -50,7 +50,7 @@ export class ExchangePage {
     }
   }
 
-  public async filterValidWallets(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
+  public async filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
 
     return protocols.filter(supportedProtocol =>
@@ -64,7 +64,7 @@ export class ExchangePage {
 
   public async initExchangePage() {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
-    this.supportedProtocolsFrom = await this.filterValidWallets(supportedProtocolsFrom)
+    this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
 
     if (this.supportedProtocolsFrom.length === 0) {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
@@ -92,13 +92,16 @@ export class ExchangePage {
       this.selectedToProtocol = protocol
     }
 
-    if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
+    if (fromOrTo === 'from') {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
-      this.supportedProtocolsTo = await this.filterValidWallets(supportedProtocolsTo, false)
-      if (this.supportedProtocolsTo.length > 0) {
-        this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
-      } else {
-        return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+      this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
+
+      if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
+        if (this.supportedProtocolsTo.length > 0) {
+          this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
+        } else {
+          return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+        }
       }
     }
 
