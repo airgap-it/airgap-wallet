@@ -75,6 +75,7 @@ export class SwapComponent {
 
   walletSet(wallet: AirGapMarketWallet) {
     this.walletSetEmitter.emit(wallet)
+    this.expandWalletSelection = false
   }
 
   doRadio() {
