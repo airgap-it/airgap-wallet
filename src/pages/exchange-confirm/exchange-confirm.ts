@@ -5,6 +5,7 @@ import { CreateTransactionResponse } from '../../providers/exchange/exchange'
 import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 import { ErrorCategory, handleErrorSentry } from '../../providers/sentry-error-handler/sentry-error-handler'
 import BigNumber from 'bignumber.js'
+import { OperationsProvider } from '../../providers/operations/operations'
 declare let cordova
 
 @Component({
@@ -22,7 +23,12 @@ export class ExchangeConfirmPage {
 
   public exchangeResult: CreateTransactionResponse
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public platform: Platform) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public platform: Platform,
+    private operationsProvider: OperationsProvider
+  ) {
     this.fromWallet = this.navParams.get('fromWallet')
     this.toWallet = this.navParams.get('toWallet')
     this.exchangeResult = this.navParams.get('exchangeResult')
@@ -44,32 +50,25 @@ export class ExchangeConfirmPage {
     const wallet = this.fromWallet
     const amount = new BigNumber(new BigNumber(this.exchangeResult.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
     const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
-    const rawUnsignedTx: any = await wallet.prepareTransaction([this.exchangeResult.payinAddress], [amount], fee)
 
-    const airGapTx = await wallet.coinProtocol.getTransactionDetails({
-      publicKey: wallet.publicKey,
-      transaction: rawUnsignedTx
-    })
+    try {
+      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(
+        wallet,
+        this.exchangeResult.payinAddress,
+        amount,
+        fee
+      )
 
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: wallet.publicKey,
-        transaction: rawUnsignedTx,
-        callback: 'airgap-wallet://?d='
-      }
-    })
-
-    this.navCtrl
-      .push(InteractionSelectionPage, {
-        wallet: wallet,
-        airGapTx: airGapTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.navCtrl
+        .push(InteractionSelectionPage, {
+          wallet: wallet,
+          airGapTx: airGapTx,
+          data: 'airgap-vault://?d=' + serializedTx
+        })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      //
+    }
   }
 
   private openUrl(url: string) {
