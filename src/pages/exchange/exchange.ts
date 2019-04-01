@@ -16,6 +16,9 @@ enum ExchangePageState {
   EXCHANGE
 }
 
+const FROM = 'from'
+const TO = 'to'
+
 @Component({
   selector: 'page-exchange',
   templateUrl: 'exchange.html'
@@ -50,11 +53,11 @@ export class ExchangePage {
     } else {
       const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
       this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
-      await this.loadWalletsForSelectedProtocol('from')
+      await this.loadWalletsForSelectedProtocol(FROM)
 
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
-      await this.loadWalletsForSelectedProtocol('to')
+      await this.loadWalletsForSelectedProtocol(TO)
     }
   }
 
@@ -78,7 +81,7 @@ export class ExchangePage {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
     }
 
-    await this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
+    await this.protocolSet(FROM, getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
 
     if (this.supportedProtocolsTo.length === 0) {
       return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
@@ -94,19 +97,19 @@ export class ExchangePage {
   }
 
   async protocolSet(fromOrTo: string, protocol: ICoinProtocol) {
-    if (fromOrTo === 'from') {
+    if (fromOrTo === FROM) {
       this.selectedFromProtocol = protocol
     } else {
       this.selectedToProtocol = protocol
     }
 
-    if (fromOrTo === 'from') {
+    if (fromOrTo === FROM) {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
 
       if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
         if (this.supportedProtocolsTo.length > 0) {
-          this.protocolSet('to', getProtocolByIdentifier(this.supportedProtocolsTo[0]))
+          this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
         } else {
           return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
         }
@@ -115,12 +118,11 @@ export class ExchangePage {
 
     await this.loadWalletsForSelectedProtocol(fromOrTo)
 
-    console.log('new protocol selected!')
     this.loadDataFromExchange()
   }
 
   async loadWalletsForSelectedProtocol(fromOrTo: string) {
-    if (fromOrTo === 'from') {
+    if (fromOrTo === FROM) {
       this.supportedFromWallets = this.accountProvider
         .getWalletList()
         .filter(wallet => wallet.protocolIdentifier === this.selectedFromProtocol.identifier && wallet.currentBalance.isGreaterThan(0))
@@ -150,13 +152,12 @@ export class ExchangePage {
   }
 
   async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
-    if (fromOrTo === 'from') {
+    if (fromOrTo === FROM) {
       this.fromWallet = wallet
     } else {
       this.toWallet = wallet
     }
 
-    console.log('new wallet selected')
     this.loadDataFromExchange()
   }
 
@@ -201,13 +202,8 @@ export class ExchangePage {
           exchangeResult: result
         })
         .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      console.log('result', result)
     } catch (error) {
-      console.log(error)
-      if (error.error.hasOwnProperty('code') && error.error.hasOwnProperty('message')) {
-        console.log('code', error.error.code)
-        console.log('message', error.error.message)
-      }
+      console.error(error)
     }
   }
 
