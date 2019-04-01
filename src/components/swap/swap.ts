@@ -83,7 +83,7 @@ export class SwapComponent {
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
         protocols.push(getProtocolByIdentifier(supportedProtocol))
-      } catch (e) {
+      } catch (error) {
         /* */
       }
     })
