@@ -4,7 +4,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <h3 padding-horizontal [innerHTML]="'add-sub-account.delegation_heading' | translate"></h3>
+  <h3 *ngIf="wallet.protocolIdentifier === 'xtz'" padding-horizontal [innerHTML]="'add-sub-account.delegation_heading' | translate"></h3>
   <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
     <card-actionable
       [imageName]="'add-account.svg'"
