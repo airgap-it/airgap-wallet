@@ -94,7 +94,6 @@ export class SwapComponent {
     })
 
     modal.onDidDismiss((protocolIdentifier: string) => {
-      console.log('dismiss', protocolIdentifier)
       if (protocolIdentifier) {
         this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier))
       }

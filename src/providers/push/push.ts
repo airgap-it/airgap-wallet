@@ -122,7 +122,7 @@ export class PushProvider {
     const pushObject: PushObject = this.push.init(this.options)
 
     pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
-      console.log('Received a notification', notification)
+      console.debug('Received a notification', notification)
       this.toastController
         .create({
           message: `${notification.title}: ${notification.message}`,
@@ -135,7 +135,7 @@ export class PushProvider {
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      console.log('device registered', registration)
+      console.debug('device registered', registration)
       this.registrationId.next(registration.registrationId)
     })
 

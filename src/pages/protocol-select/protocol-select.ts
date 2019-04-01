@@ -24,12 +24,10 @@ export class ProtocolSelectPage {
   }
 
   public onModelChange() {
-    console.log('protocol', this.selectedProtocol)
     this.viewCtrl.dismiss(this.selectedProtocol)
   }
 
   public searchTermChanged() {
-    console.log('search term changed', this.searchTerm)
     this.filteredProtocols = this.filterProtocols()
   }
 

@@ -103,7 +103,6 @@ export class OperationsProvider {
 
     try {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      console.log('preparing wallet tx', wallet)
       const rawUnsignedTx: any = await wallet.prepareTransaction([address], [amount], fee)
 
       const airGapTx = await wallet.coinProtocol.getTransactionDetails({
