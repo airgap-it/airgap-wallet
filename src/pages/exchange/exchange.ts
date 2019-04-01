@@ -50,9 +50,11 @@ export class ExchangePage {
     } else {
       const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
       this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
+      await this.loadWalletsForSelectedProtocol('from')
 
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
+      await this.loadWalletsForSelectedProtocol('to')
     }
   }
 
@@ -122,13 +124,29 @@ export class ExchangePage {
       this.supportedFromWallets = this.accountProvider
         .getWalletList()
         .filter(wallet => wallet.protocolIdentifier === this.selectedFromProtocol.identifier && wallet.currentBalance.isGreaterThan(0))
-      this.fromWallet = this.supportedFromWallets[0]
+
+      // Only set wallet if it's another protocol or not available
+      if (this.shouldReplaceActiveWallet(this.fromWallet, this.supportedFromWallets)) {
+        this.fromWallet = this.supportedFromWallets[0]
+      }
     } else {
       this.supportedToWallets = this.accountProvider
         .getWalletList()
         .filter(wallet => wallet.protocolIdentifier === this.selectedToProtocol.identifier)
       this.toWallet = this.supportedToWallets[0]
+      // Only set wallet if it's another protocol or not available
+      if (this.shouldReplaceActiveWallet(this.toWallet, this.supportedToWallets)) {
+        this.toWallet = this.supportedToWallets[0]
+      }
     }
+  }
+
+  private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
+    return (
+      !wallet ||
+      wallet.protocolIdentifier !== walletArray[0].protocolIdentifier ||
+      walletArray.every(supportedWallet => !this.accountProvider.isSameWallet(supportedWallet, wallet))
+    )
   }
 
   async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
