@@ -7,4 +7,11 @@ address-row {
       height: 48px;
     }
   }
+  .symbol--icon {
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    right: 24px;
+    top: 32px;
+  }
 }

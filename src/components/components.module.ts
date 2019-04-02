@@ -12,6 +12,7 @@ import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { MomentModule } from 'ngx-moment'
+import { SwapComponent } from './swap/swap'
 import { CardActionableComponent } from './card-actionable/card-actionable'
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
@@ -20,6 +21,7 @@ import { QRCodeModule } from 'angularx-qrcode'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
+import { CurrencyItemComponent } from './currency-item/currency-item'
 
 @NgModule({
   declarations: [
@@ -28,6 +30,7 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
+    SwapComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,
     EmptyStateComponent,
@@ -35,7 +38,8 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
     QrClipboardComponent,
     SignedTransactionComponent,
     TezosDelegationStats,
-    TezosDelegationCard
+    TezosDelegationCard,
+    CurrencyItemComponent
   ],
   imports: [IonicModule, MaterialIconsModule, PipesModule, MomentModule, TranslateModule, QRCodeModule],
   exports: [
@@ -44,6 +48,7 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
+    SwapComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,
     EmptyStateComponent,
@@ -51,7 +56,8 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
     QrClipboardComponent,
     SignedTransactionComponent,
     TezosDelegationStats,
-    TezosDelegationCard
+    TezosDelegationCard,
+    CurrencyItemComponent
   ]
 })
 export class ComponentsModule {}

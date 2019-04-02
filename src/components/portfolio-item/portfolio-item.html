@@ -27,7 +27,7 @@
     </ng-template>
   </ion-label>
 
-  <ion-row class="items--right" item-end>
+  <ion-row class="items--right" item-end *ngIf="!isExpendable && !hideFiatAmounts">
     <ion-col col-12 no-padding text-right>
       <strong *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
         <p ion-text color="black">
@@ -50,6 +50,13 @@
         <div class="skeleton--loading"><p></p></div>
       </ng-template>
     </ion-col>
+  </ion-row>
+  <ion-row class="items--right" item-end *ngIf="isExpendable" class="expendable__container">
+    <ion-icon
+      [ngClass]="{ 'icon--rotated': isExtended }"
+      md-name="keyboard_arrow_down
+        "
+    ></ion-icon>
   </ion-row>
 </ion-item>
 

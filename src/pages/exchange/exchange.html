@@ -1,0 +1,77 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ 'exchange.title' | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="exchangePageState === exchangePageStates.ONBOARDING">
+    <ion-row padding class="onboarding__container">
+      <h3 [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
+      <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
+      <p no-margin padding-bottom>{{ 'exchange.onboarding.description' | translate }}</p>
+      <button (click)="dismissExchangeOnboarding()" round ion-button color="primary" block>
+        {{ 'exchange.onboarding.exchange_label' | translate }}
+      </button>
+    </ion-row>
+  </ng-container>
+
+  <ng-container *ngIf="exchangePageState === exchangePageStates.NOT_ENOUGH_CURRENCIES">
+    <ion-row padding class="onboarding__container">
+      <h3 [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
+      <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
+      <p no-margin padding-bottom>{{ 'exchange.no-currencies.description' | translate }}</p>
+      <button (click)="goToAddCoinPage()" round ion-button color="primary" block>
+        {{ 'exchange.no-currencies.exchange_label' | translate }}
+      </button>
+    </ion-row>
+  </ng-container>
+
+  <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
+    <swap
+      [selectedWallet]="fromWallet"
+      [supportedWallets]="supportedFromWallets"
+      [selectedProtocol]="selectedFromProtocol"
+      [supportedProtocols]="supportedProtocolsFrom"
+      [exchangeAmount]="amount"
+      [minExchangeAmount]="minExchangeAmount"
+      (protocolSetEmitter)="protocolSet('from', $event)"
+      (walletSetEmitter)="walletSet('from', $event)"
+      (amountSetEmitter)="amountSet($event)"
+    ></swap>
+    <swap
+      [selectedWallet]="toWallet"
+      [supportedWallets]="supportedToWallets"
+      [selectedProtocol]="selectedToProtocol"
+      [supportedProtocols]="supportedProtocolsTo"
+      [exchangeAmount]="exchangeAmount"
+      (protocolSetEmitter)="protocolSet('to', $event)"
+      (walletSetEmitter)="walletSet('to', $event)"
+      [swapSell]="false"
+    ></swap>
+    <div class="divider--line"></div>
+    <ion-row padding align-items-center class="powered__container">
+      <span ion-text color="blackLight">
+        {{ 'exchange.powered-by_label' | translate }}
+      </span>
+      <img src="assets/img/changelly_logo.svg" />
+    </ion-row>
+    <ion-fab right bottom>
+      <button
+        color="secondary"
+        [disabled]="
+          amount?.isNaN() ||
+          amount?.isZero() ||
+          amount?.isLessThan(minExchangeAmount) ||
+          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.coinProtocol.decimals))
+        "
+        (click)="startExchange()"
+        ion-button
+        round
+        icon-left
+      >
+        {{ 'exchange.exchange_label' | translate }}
+      </button>
+    </ion-fab>
+  </ng-container>
+</ion-content>

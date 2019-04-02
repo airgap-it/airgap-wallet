@@ -8,7 +8,9 @@ export enum SettingsKey {
   WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
   SELECTED_ACCOUNT = 'selectedAccount',
   LAST_TX_BROADCAST = 'lastTxBroadcast',
-  USER_ID = 'user_id'
+  USER_ID = 'user_id',
+  EXCHANGE_INTEGRATION = 'exchangeIntroduction',
+  PUSH_INTRODUCTION = 'pushIntroduction'
 }
 
 /* TS 2.7 feature

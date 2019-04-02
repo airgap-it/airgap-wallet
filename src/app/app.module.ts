@@ -58,12 +58,17 @@ import { AccountDetailPage } from '../pages/account-detail/account-detail'
 import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
+import { ExchangePage } from '../pages/exchange/exchange'
 import { OperationsProvider } from '../providers/operations/operations'
+import { ExchangeProvider } from '../providers/exchange/exchange'
+import { ExchangeConfirmPage } from '../pages/exchange-confirm/exchange-confirm'
 import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
 import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
 import { WebExtensionProvider } from '../providers/web-extension/web-extension'
 import { AppInfoProvider } from '../providers/app-info/app-info'
 import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
+import { ProtocolSelectPage } from '../pages/protocol-select/protocol-select'
+import { IntroductionPushPage } from '../pages/introduction-push/introduction-push'
 import { PushProvider } from '../providers/push/push'
 import { PushBackendProvider } from '../providers/push-backend/push-backend'
 
@@ -97,9 +102,13 @@ export function createTranslateLoader(http: HttpClient) {
     AccountDetailPage,
     InteractionSelectionPage,
     SubAccountSelectPage,
+    ExchangePage,
+    ExchangeConfirmPage,
     SelectWalletPage,
     DelegationBakerDetailPage,
-    DisclaimerWebExtensionPage
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage,
+    IntroductionPushPage
   ],
   imports: [
     BrowserModule,
@@ -152,11 +161,16 @@ export function createTranslateLoader(http: HttpClient) {
     AccountImportOnboardingPage,
     AccountDetailPage,
     InteractionSelectionPage,
+    SubAccountSelectPage,
+    ExchangePage,
+    ExchangeConfirmPage,
     SelectWalletPage,
     SubAccountSelectPage,
     DelegationBakerDetailPage,
     SubAccountSelectPage,
-    DisclaimerWebExtensionPage
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage,
+    IntroductionPushPage
   ],
   providers: [
     StatusBar,
@@ -177,6 +191,7 @@ export function createTranslateLoader(http: HttpClient) {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
+    ExchangeProvider,
     RemoteConfigProvider,
     WebExtensionProvider,
     AppInfoProvider,

@@ -15,6 +15,14 @@ export class CurrencySymbolComponent {
   }
 
   ngAfterViewInit() {
+    this.loadImage()
+  }
+
+  ngOnChanges() {
+    this.loadImage()
+  }
+
+  loadImage() {
     const imageUrl = 'assets/symbols/' + this.symbol.toLowerCase() + '.svg'
     const img = new Image()
     img.onload = () => {

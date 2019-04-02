@@ -5,6 +5,7 @@ import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
+import { ExchangePage } from '../exchange/exchange'
 
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
@@ -16,7 +17,8 @@ import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaim
 export class TabsPage {
   tab1Root = PortfolioPage
   tab2Root = ScanPage
-  tab3Root = SettingsPage
+  tab3Root = ExchangePage
+  tab4Root = SettingsPage
 
   constructor(
     public modalController: ModalController,

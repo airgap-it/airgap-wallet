@@ -1,7 +1,10 @@
 <ion-row no-lines no-padding align-items-center>
   <ion-col col-3>
     <ion-row justify-content-center>
-      <ion-avatar><identicon [address]="address"></identicon></ion-avatar>
+      <ion-avatar>
+        <identicon [address]="address"></identicon>
+      </ion-avatar>
+      <currency-symbol [symbol]="symbol" *ngIf="hasSymbol" class="symbol--icon"></currency-symbol>
     </ion-row>
   </ion-col>
   <ion-col col-9>

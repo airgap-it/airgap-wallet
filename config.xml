@@ -111,7 +111,7 @@
     <plugin name="cordova-plugin-inappbrowser" spec="^1.7.2" />
     <plugin name="cordova-plugin-add-swift-support" spec="^1.7.2" />
     <plugin name="com.lampa.startapp" spec="^6.1.6" />
-    <plugin name="cordova-plugin-qrscanner" spec="^2.6.0" />
+    <plugin name="cordova-plugin-qrscanner" spec="2.6.0" />
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <plugin name="cordova-sqlite-storage" spec="^2.4.0" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.1.3" />

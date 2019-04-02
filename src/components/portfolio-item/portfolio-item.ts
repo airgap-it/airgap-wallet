@@ -21,6 +21,18 @@ export class PortfolioItemComponent {
   maxDigits: number = 0
 
   @Input()
+  showBalances: boolean = true
+
+  @Input()
+  isExpendable: boolean = false
+
+  @Input()
+  isExtended: boolean = false
+
+  @Input()
+  hideFiatAmounts: boolean = false
+
+  @Input()
   isToken: boolean = false
 
   @Input()

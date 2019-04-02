@@ -10,6 +10,7 @@ import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-
 import { HttpClient } from '@angular/common/http'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
+import { OperationsProvider } from '../../providers/operations/operations'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -25,12 +26,12 @@ export class TransactionPreparePage {
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
-    private toastController: ToastController,
     private navController: NavController,
     private navParams: NavParams,
     private _ngZone: NgZone,
     private http: HttpClient,
-    private clipboardProvider: ClipboardProvider
+    private clipboardProvider: ClipboardProvider,
+    private operationsProvider: OperationsProvider
   ) {
     const address = this.navParams.get('address') || ''
     this.transactionForm = formBuilder.group({
@@ -128,33 +129,8 @@ export class TransactionPreparePage {
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
-    const loading = this.loadingCtrl.create({
-      content: 'Preparing TX...'
-    })
-
-    await loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
     try {
-      // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      console.log('preparing wallet tx', this.wallet)
-      const rawUnsignedTx: any = await this.wallet.prepareTransaction([formAddress], [amount], fee)
-
-      const airGapTx = await this.wallet.coinProtocol.getTransactionDetails({
-        publicKey: this.wallet.publicKey,
-        transaction: rawUnsignedTx
-      })
-
-      const syncProtocol = new SyncProtocolUtils()
-      const serializedTx = await syncProtocol.serialize({
-        version: 1,
-        protocol: this.wallet.coinProtocol.identifier,
-        type: EncodedType.UNSIGNED_TRANSACTION,
-        payload: {
-          publicKey: this.wallet.publicKey,
-          transaction: rawUnsignedTx,
-          callback: 'airgap-wallet://?d='
-        }
-      })
+      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
 
       this.navController
         .push(InteractionSelectionPage, {
@@ -164,18 +140,7 @@ export class TransactionPreparePage {
         })
         .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
-      handleErrorSentry(ErrorCategory.COINLIB)(error)
-
-      this.toastController
-        .create({
-          message: error,
-          duration: 3000,
-          position: 'bottom'
-        })
-        .present()
-        .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
-    } finally {
-      loading.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+      //
     }
   }
 

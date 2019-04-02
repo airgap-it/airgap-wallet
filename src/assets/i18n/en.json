@@ -226,7 +226,8 @@
   "tabs": {
     "wallets": "Accounts",
     "scan": "Scan QRs",
-    "settings": "Settings"
+    "settings": "Settings",
+    "exchange": "Exchange"
   },
 
   "add-account": {
@@ -311,7 +312,43 @@
       "ok": "Ok"
     }
   },
-
+  "exchange": {
+    "title": "Exchange",
+    "exchange_label": "Exchange",
+    "powered-by_label": "powered by",
+    "onboarding": {
+      "heading": "You can exchange your <span class=\"style__strong color__primary\">Ethereum</span> to <span class=\"style__strong color__primary\">Bitcoin</span> and do other exchanges.",
+      "description": "Easily swap all supported crypto currencies directly inside AirGap.",
+      "exchange_label": "Start Exchanging"
+    },
+    "no-currencies": {
+      "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
+      "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
+      "exchange_label": "Add Coins"
+    }
+  },
+  "swap": {
+    "min-amount_label": "(min. {{minExchangeAmount}})",
+    "sell_label": "Sell",
+    "buy_label": "Buy",
+    "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
+    "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
+  },
+  "protocol-select": {
+    "title": "Select Coin"
+  },
+  "exchange-confirm": {
+    "title": "Confirm Exchange",
+    "confirm-exchange_label": "Confirm Exchange",
+    "heading": "This is your Exchange summary, you need to sign it with <span class=\"style__strong color__primary\">AirGap Vault</span> to complete the exchange.",
+    "sell_label": "From",
+    "sell-amount_label": "Amount",
+    "fee_label": "Fee",
+    "changellgy-address_label": "Changelly Address",
+    "buy-amount_label": "Buy Amount",
+    "receiving-to_label": "Receiving to",
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
+  },
   "delegation-baker-detail": {
     "title": "Baker Detail",
     "accepts-delegation": "Accepts Delegation",
@@ -325,5 +362,11 @@
     "your-rewards": "Your Rewards",
     "cycles": "{{cycles}} Cycles",
     "delegate": "Delegate"
+  },
+  "introduction-push": {
+    "title": "Push Notifications",
+    "heading": "You can receive push notifications if your accounts receive transactions.",
+    "description": "First you have to grant AirGap Wallet the push notification permission.",
+    "grant-permission_label": "Grant Permission"
   }
 }

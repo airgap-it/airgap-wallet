@@ -1,4 +1,21 @@
 portfolio-item {
+  .expendable__container {
+    ion-icon {
+      -webkit-transition-duration: 0.4s;
+      -moz-transition-duration: 0.4s;
+      -o-transition-duration: 0.4s;
+      transition-duration: 0.4s;
+
+      -webkit-transition-property: -webkit-transform;
+      -moz-transition-property: -moz-transform;
+      -o-transition-property: -o-transform;
+      transition-property: transform;
+    }
+    .icon--rotated {
+      transform: rotate(180deg);
+    }
+  }
+
   ion-badge,
   ion-label {
     margin: 0 !important;
