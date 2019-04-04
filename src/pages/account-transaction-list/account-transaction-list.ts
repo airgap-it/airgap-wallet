@@ -239,17 +239,9 @@ export class AccountTransactionListPage {
   }
 
   openBlockexplorer() {
-    let blockexplorer = ''
-    if (this.protocolIdentifier.startsWith('btc')) {
-      blockexplorer = 'https://live.blockcypher.com/btc/address/{{address}}/'
-    } else if (this.protocolIdentifier.startsWith('eth')) {
-      blockexplorer = 'https://etherscan.io/address/{{address}}'
-    } else if (this.protocolIdentifier.startsWith('ae')) {
-      blockexplorer = 'https://explorer.aepps.com/#/account/{{address}}'
-    } else if (this.protocolIdentifier.startsWith('xtz')) {
-      blockexplorer = 'https://tzscan.io/{{address}}'
-    }
-    this.openUrl(blockexplorer.replace('{{address}}', this.wallet.addresses[0]))
+    const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+
+    this.openUrl(blockexplorer)
   }
 
   private openUrl(url: string) {
