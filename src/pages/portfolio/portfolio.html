@@ -4,11 +4,23 @@
   </ion-row>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="(wallets | async) as walletsArray; else loading">
-    <ng-container *ngIf="walletsArray.length; else noItems">
-      <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
+  <ng-container *ngIf="(walletGroups | async) as walletGroupsArray; else loading">
+    <ng-container *ngIf="walletGroupsArray.length; else noItems">
+      <ion-list no-lines margin-top *ngFor="let walletGroup of walletGroupsArray">
         <ion-card>
-          <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+          <portfolio-item
+            [wallet]="walletGroup.mainWallet"
+            [maxDigits]="8"
+            tappable
+            (click)="openDetail(walletGroup.mainWallet)"
+          ></portfolio-item>
+          <portfolio-item
+            *ngFor="let wallet of walletGroup.subWallets"
+            [wallet]="wallet"
+            [maxDigits]="8"
+            tappable
+            (click)="openDetail(wallet)"
+          ></portfolio-item>
         </ion-card>
       </ion-list>
     </ng-container>
