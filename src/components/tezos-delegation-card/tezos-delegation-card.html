@@ -4,14 +4,14 @@
     [imageLeft]="false"
     [imageName]="'currencies-empty.svg'"
     [text]="
-      'account-detail.not-delegated_card.text'
+      'account-transaction-list.not-delegated_card.text'
         | translate
           : {
               amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' }
             }
     "
     [heading]="
-      'account-detail.not-delegated_card.heading'
+      'account-transaction-list.not-delegated_card.heading'
         | translate
           : {
               amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' }
@@ -26,14 +26,14 @@
     [imageLeft]="false"
     [imageName]="'currencies-empty.svg'"
     [text]="
-      'account-detail.has-delegated_card.text'
+      'account-transaction-list.has-delegated_card.text'
         | translate
           : {
               amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' }
             }
     "
     [heading]="
-      'account-detail.has-delegated_card.heading'
+      'account-transaction-list.has-delegated_card.heading'
         | translate
           : {
               amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' }

@@ -1,7 +1,10 @@
 {
-  "coin-info": {
+  "account-transaction-list": {
     "title": "Account",
     "transactions_label": "Transactions",
+    "add-tokens_label": "Add Tokens",
+    "add-accounts_label": "Add Accounts",
+    "delegate_label": "Delegate",
     "pending-transactions": {
       "label":  "Pending Transactions",
       "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",
@@ -20,6 +23,14 @@
         "text": "Currently unable to display the transaction history. Please refer to the Blockexplorer.",
         "blockexplorer_label": "Open Blockexplorer"
       }
+    },
+    "has-delegated_card": {
+      "heading": "<strong>{{amount}}</strong>",
+      "text": "You have <strong>{{amount}}</strong> delegated. You can check your rewards for each cycle."
+    },
+    "not-delegated_card": {
+      "heading": "Delegate Tezos",
+      "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
     }
   },
 
@@ -251,26 +262,6 @@
     "title": "Select Account",
     "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
     "accounts_label": "Accounts"
-  },
-
-  "account-detail": {
-    "title": "{{protocolName}}",
-    "tokens_label": "Tokens",
-    "accounts_label": "Accounts",
-    "add-tokens_label": "Add Tokens",
-    "add-accounts_label": "Add Accounts",
-    "send_label": "Send {{protocolSymbol}}",
-    "receive_label": "Receive",
-    "details_label": "Details",
-    "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
-    "has-delegated_card": {
-      "heading": "<strong>{{amount}}</strong>",
-      "text": "You have <strong>{{amount}}</strong> delegated. You can check your rewards for each cycle."
-    },
-    "not-delegated_card": {
-      "heading": "Delegate Tezos",
-      "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
-    }
   },
 
   "account-import-onboarding": {
