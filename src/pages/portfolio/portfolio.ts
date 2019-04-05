@@ -46,11 +46,7 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    if (wallet.coinProtocol.subProtocols && wallet.coinProtocol.subProtocols.length > 0) {
-      this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } else {
-      this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    }
+    this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openAccountAddPage() {
