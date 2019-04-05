@@ -1,12 +1,10 @@
 <ion-header no-border>
-  <ion-navbar color="primary">
-    <ion-title>
-      <span ion-text color="white">{{ wallet.coinProtocol.symbol | uppercase }} {{ 'wallet-address.title' | translate }}</span>
-    </ion-title>
+  <ion-navbar color="whitePrimaryContrast">
+    <ion-title>{{ wallet.coinProtocol.symbol | uppercase }} {{ 'wallet-address.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding class="colored-background">
+<ion-content padding>
   <ion-row padding>
     <ion-col>
       <ion-avatar>
@@ -19,7 +17,10 @@
       <p>
         {{ 'wallet-address.address_label' | translate }}:
         <br />
-        <span (click)="copyAddressToClipboard()" class="text--selectable typography--mono">{{ wallet.receivingPublicAddress }}</span>
+        <span (click)="copyAddressToClipboard()" class="text--selectable typography--mono">
+          {{ wallet.receivingPublicAddress }}
+          <ion-icon name="copy"></ion-icon>
+        </span>
       </p>
     </ion-col>
   </ion-row>
