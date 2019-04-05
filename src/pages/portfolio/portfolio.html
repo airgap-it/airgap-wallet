@@ -7,7 +7,9 @@
   <ng-container *ngIf="(wallets | async) as walletsArray; else loading">
     <ng-container *ngIf="walletsArray.length; else noItems">
       <ion-list no-lines margin-top *ngFor="let wallet of walletsArray">
-        <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+        <ion-card>
+          <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openDetail(wallet)"></portfolio-item>
+        </ion-card>
       </ion-list>
     </ng-container>
     <ng-template #noItems>
@@ -19,10 +21,12 @@
   </ng-container>
   <ng-template #loading>
     <ion-list no-lines margin-top>
-      <portfolio-item></portfolio-item>
-      <portfolio-item></portfolio-item>
-      <portfolio-item></portfolio-item>
-      <portfolio-item></portfolio-item>
+      <ion-card>
+        <portfolio-item></portfolio-item>
+        <portfolio-item></portfolio-item>
+        <portfolio-item></portfolio-item>
+        <portfolio-item></portfolio-item>
+      </ion-card>
     </ion-list>
   </ng-template>
 
