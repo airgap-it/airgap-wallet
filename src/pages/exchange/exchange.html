@@ -1,5 +1,5 @@
 <ion-header no-border no-shadow>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title>{{ 'exchange.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
@@ -58,7 +58,7 @@
     </ion-row>
     <ion-fab right bottom>
       <button
-        color="secondary"
+        color="primary"
         [disabled]="
           amount?.isNaN() ||
           amount?.isZero() ||

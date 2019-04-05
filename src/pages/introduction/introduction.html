@@ -1,8 +1,8 @@
 <ion-header no-border no-shadow>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title>{{ 'introduction.title' | translate }}</ion-title>
     <ion-buttons end>
-      <button ion-button (click)="dismiss()"><ion-icon name="md-close"></ion-icon></button>
+      <button ion-button (click)="dismiss()" clear icon-only><ion-icon name="md-close"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -69,9 +69,9 @@
   </ng-container>
 
   <ion-fab bottom right>
-    <button ion-button round color="primary" (click)="openIntroductionDownloadPage()">
+    <button ion-button round color="secondary" (click)="openIntroductionDownloadPage()">
       {{ 'introduction.vault-install_label' | translate }}
     </button>
-    <button ion-button round color="secondary" (click)="dismiss()">{{ 'introduction.continue_label' | translate }}</button>
+    <button ion-button round color="primary" (click)="dismiss()">{{ 'introduction.continue_label' | translate }}</button>
   </ion-fab>
 </ion-content>

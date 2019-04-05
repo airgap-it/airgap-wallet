@@ -1,5 +1,5 @@
 <ion-header no-border>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title>
       {{ 'transaction-qr.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}
     </ion-title>
@@ -20,6 +20,6 @@
   <signed-transaction *ngIf="!airGapTx" [syncProtocolString]="preparedDataQR"></signed-transaction>
 
   <ion-fab bottom right>
-    <button default ion-button color="secondary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>
+    <button default ion-button color="primary" (click)="done()" round item-right>{{ 'transaction-qr.done_label' | translate }}</button>
   </ion-fab>
 </ion-content>

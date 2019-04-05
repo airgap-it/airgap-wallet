@@ -1,5 +1,5 @@
 <ion-header no-border>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title>{{ wallet.coinProtocol.symbol | uppercase }} {{ 'wallet-address.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
@@ -30,6 +30,6 @@
   </ion-row>
 
   <ion-fab bottom right>
-    <button ion-button round color="secondary" (click)="done()">{{ 'wallet-address.done_label' | translate }}</button>
+    <button ion-button round color="primary" (click)="done()">{{ 'wallet-address.done_label' | translate }}</button>
   </ion-fab>
 </ion-content>
