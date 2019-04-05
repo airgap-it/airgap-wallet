@@ -11,6 +11,12 @@ import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import BigNumber from 'bignumber.js'
 
+export enum ActionType {
+  ADD_ACCOUNT,
+  ADD_TOKEN,
+  DELEGATE
+}
+
 @Injectable()
 export class OperationsProvider {
   private delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
@@ -168,5 +174,17 @@ export class OperationsProvider {
 
   private hideLoader(loader: Loading) {
     loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+  }
+
+  public getActionsForCoin(identifier: string): ActionType[] {
+    if (identifier === 'eth') {
+      return [ActionType.ADD_TOKEN]
+    } else if (identifier === 'xtz') {
+      return [ActionType.ADD_ACCOUNT]
+    } else if (identifier === 'xtz-kt') {
+      return [ActionType.DELEGATE]
+    } else {
+      return []
+    }
   }
 }

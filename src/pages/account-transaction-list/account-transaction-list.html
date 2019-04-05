@@ -14,18 +14,14 @@
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
     [delegateAmount]="wallet.currentBalance"
-    (onDelegatedClick)="goToDelegateSelection()"
-    (onUndelegatedClick)="goToDelegateSelection()"
+    (onDelegatedClick)="openDelegateSelection()"
+    (onUndelegatedClick)="openDelegateSelection()"
   ></tezos-delegation-card>
 
   <ion-row justify-content-center padding-top>
-    <button color="secondary" (click)="openReceivePage()" ion-button round icon-left small outline>
-      <ion-icon md-name="add"></ion-icon>
-      {{ 'account-transaction-list.add-accounts_label' | translate }}
-    </button>
-    <button color="secondary" (click)="openReceivePage()" ion-button round icon-left small outline>
-      <ion-icon md-name="attach_money"></ion-icon>
-      {{ 'account-transaction-list.delegate_label' | translate }}
+    <button *ngFor="let action of actions" color="secondary" (click)="action.action()" ion-button round icon-left small outline>
+      <ion-icon icon-left [name]="action.icon"></ion-icon>
+      {{ action.name | translate }}
     </button>
   </ion-row>
 

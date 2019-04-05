@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
-import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
-import { Platform, NavController, NavParams, PopoverController } from 'ionic-angular'
+import { IAirGapTransaction, AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { Platform, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular'
 
 import { TransactionDetailPage } from '../transaction-detail/transaction-detail'
 import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
@@ -12,7 +12,17 @@ import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountAddressPage } from '../account-address/account-address'
 import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
-import { OperationsProvider } from '../../providers/operations/operations'
+import { OperationsProvider, ActionType } from '../../providers/operations/operations'
+import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { ProtocolsProvider } from '../../providers/protocols/protocols'
+
+interface CoinAction {
+  type: ActionType
+  name: string
+  icon: string
+  action: () => void
+}
 
 declare let cordova
 
@@ -45,6 +55,8 @@ export class AccountTransactionListPage {
   // XTZ
   isKtDelegated: boolean = false
 
+  actions: CoinAction[] = []
+
   lottieConfig = {
     path: '/assets/animations/loading.json'
   }
@@ -59,7 +71,8 @@ export class AccountTransactionListPage {
     public http: HttpClient,
     private platform: Platform,
     private operationsProvider: OperationsProvider,
-    private storageProvider: StorageProvider
+    private storageProvider: StorageProvider,
+    private toastController: ToastController
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -81,6 +94,77 @@ export class AccountTransactionListPage {
   }
 
   async init() {
+    const supportedActions = this.operationsProvider.getActionsForCoin(this.wallet.protocolIdentifier)
+    const assertNever = (x: never) => undefined
+
+    supportedActions.forEach(action => {
+      if (action === ActionType.ADD_ACCOUNT) {
+        this.actions.push({
+          type: ActionType.ADD_ACCOUNT,
+          name: 'account-transaction-list.add-accounts_label',
+          icon: 'add',
+          action: async () => {
+            const protocol = new TezosKtProtocol()
+            const ktAccounts = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+            console.log('ADDRESSES', ktAccounts)
+            if (ktAccounts.length === 0) {
+              const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet)
+
+              this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            } else {
+              ktAccounts.forEach((_ktAccount, index) => {
+                const wallet = new AirGapMarketWallet(
+                  XTZ_KT,
+                  this.wallet.publicKey,
+                  this.wallet.isExtendedPublicKey,
+                  this.wallet.derivationPath,
+                  index
+                )
+                const exists = this.accountProvider.walletExists(wallet)
+                if (!exists) {
+                  wallet.addresses = ktAccounts
+                  wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+                  this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+                }
+              })
+              this.navCtrl
+                .pop()
+                .then(() => {
+                  let toast = this.toastController.create({
+                    duration: 3000,
+                    message: 'Accounts imported',
+                    showCloseButton: true,
+                    position: 'bottom'
+                  })
+                  toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+                })
+                .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            }
+          }
+        })
+      } else if (action === ActionType.ADD_TOKEN) {
+        this.actions.push({
+          type: ActionType.ADD_TOKEN,
+          name: 'account-transaction-list.add-tokens_label',
+          icon: 'add',
+          action: () => {
+            this.openAccountAddPage(SubProtocolType.TOKEN, this.wallet)
+          }
+        })
+      } else if (action === ActionType.DELEGATE) {
+        this.actions.push({
+          type: ActionType.DELEGATE,
+          name: 'account-transaction-list.delegate_label',
+          icon: 'logo-usd',
+          action: () => {
+            this.openDelegateSelection()
+          }
+        })
+      } else {
+        assertNever(action)
+      }
+    })
+
     const lastTx: {
       protocol: string
       accountIdentifier: string
@@ -283,11 +367,17 @@ export class AccountTransactionListPage {
     this.isKtDelegated = isDelegated
   }
 
-  goToDelegateSelection() {
+  openDelegateSelection() {
     this.navCtrl
       .push(DelegationBakerDetailPage, {
         wallet: this.wallet
       })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
+    this.navCtrl
+      .push(SubAccountAddPage, { subProtocolType: subProtocolType, wallet: wallet })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }
