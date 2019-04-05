@@ -6,7 +6,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountAddPage } from '../account-add/account-add'
-import { AccountDetailPage } from '../account-detail/account-detail'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 import { OperationsProvider } from '../../providers/operations/operations'
 
