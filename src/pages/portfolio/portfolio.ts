@@ -8,7 +8,6 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { AccountAddPage } from '../account-add/account-add'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
 import { OperationsProvider } from '../../providers/operations/operations'
-import { group } from '@angular/core/src/animation/dsl'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
