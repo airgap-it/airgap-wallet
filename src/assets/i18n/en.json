@@ -3,7 +3,7 @@
     "title": "Account",
     "transactions_label": "Transactions",
     "add-tokens_label": "Add Tokens",
-    "add-accounts_label": "Add Accounts",
+    "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegate",
     "pending-transactions": {
       "label":  "Pending Transactions",

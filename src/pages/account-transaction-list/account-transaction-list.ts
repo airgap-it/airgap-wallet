@@ -101,7 +101,7 @@ export class AccountTransactionListPage {
       if (action === ActionType.ADD_ACCOUNT) {
         this.actions.push({
           type: ActionType.ADD_ACCOUNT,
-          name: 'account-transaction-list.add-accounts_label',
+          name: 'account-transaction-list.import-accounts_label',
           icon: 'add',
           action: async () => {
             const protocol = new TezosKtProtocol()
