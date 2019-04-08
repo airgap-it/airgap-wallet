@@ -25,8 +25,8 @@
       }
     },
     "has-delegated_card": {
-      "heading": "<strong>{{amount}}</strong>",
-      "text": "You have <strong>{{amount}}</strong> delegated. You can check your rewards for each cycle."
+      "heading": "<strong>{{amount}}</strong> Delegated",
+      "text": "Your XTZ are delegated and being baked, you can check your rewards for each cycle."
     },
     "not-delegated_card": {
       "heading": "Delegate Tezos",

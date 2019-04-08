@@ -1,4 +1,4 @@
-<ion-card [ngClass]="imageLeft ? 'background--color__gradient' : 'background--color__gradient--reverse'">
+<ion-card [ngClass]="!imageLeft ? 'background--color__gradient' : 'background--color__gradient--reverse'">
   <ion-row align-items-center padding-horizontal>
     <ion-col col-4 *ngIf="imageLeft">
       <img src="/assets/img/{{ imageName }}" />
