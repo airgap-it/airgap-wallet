@@ -91,8 +91,13 @@ export class DelegationBakerDetailPage {
 
   async delegate() {
     try {
-      const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, this.bakerConfig.address)
-      this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      if (this.wallet.protocolIdentifier === 'xtz') {
+        const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet, this.bakerConfig.address)
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      } else {
+        const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, this.bakerConfig.address)
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
     } catch (error) {
       handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)(error)
 

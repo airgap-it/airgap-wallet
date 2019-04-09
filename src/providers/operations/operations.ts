@@ -49,13 +49,13 @@ export class OperationsProvider {
     })
   }
 
-  public async prepareOriginate(wallet: AirGapMarketWallet) {
+  public async prepareOriginate(wallet: AirGapMarketWallet, delegate?: string) {
     const loader = await this.getAndShowLoader()
 
     const protocol = new TezosKtProtocol()
 
     try {
-      const originateTx = await protocol.originate(wallet.publicKey)
+      const originateTx = await protocol.originate(wallet.publicKey, delegate)
       const serializedTx = await this.serializeTx(wallet, originateTx)
       return this.getPageDetails(wallet, originateTx, serializedTx)
     } finally {
@@ -180,7 +180,7 @@ export class OperationsProvider {
     if (identifier === 'eth') {
       return [ActionType.ADD_TOKEN]
     } else if (identifier === 'xtz') {
-      return [ActionType.ADD_ACCOUNT]
+      return [ActionType.ADD_ACCOUNT, ActionType.DELEGATE]
     } else if (identifier === 'xtz-kt') {
       return [ActionType.DELEGATE]
     } else {
