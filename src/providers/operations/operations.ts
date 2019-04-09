@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators'
 import BigNumber from 'bignumber.js'
 
 export enum ActionType {
-  ADD_ACCOUNT,
+  IMPORT_ACCOUNT,
   ADD_TOKEN,
   DELEGATE
 }
@@ -180,7 +180,7 @@ export class OperationsProvider {
     if (identifier === 'eth') {
       return [ActionType.ADD_TOKEN]
     } else if (identifier === 'xtz') {
-      return [ActionType.ADD_ACCOUNT, ActionType.DELEGATE]
+      return [ActionType.IMPORT_ACCOUNT, ActionType.DELEGATE]
     } else if (identifier === 'xtz-kt') {
       return [ActionType.DELEGATE]
     } else {

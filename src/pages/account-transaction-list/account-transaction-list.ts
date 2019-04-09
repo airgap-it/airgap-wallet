@@ -98,9 +98,9 @@ export class AccountTransactionListPage {
     const assertNever = (x: never) => undefined
 
     supportedActions.forEach(action => {
-      if (action === ActionType.ADD_ACCOUNT) {
+      if (action === ActionType.IMPORT_ACCOUNT) {
         this.actions.push({
-          type: ActionType.ADD_ACCOUNT,
+          type: ActionType.IMPORT_ACCOUNT,
           name: 'account-transaction-list.import-accounts_label',
           icon: 'add',
           action: async () => {
@@ -108,9 +108,13 @@ export class AccountTransactionListPage {
             const ktAccounts = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
             console.log('ADDRESSES', ktAccounts)
             if (ktAccounts.length === 0) {
-              const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet)
-
-              this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+              let toast = this.toastController.create({
+                duration: 3000,
+                message: 'No accounts to import.',
+                showCloseButton: true,
+                position: 'bottom'
+              })
+              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             } else {
               ktAccounts.forEach((_ktAccount, index) => {
                 const wallet = new AirGapMarketWallet(
