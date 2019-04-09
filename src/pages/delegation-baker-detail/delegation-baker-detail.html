@@ -17,14 +17,16 @@
       <p>{{ 'delegation-baker-detail.accepts-delegation' | translate }}</p>
     </ion-col>
     <ion-col col-12 no-padding>
-      <div class="progress--container">
+      <div *ngIf="!bakerInfo" class="skeleton--loading"><p></p></div>
+      <div *ngIf="bakerInfo" class="progress--container">
         <div class="progress--current" [style.width]="bakerInfo?.bakerUsage.toNumber() * 100 + '%'"></div>
       </div>
     </ion-col>
     <ion-col col-12 no-padding>
       <ion-row>
         <ion-col col-6 no-padding>
-          <small>{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }} %</small>
+          <small *ngIf="!bakerInfo" class="skeleton--loading"><p></p></small>
+          <small *ngIf="bakerInfo">{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }} %</small>
         </ion-col>
         <ion-col col-6 text-right no-padding>
           <small>
