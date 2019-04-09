@@ -5,6 +5,7 @@
     "add-tokens_label": "Add Tokens",
     "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegate",
+    "undelegate_label": "Unelegate",
     "pending-transactions": {
       "label":  "Pending Transactions",
       "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",

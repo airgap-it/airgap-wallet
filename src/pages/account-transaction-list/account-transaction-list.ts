@@ -152,14 +152,7 @@ export class AccountTransactionListPage {
           }
         })
       } else if (action === ActionType.DELEGATE) {
-        this.actions.push({
-          type: ActionType.DELEGATE,
-          name: 'account-transaction-list.delegate_label',
-          icon: 'logo-usd',
-          action: () => {
-            this.openDelegateSelection()
-          }
-        })
+        this.actions.push(this.getDelegateAction())
       } else {
         assertNever(action)
       }
@@ -178,6 +171,29 @@ export class AccountTransactionListPage {
       lastTx.date > new Date().getTime() - 5 * 60 * 1000
     ) {
       this.hasPendingTransactions = true
+    }
+  }
+
+  getDelegateAction(): CoinAction {
+    return {
+      type: ActionType.DELEGATE,
+      name: 'account-transaction-list.delegate_label',
+      icon: 'logo-usd',
+      action: async () => {
+        this.openDelegateSelection()
+      }
+    }
+  }
+
+  getUndelegateAction(): CoinAction {
+    return {
+      type: ActionType.DELEGATE,
+      name: 'account-transaction-list.undelegate_label',
+      icon: 'logo-usd',
+      action: async () => {
+        const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
+        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
     }
   }
 
@@ -350,7 +366,8 @@ export class AccountTransactionListPage {
       onDelete: () => {
         this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       },
-      onUndelegate: pageOptions => {
+      onUndelegate: async () => {
+        const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
         this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       }
     })
@@ -365,6 +382,11 @@ export class AccountTransactionListPage {
   async isDelegated(): Promise<void> {
     const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
+    const index = this.actions.findIndex(action => action.type === ActionType.DELEGATE)
+    if (index >= 0) {
+      const action = isDelegated ? this.getUndelegateAction() : this.getDelegateAction()
+      this.actions.splice(index, 1, action)
+    }
   }
 
   openDelegateSelection() {

@@ -66,9 +66,8 @@ export class AccountEditPopoverComponent {
 
   async undelegate() {
     await this.dismissPopover()
-    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
     if (this.onUndelegate) {
-      this.onUndelegate(pageOptions)
+      this.onUndelegate()
     } else {
       handleErrorSentry(ErrorCategory.OTHER)('onUndelegate not defined')
     }
@@ -95,6 +94,8 @@ export class AccountEditPopoverComponent {
                 this.dismissPopover()
                 if (this.onDelete) {
                   this.onDelete()
+                } else {
+                  handleErrorSentry(ErrorCategory.OTHER)('onDelete not defined')
                 }
               })
               .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
