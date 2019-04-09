@@ -6,33 +6,50 @@
 
 <ion-content>
   <ion-row padding-horizontal>
-    <ion-item no-lines no-padding>
+    <ion-item no-lines no-padding *ngIf="bakerConfig; else bakerAvatarSkeleton">
       <ion-avatar item-start><identicon [address]="bakerConfig?.address"></identicon></ion-avatar>
       <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.name }}</h2>
       <p>{{ bakerConfig?.address }}</p>
     </ion-item>
+    <ng-template #bakerAvatarSkeleton>
+      <div class="skeleton--loading">
+        <ion-item no-lines no-padding>
+          <ion-avatar item-start><identicon></identicon></ion-avatar>
+          <h2></h2>
+          <p></p>
+        </ion-item>
+      </div>
+    </ng-template>
   </ion-row>
   <ion-row padding-horizontal padding-bottom>
     <ion-col col-12 no-padding>
       <p>{{ 'delegation-baker-detail.accepts-delegation' | translate }}</p>
     </ion-col>
     <ion-col col-12 no-padding>
-      <div *ngIf="!bakerInfo" class="skeleton--loading"><p></p></div>
-      <div *ngIf="bakerInfo" class="progress--container">
+      <div class="progress--container">
         <div class="progress--current" [style.width]="bakerInfo?.bakerUsage.toNumber() * 100 + '%'"></div>
       </div>
     </ion-col>
     <ion-col col-12 no-padding>
       <ion-row>
         <ion-col col-6 no-padding>
-          <small *ngIf="!bakerInfo" class="skeleton--loading"><p></p></small>
-          <small *ngIf="bakerInfo">{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }} %</small>
+          <small *ngIf="bakerInfo; else bakerInfoSkeleton">{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }}%</small>
+          <ng-template #bakerInfoSkeleton>
+            <div class="skeleton--loading">
+              <p no-margin></p>
+            </div>
+          </ng-template>
         </ion-col>
         <ion-col col-6 text-right no-padding>
-          <small>
+          <small *ngIf="bakerInfo; else bakerInfoBalanceSkeleton">
             {{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} /
             {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}
           </small>
+          <ng-template #bakerInfoBalanceSkeleton>
+            <div class="skeleton--loading justify--content__end">
+              <p no-margin></p>
+            </div>
+          </ng-template>
         </ion-col>
       </ion-row>
     </ion-col>
