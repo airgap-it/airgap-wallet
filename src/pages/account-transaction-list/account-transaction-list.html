@@ -6,6 +6,12 @@
     </ion-buttons>
   </ion-navbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+  <ion-row padding-top padding-horizontal>
+    <button *ngFor="let action of actions" color="secondary" (click)="action.action()" ion-button round icon-left small outline>
+      <ion-icon icon-left [name]="action.icon"></ion-icon>
+      {{ action.name | translate }}
+    </button>
+  </ion-row>
 </ion-header>
 
 <ion-content>
@@ -17,13 +23,6 @@
     (onDelegatedClick)="openDelegateSelection()"
     (onUndelegatedClick)="openDelegateSelection()"
   ></tezos-delegation-card>
-
-  <ion-row justify-content-center padding-top>
-    <button *ngFor="let action of actions" color="secondary" (click)="action.action()" ion-button round icon-left small outline>
-      <ion-icon icon-left [name]="action.icon"></ion-icon>
-      {{ action.name | translate }}
-    </button>
-  </ion-row>
 
   <ng-container *ngIf="hasPendingTransactions">
     <ion-row padding-horizontal>
