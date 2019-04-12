@@ -173,6 +173,7 @@ export class TransactionPreparePage {
     this.clipboardProvider.paste().then(
       (text: string) => {
         this.transactionForm.controls.address.setValue(text)
+        this.transactionForm.controls.address.markAsDirty()
       },
       (err: string) => {
         console.error('Error: ' + err)
