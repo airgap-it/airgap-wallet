@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, TezosKtProtocol, SyncProtocolUtils, EncodedType, DelegationInfo, IAirGapTransaction } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  TezosKtProtocol,
+  SyncProtocolUtils,
+  EncodedType,
+  DelegationInfo,
+  IAirGapTransaction,
+  TezosProtocol
+} from 'airgap-coin-lib'
 import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
 import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
 import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
@@ -52,7 +60,7 @@ export class OperationsProvider {
   public async prepareOriginate(wallet: AirGapMarketWallet, delegate?: string) {
     const loader = await this.getAndShowLoader()
 
-    const protocol = new TezosKtProtocol()
+    const protocol = new TezosProtocol()
 
     try {
       const originateTx = await protocol.originate(wallet.publicKey, delegate)
