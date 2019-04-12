@@ -1,9 +1,18 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import {
+  getProtocolByIdentifier,
+  DeserializedSyncProtocol,
+  SignedTransaction,
+  ICoinProtocol,
+  TezosKtProtocol,
+  AirGapMarketWallet
+} from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
+import { OperationsProvider } from 'src/providers/operations/operations'
+import { AccountProvider } from 'src/providers/account/account.provider'
 
 declare var cordova: any
 
@@ -23,7 +32,8 @@ export class TransactionConfirmPage {
     public navParams: NavParams,
     private alertCtrl: AlertController,
     private platform: Platform,
-    private storageProvider: StorageProvider
+    private storageProvider: StorageProvider,
+    private accountProvider: AccountProvider
   ) {}
 
   dismiss() {
@@ -74,6 +84,36 @@ export class TransactionConfirmPage {
         if (interval) {
           clearInterval(interval)
         }
+        // TODO: Remove once tezos allows delegation from tz1 addresses
+        if (this.protocol.identifier === 'xtz') {
+          // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
+          const ktInterval = setInterval(async () => {
+            const protocol = new TezosKtProtocol()
+            const wallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === 'xtz')
+            wallets.forEach(async wallet => {
+              const ktAccounts = await protocol.getAddressesFromPublicKey(wallet.publicKey)
+              ktAccounts.forEach((_ktAccount, index) => {
+                const ktWallet = new AirGapMarketWallet(
+                  'xtz_kt',
+                  wallet.publicKey,
+                  wallet.isExtendedPublicKey,
+                  wallet.derivationPath,
+                  index
+                )
+                const exists = this.accountProvider.walletExists(ktWallet)
+                if (!exists) {
+                  ktWallet.addresses = ktAccounts
+                  ktWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+                  this.accountProvider.addWallet(ktWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+                }
+              })
+            })
+          }, 10 * 1_000)
+          setTimeout(() => {
+            clearInterval(ktInterval)
+          }, 5 * 60 * 1_000)
+        }
+
         // TODO: Remove once we introduce pending transaction handling
         // tslint:disable-next-line:no-unnecessary-type-assertion
         const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
