@@ -108,10 +108,10 @@ export class TransactionConfirmPage {
                 }
               })
             })
-          }, 10 * 1_000)
+          }, 10 * 1000)
           setTimeout(() => {
             clearInterval(ktInterval)
-          }, 5 * 60 * 1_000)
+          }, 5 * 60 * 1000)
         }
 
         // TODO: Remove once we introduce pending transaction handling
