@@ -11,8 +11,7 @@ import {
 } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
-import { OperationsProvider } from 'src/providers/operations/operations'
-import { AccountProvider } from 'src/providers/account/account.provider'
+import { AccountProvider } from '../../providers/account/account.provider'
 
 declare var cordova: any
 
