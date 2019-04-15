@@ -98,7 +98,6 @@ export class AccountTransactionListPage {
 
   async init() {
     const supportedActions = this.operationsProvider.getActionsForCoin(this.wallet.protocolIdentifier)
-    const assertNever = (x: never) => undefined
 
     supportedActions.forEach(action => {
       if (action === ActionType.IMPORT_ACCOUNT) {
@@ -108,6 +107,7 @@ export class AccountTransactionListPage {
       } else if (action === ActionType.DELEGATE) {
         this.actions.push(this.getDelegateAction())
       } else {
+        const assertNever = (x: never) => undefined
         assertNever(action)
       }
     })
