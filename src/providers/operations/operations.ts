@@ -18,6 +18,7 @@ import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import BigNumber from 'bignumber.js'
+import { AccountProvider } from '../account/account.provider'
 
 export enum ActionType {
   IMPORT_ACCOUNT,
@@ -25,11 +26,17 @@ export enum ActionType {
   DELEGATE
 }
 
+const XTZ_KT = 'xtz-kt'
+
 @Injectable()
 export class OperationsProvider {
   private delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
-  constructor(private readonly loadingController: LoadingController, private readonly toastController: ToastController) {}
+  constructor(
+    private readonly accountProvider: AccountProvider,
+    private readonly loadingController: LoadingController,
+    private readonly toastController: ToastController
+  ) {}
 
   public setDelegationStatusOfAddress(address: string, delegated: boolean) {
     this.delegationStatuses.next(this.delegationStatuses.getValue().set(address, delegated))
@@ -143,6 +150,21 @@ export class OperationsProvider {
     } finally {
       this.hideLoader(loader)
     }
+  }
+
+  public async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
+    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, XTZ_KT, index)
+
+    if (wallet) {
+      return wallet
+    }
+
+    wallet = new AirGapMarketWallet(XTZ_KT, xtzWallet.publicKey, xtzWallet.isExtendedPublicKey, xtzWallet.derivationPath, index)
+    wallet.addresses = ktAddresses
+    await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+
+    return wallet
   }
 
   private async getPageDetails(

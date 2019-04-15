@@ -47,46 +47,50 @@ export class DelegationBakerDetailPage {
     const kt = new TezosKtProtocol()
 
     this.bakerInfo = await kt.bakerInfo(this.bakerConfig.address)
-    this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
+    try {
+      this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
 
-    // we are already delegating, and to this address
-    if (delegationCheck.isDelegated && delegationCheck.value === this.bakerConfig.address) {
-      const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
+      // we are already delegating, and to this address
+      if (delegationCheck.isDelegated && delegationCheck.value === this.bakerConfig.address) {
+        const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
 
-      this.nextPayout =
-        delegatedCycles.length > 0
-          ? delegatedCycles[0].payout
-          : moment()
-              .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-              .toDate()
+        this.nextPayout =
+          delegatedCycles.length > 0
+            ? delegatedCycles[0].payout
+            : moment()
+                .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+                .toDate()
 
-      // make sure there are at least 7 cycles to wait
-      if (
-        moment(delegationCheck.delegatedDate)
-          .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-          .isAfter(this.nextPayout)
-      ) {
-        this.nextPayout = moment(delegationCheck.delegatedDate)
+        // make sure there are at least 7 cycles to wait
+        if (
+          moment(delegationCheck.delegatedDate)
+            .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+            .isAfter(this.nextPayout)
+        ) {
+          this.nextPayout = moment(delegationCheck.delegatedDate)
+            .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+            .toDate()
+        }
+      } else {
+        // if we are currently delegated, but to someone else, first payout is in 7 cycles, same for if we are undelegated
+        this.nextPayout = moment()
           .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
           .toDate()
       }
-    } else {
-      // if we are currently delegated, but to someone else, first payout is in 7 cycles, same for if we are undelegated
-      this.nextPayout = moment()
-        .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-        .toDate()
+
+      this.avgRoIPerCyclePercentage = this.delegationRewards
+        .map(delegationInfo => {
+          return delegationInfo.totalRewards.plus(delegationInfo.totalFees).div(delegationInfo.stakingBalance)
+        })
+        .reduce((avg, value) => {
+          return avg.plus(value)
+        })
+        .div(this.delegationRewards.length)
+
+      this.avgRoIPerCycle = this.avgRoIPerCyclePercentage.multipliedBy(this.wallet.currentBalance)
+    } catch (error) {
+      // If Baker has never delegated
     }
-
-    this.avgRoIPerCyclePercentage = this.delegationRewards
-      .map(delegationInfo => {
-        return delegationInfo.totalRewards.plus(delegationInfo.totalFees).div(delegationInfo.stakingBalance)
-      })
-      .reduce((avg, value) => {
-        return avg.plus(value)
-      })
-      .div(this.delegationRewards.length)
-
-    this.avgRoIPerCycle = this.avgRoIPerCyclePercentage.multipliedBy(this.wallet.currentBalance)
   }
 
   async delegate() {
@@ -110,5 +114,9 @@ export class DelegationBakerDetailPage {
         .present()
         .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
     }
+  }
+
+  async done() {
+    this.navCtrl.pop().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

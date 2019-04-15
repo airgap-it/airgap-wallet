@@ -15,7 +15,6 @@ import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation
 import { OperationsProvider, ActionType } from '../../providers/operations/operations'
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { ProtocolsProvider } from '../../providers/protocols/protocols'
 
 interface CoinAction {
   type: ActionType
@@ -27,6 +26,7 @@ interface CoinAction {
 declare let cordova
 
 const AE = 'ae'
+const XTZ = 'xtz'
 const XTZ_KT = 'xtz-kt'
 
 @Component({
@@ -89,6 +89,9 @@ export class AccountTransactionListPage {
     if (this.protocolIdentifier === XTZ_KT) {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
+    if (this.protocolIdentifier === XTZ) {
+      this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    }
 
     this.init()
   }
@@ -105,9 +108,9 @@ export class AccountTransactionListPage {
           icon: 'add',
           action: async () => {
             const protocol = new TezosKtProtocol()
-            const ktAccounts = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
-            console.log('ADDRESSES', ktAccounts)
-            if (ktAccounts.length === 0) {
+            const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+            console.log('ADDRESSES', ktAddresses)
+            if (ktAddresses.length === 0) {
               let toast = this.toastController.create({
                 duration: 3000,
                 message: 'No accounts to import.',
@@ -116,20 +119,8 @@ export class AccountTransactionListPage {
               })
               toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             } else {
-              ktAccounts.forEach((_ktAccount, index) => {
-                const wallet = new AirGapMarketWallet(
-                  XTZ_KT,
-                  this.wallet.publicKey,
-                  this.wallet.isExtendedPublicKey,
-                  this.wallet.derivationPath,
-                  index
-                )
-                const exists = this.accountProvider.walletExists(wallet)
-                if (!exists) {
-                  wallet.addresses = ktAccounts
-                  wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-                  this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-                }
+              ktAddresses.forEach(async (_ktAccount, index) => {
+                await this.operationsProvider.addKtAddress(this.wallet, index, ktAddresses)
               })
               this.navCtrl
                 .pop()
@@ -197,6 +188,18 @@ export class AccountTransactionListPage {
       action: async () => {
         const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
         this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
+    }
+  }
+
+  getStatusAction(ktAddresses): CoinAction {
+    return {
+      type: ActionType.DELEGATE,
+      name: 'account-transaction-list.delegation-status_label',
+      icon: 'logo-usd',
+      action: async () => {
+        const wallet = await this.operationsProvider.addKtAddress(this.wallet, 0, ktAddresses)
+        this.openDelegateSelection(wallet)
       }
     }
   }
@@ -386,17 +389,29 @@ export class AccountTransactionListPage {
   async isDelegated(): Promise<void> {
     const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
-    const index = this.actions.findIndex(action => action.type === ActionType.DELEGATE)
+    const action = isDelegated ? this.getUndelegateAction() : this.getDelegateAction()
+    this.replaceAction(ActionType.DELEGATE, action)
+  }
+
+  async getKtAddresses() {
+    const protocol = new TezosKtProtocol()
+    const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+    const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
+    this.replaceAction(ActionType.DELEGATE, action)
+    return ktAddresses
+  }
+
+  private replaceAction(type: ActionType, action: CoinAction) {
+    const index = this.actions.findIndex(action => action.type === type)
     if (index >= 0) {
-      const action = isDelegated ? this.getUndelegateAction() : this.getDelegateAction()
       this.actions.splice(index, 1, action)
     }
   }
 
-  openDelegateSelection() {
+  openDelegateSelection(wallet?: AirGapMarketWallet) {
     this.navCtrl
       .push(DelegationBakerDetailPage, {
-        wallet: this.wallet
+        wallet: wallet || this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

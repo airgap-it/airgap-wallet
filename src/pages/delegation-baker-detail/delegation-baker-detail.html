@@ -133,7 +133,12 @@
   </ng-container>
 
   <ion-fab bottom right>
+    <button *ngIf="isDelegated" ion-button round color="primary" (click)="done()">
+      {{ 'delegation-baker-detail.done' | translate }}
+    </button>
+
     <button
+      *ngIf="!isDelegated"
       ion-button
       round
       color="primary"
