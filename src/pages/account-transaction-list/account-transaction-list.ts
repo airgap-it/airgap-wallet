@@ -196,7 +196,7 @@ export class AccountTransactionListPage {
     return {
       type: ActionType.DELEGATE,
       name: 'account-transaction-list.delegation-status_label',
-      icon: 'logo-usd',
+      icon: 'md-information-circle',
       action: async () => {
         const wallet = await this.operationsProvider.addKtAddress(this.wallet, 0, ktAddresses)
         this.openDelegateSelection(wallet)
