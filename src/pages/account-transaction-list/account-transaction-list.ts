@@ -102,50 +102,9 @@ export class AccountTransactionListPage {
 
     supportedActions.forEach(action => {
       if (action === ActionType.IMPORT_ACCOUNT) {
-        this.actions.push({
-          type: ActionType.IMPORT_ACCOUNT,
-          name: 'account-transaction-list.import-accounts_label',
-          icon: 'add',
-          action: async () => {
-            const protocol = new TezosKtProtocol()
-            const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
-            console.log('ADDRESSES', ktAddresses)
-            if (ktAddresses.length === 0) {
-              let toast = this.toastController.create({
-                duration: 3000,
-                message: 'No accounts to import.',
-                showCloseButton: true,
-                position: 'bottom'
-              })
-              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            } else {
-              ktAddresses.forEach(async (_ktAccount, index) => {
-                await this.operationsProvider.addKtAddress(this.wallet, index, ktAddresses)
-              })
-              this.navCtrl
-                .pop()
-                .then(() => {
-                  let toast = this.toastController.create({
-                    duration: 3000,
-                    message: 'Accounts imported',
-                    showCloseButton: true,
-                    position: 'bottom'
-                  })
-                  toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-                })
-                .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            }
-          }
-        })
+        this.actions.push(this.getImportAccountAction())
       } else if (action === ActionType.ADD_TOKEN) {
-        this.actions.push({
-          type: ActionType.ADD_TOKEN,
-          name: 'account-transaction-list.add-tokens_label',
-          icon: 'add',
-          action: () => {
-            this.openAccountAddPage(SubProtocolType.TOKEN, this.wallet)
-          }
-        })
+        this.actions.push(this.getAddTokenAction())
       } else if (action === ActionType.DELEGATE) {
         this.actions.push(this.getDelegateAction())
       } else {
@@ -169,7 +128,41 @@ export class AccountTransactionListPage {
     }
   }
 
-  getDelegateAction(): CoinAction {
+  getImportAccountAction(): CoinAction {
+    return {
+      type: ActionType.IMPORT_ACCOUNT,
+      name: 'account-transaction-list.import-accounts_label',
+      icon: 'add',
+      action: async () => {
+        const protocol = new TezosKtProtocol()
+        const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+
+        if (ktAddresses.length === 0) {
+          this.showToast('No accounts to import.')
+        } else {
+          for (let [index, _ktAddress] of ktAddresses.entries()) {
+            await this.operationsProvider.addKtAddress(this.wallet, index, ktAddresses)
+          }
+
+          await this.navCtrl.pop()
+          this.showToast('Accounts imported')
+        }
+      }
+    }
+  }
+
+  private getAddTokenAction(): CoinAction {
+    return {
+      type: ActionType.ADD_TOKEN,
+      name: 'account-transaction-list.add-tokens_label',
+      icon: 'add',
+      action: () => {
+        this.openAccountAddPage(SubProtocolType.TOKEN, this.wallet)
+      }
+    }
+  }
+
+  private getDelegateAction(): CoinAction {
     return {
       type: ActionType.DELEGATE,
       name: 'account-transaction-list.delegate_label',
@@ -180,7 +173,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  getUndelegateAction(): CoinAction {
+  private getUndelegateAction(): CoinAction {
     return {
       type: ActionType.DELEGATE,
       name: 'account-transaction-list.undelegate_label',
@@ -192,7 +185,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  getStatusAction(ktAddresses): CoinAction {
+  private getStatusAction(ktAddresses): CoinAction {
     return {
       type: ActionType.DELEGATE,
       name: 'account-transaction-list.delegation-status_label',
@@ -406,6 +399,16 @@ export class AccountTransactionListPage {
     if (index >= 0) {
       this.actions.splice(index, 1, action)
     }
+  }
+
+  private showToast(message: string) {
+    let toast = this.toastController.create({
+      duration: 3000,
+      message: message,
+      showCloseButton: true,
+      position: 'bottom'
+    })
+    toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openDelegateSelection(wallet?: AirGapMarketWallet) {
