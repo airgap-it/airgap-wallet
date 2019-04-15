@@ -23,6 +23,6 @@ export class AccountImportOnboardingPage {
   }
 
   openVault() {
-    this.deeplinkProvider.sameDeviceDeeplink('airgap-vault://')
+    this.deeplinkProvider.sameDeviceDeeplink(`airgap-vault://add-account/${this.protocol}`)
   }
 }
