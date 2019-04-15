@@ -9,30 +9,38 @@ export class AppInfoProvider {
   public versionNumber = 'VERSION_NUMBER'
   public versionCode = 'VERSION_CODE'
 
+  private isInitialized: Promise<void>
+
   constructor(private app: AppVersion, private platform: Platform) {
-    this.updateVersions()
+    this.isInitialized = this.updateVersions()
   }
 
   async updateVersions() {
     if (this.platform.is('cordova')) {
       this.appName = await this.app.getAppName()
       this.packageName = await this.app.getPackageName()
+      this.versionNumber = await this.app.getVersionNumber()
+      this.versionCode = await this.app.getVersionCode()
     }
   }
 
-  getAppName() {
+  async getAppName() {
+    await this.isInitialized
     return this.appName
   }
 
-  getPackageName() {
+  async getPackageName() {
+    await this.isInitialized
     return this.packageName
   }
 
-  getVersionNumber() {
+  async getVersionNumber() {
+    await this.isInitialized
     return this.versionNumber
   }
 
-  getVersionCode() {
+  async getVersionCode() {
+    await this.isInitialized
     return this.versionCode
   }
 }

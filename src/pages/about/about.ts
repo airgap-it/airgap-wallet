@@ -18,9 +18,9 @@ export class AboutPage {
   }
 
   async updateVersions() {
-    this.appName = this.appInfoProvider.getAppName()
-    this.packageName = this.appInfoProvider.getPackageName()
-    this.versionNumber = this.appInfoProvider.getVersionNumber()
-    this.versionCode = this.appInfoProvider.getVersionCode()
+    this.appName = await this.appInfoProvider.getAppName()
+    this.packageName = await this.appInfoProvider.getPackageName()
+    this.versionNumber = await this.appInfoProvider.getVersionNumber()
+    this.versionCode = await this.appInfoProvider.getVersionCode()
   }
 }

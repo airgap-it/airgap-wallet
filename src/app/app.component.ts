@@ -57,14 +57,22 @@ export class MyApp {
       this.statusBar.styleDefault()
       this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
-      setSentryRelease('app_' + this.appInfoProvider.getVersionNumber())
 
       this.pushProvider.initPush()
-    } else if (this.webExtensionProvider.isWebExtension()) {
-      setSentryRelease('ext_' + this.appInfoProvider.getVersionNumber())
-    } else {
-      setSentryRelease('browser_' + this.appInfoProvider.getVersionNumber()) // TODO: Set version in CI once we have browser version
     }
+
+    this.appInfoProvider
+      .getVersionNumber()
+      .then(version => {
+        if (this.platform.is('cordova')) {
+          setSentryRelease('app_' + version)
+        } else if (this.webExtensionProvider.isWebExtension()) {
+          setSentryRelease('ext_' + version)
+        } else {
+          setSentryRelease('browser_' + version) // TODO: Set version in CI once we have browser version
+        }
+      })
+      .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
 
     let userId = await this.storageProvider.get(SettingsKey.USER_ID)
     if (!userId) {
