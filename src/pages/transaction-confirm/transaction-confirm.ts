@@ -16,6 +16,15 @@ import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 declare var cordova: any
 
+const SECOND = 1000
+const MINUTE = 60 * SECOND
+
+const TOAST_DURATION = 3 * SECOND
+const TOAST_ERROR_DURATION = 5 * SECOND
+const INTERVAL_KT_REFRESH = 10 * SECOND
+const TIMEOUT_TRANSACTION_QUEUED = 20 * SECOND
+const TIMEOUT_KT_REFRESH_CLEAR = 5 * MINUTE
+
 @Component({
   selector: 'page-transaction-confirm',
   templateUrl: 'transaction-confirm.html'
@@ -69,14 +78,14 @@ export class TransactionConfirmPage {
     let interval = setTimeout(() => {
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       let toast = this.toastCtrl.create({
-        duration: 3000,
+        duration: TOAST_DURATION,
         message: 'Transaction queued. It might take some time until your TX shows up!',
         showCloseButton: true,
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    }, 20 * 1000)
+    }, TIMEOUT_TRANSACTION_QUEUED)
 
     this.protocol
       .broadcastTransaction(this.signedTx)
@@ -108,10 +117,10 @@ export class TransactionConfirmPage {
                 }
               })
             })
-          }, 10 * 1000)
+          }, INTERVAL_KT_REFRESH)
           setTimeout(() => {
             clearInterval(ktInterval)
-          }, 5 * 60 * 1000)
+          }, TIMEOUT_KT_REFRESH_CLEAR)
         }
 
         // TODO: Remove once we introduce pending transaction handling
@@ -140,7 +149,7 @@ export class TransactionConfirmPage {
                   this.openUrl(blockexplorer.replace('{{txId}}', txId))
                 } else {
                   let toast = this.toastCtrl.create({
-                    duration: 3000,
+                    duration: TOAST_DURATION,
                     message: 'Unable to open blockexplorer',
                     showCloseButton: true,
                     position: 'bottom'
@@ -170,7 +179,7 @@ export class TransactionConfirmPage {
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
         let toast = this.toastCtrl.create({
-          duration: 5000,
+          duration: TOAST_ERROR_DURATION,
           message: 'Transaction broadcasting failed: ' + error,
           showCloseButton: true,
           position: 'bottom'
