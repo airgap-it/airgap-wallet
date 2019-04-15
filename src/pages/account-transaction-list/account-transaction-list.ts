@@ -86,7 +86,7 @@ export class AccountTransactionListPage {
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
-    if (this.protocolIdentifier === XTZ) {
+    if (this.protocolIdentifier === ProtocolSymbols.XTZ) {
       this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
 
