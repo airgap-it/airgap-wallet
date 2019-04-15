@@ -5,7 +5,8 @@ import BigNumber from 'bignumber.js'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
+import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 const hoursPerCycle = 68
 
@@ -54,28 +55,15 @@ export class DelegationBakerDetailPage {
       if (delegationCheck.isDelegated && delegationCheck.value === this.bakerConfig.address) {
         const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
 
-        this.nextPayout =
-          delegatedCycles.length > 0
-            ? delegatedCycles[0].payout
-            : moment()
-                .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-                .toDate()
+        this.nextPayout = delegatedCycles.length > 0 ? delegatedCycles[0].payout : this.addPayoutDelayToMoment(moment()).toDate()
 
         // make sure there are at least 7 cycles to wait
-        if (
-          moment(delegationCheck.delegatedDate)
-            .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-            .isAfter(this.nextPayout)
-        ) {
-          this.nextPayout = moment(delegationCheck.delegatedDate)
-            .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-            .toDate()
+        if (this.addPayoutDelayToMoment(moment(delegationCheck.delegatedDate)).isAfter(this.nextPayout)) {
+          this.nextPayout = this.addPayoutDelayToMoment(moment(delegationCheck.delegatedDate)).toDate()
         }
       } else {
         // if we are currently delegated, but to someone else, first payout is in 7 cycles, same for if we are undelegated
-        this.nextPayout = moment()
-          .add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
-          .toDate()
+        this.nextPayout = this.addPayoutDelayToMoment(moment()).toDate()
       }
 
       this.avgRoIPerCyclePercentage = this.delegationRewards
@@ -93,9 +81,13 @@ export class DelegationBakerDetailPage {
     }
   }
 
+  addPayoutDelayToMoment(time: Moment): Moment {
+    return time.add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
+  }
+
   async delegate() {
     try {
-      if (this.wallet.protocolIdentifier === 'xtz') {
+      if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ) {
         const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet, this.bakerConfig.address)
         this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       } else {
