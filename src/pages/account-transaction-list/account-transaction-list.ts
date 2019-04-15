@@ -173,25 +173,16 @@ export class AccountTransactionListPage {
     }
   }
 
-  private getUndelegateAction(): CoinAction {
-    return {
-      type: ActionType.DELEGATE,
-      name: 'account-transaction-list.undelegate_label',
-      icon: 'logo-usd',
-      action: async () => {
-        const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
-        this.navCtrl.push(pageOptions.page, pageOptions.params).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      }
-    }
-  }
-
-  private getStatusAction(ktAddresses): CoinAction {
+  private getStatusAction(ktAddresses?: string[]): CoinAction {
     return {
       type: ActionType.DELEGATE,
       name: 'account-transaction-list.delegation-status_label',
       icon: 'md-information-circle',
       action: async () => {
-        const wallet = await this.operationsProvider.addKtAddress(this.wallet, 0, ktAddresses)
+        let wallet = this.wallet
+        if (ktAddresses) {
+          wallet = await this.operationsProvider.addKtAddress(this.wallet, 0, ktAddresses)
+        }
         this.openDelegateSelection(wallet)
       }
     }
@@ -382,7 +373,7 @@ export class AccountTransactionListPage {
   async isDelegated(): Promise<void> {
     const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
-    const action = isDelegated ? this.getUndelegateAction() : this.getDelegateAction()
+    const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     this.replaceAction(ActionType.DELEGATE, action)
   }
 
