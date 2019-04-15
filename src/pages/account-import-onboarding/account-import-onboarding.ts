@@ -3,6 +3,8 @@ import { NavController, NavParams, Platform, Slides } from 'ionic-angular'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { DeepLinkProvider } from '../../providers/deep-link/deep-link'
 
+const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
+
 @Component({
   selector: 'page-account-import-onboarding',
   templateUrl: 'account-import-onboarding.html'
@@ -23,6 +25,6 @@ export class AccountImportOnboardingPage {
   }
 
   openVault() {
-    this.deeplinkProvider.sameDeviceDeeplink(`airgap-vault://add-account/${this.protocol}`)
+    this.deeplinkProvider.sameDeviceDeeplink(`${DEEPLINK_VAULT_ADD_ACCOUNT}${this.protocol}`)
   }
 }
