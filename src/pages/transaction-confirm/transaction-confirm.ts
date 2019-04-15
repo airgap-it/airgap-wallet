@@ -12,7 +12,7 @@ import {
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { ProtocolSymbols } from 'src/providers/protocols/protocols'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 declare var cordova: any
 

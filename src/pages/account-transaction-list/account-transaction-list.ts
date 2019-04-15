@@ -15,7 +15,7 @@ import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation
 import { OperationsProvider, ActionType } from '../../providers/operations/operations'
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { ProtocolSymbols } from 'src/providers/protocols/protocols'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 interface CoinAction {
   type: ActionType

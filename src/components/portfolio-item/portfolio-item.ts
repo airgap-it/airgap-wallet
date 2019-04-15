@@ -4,7 +4,7 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { Observable } from 'rxjs'
-import { ProtocolSymbols } from 'src/providers/protocols/protocols'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 @Component({
   selector: 'portfolio-item',

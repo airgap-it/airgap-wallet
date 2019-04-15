@@ -6,7 +6,7 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { RemoteConfigProvider, BakerConfig } from '../../providers/remote-config/remote-config'
 import moment, { Moment } from 'moment'
-import { ProtocolSymbols } from 'src/providers/protocols/protocols'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 const hoursPerCycle = 68
 

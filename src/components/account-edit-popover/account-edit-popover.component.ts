@@ -5,7 +5,7 @@ import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
-import { ProtocolSymbols } from 'src/providers/protocols/protocols'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 @Component({
   template: `
