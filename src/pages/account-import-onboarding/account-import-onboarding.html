@@ -1,5 +1,5 @@
 <ion-header no-border no-shadow>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title><span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: protocol.name }"></span></ion-title>
   </ion-navbar>
 </ion-header>
@@ -30,7 +30,7 @@
   </ion-slides>
 </ion-content>
 <ion-footer no-border no-shadow>
-  <ion-toolbar color="whitePrimaryContrast" no-padding>
+  <ion-toolbar color="whiteSecondaryContrast" no-padding>
     <ion-buttons *ngIf="!slides.isBeginning()" start>
       <button ion-button flat color="primary" (click)="slides.slidePrev()">
         <ion-icon md-name="keyboard_arrow_left"></ion-icon>

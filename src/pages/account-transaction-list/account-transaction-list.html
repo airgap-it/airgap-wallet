@@ -1,11 +1,17 @@
 <ion-header no-border no-shadow>
-  <ion-navbar color="whitePrimaryContrast">
-    <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'coin-info.title' | translate }}</ion-title>
+  <ion-navbar color="whiteSecondaryContrast">
+    <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'account-transaction-list.title' | translate }}</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="presentEditPopover($event)"><ion-icon name="more"></ion-icon></button>
     </ion-buttons>
   </ion-navbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+  <ion-row padding-top padding-horizontal>
+    <button *ngFor="let action of actions" color="secondary" (click)="action.action()" ion-button round icon-left small outline>
+      <ion-icon icon-left [name]="action.icon"></ion-icon>
+      {{ action.name | translate }}
+    </button>
+  </ion-row>
 </ion-header>
 
 <ion-content>
@@ -14,22 +20,24 @@
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
     [delegateAmount]="wallet.currentBalance"
-    (onDelegatedClick)="goToDelegateSelection()"
-    (onUndelegatedClick)="goToDelegateSelection()"
+    (onDelegatedClick)="openDelegateSelection()"
+    (onUndelegatedClick)="openDelegateSelection()"
   ></tezos-delegation-card>
 
   <ng-container *ngIf="hasPendingTransactions">
     <ion-row padding-horizontal>
       <ion-col col-12 no-padding padding-top>
-        <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.pending-transactions.label' | translate }}</span>
+        <span ion-text color="primary" class="font--weight__bold">
+          {{ 'account-transaction-list.pending-transactions.label' | translate }}
+        </span>
       </ion-col>
       <ion-col col-12 no-padding>
-        <p>{{ 'coin-info.pending-transactions.text' | translate }}</p>
+        <p>{{ 'account-transaction-list.pending-transactions.text' | translate }}</p>
       </ion-col>
       <ion-col col-12 no-padding>
         <button (click)="openBlockexplorer()" outline ion-button color="secondary" round icon-start small>
           <ion-icon md-name="open_in_new"></ion-icon>
-          {{ 'coin-info.pending-transactions.open-blockexplorer_label' | translate }}
+          {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
         </button>
       </ion-col>
     </ion-row>
@@ -37,7 +45,7 @@
 
   <ion-row align-items-center>
     <ion-col col-10 padding>
-      <span ion-text color="primary" class="font--weight__bold">{{ 'coin-info.transactions_label' | translate }}</span>
+      <span ion-text color="primary" class="font--weight__bold">{{ 'account-transaction-list.transactions_label' | translate }}</span>
     </ion-col>
     <ion-col col-2 no-padding padding-right class="justify--content__end">
       <ion-spinner *ngIf="isRefreshing" color="primary" name="dots"></ion-spinner>
@@ -52,7 +60,7 @@
     </h5>
     <p
       [innerHTML]="
-        'coin-info.aeternity.same-phase.text'
+        'account-transaction-list.aeternity.same-phase.text'
           | translate
             : {
                 migratedTokens:
@@ -67,10 +75,10 @@
     <ion-col col-4><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
     <ion-col col-1></ion-col>
     <ion-col col-7>
-      <p [innerHTML]="'coin-info.aeternity.same-phase.heading' | translate: { currentPhase: aeCurrentPhase }"></p>
+      <p [innerHTML]="'account-transaction-list.aeternity.same-phase.heading' | translate: { currentPhase: aeCurrentPhase }"></p>
       <p
         [innerHTML]="
-          'coin-info.aeternity.same-phase.text'
+          'account-transaction-list.aeternity.same-phase.text'
             | translate
               : {
                   migratedTokens:
@@ -106,12 +114,12 @@
       src="../../assets/img/empty-state-no-transaction.svg"
     />
     <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
-      {{ 'coin-info.aeternity.no-transactions_text' | translate }}
+      {{ 'account-transaction-list.aeternity.no-transactions_text' | translate }}
     </p>
     <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
-      <p>{{ 'coin-info.aeternity.tx-list-disabled.text' | translate }}</p>
+      <p>{{ 'account-transaction-list.aeternity.tx-list-disabled.text' | translate }}</p>
       <button default ion-button color="secondary" (click)="openBlockexplorer()" round icon-end>
-        {{ 'coin-info.aeternity.tx-list-disabled.blockexplorer_label' | translate }}
+        {{ 'account-transaction-list.aeternity.tx-list-disabled.blockexplorer_label' | translate }}
         <ion-icon md-name="open_in_new"></ion-icon>
       </button>
     </span>
@@ -163,7 +171,7 @@
       <ion-col>
         <button full default ion-button color="primary" (click)="openReceivePage()" round icon-start>
           <ion-icon md-name="call_received"></ion-icon>
-          {{ 'coin-info.receive_label' | translate }}
+          {{ 'account-transaction-list.receive_label' | translate }}
         </button>
       </ion-col>
       <ion-col>
@@ -178,7 +186,7 @@
           icon-start
         >
           <ion-icon name="send"></ion-icon>
-          {{ 'coin-info.send_label' | translate }}
+          {{ 'account-transaction-list.send_label' | translate }}
         </button>
       </ion-col>
     </ion-row>

@@ -14,7 +14,7 @@ page-account-transaction-list {
     text-align: center;
     font-weight: 100;
     font-size: 1.4rem;
-    height: 75%;
+    height: 50%;
   }
   .loading-header {
     color: white;
@@ -40,5 +40,8 @@ page-account-transaction-list {
   }
   ion-fab {
     width: 100%;
+  }
+  ion-header {
+    background-color: color($colors, white);
   }
 }

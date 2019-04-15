@@ -1,11 +1,29 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
-import { getProtocolByIdentifier, DeserializedSyncProtocol, SignedTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import {
+  getProtocolByIdentifier,
+  DeserializedSyncProtocol,
+  SignedTransaction,
+  ICoinProtocol,
+  TezosKtProtocol,
+  AirGapMarketWallet
+} from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
+import { AccountProvider } from '../../providers/account/account.provider'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 declare var cordova: any
+
+const SECOND = 1000
+const MINUTE = 60 * SECOND
+
+const TOAST_DURATION = 3 * SECOND
+const TOAST_ERROR_DURATION = 5 * SECOND
+const INTERVAL_KT_REFRESH = 10 * SECOND
+const TIMEOUT_TRANSACTION_QUEUED = 20 * SECOND
+const TIMEOUT_KT_REFRESH_CLEAR = 5 * MINUTE
 
 @Component({
   selector: 'page-transaction-confirm',
@@ -23,7 +41,8 @@ export class TransactionConfirmPage {
     public navParams: NavParams,
     private alertCtrl: AlertController,
     private platform: Platform,
-    private storageProvider: StorageProvider
+    private storageProvider: StorageProvider,
+    private accountProvider: AccountProvider
   ) {}
 
   dismiss() {
@@ -59,14 +78,14 @@ export class TransactionConfirmPage {
     let interval = setTimeout(() => {
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       let toast = this.toastCtrl.create({
-        duration: 3000,
+        duration: TOAST_DURATION,
         message: 'Transaction queued. It might take some time until your TX shows up!',
         showCloseButton: true,
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       this.navController.popToRoot().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    }, 20 * 1000)
+    }, TIMEOUT_TRANSACTION_QUEUED)
 
     this.protocol
       .broadcastTransaction(this.signedTx)
@@ -74,6 +93,36 @@ export class TransactionConfirmPage {
         if (interval) {
           clearInterval(interval)
         }
+        // TODO: Remove once tezos allows delegation from tz1 addresses
+        if (this.protocol.identifier === ProtocolSymbols.XTZ) {
+          // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
+          const ktInterval = setInterval(async () => {
+            const ktProtocol = new TezosKtProtocol()
+            const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === ProtocolSymbols.XTZ)
+            xtzWallets.forEach(async xtzWallet => {
+              const ktAccounts = await ktProtocol.getAddressesFromPublicKey(xtzWallet.publicKey)
+              ktAccounts.forEach((_ktAccount, index) => {
+                const ktWallet = new AirGapMarketWallet(
+                  ProtocolSymbols.XTZ_KT,
+                  xtzWallet.publicKey,
+                  xtzWallet.isExtendedPublicKey,
+                  xtzWallet.derivationPath,
+                  index
+                )
+                const exists = this.accountProvider.walletExists(ktWallet)
+                if (!exists) {
+                  ktWallet.addresses = ktAccounts
+                  ktWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+                  this.accountProvider.addWallet(ktWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+                }
+              })
+            })
+          }, INTERVAL_KT_REFRESH)
+          setTimeout(() => {
+            clearInterval(ktInterval)
+          }, TIMEOUT_KT_REFRESH_CLEAR)
+        }
+
         // TODO: Remove once we introduce pending transaction handling
         // tslint:disable-next-line:no-unnecessary-type-assertion
         const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
@@ -100,7 +149,7 @@ export class TransactionConfirmPage {
                   this.openUrl(blockexplorer.replace('{{txId}}', txId))
                 } else {
                   let toast = this.toastCtrl.create({
-                    duration: 3000,
+                    duration: TOAST_DURATION,
                     message: 'Unable to open blockexplorer',
                     showCloseButton: true,
                     position: 'bottom'
@@ -130,7 +179,7 @@ export class TransactionConfirmPage {
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
         let toast = this.toastCtrl.create({
-          duration: 5000,
+          duration: TOAST_ERROR_DURATION,
           message: 'Transaction broadcasting failed: ' + error,
           showCloseButton: true,
           position: 'bottom'

@@ -21,6 +21,19 @@ page-portfolio {
       height: 28px;
     }
   }
+  .card-ios,
+  .card-md {
+    padding: 4px 0;
+    p {
+      font-weight: inherit;
+    }
+    ion-item {
+      padding-bottom: 4px;
+    }
+  }
+  .list-ios {
+    margin: 0;
+  }
   .container__empty {
     img {
       height: 30vh;

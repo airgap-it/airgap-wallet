@@ -17,6 +17,14 @@ interface SubAccount {
   subProtocols: GenericERC20Configuration[]
 }
 
+export enum ProtocolSymbols {
+  AE = 'ae',
+  BTC = 'btc',
+  ETH = 'eth',
+  XTZ = 'xtz',
+  XTZ_KT = 'xtz-kt'
+}
+
 @Injectable()
 export class ProtocolsProvider {
   public subProtocols: SubAccount[] = [

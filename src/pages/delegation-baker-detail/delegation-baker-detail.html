@@ -1,16 +1,25 @@
 <ion-header no-border no-shadow>
-  <ion-navbar color="whitePrimaryContrast">
+  <ion-navbar color="whiteSecondaryContrast">
     <ion-title>{{ 'delegation-baker-detail.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
   <ion-row padding-horizontal>
-    <ion-item no-lines no-padding>
+    <ion-item no-lines no-padding *ngIf="bakerConfig; else bakerAvatarSkeleton">
       <ion-avatar item-start><identicon [address]="bakerConfig?.address"></identicon></ion-avatar>
       <h2 class="font--weight__bold" ion-text color="black">{{ bakerConfig?.name }}</h2>
       <p>{{ bakerConfig?.address }}</p>
     </ion-item>
+    <ng-template #bakerAvatarSkeleton>
+      <div class="skeleton--loading">
+        <ion-item no-lines no-padding>
+          <ion-avatar item-start><identicon></identicon></ion-avatar>
+          <h2></h2>
+          <p></p>
+        </ion-item>
+      </div>
+    </ng-template>
   </ion-row>
   <ion-row padding-horizontal padding-bottom>
     <ion-col col-12 no-padding>
@@ -24,13 +33,23 @@
     <ion-col col-12 no-padding>
       <ion-row>
         <ion-col col-6 no-padding>
-          <small>{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }} %</small>
+          <small *ngIf="bakerInfo; else bakerInfoSkeleton">{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }}%</small>
+          <ng-template #bakerInfoSkeleton>
+            <div class="skeleton--loading">
+              <p no-margin></p>
+            </div>
+          </ng-template>
         </ion-col>
         <ion-col col-6 text-right no-padding>
-          <small>
+          <small *ngIf="bakerInfo; else bakerInfoBalanceSkeleton">
             {{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }} /
             {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: '3' } }}
           </small>
+          <ng-template #bakerInfoBalanceSkeleton>
+            <div class="skeleton--loading justify--content__end">
+              <p no-margin></p>
+            </div>
+          </ng-template>
         </ion-col>
       </ion-row>
     </ion-col>
@@ -114,10 +133,15 @@
   </ng-container>
 
   <ion-fab bottom right>
+    <button *ngIf="isDelegated" ion-button round color="primary" (click)="done()">
+      {{ 'delegation-baker-detail.done' | translate }}
+    </button>
+
     <button
+      *ngIf="!isDelegated"
       ion-button
       round
-      color="secondary"
+      color="primary"
       (click)="delegate()"
       [disabled]="!bakerConfig?.enabled || !bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1"
     >

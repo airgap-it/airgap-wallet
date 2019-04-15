@@ -12,10 +12,10 @@ page-delegation-baker-detail {
     border: 1px solid color($colors, secondary, base);
     border-radius: 50%;
   }
-  .card-ios,
-  .card-md {
-    padding: 8px 0;
-    box-shadow: 0 10px 20px 0 rgba(color($colors, secondary), 0.12);
-    border: 1px solid rgba(color($colors, primary), 0.08);
+  .skeleton--loading {
+    p {
+      height: 10.5px;
+      min-width: 25px;
+    }
   }
 }

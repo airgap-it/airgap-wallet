@@ -1,7 +1,12 @@
 {
-  "coin-info": {
+  "account-transaction-list": {
     "title": "Account",
     "transactions_label": "Transactions",
+    "add-tokens_label": "Add Tokens",
+    "import-accounts_label": "Import Accounts",
+    "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",
+    "delegation-status_label": "Delegation",
     "pending-transactions": {
       "label":  "Pending Transactions",
       "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",
@@ -20,6 +25,14 @@
         "text": "Currently unable to display the transaction history. Please refer to the Blockexplorer.",
         "blockexplorer_label": "Open Blockexplorer"
       }
+    },
+    "has-delegated_card": {
+      "heading": "<strong>{{amount}}</strong> Delegated",
+      "text": "Your XTZ are delegated and being baked, you can check your rewards for each cycle."
+    },
+    "not-delegated_card": {
+      "heading": "Delegate Tezos",
+      "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
     }
   },
 
@@ -174,8 +187,7 @@
 
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
-    "text": "Open AirGap Vault and scan this transaction in order to sign it.",
-    "sign-on-device_label": "Sign on this device",
+    "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
     "done_label": "Done"
   },
 
@@ -251,26 +263,6 @@
     "title": "Select Account",
     "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
     "accounts_label": "Accounts"
-  },
-
-  "account-detail": {
-    "title": "{{protocolName}}",
-    "tokens_label": "Tokens",
-    "accounts_label": "Accounts",
-    "add-tokens_label": "Add Tokens",
-    "add-accounts_label": "Add Accounts",
-    "send_label": "Send {{protocolSymbol}}",
-    "receive_label": "Receive",
-    "details_label": "Details",
-    "no-accounts_text": "No {{ label }} added yet, you can create or import existing {{ label }}.",
-    "has-delegated_card": {
-      "heading": "<strong>{{amount}}</strong>",
-      "text": "You have <strong>{{amount}}</strong> delegated. You can check your rewards for each cycle."
-    },
-    "not-delegated_card": {
-      "heading": "Delegate Tezos",
-      "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
-    }
   },
 
   "account-import-onboarding": {
@@ -361,7 +353,8 @@
     "next-payout": "Next Payout",
     "your-rewards": "Your Rewards",
     "cycles": "{{cycles}} Cycles",
-    "delegate": "Delegate"
+    "delegate": "Delegate",
+    "done": "Done"
   },
   "introduction-push": {
     "title": "Push Notifications",

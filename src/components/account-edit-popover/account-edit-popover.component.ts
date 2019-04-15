@@ -5,8 +5,7 @@ import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
-
-const XTZ_KT = 'xtz-kt'
+import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 @Component({
   template: `
@@ -57,7 +56,7 @@ export class AccountEditPopoverComponent {
 
   async ngOnInit() {
     // tezos
-    if (this.wallet.protocolIdentifier === XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }
@@ -66,9 +65,8 @@ export class AccountEditPopoverComponent {
 
   async undelegate() {
     await this.dismissPopover()
-    const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
     if (this.onUndelegate) {
-      this.onUndelegate(pageOptions)
+      this.onUndelegate()
     } else {
       handleErrorSentry(ErrorCategory.OTHER)('onUndelegate not defined')
     }
@@ -95,6 +93,8 @@ export class AccountEditPopoverComponent {
                 this.dismissPopover()
                 if (this.onDelete) {
                   this.onDelete()
+                } else {
+                  handleErrorSentry(ErrorCategory.OTHER)('onDelete not defined')
                 }
               })
               .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
