@@ -12,11 +12,9 @@ import {
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { AccountProvider } from '../../providers/account/account.provider'
+import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 declare var cordova: any
-
-const XTZ = 'xtz'
-const XTZ_KT = 'xtz-kt'
 
 @Component({
   selector: 'page-transaction-confirm',
@@ -87,16 +85,16 @@ export class TransactionConfirmPage {
           clearInterval(interval)
         }
         // TODO: Remove once tezos allows delegation from tz1 addresses
-        if (this.protocol.identifier === XTZ) {
+        if (this.protocol.identifier === ProtocolSymbols.XTZ) {
           // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
           const ktInterval = setInterval(async () => {
             const ktProtocol = new TezosKtProtocol()
-            const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === XTZ)
+            const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === ProtocolSymbols.XTZ)
             xtzWallets.forEach(async xtzWallet => {
               const ktAccounts = await ktProtocol.getAddressesFromPublicKey(xtzWallet.publicKey)
               ktAccounts.forEach((_ktAccount, index) => {
                 const ktWallet = new AirGapMarketWallet(
-                  XTZ_KT,
+                  ProtocolSymbols.XTZ_KT,
                   xtzWallet.publicKey,
                   xtzWallet.isExtendedPublicKey,
                   xtzWallet.derivationPath,

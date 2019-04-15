@@ -19,14 +19,13 @@ import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import BigNumber from 'bignumber.js'
 import { AccountProvider } from '../account/account.provider'
+import { ProtocolSymbols } from '../protocols/protocols'
 
 export enum ActionType {
   IMPORT_ACCOUNT,
   ADD_TOKEN,
   DELEGATE
 }
-
-const XTZ_KT = 'xtz-kt'
 
 @Injectable()
 export class OperationsProvider {
@@ -153,13 +152,19 @@ export class OperationsProvider {
   }
 
   public async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, XTZ_KT, index)
+    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, ProtocolSymbols.XTZ_KT, index)
 
     if (wallet) {
       return wallet
     }
 
-    wallet = new AirGapMarketWallet(XTZ_KT, xtzWallet.publicKey, xtzWallet.isExtendedPublicKey, xtzWallet.derivationPath, index)
+    wallet = new AirGapMarketWallet(
+      ProtocolSymbols.XTZ_KT,
+      xtzWallet.publicKey,
+      xtzWallet.isExtendedPublicKey,
+      xtzWallet.derivationPath,
+      index
+    )
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
     await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
@@ -207,11 +212,11 @@ export class OperationsProvider {
   }
 
   public getActionsForCoin(identifier: string): ActionType[] {
-    if (identifier === 'eth') {
+    if (identifier === ProtocolSymbols.ETH) {
       return [ActionType.ADD_TOKEN]
-    } else if (identifier === 'xtz') {
+    } else if (identifier === ProtocolSymbols.XTZ) {
       return [ActionType.IMPORT_ACCOUNT, ActionType.DELEGATE]
-    } else if (identifier === 'xtz-kt') {
+    } else if (identifier === ProtocolSymbols.XTZ_KT) {
       return [ActionType.DELEGATE]
     } else {
       return []

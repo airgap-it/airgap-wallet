@@ -5,8 +5,7 @@ import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { ClipboardProvider } from '../../providers/clipboard/clipboard'
-
-const XTZ_KT = 'xtz-kt'
+import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 @Component({
   template: `
@@ -57,7 +56,7 @@ export class AccountEditPopoverComponent {
 
   async ngOnInit() {
     // tezos
-    if (this.wallet.protocolIdentifier === XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }

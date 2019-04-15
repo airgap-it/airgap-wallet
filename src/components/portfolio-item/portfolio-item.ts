@@ -4,8 +4,7 @@ import { OperationsProvider } from '../../providers/operations/operations'
 import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { Observable } from 'rxjs'
-
-const XTZ_KT = 'xtz-kt'
+import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 @Component({
   selector: 'portfolio-item',
@@ -55,7 +54,7 @@ export class PortfolioItemComponent {
   }
 
   async ngOnChanges() {
-    if (this.wallet && this.wallet.protocolIdentifier === XTZ_KT) {
+    if (this.wallet && this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(this.wallet.receivingPublicAddress)
     }
   }

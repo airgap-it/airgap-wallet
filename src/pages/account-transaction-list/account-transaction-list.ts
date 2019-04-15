@@ -15,6 +15,7 @@ import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation
 import { OperationsProvider, ActionType } from '../../providers/operations/operations'
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { ProtocolSymbols } from 'src/providers/protocols/protocols'
 
 interface CoinAction {
   type: ActionType
@@ -24,10 +25,6 @@ interface CoinAction {
 }
 
 declare let cordova
-
-const AE = 'ae'
-const XTZ = 'xtz'
-const XTZ_KT = 'xtz-kt'
 
 @Component({
   selector: 'page-account-transaction-list',
@@ -76,7 +73,7 @@ export class AccountTransactionListPage {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
-    if (this.protocolIdentifier === AE) {
+    if (this.protocolIdentifier === ProtocolSymbols.AE) {
       this.http
         .get(`https://api-airgap.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
         .subscribe((result: any) => {
@@ -86,7 +83,7 @@ export class AccountTransactionListPage {
         })
     }
 
-    if (this.protocolIdentifier === XTZ_KT) {
+    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === XTZ) {
@@ -210,7 +207,7 @@ export class AccountTransactionListPage {
   }
 
   walletIsAe() {
-    return this.wallet.protocolIdentifier === AE
+    return this.wallet.protocolIdentifier === ProtocolSymbols.AE
   }
 
   ionViewWillEnter() {
@@ -264,7 +261,7 @@ export class AccountTransactionListPage {
   }
 
   doRefresh(refresher: any = null) {
-    if (this.wallet.protocolIdentifier === XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
 
@@ -275,7 +272,7 @@ export class AccountTransactionListPage {
     }
 
     // this can safely be removed after AE has made the switch to mainnet
-    if (this.protocolIdentifier === AE) {
+    if (this.protocolIdentifier === ProtocolSymbols.AE) {
       this.http.get('https://api-airgap.gke.papers.tech/status').subscribe((result: any) => {
         this.aeTxEnabled = result.transactionsEnabled
         this.aeTxListEnabled = result.txListEnabled
