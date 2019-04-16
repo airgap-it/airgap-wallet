@@ -38,6 +38,8 @@ export class PushProvider {
   }
 
   public async initPush(): Promise<void> {
+    await this.platform.ready()
+
     if (!this.platform.is('cordova')) {
       return
     }

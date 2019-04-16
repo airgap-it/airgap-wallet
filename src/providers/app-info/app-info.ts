@@ -17,6 +17,7 @@ export class AppInfoProvider {
 
   async updateVersions() {
     if (this.platform.is('cordova')) {
+      await this.platform.ready()
       this.appName = await this.app.getAppName()
       this.packageName = await this.app.getPackageName()
       this.versionNumber = await this.app.getVersionNumber()
