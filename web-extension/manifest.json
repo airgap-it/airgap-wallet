@@ -31,6 +31,7 @@
     "unlimitedStorage",
     "clipboardWrite",
     "http://localhost:8545/",
+    "http://localhost:9001/",
     "https://*.infura.io/",
     "webRequest",
     "*://*.eth/",

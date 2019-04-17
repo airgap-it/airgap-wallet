@@ -1,8 +1,13 @@
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { configureScope } from '@sentry/browser'
 import { Transactions } from './constants'
+import ExtensionProvider from '@aeternity/aepp-sdk/es/provider/extension'
+import Account from '@aeternity/aepp-sdk/es/account'
+import { resolve } from 'path'
 
 declare let chrome
-const height = 900
-const width = 600
+const height = 500
+const width = 333
 
 chrome.runtime.onMessage.addListener(async function(request) {
   if (request.data.type === Transactions.OUTGOING_TRANSACTION) {
@@ -19,7 +24,7 @@ chrome.runtime.onMessage.addListener(async function(request) {
       console.log('JSON.stringify(rawUnsignedTx): ', JSON.stringify(rawUnsignedTx))
 
       chrome.windows.create({
-        url: `index.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
+        url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
         type: 'popup',
         width,
         height
@@ -73,3 +78,143 @@ function createWindow() {
     }
   )
 }
+
+// Init accounts
+const accounts = [
+  // You can add your own account implementation,
+  Account.compose({
+    init() {},
+    methods: {
+      /**
+       * Sign data blob
+       * @function sign
+       * @instance
+       * @abstract
+       * @category async
+       * @rtype (data: String) => data: Promise[String]
+       * @param {String} data - Data blob to sign
+       * @return {String} Signed data blob
+       */
+      async sign(data) {
+        console.trace()
+        console.log('we should sign data', data)
+        chrome.storage.local.get('selectedAccount', async function(storage) {
+          let airGapWallet = new AirGapMarketWallet(
+            storage.selectedAccount.protocolIdentifier,
+            storage.selectedAccount.publicKey,
+            storage.selectedAccount.isExtendedPublicKey,
+            storage.selectedAccount.derivationPath
+          )
+          const aeWallet = airGapWallet
+          const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
+            storage.selectedAccount.publicKey,
+            [data.recipientId],
+            [data.amount],
+            data.fee
+          )
+          const identifier = aeWallet.coinProtocol.identifier
+          const publicKey = aeWallet.publicKey
+          console.log('JSON.stringify(rawUnsignedTx): ', JSON.stringify(rawUnsignedTx))
+
+          chrome.windows.create({
+            url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
+            type: 'popup',
+            width,
+            height
+          })
+          /*
+          chrome.windows.create({
+            url: 'confirmation.html?payload=' + serializedTx,
+            type: 'popup',
+            width,
+            height
+          })
+          */
+          return true
+        })
+        // Send data to prepareTransactionScreen
+        // return signedDataFromVault
+      },
+      /**
+       * Obtain account address
+       * @function address
+       * @instance
+       * @abstract
+       * @category async
+       * @rtype () => address: Promise[String]
+       * @return {String} Public account address
+       */
+      // async address() {
+      //   return 'ak_2dPGHd5dZgKwR234uqPZcAXXcCyxr3TbWwgV8NSnNincth4Lf7'
+      // }
+
+      async address() {
+        return new Promise(resolve => {
+          let selectedAccount
+          chrome.storage.local.get('selectedAccount', function(result) {
+            if (result) {
+              selectedAccount = result.selectedAccount
+            }
+          })
+
+          chrome.storage.local.get('wallets', async function(result) {
+            let wallets = await result.wallets
+            wallets.forEach(wallet => {
+              if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
+                resolve(wallet.addresses[0])
+              }
+            })
+          })
+        })
+      }
+    }
+  })()
+]
+const postToContent = data => {
+  chrome.tabs.query({}, function(tabs) {
+    // TODO think about direct communication with tab
+    const message = { method: 'pageMessage', data }
+    tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
+  })
+}
+
+// Init extension stamp from sdk
+ExtensionProvider({
+  // Provide post function (default: window.postMessage)
+  postFunction: postToContent,
+  // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
+  accounts: accounts,
+  // Hook for sdk registration
+  onSdkRegister: function(sdk) {
+    console.log('SDK', sdk)
+    // sendDataToPopup(this.getSdks())
+    if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
+  },
+  // Hook for signing transaction
+  onSign: function({ sdkId, tx, txObject, sign }) {
+    // sendDataToPopup(this.getSdks())
+    if (confirm('Do you want to sign ' + JSON.stringify(txObject) + ' ?')) {
+      console.log('txObject', txObject)
+      accounts[0].sign(txObject)
+    } // SIGN TX
+  },
+  // Hook for broadcasting transaction result
+  onBroadcast: function(sdk) {
+    console.log(sdk)
+  }
+})
+  .then(provider => {
+    console.log('created provider')
+    // Subscribe from postMessages from page
+    chrome.runtime.onMessage.addListener((msg, sender) => {
+      console.log('msg: ', msg)
+      switch (msg.method) {
+        case 'pageMessage':
+          provider.processMessage(msg)
+          break
+      }
+    })
+  })
+  .catch(err => {
+    console.error(err)
+  })
