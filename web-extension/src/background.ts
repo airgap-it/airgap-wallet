@@ -64,7 +64,7 @@ navigator.mediaDevices
 function createWindow() {
   chrome.windows.create(
     {
-      url: chrome.extension.getURL('request_camera.html')
+      url: chrome.extension.getURL('html/request_camera.html')
     },
     function(tab) {
       console.log('TAB:')
