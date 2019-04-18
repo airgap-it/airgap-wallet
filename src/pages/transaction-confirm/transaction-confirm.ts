@@ -13,8 +13,10 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { ProtocolSymbols } from '../../providers/protocols/protocols'
+import { WebExtensionProvider } from 'src/providers/web-extension/web-extension'
 
 declare var cordova: any
+declare var chrome: any
 
 const SECOND = 1000
 const MINUTE = 60 * SECOND
@@ -42,6 +44,7 @@ export class TransactionConfirmPage {
     private alertCtrl: AlertController,
     private platform: Platform,
     private storageProvider: StorageProvider,
+    private webExtensionProvider: WebExtensionProvider,
     private accountProvider: AccountProvider
   ) {}
 
@@ -54,10 +57,28 @@ export class TransactionConfirmPage {
     this.signedTransactionSync = this.navParams.get('signedTransactionSync')
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
+    console.log('SIGNED TX', this.signedTx)
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
+  postToContent = data => {
+    chrome.tabs.query({}, function(tabs) {
+      // TODO think about direct communication with tab
+      const message = { method: 'pageMessage', data }
+      tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
+    })
+  }
+
   broadcastTransaction() {
+    if (this.webExtensionProvider.isWebExtension()) {
+      this.postToContent({
+        jsonrpc: '2.0',
+        method: 'ae:broadcast',
+        params: ['1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ=', 'raw_tx', this.signedTx],
+        id: null
+      })
+    }
+
     let loading = this.loadingCtrl.create({
       content: 'Broadcasting...'
     })
