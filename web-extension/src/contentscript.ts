@@ -50,10 +50,6 @@ window.addEventListener('message', function(event) {
   }
 })
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log(request.data)
-})
-
 // FOR AETERNITY AEPPS
 // Subscribe from postMessages from page
 const readyStateCheckInterval = setInterval(function() {

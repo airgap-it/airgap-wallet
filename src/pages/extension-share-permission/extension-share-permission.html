@@ -1,0 +1,21 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whiteSecondaryContrast">
+    <ion-title>{{ 'introduction.title' | translate }}</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()" clear icon-only>
+        <ion-icon name="md-close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding no-bounce>
+  <h3>Do you want to share your wallet with the aepp?</h3>
+
+  <ion-fab bottom right>
+    <button ion-button round color="secondary" (click)="dismiss()">
+      dismiss
+    </button>
+    <button ion-button round color="primary" (click)="shareWallet()">share</button>
+  </ion-fab>
+</ion-content>

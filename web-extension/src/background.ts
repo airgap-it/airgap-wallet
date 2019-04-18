@@ -98,13 +98,6 @@ const accounts = [
        * @return {String} Signed data blob
        */
       async sign(data) {
-        postToContent({
-          jsonrpc: '2.0',
-          method: 'ae:broadcast',
-          params: ['1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ=', 'raw_tx', 'signed_tx'],
-          id: null
-        })
-        console.trace()
         console.log('we should sign data', data)
         chrome.storage.local.get('selectedAccount', async function(storage) {
           let airGapWallet = new AirGapMarketWallet(
@@ -119,6 +112,8 @@ const accounts = [
           console.log('values', values)
           console.log('fee', fee)
           console.log('storage.selectedAccount.publicKey', storage.selectedAccount.publicKey)
+
+          // TODO: fix the tx format error
 
           // const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
           //   String(storage.selectedAccount.publicKey),
@@ -203,11 +198,25 @@ ExtensionProvider({
   // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
   accounts: accounts,
   // Hook for sdk registration
+
+  // TODO: how do we know if the permission was received from the notification.html popup?
+  // thus, when do we fire sdk.shareWallet()?
   onSdkRegister: function(sdk) {
     console.log('SDK', sdk)
+    chrome.windows.create({
+      url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
+      type: 'popup',
+      width,
+      height
+    })
+    chrome.runtime.onRemoved.addListener((msg, sender) => {
+      console.log('WINDOW ONREMOVED')
+      sdk.shareWallet()
+    })
+
     // sendDataToPopup(this.getSdks())
     // createWindow()
-    if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
+    // if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {

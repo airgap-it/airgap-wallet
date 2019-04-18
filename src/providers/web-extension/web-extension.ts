@@ -27,4 +27,22 @@ export class WebExtensionProvider {
       chrome.tabs.executeScript(tab.id, { code: code })
     })
   }
+
+  // aeternity aepps
+  postToContent = data => {
+    chrome.tabs.query({}, function(tabs) {
+      // TODO think about direct communication with tab
+      const message = { method: 'pageMessage', data }
+      tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
+    })
+  }
+
+  // aeternity aepps
+  confirmWalletShare() {
+    chrome.tabs.query({}, function(tabs) {
+      // TODO think about direct communication with tab
+      const message = { method: 'confirmWalletShare' }
+      tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
+    })
+  }
 }
