@@ -4,7 +4,6 @@ import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angul
 
 declare var chrome: any
 
-@IonicPage()
 @Component({
   selector: 'page-extension-share-permission',
   templateUrl: 'extension-share-permission.html'
