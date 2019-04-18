@@ -1,9 +1,10 @@
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { configureScope } from '@sentry/browser'
 import { Transactions } from './constants'
 import ExtensionProvider from '@aeternity/aepp-sdk/es/provider/extension'
 import Account from '@aeternity/aepp-sdk/es/account'
 import { resolve } from 'path'
+import BigNumber from 'bignumber.js'
 
 declare let chrome
 const height = 500
@@ -67,9 +68,10 @@ navigator.mediaDevices
   })
 
 function createWindow() {
+  console.log('createWindow')
   chrome.windows.create(
     {
-      url: chrome.extension.getURL('html/request_camera.html')
+      url: chrome.runtime.getURL('../html/request_camera.html')
     },
     function(tab) {
       console.log('TAB:')
@@ -96,6 +98,12 @@ const accounts = [
        * @return {String} Signed data blob
        */
       async sign(data) {
+        postToContent({
+          jsonrpc: '2.0',
+          method: 'ae:broadcast',
+          params: ['1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ=', 'raw_tx', 'signed_tx'],
+          id: null
+        })
         console.trace()
         console.log('we should sign data', data)
         chrome.storage.local.get('selectedAccount', async function(storage) {
@@ -106,15 +114,25 @@ const accounts = [
             storage.selectedAccount.derivationPath
           )
           const aeWallet = airGapWallet
-          const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
-            storage.selectedAccount.publicKey,
-            [data.recipientId],
-            [data.amount],
-            data.fee
-          )
+          const values: any = [new BigNumber(data.amount)]
+          const fee: any = new BigNumber(data.fee)
+          console.log('values', values)
+          console.log('fee', fee)
+          console.log('storage.selectedAccount.publicKey', storage.selectedAccount.publicKey)
+
+          // const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
+          //   String(storage.selectedAccount.publicKey),
+          //   ['ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv'],
+          //   values,
+          //   fee
+          // )
+          const rawUnsignedTx = {
+            transaction:
+              'tx_7WcPFuQ1mXzeHhN6jzxNUzz82bRN64RAocAamXGYuhV4NgQCF8tve1nGx8wm8XFy2UhkKzJ93LGXFtVZtYhVwgJBYRDNqztPA77dpdFx6fCs1gLJxBevJytJyJLns6AMNpbHR',
+            networkId: 'ae_mainnet'
+          }
           const identifier = aeWallet.coinProtocol.identifier
           const publicKey = aeWallet.publicKey
-          console.log('JSON.stringify(rawUnsignedTx): ', JSON.stringify(rawUnsignedTx))
 
           chrome.windows.create({
             url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
@@ -188,6 +206,7 @@ ExtensionProvider({
   onSdkRegister: function(sdk) {
     console.log('SDK', sdk)
     // sendDataToPopup(this.getSdks())
+    // createWindow()
     if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
   },
   // Hook for signing transaction
@@ -200,7 +219,7 @@ ExtensionProvider({
   },
   // Hook for broadcasting transaction result
   onBroadcast: function(sdk) {
-    console.log(sdk)
+    console.log('Brodcasting')
   }
 })
   .then(provider => {
