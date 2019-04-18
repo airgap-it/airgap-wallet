@@ -1,3 +1,4 @@
+import { ExtensionSharePermissionPage } from './../pages/extension-share-permission/extension-share-permission'
 import { DeepLinkProvider } from './../providers/deep-link/deep-link'
 import { PushProvider } from '../providers/push/push'
 
@@ -82,6 +83,7 @@ export class MyApp {
     setSentryUser(userId)
 
     let url = new URL(location.href)
+    console.log('URL in app.component.ts', url)
 
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
@@ -91,6 +93,8 @@ export class MyApp {
           sub.unsubscribe()
         }
       })
+    } else if (url.searchParams.get('extensionShareWallet')) {
+      this.nav.push(ExtensionSharePermissionPage, { sdk: url.searchParams.get('extensionShareWallet') })
     }
   }
 

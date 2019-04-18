@@ -1,3 +1,4 @@
+import { WebExtensionProvider } from './../../providers/web-extension/web-extension'
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
@@ -13,7 +14,6 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { StorageProvider, SettingsKey } from '../../providers/storage/storage'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { ProtocolSymbols } from '../../providers/protocols/protocols'
-import { WebExtensionProvider } from 'src/providers/web-extension/web-extension'
 
 declare var cordova: any
 declare var chrome: any
@@ -61,17 +61,9 @@ export class TransactionConfirmPage {
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
-  postToContent = data => {
-    chrome.tabs.query({}, function(tabs) {
-      // TODO think about direct communication with tab
-      const message = { method: 'pageMessage', data }
-      tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
-    })
-  }
-
   broadcastTransaction() {
     if (this.webExtensionProvider.isWebExtension()) {
-      this.postToContent({
+      this.webExtensionProvider.postToContent({
         jsonrpc: '2.0',
         method: 'ae:broadcast',
         params: ['1KGVZ2AFqAybJkpdKCzP/0W4W/0BQZaDH6en8g7VstQ=', 'raw_tx', this.signedTx],
