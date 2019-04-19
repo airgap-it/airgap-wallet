@@ -22,21 +22,10 @@
   <body>
     <video id="video" width="400" height="200" autoplay hidden></video>
 
-    <script>
-      let video = document.getElementById('video')
-
-      // Get access to the camera!
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        // Not adding `{ audio: true }` since we only want video now
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-          video.srcObject = stream
-          video.play()
-        })
-      }
-    </script>
+    <script src="request_camera.js" type="text/javascript"></script>
 
     <div class="imgbox">
-      <img class="center-fit" src="assets/images/request_permission.png" />
+      <img class="center-fit" src="../assets/images/request_permission.png" />
     </div>
   </body>
 </html>
