@@ -1,4 +1,5 @@
 import { transition } from '@angular/animations'
+
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { configureScope } from '@sentry/browser'
 import { Transactions } from './constants'
@@ -119,6 +120,7 @@ const accounts = [
           const publicKey = aeWallet.publicKey
 
           rawUnsignedTx.transaction = encodeURIComponent(rawUnsignedTx.transaction)
+
           chrome.windows.create({
             url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
             type: 'popup',
@@ -192,6 +194,7 @@ ExtensionProvider({
   // TODO: how do we know if the permission was received from the notification.html popup?
   // thus, when do we fire sdk.shareWallet()?
   onSdkRegister: function(sdk) {
+<<<<<<< HEAD
     // console.log('SDK', sdk)
     // chrome.windows.create({
     //   url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
@@ -207,6 +210,23 @@ ExtensionProvider({
     // sendDataToPopup(this.getSdks())
     // createWindow()
     if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
+=======
+    console.log('SDK', sdk)
+    chrome.windows.create({
+      url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
+      type: 'popup',
+      width,
+      height
+    })
+    chrome.runtime.onRemoved.addListener((msg, sender) => {
+      console.log('WINDOW ONREMOVED')
+      sdk.shareWallet()
+    })
+
+    // sendDataToPopup(this.getSdks())
+    // createWindow()
+    // if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
+>>>>>>> 4a096387597ea4ae4968f7894961eb6cd322e2a7
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
