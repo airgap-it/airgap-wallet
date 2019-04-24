@@ -85,7 +85,7 @@ export class MyApp {
     let url = new URL(location.href)
     console.log('URL in app.component.ts', url)
 
-    if (url.searchParams.get('rawUnsignedTx')) {
+    if (url.searchParams.get('rawUnsignedTx') && !url.searchParams.get('extensionSharePermissions')) {
       // Wait until wallets are initialized
       let sub = this.accountProvider.wallets.subscribe(wallets => {
         this.walletDeeplink()
@@ -93,11 +93,18 @@ export class MyApp {
           sub.unsubscribe()
         }
       })
-    } else if (url.searchParams.get('sdkId')) {
+    } else if (url.searchParams.get('extensionSharePermissions')) {
       this.nav.push(ExtensionSharePermissionPage, {
         sdkId: url.searchParams.get('sdkId'),
         address: url.searchParams.get('address'),
-        providerId: url.searchParams.get('providerId')
+        providerId: url.searchParams.get('providerId'),
+
+        wallet: url.searchParams.get('wallet'),
+        toAddress: url.searchParams.get('toAddress'),
+        amount: url.searchParams.get('amount'),
+        fee: url.searchParams.get('fee'),
+        data: url.searchParams.get('data'),
+        nextAction: url.searchParams.get('nextAction')
       })
     }
   }

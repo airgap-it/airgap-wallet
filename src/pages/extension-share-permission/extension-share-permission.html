@@ -10,12 +10,18 @@
 </ion-header>
 
 <ion-content padding no-bounce>
-  <h3>Do you want to share your wallet with the aepp?</h3>
+  <h2 *ngIf="nextAction === 'shareWallet'">Do you want to share your wallet with the aepp?</h2>
+
+  <h2 *ngIf="nextAction === 'prepareTransaction'">Do you want to sign the following data?:</h2>
+  <p *ngIf="nextAction === 'prepareTransaction'">{{ data }}</p>
 
   <ion-fab bottom right>
     <button ion-button round color="secondary" (click)="dismiss()">
       dismiss
     </button>
-    <button ion-button round color="primary" (click)="shareWallet()">share</button>
+    <button ion-button round color="primary" (click)="shareWallet()" *ngIf="nextAction === 'shareWallet'">share wallet</button>
+    <button ion-button round color="primary" (click)="prepareTransaction()" *ngIf="nextAction === 'prepareTransaction'">
+      sign data
+    </button>
   </ion-fab>
 </ion-content>

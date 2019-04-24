@@ -206,7 +206,7 @@ ExtensionProvider({
     const address = await this.address()
 
     chrome.windows.create({
-      url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${getProviderId()}`,
+      url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${getProviderId()}&nextAction=${'shareWallet'}&extensionSharePermissions=${true}`,
       type: 'popup',
       width,
       height
@@ -218,11 +218,24 @@ ExtensionProvider({
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
-    // sendDataToPopup(this.getSdks())
-    if (confirm('Do you want to sign ' + JSON.stringify(txObject) + ' ?')) {
-      console.log('txObject', txObject)
-      accounts[0].sign(txObject)
-    } // SIGN TX
+    chrome.storage.local.get('selectedAccount', async function(storage) {
+      let airGapWallet = new AirGapMarketWallet(
+        storage.selectedAccount.protocolIdentifier,
+        storage.selectedAccount.publicKey,
+        storage.selectedAccount.isExtendedPublicKey,
+        storage.selectedAccount.derivationPath
+      )
+      const aeWallet = airGapWallet
+      chrome.windows.create({
+        url: `notification.html?wallet=${JSON.stringify(aeWallet)}&toAddress=${txObject.recipientId}&amount=${txObject.amount}&fee=${
+          txObject.fee
+        }&data=${JSON.stringify(txObject)}&nextAction=${'prepareTransaction'}&extensionSharePermissions=${true}`,
+        type: 'popup',
+        width,
+        height
+      })
+      return true
+    })
   },
   // Hook for broadcasting transaction result
   onBroadcast: function(sdk) {
