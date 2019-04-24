@@ -1,3 +1,4 @@
+import { transition } from '@angular/animations'
 import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 import { configureScope } from '@sentry/browser'
 import { Transactions } from './constants'
@@ -107,28 +108,17 @@ const accounts = [
             storage.selectedAccount.derivationPath
           )
           const aeWallet = airGapWallet
-          const values: any = [new BigNumber(data.amount)]
-          const fee: any = new BigNumber(data.fee)
-          console.log('values', values)
-          console.log('fee', fee)
-          console.log('storage.selectedAccount.publicKey', storage.selectedAccount.publicKey)
 
-          // TODO: fix the tx format error
-
-          // const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
-          //   String(storage.selectedAccount.publicKey),
-          //   ['ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv'],
-          //   values,
-          //   fee
-          // )
-          const rawUnsignedTx = {
-            transaction:
-              'tx_7WcPFuQ1mXzeHhN6jzxNUzz82bRN64RAocAamXGYuhV4NgQCF8tve1nGx8wm8XFy2UhkKzJ93LGXFtVZtYhVwgJBYRDNqztPA77dpdFx6fCs1gLJxBevJytJyJLns6AMNpbHR',
-            networkId: 'ae_mainnet'
-          }
+          const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
+            String(storage.selectedAccount.publicKey),
+            [data.recipientId],
+            data.amount,
+            data.fee
+          )
           const identifier = aeWallet.coinProtocol.identifier
           const publicKey = aeWallet.publicKey
 
+          rawUnsignedTx.transaction = encodeURIComponent(rawUnsignedTx.transaction)
           chrome.windows.create({
             url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
             type: 'popup',
@@ -202,21 +192,21 @@ ExtensionProvider({
   // TODO: how do we know if the permission was received from the notification.html popup?
   // thus, when do we fire sdk.shareWallet()?
   onSdkRegister: function(sdk) {
-    console.log('SDK', sdk)
-    chrome.windows.create({
-      url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
-      type: 'popup',
-      width,
-      height
-    })
-    chrome.runtime.onRemoved.addListener((msg, sender) => {
-      console.log('WINDOW ONREMOVED')
-      sdk.shareWallet()
-    })
+    // console.log('SDK', sdk)
+    // chrome.windows.create({
+    //   url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
+    //   type: 'popup',
+    //   width,
+    //   height
+    // })
+    // chrome.runtime.onRemoved.addListener((msg, sender) => {
+    //   console.log('WINDOW ONREMOVED')
+    //   sdk.shareWallet()
+    // })
 
     // sendDataToPopup(this.getSdks())
     // createWindow()
-    // if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
+    if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
