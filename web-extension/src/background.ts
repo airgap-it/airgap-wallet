@@ -11,6 +11,7 @@ import BigNumber from 'bignumber.js'
 declare let chrome
 const height = 500
 const width = 333
+let providerId
 
 chrome.runtime.onMessage.addListener(async function(request) {
   if (request.data.type === Transactions.OUTGOING_TRANSACTION) {
@@ -191,42 +192,21 @@ ExtensionProvider({
   accounts: accounts,
   // Hook for sdk registration
 
-  // TODO: how do we know if the permission was received from the notification.html popup?
-  // thus, when do we fire sdk.shareWallet()?
-  onSdkRegister: function(sdk) {
-<<<<<<< HEAD
-    // console.log('SDK', sdk)
-    // chrome.windows.create({
-    //   url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
-    //   type: 'popup',
-    //   width,
-    //   height
-    // })
-    // chrome.runtime.onRemoved.addListener((msg, sender) => {
-    //   console.log('WINDOW ONREMOVED')
-    //   sdk.shareWallet()
-    // })
-
-    // sendDataToPopup(this.getSdks())
-    // createWindow()
-    if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
-=======
+  onSdkRegister: async function(sdk) {
     console.log('SDK', sdk)
+    const sdkId = sdk.sdkId
+    const address = await this.address()
+
     chrome.windows.create({
-      url: `notification.html?extensionShareWallet=${JSON.stringify(sdk)}`,
+      url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${providerId}`,
       type: 'popup',
       width,
       height
-    })
-    chrome.runtime.onRemoved.addListener((msg, sender) => {
-      console.log('WINDOW ONREMOVED')
-      sdk.shareWallet()
     })
 
     // sendDataToPopup(this.getSdks())
     // createWindow()
     // if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
->>>>>>> 4a096387597ea4ae4968f7894961eb6cd322e2a7
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
@@ -242,13 +222,18 @@ ExtensionProvider({
   }
 })
   .then(provider => {
-    console.log('created provider')
+    console.log('created provider', provider)
     // Subscribe from postMessages from page
     chrome.runtime.onMessage.addListener((msg, sender) => {
       console.log('msg: ', msg)
+      if (msg.data.providerId) {
+        console.log('DETECTED providerId', msg.data.providerId)
+        providerId = msg.data.providerId
+      }
       switch (msg.method) {
         case 'pageMessage':
           provider.processMessage(msg)
+
           break
       }
     })

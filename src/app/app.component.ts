@@ -93,8 +93,12 @@ export class MyApp {
           sub.unsubscribe()
         }
       })
-    } else if (url.searchParams.get('extensionShareWallet')) {
-      this.nav.push(ExtensionSharePermissionPage, { sdk: url.searchParams.get('extensionShareWallet') })
+    } else if (url.searchParams.get('sdkId')) {
+      this.nav.push(ExtensionSharePermissionPage, {
+        sdkId: url.searchParams.get('sdkId'),
+        address: url.searchParams.get('address'),
+        providerId: url.searchParams.get('providerId')
+      })
     }
   }
 
