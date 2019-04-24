@@ -184,6 +184,14 @@ const postToContent = data => {
   })
 }
 
+function setProviderId(id: string) {
+  providerId = id
+}
+
+function getProviderId() {
+  return providerId
+}
+
 // Init extension stamp from sdk
 ExtensionProvider({
   // Provide post function (default: window.postMessage)
@@ -198,7 +206,7 @@ ExtensionProvider({
     const address = await this.address()
 
     chrome.windows.create({
-      url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${providerId}`,
+      url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${getProviderId()}`,
       type: 'popup',
       width,
       height
@@ -225,15 +233,12 @@ ExtensionProvider({
     console.log('created provider', provider)
     // Subscribe from postMessages from page
     chrome.runtime.onMessage.addListener((msg, sender) => {
-      console.log('msg: ', msg)
-      if (msg.data.providerId) {
-        console.log('DETECTED providerId', msg.data.providerId)
-        providerId = msg.data.providerId
-      }
       switch (msg.method) {
         case 'pageMessage':
           provider.processMessage(msg)
-
+          if (msg.data.providerId) {
+            setProviderId(msg.data.providerId)
+          }
           break
       }
     })

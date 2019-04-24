@@ -22,7 +22,6 @@ export class ExtensionSharePermissionPage {
     this.sdkId = this.navParams.get('sdkId')
     this.address = this.navParams.get('address')
     this.providerId = this.navParams.get('providerId')
-    console.log('SHARE PERMISSIONS providerId', this.providerId)
   }
 
   async shareWallet() {
@@ -33,7 +32,7 @@ export class ExtensionSharePermissionPage {
       id: 1,
       providerId: this.providerId
     })
-    // window.close()
+    window.close()
   }
 
   public dismiss() {
