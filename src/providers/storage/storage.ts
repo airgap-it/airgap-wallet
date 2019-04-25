@@ -10,7 +10,8 @@ export enum SettingsKey {
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
   EXCHANGE_INTEGRATION = 'exchangeIntroduction',
-  PUSH_INTRODUCTION = 'pushIntroduction'
+  PUSH_INTRODUCTION = 'pushIntroduction',
+  SDK_ID = 'sdkId'
 }
 
 /* TS 2.7 feature

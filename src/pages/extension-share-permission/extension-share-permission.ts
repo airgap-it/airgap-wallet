@@ -13,15 +13,7 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 })
 export class ExtensionSharePermissionPage {
   private sdkId: any
-  private address: any
-  private providerId: any
-
-  private rawWallet: any
-  private toAddress: any
-  private amount: any
-  private fee: any
   private data: any
-
   private nextAction: any
   constructor(
     public navController: NavController,
@@ -31,33 +23,24 @@ export class ExtensionSharePermissionPage {
     private operationsProvider: OperationsProvider
   ) {
     this.sdkId = this.navParams.get('sdkId')
-    this.address = this.navParams.get('address')
-    this.providerId = this.navParams.get('providerId')
-
-    this.rawWallet = this.navParams.get('wallet')
-    this.toAddress = this.navParams.get('toAddress')
-    this.amount = this.navParams.get('amount')
-    this.fee = this.navParams.get('fee')
     this.data = this.navParams.get('data')
-
     this.nextAction = this.navParams.get('nextAction')
-    console.log('PERMISSIONS', this.nextAction)
   }
 
   async shareWallet() {
-    console.log('shareWallet called')
+    this.webExtensionProvider.setSdkId(this.sdkId)
     await this.webExtensionProvider.postToContent({
       jsonrpc: '2.0',
       method: 'ae:walletDetail',
-      params: [this.sdkId, this.address, {}],
+      params: [this.sdkId, this.navParams.get('address'), {}],
       id: 1,
-      providerId: this.providerId
+      providerId: this.navParams.get('providerId')
     })
-    window.close()
+    this.dismiss()
   }
 
   public async prepareTransaction() {
-    let wallet = JSON.parse(this.rawWallet)
+    let wallet = JSON.parse(this.navParams.get('wallet'))
     let airGapWallet = new AirGapMarketWallet(
       wallet.protocolIdentifier,
       wallet.publicKey,
@@ -65,11 +48,16 @@ export class ExtensionSharePermissionPage {
       wallet.derivationPath,
       wallet.addressIndex
     )
-    const amount = new BigNumber(this.amount)
-    const fee = new BigNumber(this.fee)
+    const amount = new BigNumber(this.navParams.get('amount'))
+    const fee = new BigNumber(this.navParams.get('fee'))
 
     try {
-      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(airGapWallet, this.toAddress, amount, fee)
+      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(
+        airGapWallet,
+        this.navParams.get('toAddress'),
+        amount,
+        fee
+      )
 
       this.navController
         .push(TransactionQrPage, {

@@ -1,12 +1,7 @@
-import { transition } from '@angular/animations'
-
-import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
-import { configureScope } from '@sentry/browser'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Transactions } from './constants'
 import ExtensionProvider from '@aeternity/aepp-sdk/es/provider/extension'
 import Account from '@aeternity/aepp-sdk/es/account'
-import { resolve } from 'path'
-import BigNumber from 'bignumber.js'
 
 declare let chrome
 const height = 500
@@ -33,14 +28,6 @@ chrome.runtime.onMessage.addListener(async function(request) {
         width,
         height
       })
-      /*
-      chrome.windows.create({
-        url: 'confirmation.html?payload=' + serializedTx,
-        type: 'popup',
-        width,
-        height
-      })
-      */
       return true
     })
     return true
@@ -90,70 +77,9 @@ const accounts = [
   Account.compose({
     init() {},
     methods: {
-      /**
-       * Sign data blob
-       * @function sign
-       * @instance
-       * @abstract
-       * @category async
-       * @rtype (data: String) => data: Promise[String]
-       * @param {String} data - Data blob to sign
-       * @return {String} Signed data blob
-       */
       async sign(data) {
         console.log('we should sign data', data)
-        chrome.storage.local.get('selectedAccount', async function(storage) {
-          let airGapWallet = new AirGapMarketWallet(
-            storage.selectedAccount.protocolIdentifier,
-            storage.selectedAccount.publicKey,
-            storage.selectedAccount.isExtendedPublicKey,
-            storage.selectedAccount.derivationPath
-          )
-          const aeWallet = airGapWallet
-
-          const rawUnsignedTx = await aeWallet.coinProtocol.prepareTransactionFromPublicKey(
-            String(storage.selectedAccount.publicKey),
-            [data.recipientId],
-            data.amount,
-            data.fee
-          )
-          const identifier = aeWallet.coinProtocol.identifier
-          const publicKey = aeWallet.publicKey
-
-          rawUnsignedTx.transaction = encodeURIComponent(rawUnsignedTx.transaction)
-
-          chrome.windows.create({
-            url: `notification.html?identifier=${identifier}&publicKey=${publicKey}&rawUnsignedTx=${JSON.stringify(rawUnsignedTx)}`,
-            type: 'popup',
-            width,
-            height
-          })
-          /*
-          chrome.windows.create({
-            url: 'confirmation.html?payload=' + serializedTx,
-            type: 'popup',
-            width,
-            height
-          })
-          */
-          return true
-        })
-        // Send data to prepareTransactionScreen
-        // return signedDataFromVault
       },
-      /**
-       * Obtain account address
-       * @function address
-       * @instance
-       * @abstract
-       * @category async
-       * @rtype () => address: Promise[String]
-       * @return {String} Public account address
-       */
-      // async address() {
-      //   return 'ak_2dPGHd5dZgKwR234uqPZcAXXcCyxr3TbWwgV8NSnNincth4Lf7'
-      // }
-
       async address() {
         return new Promise(resolve => {
           let selectedAccount
@@ -196,12 +122,11 @@ function getProviderId() {
 ExtensionProvider({
   // Provide post function (default: window.postMessage)
   postFunction: postToContent,
-  // By default `ExtesionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
+  // By default `ExtensionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
   accounts: accounts,
-  // Hook for sdk registration
 
+  // Hook for sdk registration
   onSdkRegister: async function(sdk) {
-    console.log('SDK', sdk)
     const sdkId = sdk.sdkId
     const address = await this.address()
 
@@ -211,10 +136,6 @@ ExtensionProvider({
       width,
       height
     })
-
-    // sendDataToPopup(this.getSdks())
-    // createWindow()
-    // if (confirm('Do you want to share wallet with sdk ' + sdk.sdkId)) sdk.shareWallet() // SHARE WALLET WITH SDK
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
@@ -248,6 +169,7 @@ ExtensionProvider({
     chrome.runtime.onMessage.addListener((msg, sender) => {
       switch (msg.method) {
         case 'pageMessage':
+          console.log('MSG', msg)
           provider.processMessage(msg)
           if (msg.data.providerId) {
             setProviderId(msg.data.providerId)
