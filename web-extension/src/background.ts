@@ -169,7 +169,6 @@ ExtensionProvider({
     chrome.runtime.onMessage.addListener((msg, sender) => {
       switch (msg.method) {
         case 'pageMessage':
-          console.log('MSG', msg)
           provider.processMessage(msg)
           if (msg.data.providerId) {
             setProviderId(msg.data.providerId)
