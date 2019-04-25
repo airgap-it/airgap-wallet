@@ -2,7 +2,6 @@ import { SettingsKey, StorageProvider } from './../storage/storage'
 import { ErrorCategory, handleErrorSentry } from './../sentry-error-handler/sentry-error-handler'
 import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
-import { resolve } from 'url'
 
 declare let chrome
 declare let window
@@ -33,7 +32,7 @@ export class WebExtensionProvider {
     })
   }
 
-  // aeternity aepps
+  // aeternity: send message to extension
   postToContent(data) {
     return new Promise(resolve => {
       chrome.tabs.query({}, async function(tabs) {
@@ -46,15 +45,6 @@ export class WebExtensionProvider {
         )
         resolve()
       })
-    })
-  }
-
-  // aeternity aepps
-  confirmWalletShare() {
-    chrome.tabs.query({}, function(tabs) {
-      // TODO think about direct communication with tab
-      const message = { method: 'confirmWalletShare' }
-      tabs.forEach(({ id }) => chrome.tabs.sendMessage(id, message)) // Send message to all tabs
     })
   }
 

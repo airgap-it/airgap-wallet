@@ -77,13 +77,12 @@ const accounts = [
   Account.compose({
     init() {},
     methods: {
+      // we return the signedTx upon broadcasting the signedTx from the popup
       async sign(data) {
-        console.log('we should sign data', data)
         chrome.runtime.onMessage.addListener((msg, sender) => {
           switch (msg.method) {
             case 'pageMessage':
-              if (msg.data.signedTx) {
-                console.log('RETURN SIGNEDTX', msg.data.signedTx)
+              if (msg.data.signedTx && msg.method === 'signedTx') {
                 return msg.data.signedTx
               }
               break
@@ -135,11 +134,11 @@ ExtensionProvider({
   // By default `ExtensionProvider` use first account as default account. You can change active account using `selectAccount (address)` function
   accounts: accounts,
 
-  // Hook for sdk registration
+  // Hook for sdk registration, triggered by SDK
+  // opens popup to ask for permission to share wallet
   onSdkRegister: async function(sdk) {
     const sdkId = sdk.sdkId
     const address = await this.address()
-
     chrome.windows.create({
       url: `notification.html?sdkId=${sdkId}&address=${address}&providerId=${getProviderId()}&nextAction=${'shareWallet'}&extensionSharePermissions=${true}`,
       type: 'popup',
@@ -147,7 +146,15 @@ ExtensionProvider({
       height
     })
   },
-  // Hook for signing transaction
+
+  // Hook for signing transaction, triggered by SDK
+
+  /*
+   * we open popup and ask for signing permission. Upon receiving permission,
+   * we enter the prepareTransaction page. We scan the QR, sign it with the Vault
+   * and scan the resulting QR with the extension. Now we can confirm that we wish to broadcast the transaction
+   * Meanwhile we call sign() to listen for the broadcast confirmation
+   */
   onSign: function({ sdkId, tx, txObject, sign }) {
     sign()
     chrome.storage.local.get('selectedAccount', async function(storage) {
@@ -180,9 +187,9 @@ ExtensionProvider({
     chrome.runtime.onMessage.addListener((msg, sender) => {
       switch (msg.method) {
         case 'pageMessage':
-          console.log('msg: ', msg)
           provider.processMessage(msg)
           if (msg.data.providerId) {
+            // we have to forward the providerId to the popup later to allow for sharing the wallet information
             setProviderId(msg.data.providerId)
           }
           break

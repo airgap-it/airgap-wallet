@@ -9,8 +9,9 @@
   </ion-navbar>
 </ion-header>
 
+<!-- TODO: UI styling -->
 <ion-content padding no-bounce>
-  <h2 *ngIf="nextAction === 'shareWallet'">Do you want to share your wallet with the aepp?</h2>
+  <h2 *ngIf="nextAction === 'shareWallet'">Do you want to share your wallet with {{ sdkId }}?</h2>
 
   <h2 *ngIf="nextAction === 'prepareTransaction'">Do you want to sign the following data?:</h2>
   <p *ngIf="nextAction === 'prepareTransaction'">{{ data | json }}</p>
