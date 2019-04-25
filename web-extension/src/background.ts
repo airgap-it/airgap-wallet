@@ -79,6 +79,16 @@ const accounts = [
     methods: {
       async sign(data) {
         console.log('we should sign data', data)
+        chrome.runtime.onMessage.addListener((msg, sender) => {
+          switch (msg.method) {
+            case 'pageMessage':
+              if (msg.data.signedTx) {
+                console.log('RETURN SIGNEDTX', msg.data.signedTx)
+                return msg.data.signedTx
+              }
+              break
+          }
+        })
       },
       async address() {
         return new Promise(resolve => {
@@ -139,6 +149,7 @@ ExtensionProvider({
   },
   // Hook for signing transaction
   onSign: function({ sdkId, tx, txObject, sign }) {
+    sign()
     chrome.storage.local.get('selectedAccount', async function(storage) {
       let airGapWallet = new AirGapMarketWallet(
         storage.selectedAccount.protocolIdentifier,
@@ -169,6 +180,7 @@ ExtensionProvider({
     chrome.runtime.onMessage.addListener((msg, sender) => {
       switch (msg.method) {
         case 'pageMessage':
+          console.log('msg: ', msg)
           provider.processMessage(msg)
           if (msg.data.providerId) {
             setProviderId(msg.data.providerId)
