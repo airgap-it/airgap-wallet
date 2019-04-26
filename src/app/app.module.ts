@@ -1,4 +1,3 @@
-import { ExtensionSharePermissionPage } from './../pages/extension-share-permission/extension-share-permission'
 import { SelectWalletPage } from '../pages/select-wallet/select-wallet'
 import { Push } from '@ionic-native/push'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
@@ -107,7 +106,6 @@ export function createTranslateLoader(http: HttpClient) {
     DelegationBakerDetailPage,
     DisclaimerWebExtensionPage,
     ProtocolSelectPage,
-    ExtensionSharePermissionPage,
     IntroductionPushPage
   ],
   imports: [
@@ -169,7 +167,6 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountSelectPage,
     DisclaimerWebExtensionPage,
     ProtocolSelectPage,
-    ExtensionSharePermissionPage,
     IntroductionPushPage
   ],
   providers: [

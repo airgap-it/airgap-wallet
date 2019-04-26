@@ -94,10 +94,9 @@ export class DeepLinkProvider {
     let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
     let identifier = url.searchParams.get('identifier')
     console.log('publicKey', publicKey)
-    console.log('DEEPLINK rawUnsignedTx', rawUnsignedTx)
+    console.log('rawUnsignedTx', rawUnsignedTx)
     console.log('identifier', identifier)
 
-    rawUnsignedTx.transaction = decodeURIComponent(rawUnsignedTx.transaction)
     let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
     const airGapTx = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,

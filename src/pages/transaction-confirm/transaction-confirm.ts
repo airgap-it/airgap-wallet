@@ -1,4 +1,3 @@
-import { WebExtensionProvider } from './../../providers/web-extension/web-extension'
 import { Component } from '@angular/core'
 import { LoadingController, NavController, NavParams, ToastController, AlertController, Platform } from 'ionic-angular'
 
@@ -16,7 +15,6 @@ import { AccountProvider } from '../../providers/account/account.provider'
 import { ProtocolSymbols } from '../../providers/protocols/protocols'
 
 declare var cordova: any
-declare var chrome: any
 
 const SECOND = 1000
 const MINUTE = 60 * SECOND
@@ -44,7 +42,6 @@ export class TransactionConfirmPage {
     private alertCtrl: AlertController,
     private platform: Platform,
     private storageProvider: StorageProvider,
-    private webExtensionProvider: WebExtensionProvider,
     private accountProvider: AccountProvider
   ) {}
 
@@ -57,11 +54,10 @@ export class TransactionConfirmPage {
     this.signedTransactionSync = this.navParams.get('signedTransactionSync')
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
-    console.log('SIGNED TX', this.signedTx)
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
-  async broadcastTransaction() {
+  broadcastTransaction() {
     let loading = this.loadingCtrl.create({
       content: 'Broadcasting...'
     })
@@ -140,16 +136,6 @@ export class TransactionConfirmPage {
           date: new Date().getTime()
         }
         this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
-
-        // we send the signedTx to the extension, which forwards it to the aepp
-        if (this.webExtensionProvider.isWebExtension()) {
-          this.webExtensionProvider.postToContent({
-            jsonrpc: '2.0',
-            method: 'signedTx',
-            signedTx: this.signedTx,
-            id: null
-          })
-        }
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         let alert = this.alertCtrl.create({
