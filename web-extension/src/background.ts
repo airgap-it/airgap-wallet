@@ -4,8 +4,8 @@ import ExtensionProvider from '@aeternity/aepp-sdk/es/provider/extension'
 import Account from '@aeternity/aepp-sdk/es/account'
 
 declare let chrome
-const height = 500
-const width = 333
+const height = 750
+const width = 450
 let providerId
 
 chrome.runtime.onMessage.addListener(async function(request) {
@@ -95,16 +95,16 @@ const accounts = [
           chrome.storage.local.get('selectedAccount', function(result) {
             if (result) {
               selectedAccount = result.selectedAccount
-            }
-          })
 
-          chrome.storage.local.get('wallets', async function(result) {
-            let wallets = await result.wallets
-            wallets.forEach(wallet => {
-              if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
-                resolve(wallet.addresses[0])
-              }
-            })
+              chrome.storage.local.get('wallets', async function(result) {
+                let wallets = await result.wallets
+                wallets.forEach(wallet => {
+                  if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
+                    resolve(wallet.addresses[0])
+                  }
+                })
+              })
+            }
           })
         })
       }

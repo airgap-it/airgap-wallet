@@ -23,7 +23,7 @@ export class ExtensionSharePermissionPage {
     private operationsProvider: OperationsProvider
   ) {
     this.sdkId = this.navParams.get('sdkId')
-    this.data = this.navParams.get('data')
+    this.data = JSON.parse(this.navParams.get('data'))
     this.nextAction = this.navParams.get('nextAction')
   }
 
