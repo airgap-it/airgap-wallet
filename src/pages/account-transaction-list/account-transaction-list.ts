@@ -1,3 +1,4 @@
+import { WebExtensionProvider } from './../../providers/web-extension/web-extension'
 import { Component } from '@angular/core'
 import { IAirGapTransaction, AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
 import { Platform, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular'
@@ -59,6 +60,7 @@ export class AccountTransactionListPage {
   }
 
   private TRANSACTION_LIMIT = 10
+  private isActive: boolean
 
   constructor(
     public navCtrl: NavController,
@@ -66,6 +68,7 @@ export class AccountTransactionListPage {
     public popoverCtrl: PopoverController,
     public accountProvider: AccountProvider,
     public http: HttpClient,
+    private webExtensionProvider: WebExtensionProvider,
     private platform: Platform,
     private operationsProvider: OperationsProvider,
     private storageProvider: StorageProvider,
@@ -122,6 +125,18 @@ export class AccountTransactionListPage {
       lastTx.date > new Date().getTime() - 5 * 60 * 1000
     ) {
       this.hasPendingTransactions = true
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.webExtensionProvider.isWebExtension()) {
+      this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
+        if (this.wallet && activeAccount) {
+          this.isActive = this.accountProvider.isSameWallet(this.wallet, activeAccount)
+        } else {
+          this.isActive = false
+        }
+      })
     }
   }
 
@@ -411,5 +426,9 @@ export class AccountTransactionListPage {
     this.navCtrl
       .push(SubAccountAddPage, { subProtocolType: subProtocolType, wallet: wallet })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public activateAccount() {
+    this.accountProvider.changeActiveAccount(this.wallet)
   }
 }

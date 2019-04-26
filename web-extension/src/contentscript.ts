@@ -1,4 +1,7 @@
+import { toDataUrl } from 'myetherwallet-blockies'
 import { Transactions } from './constants'
+import ExtensionProvider from '@aeternity/aepp-sdk/es/provider/extension'
+import Account from '@aeternity/aepp-sdk/es/account'
 
 declare let chrome
 
@@ -19,7 +22,6 @@ window.addEventListener('message', function(event) {
   if (event.source !== window) {
     return
   }
-
   if (event.data.type === Transactions.INCOMING_TRANSACTION) {
     // we got a transaction and have to prepare it, therefore we resend it to the background.js to create a new window etc. accordingly
     event.data.type = Transactions.OUTGOING_TRANSACTION
@@ -41,13 +43,31 @@ window.addEventListener('message', function(event) {
       wallets.forEach(wallet => {
         if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
           let responseAddress = wallet.addresses[0]
-          ;(event.source as any).postMessage({ type: Transactions.ADDRESSES_RESPONSE, addresses: responseAddress }, event.origin)
+          event.source.postMessage({ type: Transactions.ADDRESSES_RESPONSE, addresses: responseAddress }, event.origin)
         }
       })
     })
   }
 })
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log(request.data)
-})
+// FOR AETERNITY AEPPS
+// Subscribe from postMessages from page
+const readyStateCheckInterval = setInterval(function() {
+  if (document.readyState === 'complete') {
+    clearInterval(readyStateCheckInterval)
+
+    window.addEventListener(
+      'message',
+      ({ data }) => {
+        // Handle message from page and redirect to background script
+        chrome.runtime.sendMessage({ method: 'pageMessage', data })
+      },
+      false
+    )
+
+    // Handle message from background and redirect to page
+    chrome.runtime.onMessage.addListener(({ data }, sender) => {
+      window.postMessage(data, '*')
+    })
+  }
+}, 10)

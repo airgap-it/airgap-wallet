@@ -6,6 +6,10 @@
     "build": "tsc && webpack"
   },
   "dependencies": {
+    "@aeternity/aepp-sdk": "https://github.com/aeternity/aepp-sdk-js#feature/identity-provider-PoC",
+    "big-number": "^2.0.0",
+    "bignumber": "^1.1.0",
+    "bignumber.js": "^8.0.0",
     "web3": "^1.0.0-beta.36",
     "web3-provider-engine": "^14.0.6"
   },
