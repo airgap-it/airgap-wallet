@@ -1,7 +1,6 @@
 {
   "account-transaction-list": {
     "title": "Account",
-    "activate": "Activate Account",
     "transactions_label": "Transactions",
     "add-tokens_label": "Add Tokens",
     "import-accounts_label": "Import Accounts",

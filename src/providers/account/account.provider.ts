@@ -245,14 +245,7 @@ export class AccountProvider {
   }
 
   private async loadActiveAccountFromStorage() {
-    const rawWallet = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
-    let wallet = new AirGapMarketWallet(
-      rawWallet.protocolIdentifier,
-      rawWallet.publicKey,
-      rawWallet.isExtendedPublicKey,
-      rawWallet.derivationPath,
-      rawWallet.addressIndex
-    )
+    const wallet = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
     this.activeAccount = wallet
     this.persistActiveAccount()
     this.publishActiveAccount(wallet)
