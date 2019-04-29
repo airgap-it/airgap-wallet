@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core'
 import { NavController, NavParams, Platform, Slides } from 'ionic-angular'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { DeepLinkProvider } from '../../providers/deep-link/deep-link'
-import { handleErrorSentry, ErrorCategory } from 'src/providers/sentry-error-handler/sentry-error-handler'
+import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 
 const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
 
