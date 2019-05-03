@@ -2,7 +2,14 @@ import { SelectWalletPage } from '../../pages/select-wallet/select-wallet'
 import { AccountProvider } from '../account/account.provider'
 import { Injectable } from '@angular/core'
 import { AlertController, AlertButton, App, NavController } from 'ionic-angular'
-import { DeserializedSyncProtocol, SyncProtocolUtils, EncodedType, SyncWalletRequest, AirGapMarketWallet } from 'airgap-coin-lib'
+import {
+  DeserializedSyncProtocol,
+  SyncProtocolUtils,
+  EncodedType,
+  SyncWalletRequest,
+  AirGapMarketWallet,
+  supportedProtocols
+} from 'airgap-coin-lib'
 import { AccountImportPage } from '../../pages/account-import/account-import'
 import { TransactionConfirmPage } from '../../pages/transaction-confirm/transaction-confirm'
 import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
@@ -45,26 +52,64 @@ export class SchemeRoutingProvider {
       let data = rawString // Fallback to support raw data QRs
       data = url.searchParams.get('d')
 
-      try {
-        const deserializedSync = await syncProtocol.deserialize(data)
+      // try {
+      const deserializedSync = await syncProtocol.deserialize(data)
 
-        if (deserializedSync.type in EncodedType) {
-          // Only handle types that we know
-          return this.syncSchemeHandlers[deserializedSync.type](deserializedSync, scanAgainCallback)
-        } else {
-          return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
-        }
-      } catch (error) {
+      if (deserializedSync.type in EncodedType) {
+        // Only handle types that we know
+        return this.syncSchemeHandlers[deserializedSync.type](deserializedSync, scanAgainCallback)
+      } else {
+        return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
+      }
+      // }
+      /* Temporarily comment out to catch bitcoin:xxx cases 
+      catch (error) {
         console.error('Deserialization of sync failed', error)
       }
+      */
     } catch (error) {
       console.warn(error)
 
-      const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(rawString)
-      if (compatibleWallets.length > 0) {
-        this.navController
-          .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
-          .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      const splits = rawString.split(':')
+      if (splits.length > 1) {
+        const wallets = this.accountProvider.getWalletList()
+        for (const protocol of supportedProtocols()) {
+          if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
+            const partition = <T>(array: T[], isValid: (element: T) => boolean): [T[], T[]] => {
+              const pass: T[] = []
+              const fail: T[] = []
+              array.forEach(element => {
+                if (isValid(element)) {
+                  pass.push(element)
+                } else {
+                  fail.push(element)
+                }
+              })
+              return [pass, fail]
+            }
+
+            const [compatibleWallets, incompatibleWallets] = partition(
+              wallets,
+              (wallet: AirGapMarketWallet) => wallet.protocolIdentifier === protocol.identifier
+            )
+
+            if (compatibleWallets.length > 0) {
+              this.navController
+                .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
+                .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            }
+            break
+          }
+        }
+      } else {
+        const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(
+          rawString
+        )
+        if (compatibleWallets.length > 0) {
+          this.navController
+            .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
+            .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        }
       }
     }
   }
