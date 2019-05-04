@@ -6,6 +6,7 @@
     "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
+    "vote_label": "Vote",
     "delegation-status_label": "Delegation",
     "pending-transactions": {
       "label":  "Pending Transactions",

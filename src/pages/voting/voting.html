@@ -1,0 +1,43 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whiteSecondaryContrast">
+    <ion-title>Vote</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-row justify-content-center align-items-center class="row--height__100">
+    <ion-col>
+      <h3 padding-horizontal>Block Reward Initiative (BRI)</h3>
+      <img src="../assets/img/vote.svg" />
+      <p>
+        To transform aeternity into a self-sustaining platform, we propose the Block Reward Initiative (BRI), through which ~0-20% of miner
+        rewards will be allocated to development.
+      </p>
+      <h5>Further Information</h5>
+      <p>
+        <a href="https://blog.aeternity.com/aeternity-first-on-chain-governance-vote-decentralization-2-0-5e0c8a01891a">
+          Detailed Explanation in Blog Post
+        </a>
+        <br />
+        <a href="https://forum.aeternity.com/t/discussion-block-reward-initiative-and-first-on-chain-governance-vote/3278">
+          Community Discussion in Forum
+        </a>
+      </p>
+      <p>
+        To check your vote, please visit
+        <a href="https://aeternity.com">the official voting page</a>
+      </p>
+
+      <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" color="secondary">
+        <ion-label range-left>0%</ion-label>
+        <ion-label range-right>20%</ion-label>
+      </ion-range>
+
+      <p>Your vote: {{ votePercentage }}%</p>
+
+      <button round ion-button color="primary" (click)="vote()">
+        Vote
+      </button>
+    </ion-col>
+  </ion-row>
+</ion-content>

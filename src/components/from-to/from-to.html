@@ -29,5 +29,9 @@
     </ion-col>
   </ion-row>
 
+  <ion-row>
+    {{ transaction.data }}
+  </ion-row>
+
   <address-row *ngFor="let address of transaction.to" [address]="address" label="{{ 'from-to.to_label' | translate }}"></address-row>
 </ng-container>
