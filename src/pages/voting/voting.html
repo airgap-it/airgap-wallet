@@ -5,9 +5,9 @@
 </ion-header>
 
 <ion-content padding>
-  <h3>{{ 'voting.heading' | translate }}</h3>
+  <h3 no-margin>{{ 'voting.heading' | translate }}</h3>
 
-  <p *ngIf="config">
+  <p *ngIf="config" no-margin padding-bottom>
     Vote from
     <strong>
       {{ config?.startDate | amFromUnix | date: 'longDate' }}
