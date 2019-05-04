@@ -13,6 +13,22 @@
     {{ 'voting.text' | translate }}
   </p>
 
+  <p *ngIf="config?.showSelfVoted && oldVotePercentage">
+    <strong>Your last vote: {{ oldVotePercentage }}%</strong>
+  </p>
+
+  <p *ngIf="config">
+    Vote from:
+    <strong>
+      {{ config?.startDate | amFromUnix | date: 'longDate' }}
+    </strong>
+    <br />
+    Vote to:
+    <strong>
+      {{ config?.endDate | amFromUnix | date: 'longDate' }}
+    </strong>
+  </p>
+
   <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
     <ion-label range-left>0%</ion-label>
     <ion-label range-right>20%</ion-label>
@@ -21,24 +37,24 @@
     <strong [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"></strong>
   </p>
 
-  <h6 padding-top>{{ 'voting.further-information.heading' | translate }}</h6>
+  <h6 padding-top margin-bottom>{{ 'voting.further-information.heading' | translate }}</h6>
   <p>
-    <a href="https://blog.aeternity.com/aeternity-first-on-chain-governance-vote-decentralization-2-0-5e0c8a01891a">
+    <a href="#" (click)="openUrl('https://blog.aeternity.com/aeternity-first-on-chain-governance-vote-decentralization-2-0-5e0c8a01891a')">
       {{ 'voting.further-information.blog-post_label' | translate }}
       <ion-icon md-name="open_in_new"></ion-icon>
     </a>
     <br />
-    <a href="https://forum.aeternity.com/t/discussion-block-reward-initiative-and-first-on-chain-governance-vote/3278">
+    <a
+      href="#"
+      (click)="openUrl('https://forum.aeternity.com/t/discussion-block-reward-initiative-and-first-on-chain-governance-vote/3278')"
+    >
       {{ 'voting.further-information.forum_label' | translate }}
       <ion-icon md-name="open_in_new"></ion-icon>
     </a>
   </p>
-  <ion-row padding-bottom margin-bottom>
-    <p padding-bottom [innerHTML]="'voting.further-information.result_label' | translate"></p>
-  </ion-row>
 
   <ion-fab right bottom>
-    <button round ion-button color="primary" (click)="vote()">
+    <button round ion-button color="primary" [disabled]="!config?.enabled" (click)="vote()">
       {{ 'voting.vote_label' | translate }}
     </button>
   </ion-fab>
