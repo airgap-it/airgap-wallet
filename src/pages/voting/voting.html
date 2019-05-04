@@ -29,12 +29,13 @@
     <strong>Your last vote: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
   </p>
 
-  <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
+  <ion-range [disabled]="!config?.enabled" min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
     <ion-label range-left>0%</ion-label>
     <ion-label range-right>20%</ion-label>
   </ion-range>
   <p>
-    <strong [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"></strong>
+    <strong *ngIf="config?.enabled" [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"></strong>
+    <strong *ngIf="!config?.enabled">Voting is currently disabled</strong>
   </p>
 
   <h6 padding-top margin-bottom>{{ 'voting.further-information.heading' | translate }}</h6>
