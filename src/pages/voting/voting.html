@@ -6,6 +6,18 @@
 
 <ion-content padding>
   <h3>{{ 'voting.heading' | translate }}</h3>
+
+  <p *ngIf="config">
+    Vote from
+    <strong>
+      {{ config?.startDate | amFromUnix | date: 'longDate' }}
+    </strong>
+    to
+    <strong>
+      {{ config?.endDate | amFromUnix | date: 'longDate' }}
+    </strong>
+  </p>
+
   <ion-row justify-content-center>
     <img src="../assets/img/vote.svg" />
   </ion-row>
@@ -15,18 +27,6 @@
 
   <p *ngIf="config?.showSelfVoted && oldVotePercentage">
     <strong>Your last vote: {{ oldVotePercentage }}%</strong>
-  </p>
-
-  <p *ngIf="config">
-    Vote from:
-    <strong>
-      {{ config?.startDate | amFromUnix | date: 'longDate' }}
-    </strong>
-    <br />
-    Vote to:
-    <strong>
-      {{ config?.endDate | amFromUnix | date: 'longDate' }}
-    </strong>
   </p>
 
   <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
