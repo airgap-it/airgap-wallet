@@ -220,6 +220,7 @@
     "amount_label": "Amount",
     "fee_label": "Fee",
     "time_label": "Time",
+    "data_label": "Data",
     "from_label": "From",
     "to_label": "To"
   },
