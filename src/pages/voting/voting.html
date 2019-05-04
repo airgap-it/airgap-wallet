@@ -1,17 +1,16 @@
 <ion-header no-border no-shadow>
   <ion-navbar color="whiteSecondaryContrast">
-    <ion-title>Voting</ion-title>
+    <ion-title>{{ 'voting.title' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h3>Block Reward Initiative (BRI)</h3>
+  <h3>{{ 'voting.heading' | translate }}</h3>
   <ion-row justify-content-center>
     <img src="../assets/img/vote.svg" />
   </ion-row>
   <p>
-    To transform aeternity into a self-sustaining platform, we propose the Block Reward Initiative (BRI), through which ~0-20% of miner
-    rewards will be allocated to development.
+    {{ 'voting.text' | translate }}
   </p>
 
   <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
@@ -19,34 +18,28 @@
     <ion-label range-right>20%</ion-label>
   </ion-range>
   <p>
-    <strong>Your vote: {{ votePercentage }}%</strong>
+    <strong [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"></strong>
   </p>
 
-  <h6 padding-top>Further Information</h6>
+  <h6 padding-top>{{ 'voting.further-information.heading' | translate }}</h6>
   <p>
     <a href="https://blog.aeternity.com/aeternity-first-on-chain-governance-vote-decentralization-2-0-5e0c8a01891a">
-      Detailed Explanation in Blog Post
+      {{ 'voting.further-information.blog-post_label' | translate }}
       <ion-icon md-name="open_in_new"></ion-icon>
     </a>
     <br />
     <a href="https://forum.aeternity.com/t/discussion-block-reward-initiative-and-first-on-chain-governance-vote/3278">
-      Community Discussion in Forum
+      {{ 'voting.further-information.forum_label' | translate }}
       <ion-icon md-name="open_in_new"></ion-icon>
     </a>
   </p>
   <ion-row padding-bottom margin-bottom>
-    <p padding-bottom>
-      To check your vote, please visit
-      <a href="https://aeternity.com">
-        the official voting page
-        <ion-icon md-name="open_in_new"></ion-icon>
-      </a>
-    </p>
+    <p padding-bottom [innerHTML]="'voting.further-information.result_label' | translate"></p>
   </ion-row>
 
   <ion-fab right bottom>
     <button round ion-button color="primary" (click)="vote()">
-      Vote
+      {{ 'voting.vote_label' | translate }}
     </button>
   </ion-fab>
 </ion-content>
