@@ -25,8 +25,8 @@
     {{ 'voting.text' | translate }}
   </p>
 
-  <p *ngIf="config?.showSelfVoted && oldVotePercentage">
-    <strong>Your last vote: {{ oldVotePercentage }}%</strong>
+  <p *ngIf="config?.showSelfVoted && oldVotePercentage && oldVoteTimestamp">
+    <strong>Your last vote: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
   </p>
 
   <ion-range min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>

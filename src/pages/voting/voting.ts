@@ -15,6 +15,7 @@ declare let cordova
 })
 export class VotingPage {
   public oldVotePercentage: number
+  public oldVoteTimestamp: number
   public config: AeFirstVote
   public wallet: AirGapMarketWallet
 
@@ -43,6 +44,7 @@ export class VotingPage {
           try {
             console.log(JSON.parse(oldVote.data))
             this.oldVotePercentage = JSON.parse(oldVote.data).vote.option
+            this.oldVoteTimestamp = oldVote.timestamp
           } catch (error) {
             console.log(error)
           }
