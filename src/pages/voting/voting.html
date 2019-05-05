@@ -34,7 +34,11 @@
     <ion-label range-right>20%</ion-label>
   </ion-range>
   <p>
-    <strong *ngIf="config?.enabled" [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"></strong>
+    <strong
+      *ngIf="config?.enabled && votePercentage > 0"
+      [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"
+    ></strong>
+    <strong *ngIf="config?.enabled && votePercentage === 0">I am NOT supporting the BRI</strong>
     <strong *ngIf="!config?.enabled">Voting is currently disabled</strong>
   </p>
 
