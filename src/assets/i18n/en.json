@@ -6,6 +6,7 @@
     "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
+    "vote_label": "Voting",
     "delegation-status_label": "Delegation",
     "pending-transactions": {
       "label":  "Pending Transactions",
@@ -219,6 +220,7 @@
     "amount_label": "Amount",
     "fee_label": "Fee",
     "time_label": "Time",
+    "data_label": "Data",
     "from_label": "From",
     "to_label": "To"
   },
@@ -361,5 +363,18 @@
     "heading": "You can receive push notifications if your accounts receive transactions.",
     "description": "First you have to grant AirGap Wallet the push notification permission.",
     "grant-permission_label": "Grant Permission"
+  },
+  "voting": {
+    "title": "Voting",
+    "heading": "Block Reward Initiative (BRI)",
+    "text": "To transform aeternity into a self-sustaining platform, we propose the Block Reward Initiative (BRI), through which ~0-20% of miner rewards will be allocated to development.",
+    "your-vote_label": "Your vote: {{ votePercentage }}%",
+    "further-information": {
+      "heading": "Further Information",
+      "blog-post_label": "Detailed Explanation in Blog Post",
+      "forum_label": "Community Discussion in Forum",
+      "result_label": "To check your vote, please visit <a href=\"https://aeternity.com\"> the official voting page</a>"
+    },
+    "vote_label": "Vote"
   }
 }

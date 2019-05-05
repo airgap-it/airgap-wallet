@@ -1,0 +1,66 @@
+<ion-header no-border no-shadow>
+  <ion-navbar color="whiteSecondaryContrast">
+    <ion-title>{{ 'voting.title' | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h3 no-margin>{{ 'voting.heading' | translate }}</h3>
+
+  <p *ngIf="config" no-margin padding-bottom>
+    Vote from
+    <strong>
+      {{ config?.startDate | amFromUnix | date: 'longDate' }}
+    </strong>
+    to
+    <strong>
+      {{ config?.endDate | amFromUnix | date: 'longDate' }}
+    </strong>
+  </p>
+
+  <ion-row justify-content-center>
+    <img src="../assets/img/vote.svg" />
+  </ion-row>
+  <p>
+    {{ 'voting.text' | translate }}
+  </p>
+
+  <p *ngIf="config?.showSelfVoted && oldVotePercentage && oldVoteTimestamp">
+    <strong>Your last vote: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
+  </p>
+
+  <ion-range [disabled]="!config?.enabled" min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
+    <ion-label range-left>0%</ion-label>
+    <ion-label range-right>20%</ion-label>
+  </ion-range>
+  <p>
+    <strong
+      *ngIf="config?.enabled && votePercentage > 0"
+      [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"
+    ></strong>
+    <strong *ngIf="config?.enabled && votePercentage === 0">I am NOT supporting the BRI</strong>
+    <strong *ngIf="!config?.enabled">Voting is currently disabled</strong>
+  </p>
+
+  <h6 padding-top margin-bottom>{{ 'voting.further-information.heading' | translate }}</h6>
+  <p>
+    <a href="#" (click)="openUrl('https://blog.aeternity.com/aeternity-first-on-chain-governance-vote-decentralization-2-0-5e0c8a01891a')">
+      {{ 'voting.further-information.blog-post_label' | translate }}
+      <ion-icon md-name="open_in_new"></ion-icon>
+    </a>
+    <br />
+    <a
+      href="#"
+      (click)="openUrl('https://forum.aeternity.com/t/discussion-block-reward-initiative-and-first-on-chain-governance-vote/3278')"
+    >
+      {{ 'voting.further-information.forum_label' | translate }}
+      <ion-icon md-name="open_in_new"></ion-icon>
+    </a>
+  </p>
+
+  <ion-fab right bottom>
+    <button round ion-button color="primary" [disabled]="!config?.enabled" (click)="vote()">
+      {{ 'voting.vote_label' | translate }}
+    </button>
+  </ion-fab>
+</ion-content>

@@ -16,6 +16,13 @@ export interface BakerConfig {
   }
 }
 
+export interface AeFirstVote {
+  enabled: boolean
+  showSelfVoted: boolean
+  startDate: number
+  endDate: number
+}
+
 @Injectable()
 export class RemoteConfigProvider {
   constructor(private readonly httpClient: HttpClient) {}
@@ -36,5 +43,20 @@ export class RemoteConfigProvider {
         }
       }
     })
+  }
+
+  async aeFirstVote(): Promise<AeFirstVote> {
+    return this.httpClient
+      .get<AeFirstVote>(`${CONFIG_BACKEND}config/ae/firstVote`)
+      .toPromise()
+      .catch(error => {
+        handleErrorSentry(ErrorCategory.OTHER)(error)
+        return {
+          enabled: false,
+          showSelfVoted: false,
+          startDate: 1557208800,
+          endDate: 1557813600
+        }
+      })
   }
 }

@@ -16,6 +16,7 @@ import { OperationsProvider, ActionType } from '../../providers/operations/opera
 import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { ProtocolSymbols } from '../../providers/protocols/protocols'
+import { VotingPage } from '../voting/voting'
 
 interface CoinAction {
   type: ActionType
@@ -103,6 +104,8 @@ export class AccountTransactionListPage {
         this.actions.push(this.getAddTokenAction())
       } else if (action === ActionType.DELEGATE) {
         this.actions.push(this.getDelegateAction())
+      } else if (action === ActionType.VOTE) {
+        this.actions.push(this.getVoteAction())
       } else {
         const assertNever = (x: never) => undefined
         assertNever(action)
@@ -166,6 +169,17 @@ export class AccountTransactionListPage {
       icon: 'logo-usd',
       action: async () => {
         this.openDelegateSelection()
+      }
+    }
+  }
+
+  private getVoteAction(): CoinAction {
+    return {
+      type: ActionType.VOTE,
+      name: 'account-transaction-list.vote_label',
+      icon: 'archive',
+      action: async () => {
+        this.openVotePage()
       }
     }
   }
@@ -395,6 +409,14 @@ export class AccountTransactionListPage {
     this.navCtrl
       .push(DelegationBakerDetailPage, {
         wallet: wallet || this.wallet
+      })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  openVotePage() {
+    this.navCtrl
+      .push(VotingPage, {
+        wallet: this.wallet
       })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

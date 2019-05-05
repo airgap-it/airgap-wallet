@@ -70,6 +70,7 @@ import { ProtocolSelectPage } from '../pages/protocol-select/protocol-select'
 import { IntroductionPushPage } from '../pages/introduction-push/introduction-push'
 import { PushProvider } from '../providers/push/push'
 import { PushBackendProvider } from '../providers/push-backend/push-backend'
+import { VotingPage } from '../pages/voting/voting'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -106,7 +107,8 @@ export function createTranslateLoader(http: HttpClient) {
     DelegationBakerDetailPage,
     DisclaimerWebExtensionPage,
     ProtocolSelectPage,
-    IntroductionPushPage
+    IntroductionPushPage,
+    VotingPage
   ],
   imports: [
     BrowserModule,
@@ -167,7 +169,8 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountSelectPage,
     DisclaimerWebExtensionPage,
     ProtocolSelectPage,
-    IntroductionPushPage
+    IntroductionPushPage,
+    VotingPage
   ],
   providers: [
     StatusBar,

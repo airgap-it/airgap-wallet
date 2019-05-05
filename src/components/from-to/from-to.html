@@ -26,6 +26,13 @@
           {{ transaction.timestamp | amFromUnix | amCalendar: { sameDay: '[Today at] HH:mm', sameElse: 'HH:mm [on] LL' } }}
         </div>
       </ng-container>
+
+      <ng-container *ngIf="transaction.data">
+        <ion-label stacked class="typography--uppercase">{{ 'from-to.data_label' | translate }}</ion-label>
+        <div item-content>
+          {{ transaction.data }}
+        </div>
+      </ng-container>
     </ion-col>
   </ion-row>
 
