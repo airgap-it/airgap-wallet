@@ -30,6 +30,10 @@ export class ScanPage extends ScanBasePage {
   checkScan(resultString: string) {
     console.log('got new text', resultString)
 
-    this.schemeRouting.handleNewSyncRequest(this.navCtrl, resultString).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+    this.schemeRouting
+      .handleNewSyncRequest(this.navCtrl, resultString, () => {
+        this.startScan()
+      })
+      .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
   }
 }

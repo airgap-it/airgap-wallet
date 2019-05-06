@@ -72,9 +72,11 @@ export class SchemeRoutingProvider {
 
       const splits = rawString.split(':')
       if (splits.length > 1) {
+        const [address] = splits[0].split('?')
         const wallets = this.accountProvider.getWalletList()
         for (const protocol of supportedProtocols()) {
-          if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
+          if (address.toLowerCase() === protocol.symbol.toLowerCase() || address.toLowerCase() === protocol.name.toLowerCase()) {
+            // TODO: Move to utils
             const partition = <T>(array: T[], isValid: (element: T) => boolean): [T[], T[]] => {
               const pass: T[] = []
               const fail: T[] = []
