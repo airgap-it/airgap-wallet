@@ -25,9 +25,9 @@
     {{ 'voting.text' | translate }}
   </p>
 
-  <p *ngIf="config?.showSelfVoted && oldVotePercentage && oldVoteTimestamp">
-    <strong>Your last vote: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
-  </p>
+  <h5 *ngIf="config?.showSelfVoted && oldVotePercentage && oldVoteTimestamp">
+    <strong>You've voted: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
+  </h5>
 
   <ion-range [disabled]="!config?.enabled" min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
     <ion-label range-left>0%</ion-label>
@@ -59,6 +59,9 @@
   </p>
 
   <ion-fab right bottom>
+    <button round ion-button color="white" [disabled]="!config?.enabled">
+      {{ 'voting.change-vote_label' | translate }}
+    </button>
     <button round ion-button color="primary" [disabled]="!config?.enabled" (click)="vote()">
       {{ 'voting.vote_label' | translate }}
     </button>

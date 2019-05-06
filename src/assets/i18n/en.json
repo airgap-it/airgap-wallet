@@ -375,6 +375,7 @@
       "forum_label": "Community Discussion in Forum",
       "result_label": "To check your vote, please visit <a href=\"https://aeternity.com\"> the official voting page</a>"
     },
-    "vote_label": "Vote"
+    "vote_label": "Vote",
+    "change-vote_label": "Change Vote"
   }
 }
