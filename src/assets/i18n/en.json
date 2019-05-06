@@ -376,6 +376,7 @@
       "result_label": "To check your vote, please visit <a href=\"https://aeternity.com\"> the official voting page</a>"
     },
     "vote_label": "Vote",
-    "change-vote_label": "Change Vote"
+    "change-vote_label": "Change Vote",
+    "done_label": "Done"
   }
 }

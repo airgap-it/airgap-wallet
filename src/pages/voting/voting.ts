@@ -19,6 +19,8 @@ export class VotingPage {
   public config: AeFirstVote
   public wallet: AirGapMarketWallet
 
+  public voting: boolean = true
+
   public votePercentage: number = 10
   public votingAddress: string = 'ak_11111111111111111111111111111111273Yts'
 
@@ -45,6 +47,7 @@ export class VotingPage {
             console.log(JSON.parse(oldVote.data))
             this.oldVotePercentage = JSON.parse(oldVote.data).vote.option
             this.oldVoteTimestamp = oldVote.timestamp
+            this.voting = false
           } catch (error) {
             console.log(error)
           }
@@ -61,7 +64,14 @@ export class VotingPage {
     }
   }
 
+  public changeVote() {
+    this.voting = true
+  }
+
   public async vote() {
+    if (!this.voting) {
+      return this.navCtrl.pop()
+    }
     try {
       const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,

@@ -25,22 +25,24 @@
     {{ 'voting.text' | translate }}
   </p>
 
-  <h5 *ngIf="config?.showSelfVoted && oldVotePercentage && oldVoteTimestamp">
+  <h5 *ngIf="config?.showSelfVoted && oldVoteTimestamp">
     <strong>You've voted: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
   </h5>
 
-  <ion-range [disabled]="!config?.enabled" min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
-    <ion-label range-left>0%</ion-label>
-    <ion-label range-right>20%</ion-label>
-  </ion-range>
-  <p>
-    <strong
-      *ngIf="config?.enabled && votePercentage > 0"
-      [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"
-    ></strong>
-    <strong *ngIf="config?.enabled && votePercentage === 0">I am NOT supporting the BRI</strong>
-    <strong *ngIf="!config?.enabled">Voting is currently disabled</strong>
-  </p>
+  <ng-container *ngIf="voting">
+    <ion-range [disabled]="!config?.enabled" min="0" max="20" [(ngModel)]="votePercentage" [snaps]="true" [pin]="true" no-padding>
+      <ion-label range-left>0%</ion-label>
+      <ion-label range-right>20%</ion-label>
+    </ion-range>
+    <p>
+      <strong
+        *ngIf="config?.enabled && votePercentage > 0"
+        [innerHTML]="'voting.your-vote_label' | translate: { votePercentage: votePercentage }"
+      ></strong>
+      <strong *ngIf="config?.enabled && votePercentage === 0">I am NOT supporting the BRI</strong>
+      <strong *ngIf="!config?.enabled">Voting is currently disabled</strong>
+    </p>
+  </ng-container>
 
   <h6 padding-top margin-bottom>{{ 'voting.further-information.heading' | translate }}</h6>
   <p>
@@ -59,11 +61,12 @@
   </p>
 
   <ion-fab right bottom>
-    <button round ion-button color="white" [disabled]="!config?.enabled">
+    <button *ngIf="config?.enabled && !voting" (click)="changeVote()" round ion-button color="white">
       {{ 'voting.change-vote_label' | translate }}
     </button>
     <button round ion-button color="primary" [disabled]="!config?.enabled" (click)="vote()">
-      {{ 'voting.vote_label' | translate }}
+      <ng-container *ngIf="voting">{{ 'voting.vote_label' | translate }}</ng-container>
+      <ng-container *ngIf="!voting">{{ 'voting.done_label' | translate }}</ng-container>
     </button>
   </ion-fab>
 </ion-content>
