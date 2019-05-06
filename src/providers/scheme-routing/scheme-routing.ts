@@ -62,7 +62,7 @@ export class SchemeRoutingProvider {
         return this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback)
       }
       // }
-      /* Temporarily comment out to catch bitcoin:xxx cases 
+      /* Temporarily comment out to catch bitcoin:xxx cases
       catch (error) {
         console.error('Deserialization of sync failed', error)
       }
@@ -72,10 +72,11 @@ export class SchemeRoutingProvider {
 
       const splits = rawString.split(':')
       if (splits.length > 1) {
-        const [address] = splits[0].split('?')
+        const [address] = splits[1].split('?')
         const wallets = this.accountProvider.getWalletList()
+        let foundMatch = false
         for (const protocol of supportedProtocols()) {
-          if (address.toLowerCase() === protocol.symbol.toLowerCase() || address.toLowerCase() === protocol.name.toLowerCase()) {
+          if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
             // TODO: Move to utils
             const partition = <T>(array: T[], isValid: (element: T) => boolean): [T[], T[]] => {
               const pass: T[] = []
@@ -96,12 +97,16 @@ export class SchemeRoutingProvider {
             )
 
             if (compatibleWallets.length > 0) {
+              foundMatch = true
               this.navController
-                .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
+                .push(SelectWalletPage, { address: address, compatibleWallets, incompatibleWallets })
                 .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             }
             break
           }
+        }
+        if (!foundMatch) {
+          return scanAgainCallback()
         }
       } else {
         const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(
@@ -111,6 +116,8 @@ export class SchemeRoutingProvider {
           this.navController
             .push(SelectWalletPage, { address: rawString, compatibleWallets, incompatibleWallets })
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        } else {
+          return scanAgainCallback()
         }
       }
     }
