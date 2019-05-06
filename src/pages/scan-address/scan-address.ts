@@ -54,9 +54,16 @@ export class ScanAddressPage extends ScanBasePage {
     }
   }
 
-  private sendAddressToParent(address: string) {
+  private sendAddressToParent(text: string) {
     if (this.callback) {
-      this.callback(address)
+      // Strip "scheme" and "parameters" from URIs
+      let address = text
+      const [scheme, path] = text.split(':')
+      if (path) {
+        const splits = path.split('?')
+        address = splits[0]
+      }
+      this.callback(address.trim())
     }
   }
 }
