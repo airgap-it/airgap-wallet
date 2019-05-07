@@ -26,7 +26,8 @@
   </p>
 
   <h5 *ngIf="config?.showSelfVoted && oldVotePercentage !== undefined">
-    <strong>You've voted: {{ oldVotePercentage }}%</strong>
+    <strong *ngIf="votePercentage === 0">You've voted: I am NOT supporting the BRI</strong>
+    <strong *ngIf="votePercentage > 0">You've voted: {{ oldVotePercentage }}%</strong>
   </h5>
 
   <ng-container *ngIf="voting">
