@@ -25,8 +25,8 @@
     {{ 'voting.text' | translate }}
   </p>
 
-  <h5 *ngIf="config?.showSelfVoted && oldVoteTimestamp">
-    <strong>You've voted: {{ oldVotePercentage }}% on {{ oldVoteTimestamp | amFromUnix | date: 'longDate' }}</strong>
+  <h5 *ngIf="config?.showSelfVoted && oldVotePercentage !== undefined">
+    <strong>You've voted: {{ oldVotePercentage }}%</strong>
   </h5>
 
   <ng-container *ngIf="voting">

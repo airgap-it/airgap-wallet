@@ -6,6 +6,7 @@ import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from '../../providers/operations/operations'
 import { RemoteConfigProvider, AeFirstVote } from '../../providers/remote-config/remote-config'
+import { HttpClient } from '@angular/common/http'
 
 declare let cordova
 
@@ -29,31 +30,44 @@ export class VotingPage {
     public navParams: NavParams,
     private operationsProvider: OperationsProvider,
     private remoteConfigProvider: RemoteConfigProvider,
-    private platform: Platform
+    private platform: Platform,
+    private http: HttpClient
   ) {
     this.wallet = this.navParams.get('wallet')
-  }
-
-  ngOnInit() {
-    this.remoteConfigProvider.aeFirstVote().then(config => (this.config = config))
-
-    this.wallet
-      .fetchTransactions(1000, 0)
-      .then(txs => {
-        const oldVote = txs.find(tx => !!tx.data)
-        console.log(oldVote)
-        if (oldVote) {
+    this.http
+      .get<any>(
+        `https://mainnet.mdw.aepps.com/middleware/transactions/account/${this.wallet.receivingPublicAddress}/to/${this.votingAddress}`
+      )
+      .toPromise()
+      .then(({ transactions: txs }) => {
+        const oldVote = txs.find(tx => !!tx.tx.payload)
+        console.log('oldVote', oldVote)
+        if (oldVote && oldVote.block_height <= 80541) {
           try {
-            console.log(JSON.parse(oldVote.data))
-            this.oldVotePercentage = JSON.parse(oldVote.data).vote.option
-            this.oldVoteTimestamp = oldVote.timestamp
+            console.log(JSON.parse(oldVote.tx.payload))
+            this.oldVotePercentage = JSON.parse(oldVote.tx.payload).vote.option
+            // Get the time
+            /*
+            this.http
+              .get<any>(`https://roma-net.mdw.aepps.com/v2/generations/height/${oldVote.block_height}`)
+              .toPromise()
+              .then(({ key_block: keyBlock }) => {
+                console.log(keyBlock)
+                this.oldVoteTimestamp = keyBlock.time / 1000
+              })
+              .catch(console.warn)
+            */
             this.voting = false
           } catch (error) {
             console.log(error)
           }
         }
       })
-      .catch(console.log)
+      .catch(console.warn)
+  }
+
+  async ngOnInit() {
+    this.remoteConfigProvider.aeFirstVote().then(config => (this.config = config))
   }
 
   public openUrl(url: string) {
