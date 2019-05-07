@@ -369,12 +369,18 @@
     "heading": "Block Reward Initiative (BRI)",
     "text": "To transform aeternity into a self-sustaining platform, we propose the Block Reward Initiative (BRI), through which ~0-20% of miner rewards will be allocated to development.",
     "your-vote_label": "Your vote: {{ votePercentage }}%",
+    "voting-period_label": "Vote from <strong>{{startDate}}</strong> to <strong>{{endDate}}</strong>",
     "further-information": {
       "heading": "Further Information",
       "blog-post_label": "Detailed Explanation in Blog Post",
       "forum_label": "Community Discussion in Forum",
       "result_label": "To check your vote, please visit <a href=\"https://aeternity.com\"> the official voting page</a>"
     },
-    "vote_label": "Vote"
+    "vote-no_label": "You've voted: I am NOT supporting the BRI",
+    "vote-percentage_label": "You've voted: {{ oldVotePercentage }}%",
+    "vote-disabled_label": "Voting is currently disabled",
+    "vote_label": "Vote",
+    "change-vote_label": "Change Vote",
+    "done_label": "Done"
   }
 }
