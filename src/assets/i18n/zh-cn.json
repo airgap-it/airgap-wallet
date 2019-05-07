@@ -155,5 +155,24 @@
     "deep-link.not-supported-alert.ok": "好",
     "deep-link.app-not-found.title": "啊哦",
     "deep-link.app-not-found.message": "看起来您在本设备上没有安装 {{otherAppName}}。",
-    "deep-link.app-not-found.ok": "好"
+    "deep-link.app-not-found.ok": "好",
+    "voting": {
+        "title": "投票",
+        "heading": "Block Reward Initiative (BRI)区块奖励提案",
+        "text": "为了将aeternity变为一个自我维持的平台，我们提出了BRI区块奖励计划），通过该计划，将约0-20％的矿工奖励分配给开发。",
+        "your-vote_label": "投票BRI百分比: {{ votePercentage }}%",
+        "voting-period_label": "投票周期： <strong>{{startDate}}</strong> 到 <strong>{{endDate}}</strong>",
+        "further-information": {
+        "heading": "更多信息",
+        "blog-post_label": "关于BRI提案的详细内容",
+        "forum_label": "官方论坛讨论",
+        "result_label": "请访问 <a href=\"https://aeternity.com\"> 查看投票结果</a>"
+        },
+        "vote-no_label": "您已投票: 拒绝BRI提案",
+        "vote-percentage_label": "您已投票: {{ oldVotePercentage }}%",
+        "vote-disabled_label": "目前暂时无法投票",
+        "vote_label": "投票",
+        "change-vote_label": "改变投票",
+        "done_label": "完成"
+        }
 }
