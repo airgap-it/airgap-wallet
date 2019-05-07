@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { NavController, NavParams, Platform } from 'ionic-angular'
 
 import { Transaction } from '../../models/transaction.model'
+import { getProtocolByIdentifier } from 'airgap-coin-lib'
 
 declare let cordova
 
@@ -23,19 +24,13 @@ export class TransactionDetailPage {
   openBlockexplorer() {
     let transaction: any = this.transaction
     let hash = transaction.hash
-    let blockexplorer = '' // TODO: Move to coinlib
-    if (this.transaction.protocolIdentifier.startsWith('btc')) {
-      blockexplorer = 'https://live.blockcypher.com/btc/tx/{{txId}}/'
-    } else if (this.transaction.protocolIdentifier.startsWith('eth')) {
-      blockexplorer = 'https://etherscan.io/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier.startsWith('ae')) {
-      blockexplorer = 'https://explorer.aepps.com/#/tx/{{txId}}'
-    } else if (this.transaction.protocolIdentifier.startsWith('xtz')) {
-      blockexplorer = 'https://tzscan.io/{{txId}}'
-    }
 
-    if (hash && blockexplorer) {
-      this.openUrl(blockexplorer.replace('{{txId}}', hash))
+    const protocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
+
+    if (hash) {
+      const blockexplorer = protocol.getBlockExplorerLinkForTxId(hash)
+
+      this.openUrl(blockexplorer)
     } else {
       // TODO: Remove AE specific code, but add an alert that there was an error.
       if (this.transaction.protocolIdentifier.startsWith('ae')) {

@@ -24,7 +24,11 @@
     "e2e-update": "webdriver-manager update --standalone false --gecko false",
     "postinstall": "npm run browserify-coinlib",
     "browserify-coinlib": "browserify ./node_modules/airgap-coin-lib/dist/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\""
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\"",
+    "extension:prepare": "cd web-extension && npm install",
+    "extension:build:extension-only": "cd web-extension && tsc && webpack && cd .. && node ./scripts/copy-extension-files.js",
+    "extension:build:dev": "npm run build && npm run extension:build:extension-only",
+    "extension:build:all": "npm run build --prod && npm run extension:build:extension-only"
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
@@ -55,24 +59,26 @@
     "@ionic-native/deeplinks": "^4.7.0",
     "@ionic-native/diagnostic": "^4.18.0",
     "@ionic-native/keyboard": "^4.5.3",
+    "@ionic-native/push": "^4.20.0",
     "@ionic-native/qr-scanner": "^4.7.0",
     "@ionic-native/splash-screen": "4.5.3",
     "@ionic-native/status-bar": "4.5.3",
-    "@ionic/storage": "^2.1.3",
+    "@ionic/storage": "2.2.0",
     "@ngx-translate/core": "9.1.1",
     "@ngx-translate/http-loader": "2.0.1",
     "@sentry/browser": "^4.2.4",
     "@types/node": "8.0.31",
     "@zxing/ngx-scanner": "^1.3.0",
-    "airgap-coin-lib": "0.3.0",
+    "airgap-coin-lib": "0.4.2",
     "angular2-template-loader": "0.6.2",
     "angularx-qrcode": "1.5.3",
     "bignumber.js": "^8.0.0",
     "chart.js": "^2.7.2",
     "com.lampa.startapp": "^6.1.6",
-    "cordova-android": "7.1.0",
+    "cordova-android": "7.1.4",
+    "cordova-android-support-gradle-release": "^1.4.7",
     "cordova-clipboard": "^1.2.1",
-    "cordova-ios": "4.5.5",
+    "cordova-ios": "^5.0.0",
     "cordova-plugin-add-swift-support": "^1.7.2",
     "cordova-plugin-app-version": "^0.1.9",
     "cordova-plugin-compat": "1.1.0",
@@ -80,12 +86,13 @@
     "cordova-plugin-inappbrowser": "^1.7.2",
     "cordova-plugin-ionic-keyboard": "^2.1.3",
     "cordova-plugin-ionic-webview": "^2.3.1",
-    "cordova-plugin-qrscanner": "^2.6.0",
+    "cordova-plugin-qrscanner": "2.6.0",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-statusbar": "^2.4.2",
     "cordova-plugin-whitelist": "^1.3.3",
-    "cordova-plugin-x-socialsharing": "^5.4.1",
+    "cordova-plugin-x-socialsharing": "^5.4.4",
     "cordova-sqlite-storage": "^2.4.0",
+    "cordova-support-google-services": "^1.1.0",
     "cordova.plugins.diagnostic": "^4.0.10",
     "dotenv": "^6.1.0",
     "es6-promise-plugin": "^4.2.2",
@@ -93,13 +100,15 @@
     "html-loader": "0.5.1",
     "husky": "^1.1.0",
     "ionic-angular": "3.9.2",
-    "ionic-plugin-deeplinks": "^1.0.17",
+    "ionic-plugin-deeplinks": "git+https://github.com/airgap-it/ionic-plugin-deeplinks.git#cordova-ios-v5.0.0-fix",
     "ionic2-material-icons": "^1.0.3",
     "ionicons": "3.0.0",
     "moment": "^2.22.2",
     "myetherwallet-blockies": "0.1.1",
     "ng-lottie": "^0.3.2",
     "ngx-moment": "^3.1.0",
+    "phonegap-plugin-multidex": "^1.0.0",
+    "phonegap-plugin-push": "^2.2.3",
     "prettier": "1.16.4",
     "pretty-quick": "1.10.0",
     "raven-js": "3.20.1",
@@ -148,10 +157,31 @@
       "cordova-plugin-device": {},
       "cordova-plugin-statusbar": {},
       "cordova-plugin-whitelist": {},
-      "cordova-plugin-x-socialsharing": {},
+      "cordova-plugin-x-socialsharing": {
+        "ANDROID_SUPPORT_V4_VERSION": "26.1.0"
+      },
       "cordova-plugin-app-version": {},
       "cordova-plugin-inappbrowser": {},
       "cordova-plugin-add-swift-support": {},
+      "com.lampa.startapp": {},
+      "cordova-plugin-qrscanner": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-ionic-keyboard": {},
+      "cordova-clipboard": {},
+      "cordova.plugins.diagnostic": {
+        "ANDROID_SUPPORT_VERSION": "26.1.0"
+      },
+      "cordova-plugin-ionic-webview": {
+        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "26.1.0"
+      },
+      "phonegap-plugin-push": {
+        "ANDROID_SUPPORT_V13_VERSION": "26.1.0",
+        "FCM_VERSION": "11.6.2"
+      },
+      "cordova-android-support-gradle-release": {
+        "ANDROID_SUPPORT_VERSION": "26.1.0"
+      },
       "ionic-plugin-deeplinks": {
         "URL_SCHEME": "airgap-wallet",
         "DEEPLINK_HOST": "wallet.airgap.it",
@@ -169,21 +199,11 @@
         "DEEPLINK_4_HOST": " ",
         "DEEPLINK_5_SCHEME": " ",
         "DEEPLINK_5_HOST": " "
-      },
-      "com.lampa.startapp": {},
-      "cordova-plugin-qrscanner": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-sqlite-storage": {},
-      "cordova-plugin-ionic-keyboard": {},
-      "cordova-clipboard": {},
-      "cordova.plugins.diagnostic": {},
-      "cordova-plugin-ionic-webview": {
-        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
       }
     },
     "platforms": [
-      "android",
-      "ios"
+      "ios",
+      "android"
     ]
   }
 }

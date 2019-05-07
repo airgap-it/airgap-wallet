@@ -48,6 +48,6 @@ export class ClipboardProvider {
       showCloseButton: true,
       closeButtonText: 'Ok'
     })
-    toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+    toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
   }
 }

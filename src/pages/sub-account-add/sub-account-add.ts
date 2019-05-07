@@ -5,7 +5,7 @@ import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-h
 import { OperationsProvider } from '../../providers/operations/operations'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { ProtocolsProvider } from '../../providers/protocols/protocols'
+import { ProtocolsProvider, ProtocolSymbols } from '../../providers/protocols/protocols'
 
 interface IAccountWrapper {
   selected: boolean
@@ -49,14 +49,14 @@ export class SubAccountAddPage {
     this.wallet = this.navParams.get('wallet')
 
     // TODO: Make generic
-    if (this.subProtocolType === SubProtocolType.ACCOUNT && this.wallet.protocolIdentifier === 'xtz') {
+    if (this.subProtocolType === SubProtocolType.ACCOUNT && this.wallet.protocolIdentifier === ProtocolSymbols.XTZ) {
       const protocol = new TezosKtProtocol()
       protocol
         .getAddressesFromPublicKey(this.wallet.publicKey)
         .then(res => {
           res.forEach((_value, index) => {
             const wallet = new AirGapMarketWallet(
-              'xtz-kt',
+              ProtocolSymbols.XTZ_KT,
               this.wallet.publicKey,
               this.wallet.isExtendedPublicKey,
               this.wallet.derivationPath,

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
-import { NavParams, ViewController, LoadingController, Platform, NavController } from 'ionic-angular'
+import { NavParams, ViewController, LoadingController, Platform, NavController, AlertController } from 'ionic-angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { AccountProvider } from '../../providers/account/account.provider'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
+import { WebExtensionProvider } from '../../providers/web-extension/web-extension'
 
 @Component({
   selector: 'page-account-import',
@@ -13,13 +14,18 @@ export class AccountImportPage {
 
   walletAlreadyExists = false
 
+  // WebExtension
+  walletImportable = true
+
   constructor(
     private platform: Platform,
     private loadingCtrl: LoadingController,
     private viewCtrl: ViewController,
     private navParams: NavParams,
     private wallets: AccountProvider,
-    public navCtrl: NavController
+    public navCtrl: NavController,
+    private webExtensionProvider: WebExtensionProvider,
+    private alertCtrl: AlertController
   ) {}
 
   ionViewWillEnter() {
@@ -44,6 +50,23 @@ export class AccountImportPage {
           this.walletAlreadyExists = true
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           return
+        }
+
+        // we currently only support ETH and AE for the chrome extension
+        if (this.webExtensionProvider.isWebExtension()) {
+          const whitelistedProtocols = ['eth', 'ae']
+
+          this.walletImportable = whitelistedProtocols.some(
+            whitelistedProtocol => this.wallet.coinProtocol.identifier === whitelistedProtocol
+          )
+
+          if (!this.walletImportable) {
+            let alert = this.alertCtrl.create({
+              title: 'Account Not Supported',
+              message: 'We currently only support Ethereum and Aeternity accounts.'
+            })
+            alert.present()
+          }
         }
 
         const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')

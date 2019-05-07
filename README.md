@@ -60,6 +60,37 @@ To run the unit tests:
 $ npm test
 ```
 
+## Building the Chrome Extension
+
+To build and run the chrome extension, you have to use a different `@ionic/storage` module. Change the following line in your `package.json`:
+
+```
+    "@ionic/storage": "2.2.0",
+```
+
+to
+
+```
+    "@ionic/storage": "git+https://github.com/bb4L/ionic-storage.git#1499e2d3d81626ca61793b01a66b12a9494137bf",
+```
+
+After that, you need to run
+
+```bash
+npm install
+```
+
+You can now build the extension:
+
+```bash
+npm run extension:prepare
+npm run extension:build:dev
+```
+
+**Make sure you have node 11 or later installed, otherwise it might fail during the last step.**
+
+Now you can load the unpacked extension from the `./extension/` folder.
+
 ## Security
 
 If you discover a security vulnerability within this application, please send an e-mail to hi@airgap.it. All security vulnerabilities will be promptly addressed.

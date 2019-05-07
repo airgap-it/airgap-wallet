@@ -1,13 +1,18 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams } from 'ionic-angular'
-import { Observable } from 'rxjs'
+import { Observable, ReplaySubject } from 'rxjs'
 import { AccountProvider } from '../../providers/account/account.provider'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { handleErrorSentry, ErrorCategory } from '../../providers/sentry-error-handler/sentry-error-handler'
 import { AccountAddPage } from '../account-add/account-add'
-import { AccountDetailPage } from '../account-detail/account-detail'
 import { AccountTransactionListPage } from '../account-transaction-list/account-transaction-list'
+import { OperationsProvider } from '../../providers/operations/operations'
+
+interface WalletGroup {
+  mainWallet: AirGapMarketWallet
+  subWallets: AirGapMarketWallet[]
+}
 
 @Component({
   selector: 'page-portfolio',
@@ -21,14 +26,36 @@ export class PortfolioPage {
   changePercentage: number = 0
 
   wallets: Observable<AirGapMarketWallet[]>
-  subWallets: Observable<AirGapMarketWallet[]>
+  walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private walletsProvider: AccountProvider) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private walletsProvider: AccountProvider,
+    private operationsProvider: OperationsProvider
+  ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe(wallets => {
       this.calculateTotal(wallets)
+
+      const groups: WalletGroup[] = []
+      wallets.forEach(wallet => {
+        if (((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol) {
+          return
+        }
+        groups.push({
+          mainWallet: wallet,
+          subWallets: wallets.filter(subWallet => wallet !== subWallet && wallet.publicKey === subWallet.publicKey)
+        })
+      })
+
+      groups.sort((group1, group2) => {
+        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+      })
+
+      this.walletGroups.next(groups)
     })
     this.walletsProvider.walledChangedObservable.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList())
@@ -40,11 +67,7 @@ export class PortfolioPage {
   }
 
   openDetail(wallet: AirGapMarketWallet) {
-    if (wallet.coinProtocol.subProtocols && wallet.coinProtocol.subProtocols.length > 0) {
-      this.navCtrl.push(AccountDetailPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } else {
-      this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    }
+    this.navCtrl.push(AccountTransactionListPage, { wallet: wallet }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   openAccountAddPage() {
@@ -52,6 +75,9 @@ export class PortfolioPage {
   }
 
   async doRefresh(refresher: any = null) {
+    // XTZ: Refresh delegation status
+    this.operationsProvider.refreshAllDelegationStatuses()
+
     await Promise.all([
       this.walletsProvider.getWalletList().map(wallet => {
         return wallet.synchronize()

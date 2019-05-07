@@ -1,16 +1,22 @@
+import { DeepLinkProvider } from './../providers/deep-link/deep-link'
+import { PushProvider } from '../providers/push/push'
+
 import { Component, ViewChild } from '@angular/core'
 import { Deeplinks } from '@ionic-native/deeplinks'
 import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateService } from '@ngx-translate/core'
 import { Platform, Nav } from 'ionic-angular'
-
 import { TabsPage } from '../pages/tabs/tabs'
-
-import { AppVersion } from '@ionic-native/app-version'
+import { AccountProvider } from '../providers/account/account.provider'
 import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
-import { setSentryRelease, handleErrorSentry, ErrorCategory } from '../providers/sentry-error-handler/sentry-error-handler'
+import { setSentryRelease, handleErrorSentry, ErrorCategory, setSentryUser } from '../providers/sentry-error-handler/sentry-error-handler'
 import { ProtocolsProvider } from '../providers/protocols/protocols'
+import { WebExtensionProvider } from '../providers/web-extension/web-extension'
+import { AppInfoProvider } from '../providers/app-info/app-info'
+import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
+import { StorageProvider, SettingsKey } from '../providers/storage/storage'
+import { generateGUID } from '../utils/utils'
 
 @Component({
   templateUrl: 'app.html'
@@ -27,9 +33,14 @@ export class MyApp {
     private splashScreen: SplashScreen,
     private translate: TranslateService,
     private deeplinks: Deeplinks,
-    private appVersion: AppVersion,
     private schemeRoutingProvider: SchemeRoutingProvider,
-    private protocolsProvider: ProtocolsProvider
+    private protocolsProvider: ProtocolsProvider,
+    private storageProvider: StorageProvider,
+    private webExtensionProvider: WebExtensionProvider,
+    private appInfoProvider: AppInfoProvider,
+    private accountProvider: AccountProvider,
+    private deepLinkProvider: DeepLinkProvider,
+    private pushProvider: PushProvider
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -46,9 +57,40 @@ export class MyApp {
       this.statusBar.styleDefault()
       this.statusBar.backgroundColorByHexString('#FFFFFF')
       this.splashScreen.hide()
-      setSentryRelease(await this.appVersion.getVersionNumber())
-    } else {
-      setSentryRelease('browser') // TODO: Set version in CI once we have browser version
+
+      this.pushProvider.initPush()
+    }
+
+    this.appInfoProvider
+      .getVersionNumber()
+      .then(version => {
+        if (this.platform.is('cordova')) {
+          setSentryRelease('app_' + version)
+        } else if (this.webExtensionProvider.isWebExtension()) {
+          setSentryRelease('ext_' + version)
+        } else {
+          setSentryRelease('browser_' + version) // TODO: Set version in CI once we have browser version
+        }
+      })
+      .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
+
+    let userId = await this.storageProvider.get(SettingsKey.USER_ID)
+    if (!userId) {
+      userId = generateGUID()
+      this.storageProvider.set(SettingsKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    }
+    setSentryUser(userId)
+
+    let url = new URL(location.href)
+
+    if (url.searchParams.get('rawUnsignedTx')) {
+      // Wait until wallets are initialized
+      let sub = this.accountProvider.wallets.subscribe(wallets => {
+        this.walletDeeplink()
+        if (sub) {
+          sub.unsubscribe()
+        }
+      })
     }
   }
 
@@ -90,5 +132,15 @@ export class MyApp {
           }
         )
     }
+  }
+
+  // TODO: Move to provider
+  async walletDeeplink() {
+    let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
+    this.nav.push(TransactionQrPage, {
+      wallet: deeplinkInfo.wallet,
+      airGapTx: deeplinkInfo.airGapTx,
+      data: 'airgap-vault://?d=' + deeplinkInfo.serializedTx
+    })
   }
 }

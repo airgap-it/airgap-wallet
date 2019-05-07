@@ -10,4 +10,10 @@ export class AddressRowComponent {
 
   @Input()
   public address: string
+
+  @Input()
+  public symbol: string
+
+  @Input()
+  public hasSymbol: boolean = false
 }

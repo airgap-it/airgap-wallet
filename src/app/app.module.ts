@@ -1,3 +1,5 @@
+import { SelectWalletPage } from '../pages/select-wallet/select-wallet'
+import { Push } from '@ionic-native/push'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { ErrorHandler, NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
@@ -10,7 +12,6 @@ import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import { QRCodeModule } from 'angularx-qrcode'
 import { IonicApp, IonicModule } from 'ionic-angular'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 
@@ -53,11 +54,23 @@ import { AccountAddPage } from '../pages/account-add/account-add'
 import { SubAccountAddPage } from '../pages/sub-account-add/sub-account-add'
 import { SubAccountImportPage } from '../pages/sub-account-import/sub-account-import'
 import { AccountImportOnboardingPage } from '../pages/account-import-onboarding/account-import-onboarding'
-import { AccountDetailPage } from '../pages/account-detail/account-detail'
 import { DeepLinkProvider } from '../providers/deep-link/deep-link'
 import { InteractionSelectionPage } from '../pages/interaction-selection/interaction-selection'
 import { SubAccountSelectPage } from '../pages/sub-account-select/sub-account-select'
+import { ExchangePage } from '../pages/exchange/exchange'
 import { OperationsProvider } from '../providers/operations/operations'
+import { ExchangeProvider } from '../providers/exchange/exchange'
+import { ExchangeConfirmPage } from '../pages/exchange-confirm/exchange-confirm'
+import { DelegationBakerDetailPage } from '../pages/delegation-baker-detail/delegation-baker-detail'
+import { RemoteConfigProvider } from '../providers/remote-config/remote-config'
+import { WebExtensionProvider } from '../providers/web-extension/web-extension'
+import { AppInfoProvider } from '../providers/app-info/app-info'
+import { DisclaimerWebExtensionPage } from '../pages/disclaimer-web-extension/disclaimer-web-extension'
+import { ProtocolSelectPage } from '../pages/protocol-select/protocol-select'
+import { IntroductionPushPage } from '../pages/introduction-push/introduction-push'
+import { PushProvider } from '../providers/push/push'
+import { PushBackendProvider } from '../providers/push-backend/push-backend'
+import { VotingPage } from '../pages/voting/voting'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -86,9 +99,16 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountAddPage,
     SubAccountImportPage,
     AccountImportOnboardingPage,
-    AccountDetailPage,
     InteractionSelectionPage,
-    SubAccountSelectPage
+    SubAccountSelectPage,
+    ExchangePage,
+    ExchangeConfirmPage,
+    SelectWalletPage,
+    DelegationBakerDetailPage,
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage,
+    IntroductionPushPage,
+    VotingPage
   ],
   imports: [
     BrowserModule,
@@ -110,7 +130,7 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
     }),
     ComponentsModule,
     PipesModule
@@ -139,9 +159,18 @@ export function createTranslateLoader(http: HttpClient) {
     SubAccountAddPage,
     SubAccountImportPage,
     AccountImportOnboardingPage,
-    AccountDetailPage,
     InteractionSelectionPage,
-    SubAccountSelectPage
+    SubAccountSelectPage,
+    ExchangePage,
+    ExchangeConfirmPage,
+    SelectWalletPage,
+    SubAccountSelectPage,
+    DelegationBakerDetailPage,
+    SubAccountSelectPage,
+    DisclaimerWebExtensionPage,
+    ProtocolSelectPage,
+    IntroductionPushPage,
+    VotingPage
   ],
   providers: [
     StatusBar,
@@ -161,7 +190,14 @@ export function createTranslateLoader(http: HttpClient) {
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,
-    OperationsProvider
+    OperationsProvider,
+    ExchangeProvider,
+    RemoteConfigProvider,
+    WebExtensionProvider,
+    AppInfoProvider,
+    PushProvider,
+    Push,
+    PushBackendProvider
   ]
 })
 export class AppModule {}

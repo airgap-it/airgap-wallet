@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AirGap Camera Request</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .imgbox {
+        display: grid;
+        max-width: 100%;
+      }
+      .center-fit {
+        max-width: 100%;
+        max-height: 100%;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video" width="400" height="200" autoplay hidden></video>
+
+    <script src="request_camera.js" type="text/javascript"></script>
+
+    <div class="imgbox">
+      <img class="center-fit" src="../assets/images/request_permission.png" />
+    </div>
+  </body>
+</html>
