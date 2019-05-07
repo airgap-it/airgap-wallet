@@ -26,9 +26,9 @@
   </p>
 
   <h5 *ngIf="config?.showSelfVoted && oldVotePercentage !== undefined">
-    <strong *ngIf="votePercentage === 0">{{ 'voting.vote-no_label' | translate }}</strong>
+    <strong *ngIf="oldVotePercentage === 0">{{ 'voting.vote-no_label' | translate }}</strong>
     <strong
-      *ngIf="votePercentage > 0"
+      *ngIf="oldVotePercentage > 0"
       [innerHTML]="'voting.vote-percentage_label' | translate: { oldVotePercentage: oldVotePercentage }"
     ></strong>
   </h5>
