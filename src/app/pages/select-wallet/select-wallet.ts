@@ -24,7 +24,7 @@ export class SelectWalletPage {
     private route: ActivatedRoute
   ) {}
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']
       this.address = info.address
@@ -33,7 +33,7 @@ export class SelectWalletPage {
     }
   }
 
-  openPreparePage(wallet: AirGapMarketWallet) {
+  public openPreparePage(wallet: AirGapMarketWallet) {
     const info = {
       wallet: wallet,
       address: this.address

@@ -15,8 +15,8 @@ const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
 })
 export class AccountImportOnboardingPage implements OnInit {
   @ViewChild(IonSlides)
-  slides: IonSlides
-  slideOpts = {
+  public slides: IonSlides
+  public slideOpts = {
     initialSlide: 0,
     speed: 400,
     pagination: {
@@ -28,19 +28,19 @@ export class AccountImportOnboardingPage implements OnInit {
     }
   }
   public protocol: ICoinProtocol
-  isBegin: boolean = true
-  isEnd: boolean = false
+  public isBegin: boolean = true
+  public isEnd: boolean = false
 
   constructor(private route: ActivatedRoute, public platform: Platform, private deeplinkProvider: DeepLinkProvider) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     if (this.route.snapshot.data['special']) {
       this.protocol = getProtocolByIdentifier(this.route.snapshot.data['special'])
       console.log(this.protocol)
     }
   }
 
-  ionSlideDidChange() {
+  public ionSlideDidChange() {
     this.slides.getActiveIndex().then(val => {
       if (val == 0) {
         this.isBegin = true
@@ -55,7 +55,7 @@ export class AccountImportOnboardingPage implements OnInit {
     })
   }
 
-  openVault() {
+  public openVault() {
     this.deeplinkProvider
       .sameDeviceDeeplink(`${DEEPLINK_VAULT_ADD_ACCOUNT}${this.protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))

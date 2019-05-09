@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
   name: 'cryptoToFiat'
 })
 export class CryptoToFiatPipe implements PipeTransform {
-  transform(value: BigNumber, args: { protocolIdentifier: string; currentMarketPrice: BigNumber }): any {
+  public transform(value: BigNumber, args: { protocolIdentifier: string; currentMarketPrice: BigNumber }): any {
     if (
       !args ||
       !args.currentMarketPrice ||

@@ -34,11 +34,11 @@ export class TransactionQrPage {
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  done() {
+  public done() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  sameDeviceSign() {
+  public sameDeviceSign() {
     this.deeplinkProvider.sameDeviceDeeplink(this.preparedDataQR)
   }
 }

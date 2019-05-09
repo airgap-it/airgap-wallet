@@ -58,7 +58,7 @@ export class TransactionPreparePage {
     this.onChanges()
   }
 
-  onChanges(): void {
+  public onChanges(): void {
     this.transactionForm.get('amount').valueChanges.subscribe(val => {
       this.sendMaxAmount = false
     })
@@ -70,7 +70,7 @@ export class TransactionPreparePage {
     })
   }
 
-  useWallet(wallet: AirGapMarketWallet) {
+  public useWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
 
     // set fee per default to low

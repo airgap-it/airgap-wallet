@@ -18,7 +18,7 @@ export class ScanAddressPage extends ScanBasePage {
   private callbackCalled: boolean = false
 
   @ViewChild('addressScanner')
-  zxingScanner: ZXingScannerComponent
+  public zxingScanner: ZXingScannerComponent
 
   constructor(
     protected platform: Platform,
@@ -36,13 +36,13 @@ export class ScanAddressPage extends ScanBasePage {
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  checkScan(resultString: string) {
+  public checkScan(resultString: string) {
     console.log('got new text', resultString)
 
     this.handleQRScanned(resultString)
   }
 
-  handleQRScanned(text: string) {
+  public handleQRScanned(text: string) {
     if (!this.callbackCalled) {
       console.log('scan callback', text)
       this.callbackCalled = true

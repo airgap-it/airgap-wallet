@@ -13,7 +13,7 @@ declare let cordova
 })
 export class TransactionDetailPage {
   public transaction: Transaction
-  lottieConfig: any
+  public lottieConfig: any
 
   constructor(private platform: Platform, private route: ActivatedRoute) {
     if (this.route.snapshot.data['special']) {
@@ -25,7 +25,7 @@ export class TransactionDetailPage {
     }
   }
 
-  openBlockexplorer() {
+  public openBlockexplorer() {
     let transaction: any = this.transaction
     let hash = transaction.hash
 

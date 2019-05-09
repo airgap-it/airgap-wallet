@@ -34,12 +34,12 @@ export class AccountEditPopoverComponent {
     this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
-  async copyAddressToClipboard() {
+  public async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
     await this.dismissPopover()
   }
 
-  async ngOnInit() {
+  public async ngOnInit() {
     // tezos
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
@@ -48,7 +48,7 @@ export class AccountEditPopoverComponent {
     // tezos end
   }
 
-  async undelegate() {
+  public async undelegate() {
     await this.dismissPopover()
     if (this.onUndelegate) {
       this.onUndelegate()
@@ -57,7 +57,7 @@ export class AccountEditPopoverComponent {
     }
   }
 
-  delete() {
+  public delete() {
     let alert = this.alertCtrl
       .create({
         header: 'Confirm Wallet Removal',
@@ -93,7 +93,7 @@ export class AccountEditPopoverComponent {
       })
   }
 
-  dismissPopover() {
+  public dismissPopover() {
     return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

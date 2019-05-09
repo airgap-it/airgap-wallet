@@ -1,5 +1,5 @@
 export abstract class Serializable {
-  fillFromJSON(json: string): this {
+  public fillFromJSON(json: string): this {
     let jsonObj = JSON.parse(json)
     for (const propName of Object.keys(jsonObj)) {
       this[propName] = JSON.parse(jsonObj[propName])
@@ -7,7 +7,7 @@ export abstract class Serializable {
     return this
   }
 
-  fillFromObj(jsonObj: Object): this {
+  public fillFromObj(jsonObj: Object): this {
     for (const propName of Object.keys(jsonObj)) {
       this[propName] = jsonObj[propName]
     }

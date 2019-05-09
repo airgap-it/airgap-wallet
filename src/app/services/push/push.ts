@@ -78,7 +78,7 @@ export class PushProvider {
     }
   }
 
-  async registerWallets(wallets: AirGapMarketWallet[]) {
+  public async registerWallets(wallets: AirGapMarketWallet[]) {
     console.log('register wallets')
 
     this.registrationId.pipe(take(1)).subscribe(registrationId => {
@@ -99,7 +99,7 @@ export class PushProvider {
     })
   }
 
-  async unregisterWallets(wallets: AirGapMarketWallet[]) {
+  public async unregisterWallets(wallets: AirGapMarketWallet[]) {
     console.log('unregister wallets')
 
     this.registrationId.pipe(take(1)).subscribe(registrationId => {

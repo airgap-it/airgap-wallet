@@ -21,13 +21,13 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
-  isVisible = 'hidden'
+  public isVisible = 'hidden'
 
-  total: number = 0
-  changePercentage: number = 0
+  public total: number = 0
+  public changePercentage: number = 0
 
-  wallets: Observable<AirGapMarketWallet[]>
-  walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
+  public wallets: Observable<AirGapMarketWallet[]>
+  public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
 
   constructor(
     private router: Router,
@@ -64,20 +64,20 @@ export class PortfolioPage {
     })
   }
 
-  ionViewDidEnter() {
+  public ionViewDidEnter() {
     this.doRefresh().catch(handleErrorSentry())
   }
 
-  openDetail(wallet: AirGapMarketWallet) {
+  public openDetail(wallet: AirGapMarketWallet) {
     this.dataService.setData(DataServiceKey.WALLET, wallet)
     this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAccountAddPage() {
+  public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  async doRefresh(event: any = null) {
+  public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
     this.operationsProvider.refreshAllDelegationStatuses()
 
@@ -90,7 +90,7 @@ export class PortfolioPage {
     this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
   }
 
-  calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
+  public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
     console.log('calculating total')
     let newTotal = 0
     let cryptoToFiatPipe = new CryptoToFiatPipe()

@@ -64,17 +64,17 @@ export class SwapComponent {
 
   constructor(public alertCtrl: AlertController, public modalController: ModalController, private walletsProvider: AccountProvider) {}
 
-  amountSet(amount: string) {
+  public amountSet(amount: string) {
     this._amount = amount
     this.amountSetEmitter.emit(amount)
   }
 
-  walletSet(wallet: AirGapMarketWallet) {
+  public walletSet(wallet: AirGapMarketWallet) {
     this.walletSetEmitter.emit(wallet)
     this.expandWalletSelection = false
   }
 
-  async doRadio() {
+  public async doRadio() {
     const protocols = []
     this.supportedProtocols.forEach(supportedProtocol => {
       try {

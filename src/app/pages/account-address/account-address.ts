@@ -24,11 +24,11 @@ export class AccountAddressPage {
     }
   }
 
-  async copyAddressToClipboard() {
+  public async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
   }
 
-  async done() {
+  public async done() {
     this.location.back()
   }
 }

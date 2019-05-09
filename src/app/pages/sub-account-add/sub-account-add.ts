@@ -99,11 +99,11 @@ export class SubAccountAddPage {
     }
   }
 
-  toggleAccount(account: IAccountWrapper) {
+  public toggleAccount(account: IAccountWrapper) {
     account.selected = !account.selected
   }
 
-  addSubAccounts() {
+  public addSubAccounts() {
     this.subAccounts
       .filter(account => account.selected)
       .map(account => account.wallet)
@@ -113,7 +113,7 @@ export class SubAccountAddPage {
     this.location.back()
   }
 
-  async prepareOriginate() {
+  public async prepareOriginate() {
     const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet)
 
     const info = {

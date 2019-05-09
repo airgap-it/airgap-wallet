@@ -8,17 +8,17 @@ import { ClipboardProvider } from '../../services/clipboard/clipboard'
 })
 export class QrClipboardComponent {
   @Input()
-  level: string = 'L'
+  public level: string = 'L'
 
   @Input()
-  qrdata: any = ''
+  public qrdata: any = ''
 
   @Input()
-  size: number = 300
+  public size: number = 300
 
   constructor(private clipboardProvider: ClipboardProvider) {}
 
-  async copyToClipboard() {
+  public async copyToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.qrdata)
   }
 }

@@ -10,7 +10,7 @@ import { toDataUrl } from 'myetherwallet-blockies'
 })
 export class IdenticonComponent {
   // used in template
-  identicon
+  public identicon
 
   @Input()
   set address(value: string) {

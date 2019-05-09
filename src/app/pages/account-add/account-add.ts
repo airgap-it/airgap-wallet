@@ -16,11 +16,11 @@ import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
   styleUrls: ['./account-add.scss']
 })
 export class AccountAddPage {
-  searchTerm: string = ''
-  supportedAccountProtocols: ICoinProtocol[] = []
-  supportedSubAccountProtocols: ICoinProtocol[] = []
-  filteredAccountProtocols: ICoinProtocol[] = []
-  filteredSubAccountProtocols: ICoinProtocol[] = []
+  public searchTerm: string = ''
+  public supportedAccountProtocols: ICoinProtocol[] = []
+  public supportedSubAccountProtocols: ICoinProtocol[] = []
+  public filteredAccountProtocols: ICoinProtocol[] = []
+  public filteredSubAccountProtocols: ICoinProtocol[] = []
 
   constructor(
     private accountProvider: AccountProvider,
@@ -43,11 +43,11 @@ export class AccountAddPage {
     this.filterProtocols()
   }
 
-  searchTermChanged() {
+  public searchTermChanged() {
     this.filterProtocols()
   }
 
-  filterProtocols() {
+  public filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
     this.filteredAccountProtocols = this.supportedAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
@@ -57,12 +57,12 @@ export class AccountAddPage {
     )
   }
 
-  addAccount(protocolIdentifier: string) {
+  public addAccount(protocolIdentifier: string) {
     this.dataService.setData(DataServiceKey.PROTOCOL, protocolIdentifier)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  addSubAccount(subProtocolIdentifier: string) {
+  public addSubAccount(subProtocolIdentifier: string) {
     const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
     if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
       console.log(subProtocolIdentifier)

@@ -129,7 +129,7 @@ export class AccountProvider {
     this.pushProvider.registerWallets(this.walletList)
   }
 
-  getWalletList(): AirGapMarketWallet[] {
+  public getWalletList(): AirGapMarketWallet[] {
     return this.walletList
   }
 

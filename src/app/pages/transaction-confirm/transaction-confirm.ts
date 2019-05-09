@@ -32,7 +32,7 @@ const TIMEOUT_KT_REFRESH_CLEAR = 5 * MINUTE
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  signedTransactionSync: DeserializedSyncProtocol
+  public signedTransactionSync: DeserializedSyncProtocol
   private signedTx: string
   public protocol: ICoinProtocol
 
@@ -47,11 +47,11 @@ export class TransactionConfirmPage {
     private accountProvider: AccountProvider
   ) {}
 
-  dismiss() {
+  public dismiss() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     await this.platform.ready()
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']
@@ -63,7 +63,7 @@ export class TransactionConfirmPage {
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
-  async broadcastTransaction() {
+  public async broadcastTransaction() {
     let loading = await this.loadingCtrl.create({
       message: 'Broadcasting...'
     })

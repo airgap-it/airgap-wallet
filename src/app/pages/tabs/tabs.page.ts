@@ -17,10 +17,10 @@ import { SettingsPage } from '../settings/settings'
   styleUrls: ['tabs.page.scss']
 })
 export class TabsPage {
-  tab1Root = PortfolioPage
-  tab2Root = ScanPage
-  tab3Root = ExchangePage
-  tab4Root = SettingsPage
+  public tab1Root = PortfolioPage
+  public tab2Root = ScanPage
+  public tab3Root = ExchangePage
+  public tab4Root = SettingsPage
 
   constructor(
     public modalController: ModalController,

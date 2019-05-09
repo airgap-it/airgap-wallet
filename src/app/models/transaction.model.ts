@@ -2,29 +2,29 @@ import { IAirGapTransaction } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 export class TransactionParameter {
-  label: string
-  value: string
-  type: string
+  public label: string
+  public value: string
+  public type: string
 }
 
 export class Transaction implements IAirGapTransaction {
-  amount: BigNumber
-  blockHeight: string
-  data: string
-  fee: BigNumber
-  from: string[]
-  hash: string
+  public amount: BigNumber
+  public blockHeight: string
+  public data: string
+  public fee: BigNumber
+  public from: string[]
+  public hash: string
 
-  isInbound: boolean
-  meta: {} = {}
-  protocolIdentifier: string
-  to: string[]
-  timestamp: number
+  public isInbound: boolean
+  public meta: {} = {}
+  public protocolIdentifier: string
+  public to: string[]
+  public timestamp: number
 
-  information: TransactionParameter[] = []
+  public information: TransactionParameter[] = []
 
-  payload: string
-  publicKey: string
+  public payload: string
+  public publicKey: string
 
   constructor(
     from: string[],
@@ -42,7 +42,7 @@ export class Transaction implements IAirGapTransaction {
     this.payload = payload
   }
 
-  static fromAirGapTx(airgapTx: IAirGapTransaction, payload: string) {
+  public static fromAirGapTx(airgapTx: IAirGapTransaction, payload: string) {
     return new Transaction(airgapTx.from, airgapTx.to, airgapTx.amount, airgapTx.fee, airgapTx.protocolIdentifier, payload)
   }
 }

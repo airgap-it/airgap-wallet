@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
   name: 'feeConverter'
 })
 export class FeeConverterPipe implements PipeTransform {
-  transform(value: BigNumber | string | number, args: { protocolIdentifier: string }): string {
+  public transform(value: BigNumber | string | number, args: { protocolIdentifier: string }): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }

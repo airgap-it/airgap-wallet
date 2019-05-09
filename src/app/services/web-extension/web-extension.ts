@@ -17,12 +17,12 @@ export class WebExtensionProvider {
     })
   }
 
-  isWebExtension() {
+  public isWebExtension() {
     // Code running in a Chrome extension (content script, background page, etc.)
     return window.chrome && chrome.runtime && chrome.runtime.id
   }
 
-  refreshWindow() {
+  public refreshWindow() {
     chrome.tabs.getSelected(null, function(tab) {
       const code = 'window.location.reload()'
       chrome.tabs.executeScript(tab.id, { code: code })

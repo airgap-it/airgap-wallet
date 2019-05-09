@@ -50,7 +50,7 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  async ionViewDidEnter() {
+  public async ionViewDidEnter() {
     // get baker 0, always airgap for now
     this.bakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
@@ -93,11 +93,11 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  addPayoutDelayToMoment(time: Moment): Moment {
+  public addPayoutDelayToMoment(time: Moment): Moment {
     return time.add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
   }
 
-  async delegate() {
+  public async delegate() {
     try {
       if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ) {
         const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet, this.bakerConfig.address)
@@ -123,7 +123,7 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  async done() {
+  public async done() {
     this.location.back()
   }
 }

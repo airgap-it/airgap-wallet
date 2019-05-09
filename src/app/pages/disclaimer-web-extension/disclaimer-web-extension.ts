@@ -11,7 +11,7 @@ import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 export class DisclaimerWebExtensionPage {
   constructor(private viewController: ModalController, private storageProvider: StorageProvider) {}
 
-  async accept() {
+  public async accept() {
     await this.storageProvider.set(SettingsKey.WEB_EXTENSION_DISCLAIMER, true)
     this.viewController.dismiss()
   }

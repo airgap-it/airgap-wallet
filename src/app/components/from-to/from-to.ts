@@ -9,5 +9,5 @@ import { Transaction } from '../../models/transaction.model'
 })
 export class FromToComponent {
   @Input()
-  transaction: Transaction
+  public transaction: Transaction
 }

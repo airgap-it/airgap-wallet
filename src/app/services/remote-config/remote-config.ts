@@ -30,7 +30,7 @@ export interface AeFirstVote {
 export class RemoteConfigProvider {
   constructor(private readonly httpClient: HttpClient) {}
 
-  async tezosBakers(): Promise<BakerConfig[]> {
+  public async tezosBakers(): Promise<BakerConfig[]> {
     const responsePromise = this.httpClient.get<BakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
     responsePromise.catch(handleErrorSentry(ErrorCategory.OTHER))
     const response = await responsePromise

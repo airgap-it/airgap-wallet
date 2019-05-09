@@ -14,15 +14,15 @@ export class CurrencySymbolComponent {
     /* */
   }
 
-  ngAfterViewInit() {
+  public ngAfterViewInit() {
     this.loadImage()
   }
 
-  ngOnChanges() {
+  public ngOnChanges() {
     this.loadImage()
   }
 
-  loadImage() {
+  public loadImage() {
     const imageUrl = 'assets/symbols/' + this.symbol.toLowerCase() + '.svg'
     const img = new Image()
     img.onload = () => {

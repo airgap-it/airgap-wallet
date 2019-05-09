@@ -16,7 +16,7 @@ export interface PushAddressRequest {
 export class PushBackendProvider {
   constructor(private http: HttpClient) {}
 
-  async registerPushMany(pushRequests: PushAddressRequest[]) {
+  public async registerPushMany(pushRequests: PushAddressRequest[]) {
     console.log(`PushService: Registering ${pushRequests.length} wallets`)
 
     return this.http
@@ -24,7 +24,7 @@ export class PushBackendProvider {
       .toPromise()
   }
 
-  async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
+  public async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
     console.log(`PushService: Unregistering wallet ${protocolIdentifier}-${address}`)
     const body = {
       address: address,

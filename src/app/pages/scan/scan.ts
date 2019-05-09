@@ -16,7 +16,7 @@ import { ScanBasePage } from '../scan-base/scan-base'
 })
 export class ScanPage extends ScanBasePage {
   @ViewChild('scanner')
-  zxingScanner: ZXingScannerComponent
+  public zxingScanner: ZXingScannerComponent
 
   constructor(
     protected platform: Platform,
@@ -29,7 +29,7 @@ export class ScanPage extends ScanBasePage {
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  async checkScan(resultString: string) {
+  public async checkScan(resultString: string) {
     console.log('got new text', resultString)
     this.schemeRouting
       .handleNewSyncRequest(this.router, resultString, () => {

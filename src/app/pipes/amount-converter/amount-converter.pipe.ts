@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
   name: 'amountConverter'
 })
 export class AmountConverterPipe implements PipeTransform {
-  transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
+  public transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }
@@ -39,7 +39,7 @@ export class AmountConverterPipe implements PipeTransform {
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 
-  formatBigNumber(value: BigNumber, maxDigits?: number): string {
+  public formatBigNumber(value: BigNumber, maxDigits?: number): string {
     if (!maxDigits) {
       return value.toFormat()
     }
@@ -58,7 +58,7 @@ export class AmountConverterPipe implements PipeTransform {
     return value.toFormat(maxDigits - integerValueLength).replace(/\.?0+$/, '')
   }
 
-  makeFullNumberSmaller(value: BigNumber, maxDigits: number): string {
+  public makeFullNumberSmaller(value: BigNumber, maxDigits: number): string {
     if (value.toFixed().length <= maxDigits) {
       return value.toFormat()
     }

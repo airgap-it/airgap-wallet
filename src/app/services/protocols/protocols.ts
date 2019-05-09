@@ -49,11 +49,11 @@ export class ProtocolsProvider {
     /* */
   }
 
-  getEnabledSubProtocols() {
+  public getEnabledSubProtocols() {
     return ['eth-erc20-ae']
   }
 
-  addProtocols() {
+  public addProtocols() {
     addSubProtocol('xtz', new TezosKtProtocol())
 
     this.subProtocols.forEach(supportedSubAccount => {

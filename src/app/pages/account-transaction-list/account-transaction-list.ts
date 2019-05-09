@@ -36,30 +36,30 @@ declare let cordova
   styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
-  isRefreshing = false
-  initialTransactionsLoaded = false
-  infiniteEnabled = false
-  txOffset: number = 0
-  wallet: AirGapMarketWallet
-  transactions: IAirGapTransaction[] = []
+  public isRefreshing = false
+  public initialTransactionsLoaded = false
+  public infiniteEnabled = false
+  public txOffset: number = 0
+  public wallet: AirGapMarketWallet
+  public transactions: IAirGapTransaction[] = []
 
-  protocolIdentifier: string
+  public protocolIdentifier: string
 
-  hasPendingTransactions: boolean = false
+  public hasPendingTransactions: boolean = false
 
   // AE-Migration Stuff
-  aeTxEnabled: boolean = false
-  aeTxListEnabled: boolean = false
-  aeMigratedTokens: BigNumber = new BigNumber(0)
-  aeCurrentPhase: string = ''
-  aePhaseEnd: string = ''
+  public aeTxEnabled: boolean = false
+  public aeTxListEnabled: boolean = false
+  public aeMigratedTokens: BigNumber = new BigNumber(0)
+  public aeCurrentPhase: string = ''
+  public aePhaseEnd: string = ''
 
   // XTZ
-  isKtDelegated: boolean = false
+  public isKtDelegated: boolean = false
 
-  actions: CoinAction[] = []
+  public actions: CoinAction[] = []
 
-  lottieConfig = {
+  public lottieConfig = {
     path: '/assets/animations/loading.json'
   }
 
@@ -103,7 +103,7 @@ export class AccountTransactionListPage {
     this.init()
   }
 
-  async init() {
+  public async init() {
     const supportedActions = this.operationsProvider.getActionsForCoin(this.wallet.protocolIdentifier)
 
     supportedActions.forEach(action => {
@@ -135,7 +135,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  getImportAccountAction(): CoinAction {
+  public getImportAccountAction(): CoinAction {
     return {
       type: ActionType.IMPORT_ACCOUNT,
       name: 'account-transaction-list.import-accounts_label',
@@ -200,7 +200,7 @@ export class AccountTransactionListPage {
    * This should be shown if the user has balance on mainnet,
    * but also balance on the next migration phase.
    */
-  showAeMigrationBanner() {
+  public showAeMigrationBanner() {
     return this.walletIsAe() && (this.wallet.currentBalance.gt(0) || this.transactions.length > 0) && this.aeMigratedTokens.gt(0)
   }
 
@@ -208,23 +208,23 @@ export class AccountTransactionListPage {
    * This is the full page screen informing the user about token migration
    * It should be shown when the user has migration balance, but no mainnet balance.
    */
-  showAeMigrationScreen() {
+  public showAeMigrationScreen() {
     return this.walletIsAe() && (this.wallet.currentBalance.eq(0) && this.transactions.length === 0) && this.aeMigratedTokens.gt(0)
   }
 
-  showNoTransactionScreen() {
+  public showNoTransactionScreen() {
     return this.transactions.length === 0 && !this.showAeMigrationScreen()
   }
 
-  walletIsAe() {
+  public walletIsAe() {
     return this.wallet.protocolIdentifier === ProtocolSymbols.AE
   }
 
-  ionViewWillEnter() {
+  public ionViewWillEnter() {
     this.doRefresh()
   }
 
-  openPreparePage() {
+  public openPreparePage() {
     const info = {
       wallet: this.wallet,
       address: ''
@@ -233,17 +233,17 @@ export class AccountTransactionListPage {
     this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openReceivePage() {
+  public openReceivePage() {
     this.dataService.setData(DataServiceKey.DETAIL, this.wallet)
     this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openTransactionDetailPage(transaction: IAirGapTransaction) {
+  public openTransactionDetailPage(transaction: IAirGapTransaction) {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
     this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openBlockexplorer() {
+  public openBlockexplorer() {
     const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.openUrl(blockexplorer)
@@ -257,7 +257,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  doRefresh(event: any = null) {
+  public doRefresh(event: any = null) {
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
@@ -285,7 +285,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  async doInfinite(event) {
+  public async doInfinite(event) {
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
@@ -305,7 +305,7 @@ export class AccountTransactionListPage {
     event.target.complete()
   }
 
-  async loadInitialTransactions(): Promise<void> {
+  public async loadInitialTransactions(): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
@@ -325,12 +325,12 @@ export class AccountTransactionListPage {
     this.infiniteEnabled = true
   }
 
-  async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
+  public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
     const results = await Promise.all([this.wallet.fetchTransactions(limit, offset), this.wallet.synchronize()])
     return results[0]
   }
 
-  mergeTransactions(oldTransactions, newTransactions): IAirGapTransaction[] {
+  public mergeTransactions(oldTransactions, newTransactions): IAirGapTransaction[] {
     if (!oldTransactions) {
       return newTransactions
     }
@@ -345,7 +345,7 @@ export class AccountTransactionListPage {
     return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
   }
 
-  async presentEditPopover(event) {
+  public async presentEditPopover(event) {
     let popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
@@ -373,14 +373,14 @@ export class AccountTransactionListPage {
   }
 
   // Tezos
-  async isDelegated(): Promise<void> {
+  public async isDelegated(): Promise<void> {
     const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
     const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     this.replaceAction(ActionType.DELEGATE, action)
   }
 
-  async getKtAddresses() {
+  public async getKtAddresses() {
     const protocol = new TezosKtProtocol()
     const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
@@ -408,7 +408,7 @@ export class AccountTransactionListPage {
       })
   }
 
-  openDelegateSelection(wallet?: AirGapMarketWallet) {
+  public openDelegateSelection(wallet?: AirGapMarketWallet) {
     const info = {
       wallet: wallet || this.wallet
     }
@@ -416,7 +416,7 @@ export class AccountTransactionListPage {
     this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
+  public openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
     const info = {
       subProtocolType: subProtocolType,
       wallet: wallet

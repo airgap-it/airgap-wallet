@@ -19,11 +19,11 @@ export class DataService {
 
   constructor(private storage: Storage) {}
 
-  setData(id, data) {
+  public setData(id, data) {
     this.data[id] = data
   }
 
-  getData(id) {
+  public getData(id) {
     return this.data[id]
   }
 

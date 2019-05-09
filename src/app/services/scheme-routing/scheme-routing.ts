@@ -42,7 +42,7 @@ export class SchemeRoutingProvider {
     this.syncSchemeHandlers[EncodedType.SIGNED_TRANSACTION] = this.handleSignedTransaction.bind(this)
   }
 
-  async handleNewSyncRequest(
+  public async handleNewSyncRequest(
     router: Router,
     rawString: string,
     scanAgainCallback: Function = () => {
@@ -136,7 +136,7 @@ export class SchemeRoutingProvider {
     }
   }
 
-  async handleWalletSync(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
+  public async handleWalletSync(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const walletSync = deserializedSync.payload as SyncWalletRequest
     const wallet = new AirGapMarketWallet(
@@ -151,7 +151,7 @@ export class SchemeRoutingProvider {
     }
   }
 
-  async handleSignedTransaction(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
+  public async handleSignedTransaction(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) {
     if (this.router) {
       const info = {
         signedTransactionSync: deserializedSync

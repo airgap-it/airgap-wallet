@@ -14,7 +14,7 @@ export class ClipboardProvider {
     private readonly toastController: ToastController
   ) {}
 
-  async copy(text: string): Promise<void> {
+  public async copy(text: string): Promise<void> {
     if (this.platform.is('cordova')) {
       return this.clipboard.copy(text)
     } else {
@@ -22,7 +22,7 @@ export class ClipboardProvider {
     }
   }
 
-  async copyAndShowToast(text: string, toastMessage: string = 'Successfully copied to your clipboard!') {
+  public async copyAndShowToast(text: string, toastMessage: string = 'Successfully copied to your clipboard!') {
     try {
       await this.copy(text)
       await this.showToast(toastMessage)
@@ -31,7 +31,7 @@ export class ClipboardProvider {
     }
   }
 
-  async paste(): Promise<string> {
+  public async paste(): Promise<string> {
     try {
       if (this.platform.is('cordova')) {
         return this.clipboard.paste()

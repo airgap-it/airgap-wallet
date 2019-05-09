@@ -23,12 +23,12 @@ export enum PermissionTypes {
 export class PermissionsProvider {
   constructor(private platform: Platform, private diagnostic: Diagnostic, private alertCtrl: AlertController) {}
 
-  async hasCameraPermission(): Promise<PermissionStatus> {
+  public async hasCameraPermission(): Promise<PermissionStatus> {
     const permission = await this.diagnostic.getCameraAuthorizationStatus(false)
     return this.getPermissionStatus(permission)
   }
 
-  async requestPermissions(permissions: PermissionTypes[]): Promise<void> {
+  public async requestPermissions(permissions: PermissionTypes[]): Promise<void> {
     if (this.platform.is('android')) {
       const permissionsToRequest = []
       if (permissions.indexOf(PermissionTypes.CAMERA) >= 0) {
@@ -49,7 +49,7 @@ export class PermissionsProvider {
    * can ask him for the permissions natively, otherwise we show an alert with a
    * link to the settings.
    */
-  async userRequestsPermissions(permissions: PermissionTypes[]) {
+  public async userRequestsPermissions(permissions: PermissionTypes[]) {
     let canRequestPermission = false
     for (const p of permissions) {
       canRequestPermission = (await this.canAskForPermission(p)) || canRequestPermission
@@ -61,7 +61,7 @@ export class PermissionsProvider {
     }
   }
 
-  showSettingsAlert() {
+  public showSettingsAlert() {
     this.showAlert('Settings', 'You can enable the missing permissions in the device settings.')
   }
 

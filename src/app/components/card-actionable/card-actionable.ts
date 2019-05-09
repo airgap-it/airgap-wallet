@@ -7,14 +7,14 @@ import { Component, Input } from '@angular/core'
 })
 export class CardActionableComponent {
   @Input()
-  imageLeft: boolean = true
+  public imageLeft: boolean = true
 
   @Input()
-  imageName: string
+  public imageName: string
 
   @Input()
-  heading: string
+  public heading: string
 
   @Input()
-  text: string
+  public text: string
 }

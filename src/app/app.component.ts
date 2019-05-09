@@ -44,7 +44,7 @@ export class AppComponent {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  async initializeApp() {
+  public async initializeApp() {
     const supportedLanguages = ['en', 'de', 'zh-cn']
 
     this.loadLanguages(supportedLanguages)
@@ -93,7 +93,7 @@ export class AppComponent {
     }
   }
 
-  loadLanguages(supportedLanguages: string[]) {
+  public loadLanguages(supportedLanguages: string[]) {
     this.translate.setDefaultLang('en')
 
     const language = this.translate.getBrowserLang()
@@ -108,7 +108,7 @@ export class AppComponent {
     }
   }
 
-  async ngAfterViewInit() {
+  public async ngAfterViewInit() {
     await this.platform.ready()
     if (this.platform.is('cordova')) {
       this.deeplinks
@@ -134,7 +134,7 @@ export class AppComponent {
   }
 
   // TODO: Move to provider
-  async walletDeeplink() {
+  public async walletDeeplink() {
     let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     const info = {
       wallet: deeplinkInfo.wallet,

@@ -13,14 +13,14 @@ import { WebExtensionProvider } from '../../services/web-extension/web-extension
   templateUrl: 'account-import.html'
 })
 export class AccountImportPage {
-  wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
 
-  walletAlreadyExists = false
+  public walletAlreadyExists = false
 
   // WebExtension
-  walletImportable = true
+  public walletImportable = true
 
-  loading: HTMLIonLoadingElement
+  public loading: HTMLIonLoadingElement
 
   constructor(
     private platform: Platform,
@@ -39,7 +39,7 @@ export class AccountImportPage {
     }
   }
 
-  ionViewWillEnter() {
+  public ionViewWillEnter() {
     this.platform
       .ready()
       .then(async () => {
@@ -107,11 +107,11 @@ export class AccountImportPage {
       .catch(console.error)
   }
 
-  dismiss() {
+  public dismiss() {
     this.location.back()
   }
 
-  async import() {
+  public async import() {
     await this.wallets.addWallet(this.wallet)
     await this.router.navigateByUrl('/tabs/portfolio')
   }

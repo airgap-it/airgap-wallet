@@ -12,11 +12,11 @@ const ktProtocol = new TezosKtProtocol()
 })
 export class TezosDelegationStats {
   @Input()
-  wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
 
-  delegationRewards: DelegationRewardInfo[] | void
+  public delegationRewards: DelegationRewardInfo[] | void
 
-  async ngOnChanges() {
+  public async ngOnChanges() {
     if (this.wallet) {
       this.delegationRewards = await ktProtocol.delegationInfo(this.wallet.receivingPublicAddress).catch(handleErrorIgnore)
     }

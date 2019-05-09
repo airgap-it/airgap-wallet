@@ -49,7 +49,7 @@ export class ExchangePage {
     private dataService: DataService
   ) {}
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
       this.initExchangePage()
     } else {
@@ -101,7 +101,7 @@ export class ExchangePage {
     this.exchangePageState = ExchangePageState.EXCHANGE
   }
 
-  async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
+  public async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
     if (fromOrTo === FROM) {
       this.selectedFromProtocol = protocol
     } else {
@@ -127,7 +127,7 @@ export class ExchangePage {
     return this.loadDataFromExchange()
   }
 
-  async loadWalletsForSelectedProtocol(fromOrTo: string) {
+  public async loadWalletsForSelectedProtocol(fromOrTo: string) {
     if (fromOrTo === FROM) {
       this.supportedFromWallets = this.accountProvider
         .getWalletList()
@@ -157,7 +157,7 @@ export class ExchangePage {
     )
   }
 
-  async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
+  public async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
     if (fromOrTo === FROM) {
       this.fromWallet = wallet
     } else {
@@ -167,13 +167,13 @@ export class ExchangePage {
     this.loadDataFromExchange()
   }
 
-  async amountSet(amount: string) {
+  public async amountSet(amount: string) {
     this.amount = new BigNumber(amount)
 
     this.loadDataFromExchange()
   }
 
-  async loadDataFromExchange() {
+  public async loadDataFromExchange() {
     if (this.fromWallet && this.toWallet) {
       this.minExchangeAmount = new BigNumber(
         await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocolIdentifier, this.toWallet.protocolIdentifier)
@@ -192,7 +192,7 @@ export class ExchangePage {
     }
   }
 
-  async startExchange() {
+  public async startExchange() {
     try {
       const result = await this.exchangeProvider.createTransaction(
         this.fromWallet.protocolIdentifier,
@@ -214,12 +214,12 @@ export class ExchangePage {
     }
   }
 
-  dismissExchangeOnboarding() {
+  public dismissExchangeOnboarding() {
     this.initExchangePage()
     this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
-  goToAddCoinPage() {
+  public goToAddCoinPage() {
     this.router.navigateByUrl('/account-add')
   }
 }

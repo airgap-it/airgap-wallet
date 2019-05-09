@@ -30,9 +30,9 @@ export class InteractionSelectionPage {
     }
   }
 
-  async ionViewDidEnter() {}
+  public async ionViewDidEnter() {}
 
-  offlineDeviceSign() {
+  public offlineDeviceSign() {
     const info = {
       wallet: this.wallet,
       airGapTx: this.airGapTx,
@@ -42,7 +42,7 @@ export class InteractionSelectionPage {
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  sameDeviceSign() {
+  public sameDeviceSign() {
     this.deepLinkProvider
       .sameDeviceDeeplink(this.preparedDataQR)
       .then(() => {

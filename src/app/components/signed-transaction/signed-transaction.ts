@@ -16,21 +16,21 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 })
 export class SignedTransactionComponent {
   @Input()
-  signedTx: DeserializedSyncProtocol
+  public signedTx: DeserializedSyncProtocol
 
   @Input()
-  syncProtocolString: string
+  public syncProtocolString: string
 
-  airGapTx: IAirGapTransaction
-  fallbackActivated: boolean = false
+  public airGapTx: IAirGapTransaction
+  public fallbackActivated: boolean = false
 
-  rawTxData: SignedTransaction
+  public rawTxData: SignedTransaction
 
   constructor() {
     //
   }
 
-  async ngOnChanges() {
+  public async ngOnChanges() {
     if (this.syncProtocolString) {
       try {
         const syncUtils = new SyncProtocolUtils()

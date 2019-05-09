@@ -45,19 +45,19 @@ export class SubAccountImportPage {
       })
   }
 
-  importWallets() {
+  public importWallets() {
     this.subWallets.forEach(subWallet => {
       this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     })
     this.popToRoot()
   }
 
-  importWallet(subWallet: AirGapMarketWallet) {
+  public importWallet(subWallet: AirGapMarketWallet) {
     this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     this.popToRoot()
   }
 
-  popToRoot() {
+  public popToRoot() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

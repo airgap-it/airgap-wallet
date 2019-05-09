@@ -7,11 +7,11 @@ import { ICoinProtocol } from 'airgap-coin-lib'
   templateUrl: 'protocol-select.html'
 })
 export class ProtocolSelectPage {
-  searchTerm: string = ''
+  public searchTerm: string = ''
 
-  selectedProtocol: string
-  protocols: ICoinProtocol[]
-  filteredProtocols: ICoinProtocol[]
+  public selectedProtocol: string
+  public protocols: ICoinProtocol[]
+  public filteredProtocols: ICoinProtocol[]
 
   constructor(public navParams: NavParams, public viewCtrl: ModalController) {
     this.selectedProtocol = this.navParams.get('selectedProtocol')

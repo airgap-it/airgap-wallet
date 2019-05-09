@@ -16,28 +16,28 @@ export class PortfolioItemComponent {
   public isActive: boolean = false
 
   @Input()
-  wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
 
   @Input()
-  maxDigits: number = 0
+  public maxDigits: number = 0
 
   @Input()
-  showBalances: boolean = true
+  public showBalances: boolean = true
 
   @Input()
-  isExpendable: boolean = false
+  public isExpendable: boolean = false
 
   @Input()
-  isExtended: boolean = false
+  public isExtended: boolean = false
 
   @Input()
-  hideFiatAmounts: boolean = false
+  public hideFiatAmounts: boolean = false
 
   @Input()
-  isToken: boolean = false
+  public isToken: boolean = false
 
   @Input()
-  isDelegated: Observable<boolean>
+  public isDelegated: Observable<boolean>
 
   constructor(
     private readonly operationsProvider: OperationsProvider,
@@ -45,7 +45,7 @@ export class PortfolioItemComponent {
     public accountProvider: AccountProvider
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     if (this.webExtensionProvider.isWebExtension()) {
       this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
         if (this.wallet && activeAccount) {
@@ -55,7 +55,7 @@ export class PortfolioItemComponent {
     }
   }
 
-  async ngOnChanges() {
+  public async ngOnChanges() {
     if (this.wallet && this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(this.wallet.receivingPublicAddress)
     }

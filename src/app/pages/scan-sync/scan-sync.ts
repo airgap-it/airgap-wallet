@@ -10,7 +10,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 export class ScanSyncPage {
   constructor(public router: Router) {}
 
-  goToScanPage() {
+  public goToScanPage() {
     this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

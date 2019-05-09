@@ -5,32 +5,32 @@ import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../se
 import { ScannerProvider } from '../../services/scanner/scanner'
 
 export class ScanBasePage {
-  zxingScanner: ZXingScannerComponent
-  availableDevices: MediaDeviceInfo[]
-  selectedDevice: MediaDeviceInfo
-  scannerEnabled = true
+  public zxingScanner: ZXingScannerComponent
+  public availableDevices: MediaDeviceInfo[]
+  public selectedDevice: MediaDeviceInfo
+  public scannerEnabled = true
 
   public isBrowser = false
 
-  hasCameras = false
+  public hasCameras = false
 
   public hasCameraPermission = false
 
   constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {}
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     if (this.platform.is('cordova')) {
       await this.platform.ready()
       await this.checkCameraPermissionsAndActivate()
     }
   }
 
-  async requestPermission() {
+  public async requestPermission() {
     await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
     await this.checkCameraPermissionsAndActivate()
   }
 
-  async checkCameraPermissionsAndActivate() {
+  public async checkCameraPermissionsAndActivate() {
     const permission = await this.permissionsProvider.hasCameraPermission()
     if (permission === PermissionStatus.GRANTED) {
       this.hasCameraPermission = true
@@ -38,7 +38,7 @@ export class ScanBasePage {
     }
   }
 
-  ionViewDidEnter() {
+  public ionViewDidEnter() {
     if (!this.platform.is('cordova')) {
       this.hasCameraPermission = true
       this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
@@ -56,7 +56,7 @@ export class ScanBasePage {
     }
   }
 
-  ionViewWillLeave() {
+  public ionViewWillLeave() {
     if (this.platform.is('cordova')) {
       this.scanner.destroy()
     } else {
@@ -81,7 +81,7 @@ export class ScanBasePage {
     }
   }
 
-  checkScan(resultString: string) {
+  public checkScan(resultString: string) {
     console.error(`The checkScan method needs to be overwritten. Ignoring text ${resultString}`)
   }
 }

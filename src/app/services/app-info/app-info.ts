@@ -17,7 +17,7 @@ export class AppInfoProvider {
     this.isInitialized = this.updateVersions()
   }
 
-  async updateVersions() {
+  public async updateVersions() {
     if (this.platform.is('cordova')) {
       await this.platform.ready()
       this.appName = await this.app.getAppName()
@@ -27,22 +27,22 @@ export class AppInfoProvider {
     }
   }
 
-  async getAppName() {
+  public async getAppName() {
     await this.isInitialized
     return this.appName
   }
 
-  async getPackageName() {
+  public async getPackageName() {
     await this.isInitialized
     return this.packageName
   }
 
-  async getVersionNumber() {
+  public async getVersionNumber() {
     await this.isInitialized
     return this.versionNumber
   }
 
-  async getVersionCode() {
+  public async getVersionCode() {
     await this.isInitialized
     return this.versionCode
   }

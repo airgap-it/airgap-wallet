@@ -17,7 +17,7 @@ export class AboutPage {
     this.updateVersions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  async updateVersions() {
+  public async updateVersions() {
     this.appName = await this.appInfoProvider.getAppName()
     this.packageName = await this.appInfoProvider.getPackageName()
     this.versionNumber = await this.appInfoProvider.getVersionNumber()

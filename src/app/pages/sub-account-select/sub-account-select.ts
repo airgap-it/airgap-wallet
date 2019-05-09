@@ -32,7 +32,7 @@ export class SubAccountSelectPage {
     })
   }
 
-  async goToDelegateSelection(subWallet: AirGapMarketWallet) {
+  public async goToDelegateSelection(subWallet: AirGapMarketWallet) {
     const info = {
       wallet: subWallet
     }

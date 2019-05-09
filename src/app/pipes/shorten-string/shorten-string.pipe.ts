@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core'
   name: 'shortenString'
 })
 export class ShortenStringPipe implements PipeTransform {
-  transform(value: string) {
+  public transform(value: string) {
     if (!value || !(typeof value === 'string')) {
       // console.warn(`ShortenStringPipe: invalid value: ${value}`)
       return ''

@@ -20,7 +20,7 @@ export class DeepLinkProvider {
     private accountProvider: AccountProvider
   ) {}
 
-  sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
+  public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
     return new Promise((resolve, reject) => {
       let sApp
 
@@ -52,7 +52,7 @@ export class DeepLinkProvider {
     })
   }
 
-  showDeeplinkOnlyOnDevicesAlert() {
+  public showDeeplinkOnlyOnDevicesAlert() {
     this.translateService
       .get(['deep-link.not-supported-alert.title', 'deep-link.not-supported-alert.message', 'deep-link.not-supported-alert.ok'])
       .subscribe(translated => {
@@ -74,7 +74,7 @@ export class DeepLinkProvider {
       })
   }
 
-  showAppNotFoundAlert() {
+  public showAppNotFoundAlert() {
     this.translateService
       .get(['deep-link.app-not-found.title', 'deep-link.app-not-found.message', 'deep-link.app-not-found.ok'], {
         otherAppName: 'AirGap Vault'
@@ -98,7 +98,7 @@ export class DeepLinkProvider {
       })
   }
   // TODO: Move to provider
-  async walletDeepLink() {
+  public async walletDeepLink() {
     let url = new URL(location.href)
     let publicKey = url.searchParams.get('publicKey')
     let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
