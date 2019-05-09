@@ -32,7 +32,7 @@ export enum ActionType {
   providedIn: 'root'
 })
 export class OperationsProvider {
-  private delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
+  private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
   constructor(
     private readonly accountProvider: AccountProvider,

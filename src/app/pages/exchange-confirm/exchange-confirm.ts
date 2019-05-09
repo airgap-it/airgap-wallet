@@ -28,11 +28,11 @@ export class ExchangeConfirmPage {
   public exchangeResult: CreateTransactionResponse
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     public platform: Platform,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

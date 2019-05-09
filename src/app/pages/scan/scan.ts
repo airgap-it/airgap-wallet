@@ -22,8 +22,8 @@ export class ScanPage extends ScanBasePage {
     protected platform: Platform,
     protected scanner: ScannerProvider,
     protected permissionsProvider: PermissionsProvider,
-    private schemeRouting: SchemeRoutingProvider,
-    private router: Router
+    private readonly schemeRouting: SchemeRoutingProvider,
+    private readonly router: Router
   ) {
     super(platform, scanner, permissionsProvider)
     this.isBrowser = !this.platform.is('cordova')

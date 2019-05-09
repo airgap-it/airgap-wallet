@@ -18,13 +18,13 @@ declare var cordova: any
 })
 export class SettingsPage {
   constructor(
-    private router: Router,
-    private modalController: ModalController,
-    private translateService: TranslateService,
+    private readonly router: Router,
+    private readonly modalController: ModalController,
+    private readonly translateService: TranslateService,
     public platform: Platform,
     public alertCtrl: AlertController,
-    private clipboardProvider: ClipboardProvider,
-    private schemeRoutingProvider: SchemeRoutingProvider
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly schemeRoutingProvider: SchemeRoutingProvider
   ) {}
 
   public about() {

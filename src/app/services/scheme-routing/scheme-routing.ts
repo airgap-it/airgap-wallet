@@ -27,9 +27,16 @@ export class SchemeRoutingProvider {
     [key in EncodedType]: (deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>
   }
   */
-  private syncSchemeHandlers: ((deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>)[] = []
+  private readonly syncSchemeHandlers: ((
+    deserializedSync: DeserializedSyncProtocol,
+    scanAgainCallback: Function
+  ) => Promise<boolean>)[] = []
 
-  constructor(private alertController: AlertController, private accountProvider: AccountProvider, private dataService: DataService) {
+  constructor(
+    private readonly alertController: AlertController,
+    private readonly accountProvider: AccountProvider,
+    private readonly dataService: DataService
+  ) {
     /* TS 2.7 feature
     this.syncSchemeHandlers = {
       [EncodedType.WALLET_SYNC]: this.handleWalletSync.bind(this),

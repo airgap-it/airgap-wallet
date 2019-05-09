@@ -13,7 +13,7 @@ export class AboutPage {
   public versionNumber = ''
   public versionCode: string | number = ''
 
-  constructor(private appInfoProvider: AppInfoProvider) {
+  constructor(private readonly appInfoProvider: AppInfoProvider) {
     this.updateVersions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 

@@ -9,7 +9,7 @@ import { SettingsKey, StorageProvider } from '../../services/storage/storage'
   styleUrls: ['./disclaimer-web-extension.scss']
 })
 export class DisclaimerWebExtensionPage {
-  constructor(private viewController: ModalController, private storageProvider: StorageProvider) {}
+  constructor(private readonly viewController: ModalController, private readonly storageProvider: StorageProvider) {}
 
   public async accept() {
     await this.storageProvider.set(SettingsKey.WEB_EXTENSION_DISCLAIMER, true)

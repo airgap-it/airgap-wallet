@@ -14,10 +14,10 @@ export class AccountAddressPage {
   public wallet: AirGapMarketWallet
 
   constructor(
-    private location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    private clipboardProvider: ClipboardProvider
+    private readonly location: Location,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly clipboardProvider: ClipboardProvider
   ) {
     if (this.route.snapshot.data['special']) {
       this.wallet = this.route.snapshot.data['special']

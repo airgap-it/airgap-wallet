@@ -38,13 +38,13 @@ export class TransactionConfirmPage {
 
   constructor(
     public loadingCtrl: LoadingController,
-    private toastCtrl: ToastController,
-    private router: Router,
-    private route: ActivatedRoute,
-    private alertCtrl: AlertController,
-    private platform: Platform,
-    private storageProvider: StorageProvider,
-    private accountProvider: AccountProvider
+    private readonly toastCtrl: ToastController,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly alertCtrl: AlertController,
+    private readonly platform: Platform,
+    private readonly storageProvider: StorageProvider,
+    private readonly accountProvider: AccountProvider
   ) {}
 
   public dismiss() {

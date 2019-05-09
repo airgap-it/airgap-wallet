@@ -42,11 +42,11 @@ export class ExchangePage {
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
 
   constructor(
-    private router: Router,
-    private exchangeProvider: ExchangeProvider,
-    private storageProvider: StorageProvider,
-    private accountProvider: AccountProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly exchangeProvider: ExchangeProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly accountProvider: AccountProvider,
+    private readonly dataService: DataService
   ) {}
 
   public async ionViewWillEnter() {

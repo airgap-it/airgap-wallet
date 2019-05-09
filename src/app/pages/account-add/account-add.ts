@@ -23,10 +23,10 @@ export class AccountAddPage {
   public filteredSubAccountProtocols: ICoinProtocol[] = []
 
   constructor(
-    private accountProvider: AccountProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private router: Router,
-    private dataService: DataService
+    private readonly accountProvider: AccountProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly router: Router,
+    private readonly dataService: DataService
   ) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {

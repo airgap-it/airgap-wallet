@@ -7,7 +7,7 @@ import { DataService } from '../data/data.service'
   providedIn: 'root'
 })
 export class DataResolverService implements Resolve<any> {
-  constructor(private dataService: DataService) {}
+  constructor(private readonly dataService: DataService) {}
 
   public resolve(route: ActivatedRouteSnapshot) {
     const id = route.paramMap.get('id')

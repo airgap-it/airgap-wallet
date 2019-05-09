@@ -6,7 +6,7 @@ import { Component, Input } from '@angular/core'
 })
 export class CurrencySymbolComponent {
   @Input()
-  private symbol: string
+  private readonly symbol: string
 
   public symbolURL: string = 'assets/symbols/generic-coin.svg'
 

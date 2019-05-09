@@ -16,7 +16,7 @@ import { PushBackendProvider } from './../push-backend/push-backend'
   providedIn: 'root'
 })
 export class PushProvider {
-  private registrationId: ReplaySubject<string> = new ReplaySubject(1)
+  private readonly registrationId: ReplaySubject<string> = new ReplaySubject(1)
   private registerCalled: boolean = false
 
   private readonly options: PushOptions = {

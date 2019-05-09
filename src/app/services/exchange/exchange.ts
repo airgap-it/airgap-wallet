@@ -168,7 +168,7 @@ class ChangellyExchange extends ChangellyApi implements Exchange {
   providedIn: 'root'
 })
 export class ExchangeProvider implements Exchange {
-  private exchange: Exchange
+  private readonly exchange: Exchange
   constructor(public http: HttpClient) {
     this.exchange = new ChangellyExchange(http)
   }

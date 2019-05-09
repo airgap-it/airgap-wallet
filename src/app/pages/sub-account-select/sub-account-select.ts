@@ -11,15 +11,15 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   templateUrl: 'sub-account-select.html'
 })
 export class SubAccountSelectPage {
-  private wallet: AirGapMarketWallet
+  private readonly wallet: AirGapMarketWallet
   public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private accountProvider: AccountProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly accountProvider: AccountProvider,
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

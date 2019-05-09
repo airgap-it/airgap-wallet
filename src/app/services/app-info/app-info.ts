@@ -11,9 +11,9 @@ export class AppInfoProvider {
   public versionNumber = 'VERSION_NUMBER'
   public versionCode: string | number = 'VERSION_CODE'
 
-  private isInitialized: Promise<void>
+  private readonly isInitialized: Promise<void>
 
-  constructor(private app: AppVersion, private platform: Platform) {
+  constructor(private readonly app: AppVersion, private readonly platform: Platform) {
     this.isInitialized = this.updateVersions()
   }
 

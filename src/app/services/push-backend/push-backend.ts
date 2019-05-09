@@ -14,7 +14,7 @@ export interface PushAddressRequest {
   providedIn: 'root'
 })
 export class PushBackendProvider {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   public async registerPushMany(pushRequests: PushAddressRequest[]) {
     console.log(`PushService: Registering ${pushRequests.length} wallets`)

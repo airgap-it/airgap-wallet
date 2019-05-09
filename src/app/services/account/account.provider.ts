@@ -11,7 +11,7 @@ import { SettingsKey, StorageProvider } from '../storage/storage'
   providedIn: 'root'
 })
 export class AccountProvider {
-  private walletList: AirGapMarketWallet[] = []
+  private readonly walletList: AirGapMarketWallet[] = []
   public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
   public refreshPageSubject: Subject<void> = new Subject()
 
@@ -21,13 +21,13 @@ export class AccountProvider {
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public usedProtocols: ReplaySubject<ICoinProtocol[]> = new ReplaySubject(1)
 
-  private walletChangedBehaviour: Subject<void> = new Subject()
+  private readonly walletChangedBehaviour: Subject<void> = new Subject()
 
   get walledChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
-  constructor(private storageProvider: StorageProvider, private pushProvider: PushProvider) {
+  constructor(private readonly storageProvider: StorageProvider, private readonly pushProvider: PushProvider) {
     this.loadWalletsFromStorage().catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)

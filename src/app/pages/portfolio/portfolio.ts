@@ -30,11 +30,11 @@ export class PortfolioPage {
   public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
 
   constructor(
-    private router: Router,
-    private walletsProvider: AccountProvider,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService,
-    private qrScanner: QRScanner
+    private readonly router: Router,
+    private readonly walletsProvider: AccountProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService,
+    private readonly qrScanner: QRScanner
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 

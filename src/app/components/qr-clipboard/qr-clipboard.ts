@@ -16,7 +16,7 @@ export class QrClipboardComponent {
   @Input()
   public size: number = 300
 
-  constructor(private clipboardProvider: ClipboardProvider) {}
+  constructor(private readonly clipboardProvider: ClipboardProvider) {}
 
   public async copyToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.qrdata)

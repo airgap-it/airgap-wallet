@@ -15,9 +15,9 @@ export enum DataServiceKey {
   providedIn: 'root'
 })
 export class DataService {
-  private data = []
+  private readonly data = []
 
-  constructor(private storage: Storage) {}
+  constructor(private readonly storage: Storage) {}
 
   public setData(id, data) {
     this.data[id] = data

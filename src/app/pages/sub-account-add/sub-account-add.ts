@@ -31,12 +31,12 @@ export class SubAccountAddPage {
 
   constructor(
     public location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    private accountProvider: AccountProvider,
-    private operationsProvider: OperationsProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly accountProvider: AccountProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

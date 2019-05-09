@@ -37,12 +37,12 @@ export class DelegationBakerDetailPage {
 
   constructor(
     public location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     public toastController: ToastController,
     public operationsProvider: OperationsProvider,
     public remoteConfigProvider: RemoteConfigProvider,
-    private dataService: DataService
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

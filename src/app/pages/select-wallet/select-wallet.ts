@@ -19,9 +19,9 @@ export class SelectWalletPage {
 
   constructor(
     public accountProvider: AccountProvider,
-    private dataService: DataService,
-    private router: Router,
-    private route: ActivatedRoute
+    private readonly dataService: DataService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
 
   public async ionViewWillEnter() {

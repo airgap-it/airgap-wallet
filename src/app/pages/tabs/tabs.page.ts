@@ -24,8 +24,8 @@ export class TabsPage {
 
   constructor(
     public modalController: ModalController,
-    private storageProvider: StorageProvider,
-    private webExtensionProvider: WebExtensionProvider
+    private readonly storageProvider: StorageProvider,
+    private readonly webExtensionProvider: WebExtensionProvider
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }

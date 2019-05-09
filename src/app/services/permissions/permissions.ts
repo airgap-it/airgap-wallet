@@ -21,7 +21,7 @@ export enum PermissionTypes {
   providedIn: 'root'
 })
 export class PermissionsProvider {
-  constructor(private platform: Platform, private diagnostic: Diagnostic, private alertCtrl: AlertController) {}
+  constructor(private readonly platform: Platform, private readonly diagnostic: Diagnostic, private readonly alertCtrl: AlertController) {}
 
   public async hasCameraPermission(): Promise<PermissionStatus> {
     const permission = await this.diagnostic.getCameraAuthorizationStatus(false)

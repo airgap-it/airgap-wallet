@@ -14,7 +14,7 @@ import { ScanBasePage } from '../scan-base/scan-base'
   styleUrls: ['./scan-address.scss']
 })
 export class ScanAddressPage extends ScanBasePage {
-  private callback: (address: string) => void
+  private readonly callback: (address: string) => void
   private callbackCalled: boolean = false
 
   @ViewChild('addressScanner')
@@ -24,9 +24,9 @@ export class ScanAddressPage extends ScanBasePage {
     protected platform: Platform,
     protected scanner: ScannerProvider,
     protected permissionsProvider: PermissionsProvider,
-    private navCtrl: NavController,
-    private router: Router,
-    private route: ActivatedRoute
+    private readonly navCtrl: NavController,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {
     super(platform, scanner, permissionsProvider)
     if (this.route.snapshot.data['special']) {

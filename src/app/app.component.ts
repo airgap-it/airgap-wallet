@@ -25,21 +25,21 @@ import { generateGUID } from './utils/utils'
 })
 export class AppComponent {
   constructor(
-    private platform: Platform,
-    private statusBar: StatusBar,
-    private splashScreen: SplashScreen,
-    private translate: TranslateService,
-    private deeplinks: Deeplinks,
-    private schemeRoutingProvider: SchemeRoutingProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private storageProvider: StorageProvider,
-    private webExtensionProvider: WebExtensionProvider,
-    private appInfoProvider: AppInfoProvider,
-    private accountProvider: AccountProvider,
-    private deepLinkProvider: DeepLinkProvider,
-    private pushProvider: PushProvider,
-    private router: Router,
-    private dataService: DataService
+    private readonly platform: Platform,
+    private readonly statusBar: StatusBar,
+    private readonly splashScreen: SplashScreen,
+    private readonly translate: TranslateService,
+    private readonly deeplinks: Deeplinks,
+    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly appInfoProvider: AppInfoProvider,
+    private readonly accountProvider: AccountProvider,
+    private readonly deepLinkProvider: DeepLinkProvider,
+    private readonly pushProvider: PushProvider,
+    private readonly router: Router,
+    private readonly dataService: DataService
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }

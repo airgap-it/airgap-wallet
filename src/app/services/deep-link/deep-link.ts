@@ -14,10 +14,10 @@ declare let window: any
 })
 export class DeepLinkProvider {
   constructor(
-    private platform: Platform,
-    private alertCtrl: AlertController,
-    private translateService: TranslateService,
-    private accountProvider: AccountProvider
+    private readonly platform: Platform,
+    private readonly alertCtrl: AlertController,
+    private readonly translateService: TranslateService,
+    private readonly accountProvider: AccountProvider
   ) {}
 
   public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {

@@ -14,7 +14,7 @@ function slugify(text) {
 }
 
 export class AppPage {
-  private time = new Date()
+  private readonly time = new Date()
 
   public navigateTo() {
     return browser.get('/')

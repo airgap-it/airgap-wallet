@@ -63,20 +63,20 @@ export class AccountTransactionListPage {
     path: '/assets/animations/loading.json'
   }
 
-  private TRANSACTION_LIMIT = 10
+  private readonly TRANSACTION_LIMIT = 10
 
   constructor(
-    private location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
+    private readonly location: Location,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     public popoverCtrl: PopoverController,
     public accountProvider: AccountProvider,
     public http: HttpClient,
-    private platform: Platform,
-    private operationsProvider: OperationsProvider,
-    private storageProvider: StorageProvider,
-    private toastController: ToastController,
-    private dataService: DataService
+    private readonly platform: Platform,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly toastController: ToastController,
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data['special']) {
       this.wallet = this.route.snapshot.data['special']

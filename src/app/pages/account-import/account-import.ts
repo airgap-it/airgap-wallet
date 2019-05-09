@@ -23,16 +23,16 @@ export class AccountImportPage {
   public loading: HTMLIonLoadingElement
 
   constructor(
-    private platform: Platform,
-    private location: Location,
-    private loadingCtrl: LoadingController,
-    private viewCtrl: ModalController,
-    private route: ActivatedRoute,
-    private router: Router,
-    private wallets: AccountProvider,
-    private webExtensionProvider: WebExtensionProvider,
-    private alertCtrl: AlertController,
-    private ngZone: NgZone
+    private readonly platform: Platform,
+    private readonly location: Location,
+    private readonly loadingCtrl: LoadingController,
+    private readonly viewCtrl: ModalController,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly wallets: AccountProvider,
+    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly alertCtrl: AlertController,
+    private readonly ngZone: NgZone
   ) {
     if (this.route.snapshot.data['special']) {
       this.wallet = this.route.snapshot.data['special']

@@ -19,10 +19,10 @@ export class TransactionQrPage {
   public qrDataTooBig: boolean = false
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private platform: Platform,
-    private deeplinkProvider: DeepLinkProvider
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly platform: Platform,
+    private readonly deeplinkProvider: DeepLinkProvider
   ) {
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

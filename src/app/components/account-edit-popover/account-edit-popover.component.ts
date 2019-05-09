@@ -13,21 +13,21 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   styleUrls: ['./account-edit-popover.component.scss']
 })
 export class AccountEditPopoverComponent {
-  private wallet: AirGapMarketWallet
-  private onDelete: Function
-  private onUndelegate: Function
+  private readonly wallet: AirGapMarketWallet
+  private readonly onDelete: Function
+  private readonly onUndelegate: Function
 
   // Tezos
   public isTezosKT: boolean = false
   public isDelegated: boolean = false
 
   constructor(
-    private alertCtrl: AlertController,
-    private navParams: NavParams,
-    private walletsProvider: AccountProvider,
-    private viewCtrl: PopoverController,
-    private clipboardProvider: ClipboardProvider,
-    private operationsProvider: OperationsProvider
+    private readonly alertCtrl: AlertController,
+    private readonly navParams: NavParams,
+    private readonly walletsProvider: AccountProvider,
+    private readonly viewCtrl: PopoverController,
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')

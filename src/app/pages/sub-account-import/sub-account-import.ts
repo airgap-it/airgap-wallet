@@ -11,14 +11,14 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   templateUrl: 'sub-account-import.html'
 })
 export class SubAccountImportPage {
-  private subProtocolIdentifier: string
+  private readonly subProtocolIdentifier: string
 
   public subProtocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
   public typeLabel: string = ''
 
-  constructor(private router: Router, private route: ActivatedRoute, private accountProvider: AccountProvider) {
+  constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly accountProvider: AccountProvider) {
     this.subWallets = []
     if (this.route.snapshot.data['special']) {
       const info = this.route.snapshot.data['special']

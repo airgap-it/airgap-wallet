@@ -62,7 +62,11 @@ export class SwapComponent {
   @Output()
   private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
-  constructor(public alertCtrl: AlertController, public modalController: ModalController, private walletsProvider: AccountProvider) {}
+  constructor(
+    public alertCtrl: AlertController,
+    public modalController: ModalController,
+    private readonly walletsProvider: AccountProvider
+  ) {}
 
   public amountSet(amount: string) {
     this._amount = amount

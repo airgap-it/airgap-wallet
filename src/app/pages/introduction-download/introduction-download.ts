@@ -8,7 +8,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   templateUrl: 'introduction-download.html'
 })
 export class IntroductionDownloadPage {
-  constructor(private platform: Platform, public viewController: ModalController) {}
+  constructor(private readonly platform: Platform, public viewController: ModalController) {}
 
   public dismiss(shouldCloseAllModals = false) {
     this.viewController.dismiss(shouldCloseAllModals).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

@@ -30,13 +30,13 @@ export class TransactionPreparePage {
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private _ngZone: NgZone,
-    private http: HttpClient,
-    private clipboardProvider: ClipboardProvider,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly _ngZone: NgZone,
+    private readonly http: HttpClient,
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService
   ) {
     let address = '',
       wallet
