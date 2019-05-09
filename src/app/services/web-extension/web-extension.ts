@@ -17,10 +17,8 @@ export class WebExtensionProvider {
   }
 
   isWebExtension() {
-    if (window.chrome && chrome.runtime && chrome.runtime.id) {
-      // Code running in a Chrome extension (content script, background page, etc.)
-      return true
-    }
+    // Code running in a Chrome extension (content script, background page, etc.)
+    return window.chrome && chrome.runtime && chrome.runtime.id
   }
 
   refreshWindow() {

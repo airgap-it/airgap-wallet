@@ -74,30 +74,33 @@ export class ExchangePage {
     )
   }
 
-  public async initExchangePage() {
+  public async initExchangePage(): Promise<void> {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
     this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
 
     if (this.supportedProtocolsFrom.length === 0) {
-      return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+      this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+      return
     }
 
     await this.protocolSet(FROM, getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
 
     if (this.supportedProtocolsTo.length === 0) {
-      return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+      this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+      return
     }
 
     const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
 
     if (!hasShownOnboarding) {
-      return (this.exchangePageState = ExchangePageState.ONBOARDING)
+      this.exchangePageState = ExchangePageState.ONBOARDING
+      return
     }
 
     this.exchangePageState = ExchangePageState.EXCHANGE
   }
 
-  async protocolSet(fromOrTo: string, protocol: ICoinProtocol) {
+  async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
     if (fromOrTo === FROM) {
       this.selectedFromProtocol = protocol
     } else {
@@ -112,14 +115,15 @@ export class ExchangePage {
         if (this.supportedProtocolsTo.length > 0) {
           this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
         } else {
-          return (this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES)
+          this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+          return
         }
       }
     }
 
     await this.loadWalletsForSelectedProtocol(fromOrTo)
 
-    this.loadDataFromExchange()
+    return this.loadDataFromExchange()
   }
 
   async loadWalletsForSelectedProtocol(fromOrTo: string) {

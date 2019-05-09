@@ -17,7 +17,7 @@ export class ScannerProvider {
     }
   }
 
-  public hasPermission(): Promise<Boolean[]> {
+  public hasPermission(): Promise<[boolean, boolean]> {
     if (this.platform.is('cordova')) {
       return new Promise((resolve, reject) => {
         const onDone = (err, status) => {
@@ -45,6 +45,8 @@ export class ScannerProvider {
         }
         QRScanner.prepare(onDone)
       })
+    } else {
+      return Promise.resolve([true, true] as [boolean, boolean])
     }
   }
 

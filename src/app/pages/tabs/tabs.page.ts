@@ -46,22 +46,24 @@ export class TabsPage {
     return this.showModal(SettingsKey.WEB_EXTENSION_DISCLAIMER, DisclaimerWebExtensionPage)
   }
 
-  private async showModal(settingsKey: SettingsKey, page: any) {
+  private async showModal(settingsKey: SettingsKey, page: any): Promise<void> {
     const introduction = await this.storageProvider.get(settingsKey)
     if (!introduction) {
-      return new Promise(resolve => {
-        const modal = this.modalController
-          .create({
-            component: page
+      return new Promise<void>(async resolve => {
+        const modal = await this.modalController.create({
+          component: page
+        })
+        modal
+          .onDidDismiss()
+          .then(async () => {
+            await this.storageProvider.set(settingsKey, true)
+            resolve(undefined)
           })
-          .then(modal => {
-            modal.onDidDismiss().then(async () => {
-              await this.storageProvider.set(settingsKey, true)
-              resolve()
-            })
-            modal.present().catch(console.error)
-          })
+          .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+        modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
       })
+    } else {
+      return Promise.resolve()
     }
   }
 }
