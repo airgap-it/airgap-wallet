@@ -1,5 +1,6 @@
 // https://stackoverflow.com/a/8472700/4790610
-export function generateGUID() {
+export function generateGUID(): string {
+  // tslint:disable
   if (typeof window.crypto !== 'undefined' && typeof window.crypto.getRandomValues !== 'undefined') {
     // If we have a cryptographically secure PRNG, use that
     // https://stackoverflow.com/questions/6906916/collisions-when-generating-uuids-in-javascript
@@ -25,4 +26,5 @@ export function generateGUID() {
       return v.toString(16)
     })
   }
+  // tslint:enable
 }
