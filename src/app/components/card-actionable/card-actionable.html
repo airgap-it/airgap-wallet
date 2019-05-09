@@ -1,0 +1,18 @@
+<ion-card [ngClass]="imageLeft ? 'background--color__gradient--reverse' : 'background--color__gradient'">
+  <ion-row align-items-center padding-horizontal>
+    <ion-col size="4" *ngIf="imageLeft">
+      <img src="/assets/img/{{ imageName }}" />
+    </ion-col>
+    <ion-col size="8">
+      <ion-card-title ion-text color="white" no-padding [innerHTML]="heading">
+        <ion-icon md-name="arrow_forward"></ion-icon>
+      </ion-card-title>
+      <ion-text color="white">
+        <p [innerHTML]="text" padding-top></p>
+      </ion-text>
+    </ion-col>
+    <ion-col size="4" *ngIf="!imageLeft">
+      <img src="/assets/img/{{ imageName }}" />
+    </ion-col>
+  </ion-row>
+</ion-card>

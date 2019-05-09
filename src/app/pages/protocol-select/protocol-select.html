@@ -1,0 +1,22 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'protocol-select.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear">
+        <ion-icon name="md-close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list lines="none">
+    <ion-radio-group ngDefaultControl [(ngModel)]="selectedProtocol" (ngModelChange)="onModelChange($event)" lines="none">
+      <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true"></currency-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-content>

@@ -1,9 +1,11 @@
 FROM agileek/ionic-framework:3.19.1
 
-RUN apt-get update -y
-RUN apt-get install -y bzip2 build-essential
-RUN apt-get install -y pkg-config libcairo2-dev
-RUN apt-get install -y libjpeg-dev
+RUN apt-get update -y && apt-get install -y \
+    bzip2 \
+    build-essential  \
+    pkg-config  \
+    libcairo2-dev \
+    libjpeg-dev
 
 # android build tools version
 RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui --filter build-tools-26.0.2,android-27"]
@@ -12,18 +14,8 @@ RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui 
 RUN mkdir /app
 WORKDIR /app
 
-# echo
-RUN npm install -g npm@6.4.1
-RUN npm cache verify
-
-# install ionic
-RUN npm install -g ionic@3.20.0
-
-# install cordova
-RUN npm install -g cordova@8.1.2
-
-# add google-services.json
-COPY google-services.json /app/google-services.json 
+# using npm 6.5.0 to fix installing certain cordova/ionic plugins
+RUN npm install -g npm@6.5.0 ionic@4.6.0 https://github.com/smartcrm/playup.git
 
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app/package.json
@@ -42,8 +34,8 @@ RUN mkdir www
 # run ionic android build
 RUN ionic info
 
-# Bundle app source
-COPY ./hooks /app/hooks
+# add google-services.json
+COPY google-services.json /app/google-services.json 
 
 # add android platform
 RUN ionic cordova platforms add android
@@ -51,9 +43,18 @@ RUN ionic cordova platforms add android
 # Bundle app source
 COPY . /app
 
+# post-install hook, to be safe if it got cached
+RUN node config/patch_crypto.js
+
 # set version code
 ARG BUILD_NR
 RUN sed -i -e "s/android-versionCode=\"1\"/android-versionCode=\"$BUILD_NR\"/g" config.xml
+
+# disable pure getters due to https://github.com/angular/angular-cli/issues/11439 
+RUN npm run disable-pure-getters
+
+# configure mangle (keep_fnames) for bitcoinjs https://github.com/bitcoinjs/bitcoinjs-lib/issues/959
+RUN npm run configure-mangle
 
 ARG SENTRY_DSN
 

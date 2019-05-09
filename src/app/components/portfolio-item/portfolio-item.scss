@@ -1,0 +1,45 @@
+.expendable__container {
+  ion-icon {
+    -webkit-transition-duration: 0.4s;
+    -moz-transition-duration: 0.4s;
+    -o-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+
+    -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -o-transition-property: -o-transform;
+    transition-property: transform;
+  }
+  .icon--rotated {
+    transform: rotate(180deg);
+  }
+}
+
+ion-badge,
+ion-label {
+  margin: 0 !important;
+}
+.symbol--icon {
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  left: 40px;
+  top: 40px;
+}
+.symbol--icon__isToken {
+  top: 18px;
+}
+h2,
+.items--right ion-col:first-of-type {
+  margin: 2px 0px 6px !important;
+}
+p {
+  margin: 0px;
+}
+ion-item {
+  ion-avatar {
+    margin: 8px 16px 8px 0;
+    min-height: 48px;
+    min-width: 48px;
+  }
+}

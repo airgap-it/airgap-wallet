@@ -15,6 +15,6 @@
     "transform-loader": "^0.2.4",
     "typescript": "^3.2.2",
     "webpack": "^4.17.3",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.3.1"
   }
 }

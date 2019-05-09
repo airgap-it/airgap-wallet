@@ -1,0 +1,24 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <span ion-text color="white">{{ 'scan-sync.title' | translate }}</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding class="colored-background">
+  <ion-row>
+    <strong><p [innerHTML]="'scan-sync.text' | translate"></p></strong>
+  </ion-row>
+  <ion-row justify-content-center><img src="assets/img/sync-wallet_onboarding_2.png" /></ion-row>
+  <ion-row>
+    <p>{{ 'scan-sync.description' | translate }}</p>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="goToScanPage()">{{ 'scan-sync.scan_label' | translate }}</ion-button>
+  </ion-fab>
+</ion-content>

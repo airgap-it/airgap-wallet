@@ -1,0 +1,108 @@
+<ion-item *ngIf="wallet; else skeletonWallet" lines="none">
+  <ion-avatar slot="start">
+    <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="isToken"></currency-symbol>
+    <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
+  </ion-avatar>
+  <ion-label>
+    <h2 class="font--weight__bold" ion-text color="black" *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading">
+      {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}
+    </h2>
+    <ng-template #syncingHeading>
+      <div>
+        <h2>
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </h2>
+      </div>
+    </ng-template>
+    <ng-container *ngIf="!isToken">
+      <ion-text color="blackLight">
+        <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono">
+          <ion-badge slot="end" color="primary" *ngIf="isActive">active</ion-badge>
+          {{ wallet.receivingPublicAddress | shortenString }}
+        </h3>
+      </ion-text>
+    </ng-container>
+
+    <ion-badge *ngIf="(isDelegated | async) !== null" color="secondary">
+      {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
+    </ion-badge>
+
+    <ng-template #syncingHeadingLow>
+      <div>
+        <h3>
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </h3>
+      </div>
+    </ng-template>
+  </ion-label>
+
+  <ion-row class="items--right" slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
+    <ion-col size="12" no-padding text-right>
+      <strong *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
+        <ion-text color="black">
+          <p>
+            ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+            wallet.currentMarketPrice } | number: '1.2-2' }}
+          </p>
+        </ion-text>
+      </strong>
+      <ng-template #syncingBalance>
+        <div>
+          <p>
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </p>
+        </div>
+      </ng-template>
+    </ion-col>
+    <ion-col size="12" no-padding text-right>
+      <p *ngIf="wallet.currentBalance; else syncingPrice">
+        <ion-text color="blackLight">
+          <span *ngIf="wallet.currentBalance?.toNumber() > 0">${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}</span>
+        </ion-text>
+        <!-- <span ion-text [ngClass]="wallet.change24hour >= 0 ? 'green' : 'red'">{{ wallet.change24hour }}%</span> -->
+      </p>
+      <ng-template #syncingPrice>
+        <div>
+          <p>
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </p>
+        </div>
+      </ng-template>
+    </ion-col>
+  </ion-row>
+  <ion-row class="items--right" slot="end" *ngIf="isExpendable" class="expendable__container">
+    <ion-icon [ngClass]="{ 'icon--rotated': isExtended }" name="arrow-dropdown"></ion-icon>
+  </ion-row>
+</ion-item>
+
+<ng-template #skeletonWallet>
+  <ion-item lines="none">
+    <ion-avatar slot="start">
+      <ion-skeleton-text animated></ion-skeleton-text>
+      <div class="symbol--icon">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </div>
+    </ion-avatar>
+    <ion-label>
+      <h2>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </h2>
+      <h3 *ngIf="!isToken">
+        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+      </h3>
+    </ion-label>
+    <ion-row class="items--right" slot="end">
+      <ion-col size="12" no-padding text-right>
+        <p>
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </p>
+      </ion-col>
+      <ion-col size="12" no-padding text-right>
+        <p>
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </p>
+      </ion-col>
+    </ion-row>
+  </ion-item>
+</ng-template>

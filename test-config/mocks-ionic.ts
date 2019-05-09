@@ -1,32 +1,84 @@
-import { StatusBar } from '@ionic-native/status-bar'
-import { SplashScreen } from '@ionic-native/splash-screen'
+import { StatusBar } from '@ionic-native/status-bar/ngx'
+import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 
-export const AlertControllerMock = jasmine.createSpyObj('AlertController', {
-  create: jasmine.createSpyObj('Alert', {
-    present: () => Promise.resolve()
-  })
-})
+class ComponentMock {}
 
+export type Spied<T> = { [Method in keyof T]: jasmine.Spy }
+
+export class RouterMock {
+  public navigateByUrl = jasmine.createSpy('navigateByUrl').and.returnValue(Promise.resolve())
+  public navigate = jasmine.createSpy('navigate').and.returnValue(Promise.resolve())
+}
+
+export class ModalControllerMock {
+  public create = jasmine.createSpy('create').and.returnValue(
+    Promise.resolve({
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
+      onDidDismiss: jasmine.createSpy('onDidDismiss').and.returnValue(Promise.resolve())
+    })
+  )
+  public dismiss = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+}
+
+export class AlertControllerMock {
+  public create = jasmine.createSpy('create').and.returnValue(
+    Promise.resolve({
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
+      onDidDismiss: jasmine.createSpy('onDidDismiss').and.returnValue(Promise.resolve())
+    })
+  )
+  public dismiss = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+}
+
+export class LoadingControllerMock {
+  public create = jasmine.createSpy('create').and.returnValue(
+    Promise.resolve({
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
+      onDidDismiss: jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+    })
+  )
+}
+
+export class ToastControllerMock {
+  public create = jasmine.createSpy('create').and.returnValue(
+    Promise.resolve({
+      present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
+      onDidDismiss: jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+    })
+  )
+}
+
+export class MockActivatedRouteSnapshot {
+  private readonly _data: any
+
+  constructor(data: any) {
+    this._data = data
+  }
+
+  get data() {
+    return this._data
+  }
+}
 export class DeviceProviderMock {
-  isRooted = 0
+  public isRooted = 0
 
-  checkForRoot() {
+  public checkForRoot() {
     return Promise.resolve(this.isRooted)
   }
 }
 
 export class NavParamsMock {
-  static params = {}
+  public static params: any = {}
+
+  public static setParams(value: any) {
+    NavParamsMock.params = value
+  }
 
   public get(key: string): any {
     if (NavParamsMock.params[key]) {
       return NavParamsMock.params[key]
     }
     return undefined
-  }
-
-  static setParams(value) {
-    NavParamsMock.params = value
   }
 }
 
@@ -91,19 +143,7 @@ export class PlatformMock {
   }
 
   public getActiveElement(): any {
-    return document['activeElement']
-  }
-}
-
-export class StatusBarMock extends StatusBar {
-  styleDefault() {
-    return
-  }
-}
-
-export class SplashScreenMock extends SplashScreen {
-  hide() {
-    return
+    return document.activeElement
   }
 }
 
@@ -133,6 +173,18 @@ export class NavMock {
   }
 
   public registerChildNav(nav: any): void {
+    return
+  }
+}
+
+export class StatusBarMock extends StatusBar {
+  styleDefault() {
+    return
+  }
+}
+
+export class SplashScreenMock extends SplashScreen {
+  hide() {
     return
   }
 }

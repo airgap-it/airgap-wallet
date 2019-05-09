@@ -1,103 +1,184 @@
 // Ionic Variables and Theming. For more info, please see:
-// http://ionicframework.com/docs/v2/theming/
+// http://ionicframework.com/docs/theming/
 
-// Font path is used to include ionicons,
-// roboto, and noto sans fonts
-$font-path: '../assets/fonts';
+/** Ionic CSS Variables **/
+:root {
+  /** primary **/
+  --ion-color-primary: #00e8cc;
+  --ion-color-primary-rgb: 0, 232, 204;
+  --ion-color-primary-contrast: #311b58;
+  --ion-color-primary-contrast-rgb: 49, 27, 88;
+  --ion-color-primary-shade: #00ccb4;
+  --ion-color-primary-tint: #1aead1;
 
-// The app direction is used to include
-// rtl styles in your app. For more info, please see:
-// http://ionicframework.com/docs/theming/rtl-support/
-$app-direction: ltr;
+  /** secondary **/
+  --ion-color-secondary: #311b58;
+  --ion-color-secondary-rgb: 49, 27, 88;
+  --ion-color-secondary-contrast: #00e8cc;
+  --ion-color-secondary-contrast-rgb: 0, 232, 204;
+  --ion-color-secondary-shade: #2b184d;
+  --ion-color-secondary-tint: #463269;
 
-@import 'ionic.globals';
+  /** tertiary **/
+  --ion-color-tertiary: #7044ff;
+  --ion-color-tertiary-rgb: 112, 68, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #633ce0;
+  --ion-color-tertiary-tint: #7e57ff;
 
-// Shared Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Sass variables found in Ionic's source scss files.
-// To view all the possible Ionic variables, see:
-// http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
+  /** success **/
+  --ion-color-success: #10dc60;
+  --ion-color-success-rgb: 16, 220, 96;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0ec254;
+  --ion-color-success-tint: #28e070;
 
-// Named Color Variables
-// --------------------------------------------------
-// Named colors makes it easy to reuse colors on various components.
-// It's highly recommended to change the default colors
-// to match your app's branding. Ionic uses a Sass map of
-// colors so you can add, rename and remove colors as needed.
-// The "primary" color is the only required color in the map.
+  /** warning **/
+  --ion-color-warning: #ffce00;
+  --ion-color-warning-rgb: 255, 206, 0;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #e0b500;
+  --ion-color-warning-tint: #ffd31a;
 
-$colors: (
-  primary: (
-    base: #00e8cc,
-    contrast: #311b58
-  ),
-  secondary: (
-    base: #311b58,
-    contrast: #00e8cc
-  ),
-  secondaryLight: #440094,
-  secondarydDark: #2d53a1,
-  danger: #f53d3d,
-  light: #f4f4f4,
-  gray: #d3d3d3,
-  dark: #222,
-  muted: #999,
-  whitePrimaryyContrast: (
-    base: #fff,
-    contrast: #00e8cc
-  ),
-  whiteSecondaryContrast: (
-    base: #fff,
-    contrast: #311b58
-  ),
-  white: (
-    base: #fff,
-    contrast: #000
-  ),
-  whiteLight: rgba(255, 255, 255, 0.84),
-  black: #000,
-  blackLight: rgba(0, 0, 0, 0.54),
-  blackLightest: rgba(0, 0, 0, 0.12),
-  transparent: transparent
-);
+  /** danger **/
+  --ion-color-danger: #f04141;
+  --ion-color-danger-rgb: 245, 61, 61;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d33939;
+  --ion-color-danger-tint: #f25454;
 
-// App iOS Variables
-// --------------------------------------------------
-// iOS only Sass variables can go here
+  /** dark **/
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34, 34, 34;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #1e2023;
+  --ion-color-dark-tint: #383a3e;
 
-// App Material Design Variables
-// --------------------------------------------------
-// Material Design only Sass variables can go here
+  /** medium **/
+  --ion-color-medium: #989aa2;
+  --ion-color-medium-rgb: 152, 154, 162;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #86888f;
+  --ion-color-medium-tint: #a2a4ab;
 
-// App Windows Variables
-// --------------------------------------------------
-// Windows only Sass variables can go here
+  /** light **/
+  --ion-color-light: #f4f4f4;
+  --ion-color-light-rgb: 244, 244, 244;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
 
-// App Theme
-// --------------------------------------------------
-// Ionic apps can have different themes applied, which can
-// then be future customized. This import comes last
-// so that the above variables are used and Ionic's
-// default are overridden.
+  /** secondary light **/
+  --ion-color-secondaryLight: #440094;
+  --ion-color-secondaryLight-rgb: 68, 0, 148;
+  --ion-color-secondaryLight-contrast: #ffffff;
+  --ion-color-secondaryLight-contrast-rgb: 255, 255, 255;
+  --ion-color-secondaryLight-shade: #3c0082;
+  --ion-color-secondaryLight-tint: #571a9f;
 
-@import 'ionic.theme.default';
+  /** gray **/
+  --ion-color-gray: #d3d3d3;
+  --ion-color-gray-rgb: 211, 211, 211;
+  --ion-color-gray-contrast: #000;
+  --ion-color-gray-contrast-rgb: 255, 255, 255;
+  --ion-color-gray-shade: #bababa;
+  --ion-color-gray-tint: #d7d7d7;
 
-// Ionicons
-// --------------------------------------------------
-// The premium icon font for Ionic. For more info, please see:
-// http://ionicframework.com/docs/v2/ionicons/
+  /** gray light **/
+  --ion-color-grayLight: #f4f4f4;
+  --ion-color-grayLight-rgb: 244, 244, 244;
+  --ion-color-grayLight-contrast: #000;
+  --ion-color-grayLight-contrast-rgb: 255, 255, 255;
+  --ion-color-grayLight-shade: #d7d7d7;
+  --ion-color-grayLight-tint: #f5f5f5;
 
-@import 'ionic.ionicons';
+  /* sets the color of ion-title to secondary */
+  ion-title {
+    --color: var(--ion-color-secondary);
+  }
 
-// Fonts
-// --------------------------------------------------
+  /* sets the colof of ion-back-button to secondary and removes margin */
+  ion-back-button {
+    --icon-margin-end: 0;
+    --color: var(--ion-color-secondary);
+  }
 
-@import 'roboto';
-@import 'noto-sans';
+  /* Set the border width and padding on all ion-button elements */
+  ion-button {
+    --border-width: 1px;
+    --padding-start: 1.5rem;
+    --padding-end: 1.5rem;
+  }
 
-$item-md-avatar-size: 48px;
-$item-ios-avatar-size: 48px;
-$tabs-tab-color-active: color($colors, secondary);
-$tabs-md-tab-font-weight: 500;
-$tabs-background: color($colors, white);
+  /* Enforces border radius for round buttons on small buttons */
+  ion-button.button-small {
+    --border-radius: 1em;
+  }
+
+  /* Set the padding with on ion-button in ion-toolbar elements */
+  ion-toolbar ion-button {
+    --padding-start: 0.5rem;
+    --padding-end: 0.5rem;
+  }
+}
+
+.ion-color-white {
+  --ion-color-base: #fff;
+  --ion-color-base-rgb: 255, 255, 255;
+  --ion-color-contrast: #000;
+  --ion-color-contrast-rgb: 0, 0, 0;
+  --ion-color-shade: #e0e0e0;
+  --ion-color-tint: #ffffff;
+}
+
+.ion-color-black {
+  --ion-color-base: #000;
+  --ion-color-base-rgb: 0, 0, 0;
+  --ion-color-contrast: #000;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #5ca56c;
+  --ion-color-tint: #78c288;
+}
+
+.ion-color-whiteLight {
+  --ion-color-base: #311b58;
+  --ion-color-base-rgb: 49, 27, 88;
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #2b184d;
+  --ion-color-tint: #463269;
+}
+
+.ion-color-blackLight {
+  --ion-color-base: rgba(0, 0, 0, 0.54);
+  --ion-color-base-rgb: 49, 27, 88;
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #5ca56c;
+  --ion-color-tint: #78c288;
+}
+
+.ion-color-grayLight {
+  --ion-color-base: #f4f4f4;
+  --ion-color-base-rgb: 0, 0, 0;
+  --ion-color-contrast: #000;
+  --ion-color-contrast-rgb: 255, 255, 255;
+  --ion-color-shade: #5ca56c;
+  --ion-color-tint: #78c288;
+}
+
+ion-avatar {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.item__image[slot='start'] {
+  margin: 8px 16px 8px 0;
+}

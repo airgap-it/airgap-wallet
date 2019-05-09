@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'introduction-download.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()"><ion-icon name="md-close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <h1>{{ 'introduction-download.heading' | translate }}</h1>
+
+  <p padding-bottom>{{ 'introduction-download.text' | translate }}</p>
+
+  <ion-button id="btn-generate-secret" color="primary" (click)="downloadAndroid()" shape="round" margin-top>
+    <ion-icon slot="start" name="logo-android"></ion-icon>
+    Android
+  </ion-button>
+
+  <p padding-bottom>
+    {{ 'introduction-download.play-store_text' | translate }}
+  </p>
+
+  <ion-button id="btn-import-secret" color="primary" (click)="downloadIos()" shape="round">
+    <ion-icon slot="start" name="phone-portrait"></ion-icon>
+    iOS
+  </ion-button>
+
+  <p padding-bottom>{{ 'introduction-download.app-store_text' | translate }}</p>
+
+  <ion-button id="btn-recover-secret" color="primary" (click)="downloadDistribution()" shape="round">
+    <ion-icon slot="start" name="desktop"></ion-icon>
+    {{ 'introduction-download.linux-distro_label' | translate }}
+  </ion-button>
+
+  <p>{{ 'introduction-download.install-distro_text' | translate }}</p>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="dismiss()">{{ 'introduction-download.go_label' | translate }}</ion-button>
+  </ion-fab>
+</ion-content>
