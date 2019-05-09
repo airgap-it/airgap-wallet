@@ -1,9 +1,11 @@
-import { SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
-import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
-import { Platform, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { AlertController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+
+import { AccountProvider } from './../account/account.provider'
 
 declare let window: any
 

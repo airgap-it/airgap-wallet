@@ -1,5 +1,5 @@
-import { ICoinProtocol } from 'airgap-coin-lib'
 import { FormControl } from '@angular/forms'
+import { ICoinProtocol } from 'airgap-coin-lib'
 
 export class AddressValidator {
   static validate(protocol: ICoinProtocol): any {

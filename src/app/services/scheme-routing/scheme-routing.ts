@@ -1,20 +1,21 @@
 //import { SelectWalletPage } from "../../pages/select-wallet/select-wallet";
-import { AccountProvider } from '../account/account.provider'
 import { Injectable } from '@angular/core'
+import { NavigationExtras, Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
-import { Router, NavigationExtras } from '@angular/router'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
 import {
-  DeserializedSyncProtocol,
-  SyncProtocolUtils,
-  EncodedType,
-  SyncWalletRequest,
   AirGapMarketWallet,
-  supportedProtocols
+  DeserializedSyncProtocol,
+  EncodedType,
+  supportedProtocols,
+  SyncProtocolUtils,
+  SyncWalletRequest
 } from 'airgap-coin-lib'
+
 import { AccountImportPage } from '../../pages/account-import/account-import'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { AccountProvider } from '../account/account.provider'
 //import { TransactionConfirmPage } from "../../pages/transaction-confirm/transaction-confirm";
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
   providedIn: 'root'

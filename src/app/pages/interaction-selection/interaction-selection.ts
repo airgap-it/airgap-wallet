@@ -1,10 +1,10 @@
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { Component } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DeepLinkProvider } from '../../services/deep-link/deep-link'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-interaction-selection',

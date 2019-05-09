@@ -1,7 +1,8 @@
 import { Platform } from '@ionic/angular'
-import { ScannerProvider } from '../../services/scanner/scanner'
-import { PermissionsProvider, PermissionTypes, PermissionStatus } from '../../services/permissions/permissions'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+
+import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../services/permissions/permissions'
+import { ScannerProvider } from '../../services/scanner/scanner'
 
 export class ScanBasePage {
   zxingScanner: ZXingScannerComponent

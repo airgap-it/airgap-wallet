@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core'
 import {
   DeserializedSyncProtocol,
-  IAirGapTransaction,
   getProtocolByIdentifier,
+  IAirGapTransaction,
   SignedTransaction,
   SyncProtocolUtils
 } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'signed-transaction',

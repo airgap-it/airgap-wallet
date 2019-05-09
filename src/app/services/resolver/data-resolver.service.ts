@@ -1,6 +1,7 @@
-import { DataService } from '../data/data.service'
 import { Injectable } from '@angular/core'
-import { Resolve, ActivatedRouteSnapshot } from '@angular/router'
+import { ActivatedRouteSnapshot, Resolve } from '@angular/router'
+
+import { DataService } from '../data/data.service'
 
 @Injectable({
   providedIn: 'root'

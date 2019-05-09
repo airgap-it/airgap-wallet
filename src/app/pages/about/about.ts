@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
 import { AppInfoProvider } from '../../services/app-info/app-info'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-about',

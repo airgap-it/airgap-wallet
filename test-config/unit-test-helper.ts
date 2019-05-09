@@ -5,12 +5,12 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { MomentModule } from 'ngx-moment'
 
 import { PipesModule } from '../src/app/pipes/pipes.module'
 
 import { ToastControllerMock } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
-import { MomentModule } from 'ngx-moment'
 
 export class UnitHelper {
   public static testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed = false): TestModuleMetadata {

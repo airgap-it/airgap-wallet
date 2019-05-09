@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavParams, ModalController } from '@ionic/angular'
+import { ModalController, NavParams } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
 
 @Component({

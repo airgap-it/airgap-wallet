@@ -1,6 +1,6 @@
-import { Platform } from '@ionic/angular'
-import { AppVersion } from '@ionic-native/app-version/ngx'
 import { Injectable } from '@angular/core'
+import { AppVersion } from '@ionic-native/app-version/ngx'
+import { Platform } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root'

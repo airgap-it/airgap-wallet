@@ -1,5 +1,6 @@
-import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
+
+import { AccountProvider } from './../account/account.provider'
 
 declare let chrome
 declare let window

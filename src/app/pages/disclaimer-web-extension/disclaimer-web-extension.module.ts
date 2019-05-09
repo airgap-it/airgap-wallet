@@ -1,11 +1,13 @@
-import { IonicModule } from '@ionic/angular'
-import { RouterModule } from '@angular/router'
-import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DisclaimerWebExtensionPage } from './disclaimer-web-extension'
-import { ComponentsModule } from '../../components/components.module'
+import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
+
+import { ComponentsModule } from '../../components/components.module'
+
+import { DisclaimerWebExtensionPage } from './disclaimer-web-extension'
 
 @NgModule({
   imports: [

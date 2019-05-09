@@ -1,9 +1,10 @@
-import { Component, ViewChild, OnInit } from '@angular/core'
-import { Platform, IonSlides } from '@ionic/angular'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
+import { IonSlides, Platform } from '@ionic/angular'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
 

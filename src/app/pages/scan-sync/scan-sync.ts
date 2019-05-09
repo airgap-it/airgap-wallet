@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan-sync',

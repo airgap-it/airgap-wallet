@@ -1,6 +1,8 @@
-import { AmountConverterPipe } from './amount-converter.pipe'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { BigNumber } from 'bignumber.js'
+
+import { ProtocolsProvider } from '../../services/protocols/protocols'
+
+import { AmountConverterPipe } from './amount-converter.pipe'
 const BN = BigNumber.clone({
   FORMAT: {
     decimalSeparator: `.`,

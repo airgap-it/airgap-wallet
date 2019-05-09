@@ -1,13 +1,14 @@
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
-import { CreateTransactionResponse } from '../../services/exchange/exchange'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import BigNumber from 'bignumber.js'
-import { OperationsProvider } from '../../services/operations/operations'
+
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { CreateTransactionResponse } from '../../services/exchange/exchange'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 declare let cordova
 
 @Component({

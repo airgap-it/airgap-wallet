@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
 import { ModalController, Platform } from '@ionic/angular'
+
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionDownloadPage } from '../introduction-download/introduction-download'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-introduction',

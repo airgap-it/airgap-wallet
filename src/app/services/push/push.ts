@@ -1,14 +1,16 @@
-import { PushBackendProvider } from './../push-backend/push-backend'
 import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
+import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
-import { Platform, ModalController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
-import { take, filter } from 'rxjs/operators'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { filter, take } from 'rxjs/operators'
+
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../storage/storage'
+
+import { PushBackendProvider } from './../push-backend/push-backend'
 
 @Injectable({
   providedIn: 'root'

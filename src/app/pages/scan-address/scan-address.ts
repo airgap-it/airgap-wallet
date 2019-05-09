@@ -1,12 +1,12 @@
 import { Component, ViewChild } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { NavController, Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-
-import { ScannerProvider } from '../../services/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+
 import { PermissionsProvider } from '../../services/permissions/permissions'
+import { ScannerProvider } from '../../services/scanner/scanner'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan-address',

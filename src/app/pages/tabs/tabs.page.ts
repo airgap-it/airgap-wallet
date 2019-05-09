@@ -1,16 +1,15 @@
 import { Component } from '@angular/core'
 import { Events, ModalController } from '@ionic/angular'
 
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WebExtensionProvider } from '../../services/web-extension/web-extension'
+import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
+import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
-import { ExchangePage } from '../exchange/exchange'
-
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
 
 @Component({
   selector: 'app-tabs',

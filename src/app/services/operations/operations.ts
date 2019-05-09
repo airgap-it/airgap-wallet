@@ -1,25 +1,26 @@
 import { Injectable } from '@angular/core'
+import { LoadingController, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  TezosKtProtocol,
-  SyncProtocolUtils,
-  EncodedType,
   DelegationInfo,
+  EncodedType,
   IAirGapTransaction,
+  SyncProtocolUtils,
+  TezosKtProtocol,
   TezosProtocol
 } from 'airgap-coin-lib'
-import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
-import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
-import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
-import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/bitcoin-transactions.serializer'
 import { RawAeternityTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/aeternity-transactions.serializer'
-import { LoadingController, ToastController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/bitcoin-transactions.serializer'
+import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
+import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
+import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
-import BigNumber from 'bignumber.js'
+
+import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
 import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 export enum ActionType {
   IMPORT_ACCOUNT,

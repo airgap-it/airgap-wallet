@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 import BigNumber from 'bignumber.js'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
 

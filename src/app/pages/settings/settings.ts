@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
-import { ModalController, Platform, AlertController } from '@ionic/angular'
 import { Router } from '@angular/router'
-
-import { AboutPage } from '../about/about'
-import { IntroductionPage } from '../introduction/introduction'
+import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AboutPage } from '../about/about'
+import { IntroductionPage } from '../introduction/introduction'
 
 declare var window: any
 declare var cordova: any

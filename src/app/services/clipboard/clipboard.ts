@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
-import { Platform, ToastController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
 import { Clipboard } from '@ionic-native/clipboard/ngx'
+import { Platform, ToastController } from '@ionic/angular'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
   providedIn: 'root'

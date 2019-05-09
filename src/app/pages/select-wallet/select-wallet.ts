@@ -1,11 +1,11 @@
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { AccountProvider } from '../../services/account/account.provider'
 import { Component } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
 
 @Component({
   selector: 'page-select-wallet',

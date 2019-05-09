@@ -1,10 +1,11 @@
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { Transaction } from '../../models/transaction.model'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { Transaction } from '../../models/transaction.model'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-transaction-qr',

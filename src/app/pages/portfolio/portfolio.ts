@@ -1,14 +1,14 @@
 import { Component } from '@angular/core'
-import { Observable, ReplaySubject } from 'rxjs'
 import { Router } from '@angular/router'
-
-import { AccountProvider } from '../../services/account/account.provider'
+import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
+import { Observable, ReplaySubject } from 'rxjs'
+
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
-import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet

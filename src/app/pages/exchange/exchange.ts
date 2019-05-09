@@ -1,13 +1,14 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { ExchangeProvider } from '../../services/exchange/exchange'
-import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
-import { AccountProvider } from '../../services/account/account.provider'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
+
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ExchangeProvider } from '../../services/exchange/exchange'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
 
 enum ExchangePageState {
   LOADING,

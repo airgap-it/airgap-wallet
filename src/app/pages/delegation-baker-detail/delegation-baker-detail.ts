@@ -1,16 +1,16 @@
+import { Location } from '@angular/common'
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { ToastController } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-import { BakerInfo, DelegationRewardInfo, TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, BakerInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-import { OperationsProvider } from '../../services/operations/operations'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { RemoteConfigProvider, BakerConfig } from '../../services/remote-config/remote-config'
 import * as moment from 'moment'
 
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { Location } from '@angular/common'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { BakerConfig, RemoteConfigProvider } from '../../services/remote-config/remote-config'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 type Moment = moment.Moment
 

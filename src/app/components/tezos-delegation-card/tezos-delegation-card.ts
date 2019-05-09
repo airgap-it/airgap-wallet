@@ -1,4 +1,4 @@
-import { Input, Component, Output, EventEmitter } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 @Component({

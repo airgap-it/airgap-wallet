@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
-import { Platform, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { AlertController, Platform } from '@ionic/angular'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',

@@ -1,14 +1,14 @@
-import { Component } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
-
-import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { OperationsProvider } from '../../services/operations/operations'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { Location } from '@angular/common'
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 interface IAccountWrapper {
   selected: boolean

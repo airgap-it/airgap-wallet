@@ -1,9 +1,10 @@
 import { Component } from '@angular/core'
-import { AccountProvider } from '../../services/account/account.provider'
+import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 import { map } from 'rxjs/operators'
-import { Router, ActivatedRoute } from '@angular/router'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-sub-account-import',

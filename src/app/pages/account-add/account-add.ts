@@ -1,13 +1,14 @@
 import { Component } from '@angular/core'
-import { supportedProtocols, ICoinProtocol } from 'airgap-coin-lib'
+import { Router } from '@angular/router'
+import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ProtocolsProvider } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AccountImportOnboardingPage } from '../account-import-onboarding/account-import-onboarding'
 import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
-import { Router } from '@angular/router'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
 
 @Component({
   selector: 'page-account-add',

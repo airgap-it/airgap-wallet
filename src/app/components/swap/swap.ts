@@ -1,13 +1,14 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { ModalController, AlertController } from '@ionic/angular'
-import { AccountProvider } from '../../services/account/account.provider'
-import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
+import { animate, style, transition, trigger } from '@angular/animations'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { AlertController, ModalController } from '@ionic/angular'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
 import { Observable, ReplaySubject } from 'rxjs'
 import { map, take } from 'rxjs/operators'
-import { trigger, transition, style, animate } from '@angular/animations'
-import { BigNumber } from 'bignumber.js'
+
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from '../../services/account/account.provider'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'swap',

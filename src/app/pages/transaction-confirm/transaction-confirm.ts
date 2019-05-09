@@ -1,19 +1,19 @@
 import { Component } from '@angular/core'
-import { LoadingController, ToastController, AlertController, Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-
+import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import {
-  getProtocolByIdentifier,
+  AirGapMarketWallet,
   DeserializedSyncProtocol,
-  SignedTransaction,
+  getProtocolByIdentifier,
   ICoinProtocol,
-  TezosKtProtocol,
-  AirGapMarketWallet
+  SignedTransaction,
+  TezosKtProtocol
 } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 declare var cordova: any
 

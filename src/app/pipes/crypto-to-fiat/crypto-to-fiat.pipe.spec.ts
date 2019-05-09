@@ -1,5 +1,6 @@
-import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 import { BigNumber } from 'bignumber.js'
+
+import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 
 describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe

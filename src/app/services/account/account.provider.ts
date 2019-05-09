@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
-import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { StorageProvider, SettingsKey } from '../storage/storage'
-import { map, take, auditTime } from 'rxjs/operators'
+import { ReplaySubject, Subject } from 'rxjs'
+import { auditTime, map, take } from 'rxjs/operators'
+
 import { PushProvider } from '../push/push'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../storage/storage'
 
 @Injectable({
   providedIn: 'root'

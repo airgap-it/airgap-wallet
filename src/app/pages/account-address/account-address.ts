@@ -1,8 +1,9 @@
-import { Component } from '@angular/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
-import { Router, ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+
+import { ClipboardProvider } from '../../services/clipboard/clipboard'
 
 @Component({
   selector: 'page-account-address',

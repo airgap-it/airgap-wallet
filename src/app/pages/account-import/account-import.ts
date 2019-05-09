@@ -1,10 +1,11 @@
-import { Component, NgZone } from '@angular/core'
 import { Location } from '@angular/common'
-import { ModalController, LoadingController, Platform, AlertController } from '@ionic/angular'
+import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, ModalController, Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+
 import { AccountProvider } from '../../services/account/account.provider'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 
 @Component({

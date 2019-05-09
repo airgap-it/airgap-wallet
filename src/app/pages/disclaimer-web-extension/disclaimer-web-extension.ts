@@ -1,6 +1,7 @@
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { ModalController } from '@ionic/angular'
 import { Component } from '@angular/core'
+import { ModalController } from '@ionic/angular'
+
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 @Component({
   selector: 'page-disclaimer-web-extension',

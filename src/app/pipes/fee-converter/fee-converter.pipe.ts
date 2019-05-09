@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { BigNumber } from 'bignumber.js'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
 
 @Pipe({
   name: 'feeConverter'

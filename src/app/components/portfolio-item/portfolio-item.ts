@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { OperationsProvider } from '../../services/operations/operations'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { AccountProvider } from '../../services/account/account.provider'
 import { Observable } from 'rxjs'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 
 @Component({
   selector: 'portfolio-item',
