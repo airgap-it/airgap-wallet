@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core'
 
 import { AccountProvider } from './../account/account.provider'
 
-declare let window: Window // TODO: add global this in TS 3.4
+// tslint:disable-next-line:no-any
+declare let chrome: any
+declare let window: Window & { chrome?: { runtime?: { id?: string } } } // TODO: add global this in TS 3.4
 
 @Injectable({
   providedIn: 'root'
