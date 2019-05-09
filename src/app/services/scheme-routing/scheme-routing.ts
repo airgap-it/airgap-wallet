@@ -53,7 +53,7 @@ export class SchemeRoutingProvider {
     const syncProtocol = new SyncProtocolUtils()
 
     try {
-      let url = new URL(rawString)
+      const url = new URL(rawString)
       let data = rawString // Fallback to support raw data QRs
       data = url.searchParams.get('d')
 
@@ -215,7 +215,7 @@ export class SchemeRoutingProvider {
   }
 
   public async showAlert(title: string, message: string, buttons: any) {
-    let alert = this.alertController
+    const alert = this.alertController
       .create({
         header: title,
         message,

@@ -335,7 +335,7 @@ export class AccountTransactionListPage {
     if (!oldTransactions) {
       return newTransactions
     }
-    let transactionMap = new Map<string, IAirGapTransaction>(
+    const transactionMap = new Map<string, IAirGapTransaction>(
       oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
     )
 
@@ -347,7 +347,7 @@ export class AccountTransactionListPage {
   }
 
   public async presentEditPopover(event) {
-    let popover = await this.popoverCtrl.create({
+    const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
@@ -399,7 +399,7 @@ export class AccountTransactionListPage {
   }
 
   private showToast(message: string) {
-    let toast = this.toastController
+    const toast = this.toastController
       .create({
         duration: 3000,
         message: message,

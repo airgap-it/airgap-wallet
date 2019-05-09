@@ -58,7 +58,7 @@ export class AccountEditPopoverComponent {
   }
 
   public delete() {
-    let alert = this.alertCtrl
+    const alert = this.alertCtrl
       .create({
         header: 'Confirm Wallet Removal',
         message: 'Do you want to remove this wallet? You can always sync it again from your vault.',

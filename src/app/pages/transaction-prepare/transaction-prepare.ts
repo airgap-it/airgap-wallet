@@ -156,7 +156,7 @@ export class TransactionPreparePage {
   }
 
   public openScanner() {
-    let callback = address => {
+    const callback = address => {
       this.transactionForm.controls.address.setValue(address)
     }
     const info = {

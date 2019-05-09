@@ -80,11 +80,11 @@ export class AppComponent {
     }
     setSentryUser(userId)
 
-    let url = new URL(location.href)
+    const url = new URL(location.href)
 
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
-      let sub = this.accountProvider.wallets.subscribe(wallets => {
+      const sub = this.accountProvider.wallets.subscribe(wallets => {
         this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()
@@ -135,7 +135,7 @@ export class AppComponent {
 
   // TODO: Move to provider
   public async walletDeeplink() {
-    let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
+    const deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     const info = {
       wallet: deeplinkInfo.wallet,
       airGapTx: deeplinkInfo.airGapTx,

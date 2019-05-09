@@ -49,7 +49,7 @@ export class AmountConverterPipe implements PipeTransform {
       return value.toFormat()
     }
 
-    let integerValueLength = value.integerValue().toString().length
+    const integerValueLength = value.integerValue().toString().length
     if (integerValueLength >= maxDigits) {
       // We can omit floating point
       return this.makeFullNumberSmaller(value, maxDigits)

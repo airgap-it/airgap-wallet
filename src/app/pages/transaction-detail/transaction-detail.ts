@@ -26,8 +26,8 @@ export class TransactionDetailPage {
   }
 
   public openBlockexplorer() {
-    let transaction: any = this.transaction
-    let hash = transaction.hash
+    const transaction: any = this.transaction
+    const hash = transaction.hash
 
     const protocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
 

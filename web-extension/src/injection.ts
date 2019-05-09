@@ -11,7 +11,7 @@ window.addEventListener('message', receiveAddress, false)
 
 function receiveAddress(event) {
   if (event.data.type === Transactions.ADDRESSES_RESPONSE) {
-    let addresses = event.data.addresses
+    const addresses = event.data.addresses
 
     const engine = new ProviderEngine()
 
@@ -21,7 +21,7 @@ function receiveAddress(event) {
           cb(undefined, [addresses])
         },
         signTransaction: function(cb) {
-          let data = { type: Transactions.INCOMING_TRANSACTION, signTransaction: cb }
+          const data = { type: Transactions.INCOMING_TRANSACTION, signTransaction: cb }
           window.postMessage(data, '*')
         }
       })
@@ -41,7 +41,7 @@ function receiveAddress(event) {
 
     engine.start()
 
-    let web3 = new Web3(engine)
+    const web3 = new Web3(engine)
     web3.currentProvider.setMaxListeners(100)
     ;(window as any).web3 = web3
     ;(window as any).Web3 = Web3

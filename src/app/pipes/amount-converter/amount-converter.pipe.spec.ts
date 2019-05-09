@@ -160,7 +160,7 @@ describe('AmountConverter Pipe', () => {
   })
 
   it('should handle values that are empty object', () => {
-    let value: any = {}
+    const value: any = {}
     expect(
       amountConverterPipe.transform(value, {
         protocolIdentifier: 'eth',

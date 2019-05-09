@@ -72,7 +72,7 @@ export class AccountImportPage {
           )
 
           if (!this.walletImportable) {
-            let alert = this.alertCtrl
+            const alert = this.alertCtrl
               .create({
                 header: 'Account Not Supported',
                 message: 'We currently only support Ethereum and Aeternity accounts.'

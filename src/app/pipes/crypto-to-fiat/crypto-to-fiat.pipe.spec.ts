@@ -37,7 +37,7 @@ describe('CryptoToFiatPipe', () => {
   })
 
   it('should return an empty string when value is not a BigNumber', () => {
-    let value: any = 'test'
+    const value: any = 'test'
     expect(
       cryptoToFiatPipe.transform(value, {
         protocolIdentifier: 'eth',
@@ -47,7 +47,7 @@ describe('CryptoToFiatPipe', () => {
   })
 
   it('should return an empty string when price is not a BigNumber', () => {
-    let value: any = 'test'
+    const value: any = 'test'
     expect(
       cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: 'eth',

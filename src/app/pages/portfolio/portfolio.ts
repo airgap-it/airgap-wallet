@@ -93,10 +93,10 @@ export class PortfolioPage {
   public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
     console.log('calculating total')
     let newTotal = 0
-    let cryptoToFiatPipe = new CryptoToFiatPipe()
+    const cryptoToFiatPipe = new CryptoToFiatPipe()
 
     wallets.forEach(wallet => {
-      let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
+      const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
         protocolIdentifier: wallet.protocolIdentifier,
         currentMarketPrice: wallet.currentMarketPrice
       })

@@ -6,7 +6,7 @@ const width = 600
 
 chrome.runtime.onMessage.addListener(async function(request) {
   if (request.data.type === Transactions.OUTGOING_TRANSACTION) {
-    let rawUnsignedTx = request.data.signTransaction
+    const rawUnsignedTx = request.data.signTransaction
 
     rawUnsignedTx.chainId = rawUnsignedTx.chainId || 1
     rawUnsignedTx.gasLimit = rawUnsignedTx.gas || `0x${(21000).toString(16)}`

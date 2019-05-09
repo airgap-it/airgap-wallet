@@ -32,7 +32,7 @@ export class SettingsPage {
   }
 
   public share() {
-    let options = {
+    const options = {
       message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',
       // not supported on some apps (Facebook, Instagram)
       subject: 'Checkout airgap.it', // fi. for email
@@ -40,13 +40,13 @@ export class SettingsPage {
       chooserTitle: 'Pick an app' // Android only, you can override the default share sheet title
     }
 
-    let onSuccess = function(result: any) {
+    const onSuccess = function(result: any) {
       console.log(`Share completed: ${result.completed}`) // On Android apps mostly return false even while it's true
       console.log(`Shared to app: ${result.app}`)
       // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
     }
 
-    let onError = function(msg: string) {
+    const onError = function(msg: string) {
       console.log('Sharing failed with message: ' + msg)
     }
 
@@ -70,7 +70,7 @@ export class SettingsPage {
   }
 
   public telegram() {
-    let alert = this.alertCtrl
+    const alert = this.alertCtrl
       .create({
         header: this.translateService.instant('settings.alert_title'),
         inputs: [

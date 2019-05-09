@@ -31,7 +31,7 @@ export class IdenticonComponent {
 
   private b582int(v) {
     let rv = new BigNumber(0)
-    let alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    const alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
     for (let i = 0; i < v.length; i++) {
       rv = rv.plus(new BigNumber(alpha.indexOf(v[v.length - 1 - i])).multipliedBy(new BigNumber(alpha.length).exponentiatedBy(i)))
     }

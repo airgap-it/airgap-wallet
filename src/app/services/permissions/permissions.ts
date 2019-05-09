@@ -70,12 +70,12 @@ export class PermissionsProvider {
     let canAskForPermission = true
     if (this.platform.is('android')) {
       if (permission === PermissionTypes.CAMERA) {
-        let permissionStatus = await this.hasCameraPermission()
+        const permissionStatus = await this.hasCameraPermission()
         canAskForPermission = !(permissionStatus === PermissionStatus.DENIED_ALWAYS)
       }
     } else if (this.platform.is('ios')) {
       if (permission === PermissionTypes.CAMERA) {
-        let permissionStatus = await this.hasCameraPermission()
+        const permissionStatus = await this.hasCameraPermission()
         canAskForPermission = !(permissionStatus === PermissionStatus.DENIED)
       }
     }

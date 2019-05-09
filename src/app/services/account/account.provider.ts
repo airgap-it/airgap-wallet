@@ -69,7 +69,7 @@ export class AccountProvider {
     }
 
     wallets.forEach(wallet => {
-      let airGapWallet = new AirGapMarketWallet(
+      const airGapWallet = new AirGapMarketWallet(
         wallet.protocolIdentifier,
         wallet.publicKey,
         wallet.isExtendedPublicKey,
@@ -155,7 +155,7 @@ export class AccountProvider {
   }
 
   public removeWallet(walletToRemove: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
+    const index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }

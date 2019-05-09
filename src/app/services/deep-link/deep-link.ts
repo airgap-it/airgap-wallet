@@ -58,7 +58,7 @@ export class DeepLinkProvider {
     this.translateService
       .get(['deep-link.not-supported-alert.title', 'deep-link.not-supported-alert.message', 'deep-link.not-supported-alert.ok'])
       .subscribe(translated => {
-        let alert = this.alertCtrl
+        const alert = this.alertCtrl
           .create({
             header: translated['deep-link.not-supported-alert.title'],
             message: translated['deep-link.not-supported-alert.message'],
@@ -82,7 +82,7 @@ export class DeepLinkProvider {
         otherAppName: 'AirGap Vault'
       })
       .subscribe(translated => {
-        let alert = this.alertCtrl
+        const alert = this.alertCtrl
           .create({
             header: translated['deep-link.app-not-found.title'],
             message: translated['deep-link.app-not-found.message'],
@@ -101,15 +101,15 @@ export class DeepLinkProvider {
   }
   // TODO: Move to provider
   public async walletDeepLink() {
-    let url = new URL(location.href)
-    let publicKey = url.searchParams.get('publicKey')
-    let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
-    let identifier = url.searchParams.get('identifier')
+    const url = new URL(location.href)
+    const publicKey = url.searchParams.get('publicKey')
+    const rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
+    const identifier = url.searchParams.get('identifier')
     console.log('publicKey', publicKey)
     console.log('rawUnsignedTx', rawUnsignedTx)
     console.log('identifier', identifier)
 
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
+    const wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
     const airGapTx = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
