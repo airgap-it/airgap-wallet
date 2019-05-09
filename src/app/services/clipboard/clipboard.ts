@@ -48,7 +48,7 @@ export class ClipboardProvider {
   private async showToast(message: string) {
     this.toastController
       .create({
-        message: message,
+        message,
         duration: 1000,
         position: 'top',
         showCloseButton: true,

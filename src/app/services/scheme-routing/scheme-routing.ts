@@ -1,6 +1,6 @@
-//import { SelectWalletPage } from "../../pages/select-wallet/select-wallet";
+// import { SelectWalletPage } from "../../pages/select-wallet/select-wallet";
 import { Injectable } from '@angular/core'
-import { NavigationExtras, Router } from '@angular/router'
+import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
@@ -11,10 +11,9 @@ import {
   SyncWalletRequest
 } from 'airgap-coin-lib'
 
-import { AccountImportPage } from '../../pages/account-import/account-import'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { AccountProvider } from '../account/account.provider'
-//import { TransactionConfirmPage } from "../../pages/transaction-confirm/transaction-confirm";
+// import { TransactionConfirmPage } from "../../pages/transaction-confirm/transaction-confirm";
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
@@ -112,7 +111,7 @@ export class SchemeRoutingProvider {
             if (compatibleWallets.length > 0) {
               foundMatch = true
               const info = {
-                address: address,
+                address,
                 compatibleWallets,
                 incompatibleWallets
               }

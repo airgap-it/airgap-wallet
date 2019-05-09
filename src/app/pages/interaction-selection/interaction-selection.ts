@@ -22,8 +22,8 @@ export class InteractionSelectionPage {
     private readonly deepLinkProvider: DeepLinkProvider,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTx = info.airGapTx
       this.preparedDataQR = info.data

@@ -44,8 +44,8 @@ export class DelegationBakerDetailPage {
     public remoteConfigProvider: RemoteConfigProvider,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
     }
   }

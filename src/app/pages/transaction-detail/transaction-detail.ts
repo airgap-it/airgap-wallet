@@ -16,8 +16,8 @@ export class TransactionDetailPage {
   public lottieConfig: any
 
   constructor(private readonly platform: Platform, private readonly route: ActivatedRoute) {
-    if (this.route.snapshot.data['special']) {
-      this.transaction = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      this.transaction = this.route.snapshot.data.special
     }
 
     this.lottieConfig = {

@@ -128,9 +128,9 @@ export class DeepLinkProvider {
     })
 
     return {
-      wallet: wallet,
-      airGapTx: airGapTx,
-      serializedTx: serializedTx
+      wallet,
+      airGapTx,
+      serializedTx
     }
   }
 }

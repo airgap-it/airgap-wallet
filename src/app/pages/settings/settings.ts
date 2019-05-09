@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AboutPage } from '../about/about'
 import { IntroductionPage } from '../introduction/introduction'
 
 declare var window: any
@@ -104,7 +103,6 @@ export class SettingsPage {
                   break
                 case 'Chinese':
                   this.openUrl('https://t.me/AirGap_cn')
-                  break
               }
             }
           }

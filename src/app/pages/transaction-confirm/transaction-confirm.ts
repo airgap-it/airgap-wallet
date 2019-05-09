@@ -53,8 +53,8 @@ export class TransactionConfirmPage {
 
   public async ionViewWillEnter() {
     await this.platform.ready()
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.signedTransactionSync = info.signedTransactionSync
     }
 

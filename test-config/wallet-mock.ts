@@ -1,4 +1,4 @@
-import { AirGapMarketWallet, AirGapWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { Transaction } from '../src/app/models/transaction.model'
 

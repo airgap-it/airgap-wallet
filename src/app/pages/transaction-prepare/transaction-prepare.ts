@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+import { LoadingController } from '@ionic/angular'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
@@ -12,8 +12,6 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { RegexValidator } from '../../validators/RegexValidator'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
-import { ScanAddressPage } from '../scan-address/scan-address'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -40,8 +38,8 @@ export class TransactionPreparePage {
   ) {
     let address = '',
       wallet
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       address = info.address || ''
       wallet = info.wallet
     }
@@ -101,7 +99,6 @@ export class TransactionPreparePage {
                 break
               default:
                 this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
-                break
             }
           })
         })
@@ -129,7 +126,6 @@ export class TransactionPreparePage {
               this.transactionForm.controls.fee.setValue(
                 this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
-              break
           }
         })
       })
@@ -145,7 +141,7 @@ export class TransactionPreparePage {
       const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
-        airGapTx: airGapTx,
+        airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -160,7 +156,7 @@ export class TransactionPreparePage {
       this.transactionForm.controls.address.setValue(address)
     }
     const info = {
-      callback: callback
+      callback
     }
     this.dataService.setData(DataServiceKey.SCAN, info)
     this.router.navigateByUrl('/scan-address/' + DataServiceKey.SCAN).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

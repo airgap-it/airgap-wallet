@@ -21,8 +21,8 @@ export class SubAccountSelectPage {
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
     }
     this.subWallets = []

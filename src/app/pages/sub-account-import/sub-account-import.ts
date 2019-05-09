@@ -20,8 +20,8 @@ export class SubAccountImportPage {
 
   constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly accountProvider: AccountProvider) {
     this.subWallets = []
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
       this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier)
     }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx'
+import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
 import { Observable, ReplaySubject } from 'rxjs'
 

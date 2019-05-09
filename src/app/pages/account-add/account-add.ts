@@ -7,8 +7,6 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AccountImportOnboardingPage } from '../account-import-onboarding/account-import-onboarding'
-import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
 
 @Component({
   selector: 'page-account-add',
@@ -69,7 +67,7 @@ export class AccountAddPage {
     if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
       console.log(subProtocolIdentifier)
       const info = {
-        subProtocolIdentifier: subProtocolIdentifier
+        subProtocolIdentifier
       }
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

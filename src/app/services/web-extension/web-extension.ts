@@ -25,7 +25,7 @@ export class WebExtensionProvider {
   public refreshWindow() {
     chrome.tabs.getSelected(null, function(tab) {
       const code = 'window.location.reload()'
-      chrome.tabs.executeScript(tab.id, { code: code })
+      chrome.tabs.executeScript(tab.id, { code })
     })
   }
 }

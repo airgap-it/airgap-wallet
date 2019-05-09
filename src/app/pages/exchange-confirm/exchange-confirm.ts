@@ -1,14 +1,13 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { CreateTransactionResponse } from '../../services/exchange/exchange'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
 declare let cordova
 
 @Component({
@@ -34,8 +33,8 @@ export class ExchangeConfirmPage {
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.fromWallet = info.fromWallet
       this.toWallet = info.toWallet
       this.exchangeResult = info.exchangeResult
@@ -68,8 +67,8 @@ export class ExchangeConfirmPage {
       )
 
       const info = {
-        wallet: wallet,
-        airGapTx: airGapTx,
+        wallet,
+        airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
 

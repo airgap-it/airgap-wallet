@@ -3,8 +3,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
-import { Observable, ReplaySubject } from 'rxjs'
-import { map, take } from 'rxjs/operators'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -92,7 +90,7 @@ export class SwapComponent {
       component: ProtocolSelectPage,
       componentProps: {
         selectedProtocol: this.selectedProtocol.identifier,
-        protocols: protocols
+        protocols
       }
     })
 

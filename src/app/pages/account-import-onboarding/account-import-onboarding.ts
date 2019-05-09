@@ -34,8 +34,8 @@ export class AccountImportOnboardingPage implements OnInit {
   constructor(private readonly route: ActivatedRoute, public platform: Platform, private readonly deeplinkProvider: DeepLinkProvider) {}
 
   public ngOnInit() {
-    if (this.route.snapshot.data['special']) {
-      this.protocol = getProtocolByIdentifier(this.route.snapshot.data['special'])
+    if (this.route.snapshot.data.special) {
+      this.protocol = getProtocolByIdentifier(this.route.snapshot.data.special)
       console.log(this.protocol)
     }
   }

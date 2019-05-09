@@ -1,5 +1,3 @@
-import { stringify } from 'querystring'
-
 import { ShortenStringPipe } from './shorten-string.pipe'
 
 describe('ShortenString Pipe', () => {

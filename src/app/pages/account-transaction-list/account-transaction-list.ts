@@ -14,18 +14,13 @@ import { ActionType, OperationsProvider } from '../../services/operations/operat
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { AccountAddressPage } from '../account-address/account-address'
-import { DelegationBakerDetailPage } from '../delegation-baker-detail/delegation-baker-detail'
-import { SubAccountAddPage } from '../sub-account-add/sub-account-add'
-import { TransactionDetailPage } from '../transaction-detail/transaction-detail'
-import { TransactionPreparePage } from '../transaction-prepare/transaction-prepare'
-//import 'core-js/es7/object'
+// import 'core-js/es7/object'
 
 interface CoinAction {
   type: ActionType
   name: string
   icon: string
-  action: () => void
+  action(): void
 }
 
 declare let cordova
@@ -78,8 +73,8 @@ export class AccountTransactionListPage {
     private readonly toastController: ToastController,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      this.wallet = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      this.wallet = this.route.snapshot.data.special
     }
 
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -367,7 +362,7 @@ export class AccountTransactionListPage {
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         }
       },
-      event: event,
+      event,
       translucent: true
     })
 
@@ -402,7 +397,7 @@ export class AccountTransactionListPage {
     const toast = this.toastController
       .create({
         duration: 3000,
-        message: message,
+        message,
         showCloseButton: true,
         position: 'bottom'
       })
@@ -421,8 +416,8 @@ export class AccountTransactionListPage {
 
   public openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
     const info = {
-      subProtocolType: subProtocolType,
-      wallet: wallet
+      subProtocolType,
+      wallet
     }
     this.dataService.setData(DataServiceKey.DETAIL, info)
     this.router.navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

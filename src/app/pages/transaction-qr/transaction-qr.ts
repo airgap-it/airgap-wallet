@@ -24,8 +24,8 @@ export class TransactionQrPage {
     private readonly platform: Platform,
     private readonly deeplinkProvider: DeepLinkProvider
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTx = info.airGapTx
       this.preparedDataQR = info.data

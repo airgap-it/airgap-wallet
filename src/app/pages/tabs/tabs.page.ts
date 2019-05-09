@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { Events, ModalController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'

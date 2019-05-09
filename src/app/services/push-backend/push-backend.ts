@@ -27,9 +27,9 @@ export class PushBackendProvider {
   public async unregisterPush(protocolIdentifier: string, address: string, pushToken: string) {
     console.log(`PushService: Unregistering wallet ${protocolIdentifier}-${address}`)
     const body = {
-      address: address,
+      address,
       identifier: protocolIdentifier,
-      pushToken: pushToken
+      pushToken
     }
 
     return this.http.post(`${TRANSACTION_BACKEND_URL}api/v1/push_notifications/unregister/`, body, { responseType: 'text' }).toPromise()

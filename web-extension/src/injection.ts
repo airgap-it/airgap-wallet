@@ -17,10 +17,10 @@ function receiveAddress(event) {
 
     engine.addProvider(
       new HookedWalletSubprovider({
-        getAccounts: function(cb, params) {
+        getAccounts(cb, params) {
           cb(undefined, [addresses])
         },
-        signTransaction: function(cb) {
+        signTransaction(cb) {
           const data = { type: Transactions.INCOMING_TRANSACTION, signTransaction: cb }
           window.postMessage(data, '*')
         }

@@ -38,8 +38,8 @@ export class SubAccountAddPage {
     private readonly protocolsProvider: ProtocolsProvider,
     private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
     }
@@ -74,7 +74,7 @@ export class SubAccountAddPage {
             if (!exists) {
               wallet.addresses = res
               wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-              this.subAccounts.push({ selected: false, wallet: wallet })
+              this.subAccounts.push({ selected: false, wallet })
             }
           })
         })
@@ -92,7 +92,7 @@ export class SubAccountAddPage {
           if (!exists) {
             wallet.addresses = this.wallet.addresses
             wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-            this.subAccounts.push({ selected: false, wallet: wallet })
+            this.subAccounts.push({ selected: false, wallet })
           }
         }
       })

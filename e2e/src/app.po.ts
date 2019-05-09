@@ -1,6 +1,5 @@
 import * as fs from 'fs'
 import { browser, by, element } from 'protractor'
-import * as protractor from 'protractor'
 
 function slugify(text) {
   return text

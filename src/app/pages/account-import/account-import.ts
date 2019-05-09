@@ -34,8 +34,8 @@ export class AccountImportPage {
     private readonly alertCtrl: AlertController,
     private readonly ngZone: NgZone
   ) {
-    if (this.route.snapshot.data['special']) {
-      this.wallet = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      this.wallet = this.route.snapshot.data.special
     }
   }
 

@@ -19,8 +19,8 @@ export class AccountAddressPage {
     private readonly route: ActivatedRoute,
     private readonly clipboardProvider: ClipboardProvider
   ) {
-    if (this.route.snapshot.data['special']) {
-      this.wallet = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      this.wallet = this.route.snapshot.data.special
     }
   }
 

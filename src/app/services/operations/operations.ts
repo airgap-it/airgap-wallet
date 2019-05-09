@@ -110,7 +110,7 @@ export class OperationsProvider {
       type: EncodedType.UNSIGNED_TRANSACTION,
       payload: {
         publicKey: wallet.publicKey,
-        transaction: transaction,
+        transaction,
         callback: 'airgap-wallet://?d='
       }
     })
@@ -192,7 +192,7 @@ export class OperationsProvider {
     try {
       airGapTx = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
-        transaction: transaction
+        transaction
       })
     } catch (e) {
       handleErrorSentry(ErrorCategory.COINLIB)(e)
@@ -201,8 +201,8 @@ export class OperationsProvider {
     return {
       page: InteractionSelectionPage,
       params: {
-        wallet: wallet,
-        airGapTx: airGapTx,
+        wallet,
+        airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
     }

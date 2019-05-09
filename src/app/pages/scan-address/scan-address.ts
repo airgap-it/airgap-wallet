@@ -29,8 +29,8 @@ export class ScanAddressPage extends ScanBasePage {
     private readonly route: ActivatedRoute
   ) {
     super(platform, scanner, permissionsProvider)
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.callback = info.callback
     }
     this.isBrowser = !this.platform.is('cordova')

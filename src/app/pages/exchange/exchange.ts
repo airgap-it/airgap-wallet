@@ -8,7 +8,6 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ExchangeProvider } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
 
 enum ExchangePageState {
   LOADING,

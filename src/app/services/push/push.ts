@@ -4,7 +4,7 @@ import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
-import { filter, take } from 'rxjs/operators'
+import { take } from 'rxjs/operators'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -88,7 +88,7 @@ export class PushProvider {
         address: wallet.receivingPublicAddress,
         identifier: wallet.protocolIdentifier,
         pushToken: registrationId,
-        languageCode: languageCode
+        languageCode
       }))
 
       this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
