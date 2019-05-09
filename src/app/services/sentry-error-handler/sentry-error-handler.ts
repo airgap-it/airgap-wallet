@@ -1,17 +1,21 @@
-import { ErrorHandler, Injectable } from '@angular/core'
-import { init, captureException, configureScope, withScope } from '@sentry/browser'
+import { ErrorHandler } from '@angular/core'
+import * as Sentry from '@sentry/browser'
 
-init({
+Sentry.init({
   dsn: process.env.SENTRY_DSN,
   release: 'unknown',
-  beforeSend: data => {
-    let stacktrace = data.stacktrace || (data.exception && data.exception.values[0].stacktrace)
+  beforeSend: (data: Sentry.Event): Sentry.Event => {
+    const stacktrace: Sentry.Stacktrace | undefined =
+      data.stacktrace || (data.exception && data.exception.values && data.exception.values[0].stacktrace)
 
-    if (stacktrace) {
-      stacktrace.frames.forEach(function(frame) {
-        frame.filename = frame.filename.substring(frame.filename.lastIndexOf('/'))
+    if (stacktrace && stacktrace.frames) {
+      stacktrace.frames.forEach((frame: Sentry.StackFrame) => {
+        if (frame.filename) {
+          frame.filename = frame.filename.substring(frame.filename.lastIndexOf('/'))
+        }
       })
     }
+
     return data
   }
 })
@@ -36,13 +40,13 @@ export enum ErrorCategory {
 const AIRGAP_ERROR_CATEGORY = 'airgap-error-category'
 
 const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
-  return error => {
+  return (error: any) => {
     try {
       console.debug('sending error to sentry, category', category)
       console.debug(error.originalError || error)
-      withScope(scope => {
+      Sentry.withScope(scope => {
         scope.setTag(AIRGAP_ERROR_CATEGORY, category)
-        captureException(error.originalError || error)
+        Sentry.captureException(error.originalError || error)
       })
     } catch (e) {
       console.debug('Error reporting exception to sentry: ', e)
@@ -56,7 +60,7 @@ const handleErrorIgnore = error => {
 }
 
 const setSentryRelease = (release: string) => {
-  configureScope(scope => {
+  Sentry.configureScope(scope => {
     scope.addEventProcessor(async event => {
       event.release = release
       return event
@@ -65,7 +69,7 @@ const setSentryRelease = (release: string) => {
 }
 
 const setSentryUser = (UUID: string) => {
-  configureScope(scope => {
+  Sentry.configureScope(scope => {
     scope.setUser({ id: UUID })
   })
 }
@@ -73,7 +77,7 @@ const setSentryUser = (UUID: string) => {
 export { setSentryRelease, setSentryUser, handleErrorIgnore, handleErrorSentry }
 
 export class SentryErrorHandler extends ErrorHandler {
-  handleError(error) {
+  public handleError(error: any): void {
     super.handleError(error)
     handleErrorSentry(error)
   }
