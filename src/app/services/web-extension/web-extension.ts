@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core'
 
 import { AccountProvider } from './../account/account.provider'
 
-declare let chrome
-declare let window
+declare let window: Window // TODO: add global this in TS 3.4
 
 @Injectable({
   providedIn: 'root'
@@ -17,14 +16,14 @@ export class WebExtensionProvider {
     })
   }
 
-  public isWebExtension() {
+  public isWebExtension(): boolean {
     // Code running in a Chrome extension (content script, background page, etc.)
-    return window.chrome && chrome.runtime && chrome.runtime.id
+    return !!(window.chrome && chrome.runtime && chrome.runtime.id)
   }
 
-  public refreshWindow() {
-    chrome.tabs.getSelected(null, function(tab) {
-      const code = 'window.location.reload()'
+  public refreshWindow(): void {
+    chrome.tabs.getSelected(null, tab => {
+      const code: string = 'window.location.reload()'
       chrome.tabs.executeScript(tab.id, { code })
     })
   }
