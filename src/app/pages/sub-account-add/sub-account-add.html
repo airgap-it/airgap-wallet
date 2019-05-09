@@ -1,0 +1,54 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'add-sub-account.title' | translate: { typeLabel: typeLabel | translate } }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <h3 *ngIf="wallet.protocolIdentifier === 'xtz'" padding-horizontal [innerHTML]="'add-sub-account.delegation_heading' | translate"></h3>
+  <ion-row *ngIf="wallet.protocolIdentifier === 'xtz'">
+    <card-actionable
+      [imageName]="'add-account.svg'"
+      [text]="'add-sub-account.add-account_card.text' | translate"
+      [heading]="'add-sub-account.add-account_card.heading' | translate"
+      tappable
+      (click)="prepareOriginate()"
+    ></card-actionable>
+  </ion-row>
+  <ion-row padding>
+    <ion-text class="font--weight__bold" color="primary">
+      <span>{{ typeLabel | translate }}</span>
+    </ion-text>
+  </ion-row>
+
+  <empty-state
+    *ngIf="!subAccounts.length"
+    [text]="'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate }"
+    [imageName]="wallet.protocolIdentifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
+    [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
+  ></empty-state>
+
+  <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
+    <ion-col size="10" no-padding>
+      <portfolio-item
+        [isToken]="subProtocolType === subProtocolTypes.TOKEN"
+        [wallet]="subAccount.wallet"
+        [maxDigits]="8"
+        tappable
+        (click)="toggleAccount(subAccount)"
+      ></portfolio-item>
+    </ion-col>
+    <ion-col size="2" class="content--align__center-center" no-padding>
+      <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
+    </ion-col>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">
+      <ion-icon slot="start" name="add"></ion-icon>
+      {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

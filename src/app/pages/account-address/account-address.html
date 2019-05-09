@@ -1,0 +1,38 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ wallet.coinProtocol.symbol | uppercase }} {{ 'wallet-address.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-row padding>
+    <ion-col>
+      <ion-avatar>
+        <identicon [address]="wallet.receivingPublicAddress"></identicon>
+      </ion-avatar>
+      <currency-symbol class="symbol--icon" [symbol]="wallet.coinProtocol.symbol"></currency-symbol>
+    </ion-col>
+    <ion-col>
+      <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol | uppercase }}</h2>
+      <p>
+        {{ 'wallet-address.address_label' | translate }}:
+        <br />
+        <span (click)="copyAddressToClipboard()" class="text--selectable typography--mono">
+          {{ wallet.receivingPublicAddress }}
+          <ion-icon name="md-clipboard"></ion-icon>
+        </span>
+      </p>
+    </ion-col>
+  </ion-row>
+
+  <ion-row justify-content-center padding-bottom>
+    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [size]="240"></qr-clipboard>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="done()">{{ 'wallet-address.done_label' | translate }}</ion-button>
+  </ion-fab>
+</ion-content>

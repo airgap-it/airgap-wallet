@@ -1,0 +1,18 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'sub-account-select.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p [innerHTML]="'sub-account-select.text' | translate" padding-horizontal></p>
+  <ion-row padding>
+    <span ion-text class="font--weight__bold" color="primary">{{ 'sub-account-select.accounts_label' | translate }}</span>
+  </ion-row>
+  <ng-container *ngFor="let subWallet of subWallets">
+    <portfolio-item no-lines [wallet]="subWallet" [maxDigits]="8" tappable (click)="goToDelegateSelection(subWallet)"></portfolio-item>
+  </ng-container>
+</ion-content>

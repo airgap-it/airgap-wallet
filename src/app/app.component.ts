@@ -1,32 +1,31 @@
-import { DeepLinkProvider } from './../providers/deep-link/deep-link'
-import { PushProvider } from '../providers/push/push'
-
 import { Component, ViewChild } from '@angular/core'
-import { Deeplinks } from '@ionic-native/deeplinks'
-import { SplashScreen } from '@ionic-native/splash-screen'
-import { StatusBar } from '@ionic-native/status-bar'
+import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { TranslateService } from '@ngx-translate/core'
-import { Platform, Nav } from 'ionic-angular'
-import { TabsPage } from '../pages/tabs/tabs'
-import { AccountProvider } from '../providers/account/account.provider'
-import { SchemeRoutingProvider } from '../providers/scheme-routing/scheme-routing'
-import { setSentryRelease, handleErrorSentry, ErrorCategory, setSentryUser } from '../providers/sentry-error-handler/sentry-error-handler'
-import { ProtocolsProvider } from '../providers/protocols/protocols'
-import { WebExtensionProvider } from '../providers/web-extension/web-extension'
-import { AppInfoProvider } from '../providers/app-info/app-info'
-import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
-import { StorageProvider, SettingsKey } from '../providers/storage/storage'
-import { generateGUID } from '../utils/utils'
+import { Router } from '@angular/router'
+
+import { AccountProvider } from './services/account/account.provider'
+import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
+import { setSentryRelease, handleErrorSentry, ErrorCategory, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
+import { ProtocolsProvider } from './services/protocols/protocols'
+import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { AppInfoProvider } from './services/app-info/app-info'
+// import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
+import { StorageProvider, SettingsKey } from './services/storage/storage'
+import { generateGUID } from './utils/utils'
+
+import { Platform } from '@ionic/angular'
+import { SplashScreen } from '@ionic-native/splash-screen/ngx'
+import { StatusBar } from '@ionic-native/status-bar/ngx'
+
+import { DeepLinkProvider } from './services/deep-link/deep-link'
+import { PushProvider } from './services/push/push'
+import { DataService, DataServiceKey } from './services/data/data.service'
 
 @Component({
-  templateUrl: 'app.html'
+  selector: 'app-root',
+  templateUrl: 'app.component.html'
 })
-export class MyApp {
-  @ViewChild(Nav)
-  nav: Nav
-
-  rootPage: any = TabsPage
-
+export class AppComponent {
   constructor(
     private platform: Platform,
     private statusBar: StatusBar,
@@ -40,7 +39,9 @@ export class MyApp {
     private appInfoProvider: AppInfoProvider,
     private accountProvider: AccountProvider,
     private deepLinkProvider: DeepLinkProvider,
-    private pushProvider: PushProvider
+    private pushProvider: PushProvider,
+    private router: Router,
+    private dataService: DataService
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -123,7 +124,7 @@ export class MyApp {
             // match.$link - the full link data
             console.log('Successfully matched route', JSON.stringify(match))
             this.schemeRoutingProvider
-              .handleNewSyncRequest(this.nav, match.$link.url)
+              .handleNewSyncRequest(this.router, match.$link.url)
               .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
           },
           nomatch => {
@@ -137,10 +138,12 @@ export class MyApp {
   // TODO: Move to provider
   async walletDeeplink() {
     let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
-    this.nav.push(TransactionQrPage, {
+    const info = {
       wallet: deeplinkInfo.wallet,
       airGapTx: deeplinkInfo.airGapTx,
       data: 'airgap-vault://?d=' + deeplinkInfo.serializedTx
-    })
+    }
+    this.dataService.setData(DataServiceKey.TRANSACTION, info)
+    this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

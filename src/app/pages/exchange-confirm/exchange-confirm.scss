@@ -1,0 +1,10 @@
+.line--first {
+  height: 96px;
+}
+.line--second {
+  height: 48px;
+}
+.line--first,
+.line--second {
+  border-left: 1px solid var(--ion-color-dark);
+}

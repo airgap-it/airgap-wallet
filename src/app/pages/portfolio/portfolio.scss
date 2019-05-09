@@ -1,0 +1,55 @@
+.loading-header {
+  color: white;
+  font-weight: 300;
+  width: 100%;
+  text-align: center;
+  ion-spinner * {
+    width: 28px;
+    height: 28px;
+    stroke: #fff !important;
+  }
+}
+.loading-content {
+  color: white;
+  font-weight: 300;
+  width: 100%;
+  margin-top: 20vh;
+  text-align: center;
+  ion-spinner * {
+    width: 28px;
+    height: 28px;
+  }
+}
+.sc-ion-card-ios-h,
+.sc-ion-card-md-h {
+  padding: 4px 0;
+  margin-bottom: 16px;
+  margin-top: 0px;
+  p {
+    font-weight: inherit;
+  }
+  ion-item {
+    padding-bottom: 4px;
+  }
+}
+.list-ios {
+  margin: 0;
+}
+.container__empty {
+  img {
+    height: 30vh;
+  }
+}
+/* FAB with a button, bottom padding fix for ios devices, reset for FAB on page with bottom navigation */
+.content-ios ion-fab[bottom] {
+  bottom: 10px;
+}
+.portfolio--hero {
+  background: url('/assets/img/portfolio-lines.svg') no-repeat;
+  height: 25vh;
+  background-position: bottom;
+  h1 {
+    margin-bottom: 48px;
+    font-weight: bold;
+  }
+}

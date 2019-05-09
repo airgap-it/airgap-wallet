@@ -1,29 +1,22 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
     "declaration": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["dom", "es2015"],
     "module": "es2015",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "downlevelIteration": true, // To enable [].entries()
     "target": "es5",
-    "downlevelIteration": true,
-    "typeRoots": ["./node_modules/@types"],
-    "types": ["jasmine", "node"],
-    "paths": {
-      "bignumber.js": ["node_modules/bignumber.js"]
-    },
-    "baseUrl": "./"
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "src/**/*.spec.ts", "src/**/__tests__/*.ts"],
-  "compileOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom"]
   },
   "angularCompilerOptions": {
+    "strictInjectionParameters": true,
     "fullTemplateTypeCheck": true
   }
 }

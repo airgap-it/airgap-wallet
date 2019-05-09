@@ -47,7 +47,7 @@ let copyExtensionFiles = async () => {
 
 rimraf('./extension', function() {
   copyExtensionFiles().then(() => {
-    const needle = `<link href="build/main.css" rel="stylesheet">`
+    const needle = `<script src="cordova.js"></script>`
     const css = `
 		<style>
 			html {

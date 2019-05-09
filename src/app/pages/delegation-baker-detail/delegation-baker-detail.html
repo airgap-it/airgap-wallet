@@ -1,0 +1,208 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'delegation-baker-detail.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row padding-horizontal>
+    <ion-col size="12">
+      <ion-item lines="none" no-padding *ngIf="bakerConfig; else bakerAvatarSkeleton">
+        <ion-avatar slot="start"><identicon [address]="bakerConfig?.address"></identicon></ion-avatar>
+        <ion-label>
+          <h2 class="font--weight__bold" ion-text color="black">
+            {{ bakerConfig?.name }}
+          </h2>
+          <p>{{ bakerConfig?.address }}</p>
+        </ion-label>
+      </ion-item>
+      <ng-template #bakerAvatarSkeleton>
+        <div>
+          <ion-item lines="none" no-padding>
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ng-template>
+    </ion-col>
+  </ion-row>
+  <ion-row padding-horizontal padding-bottom>
+    <ion-col size="12" no-padding>
+      <p>{{ 'delegation-baker-detail.accepts-delegation' | translate }}</p>
+    </ion-col>
+    <ion-col size="12" no-padding>
+      <div class="progress--container">
+        <div class="progress--current" [style.width]="bakerInfo?.bakerUsage.toNumber() * 100 + '%'"></div>
+      </div>
+    </ion-col>
+    <ion-col size="12" no-padding>
+      <ion-row>
+        <ion-col size="6" no-padding>
+          <small *ngIf="bakerInfo; else bakerInfoSkeleton">{{ bakerInfo?.bakerUsage.toNumber() * 100 | number }}%</small>
+          <ng-template #bakerInfoSkeleton>
+            <div>
+              <p no-margin>
+                <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+              </p>
+            </div>
+          </ng-template>
+        </ion-col>
+        <ion-col size="6" text-right no-padding>
+          <small *ngIf="bakerInfo; else bakerInfoBalanceSkeleton">
+            {{ bakerInfo?.stakingBalance.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }} /
+            {{ bakerInfo?.bakerCapacity.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }}
+          </small>
+          <ng-template #bakerInfoBalanceSkeleton>
+            <div class="justify--content__end">
+              <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+            </div>
+          </ng-template>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-row padding-bottom>
+    <ion-col size="12">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="logo-usd"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
+              {{ bakerConfig?.fee.toNumber() * 100 | number }} %
+            </h2>
+            <ng-template #bakerConfigSkeleton>
+              <div>
+                <h2>
+                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h2>
+              </div>
+            </ng-template>
+            <h3>{{ 'delegation-baker-detail.fee' | translate }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
+              {{ 'delegation-baker-detail.cycles' | translate: { cycles: bakerConfig?.payout.cycles } }}
+              <small>{{ bakerConfig?.payout.time }}</small>
+            </h2>
+            <h3>{{ 'delegation-baker-detail.payout-schedule' | translate }}</h3>
+            <ng-template #bakerConfigSkeleton>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h3>
+            </ng-template>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <ion-row padding-horizontal>
+    <ion-text color="primary">
+      <p ion-text class="font--weight__bold" no-margin>
+        {{ 'delegation-baker-detail.your-delegation' | translate }}
+      </p>
+    </ion-text>
+  </ion-row>
+  <ion-row padding-bottom>
+    <ion-col size="12">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="wallet"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black">
+              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+            </h2>
+            <h3>{{ 'delegation-baker-detail.your-balance' | translate }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="alarm"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="avgRoIPerCycle; else avgRoiSkeleton">
+              {{ avgRoIPerCycle?.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+            </h2>
+            <h3>{{ 'delegation-baker-detail.estimated-return' | translate }}</h3>
+            <ng-template #avgRoiSkeleton>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h3>
+            </ng-template>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="nextPayout; else nextPayoutSkeleton">
+              {{ nextPayout | amTimeAgo }}
+            </h2>
+            <h3>
+              {{ (isDelegated ? 'delegation-baker-detail.next-payout' : 'delegation-baker-detail.first-payout') | translate }}
+            </h3>
+            <ng-template #nextPayoutSkeleton>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h3>
+            </ng-template>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ng-container *ngIf="isDelegated">
+    <ion-row padding-horizontal>
+      <ion-text color="primary">
+        <p ion-text class="font--weight__bold" no-margin>
+          {{ 'delegation-baker-detail.your-rewards' | translate }}
+        </p>
+      </ion-text>
+    </ion-row>
+
+    <tezos-delegation-stats [wallet]="wallet"></tezos-delegation-stats>
+  </ng-container>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button *ngIf="isDelegated" shape="round" color="primary" (click)="done()">
+      {{ 'delegation-baker-detail.done' | translate }}
+    </ion-button>
+
+    <ion-button
+      *ngIf="!isDelegated"
+      shape="round"
+      color="primary"
+      (click)="delegate()"
+      [disabled]="!bakerConfig?.enabled || !bakerInfo?.bakingActive || bakerInfo?.bakerUsage >= 1"
+    >
+      {{ 'delegation-baker-detail.delegate' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

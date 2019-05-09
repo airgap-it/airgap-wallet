@@ -1,0 +1,41 @@
+.amount__container {
+  .item-inner {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  ion-input {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .coin__selection {
+    background-color: rgba(0, 232, 204, 0.24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+
+    ion-row {
+      justify-content: center;
+      h5 {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}
+.border--vertical {
+  border-top: 1px solid rgba(0, 232, 204, 0.24);
+}
+.expendable__container {
+  ion-icon {
+    font-size: 1.8em;
+  }
+}

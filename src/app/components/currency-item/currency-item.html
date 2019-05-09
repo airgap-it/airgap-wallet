@@ -1,0 +1,11 @@
+<ion-item *ngIf="protocol" no-padding>
+  <currency-symbol class="item__image" [symbol]="protocol.symbol" slot="start"></currency-symbol>
+  <ion-label>
+    <h2>
+      <strong>{{ protocol.name }}</strong>
+      <span>{{ protocol.symbol }}</span>
+    </h2>
+  </ion-label>
+
+  <ion-radio *ngIf="radioList" [value]="protocol.identifier" slot="end"></ion-radio>
+</ion-item>

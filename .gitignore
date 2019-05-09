@@ -42,3 +42,6 @@ UserInterfaceState.xcuserstate
 src/assets/libs/airgap-coin-lib.browserify.js
 
 .env
+
+screenshots/
+reports/

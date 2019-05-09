@@ -9,9 +9,9 @@
     "vote_label": "Voting",
     "delegation-status_label": "Delegation",
     "pending-transactions": {
-      "label":  "Pending Transactions",
-      "text":  "Pending transactions are currently not enabled, please refer to the blockexplorer.",
-      "open-blockexplorer_label":  "Open Blockexplorer"
+      "label": "Pending Transactions",
+      "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
+      "open-blockexplorer_label": "Open Blockexplorer"
     },
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
@@ -130,7 +130,7 @@
   },
 
   "web-extension-disclaimer": {
-    "heading": "This is a <span class=\"style__strong color__primary\">ALPHA</span> version, only use with small amounts of funds.", 
+    "heading": "This is a <span class=\"style__strong color__primary\">ALPHA</span> version, only use with small amounts of funds.",
     "text": "The extesion has been currently tested with.",
     "list": {
       "item-1_text": "MyEtherWallet",
@@ -183,8 +183,8 @@
     "error": {
       "amount_label": "Please enter a valid number",
       "address_label": "Looks like a wrong address format, it should start with <strong>{{addressPlaceholder}}</strong>"
-    } 
-    },
+    }
+  },
 
   "transaction-qr": {
     "title": "{{title}} Transaction QR",

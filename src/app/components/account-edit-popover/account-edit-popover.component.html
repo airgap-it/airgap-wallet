@@ -1,0 +1,17 @@
+<ion-list lines="none" no-detail no-padding no-margin>
+  <ion-list-header>
+    <ion-label>{{ 'wallet-edit-popover-component.settings_label' | translate }}</ion-label>
+  </ion-list-header>
+  <ion-item button detail="false" (click)="copyAddressToClipboard()">
+    <ion-icon name="clipboard" color="dark" slot="end"></ion-icon>
+    {{ 'wallet-edit-popover-component.copy-address_label' | translate }}
+  </ion-item>
+  <ion-item button detail="false" (click)="delete()">
+    <ion-icon name="trash" color="dark" slot="end"></ion-icon>
+    {{ 'wallet-edit-popover-component.delete_label' | translate }}
+  </ion-item>
+  <ion-item *ngIf="isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
+    <ion-icon name="close" color="dark" slot="end"></ion-icon>
+    {{ 'wallet-edit-popover-component.undelegate_label' | translate }}
+  </ion-item>
+</ion-list>

@@ -1,0 +1,142 @@
+// http://ionicframework.com/docs/theming/
+@import '~@ionic/angular/css/core.css';
+@import '~@ionic/angular/css/normalize.css';
+@import '~@ionic/angular/css/structure.css';
+@import '~@ionic/angular/css/typography.css';
+@import '~@ionic/angular/css/display.css';
+@import '~@ionic/angular/css/padding.css';
+@import '~@ionic/angular/css/float-elements.css';
+@import '~@ionic/angular/css/text-alignment.css';
+@import '~@ionic/angular/css/text-transformation.css';
+@import '~@ionic/angular/css/flex-utils.css';
+
+/* forces the paragraph size */
+p {
+  font-size: 14px;
+}
+
+/* forces the ion-label size */
+ion-label {
+  font-size: 12px;
+}
+
+identicon {
+  width: inherit;
+  height: inherit;
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Styling of translated messages */
+.color__primary {
+  color: var(--ion-color-primary);
+}
+.style__strong {
+  font-weight: bold;
+}
+
+.scanning {
+  background: none !important;
+}
+
+/* Content in item is not shortened */
+.item-md p {
+  white-space: initial;
+}
+/* Center content vertically and horizontally */
+.content--align__center-center {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.content--align-vert__center {
+  align-items: center !important;
+}
+.justify--content__end {
+  display: flex;
+  justify-content: flex-end;
+}
+.font--weight__light {
+  font-weight: 200;
+}
+.font--weight__bold {
+  font-weight: 700 !important;
+}
+
+.font--weight__med {
+  font-weight: 500;
+}
+
+.typography--mono {
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+  font-weight: 600 !important;
+  font-size: 1rem;
+  word-wrap: break-word;
+}
+
+.ion-text-capitalize {
+  text-transform: uppercase;
+}
+
+.text--selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+qr-clipboard {
+  padding: 20px;
+  background-color: white;
+}
+
+/* FAB with a button, bottom padding fix for ios devices */
+.content-ios ion-fab[bottom] {
+  bottom: calc(10px + env(safe-area-inset-bottom));
+}
+ion-fab .col {
+  padding: 0 10px;
+}
+/* Fixes card padding & margin */
+ion-card {
+  padding: 8px 0;
+}
+
+/* Card Styling */
+page-portfolio,
+page-delegation-baker-detail,
+page-account-address,
+page-transaction-qr {
+  .sc-ion-card-md-h,
+  .sc-ion-card-ios-h,
+  qr-clipboard {
+    box-shadow: 0 10px 20px 0 rgba(49, 27, 88, 0.12);
+    border: 1px solid rgba(0, 232, 204, 0.08);
+    border-radius: 0;
+  }
+}
+
+/* Account onboarding progress bar styling */
+page-account-import-onboarding {
+  .swiper-pagination-custom {
+    top: 0;
+  }
+  .swiper-pagination-progressbar .swiper-pagination-progressbar-fill {
+    background: var(--ion-color-primary);
+  }
+  .swiper-pagination-progressbar {
+    background: rgba(var(--ion-color-secondary-rgb), 0.12);
+  }
+}
+
+.typography--mono {
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+  font-weight: 600 !important;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+.typography--uppercase {
+  text-transform: uppercase;
+  font-size: 14px;
+}

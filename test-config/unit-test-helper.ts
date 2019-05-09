@@ -1,33 +1,36 @@
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { IonicModule, Platform, NavController } from 'ionic-angular'
-import { TestModuleMetadata } from '@angular/core/testing'
-import { StorageMock } from './storage-mock'
-import { Storage, IonicStorageModule } from '@ionic/storage'
-import { PipesModule } from '../src/pipes/pipes.module'
 import { CommonModule } from '@angular/common'
+import { TestModuleMetadata } from '@angular/core/testing'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { RouterTestingModule } from '@angular/router/testing'
+import { IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
+import { IonicStorageModule, Storage } from '@ionic/storage'
+import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
+
+import { PipesModule } from '../src/app/pipes/pipes.module'
+
+import { ToastControllerMock } from './mocks-ionic'
+import { StorageMock } from './storage-mock'
 import { MomentModule } from 'ngx-moment'
-import { TranslateModule, TranslateLoader, TranslateFakeLoader } from '@ngx-translate/core'
-import { MaterialIconsModule } from 'ionic2-material-icons'
 
 export class UnitHelper {
-  static testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed = false): TestModuleMetadata {
+  public static testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed = false): TestModuleMetadata {
     const mandatoryDeclarations: any[] = []
     const mandatoryImports: any[] = [
       CommonModule,
       ReactiveFormsModule,
       IonicModule,
       FormsModule,
+      RouterTestingModule,
       IonicStorageModule.forRoot({
         name: '__test_airgap_storage',
         driverOrder: ['localstorage']
       }),
       MomentModule,
-      MaterialIconsModule,
       TranslateModule.forRoot({
         loader: { provide: TranslateLoader, useClass: TranslateFakeLoader }
       })
     ]
-    const mandatoryProviders: any[] = [NavController, Platform]
+    const mandatoryProviders: any[] = [NavController, Platform, { provide: ToastController, useClass: ToastControllerMock }]
 
     if (!useIonicOnlyTestBed) {
       mandatoryProviders.push({ provide: Storage, useClass: StorageMock })

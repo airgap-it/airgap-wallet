@@ -1,0 +1,68 @@
+<ion-content>
+  <ion-row class="portfolio--hero" justify-content-center align-items-center>
+    <h1 no-margin>${{ total | number: '1.2-2' }}</h1>
+  </ion-row>
+  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  <ng-container *ngIf="(walletGroups | async) as walletGroupsArray; else loading">
+    <ng-container *ngIf="walletGroupsArray.length; else noItems">
+      <ion-list lines="none" no-padding *ngFor="let walletGroup of walletGroupsArray">
+        <ion-card>
+          <portfolio-item
+            [wallet]="walletGroup.mainWallet"
+            [maxDigits]="8"
+            tappable
+            (click)="openDetail(walletGroup.mainWallet)"
+          ></portfolio-item>
+          <portfolio-item
+            *ngFor="let wallet of walletGroup.subWallets"
+            [wallet]="wallet"
+            [maxDigits]="8"
+            tappable
+            (click)="openDetail(wallet)"
+          ></portfolio-item>
+        </ion-card>
+      </ion-list>
+    </ng-container>
+    <ng-template #noItems>
+      <ion-row class="container__empty" padding justify-content-center>
+        <img src="assets/img/sync_wallet_onboarding_1.svg" />
+        <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
+      </ion-row>
+    </ng-template>
+  </ng-container>
+  <ng-template #loading>
+    <ion-list lines="none" margin-top>
+      <ion-card>
+        <portfolio-item></portfolio-item>
+      </ion-card>
+      <ion-card>
+        <portfolio-item></portfolio-item>
+      </ion-card>
+      <ion-card>
+        <portfolio-item></portfolio-item>
+      </ion-card>
+      <ion-card>
+        <portfolio-item></portfolio-item>
+      </ion-card>
+    </ion-list>
+  </ng-template>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ng-container *ngIf="(wallets | async) as walletsArray">
+      <ion-fab-button *ngIf="walletsArray.length > 0" id="add-more-coins-button" color="secondary" (click)="openAccountAddPage()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+      <ion-button
+        *ngIf="walletsArray.length === 0"
+        id="add-initial-coin-button"
+        color="secondary"
+        (click)="openAccountAddPage()"
+        shape="round"
+      >
+        <ion-icon slot="start" name="add"></ion-icon>
+        {{ 'portfolio.add-coins_label' | translate }}
+      </ion-button>
+    </ng-container>
+  </ion-fab>
+</ion-content>

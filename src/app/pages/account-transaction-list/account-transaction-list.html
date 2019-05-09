@@ -1,0 +1,218 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'account-transaction-list.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentEditPopover($event)"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+  <ion-row padding-top padding-horizontal>
+    <ion-button *ngFor="let action of actions" color="secondary" (click)="action.action()" shape="round" size="small" fill="outline">
+      <ion-icon slot="start" [name]="action.icon"></ion-icon>
+      {{ action.name | translate }}
+    </ion-button>
+  </ion-row>
+</ion-header>
+
+<ion-content>
+  <tezos-delegation-card
+    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
+    [wallet]="wallet"
+    [isDelegated]="isKtDelegated"
+    [delegateAmount]="wallet.currentBalance"
+    (onDelegatedClick)="openDelegateSelection()"
+    (onUndelegatedClick)="openDelegateSelection()"
+  ></tezos-delegation-card>
+
+  <ng-container *ngIf="hasPendingTransactions">
+    <ion-row padding-horizontal>
+      <ion-col size="12" no-padding padding-top>
+        <ion-text color="primary">
+          <p class="font--weight__bold">
+            {{ 'account-transaction-list.pending-transactions.label' | translate }}
+          </p>
+        </ion-text>
+      </ion-col>
+      <ion-col size="12" no-padding>
+        <p>
+          {{ 'account-transaction-list.pending-transactions.text' | translate }}
+        </p>
+      </ion-col>
+      <ion-col size="12" no-padding>
+        <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round" slot="start" size="small">
+          <ion-icon slot="start" name="open"></ion-icon>
+          {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+
+  <ion-row align-items-center>
+    <ion-col size="10" padding>
+      <ion-text class="font--weight__bold" color="primary">
+        <p>{{ 'account-transaction-list.transactions_label' | translate }}</p>
+      </ion-text>
+    </ion-col>
+    <ion-col size="1" no-padding class="justify--content__end">
+      <ion-spinner *ngIf="isRefreshing" color="primary" name="dots"></ion-spinner>
+    </ion-col>
+    <ion-col size="1"></ion-col>
+  </ion-row>
+  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+
+  <div padding-horizontal class="empty-list" *ngIf="!isRefreshing && showAeMigrationScreen()">
+    <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
+    <ion-text color="primary">
+      <h5>
+        {{ aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+      </h5>
+    </ion-text>
+    <p
+      [innerHTML]="
+        'account-transaction-list.aeternity.same-phase.text'
+          | translate
+            : {
+                migratedTokens:
+                  aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 },
+                phaseEnd: aePhaseEnd | amFromUnix | amDateFormat: 'MMMM'
+              }
+      "
+    ></p>
+  </div>
+
+  <ion-row padding justify-content-center align-items-center *ngIf="!isRefreshing && showAeMigrationBanner()">
+    <ion-col size="4"><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
+    <ion-col size="1"></ion-col>
+    <ion-col size="7">
+      <p [innerHTML]="'account-transaction-list.aeternity.same-phase.heading' | translate: { currentPhase: aeCurrentPhase }"></p>
+      <p
+        [innerHTML]="
+          'account-transaction-list.aeternity.same-phase.text'
+            | translate
+              : {
+                  migratedTokens:
+                    aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 },
+                  phaseEnd: aePhaseEnd | amFromUnix | amDateFormat: 'MMMM'
+                }
+        "
+      ></p>
+
+      <!--
+        <strong ion-text color="primary">{{ aeCurrentPhase }} Migration Successful</strong>
+        <p>
+          Your balance of
+          <strong ion-text color="primary">
+            {{ aeMigratedTokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+          </strong>
+          will become available with the next hardfork at
+          <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
+        </p>
+      -->
+    </ion-col>
+  </ion-row>
+
+  <div
+    padding-horizontal
+    [ngClass]="{ 'empty--list__container': showAeMigrationBanner() }"
+    class="empty-list"
+    *ngIf="!isRefreshing && showNoTransactionScreen()"
+  >
+    <img
+      padding-vertical
+      [ngClass]="{ 'empty--list__image': showAeMigrationBanner() }"
+      src="../../assets/img/empty-state-no-transaction.svg"
+    />
+    <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
+      {{ 'account-transaction-list.aeternity.no-transactions_text' | translate }}
+    </p>
+    <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
+      <p>
+        {{ 'account-transaction-list.aeternity.tx-list-disabled.text' | translate }}
+      </p>
+      <ion-button size="default" color="secondary" (click)="openBlockexplorer()" shape="round" icon-end>
+        {{ 'account-transaction-list.aeternity.tx-list-disabled.blockexplorer_label' | translate }}
+        <ion-icon name="open"></ion-icon>
+      </ion-button>
+    </span>
+  </div>
+
+  <ion-list lines="none" padding-bottom>
+    <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
+      <ion-avatar slot="start">
+        <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon>
+        <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
+      </ion-avatar>
+      <ion-label>
+        <h2>
+          <ion-icon *ngIf="t.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
+          <ion-icon *ngIf="!t.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+          <ion-text class="font--weight__bold" color="black">
+            <span>
+              {{ t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+            </span>
+          </ion-text>
+        </h2>
+        <ion-text color="blackLight">
+          <h3 class="typography--mono">
+            <ng-container *ngIf="t.isInbound">{{ t.from[0] | shortenString }}</ng-container>
+            <ng-container *ngIf="!t.isInbound">{{ t.to[0] | shortenString }}</ng-container>
+          </h3>
+        </ion-text>
+      </ion-label>
+      <ion-row class="items--right" slot="end">
+        <ion-col no-padding>
+          <ion-row justify-content-end>
+            <ion-text color="blackLight">
+              <p *ngIf="t.timestamp">
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
+                'HH:mm' } }}
+              </p>
+            </ion-text>
+          </ion-row>
+          <ion-row justify-content-end>
+            <ion-text color="blackLight">
+              <p *ngIf="t.timestamp">
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
+                'L' } }}
+              </p>
+            </ion-text>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+      <ion-spinner color="black"></ion-spinner>
+    </div>
+  </ion-list>
+
+  <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <ion-fab vertical="bottom" slot="fixed">
+    <ion-row>
+      <ion-col>
+        <ion-button expand="full" size="default" color="primary" (click)="openReceivePage()" shape="round">
+          <ion-icon slot="start" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
+          {{ 'account-transaction-list.receive_label' | translate }}
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button
+          expand="full"
+          size="default"
+          color="primary"
+          (click)="openPreparePage()"
+          [disabled]="protocolIdentifier === 'ae' && (!aeTxEnabled || wallet.currentBalance.toNumber() === 0)"
+          shape="round"
+        >
+          <ion-icon slot="start" name="send"></ion-icon>
+          {{ 'account-transaction-list.send_label' | translate }}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-fab>
+</ion-content>

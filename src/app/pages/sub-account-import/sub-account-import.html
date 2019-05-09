@@ -1,0 +1,26 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'sub-account-import.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: subProtocol.name }" padding-horizontal></p>
+  <ion-list lines="none" margin-top *ngFor="let wallet of subWallets">
+    <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="importWallet(wallet)"></portfolio-item>
+  </ion-list>
+  <empty-state
+    *ngIf="subWallets.length === 0"
+    [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol.name }"
+    [imageName]="'no-imports.svg'"
+  ></empty-state>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" (click)="importWallets()" color="secondary" [disabled]="subWallets.length === 0">
+      <ion-icon slot="start" name="add"></ion-icon>
+      {{ 'sub-account-import.import-all_label' | translate: { typeLabel: typeLabel | translate } }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

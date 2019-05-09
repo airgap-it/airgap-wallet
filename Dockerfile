@@ -17,12 +17,6 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 	&& apt-get purge --auto-remove -y curl \
 	&& rm -rf /src/*.deb
 
-# install npm
-RUN npm install -g npm@6.4.1
-
-# install static webserver
-RUN npm install -g node-static
-
 # create app directory
 RUN mkdir /app
 WORKDIR /app
@@ -32,7 +26,10 @@ COPY package.json /app
 COPY package-lock.json /app
 
 # install dependencies
-RUN npm ci
+RUN npm install
+
+# install static webserver
+RUN npm install node-static -g
 
 # browserify coin-lib
 RUN npm run browserify-coinlib
@@ -42,6 +39,9 @@ COPY . /app
 
 # set to production
 RUN export NODE_ENV=production
+
+# post-install hook, to be safe if it got cached
+RUN node config/patch_crypto.js
 
 # build
 RUN npm run build --prod
