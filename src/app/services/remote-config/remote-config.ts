@@ -34,6 +34,7 @@ export class RemoteConfigProvider {
     const responsePromise = this.httpClient.get<BakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
     responsePromise.catch(handleErrorSentry(ErrorCategory.OTHER))
     const response = await responsePromise
+
     return response.map(config => {
       return {
         name: config.name,

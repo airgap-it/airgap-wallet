@@ -84,6 +84,7 @@ class ChangellyApi {
     const method = 'getCurrencies'
     const params = {}
     const result = await this.makeJsonRpcCall<Object, string[]>(method, params)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(result)
   }
 
@@ -96,6 +97,7 @@ class ChangellyApi {
       from: fromCurrency,
       to: toCurrency
     }
+
     return this.makeJsonRpcCall<Object, string>(method, params)
   }
 
@@ -109,6 +111,7 @@ class ChangellyApi {
       to: toCurrency,
       amount
     }
+
     return this.makeJsonRpcCall<Object, string>(method, params)
   }
 
@@ -120,6 +123,7 @@ class ChangellyApi {
       currency,
       address
     }
+
     return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, params)
   }
 
@@ -134,6 +138,7 @@ class ChangellyApi {
       address,
       amount
     }
+
     return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
   }
 
@@ -142,6 +147,7 @@ class ChangellyApi {
     const params = {
       id: transactionId
     }
+
     return this.makeJsonRpcCall<Object, any>(method, params)
   }
 }
@@ -153,6 +159,7 @@ class ChangellyExchange extends ChangellyApi implements Exchange {
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
     const availableCurrencies = await this.getAvailableFromCurrencies()
+
     return availableCurrencies.filter(availableCurrency => availableCurrency !== selectedFrom)
   }
 }

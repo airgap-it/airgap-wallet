@@ -6,6 +6,7 @@ export class RegexValidator {
       if (String(control.value).match(regExp) === null) {
         return { pattern: 'Pattern does not match.' }
       }
+
       return null
     }
   }

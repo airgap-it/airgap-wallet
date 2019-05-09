@@ -34,6 +34,7 @@ export class DeepLinkProvider {
         sApp = window.startApp.set(url)
       } else {
         this.showDeeplinkOnlyOnDevicesAlert()
+
         return reject()
       }
 
@@ -46,6 +47,7 @@ export class DeepLinkProvider {
           console.error('deeplink used', url)
           console.error(error)
           this.showAppNotFoundAlert()
+
           return reject()
         }
       )
@@ -124,6 +126,7 @@ export class DeepLinkProvider {
         callback: 'airgap-wallet://?d='
       }
     })
+
     return {
       wallet: wallet,
       airGapTx: airGapTx,

@@ -35,6 +35,7 @@ export class CryptoToFiatPipe implements PipeTransform {
     }
 
     let fiatValue = args.currentMarketPrice.multipliedBy(value.shiftedBy(-1 * protocol.decimals))
+
     return fiatValue.toFixed()
   }
 }

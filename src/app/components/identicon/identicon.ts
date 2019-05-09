@@ -35,6 +35,7 @@ export class IdenticonComponent {
     for (let i = 0; i < v.length; i++) {
       rv = rv.plus(new BigNumber(alpha.indexOf(v[v.length - 1 - i])).multipliedBy(new BigNumber(alpha.length).exponentiatedBy(i)))
     }
+
     return rv.toString(16)
   }
 }

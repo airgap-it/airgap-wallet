@@ -40,6 +40,7 @@ export class ClipboardProvider {
       }
     } catch (err) {
       console.error('Failed to copy: ', err)
+
       return ''
     }
   }

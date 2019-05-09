@@ -24,6 +24,7 @@ chrome.runtime.onMessage.addListener(async function(request) {
         width,
         height
       })
+
       /*
       chrome.windows.create({
         url: 'confirmation.html?payload=' + serializedTx,
@@ -34,6 +35,7 @@ chrome.runtime.onMessage.addListener(async function(request) {
       */
       return true
     })
+
     return true
   }
 })

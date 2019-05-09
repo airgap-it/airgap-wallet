@@ -150,6 +150,7 @@ export class AccountProvider {
     this.walletList.push(wallet)
 
     this.wallets.next(this.walletList)
+
     return this.persist()
   }
 
@@ -170,6 +171,7 @@ export class AccountProvider {
     this.pushProvider.unregisterWallets([walletToRemove]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
+
     return this.persist()
   }
 
@@ -201,6 +203,7 @@ export class AccountProvider {
     if (!(wallet1 instanceof AirGapMarketWallet) || !(wallet2 instanceof AirGapMarketWallet)) {
       return false
     }
+
     return (
       wallet1.publicKey === wallet2.publicKey &&
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&

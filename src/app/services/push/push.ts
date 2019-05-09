@@ -94,6 +94,7 @@ export class PushProvider {
       this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
       if (!this.registrationId) {
         console.error('No registration token found')
+
         return
       }
     })
@@ -112,6 +113,7 @@ export class PushProvider {
   private async unregisterWallet(wallet: AirGapMarketWallet, registrationId: string) {
     if (!this.registrationId) {
       console.error('No registration token found')
+
       return
     }
 

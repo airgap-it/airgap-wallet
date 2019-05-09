@@ -78,6 +78,7 @@ export class NavParamsMock {
     if (NavParamsMock.params[key]) {
       return NavParamsMock.params[key]
     }
+
     return undefined
   }
 }

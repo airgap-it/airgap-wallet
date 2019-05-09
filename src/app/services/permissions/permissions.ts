@@ -25,6 +25,7 @@ export class PermissionsProvider {
 
   public async hasCameraPermission(): Promise<PermissionStatus> {
     const permission = await this.diagnostic.getCameraAuthorizationStatus(false)
+
     return this.getPermissionStatus(permission)
   }
 
@@ -78,6 +79,7 @@ export class PermissionsProvider {
         canAskForPermission = !(permissionStatus === PermissionStatus.DENIED)
       }
     }
+
     return canAskForPermission
   }
 

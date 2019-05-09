@@ -36,6 +36,7 @@ export class AmountConverterPipe implements PipeTransform {
       }
     })
     const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
+
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 

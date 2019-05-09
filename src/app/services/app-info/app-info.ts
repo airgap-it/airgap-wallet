@@ -29,21 +29,25 @@ export class AppInfoProvider {
 
   public async getAppName() {
     await this.isInitialized
+
     return this.appName
   }
 
   public async getPackageName() {
     await this.isInitialized
+
     return this.packageName
   }
 
   public async getVersionNumber() {
     await this.isInitialized
+
     return this.versionNumber
   }
 
   public async getVersionCode() {
     await this.isInitialized
+
     return this.versionCode
   }
 }

@@ -59,6 +59,7 @@ export class AccountImportPage {
           )
           this.walletAlreadyExists = true
           this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
           return
         }
 

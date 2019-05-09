@@ -14,6 +14,7 @@ export class ShortenStringPipe implements PipeTransform {
     if (value.length >= 12) {
       result = `${value.substr(0, 5)}...${value.substr(-5)}`
     }
+
     return result
   }
 }

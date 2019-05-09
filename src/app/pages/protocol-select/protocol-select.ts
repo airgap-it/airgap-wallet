@@ -33,6 +33,7 @@ export class ProtocolSelectPage {
 
   private filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
+
     return this.protocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )

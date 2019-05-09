@@ -81,6 +81,7 @@ export class ExchangePage {
 
     if (this.supportedProtocolsFrom.length === 0) {
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
       return
     }
 
@@ -88,6 +89,7 @@ export class ExchangePage {
 
     if (this.supportedProtocolsTo.length === 0) {
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
       return
     }
 
@@ -95,6 +97,7 @@ export class ExchangePage {
 
     if (!hasShownOnboarding) {
       this.exchangePageState = ExchangePageState.ONBOARDING
+
       return
     }
 
@@ -117,6 +120,7 @@ export class ExchangePage {
           this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
         } else {
           this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
           return
         }
       }

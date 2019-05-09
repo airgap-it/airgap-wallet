@@ -327,6 +327,7 @@ export class AccountTransactionListPage {
 
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
     const results = await Promise.all([this.wallet.fetchTransactions(limit, offset), this.wallet.synchronize()])
+
     return results[0]
   }
 
@@ -369,6 +370,7 @@ export class AccountTransactionListPage {
       event: event,
       translucent: true
     })
+
     return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
@@ -385,6 +387,7 @@ export class AccountTransactionListPage {
     const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     this.replaceAction(ActionType.DELEGATE, action)
+
     return ktAddresses
   }
 

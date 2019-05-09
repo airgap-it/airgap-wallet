@@ -49,6 +49,7 @@ export class OperationsProvider {
     if (refresh || delegationStatus === undefined) {
       const { isDelegated } = await this.checkDelegated(address)
       this.setDelegationStatusOfAddress(address, isDelegated)
+
       return isDelegated
     } else {
       return delegationStatus
@@ -57,6 +58,7 @@ export class OperationsProvider {
 
   public async getDelegationStatusObservableOfAddress(address) {
     await this.getDelegationStatusOfAddress(address)
+
     return this.delegationStatuses.pipe(map(delegationStatuses => delegationStatuses.get(address)))
   }
 
@@ -74,6 +76,7 @@ export class OperationsProvider {
     try {
       const originateTx = await protocol.originate(wallet.publicKey, delegate)
       const serializedTx = await this.serializeTx(wallet, originateTx)
+
       return this.getPageDetails(wallet, originateTx, serializedTx)
     } finally {
       this.hideLoader(loader)
@@ -88,6 +91,7 @@ export class OperationsProvider {
     try {
       const delegateTx = await protocol.delegate(wallet.publicKey, wallet.receivingPublicAddress, delegateTargetAddress)
       const serializedTx = await this.serializeTx(wallet, delegateTx)
+
       return this.getPageDetails(wallet, delegateTx, serializedTx)
     } finally {
       this.hideLoader(loader)
@@ -99,6 +103,7 @@ export class OperationsProvider {
     transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction
   ) {
     const syncProtocol = new SyncProtocolUtils()
+
     return syncProtocol.serialize({
       version: 1,
       protocol: wallet.coinProtocol.identifier,
@@ -113,6 +118,7 @@ export class OperationsProvider {
 
   public async checkDelegated(address: string): Promise<DelegationInfo> {
     const protocol = new TezosKtProtocol()
+
     return protocol.isAddressDelegated(address)
   }
 
@@ -208,6 +214,7 @@ export class OperationsProvider {
     })
 
     await loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+
     return loader
   }
 

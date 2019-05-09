@@ -4,6 +4,7 @@ export abstract class Serializable {
     for (const propName of Object.keys(jsonObj)) {
       this[propName] = JSON.parse(jsonObj[propName])
     }
+
     return this
   }
 
@@ -11,6 +12,7 @@ export abstract class Serializable {
     for (const propName of Object.keys(jsonObj)) {
       this[propName] = jsonObj[propName]
     }
+
     return this
   }
 }

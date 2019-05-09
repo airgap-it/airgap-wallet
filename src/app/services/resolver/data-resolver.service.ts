@@ -11,6 +11,7 @@ export class DataResolverService implements Resolve<any> {
 
   public resolve(route: ActivatedRouteSnapshot) {
     let id = route.paramMap.get('id')
+
     return this.dataService.getData(id)
   }
 }

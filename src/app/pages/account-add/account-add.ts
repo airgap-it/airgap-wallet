@@ -36,8 +36,10 @@ export class AccountAddPage {
             subProtocol.subProtocolType === SubProtocolType.TOKEN &&
             this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
         )
+
         return pv.concat(...subProtocols)
       }
+
       return pv
     }, [])
     this.filterProtocols()
