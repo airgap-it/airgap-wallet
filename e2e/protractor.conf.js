@@ -8,6 +8,7 @@ exports.config = {
   allScriptsTimeout: 11000,
   specs: ['./src/**/*.e2e-spec.ts'],
   multiCapabilities: [
+    /*
     {
       browserName: 'chrome',
 
@@ -29,9 +30,27 @@ exports.config = {
       browserName: 'chrome',
 
       chromeOptions: {
-        args: ['--headless', '--disable-gpu' /*, 'lang=de-DE' */],
+        args: ['--headless', '--disable-gpu', 'lang=de-DE'],
         mobileEmulation: {
           deviceName: 'iPhone X'
+        }
+      }
+    },
+    */
+    {
+      browserName: 'chrome',
+
+      chromeOptions: {
+        args: [
+          /*, 'lang=de-DE' */
+        ],
+        mobileEmulation: {
+          deviceName: 'iPhone X'
+        },
+        prefs: {
+          'profile.content_settings.exceptions.clipboard': {
+            'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
+          }
         }
       }
     }
