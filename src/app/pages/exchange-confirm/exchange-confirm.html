@@ -7,8 +7,8 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding-right>
-  <h3 padding-bottom padding-left [innerHTML]="'exchange-confirm.heading' | translate"></h3>
+<ion-content>
+  <h3 padding-start padding-bottom [innerHTML]="'exchange-confirm.heading' | translate"></h3>
   <address-row
     [address]="fromWallet.receivingPublicAddress"
     label="{{ 'exchange-confirm.sell_label' | translate }}"
