@@ -6,7 +6,7 @@
 
 > Your old smartphone is your new ‘hardware wallet’
 
-[AirGap](https://airgap.it) is a crypto wallet system, that let's you secure cypto assets with one secret on an offline device. The AirGap Wallet application is installed installed on an everyday smartphonem whereas [AirGap Vault](https://github.com/airgap-it/airgap-vault) is installed on a is installed on a dedicated or old smartphone that has no connection to any network, thus it is air gapped.
+[AirGap](https://airgap.it) is a crypto wallet system, that let's you secure cypto assets with one secret on an offline device. The AirGap Wallet application is installed on an everyday smartphone whereas [AirGap Vault](https://github.com/airgap-it/airgap-vault) is installed on a dedicated or old smartphone that has no connection to any network, thus it is air gapped.
 
 ## Description
 
