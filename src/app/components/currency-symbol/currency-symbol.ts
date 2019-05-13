@@ -6,7 +6,7 @@ import { Component, Input } from '@angular/core'
 })
 export class CurrencySymbolComponent {
   @Input()
-  private symbol: string
+  private readonly symbol: string
 
   public symbolURL: string = 'assets/symbols/generic-coin.svg'
 
@@ -14,15 +14,15 @@ export class CurrencySymbolComponent {
     /* */
   }
 
-  ngAfterViewInit() {
+  public ngAfterViewInit() {
     this.loadImage()
   }
 
-  ngOnChanges() {
+  public ngOnChanges() {
     this.loadImage()
   }
 
-  loadImage() {
+  public loadImage() {
     const imageUrl = 'assets/symbols/' + this.symbol.toLowerCase() + '.svg'
     const img = new Image()
     img.onload = () => {

@@ -1,13 +1,15 @@
-import { IonicModule } from '@ionic/angular'
-import { RouterModule } from '@angular/router'
-import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { DelegationBakerDetailPage } from './delegation-baker-detail'
-import { ComponentsModule } from '../../components/components.module'
+import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
-import { PipesModule } from '../../pipes/pipes.module'
 import { MomentModule } from 'ngx-moment'
+
+import { ComponentsModule } from '../../components/components.module'
+import { PipesModule } from '../../pipes/pipes.module'
+
+import { DelegationBakerDetailPage } from './delegation-baker-detail'
 
 @NgModule({
   imports: [

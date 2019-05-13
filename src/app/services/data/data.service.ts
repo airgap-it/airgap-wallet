@@ -15,15 +15,15 @@ export enum DataServiceKey {
   providedIn: 'root'
 })
 export class DataService {
-  private data = []
+  private readonly data = []
 
-  constructor(private storage: Storage) {}
+  constructor(private readonly storage: Storage) {}
 
-  setData(id, data) {
+  public setData(id, data) {
     this.data[id] = data
   }
 
-  getData(id) {
+  public getData(id) {
     return this.data[id]
   }
 

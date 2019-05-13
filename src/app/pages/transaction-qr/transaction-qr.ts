@@ -1,10 +1,11 @@
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { Transaction } from '../../models/transaction.model'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { Transaction } from '../../models/transaction.model'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-transaction-qr',
@@ -18,13 +19,13 @@ export class TransactionQrPage {
   public qrDataTooBig: boolean = false
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private platform: Platform,
-    private deeplinkProvider: DeepLinkProvider
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly platform: Platform,
+    private readonly deeplinkProvider: DeepLinkProvider
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTx = info.airGapTx
       this.preparedDataQR = info.data
@@ -33,11 +34,11 @@ export class TransactionQrPage {
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  done() {
+  public done() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  sameDeviceSign() {
+  public sameDeviceSign() {
     this.deeplinkProvider.sameDeviceDeeplink(this.preparedDataQR)
   }
 }

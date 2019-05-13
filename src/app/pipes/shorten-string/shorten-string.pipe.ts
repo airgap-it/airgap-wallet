@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core'
   name: 'shortenString'
 })
 export class ShortenStringPipe implements PipeTransform {
-  transform(value: string) {
+  public transform(value: string) {
     if (!value || !(typeof value === 'string')) {
       // console.warn(`ShortenStringPipe: invalid value: ${value}`)
       return ''
@@ -14,6 +14,7 @@ export class ShortenStringPipe implements PipeTransform {
     if (value.length >= 12) {
       result = `${value.substr(0, 5)}...${value.substr(-5)}`
     }
+
     return result
   }
 }

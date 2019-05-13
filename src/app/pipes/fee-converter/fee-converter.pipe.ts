@@ -1,12 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { BigNumber } from 'bignumber.js'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
 
 @Pipe({
   name: 'feeConverter'
 })
 export class FeeConverterPipe implements PipeTransform {
-  transform(value: BigNumber | string | number, args: { protocolIdentifier: string }): string {
+  public transform(value: BigNumber | string | number, args: { protocolIdentifier: string }): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }

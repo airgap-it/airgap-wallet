@@ -63,6 +63,7 @@ const setSentryRelease = (release: string) => {
   Sentry.configureScope(scope => {
     scope.addEventProcessor(async event => {
       event.release = release
+
       return event
     })
   })

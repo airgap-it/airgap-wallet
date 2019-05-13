@@ -1,4 +1,4 @@
-import { Input, Component, Output, EventEmitter } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 @Component({
@@ -7,25 +7,25 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 })
 export class TezosDelegationCard {
   @Input()
-  wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
 
   @Input()
-  isDelegated: boolean = false
+  public isDelegated: boolean = false
 
   @Input()
-  delegateAmount: number = 0
+  public delegateAmount: number = 0
 
   @Output()
-  onDelegatedClick: EventEmitter<void> = new EventEmitter<void>()
+  public onDelegatedClick: EventEmitter<void> = new EventEmitter<void>()
 
   @Output()
-  onUndelegatedClick: EventEmitter<void> = new EventEmitter<void>()
+  public onUndelegatedClick: EventEmitter<void> = new EventEmitter<void>()
 
-  delegatedClick() {
+  public delegatedClick() {
     this.onDelegatedClick.emit()
   }
 
-  undelegatedClick() {
+  public undelegatedClick() {
     this.onUndelegatedClick.emit()
   }
 }

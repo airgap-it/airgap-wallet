@@ -1,19 +1,17 @@
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
-import { AddressValidator } from '../../validators/AddressValidator'
+import { HttpClient } from '@angular/common/http'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { RegexValidator } from '../../validators/RegexValidator'
+import { ActivatedRoute, Router } from '@angular/router'
+import { LoadingController } from '@ionic/angular'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
-import { ToastController, LoadingController } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
 
-import { ScanAddressPage } from '../scan-address/scan-address'
-import { AirGapMarketWallet, SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
-import { HttpClient } from '@angular/common/http'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
-import { OperationsProvider } from '../../services/operations/operations'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AddressValidator } from '../../validators/AddressValidator'
+import { RegexValidator } from '../../validators/RegexValidator'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -30,18 +28,18 @@ export class TransactionPreparePage {
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private _ngZone: NgZone,
-    private http: HttpClient,
-    private clipboardProvider: ClipboardProvider,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly _ngZone: NgZone,
+    private readonly http: HttpClient,
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService
   ) {
     let address = '',
       wallet
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       address = info.address || ''
       wallet = info.wallet
     }
@@ -58,7 +56,7 @@ export class TransactionPreparePage {
     this.onChanges()
   }
 
-  onChanges(): void {
+  public onChanges(): void {
     this.transactionForm.get('amount').valueChanges.subscribe(val => {
       this.sendMaxAmount = false
     })
@@ -70,7 +68,7 @@ export class TransactionPreparePage {
     })
   }
 
-  useWallet(wallet: AirGapMarketWallet) {
+  public useWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
 
     // set fee per default to low
@@ -101,7 +99,6 @@ export class TransactionPreparePage {
                 break
               default:
                 this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
-                break
             }
           })
         })
@@ -129,7 +126,6 @@ export class TransactionPreparePage {
               this.transactionForm.controls.fee.setValue(
                 this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
-              break
           }
         })
       })
@@ -145,7 +141,7 @@ export class TransactionPreparePage {
       const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
-        airGapTx: airGapTx,
+        airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -156,11 +152,11 @@ export class TransactionPreparePage {
   }
 
   public openScanner() {
-    let callback = address => {
+    const callback = address => {
       this.transactionForm.controls.address.setValue(address)
     }
     const info = {
-      callback: callback
+      callback
     }
     this.dataService.setData(DataServiceKey.SCAN, info)
     this.router.navigateByUrl('/scan-address/' + DataServiceKey.SCAN).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

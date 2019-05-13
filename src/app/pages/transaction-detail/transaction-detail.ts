@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
-import { Platform } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
-import { Transaction } from '../../models/transaction.model'
+import { Platform } from '@ionic/angular'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+
+import { Transaction } from '../../models/transaction.model'
 
 declare let cordova
 
@@ -12,11 +13,11 @@ declare let cordova
 })
 export class TransactionDetailPage {
   public transaction: Transaction
-  lottieConfig: any
+  public lottieConfig: any
 
-  constructor(private platform: Platform, private route: ActivatedRoute) {
-    if (this.route.snapshot.data['special']) {
-      this.transaction = this.route.snapshot.data['special']
+  constructor(private readonly platform: Platform, private readonly route: ActivatedRoute) {
+    if (this.route.snapshot.data.special) {
+      this.transaction = this.route.snapshot.data.special
     }
 
     this.lottieConfig = {
@@ -24,9 +25,9 @@ export class TransactionDetailPage {
     }
   }
 
-  openBlockexplorer() {
-    let transaction: any = this.transaction
-    let hash = transaction.hash
+  public openBlockexplorer() {
+    const transaction: any = this.transaction
+    const hash = transaction.hash
 
     const protocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
 

@@ -1,5 +1,5 @@
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
+import { StatusBar } from '@ionic-native/status-bar/ngx'
 
 class ComponentMock {}
 
@@ -78,6 +78,7 @@ export class NavParamsMock {
     if (NavParamsMock.params[key]) {
       return NavParamsMock.params[key]
     }
+
     return undefined
   }
 }
@@ -178,13 +179,13 @@ export class NavMock {
 }
 
 export class StatusBarMock extends StatusBar {
-  styleDefault() {
+  public styleDefault() {
     return
   }
 }
 
 export class SplashScreenMock extends SplashScreen {
-  hide() {
+  public hide() {
     return
   }
 }

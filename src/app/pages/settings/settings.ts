@@ -1,13 +1,12 @@
 import { Component } from '@angular/core'
-import { ModalController, Platform, AlertController } from '@ionic/angular'
 import { Router } from '@angular/router'
-
-import { AboutPage } from '../about/about'
-import { IntroductionPage } from '../introduction/introduction'
+import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { IntroductionPage } from '../introduction/introduction'
 
 declare var window: any
 declare var cordova: any
@@ -18,13 +17,13 @@ declare var cordova: any
 })
 export class SettingsPage {
   constructor(
-    private router: Router,
-    private modalController: ModalController,
-    private translateService: TranslateService,
+    private readonly router: Router,
+    private readonly modalController: ModalController,
+    private readonly translateService: TranslateService,
     public platform: Platform,
     public alertCtrl: AlertController,
-    private clipboardProvider: ClipboardProvider,
-    private schemeRoutingProvider: SchemeRoutingProvider
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly schemeRoutingProvider: SchemeRoutingProvider
   ) {}
 
   public about() {
@@ -32,7 +31,7 @@ export class SettingsPage {
   }
 
   public share() {
-    let options = {
+    const options = {
       message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',
       // not supported on some apps (Facebook, Instagram)
       subject: 'Checkout airgap.it', // fi. for email
@@ -40,13 +39,13 @@ export class SettingsPage {
       chooserTitle: 'Pick an app' // Android only, you can override the default share sheet title
     }
 
-    let onSuccess = function(result: any) {
+    const onSuccess = function(result: any) {
       console.log(`Share completed: ${result.completed}`) // On Android apps mostly return false even while it's true
       console.log(`Shared to app: ${result.app}`)
       // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
     }
 
-    let onError = function(msg: string) {
+    const onError = function(msg: string) {
       console.log('Sharing failed with message: ' + msg)
     }
 
@@ -70,7 +69,7 @@ export class SettingsPage {
   }
 
   public telegram() {
-    let alert = this.alertCtrl
+    const alert = this.alertCtrl
       .create({
         header: this.translateService.instant('settings.alert_title'),
         inputs: [
@@ -104,7 +103,6 @@ export class SettingsPage {
                   break
                 case 'Chinese':
                   this.openUrl('https://t.me/AirGap_cn')
-                  break
               }
             }
           }

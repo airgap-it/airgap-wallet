@@ -1,12 +1,12 @@
-import { PipeTransform, Pipe } from '@angular/core'
-import { BigNumber } from 'bignumber.js'
+import { Pipe, PipeTransform } from '@angular/core'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
 
 @Pipe({
   name: 'amountConverter'
 })
 export class AmountConverterPipe implements PipeTransform {
-  transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
+  public transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }
@@ -36,10 +36,11 @@ export class AmountConverterPipe implements PipeTransform {
       }
     })
     const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
+
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 
-  formatBigNumber(value: BigNumber, maxDigits?: number): string {
+  public formatBigNumber(value: BigNumber, maxDigits?: number): string {
     if (!maxDigits) {
       return value.toFormat()
     }
@@ -48,7 +49,7 @@ export class AmountConverterPipe implements PipeTransform {
       return value.toFormat()
     }
 
-    let integerValueLength = value.integerValue().toString().length
+    const integerValueLength = value.integerValue().toString().length
     if (integerValueLength >= maxDigits) {
       // We can omit floating point
       return this.makeFullNumberSmaller(value, maxDigits)
@@ -58,7 +59,7 @@ export class AmountConverterPipe implements PipeTransform {
     return value.toFormat(maxDigits - integerValueLength).replace(/\.?0+$/, '')
   }
 
-  makeFullNumberSmaller(value: BigNumber, maxDigits: number): string {
+  public makeFullNumberSmaller(value: BigNumber, maxDigits: number): string {
     if (value.toFixed().length <= maxDigits) {
       return value.toFormat()
     }

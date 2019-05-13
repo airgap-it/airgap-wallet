@@ -1,6 +1,6 @@
-import { Platform } from '@ionic/angular'
-import { AppVersion } from '@ionic-native/app-version/ngx'
 import { Injectable } from '@angular/core'
+import { AppVersion } from '@ionic-native/app-version/ngx'
+import { Platform } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +11,13 @@ export class AppInfoProvider {
   public versionNumber = 'VERSION_NUMBER'
   public versionCode: string | number = 'VERSION_CODE'
 
-  private isInitialized: Promise<void>
+  private readonly isInitialized: Promise<void>
 
-  constructor(private app: AppVersion, private platform: Platform) {
+  constructor(private readonly app: AppVersion, private readonly platform: Platform) {
     this.isInitialized = this.updateVersions()
   }
 
-  async updateVersions() {
+  public async updateVersions() {
     if (this.platform.is('cordova')) {
       await this.platform.ready()
       this.appName = await this.app.getAppName()
@@ -27,23 +27,27 @@ export class AppInfoProvider {
     }
   }
 
-  async getAppName() {
+  public async getAppName() {
     await this.isInitialized
+
     return this.appName
   }
 
-  async getPackageName() {
+  public async getPackageName() {
     await this.isInitialized
+
     return this.packageName
   }
 
-  async getVersionNumber() {
+  public async getVersionNumber() {
     await this.isInitialized
+
     return this.versionNumber
   }
 
-  async getVersionCode() {
+  public async getVersionCode() {
     await this.isInitialized
+
     return this.versionCode
   }
 }

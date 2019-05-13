@@ -1,14 +1,14 @@
 import { Component } from '@angular/core'
-import { Observable, ReplaySubject } from 'rxjs'
 import { Router } from '@angular/router'
-
-import { AccountProvider } from '../../services/account/account.provider'
+import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
+import { Observable, ReplaySubject } from 'rxjs'
+
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
-import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -21,20 +21,20 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
-  isVisible = 'hidden'
+  public isVisible = 'hidden'
 
-  total: number = 0
-  changePercentage: number = 0
+  public total: number = 0
+  public changePercentage: number = 0
 
-  wallets: Observable<AirGapMarketWallet[]>
-  walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
+  public wallets: Observable<AirGapMarketWallet[]>
+  public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
 
   constructor(
-    private router: Router,
-    private walletsProvider: AccountProvider,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService,
-    private qrScanner: QRScanner
+    private readonly router: Router,
+    private readonly walletsProvider: AccountProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService,
+    private readonly qrScanner: QRScanner
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
@@ -64,20 +64,20 @@ export class PortfolioPage {
     })
   }
 
-  ionViewDidEnter() {
+  public ionViewDidEnter() {
     this.doRefresh().catch(handleErrorSentry())
   }
 
-  openDetail(wallet: AirGapMarketWallet) {
+  public openDetail(wallet: AirGapMarketWallet) {
     this.dataService.setData(DataServiceKey.WALLET, wallet)
     this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openAccountAddPage() {
+  public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  async doRefresh(event: any = null) {
+  public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
     this.operationsProvider.refreshAllDelegationStatuses()
 
@@ -90,13 +90,13 @@ export class PortfolioPage {
     this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
   }
 
-  calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
+  public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
     console.log('calculating total')
     let newTotal = 0
-    let cryptoToFiatPipe = new CryptoToFiatPipe()
+    const cryptoToFiatPipe = new CryptoToFiatPipe()
 
     wallets.forEach(wallet => {
-      let fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
+      const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
         protocolIdentifier: wallet.protocolIdentifier,
         currentMarketPrice: wallet.currentMarketPrice
       })

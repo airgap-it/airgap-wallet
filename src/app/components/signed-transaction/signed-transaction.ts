@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core'
 import {
   DeserializedSyncProtocol,
-  IAirGapTransaction,
   getProtocolByIdentifier,
+  IAirGapTransaction,
   SignedTransaction,
   SyncProtocolUtils
 } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'signed-transaction',
@@ -15,21 +16,21 @@ import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-ha
 })
 export class SignedTransactionComponent {
   @Input()
-  signedTx: DeserializedSyncProtocol
+  public signedTx: DeserializedSyncProtocol
 
   @Input()
-  syncProtocolString: string
+  public syncProtocolString: string
 
-  airGapTx: IAirGapTransaction
-  fallbackActivated: boolean = false
+  public airGapTx: IAirGapTransaction
+  public fallbackActivated: boolean = false
 
-  rawTxData: SignedTransaction
+  public rawTxData: SignedTransaction
 
   constructor() {
     //
   }
 
-  async ngOnChanges() {
+  public async ngOnChanges() {
     if (this.syncProtocolString) {
       try {
         const syncUtils = new SyncProtocolUtils()

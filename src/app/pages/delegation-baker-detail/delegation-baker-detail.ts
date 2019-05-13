@@ -1,16 +1,16 @@
+import { Location } from '@angular/common'
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { ToastController } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-import { BakerInfo, DelegationRewardInfo, TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, BakerInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-import { OperationsProvider } from '../../services/operations/operations'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { RemoteConfigProvider, BakerConfig } from '../../services/remote-config/remote-config'
 import * as moment from 'moment'
 
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { Location } from '@angular/common'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { BakerConfig, RemoteConfigProvider } from '../../services/remote-config/remote-config'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 type Moment = moment.Moment
 
@@ -37,20 +37,20 @@ export class DelegationBakerDetailPage {
 
   constructor(
     public location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     public toastController: ToastController,
     public operationsProvider: OperationsProvider,
     public remoteConfigProvider: RemoteConfigProvider,
-    private dataService: DataService
+    private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
     }
   }
 
-  async ionViewDidEnter() {
+  public async ionViewDidEnter() {
     // get baker 0, always airgap for now
     this.bakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
@@ -93,11 +93,11 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  addPayoutDelayToMoment(time: Moment): Moment {
+  public addPayoutDelayToMoment(time: Moment): Moment {
     return time.add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
   }
 
-  async delegate() {
+  public async delegate() {
     try {
       if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ) {
         const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet, this.bakerConfig.address)
@@ -123,7 +123,7 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  async done() {
+  public async done() {
     this.location.back()
   }
 }

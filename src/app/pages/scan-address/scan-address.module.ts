@@ -1,12 +1,14 @@
-import { IonicModule } from '@ionic/angular'
-import { RouterModule } from '@angular/router'
-import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { ScanAddressPage } from './scan-address'
-import { ComponentsModule } from '../../components/components.module'
+import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+
+import { ComponentsModule } from '../../components/components.module'
+
+import { ScanAddressPage } from './scan-address'
 
 @NgModule({
   imports: [

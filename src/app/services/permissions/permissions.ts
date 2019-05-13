@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
-import { Platform, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { AlertController, Platform } from '@ionic/angular'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',
@@ -20,14 +21,15 @@ export enum PermissionTypes {
   providedIn: 'root'
 })
 export class PermissionsProvider {
-  constructor(private platform: Platform, private diagnostic: Diagnostic, private alertCtrl: AlertController) {}
+  constructor(private readonly platform: Platform, private readonly diagnostic: Diagnostic, private readonly alertCtrl: AlertController) {}
 
-  async hasCameraPermission(): Promise<PermissionStatus> {
+  public async hasCameraPermission(): Promise<PermissionStatus> {
     const permission = await this.diagnostic.getCameraAuthorizationStatus(false)
+
     return this.getPermissionStatus(permission)
   }
 
-  async requestPermissions(permissions: PermissionTypes[]): Promise<void> {
+  public async requestPermissions(permissions: PermissionTypes[]): Promise<void> {
     if (this.platform.is('android')) {
       const permissionsToRequest = []
       if (permissions.indexOf(PermissionTypes.CAMERA) >= 0) {
@@ -48,7 +50,7 @@ export class PermissionsProvider {
    * can ask him for the permissions natively, otherwise we show an alert with a
    * link to the settings.
    */
-  async userRequestsPermissions(permissions: PermissionTypes[]) {
+  public async userRequestsPermissions(permissions: PermissionTypes[]) {
     let canRequestPermission = false
     for (const p of permissions) {
       canRequestPermission = (await this.canAskForPermission(p)) || canRequestPermission
@@ -60,7 +62,7 @@ export class PermissionsProvider {
     }
   }
 
-  showSettingsAlert() {
+  public showSettingsAlert() {
     this.showAlert('Settings', 'You can enable the missing permissions in the device settings.')
   }
 
@@ -68,15 +70,16 @@ export class PermissionsProvider {
     let canAskForPermission = true
     if (this.platform.is('android')) {
       if (permission === PermissionTypes.CAMERA) {
-        let permissionStatus = await this.hasCameraPermission()
+        const permissionStatus = await this.hasCameraPermission()
         canAskForPermission = !(permissionStatus === PermissionStatus.DENIED_ALWAYS)
       }
     } else if (this.platform.is('ios')) {
       if (permission === PermissionTypes.CAMERA) {
-        let permissionStatus = await this.hasCameraPermission()
+        const permissionStatus = await this.hasCameraPermission()
         canAskForPermission = !(permissionStatus === PermissionStatus.DENIED)
       }
     }
+
     return canAskForPermission
   }
 

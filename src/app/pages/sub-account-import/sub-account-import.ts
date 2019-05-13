@@ -1,26 +1,27 @@
 import { Component } from '@angular/core'
-import { AccountProvider } from '../../services/account/account.provider'
+import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 import { map } from 'rxjs/operators'
-import { Router, ActivatedRoute } from '@angular/router'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-sub-account-import',
   templateUrl: 'sub-account-import.html'
 })
 export class SubAccountImportPage {
-  private subProtocolIdentifier: string
+  private readonly subProtocolIdentifier: string
 
   public subProtocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
   public typeLabel: string = ''
 
-  constructor(private router: Router, private route: ActivatedRoute, private accountProvider: AccountProvider) {
+  constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly accountProvider: AccountProvider) {
     this.subWallets = []
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
       this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier)
     }
@@ -44,19 +45,19 @@ export class SubAccountImportPage {
       })
   }
 
-  importWallets() {
+  public importWallets() {
     this.subWallets.forEach(subWallet => {
       this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     })
     this.popToRoot()
   }
 
-  importWallet(subWallet: AirGapMarketWallet) {
+  public importWallet(subWallet: AirGapMarketWallet) {
     this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     this.popToRoot()
   }
 
-  popToRoot() {
+  public popToRoot() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

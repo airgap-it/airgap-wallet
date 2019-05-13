@@ -1,14 +1,14 @@
-import { Component } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
-
-import { TezosKtProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { OperationsProvider } from '../../services/operations/operations'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { Location } from '@angular/common'
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 interface IAccountWrapper {
   selected: boolean
@@ -31,15 +31,15 @@ export class SubAccountAddPage {
 
   constructor(
     public location: Location,
-    private router: Router,
-    private route: ActivatedRoute,
-    private accountProvider: AccountProvider,
-    private operationsProvider: OperationsProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly accountProvider: AccountProvider,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
     }
@@ -74,7 +74,7 @@ export class SubAccountAddPage {
             if (!exists) {
               wallet.addresses = res
               wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-              this.subAccounts.push({ selected: false, wallet: wallet })
+              this.subAccounts.push({ selected: false, wallet })
             }
           })
         })
@@ -92,18 +92,18 @@ export class SubAccountAddPage {
           if (!exists) {
             wallet.addresses = this.wallet.addresses
             wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-            this.subAccounts.push({ selected: false, wallet: wallet })
+            this.subAccounts.push({ selected: false, wallet })
           }
         }
       })
     }
   }
 
-  toggleAccount(account: IAccountWrapper) {
+  public toggleAccount(account: IAccountWrapper) {
     account.selected = !account.selected
   }
 
-  addSubAccounts() {
+  public addSubAccounts() {
     this.subAccounts
       .filter(account => account.selected)
       .map(account => account.wallet)
@@ -113,7 +113,7 @@ export class SubAccountAddPage {
     this.location.back()
   }
 
-  async prepareOriginate() {
+  public async prepareOriginate() {
     const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet)
 
     const info = {

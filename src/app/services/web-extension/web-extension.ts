@@ -1,8 +1,10 @@
-import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
 
-declare let chrome
-declare let window
+import { AccountProvider } from './../account/account.provider'
+
+// tslint:disable-next-line:no-any
+declare let chrome: any
+declare let window: Window & { chrome?: { runtime?: { id?: string } } } // TODO: add global this in TS 3.4
 
 @Injectable({
   providedIn: 'root'
@@ -16,17 +18,15 @@ export class WebExtensionProvider {
     })
   }
 
-  isWebExtension() {
-    if (window.chrome && chrome.runtime && chrome.runtime.id) {
-      // Code running in a Chrome extension (content script, background page, etc.)
-      return true
-    }
+  public isWebExtension(): boolean {
+    // Code running in a Chrome extension (content script, background page, etc.)
+    return !!(window.chrome && chrome.runtime && chrome.runtime.id)
   }
 
-  refreshWindow() {
-    chrome.tabs.getSelected(null, function(tab) {
-      const code = 'window.location.reload()'
-      chrome.tabs.executeScript(tab.id, { code: code })
+  public refreshWindow(): void {
+    chrome.tabs.getSelected(null, tab => {
+      const code: string = 'window.location.reload()'
+      chrome.tabs.executeScript(tab.id, { code })
     })
   }
 }
