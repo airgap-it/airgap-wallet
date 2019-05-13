@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { ExchangeProvider } from '../../services/exchange/exchange'
-import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { ExchangeConfirmPage } from '../exchange-confirm/exchange-confirm'
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
-import { AccountProvider } from '../../services/account/account.provider'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
+
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ExchangeProvider } from '../../services/exchange/exchange'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 enum ExchangePageState {
   LOADING,
@@ -41,14 +41,14 @@ export class ExchangePage {
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
 
   constructor(
-    private router: Router,
-    private exchangeProvider: ExchangeProvider,
-    private storageProvider: StorageProvider,
-    private accountProvider: AccountProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly exchangeProvider: ExchangeProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly accountProvider: AccountProvider,
+    private readonly dataService: DataService
   ) {}
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
       this.initExchangePage()
     } else {
@@ -80,6 +80,7 @@ export class ExchangePage {
 
     if (this.supportedProtocolsFrom.length === 0) {
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
       return
     }
 
@@ -87,6 +88,7 @@ export class ExchangePage {
 
     if (this.supportedProtocolsTo.length === 0) {
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
       return
     }
 
@@ -94,13 +96,14 @@ export class ExchangePage {
 
     if (!hasShownOnboarding) {
       this.exchangePageState = ExchangePageState.ONBOARDING
+
       return
     }
 
     this.exchangePageState = ExchangePageState.EXCHANGE
   }
 
-  async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
+  public async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
     if (fromOrTo === FROM) {
       this.selectedFromProtocol = protocol
     } else {
@@ -116,6 +119,7 @@ export class ExchangePage {
           this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
         } else {
           this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
+
           return
         }
       }
@@ -126,7 +130,7 @@ export class ExchangePage {
     return this.loadDataFromExchange()
   }
 
-  async loadWalletsForSelectedProtocol(fromOrTo: string) {
+  public async loadWalletsForSelectedProtocol(fromOrTo: string) {
     if (fromOrTo === FROM) {
       this.supportedFromWallets = this.accountProvider
         .getWalletList()
@@ -156,7 +160,7 @@ export class ExchangePage {
     )
   }
 
-  async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
+  public async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
     if (fromOrTo === FROM) {
       this.fromWallet = wallet
     } else {
@@ -166,13 +170,13 @@ export class ExchangePage {
     this.loadDataFromExchange()
   }
 
-  async amountSet(amount: string) {
+  public async amountSet(amount: string) {
     this.amount = new BigNumber(amount)
 
     this.loadDataFromExchange()
   }
 
-  async loadDataFromExchange() {
+  public async loadDataFromExchange() {
     if (this.fromWallet && this.toWallet) {
       this.minExchangeAmount = new BigNumber(
         await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocolIdentifier, this.toWallet.protocolIdentifier)
@@ -191,7 +195,7 @@ export class ExchangePage {
     }
   }
 
-  async startExchange() {
+  public async startExchange() {
     try {
       const result = await this.exchangeProvider.createTransaction(
         this.fromWallet.protocolIdentifier,
@@ -213,12 +217,12 @@ export class ExchangePage {
     }
   }
 
-  dismissExchangeOnboarding() {
+  public dismissExchangeOnboarding() {
     this.initExchangePage()
     this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
-  goToAddCoinPage() {
+  public goToAddCoinPage() {
     this.router.navigateByUrl('/account-add')
   }
 }

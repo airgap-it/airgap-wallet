@@ -1,13 +1,12 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { ModalController, AlertController } from '@ionic/angular'
-import { AccountProvider } from '../../services/account/account.provider'
-import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { Observable, ReplaySubject } from 'rxjs'
-import { map, take } from 'rxjs/operators'
-import { trigger, transition, style, animate } from '@angular/animations'
+import { animate, style, transition, trigger } from '@angular/animations'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { AlertController, ModalController } from '@ionic/angular'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
+
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from '../../services/account/account.provider'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'swap',
@@ -61,19 +60,23 @@ export class SwapComponent {
   @Output()
   private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
-  constructor(public alertCtrl: AlertController, public modalController: ModalController, private walletsProvider: AccountProvider) {}
+  constructor(
+    public alertCtrl: AlertController,
+    public modalController: ModalController,
+    private readonly walletsProvider: AccountProvider
+  ) {}
 
-  amountSet(amount: string) {
+  public amountSet(amount: string) {
     this._amount = amount
     this.amountSetEmitter.emit(amount)
   }
 
-  walletSet(wallet: AirGapMarketWallet) {
+  public walletSet(wallet: AirGapMarketWallet) {
     this.walletSetEmitter.emit(wallet)
     this.expandWalletSelection = false
   }
 
-  async doRadio() {
+  public async doRadio() {
     const protocols = []
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
@@ -87,7 +90,7 @@ export class SwapComponent {
       component: ProtocolSelectPage,
       componentProps: {
         selectedProtocol: this.selectedProtocol.identifier,
-        protocols: protocols
+        protocols
       }
     })
 

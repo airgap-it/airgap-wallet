@@ -32,7 +32,7 @@ type SettingsKeyReturnType = {
   providedIn: 'root'
 })
 export class StorageProvider {
-  constructor(private storage: Storage) {}
+  constructor(private readonly storage: Storage) {}
 
   /* TS 2.7 feature
   public async get<K extends SettingsKey>(key: K): Promise<SettingsKeyReturnType[K]> {

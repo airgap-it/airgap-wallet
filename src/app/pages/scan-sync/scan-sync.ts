@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan-sync',
@@ -9,7 +10,7 @@ import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-ha
 export class ScanSyncPage {
   constructor(public router: Router) {}
 
-  goToScanPage() {
+  public goToScanPage() {
     this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

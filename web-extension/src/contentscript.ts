@@ -3,7 +3,7 @@ import { Transactions } from './constants'
 declare let chrome
 
 function setupInjection() {
-  let s = document.createElement('script')
+  const s = document.createElement('script')
 
   s.src = chrome.extension.getURL('dist/injection.js')
   ;(document.head || document.documentElement).appendChild(s)
@@ -37,10 +37,10 @@ window.addEventListener('message', function(event) {
     })
 
     chrome.storage.local.get('wallets', async function(result) {
-      let wallets = await result.wallets
+      const wallets = await result.wallets
       wallets.forEach(wallet => {
         if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
-          let responseAddress = wallet.addresses[0]
+          const responseAddress = wallet.addresses[0]
           ;(event.source as any).postMessage({ type: Transactions.ADDRESSES_RESPONSE, addresses: responseAddress }, event.origin)
         }
       })

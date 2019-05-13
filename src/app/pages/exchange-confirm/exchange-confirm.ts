@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
-import { CreateTransactionResponse } from '../../services/exchange/exchange'
-import { InteractionSelectionPage } from '../interaction-selection/interaction-selection'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-import { OperationsProvider } from '../../services/operations/operations'
+
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { CreateTransactionResponse } from '../../services/exchange/exchange'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 declare let cordova
 
 @Component({
@@ -27,14 +27,14 @@ export class ExchangeConfirmPage {
   public exchangeResult: CreateTransactionResponse
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     public platform: Platform,
-    private operationsProvider: OperationsProvider,
-    private dataService: DataService
+    private readonly operationsProvider: OperationsProvider,
+    private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.fromWallet = info.fromWallet
       this.toWallet = info.toWallet
       this.exchangeResult = info.exchangeResult
@@ -67,8 +67,8 @@ export class ExchangeConfirmPage {
       )
 
       const info = {
-        wallet: wallet,
-        airGapTx: airGapTx,
+        wallet,
+        airGapTx,
         data: 'airgap-vault://?d=' + serializedTx
       }
 

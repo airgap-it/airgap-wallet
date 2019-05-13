@@ -1,13 +1,12 @@
 import { Component } from '@angular/core'
-import { supportedProtocols, ICoinProtocol } from 'airgap-coin-lib'
-import { AccountImportOnboardingPage } from '../account-import-onboarding/account-import-onboarding'
-import { SubAccountImportPage } from '../sub-account-import/sub-account-import'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { Router } from '@angular/router'
+import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ProtocolsProvider } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-account-add',
@@ -15,17 +14,17 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
   styleUrls: ['./account-add.scss']
 })
 export class AccountAddPage {
-  searchTerm: string = ''
-  supportedAccountProtocols: ICoinProtocol[] = []
-  supportedSubAccountProtocols: ICoinProtocol[] = []
-  filteredAccountProtocols: ICoinProtocol[] = []
-  filteredSubAccountProtocols: ICoinProtocol[] = []
+  public searchTerm: string = ''
+  public supportedAccountProtocols: ICoinProtocol[] = []
+  public supportedSubAccountProtocols: ICoinProtocol[] = []
+  public filteredAccountProtocols: ICoinProtocol[] = []
+  public filteredSubAccountProtocols: ICoinProtocol[] = []
 
   constructor(
-    private accountProvider: AccountProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private router: Router,
-    private dataService: DataService
+    private readonly accountProvider: AccountProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly router: Router,
+    private readonly dataService: DataService
   ) {
     this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
     this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
@@ -35,18 +34,20 @@ export class AccountAddPage {
             subProtocol.subProtocolType === SubProtocolType.TOKEN &&
             this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
         )
+
         return pv.concat(...subProtocols)
       }
+
       return pv
     }, [])
     this.filterProtocols()
   }
 
-  searchTermChanged() {
+  public searchTermChanged() {
     this.filterProtocols()
   }
 
-  filterProtocols() {
+  public filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
     this.filteredAccountProtocols = this.supportedAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
@@ -56,17 +57,17 @@ export class AccountAddPage {
     )
   }
 
-  addAccount(protocolIdentifier: string) {
+  public addAccount(protocolIdentifier: string) {
     this.dataService.setData(DataServiceKey.PROTOCOL, protocolIdentifier)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  addSubAccount(subProtocolIdentifier: string) {
+  public addSubAccount(subProtocolIdentifier: string) {
     const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
     if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
       console.log(subProtocolIdentifier)
       const info = {
-        subProtocolIdentifier: subProtocolIdentifier
+        subProtocolIdentifier
       }
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

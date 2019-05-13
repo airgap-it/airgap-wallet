@@ -1,10 +1,10 @@
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { Component } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DeepLinkProvider } from '../../services/deep-link/deep-link'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-interaction-selection',
@@ -13,26 +13,26 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 })
 export class InteractionSelectionPage {
   public preparedDataQR: string = ''
-  private wallet: AirGapMarketWallet
-  private airGapTx: IAirGapTransaction
+  private readonly wallet: AirGapMarketWallet
+  private readonly airGapTx: IAirGapTransaction
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private deepLinkProvider: DeepLinkProvider,
-    private dataService: DataService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly deepLinkProvider: DeepLinkProvider,
+    private readonly dataService: DataService
   ) {
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTx = info.airGapTx
       this.preparedDataQR = info.data
     }
   }
 
-  async ionViewDidEnter() {}
+  public async ionViewDidEnter() {}
 
-  offlineDeviceSign() {
+  public offlineDeviceSign() {
     const info = {
       wallet: this.wallet,
       airGapTx: this.airGapTx,
@@ -42,7 +42,7 @@ export class InteractionSelectionPage {
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  sameDeviceSign() {
+  public sameDeviceSign() {
     this.deepLinkProvider
       .sameDeviceDeeplink(this.preparedDataQR)
       .then(() => {

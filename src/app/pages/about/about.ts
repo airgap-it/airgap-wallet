@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+
 import { AppInfoProvider } from '../../services/app-info/app-info'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-about',
@@ -12,11 +13,11 @@ export class AboutPage {
   public versionNumber = ''
   public versionCode: string | number = ''
 
-  constructor(private appInfoProvider: AppInfoProvider) {
+  constructor(private readonly appInfoProvider: AppInfoProvider) {
     this.updateVersions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  async updateVersions() {
+  public async updateVersions() {
     this.appName = await this.appInfoProvider.getAppName()
     this.packageName = await this.appInfoProvider.getPackageName()
     this.versionNumber = await this.appInfoProvider.getVersionNumber()

@@ -1,9 +1,11 @@
-import { SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
-import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
-import { Platform, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { AlertController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+
+import { AccountProvider } from './../account/account.provider'
 
 declare let window: any
 
@@ -12,13 +14,13 @@ declare let window: any
 })
 export class DeepLinkProvider {
   constructor(
-    private platform: Platform,
-    private alertCtrl: AlertController,
-    private translateService: TranslateService,
-    private accountProvider: AccountProvider
+    private readonly platform: Platform,
+    private readonly alertCtrl: AlertController,
+    private readonly translateService: TranslateService,
+    private readonly accountProvider: AccountProvider
   ) {}
 
-  sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
+  public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
     return new Promise((resolve, reject) => {
       let sApp
 
@@ -32,6 +34,7 @@ export class DeepLinkProvider {
         sApp = window.startApp.set(url)
       } else {
         this.showDeeplinkOnlyOnDevicesAlert()
+
         return reject()
       }
 
@@ -44,17 +47,18 @@ export class DeepLinkProvider {
           console.error('deeplink used', url)
           console.error(error)
           this.showAppNotFoundAlert()
+
           return reject()
         }
       )
     })
   }
 
-  showDeeplinkOnlyOnDevicesAlert() {
+  public showDeeplinkOnlyOnDevicesAlert() {
     this.translateService
       .get(['deep-link.not-supported-alert.title', 'deep-link.not-supported-alert.message', 'deep-link.not-supported-alert.ok'])
       .subscribe(translated => {
-        let alert = this.alertCtrl
+        const alert = this.alertCtrl
           .create({
             header: translated['deep-link.not-supported-alert.title'],
             message: translated['deep-link.not-supported-alert.message'],
@@ -72,13 +76,13 @@ export class DeepLinkProvider {
       })
   }
 
-  showAppNotFoundAlert() {
+  public showAppNotFoundAlert() {
     this.translateService
       .get(['deep-link.app-not-found.title', 'deep-link.app-not-found.message', 'deep-link.app-not-found.ok'], {
         otherAppName: 'AirGap Vault'
       })
       .subscribe(translated => {
-        let alert = this.alertCtrl
+        const alert = this.alertCtrl
           .create({
             header: translated['deep-link.app-not-found.title'],
             message: translated['deep-link.app-not-found.message'],
@@ -96,16 +100,16 @@ export class DeepLinkProvider {
       })
   }
   // TODO: Move to provider
-  async walletDeepLink() {
-    let url = new URL(location.href)
-    let publicKey = url.searchParams.get('publicKey')
-    let rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
-    let identifier = url.searchParams.get('identifier')
+  public async walletDeepLink() {
+    const url = new URL(location.href)
+    const publicKey = url.searchParams.get('publicKey')
+    const rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
+    const identifier = url.searchParams.get('identifier')
     console.log('publicKey', publicKey)
     console.log('rawUnsignedTx', rawUnsignedTx)
     console.log('identifier', identifier)
 
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
+    const wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
     const airGapTx = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
@@ -122,10 +126,11 @@ export class DeepLinkProvider {
         callback: 'airgap-wallet://?d='
       }
     })
+
     return {
-      wallet: wallet,
-      airGapTx: airGapTx,
-      serializedTx: serializedTx
+      wallet,
+      airGapTx,
+      serializedTx
     }
   }
 }

@@ -1,12 +1,12 @@
 import { Component, ViewChild } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
 import { NavController, Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-
-import { ScannerProvider } from '../../services/scanner/scanner'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+
 import { PermissionsProvider } from '../../services/permissions/permissions'
+import { ScannerProvider } from '../../services/scanner/scanner'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-scan-address',
@@ -14,35 +14,35 @@ import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-ha
   styleUrls: ['./scan-address.scss']
 })
 export class ScanAddressPage extends ScanBasePage {
-  private callback: (address: string) => void
+  private readonly callback: (address: string) => void
   private callbackCalled: boolean = false
 
   @ViewChild('addressScanner')
-  zxingScanner: ZXingScannerComponent
+  public zxingScanner: ZXingScannerComponent
 
   constructor(
     protected platform: Platform,
     protected scanner: ScannerProvider,
     protected permissionsProvider: PermissionsProvider,
-    private navCtrl: NavController,
-    private router: Router,
-    private route: ActivatedRoute
+    private readonly navCtrl: NavController,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {
     super(platform, scanner, permissionsProvider)
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.callback = info.callback
     }
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  checkScan(resultString: string) {
+  public checkScan(resultString: string) {
     console.log('got new text', resultString)
 
     this.handleQRScanned(resultString)
   }
 
-  handleQRScanned(text: string) {
+  public handleQRScanned(text: string) {
     if (!this.callbackCalled) {
       console.log('scan callback', text)
       this.callbackCalled = true

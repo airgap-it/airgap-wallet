@@ -1,19 +1,19 @@
 import { Component } from '@angular/core'
-import { LoadingController, ToastController, AlertController, Platform } from '@ionic/angular'
-import { Router, ActivatedRoute } from '@angular/router'
-
+import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import {
-  getProtocolByIdentifier,
+  AirGapMarketWallet,
   DeserializedSyncProtocol,
-  SignedTransaction,
+  getProtocolByIdentifier,
   ICoinProtocol,
-  TezosKtProtocol,
-  AirGapMarketWallet
+  SignedTransaction,
+  TezosKtProtocol
 } from 'airgap-coin-lib'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 declare var cordova: any
 
@@ -32,29 +32,29 @@ const TIMEOUT_KT_REFRESH_CLEAR = 5 * MINUTE
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  signedTransactionSync: DeserializedSyncProtocol
+  public signedTransactionSync: DeserializedSyncProtocol
   private signedTx: string
   public protocol: ICoinProtocol
 
   constructor(
     public loadingCtrl: LoadingController,
-    private toastCtrl: ToastController,
-    private router: Router,
-    private route: ActivatedRoute,
-    private alertCtrl: AlertController,
-    private platform: Platform,
-    private storageProvider: StorageProvider,
-    private accountProvider: AccountProvider
+    private readonly toastCtrl: ToastController,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly alertCtrl: AlertController,
+    private readonly platform: Platform,
+    private readonly storageProvider: StorageProvider,
+    private readonly accountProvider: AccountProvider
   ) {}
 
-  dismiss() {
+  public dismiss() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  async ionViewWillEnter() {
+  public async ionViewWillEnter() {
     await this.platform.ready()
-    if (this.route.snapshot.data['special']) {
-      const info = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
       this.signedTransactionSync = info.signedTransactionSync
     }
 
@@ -63,16 +63,16 @@ export class TransactionConfirmPage {
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
   }
 
-  async broadcastTransaction() {
-    let loading = await this.loadingCtrl.create({
+  public async broadcastTransaction() {
+    const loading = await this.loadingCtrl.create({
       message: 'Broadcasting...'
     })
 
     loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-    let interval = setTimeout(() => {
+    const interval = setTimeout(() => {
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      let toast = this.toastCtrl
+      const toast = this.toastCtrl
         .create({
           duration: TOAST_DURATION,
           message: 'Transaction queued. It might take some time until your TX shows up!',
@@ -137,7 +137,7 @@ export class TransactionConfirmPage {
         this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        let alert = this.alertCtrl
+        const alert = this.alertCtrl
           .create({
             header: 'Transaction broadcasted!',
             message: 'Your transaction has been successfully broadcasted',
@@ -172,7 +172,7 @@ export class TransactionConfirmPage {
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        let toast = this.toastCtrl
+        const toast = this.toastCtrl
           .create({
             duration: TOAST_ERROR_DURATION,
             message: 'Transaction broadcasting failed: ' + error,

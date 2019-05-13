@@ -1,11 +1,13 @@
-import { IonicModule } from '@ionic/angular'
-import { RouterModule } from '@angular/router'
-import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
+import { NgModule } from '@angular/core'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
+
 import { ComponentsModule } from '../../components/components.module'
 import { PipesModule } from '../../pipes/pipes.module'
+
 import { TransactionQrPage } from './transaction-qr'
 
 @NgModule({

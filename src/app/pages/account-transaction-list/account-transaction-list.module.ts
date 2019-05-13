@@ -1,14 +1,16 @@
-import { IonicModule } from '@ionic/angular'
-import { RouterModule } from '@angular/router'
-import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { AccountTransactionListPage } from './account-transaction-list'
+import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
+import { TranslateModule } from '@ngx-translate/core'
+import { MaterialIconsModule } from 'ionic2-material-icons'
+import { MomentModule } from 'ngx-moment'
+
 import { ComponentsModule } from '../../components/components.module'
 import { PipesModule } from '../../pipes/pipes.module'
-import { TranslateModule } from '@ngx-translate/core'
-import { MomentModule } from 'ngx-moment'
-import { MaterialIconsModule } from 'ionic2-material-icons'
+
+import { AccountTransactionListPage } from './account-transaction-list'
 
 @NgModule({
   imports: [

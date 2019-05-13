@@ -1,16 +1,15 @@
 import { Component } from '@angular/core'
-import { Events, ModalController } from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WebExtensionProvider } from '../../services/web-extension/web-extension'
+import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
+import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
 import { SettingsPage } from '../settings/settings'
-import { ExchangePage } from '../exchange/exchange'
-
-import { StorageProvider, SettingsKey } from '../../services/storage/storage'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
 
 @Component({
   selector: 'app-tabs',
@@ -18,15 +17,15 @@ import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaim
   styleUrls: ['tabs.page.scss']
 })
 export class TabsPage {
-  tab1Root = PortfolioPage
-  tab2Root = ScanPage
-  tab3Root = ExchangePage
-  tab4Root = SettingsPage
+  public tab1Root = PortfolioPage
+  public tab2Root = ScanPage
+  public tab3Root = ExchangePage
+  public tab4Root = SettingsPage
 
   constructor(
     public modalController: ModalController,
-    private storageProvider: StorageProvider,
-    private webExtensionProvider: WebExtensionProvider
+    private readonly storageProvider: StorageProvider,
+    private readonly webExtensionProvider: WebExtensionProvider
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
   }

@@ -1,25 +1,23 @@
-import { Component, ViewChild } from '@angular/core'
-import { Deeplinks } from '@ionic-native/deeplinks/ngx'
-import { TranslateService } from '@ngx-translate/core'
+import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-
-import { AccountProvider } from './services/account/account.provider'
-import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
-import { setSentryRelease, handleErrorSentry, ErrorCategory, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
-import { ProtocolsProvider } from './services/protocols/protocols'
-import { WebExtensionProvider } from './services/web-extension/web-extension'
-import { AppInfoProvider } from './services/app-info/app-info'
-// import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
-import { StorageProvider, SettingsKey } from './services/storage/storage'
-import { generateGUID } from './utils/utils'
-
-import { Platform } from '@ionic/angular'
+import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
+import { Platform } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 
-import { DeepLinkProvider } from './services/deep-link/deep-link'
-import { PushProvider } from './services/push/push'
+import { AccountProvider } from './services/account/account.provider'
+import { AppInfoProvider } from './services/app-info/app-info'
 import { DataService, DataServiceKey } from './services/data/data.service'
+import { DeepLinkProvider } from './services/deep-link/deep-link'
+import { ProtocolsProvider } from './services/protocols/protocols'
+import { PushProvider } from './services/push/push'
+import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
+import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
+// import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
+import { SettingsKey, StorageProvider } from './services/storage/storage'
+import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { generateGUID } from './utils/utils'
 
 @Component({
   selector: 'app-root',
@@ -27,26 +25,26 @@ import { DataService, DataServiceKey } from './services/data/data.service'
 })
 export class AppComponent {
   constructor(
-    private platform: Platform,
-    private statusBar: StatusBar,
-    private splashScreen: SplashScreen,
-    private translate: TranslateService,
-    private deeplinks: Deeplinks,
-    private schemeRoutingProvider: SchemeRoutingProvider,
-    private protocolsProvider: ProtocolsProvider,
-    private storageProvider: StorageProvider,
-    private webExtensionProvider: WebExtensionProvider,
-    private appInfoProvider: AppInfoProvider,
-    private accountProvider: AccountProvider,
-    private deepLinkProvider: DeepLinkProvider,
-    private pushProvider: PushProvider,
-    private router: Router,
-    private dataService: DataService
+    private readonly platform: Platform,
+    private readonly statusBar: StatusBar,
+    private readonly splashScreen: SplashScreen,
+    private readonly translate: TranslateService,
+    private readonly deeplinks: Deeplinks,
+    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly storageProvider: StorageProvider,
+    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly appInfoProvider: AppInfoProvider,
+    private readonly accountProvider: AccountProvider,
+    private readonly deepLinkProvider: DeepLinkProvider,
+    private readonly pushProvider: PushProvider,
+    private readonly router: Router,
+    private readonly dataService: DataService
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  async initializeApp() {
+  public async initializeApp() {
     const supportedLanguages = ['en', 'de', 'zh-cn']
 
     this.loadLanguages(supportedLanguages)
@@ -82,11 +80,11 @@ export class AppComponent {
     }
     setSentryUser(userId)
 
-    let url = new URL(location.href)
+    const url = new URL(location.href)
 
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
-      let sub = this.accountProvider.wallets.subscribe(wallets => {
+      const sub = this.accountProvider.wallets.subscribe(wallets => {
         this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()
@@ -95,7 +93,7 @@ export class AppComponent {
     }
   }
 
-  loadLanguages(supportedLanguages: string[]) {
+  public loadLanguages(supportedLanguages: string[]) {
     this.translate.setDefaultLang('en')
 
     const language = this.translate.getBrowserLang()
@@ -110,7 +108,7 @@ export class AppComponent {
     }
   }
 
-  async ngAfterViewInit() {
+  public async ngAfterViewInit() {
     await this.platform.ready()
     if (this.platform.is('cordova')) {
       this.deeplinks
@@ -136,8 +134,8 @@ export class AppComponent {
   }
 
   // TODO: Move to provider
-  async walletDeeplink() {
-    let deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
+  public async walletDeeplink() {
+    const deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     const info = {
       wallet: deeplinkInfo.wallet,
       airGapTx: deeplinkInfo.airGapTx,

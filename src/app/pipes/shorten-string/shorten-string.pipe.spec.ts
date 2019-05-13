@@ -1,5 +1,4 @@
 import { ShortenStringPipe } from './shorten-string.pipe'
-import { stringify } from 'querystring'
 
 describe('ShortenString Pipe', () => {
   let shortenStringPipe: ShortenStringPipe

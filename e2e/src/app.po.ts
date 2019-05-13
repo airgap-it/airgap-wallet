@@ -1,6 +1,5 @@
-import { browser, by, element } from 'protractor'
 import * as fs from 'fs'
-import * as protractor from 'protractor'
+import { browser, by, element } from 'protractor'
 
 function slugify(text) {
   return text
@@ -14,25 +13,25 @@ function slugify(text) {
 }
 
 export class AppPage {
-  private time = new Date()
+  private readonly time = new Date()
 
-  navigateTo() {
+  public navigateTo() {
     return browser.get('/')
   }
 
-  waitForAngular() {
+  public waitForAngular() {
     return browser.waitForAngular()
   }
 
-  getParagraphText() {
+  public getParagraphText() {
     return element(by.deepCss('app-root ion-content')).getText()
   }
 
-  sleep(time: number) {
+  public sleep(time: number) {
     return browser.sleep(time)
   }
 
-  takeScreenshot(page: string) {
+  public takeScreenshot(page: string) {
     return browser
       .takeScreenshot()
       .then(async png => {

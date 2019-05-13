@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavParams, ModalController } from '@ionic/angular'
+import { ModalController, NavParams } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
 
 @Component({
@@ -7,11 +7,11 @@ import { ICoinProtocol } from 'airgap-coin-lib'
   templateUrl: 'protocol-select.html'
 })
 export class ProtocolSelectPage {
-  searchTerm: string = ''
+  public searchTerm: string = ''
 
-  selectedProtocol: string
-  protocols: ICoinProtocol[]
-  filteredProtocols: ICoinProtocol[]
+  public selectedProtocol: string
+  public protocols: ICoinProtocol[]
+  public filteredProtocols: ICoinProtocol[]
 
   constructor(public navParams: NavParams, public viewCtrl: ModalController) {
     this.selectedProtocol = this.navParams.get('selectedProtocol')
@@ -33,6 +33,7 @@ export class ProtocolSelectPage {
 
   private filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
+
     return this.protocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )

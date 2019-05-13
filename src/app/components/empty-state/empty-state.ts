@@ -7,11 +7,11 @@ import { Component, Input } from '@angular/core'
 })
 export class EmptyStateComponent {
   @Input()
-  imageName: string
+  public imageName: string
 
   @Input()
-  text: string
+  public text: string
 
   @Input()
-  fullHeight: boolean = true
+  public fullHeight: boolean = true
 }

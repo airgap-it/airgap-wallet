@@ -1,6 +1,7 @@
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { ModalController } from '@ionic/angular'
 import { Component } from '@angular/core'
+import { ModalController } from '@ionic/angular'
+
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 @Component({
   selector: 'page-disclaimer-web-extension',
@@ -8,9 +9,9 @@ import { Component } from '@angular/core'
   styleUrls: ['./disclaimer-web-extension.scss']
 })
 export class DisclaimerWebExtensionPage {
-  constructor(private viewController: ModalController, private storageProvider: StorageProvider) {}
+  constructor(private readonly viewController: ModalController, private readonly storageProvider: StorageProvider) {}
 
-  async accept() {
+  public async accept() {
     await this.storageProvider.set(SettingsKey.WEB_EXTENSION_DISCLAIMER, true)
     this.viewController.dismiss()
   }

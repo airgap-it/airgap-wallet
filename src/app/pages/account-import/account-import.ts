@@ -1,10 +1,11 @@
-import { Component, NgZone } from '@angular/core'
 import { Location } from '@angular/common'
-import { ModalController, LoadingController, Platform, AlertController } from '@ionic/angular'
+import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, ModalController, Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+
 import { AccountProvider } from '../../services/account/account.provider'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 
 @Component({
@@ -12,33 +13,33 @@ import { WebExtensionProvider } from '../../services/web-extension/web-extension
   templateUrl: 'account-import.html'
 })
 export class AccountImportPage {
-  wallet: AirGapMarketWallet
+  public wallet: AirGapMarketWallet
 
-  walletAlreadyExists = false
+  public walletAlreadyExists = false
 
   // WebExtension
-  walletImportable = true
+  public walletImportable = true
 
-  loading: HTMLIonLoadingElement
+  public loading: HTMLIonLoadingElement
 
   constructor(
-    private platform: Platform,
-    private location: Location,
-    private loadingCtrl: LoadingController,
-    private viewCtrl: ModalController,
-    private route: ActivatedRoute,
-    private router: Router,
-    private wallets: AccountProvider,
-    private webExtensionProvider: WebExtensionProvider,
-    private alertCtrl: AlertController,
-    private ngZone: NgZone
+    private readonly platform: Platform,
+    private readonly location: Location,
+    private readonly loadingCtrl: LoadingController,
+    private readonly viewCtrl: ModalController,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly wallets: AccountProvider,
+    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly alertCtrl: AlertController,
+    private readonly ngZone: NgZone
   ) {
-    if (this.route.snapshot.data['special']) {
-      this.wallet = this.route.snapshot.data['special']
+    if (this.route.snapshot.data.special) {
+      this.wallet = this.route.snapshot.data.special
     }
   }
 
-  ionViewWillEnter() {
+  public ionViewWillEnter() {
     this.platform
       .ready()
       .then(async () => {
@@ -58,6 +59,7 @@ export class AccountImportPage {
           )
           this.walletAlreadyExists = true
           this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
           return
         }
 
@@ -70,7 +72,7 @@ export class AccountImportPage {
           )
 
           if (!this.walletImportable) {
-            let alert = this.alertCtrl
+            const alert = this.alertCtrl
               .create({
                 header: 'Account Not Supported',
                 message: 'We currently only support Ethereum and Aeternity accounts.'
@@ -106,11 +108,11 @@ export class AccountImportPage {
       .catch(console.error)
   }
 
-  dismiss() {
+  public dismiss() {
     this.location.back()
   }
 
-  async import() {
+  public async import() {
     await this.wallets.addWallet(this.wallet)
     await this.router.navigateByUrl('/tabs/portfolio')
   }

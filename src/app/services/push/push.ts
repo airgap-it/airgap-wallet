@@ -1,20 +1,22 @@
-import { PushBackendProvider } from './../push-backend/push-backend'
 import { Injectable } from '@angular/core'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
+import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
-import { Platform, ModalController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
-import { take, filter } from 'rxjs/operators'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { take } from 'rxjs/operators'
+
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../storage/storage'
+
+import { PushBackendProvider } from './../push-backend/push-backend'
 
 @Injectable({
   providedIn: 'root'
 })
 export class PushProvider {
-  private registrationId: ReplaySubject<string> = new ReplaySubject(1)
+  private readonly registrationId: ReplaySubject<string> = new ReplaySubject(1)
   private registerCalled: boolean = false
 
   private readonly options: PushOptions = {
@@ -76,7 +78,7 @@ export class PushProvider {
     }
   }
 
-  async registerWallets(wallets: AirGapMarketWallet[]) {
+  public async registerWallets(wallets: AirGapMarketWallet[]) {
     console.log('register wallets')
 
     this.registrationId.pipe(take(1)).subscribe(registrationId => {
@@ -86,18 +88,19 @@ export class PushProvider {
         address: wallet.receivingPublicAddress,
         identifier: wallet.protocolIdentifier,
         pushToken: registrationId,
-        languageCode: languageCode
+        languageCode
       }))
 
       this.pushBackendProvider.registerPushMany(pushRegisterRequests).catch(handleErrorSentry(ErrorCategory.PUSH))
       if (!this.registrationId) {
         console.error('No registration token found')
+
         return
       }
     })
   }
 
-  async unregisterWallets(wallets: AirGapMarketWallet[]) {
+  public async unregisterWallets(wallets: AirGapMarketWallet[]) {
     console.log('unregister wallets')
 
     this.registrationId.pipe(take(1)).subscribe(registrationId => {
@@ -110,6 +113,7 @@ export class PushProvider {
   private async unregisterWallet(wallet: AirGapMarketWallet, registrationId: string) {
     if (!this.registrationId) {
       console.error('No registration token found')
+
       return
     }
 

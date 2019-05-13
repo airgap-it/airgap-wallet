@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+
 import { Exchange } from './exchange.interface'
 
 const CHANGELLY_BASE_URL = 'https://swap.airgap.prod.gke.papers.tech/'
@@ -50,7 +51,7 @@ identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
 class ChangellyApi {
   constructor(public http: HttpClient) {}
 
-  async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
+  public async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
     const wrapper: JsonRpcWrapper<T> = {
       id: Math.random()
         .toString(36)
@@ -79,14 +80,15 @@ class ChangellyApi {
     })
   }
 
-  async getAvailableFromCurrencies(): Promise<string[]> {
+  public async getAvailableFromCurrencies(): Promise<string[]> {
     const method = 'getCurrencies'
     const params = {}
     const result = await this.makeJsonRpcCall<Object, string[]>(method, params)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(result)
   }
 
-  getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
+  public getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -95,10 +97,11 @@ class ChangellyApi {
       from: fromCurrency,
       to: toCurrency
     }
+
     return this.makeJsonRpcCall<Object, string>(method, params)
   }
 
-  getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
+  public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -108,10 +111,11 @@ class ChangellyApi {
       to: toCurrency,
       amount
     }
+
     return this.makeJsonRpcCall<Object, string>(method, params)
   }
 
-  validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
+  public validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
     currency = this.convertAirGapIdentifierToExchangeIdentifier([currency])[0]
 
     const method = 'validateAddress'
@@ -119,10 +123,11 @@ class ChangellyApi {
       currency,
       address
     }
+
     return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, params)
   }
 
-  createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -133,14 +138,16 @@ class ChangellyApi {
       address,
       amount
     }
+
     return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
   }
 
-  getStatus(transactionId: string): Promise<any> {
+  public getStatus(transactionId: string): Promise<any> {
     const method = 'getStatus'
     const params = {
       id: transactionId
     }
+
     return this.makeJsonRpcCall<Object, any>(method, params)
   }
 }
@@ -152,6 +159,7 @@ class ChangellyExchange extends ChangellyApi implements Exchange {
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
     const availableCurrencies = await this.getAvailableFromCurrencies()
+
     return availableCurrencies.filter(availableCurrency => availableCurrency !== selectedFrom)
   }
 }
@@ -160,36 +168,36 @@ class ChangellyExchange extends ChangellyApi implements Exchange {
   providedIn: 'root'
 })
 export class ExchangeProvider implements Exchange {
-  private exchange: Exchange
+  private readonly exchange: Exchange
   constructor(public http: HttpClient) {
     this.exchange = new ChangellyExchange(http)
   }
 
-  getAvailableFromCurrencies(): Promise<string[]> {
+  public getAvailableFromCurrencies(): Promise<string[]> {
     return this.exchange.getAvailableFromCurrencies()
   }
 
-  getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
+  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
     return this.exchange.getAvailableToCurrenciesForCurrency(selectedFrom)
   }
 
-  getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
+  public getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
     return this.exchange.getMinAmountForCurrency(fromCurrency, toCurrency)
   }
 
-  getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
+  public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
     return this.exchange.getExchangeAmount(fromCurrency, toCurrency, amount)
   }
 
-  validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
+  public validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
     return this.exchange.validateAddress(currency, address)
   }
 
-  createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
     return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
   }
 
-  getStatus(transactionId: string): Promise<any> {
+  public getStatus(transactionId: string): Promise<any> {
     return this.exchange.getStatus(transactionId)
   }
 }

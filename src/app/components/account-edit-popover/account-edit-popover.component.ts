@@ -1,44 +1,45 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+
 import { AccountProvider } from '../../services/account/account.provider'
-import { handleErrorSentry, ErrorCategory } from '../../services/sentry-error-handler/sentry-error-handler'
-import { OperationsProvider } from '../../services/operations/operations'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   templateUrl: 'account-edit-popover.component.html',
   styleUrls: ['./account-edit-popover.component.scss']
 })
 export class AccountEditPopoverComponent {
-  private wallet: AirGapMarketWallet
-  private onDelete: Function
-  private onUndelegate: Function
+  private readonly wallet: AirGapMarketWallet
+  private readonly onDelete: Function
+  private readonly onUndelegate: Function
 
   // Tezos
   public isTezosKT: boolean = false
   public isDelegated: boolean = false
 
   constructor(
-    private alertCtrl: AlertController,
-    private navParams: NavParams,
-    private walletsProvider: AccountProvider,
-    private viewCtrl: PopoverController,
-    private clipboardProvider: ClipboardProvider,
-    private operationsProvider: OperationsProvider
+    private readonly alertCtrl: AlertController,
+    private readonly navParams: NavParams,
+    private readonly walletsProvider: AccountProvider,
+    private readonly viewCtrl: PopoverController,
+    private readonly clipboardProvider: ClipboardProvider,
+    private readonly operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
     this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
-  async copyAddressToClipboard() {
+  public async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
     await this.dismissPopover()
   }
 
-  async ngOnInit() {
+  public async ngOnInit() {
     // tezos
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
@@ -47,7 +48,7 @@ export class AccountEditPopoverComponent {
     // tezos end
   }
 
-  async undelegate() {
+  public async undelegate() {
     await this.dismissPopover()
     if (this.onUndelegate) {
       this.onUndelegate()
@@ -56,8 +57,8 @@ export class AccountEditPopoverComponent {
     }
   }
 
-  delete() {
-    let alert = this.alertCtrl
+  public delete() {
+    const alert = this.alertCtrl
       .create({
         header: 'Confirm Wallet Removal',
         message: 'Do you want to remove this wallet? You can always sync it again from your vault.',
@@ -92,7 +93,7 @@ export class AccountEditPopoverComponent {
       })
   }
 
-  dismissPopover() {
+  public dismissPopover() {
     return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

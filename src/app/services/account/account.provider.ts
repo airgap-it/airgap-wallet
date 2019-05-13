@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core'
-import { Subject, ReplaySubject } from 'rxjs'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { StorageProvider, SettingsKey } from '../storage/storage'
-import { map, take, auditTime } from 'rxjs/operators'
+import { ReplaySubject, Subject } from 'rxjs'
+import { auditTime, map, take } from 'rxjs/operators'
+
 import { PushProvider } from '../push/push'
-import { handleErrorSentry, ErrorCategory } from '../sentry-error-handler/sentry-error-handler'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../storage/storage'
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountProvider {
-  private walletList: AirGapMarketWallet[] = []
+  private readonly walletList: AirGapMarketWallet[] = []
   public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
   public refreshPageSubject: Subject<void> = new Subject()
 
@@ -20,13 +21,13 @@ export class AccountProvider {
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public usedProtocols: ReplaySubject<ICoinProtocol[]> = new ReplaySubject(1)
 
-  private walletChangedBehaviour: Subject<void> = new Subject()
+  private readonly walletChangedBehaviour: Subject<void> = new Subject()
 
   get walledChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
-  constructor(private storageProvider: StorageProvider, private pushProvider: PushProvider) {
+  constructor(private readonly storageProvider: StorageProvider, private readonly pushProvider: PushProvider) {
     this.loadWalletsFromStorage().catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
@@ -68,7 +69,7 @@ export class AccountProvider {
     }
 
     wallets.forEach(wallet => {
-      let airGapWallet = new AirGapMarketWallet(
+      const airGapWallet = new AirGapMarketWallet(
         wallet.protocolIdentifier,
         wallet.publicKey,
         wallet.isExtendedPublicKey,
@@ -128,7 +129,7 @@ export class AccountProvider {
     this.pushProvider.registerWallets(this.walletList)
   }
 
-  getWalletList(): AirGapMarketWallet[] {
+  public getWalletList(): AirGapMarketWallet[] {
     return this.walletList
   }
 
@@ -149,11 +150,12 @@ export class AccountProvider {
     this.walletList.push(wallet)
 
     this.wallets.next(this.walletList)
+
     return this.persist()
   }
 
   public removeWallet(walletToRemove: AirGapMarketWallet): Promise<void> {
-    let index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
+    const index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
@@ -169,6 +171,7 @@ export class AccountProvider {
     this.pushProvider.unregisterWallets([walletToRemove]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
+
     return this.persist()
   }
 
@@ -200,6 +203,7 @@ export class AccountProvider {
     if (!(wallet1 instanceof AirGapMarketWallet) || !(wallet2 instanceof AirGapMarketWallet)) {
       return false
     }
+
     return (
       wallet1.publicKey === wallet2.publicKey &&
       wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
