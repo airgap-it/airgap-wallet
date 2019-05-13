@@ -4,57 +4,85 @@
 const { SpecReporter } = require('jasmine-spec-reporter')
 var HtmlReporter = require('protractor-beautiful-reporter')
 
+function getBaseCapability() {
+  return {
+    browserName: 'chrome',
+
+    chromeOptions: {
+      args: []
+    }
+  }
+}
+
+const desktopCapability = {
+  browserName: 'chrome',
+
+  chromeOptions: {
+    args: ['--headless', '--disable-gpu', '--window-size=1300,800']
+  }
+}
+
+const androidCapability = {
+  browserName: 'chrome',
+
+  chromeOptions: {
+    args: ['--headless', '--disable-gpu'],
+    mobileEmulation: {
+      deviceName: 'Pixel 2 XL'
+    }
+  }
+}
+
+const iPhoneCapability = {
+  browserName: 'chrome',
+
+  chromeOptions: {
+    args: ['--headless', '--disable-gpu'],
+    mobileEmulation: {
+      deviceName: 'iPhone X'
+    }
+  }
+}
+
+makeHeadless(makeiPhone(getBaseCapability()))
+
+function makeiPhone(capability) {
+  capability.chromeOptions.mobileEmulation = {
+    deviceName: 'iPhone X'
+  }
+  return capability
+}
+
+function makeHeadless(capability) {
+  capability.chromeOptions.args.push('--headless', '--disable-gpu')
+  return capability
+}
+
+const headful = {
+  browserName: 'chrome',
+
+  chromeOptions: {
+    args: [
+      /*, 'lang=de-DE' */
+    ],
+    mobileEmulation: {
+      deviceName: 'iPhone X'
+    },
+    prefs: {
+      'profile.content_settings.exceptions.clipboard': {
+        'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
+      }
+    }
+  }
+}
+
+// const multiCapabilities = [makeHeadless(makeiPhone(getBaseCapability()))]
+const multiCapabilities = [headful]
+
 exports.config = {
   allScriptsTimeout: 11000,
   specs: ['./src/**/*.e2e-spec.ts'],
-  multiCapabilities: [
-    /*
-    {
-      browserName: 'chrome',
-
-      chromeOptions: {
-        args: ['--headless', '--disable-gpu', '--window-size=1300,800']
-      }
-    },
-    {
-      browserName: 'chrome',
-
-      chromeOptions: {
-        args: ['--headless', '--disable-gpu'],
-        mobileEmulation: {
-          deviceName: 'Pixel 2 XL'
-        }
-      }
-    },
-    {
-      browserName: 'chrome',
-
-      chromeOptions: {
-        args: ['--headless', '--disable-gpu', 'lang=de-DE'],
-        mobileEmulation: {
-          deviceName: 'iPhone X'
-        }
-      }
-    },
-    */
-    {
-      browserName: 'chrome',
-
-      chromeOptions: {
-        args: [
-          /*, 'lang=de-DE' */
-        ],
-        mobileEmulation: {
-          deviceName: 'iPhone X'
-        },
-        prefs: {
-          'profile.content_settings.exceptions.clipboard': {
-            'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
-          }
-        }
-      }
-    }
-  ],
+  multiCapabilities,
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
   framework: 'jasmine',

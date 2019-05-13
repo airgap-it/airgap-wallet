@@ -2,17 +2,19 @@ import { by, element } from 'protractor'
 
 import { AppPage } from './app.po'
 
+import { copyToClipboard } from './utils'
+
 declare let navigator: any
 
 describe('new App', () => {
   let page: AppPage
 
   beforeEach(() => {
-    page = new AppPage()
+    page = new AppPage('app-root', '/')
   })
 
   it('should be blank', async () => {
-    await page.navigateTo()
+    await page.load()
     const text = await page.getParagraphText()
 
     // await page.takeScreenshot('introduction')
@@ -41,13 +43,7 @@ describe('new App', () => {
     )
     */
 
-    function pbcopy(data) {
-      var proc = require('child_process').spawn('pbcopy')
-      proc.stdin.write(data)
-      proc.stdin.end()
-    }
-
-    pbcopy(
+    copyToClipboard(
       'airgap-wallet://?d=AerPyFXzb1kpQPp59Mug3kmKpYfPahzZ1jTW4ykyuaJcVLXeuEvLGCiEr3Fxi8H4P9513SA5RjGN87sGFWmZJ2ZoJCy8bjbJV6RthWtJpjYR4n5Ei8ahAuAWUpogSiasEK6KBhHnE'
     )
 
