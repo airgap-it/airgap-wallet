@@ -117,11 +117,6 @@
     --padding-end: 1.5rem;
   }
 
-  /* Enforces border radius for round buttons on small buttons */
-  ion-button.button-small {
-    --border-radius: 1em;
-  }
-
   /* Set the padding with on ion-button in ion-toolbar elements */
   ion-toolbar ion-button {
     --padding-start: 0.5rem;

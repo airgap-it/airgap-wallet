@@ -8,7 +8,7 @@
   <ng-container *ngIf="exchangePageState === exchangePageStates.ONBOARDING">
     <ion-row padding class="onboarding__container">
       <ion-col size="12">
-        <h3 [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
+        <h3 no-margin [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
         <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
         <p no-margin padding-bottom>
           {{ 'exchange.onboarding.description' | translate }}
@@ -23,7 +23,7 @@
   <ng-container *ngIf="exchangePageState === exchangePageStates.NOT_ENOUGH_CURRENCIES">
     <ion-row padding class="onboarding__container">
       <ion-col size="12">
-        <h3 [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
+        <h3 no-margin [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
         <ion-col no-padding class="content--align__center-center"><img src="assets/img/token_swap.svg" /></ion-col>
         <p no-margin padding-bottom>
           {{ 'exchange.no-currencies.description' | translate }}

@@ -20,6 +20,15 @@ ion-label {
   font-size: 12px;
 }
 
+ion-card-title {
+  font-size: 20px;
+}
+
+/* iOS font-size fix */
+sc-ion-label-ios-s h2 {
+  font-size: 16px;
+}
+
 identicon {
   width: inherit;
   height: inherit;
@@ -67,17 +76,6 @@ identicon {
   font-weight: 500;
 }
 
-.typography--mono {
-  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
-  font-weight: 600 !important;
-  font-size: 1rem;
-  word-wrap: break-word;
-}
-
-.ion-text-capitalize {
-  text-transform: uppercase;
-}
-
 .text--selectable {
   user-select: text;
   -webkit-user-select: text;
@@ -100,6 +98,11 @@ ion-fab .col {
 /* Fixes card padding & margin */
 ion-card {
   padding: 8px 0;
+}
+page-account-transaction-list {
+  .sc-ion-card-ios-h {
+    margin: 8px 16px;
+  }
 }
 
 /* Card Styling */
@@ -138,5 +141,4 @@ page-account-import-onboarding {
 
 .typography--uppercase {
   text-transform: uppercase;
-  font-size: 14px;
 }
