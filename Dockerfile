@@ -44,6 +44,6 @@ RUN export NODE_ENV=production
 RUN node config/patch_crypto.js
 
 # build
-RUN ionic build --prod
+RUN npx ionic build --prod
 
 CMD ["static", "-p", "8100", "-a", "0.0.0.0", "www"]

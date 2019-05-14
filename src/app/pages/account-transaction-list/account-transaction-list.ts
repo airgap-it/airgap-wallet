@@ -42,7 +42,7 @@ export class AccountTransactionListPage {
   public protocolIdentifier: string
 
   public hasPendingTransactions: boolean = false
-  private pendingTransactions: IAirGapTransaction[]
+  public pendingTransactions: IAirGapTransaction[]
 
   // AE-Migration Stuff
   public aeTxEnabled: boolean = false
