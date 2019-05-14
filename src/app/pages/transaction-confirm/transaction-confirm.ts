@@ -12,19 +12,20 @@ import {
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
-declare var cordova: any
+declare var cordova
 
-const SECOND = 1000
-const MINUTE = 60 * SECOND
+const SECOND: number = 1000
+const MINUTE: number = SECOND * 60
 
-const TOAST_DURATION = 3 * SECOND
-const TOAST_ERROR_DURATION = 5 * SECOND
-const INTERVAL_KT_REFRESH = 10 * SECOND
-const TIMEOUT_TRANSACTION_QUEUED = 20 * SECOND
-const TIMEOUT_KT_REFRESH_CLEAR = 5 * MINUTE
+const TOAST_DURATION: number = SECOND * 3
+const TOAST_ERROR_DURATION: number = SECOND * 5
+const INTERVAL_KT_REFRESH: number = SECOND * 10
+const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
+const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
 
 @Component({
   selector: 'page-transaction-confirm',
@@ -44,10 +45,11 @@ export class TransactionConfirmPage {
     private readonly alertCtrl: AlertController,
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
-    private readonly accountProvider: AccountProvider
+    private readonly accountProvider: AccountProvider,
+    private readonly pushBackendProvider: PushBackendProvider
   ) {}
 
-  public dismiss() {
+  public dismiss(): void {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
@@ -64,6 +66,15 @@ export class TransactionConfirmPage {
   }
 
   public async broadcastTransaction() {
+    const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
+    // necessary for the transaction backend
+    signed.amount = signed.amount.toString()
+    signed.fee = signed.fee.toString()
+    signed.signedTx = this.signedTx
+    signed.hash = ''
+
+    await this.pushBackendProvider.postPendingTx(signed)
+
     const loading = await this.loadingCtrl.create({
       message: 'Broadcasting...'
     })
