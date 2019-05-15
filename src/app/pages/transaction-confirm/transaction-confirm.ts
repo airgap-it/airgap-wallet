@@ -66,15 +66,6 @@ export class TransactionConfirmPage {
   }
 
   public async broadcastTransaction() {
-    const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
-    // necessary for the transaction backend
-    signed.amount = signed.amount.toString()
-    signed.fee = signed.fee.toString()
-    signed.signedTx = this.signedTx
-    signed.hash = ''
-
-    await this.pushBackendProvider.postPendingTx(signed)
-
     const loading = await this.loadingCtrl.create({
       message: 'Broadcasting...'
     })
@@ -99,7 +90,7 @@ export class TransactionConfirmPage {
 
     this.protocol
       .broadcastTransaction(this.signedTx)
-      .then(txId => {
+      .then(async txId => {
         if (interval) {
           clearInterval(interval)
         }
@@ -173,6 +164,17 @@ export class TransactionConfirmPage {
           .then(alert => {
             alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
+
+        // POST TX TO BACKEND
+        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
+        // necessary for the transaction backend
+        signed.amount = signed.amount.toString()
+        signed.fee = signed.fee.toString()
+        signed.signedTx = this.signedTx
+        signed.hash = txId
+
+        this.pushBackendProvider.postPendingTx(signed) // Don't await
+        // END POST TX TO BACKEND
       })
       .catch(error => {
         if (interval) {
