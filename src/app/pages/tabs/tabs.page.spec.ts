@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ModalController } from '@ionic/angular'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { TabsPage } from './tabs.page'
-/*
-// TODO: Enabling this gives error, even though it's exactly the same as portfolio.page
+
 describe('TabsPage', () => {
   let component: TabsPage
   let fixture: ComponentFixture<TabsPage>
@@ -14,6 +14,7 @@ describe('TabsPage', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
+        providers: [{ provide: ModalController, useValue: unitHelper.mockRefs.modalController }],
         declarations: [TabsPage]
       })
     )
@@ -31,4 +32,3 @@ describe('TabsPage', () => {
     expect(component).toBeTruthy()
   })
 })
-*/

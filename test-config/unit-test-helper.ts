@@ -4,7 +4,7 @@ import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Push } from '@ionic-native/push/ngx'
-import { IonicModule, NavController, Platform, ToastController, AlertController } from '@ionic/angular'
+import { AlertController, IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
@@ -16,6 +16,8 @@ import {
   AlertControllerMock,
   AppVersionMock,
   DeeplinkMock,
+  LoadingControllerMock,
+  ModalControllerMock,
   NavControllerMock,
   PlatformMock,
   SplashScreenMock,
@@ -32,7 +34,9 @@ export class UnitHelper {
     splashScreen: new SplashScreenMock(),
     deeplink: new DeeplinkMock(),
     toastController: new ToastControllerMock(),
-    alertController: new AlertControllerMock()
+    alertController: new AlertControllerMock(),
+    loadingController: new LoadingControllerMock(),
+    modalController: new ModalControllerMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
