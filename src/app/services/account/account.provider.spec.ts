@@ -1,20 +1,25 @@
-/*import { async, TestBed } from '@angular/core/testing'
-
-import { AccountProvider } from '../../services/account/account.provider'
-import { StorageMock } from '../../../../test-config/storage-mock'
-import { Storage } from '@ionic/storage'
+import { TestBed } from '@angular/core/testing'
+import { Push } from '@ionic-native/push/ngx'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { StorageProvider } from '../storage/storage'
 import { take } from 'rxjs/operators'
+
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { AccountProvider } from '../../services/account/account.provider'
 
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      providers: [AccountProvider, StorageProvider, { provide: Storage, useClass: StorageMock }]
-    })
-  }))
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [Push]
+      })
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
 
   beforeEach(async () => {
     accountProvider = TestBed.get(AccountProvider)
@@ -100,4 +105,3 @@ describe('AccountProvider', () => {
     expect(accountProvider.getWalletList().length).toEqual(1)
   })
 })
-*/

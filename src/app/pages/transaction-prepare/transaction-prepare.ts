@@ -36,8 +36,9 @@ export class TransactionPreparePage {
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService
   ) {
-    let address = '',
-      wallet
+    let address = ''
+    let wallet
+
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       address = info.address || ''

@@ -1,32 +1,32 @@
-/*
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { TestBed, async } from '@angular/core/testing'
-
-import { Platform } from '@ionic/angular'
+import { TestBed } from '@angular/core/testing'
+import { AppVersion } from '@ionic-native/app-version/ngx'
+import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
+
+import { UnitHelper } from '../../test-config/unit-test-helper'
 
 import { AppComponent } from './app.component'
 
 describe('AppComponent', () => {
-  let statusBarSpy, splashScreenSpy, platformReadySpy, platformSpy
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
 
-  beforeEach(async(() => {
-    statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault'])
-    splashScreenSpy = jasmine.createSpyObj('SplashScreen', ['hide'])
-    platformReadySpy = Promise.resolve()
-    platformSpy = jasmine.createSpyObj('Platform', { ready: platformReadySpy })
-
-    TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [
-        { provide: StatusBar, useValue: statusBarSpy },
-        { provide: SplashScreen, useValue: splashScreenSpy },
-        { provide: Platform, useValue: platformSpy }
-      ]
-    }).compileComponents()
-  }))
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [
+          { provide: StatusBar, useValue: unitHelper.mockRefs.statusBar },
+          { provide: SplashScreen, useValue: unitHelper.mockRefs.splashScreen },
+          Deeplinks,
+          { provide: AppVersion, useValue: unitHelper.mockRefs.appVersion }
+        ],
+        declarations: [AppComponent]
+      })
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent)
@@ -34,14 +34,23 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy()
   })
 
+  /*
+  // TODO: Enable when all native parts are mocked and we can run it as "cordova"
   it('should initialize the app', async () => {
     TestBed.createComponent(AppComponent)
-    expect(platformSpy.ready).toHaveBeenCalled()
-    await platformReadySpy
-    expect(statusBarSpy.styleDefault).toHaveBeenCalled()
-    expect(splashScreenSpy.hide).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.platform.ready).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.statusBar.styleDefault).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.splashScreen.hide).toHaveBeenCalled()
   })
+
+  it('should initialize the app', async () => {
+    TestBed.createComponent(AppComponent)
+    expect(unitHelper.mockRefs.appVersion.getAppName).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.appVersion.getPackageName).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.appVersion.getVersionCode).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.appVersion.getVersionNumber).toHaveBeenCalled()
+  })
+  */
 
   // TODO: add more tests!
 })
-*/

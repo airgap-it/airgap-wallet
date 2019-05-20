@@ -1,25 +1,25 @@
-/*
-import { async, TestBed, ComponentFixture } from '@angular/core/testing'
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
 
-import { IdenticonComponent } from './../identicon/identicon'
-import { AddressRowComponent } from './../address-row/address-row'
-import { FromToComponent } from './../from-to/from-to'
-import { SignedTransactionComponent } from './signed-transaction'
-import { CurrencySymbolComponent } from '../../components/currency-symbol/currency-symbol'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
-import { SyncProtocolUtils, EncodedType } from 'airgap-coin-lib'
 
-fdescribe('SignedTransactionComponent', () => {
+import { SignedTransactionComponent } from './signed-transaction'
+
+describe('SignedTransactionComponent', () => {
   let signedTransactionFixture: ComponentFixture<SignedTransactionComponent>
   let signedTransaction: SignedTransactionComponent
 
-  beforeEach(async(() => {
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
-      UnitHelper.testBed({
-        declarations: [CurrencySymbolComponent, SignedTransactionComponent, FromToComponent, AddressRowComponent, IdenticonComponent]
+      unitHelper.testBed({
+        declarations: []
       })
-    ).compileComponents()
-  }))
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
 
   beforeEach(async () => {
     signedTransactionFixture = TestBed.createComponent(SignedTransactionComponent)
@@ -78,4 +78,3 @@ fdescribe('SignedTransactionComponent', () => {
     expect(signedTransaction.fallbackActivated).toBe(true)
   }))
 })
-*/

@@ -1,6 +1,7 @@
-/*
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { QRScanner } from '@ionic-native/qr-scanner/ngx'
+
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { PortfolioPage } from './portfolio'
 
@@ -8,12 +9,18 @@ describe('PortfolioPage', () => {
   let component: PortfolioPage
   let fixture: ComponentFixture<PortfolioPage>
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [PortfolioPage],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    }).compileComponents()
-  }))
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [QRScanner],
+        declarations: [PortfolioPage]
+      })
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PortfolioPage)
@@ -25,4 +32,3 @@ describe('PortfolioPage', () => {
     expect(component).toBeTruthy()
   })
 })
-*/
