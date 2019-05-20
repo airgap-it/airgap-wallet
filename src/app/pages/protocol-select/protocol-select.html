@@ -10,7 +10,9 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
+  <ion-toolbar>
+    <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
