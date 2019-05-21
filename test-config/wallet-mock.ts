@@ -1,4 +1,5 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import BigNumber from 'bignumber.js'
 
 import { Transaction } from '../src/app/models/transaction.model'
 
@@ -6,7 +7,7 @@ class WalletMock {
   public ethWallet: AirGapMarketWallet = Object.assign(
     new AirGapMarketWallet('eth', '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6', false, "m/44'/60'/0'/0/0"),
     {
-      currentMarketPrice: '100'
+      currentMarketPrice: new BigNumber('100')
     }
   )
   public ethTransaction: Transaction = Object.assign(

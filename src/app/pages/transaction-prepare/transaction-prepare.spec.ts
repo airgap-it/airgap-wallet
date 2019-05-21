@@ -1,29 +1,19 @@
-/*
-import { async, TestBed, ComponentFixture } from '@angular/core/testing'
-import { HttpClient, HttpClientModule } from '@angular/common/http'
-import { IonicModule, NavController, NavParams, Platform, LoadingController, ToastController } from '@ionic/angular'
-import { AppComponent } from '../../app.component'
-import { TransactionPreparePage } from './transaction-prepare'
-import { StatusBar } from '@ionic-native/status-bar'
-import { SplashScreen } from '@ionic-native/splash-screen'
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import { Keyboard } from '@ionic-native/keyboard'
-
-import { PlatformMock, StatusBarMock, SplashScreenMock, NavParamsMock } from '../../../../test-config/mocks-ionic'
-
-import { ComponentsModule } from '../../components/components.module'
-import { AccountProvider } from '../../services/account/account.provider'
-import { WalletMock } from '../../../../test-config/wallet-mock'
-import { StorageMock } from '../../../../test-config/storage-mock'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ActivatedRoute } from '@angular/router'
+import { Clipboard } from '@ionic-native/clipboard/ngx'
+import { SplashScreen } from '@ionic-native/splash-screen/ngx'
+import { StatusBar } from '@ionic-native/status-bar/ngx'
+import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { PipesModule } from '../../pipes/pipes.module'
-import { Clipboard } from '@ionic-native/clipboard'
+
+import { NavParamsMock, PlatformMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
+import { StorageMock } from '../../../../test-config/storage-mock'
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { WalletMock } from '../../../../test-config/wallet-mock'
+import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
 
-export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json')
-}
+import { TransactionPreparePage } from './transaction-prepare'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
@@ -35,39 +25,45 @@ describe('TransactionPrepare Page', () => {
   let fixture: ComponentFixture<TransactionPreparePage>
   let component: TransactionPreparePage
 
-  beforeEach(async(() => {
-    WalletMock.injectSecret()
-    NavParamsMock.setParams({
-      transaction: ethTransaction,
-      wallet: ethWallet
-    })
-    TestBed.configureTestingModule({
-      declarations: [TransactionPreparePage],
-      imports: [
-        ComponentsModule,
-        PipesModule,
-        HttpClientModule,
-        TranslateModule.forRoot({
-          loader: {
-            provide: TranslateLoader,
-            useFactory: createTranslateLoader,
-            deps: [HttpClient]
-          }
-        })
-      ],
-      providers: [
-        AccountProvider,
-        Clipboard,
-        { provide: Storage, useClass: StorageMock },
-        { provide: NavParams, useClass: NavParamsMock },
-        { provide: StatusBar, useClass: StatusBarMock },
-        { provide: SplashScreen, useClass: SplashScreenMock },
-        { provide: Platform, useClass: PlatformMock },
-        ClipboardProvider
-      ]
-    })
-  }))
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
 
+    WalletMock.injectSecret()
+
+    const routeInfo = {
+      snapshot: {
+        data: {
+          special: {
+            transaction: ethTransaction,
+            wallet: ethWallet
+          }
+        }
+      }
+    }
+
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [
+          AccountProvider,
+          Clipboard,
+          { provide: Storage, useClass: StorageMock },
+          { provide: NavParams, useClass: NavParamsMock },
+          { provide: StatusBar, useClass: StatusBarMock },
+          { provide: SplashScreen, useClass: SplashScreenMock },
+          { provide: Platform, useClass: PlatformMock },
+          ClipboardProvider,
+          {
+            provide: ActivatedRoute,
+            useValue: routeInfo
+          }
+        ],
+        declarations: [TransactionPreparePage]
+      })
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
   beforeEach(async () => {
     ethWallet.addresses = await ethWallet.deriveAddresses(1)
     fixture = TestBed.createComponent(TransactionPreparePage)
@@ -80,9 +76,9 @@ describe('TransactionPrepare Page', () => {
   })
 
   it('should select the correct default fee, and low/medium/high fees', done => {
-    let el = fixture.debugElement.nativeElement
-    let feeAmount = el.querySelector('#fee-amount')
-    let feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
+    const element = fixture.debugElement.nativeElement
+    const feeAmount = element.querySelector('#fee-amount')
+    const feeAmountAdvanced = element.querySelector('#fee-amount-advanced')
 
     component.useWallet(ethWallet)
     expect(component.transactionForm.value.fee).toEqual(
@@ -115,30 +111,31 @@ describe('TransactionPrepare Page', () => {
   })
 
   it('should properly display $ amount of a fee', () => {
-    let el = fixture.debugElement.nativeElement
-    let feeAmount = el.querySelector('#fee-amount')
-    let feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
+    const el = fixture.debugElement.nativeElement
+    const feeAmount = el.querySelector('#fee-amount')
+    const feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
     component.useWallet(ethWallet)
     expect(feeAmount.textContent.trim()).toEqual('$0.021')
     expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
   })
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
+    // TODO: Move this test to "operationsProvider"
     component.transactionForm.controls['address'].setValue(ethWallet.addresses[0])
     component.transactionForm.controls['amount'].setValue(10)
     component.transactionForm.controls['fee'].setValue(10)
 
     await component.prepareTransaction()
-
+    /*
     // should create a loadingCtrl
     expect((component as any).loadingCtrl.create).toHaveBeenCalled()
 
     // should create a toastCtrl
-    expect((component as any).toastController.create).toHaveBeenCalledWith({
+    expect(unitHelper.mockRefs.toastController.create).toHaveBeenCalledWith({
       message: new Error('not enough balance'),
       duration: 3000,
       position: 'bottom'
     })
+    */
   })
 })
-*/

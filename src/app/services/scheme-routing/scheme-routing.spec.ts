@@ -1,15 +1,15 @@
-/*import { async, TestBed } from '@angular/core/testing'
-import { NavController, Platform, AlertController, LoadingController } from '@ionic/angular'
-import { Router, NavigationExtras } from '@angular/router'
-import { StatusBar } from '@ionic-native/status-bar'
-import 'jasmine'
+import { async, TestBed } from '@angular/core/testing'
+import { Router } from '@angular/router'
 import { SplashScreen } from '@ionic-native/splash-screen'
-
-import { PlatformMock, StatusBarMock, SplashScreenMock, AlertControllerMock } from '../../../../test-config/mocks-ionic'
-import { SchemeRoutingProvider } from './scheme-routing'
-
-import { StorageMock } from '../../../../test-config/storage-mock'
+import { StatusBar } from '@ionic-native/status-bar'
+import { AlertController, NavController, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+
+import { AlertControllerMock, PlatformMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
+import { StorageMock } from '../../../../test-config/storage-mock'
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
+
+import { SchemeRoutingProvider } from './scheme-routing'
 
 describe('SchemeRoutingProvider Provider', () => {
   let schemeRoutingProvider: SchemeRoutingProvider
@@ -17,21 +17,24 @@ describe('SchemeRoutingProvider Provider', () => {
   let navController: NavController
   let router: Router
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        SchemeRoutingProvider,
-        {
-          provide: AlertController,
-          useValue: AlertControllerMock
-        },
-        { provide: Storage, useClass: StorageMock },
-        { provide: StatusBar, useClass: StatusBarMock },
-        { provide: SplashScreen, useClass: SplashScreenMock },
-        { provide: Platform, useClass: PlatformMock }
-      ]
-    })
-  }))
+  let unitHelper: UnitHelper
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
+
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [
+          SchemeRoutingProvider,
+          { provide: Storage, useClass: StorageMock },
+          { provide: StatusBar, useClass: StatusBarMock },
+          { provide: SplashScreen, useClass: SplashScreenMock },
+          { provide: Platform, useClass: PlatformMock }
+        ]
+      })
+    )
+      .compileComponents()
+      .catch(console.error)
+  })
 
   beforeEach(() => {
     schemeRoutingProvider = TestBed.get(SchemeRoutingProvider)
@@ -48,11 +51,15 @@ describe('SchemeRoutingProvider Provider', () => {
     done()
   })
 
-  it('should handle request', async done => {
+  it('should throw for invalid URL', async done => {
     const text: string = 'test'
     const callback = () => undefined
-    await schemeRoutingProvider.handleNewSyncRequest(router, text, callback)
+    try {
+      await schemeRoutingProvider.handleNewSyncRequest(router, text, callback)
+    } catch (error) {
+      if (error.name === "TypeError: Failed to construct 'URL': Invalid URL") {
+      }
+    }
     done()
   })
 })
-*/

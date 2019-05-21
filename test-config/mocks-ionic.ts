@@ -1,5 +1,10 @@
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
+import { Platform } from '@ionic/angular'
+
+// tslint:disable:max-classes-per-file
+
+const newSpy = (name: string, returnValue: any): jasmine.Spy => jasmine.createSpy(name).and.returnValue(returnValue)
 
 class ComponentMock {}
 
@@ -83,19 +88,18 @@ export class NavParamsMock {
   }
 }
 
+export class AppVersionMock {
+  public getAppName: jasmine.Spy = newSpy('getAppName', Promise.resolve('AirGap.UnitTest'))
+  public getPackageName: jasmine.Spy = newSpy('getPackageName', Promise.resolve('AirGap'))
+  public getVersionNumber: jasmine.Spy = newSpy('getVersionNumber', Promise.resolve('0.0.0'))
+  public getVersionCode: jasmine.Spy = newSpy('getVersionCode', Promise.resolve('0'))
+}
+
 export class PlatformMock {
-  public ready(): Promise<string> {
-    return new Promise(resolve => {
-      resolve('READY')
-    })
-  }
+  public ready: jasmine.Spy = newSpy('ready', Promise.resolve())
 
-  public getQueryParam() {
+  public getQueryParam(): boolean {
     return true
-  }
-
-  public registerBackButtonAction(fn: Function, priority?: number): Function {
-    return () => true
   }
 
   public hasFocus(ele: HTMLElement): boolean {
@@ -107,7 +111,8 @@ export class PlatformMock {
   }
 
   public is(): boolean {
-    return true
+    console.log('MOCK IS NOT CORDOVA ')
+    return false
   }
 
   public getElementComputedStyle(container: any): any {
@@ -148,7 +153,7 @@ export class PlatformMock {
   }
 }
 
-export class NavMock {
+export class NavControllerMock {
   public pop(): any {
     return new Promise(function(resolve: Function): void {
       resolve()
@@ -178,16 +183,20 @@ export class NavMock {
   }
 }
 
-export class StatusBarMock extends StatusBar {
-  public styleDefault() {
-    return
-  }
+export class StatusBarMock {
+  public styleDefault: jasmine.Spy = newSpy('styleDefault', Promise.resolve())
+  public backgroundColorByHexString: jasmine.Spy = newSpy('backgroundColorByHexString', Promise.resolve())
 }
 
-export class SplashScreenMock extends SplashScreen {
-  public hide() {
-    return
-  }
+export class SplashScreenMock {
+  public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }
 
-export class DeepLinkerMock {}
+export class DeeplinkMock {
+  public create: jasmine.Spy = newSpy(
+    'route',
+    Promise.resolve({
+      subscribe: jasmine.createSpy('subscribe').and.returnValue(Promise.resolve())
+    })
+  )
+}

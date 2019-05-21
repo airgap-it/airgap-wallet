@@ -1,19 +1,45 @@
 import { CommonModule } from '@angular/common'
+import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
-import { IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
+import { Push } from '@ionic-native/push/ngx'
+import { AlertController, IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
 
+import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
 
-import { ToastControllerMock } from './mocks-ionic'
+import {
+  AlertControllerMock,
+  AppVersionMock,
+  DeeplinkMock,
+  LoadingControllerMock,
+  ModalControllerMock,
+  NavControllerMock,
+  PlatformMock,
+  SplashScreenMock,
+  StatusBarMock,
+  ToastControllerMock
+} from './mocks-ionic'
 import { StorageMock } from './storage-mock'
 
 export class UnitHelper {
-  public static testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed = false): TestModuleMetadata {
+  public readonly mockRefs = {
+    appVersion: new AppVersionMock(),
+    platform: new PlatformMock(),
+    statusBar: new StatusBarMock(),
+    splashScreen: new SplashScreenMock(),
+    deeplink: new DeeplinkMock(),
+    toastController: new ToastControllerMock(),
+    alertController: new AlertControllerMock(),
+    loadingController: new LoadingControllerMock(),
+    modalController: new ModalControllerMock()
+  }
+
+  public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
     const mandatoryDeclarations: any[] = []
     const mandatoryImports: any[] = [
       CommonModule,
@@ -21,6 +47,8 @@ export class UnitHelper {
       IonicModule,
       FormsModule,
       RouterTestingModule,
+      HttpClientModule,
+      ComponentsModule,
       IonicStorageModule.forRoot({
         name: '__test_airgap_storage',
         driverOrder: ['localstorage']
@@ -30,7 +58,13 @@ export class UnitHelper {
         loader: { provide: TranslateLoader, useClass: TranslateFakeLoader }
       })
     ]
-    const mandatoryProviders: any[] = [NavController, Platform, { provide: ToastController, useClass: ToastControllerMock }]
+    const mandatoryProviders: any[] = [
+      { provide: NavController, useClass: NavControllerMock },
+      { provide: Platform, useValue: this.mockRefs.platform },
+      Push,
+      { provide: ToastController, useValue: this.mockRefs.toastController },
+      { provide: AlertController, useValue: this.mockRefs.alertController }
+    ]
 
     if (!useIonicOnlyTestBed) {
       mandatoryProviders.push({ provide: Storage, useClass: StorageMock })
