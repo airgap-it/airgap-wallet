@@ -76,9 +76,9 @@ describe('TransactionPrepare Page', () => {
   })
 
   it('should select the correct default fee, and low/medium/high fees', done => {
-    const el = fixture.debugElement.nativeElement
-    const feeAmount = el.querySelector('#fee-amount')
-    const feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
+    const element = fixture.debugElement.nativeElement
+    const feeAmount = element.querySelector('#fee-amount')
+    const feeAmountAdvanced = element.querySelector('#fee-amount-advanced')
 
     component.useWallet(ethWallet)
     expect(component.transactionForm.value.fee).toEqual(
