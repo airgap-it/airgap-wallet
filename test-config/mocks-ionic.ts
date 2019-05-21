@@ -4,9 +4,7 @@ import { Platform } from '@ionic/angular'
 
 // tslint:disable:max-classes-per-file
 
-const newSpy = (name: string, returnValue: any): jasmine.Spy => {
-  return jasmine.createSpy(name).and.returnValue(returnValue)
-}
+const newSpy = (name: string, returnValue: any): jasmine.Spy => jasmine.createSpy(name).and.returnValue(returnValue)
 
 class ComponentMock {}
 
