@@ -383,12 +383,13 @@
     "change-vote_label": "Change Vote",
     "done_label": "Done"
   },
-  "delegate-edit-popover.component": {
+  "delegate-edit-popover": {
+    "settings_label": "Settings",
+    "change-baker_label": "Change Baker",
     "heading": "Enter the bakers address",
     "text": "Enter the address provided to you by the baker.",
     "baker-address_label": "Baker address",
     "cancel_label": "Cancel",
     "set-baker_label": "Set Baker"
-
   }
 }
