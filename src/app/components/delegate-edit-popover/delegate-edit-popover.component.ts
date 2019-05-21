@@ -11,6 +11,7 @@ export class DelegateEditPopoverComponent {
 
   public async changeBaker(): Promise<void> {
     const alert: HTMLIonAlertElement = await this.alertController.create({
+      /* TODO: use translations */
       header: 'Enter the bakers address',
       message: 'Enter the address provided to you by the baker.',
       inputs: [

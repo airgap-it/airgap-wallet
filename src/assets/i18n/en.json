@@ -382,5 +382,13 @@
     "vote_label": "Vote",
     "change-vote_label": "Change Vote",
     "done_label": "Done"
+  },
+  "delegate-edit-popover.component": {
+    "heading": "Enter the bakers address",
+    "text": "Enter the address provided to you by the baker.",
+    "baker-address_label": "Baker address",
+    "cancel_label": "Cancel",
+    "set-baker_label": "Set Baker"
+
   }
 }
