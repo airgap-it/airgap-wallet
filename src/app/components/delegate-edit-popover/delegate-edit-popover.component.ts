@@ -11,14 +11,13 @@ export class DelegateEditPopoverComponent {
 
   public async changeBaker(): Promise<void> {
     const alert: HTMLIonAlertElement = await this.alertController.create({
-      header: 'Enter baker address!',
-      subHeader: 'Subtitle',
-      message: 'This is an alert message.',
+      header: 'Enter the bakers address',
+      message: 'Enter the address provided to you by the baker.',
       inputs: [
         {
           name: 'bakerAddress',
           id: 'baker-address',
-          placeholder: 'Baker Address'
+          placeholder: 'Baker address'
         }
       ],
       buttons: [
@@ -31,7 +30,7 @@ export class DelegateEditPopoverComponent {
           }
         },
         {
-          text: 'Okay',
+          text: 'Set Baker',
           handler: ({ bakerAddress }: { bakerAddress: string }): void => {
             this.popoverController.dismiss({ bakerAddress })
           }
