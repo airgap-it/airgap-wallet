@@ -1,7 +1,7 @@
 import { Location } from '@angular/common'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ToastController } from '@ionic/angular'
+import { ToastController, PopoverController } from '@ionic/angular'
 import { AirGapMarketWallet, BakerInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -11,10 +11,17 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { BakerConfig, RemoteConfigProvider } from '../../services/remote-config/remote-config'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
+import { OverlayEventDetail } from '@ionic/core'
 
 type Moment = moment.Moment
 
 const hoursPerCycle = 68
+
+interface Test {
+  a: number
+  b: string
+}
 
 @Component({
   selector: 'page-delegation-baker-detail',
@@ -42,7 +49,8 @@ export class DelegationBakerDetailPage {
     public toastController: ToastController,
     public operationsProvider: OperationsProvider,
     public remoteConfigProvider: RemoteConfigProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    public popoverCtrl: PopoverController
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -125,5 +133,31 @@ export class DelegationBakerDetailPage {
 
   public async done() {
     this.location.back()
+  }
+
+  public async presentEditPopover(event) {
+    const popover: HTMLIonPopoverElement = await this.popoverCtrl.create({
+      component: DelegateEditPopoverComponent,
+      event,
+      translucent: true
+    })
+
+    function isBakerAddressObject(value: unknown): value is { bakerAddress: string } {
+      return value instanceof Object && 'bakerAddress' in value
+    }
+
+    popover
+      .onDidDismiss()
+      .then(({ data }: OverlayEventDetail<unknown>) => {
+        if (isBakerAddressObject(data)) {
+          console.log(data.bakerAddress)
+        } else {
+          console.log('Did not receive valid baker address object')
+        }
+        console.log('dismiss')
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+
+    return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }
