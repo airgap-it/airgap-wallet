@@ -62,13 +62,12 @@ const headful = {
   browserName: 'chrome',
 
   chromeOptions: {
-    args: [
-      /*, 'lang=de-DE' */
-    ],
+    // args: ['--lang=de-DE'],
     mobileEmulation: {
       deviceName: 'iPhone X'
     },
     prefs: {
+      // 'intl.accept_languages': 'zh-CN',
       'profile.content_settings.exceptions.clipboard': {
         'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
       }
@@ -78,6 +77,8 @@ const headful = {
 
 // const multiCapabilities = [makeHeadless(makeiPhone(getBaseCapability()))]
 const multiCapabilities = [headful]
+
+const { join } = require('path')
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -91,6 +92,21 @@ exports.config = {
     defaultTimeoutInterval: 30000,
     print: function() {}
   },
+  plugins: [
+    {
+      // The module name
+      package: 'protractor-image-comparison',
+      // Some options, see the docs for more
+      options: {
+        baselineFolder: join(process.cwd(), './baseline/'),
+        formatImageName: `{tag}-{logName}-{width}x{height}`,
+        screenshotPath: join(process.cwd(), '.tmp/'),
+        savePerInstance: true
+        // autoSaveBaseline: true
+        // ... more options
+      }
+    }
+  ],
   onPrepare() {
     require('ts-node').register({
       project: require('path').join(__dirname, './tsconfig.e2e.json')

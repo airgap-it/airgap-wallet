@@ -3,13 +3,14 @@ import { slugify } from './utils'
 import * as fs from 'fs'
 
 export class PageObjectBase {
-  private time: Date = new Date()
+  private time: Date
   private path: string
   protected tag: string
 
-  constructor(tag: string, path: string) {
+  constructor(tag: string, path: string, time: Date = new Date()) {
     this.tag = tag
     this.path = path
+    this.time = time
   }
 
   load() {
@@ -66,7 +67,9 @@ export class PageObjectBase {
     el.click()
   }
 
-  takeScreenshot(comment: string) {
+  async takeScreenshot(name: string) {
+    await browser.imageComparison.checkScreen(name)
+
     return browser
       .takeScreenshot()
       .then(async png => {
@@ -76,10 +79,10 @@ export class PageObjectBase {
           ? slugify(config.capabilities.chromeOptions.mobileEmulation.deviceName)
           : 'desktop'
 
-        console.log(platform, 'browser.takeScreenshot()')
+        console.log(platform, 'screenshot', name)
 
         const stream = fs.createWriteStream(
-          `./screenshots/${platform}/${this.tag}-${this.time.getTime()}-screenshot.png` /* node >10 { recursive: true }*/
+          `./screenshots/${platform}/${this.tag}-${this.time.getTime()}-${name}.png` /* node >10 { recursive: true }*/
         )
         stream.write(Buffer.from(png, 'base64'))
         stream.end()
