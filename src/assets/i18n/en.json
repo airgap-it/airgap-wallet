@@ -347,6 +347,7 @@
     "title": "Baker Detail",
     "accepts-delegation": "Accepts Delegation",
     "fee": "Fee",
+    "invalid-address": "This address is invalid.",
     "payout-schedule": "Payout Schedule",
     "your-delegation": "Your Delegation",
     "your-balance": "Your Balance",

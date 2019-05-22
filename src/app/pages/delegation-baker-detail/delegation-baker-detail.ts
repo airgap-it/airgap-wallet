@@ -25,7 +25,7 @@ const hoursPerCycle = 68
 })
 export class DelegationBakerDetailPage {
   public bakerConfig: BakerConfig
-  public bakerConfigError: string
+  public bakerConfigError: string | undefined
 
   public wallet: AirGapMarketWallet
 
@@ -132,11 +132,11 @@ export class DelegationBakerDetailPage {
     const re = new RegExp(ktProtocol.addressValidationPattern)
     if (re.exec(this.bakerConfig.address)) {
       // Valid address
-      this.bakerConfigError = ''
+      this.bakerConfigError = undefined
       this.calculateBakerStats()
     } else {
       // Invalid address
-      this.bakerConfigError = 'This is an invalid address'
+      this.bakerConfigError = 'delegation-baker-detail.invalid-address'
       this.delegationRewards = []
       this.bakerInfo = undefined
       this.nextPayout = undefined
