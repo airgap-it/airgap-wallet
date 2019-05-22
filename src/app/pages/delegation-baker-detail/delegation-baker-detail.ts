@@ -74,6 +74,11 @@ export class DelegationBakerDetailPage {
 
     this.bakerInfo = await kt.bakerInfo(this.bakerConfig.address)
 
+    // TODO: Remove once the baker capacity is calculated correctly in the coinlib
+    this.bakerInfo.bakerCapacity = this.bakerInfo.bakerCapacity.multipliedBy(0.7)
+    this.bakerInfo.bakerUsage = this.bakerInfo.stakingBalance.div(this.bakerInfo.bakerCapacity)
+    // End remove
+
     try {
       this.delegationRewards = await kt.delegationRewards(this.bakerConfig.address)
 
