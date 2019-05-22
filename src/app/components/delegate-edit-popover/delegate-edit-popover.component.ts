@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, PopoverController } from '@ionic/angular'
+import { LanguageService } from 'src/app/services/language.service'
 
 @Component({
   selector: 'app-delegate-edit-popover',
@@ -7,23 +8,26 @@ import { AlertController, PopoverController } from '@ionic/angular'
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
-  constructor(private readonly alertController: AlertController, private readonly popoverController: PopoverController) {}
+  constructor(
+    private readonly alertController: AlertController,
+    private readonly popoverController: PopoverController,
+    private readonly languageService: LanguageService
+  ) {}
 
   public async changeBaker(): Promise<void> {
-    const alert: HTMLIonAlertElement = await this.alertController.create({
-      /* TODO: use translations */
-      header: 'Enter the bakers address',
-      message: 'Enter the address provided to you by the baker.',
-      inputs: [
+    const translatedAlert = await this.languageService.getTranslatedAlert(
+      'delegate-edit-popover.heading',
+      'delegate-edit-popover.text',
+      [
         {
           name: 'bakerAddress',
           id: 'baker-address',
-          placeholder: 'Baker address'
+          placeholder: 'delegate-edit-popover.baker-address_label'
         }
       ],
-      buttons: [
+      [
         {
-          text: 'Cancel',
+          text: 'delegate-edit-popover.cancel_label',
           role: 'cancel',
           cssClass: 'secondary',
           handler: (): void => {
@@ -31,7 +35,7 @@ export class DelegateEditPopoverComponent {
           }
         },
         {
-          text: 'Set Baker',
+          text: 'delegate-edit-popover.set-baker_label',
           handler: ({ bakerAddress }: { bakerAddress: string }): boolean => {
             this.popoverController.dismiss({ bakerAddress })
 
@@ -39,7 +43,8 @@ export class DelegateEditPopoverComponent {
           }
         }
       ]
-    })
+    )
+    const alert: HTMLIonAlertElement = await this.alertController.create(translatedAlert)
 
     await alert.present()
   }
