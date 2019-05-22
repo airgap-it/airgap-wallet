@@ -25,6 +25,7 @@ const hoursPerCycle = 68
 })
 export class DelegationBakerDetailPage {
   public bakerConfig: BakerConfig
+  public bakerConfigError: string
 
   public wallet: AirGapMarketWallet
 
@@ -116,7 +117,21 @@ export class DelegationBakerDetailPage {
       ...config
     }
 
-    this.calculateBakerStats()
+    const ktProtocol = new TezosKtProtocol()
+    const re = new RegExp(ktProtocol.addressValidationPattern)
+    if (re.exec(this.bakerConfig.address)) {
+      // Valid address
+      this.bakerConfigError = ''
+      this.calculateBakerStats()
+    } else {
+      // Invalid address
+      this.bakerConfigError = 'This is an invalid address'
+      this.delegationRewards = []
+      this.bakerInfo = undefined
+      this.nextPayout = undefined
+      this.avgRoIPerCyclePercentage = new BigNumber(0)
+      this.avgRoIPerCycle = new BigNumber(0)
+    }
   }
 
   public addPayoutDelayToMoment(time: Moment): Moment {

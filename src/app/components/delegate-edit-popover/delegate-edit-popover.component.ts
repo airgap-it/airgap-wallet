@@ -32,8 +32,10 @@ export class DelegateEditPopoverComponent {
         },
         {
           text: 'Set Baker',
-          handler: ({ bakerAddress }: { bakerAddress: string }): void => {
+          handler: ({ bakerAddress }: { bakerAddress: string }): boolean => {
             this.popoverController.dismiss({ bakerAddress })
+
+            return true
           }
         }
       ]
