@@ -89,7 +89,7 @@
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
               <span *ngIf="bakerConfig?.fee">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</span>
-              <span>Unknown</span>
+              <span *ngIf="!bakerConfig?.fee">Unknown</span>
             </h2>
             <ng-template #bakerConfigSkeleton>
               <div>
