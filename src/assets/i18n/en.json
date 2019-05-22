@@ -386,6 +386,7 @@
   "delegate-edit-popover": {
     "settings_label": "Settings",
     "change-baker_label": "Change Baker",
+    "change-baker-to-airgap_label": "Change to tezosAirGap Baker",
     "heading": "Enter the bakers address",
     "text": "Enter the address provided to you by the baker.",
     "baker-address_label": "Baker address",

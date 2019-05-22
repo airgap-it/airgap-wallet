@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
-import { AlertController, PopoverController } from '@ionic/angular'
-import { LanguageService } from 'src/app/services/language.service'
+import { AlertController, PopoverController, NavParams } from '@ionic/angular'
+import { LanguageService } from '../../services/language.service'
 
 @Component({
   selector: 'app-delegate-edit-popover',
@@ -8,11 +8,16 @@ import { LanguageService } from 'src/app/services/language.service'
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
+  public hideAirGap: boolean
+
   constructor(
     private readonly alertController: AlertController,
     private readonly popoverController: PopoverController,
-    private readonly languageService: LanguageService
-  ) {}
+    private readonly languageService: LanguageService,
+    private readonly navParams: NavParams
+  ) {
+    this.hideAirGap = this.navParams.get('hideAirGap')
+  }
 
   public async changeBaker(): Promise<void> {
     const translatedAlert = await this.languageService.getTranslatedAlert(
@@ -47,5 +52,9 @@ export class DelegateEditPopoverComponent {
     const alert: HTMLIonAlertElement = await this.alertController.create(translatedAlert)
 
     await alert.present()
+  }
+
+  public async changeBakerToAirGap() {
+    this.popoverController.dismiss({ changeToAirGap: true })
   }
 }

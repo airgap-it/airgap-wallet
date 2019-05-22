@@ -40,6 +40,8 @@ export class DelegationBakerDetailPage {
 
   public delegationInfo: DelegationInfo
 
+  private airGapBaker: BakerConfig
+
   constructor(
     public location: Location,
     private readonly router: Router,
@@ -59,6 +61,7 @@ export class DelegationBakerDetailPage {
   public async ionViewDidEnter() {
     // get baker 0, always airgap for now
     const airGapBakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
+    this.airGapBaker = airGapBakerConfig
 
     this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isDelegated = this.delegationInfo.isDelegated
@@ -179,6 +182,9 @@ export class DelegationBakerDetailPage {
   public async presentEditPopover(event) {
     const popover: HTMLIonPopoverElement = await this.popoverCtrl.create({
       component: DelegateEditPopoverComponent,
+      componentProps: {
+        hideAirGap: this.bakerConfig.address === this.airGapBaker.address
+      },
       event,
       translucent: true
     })
@@ -187,12 +193,18 @@ export class DelegationBakerDetailPage {
       return value instanceof Object && 'bakerAddress' in value
     }
 
+    function isChangeToAirGapObject(value: unknown): value is { changeToAirGap: boolean } {
+      return value instanceof Object && 'changeToAirGap' in value
+    }
+
     popover
       .onDidDismiss()
       .then(({ data }: OverlayEventDetail<unknown>) => {
         if (isBakerAddressObject(data)) {
           console.log(data.bakerAddress)
           this.setBaker({ address: data.bakerAddress })
+        } else if (isChangeToAirGapObject(data) && data.changeToAirGap) {
+          this.setBaker(this.airGapBaker)
         } else {
           console.log('Did not receive valid baker address object')
         }
