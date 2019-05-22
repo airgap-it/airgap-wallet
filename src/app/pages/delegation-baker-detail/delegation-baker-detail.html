@@ -20,7 +20,9 @@
             {{ bakerConfig?.name }}
           </h2>
           <p>{{ bakerConfig?.address }}</p>
-          <p>{{ bakerConfigError }}</p>
+          <ion-text color="danger" *ngIf="bakerConfigError">
+            <p>{{ bakerConfigError }}</p>
+          </ion-text>
         </ion-label>
       </ion-item>
       <ng-template #bakerAvatarSkeleton>
