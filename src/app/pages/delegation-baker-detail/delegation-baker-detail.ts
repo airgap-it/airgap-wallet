@@ -123,7 +123,7 @@ export class DelegationBakerDetailPage {
       enabled: true,
       payout: {
         cycles: 0,
-        time: 'unknown'
+        time: undefined
       },
       ...config
     }
