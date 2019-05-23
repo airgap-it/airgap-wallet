@@ -67,7 +67,10 @@ export class DelegationBakerDetailPage {
     this.isDelegated = this.delegationInfo.isDelegated
 
     // If baker is not us, we can't display more info
-    const config = this.delegationInfo.value === airGapBakerConfig.address ? airGapBakerConfig : { address: this.delegationInfo.value }
+    const config =
+      !this.delegationInfo.value || this.delegationInfo.value === airGapBakerConfig.address
+        ? airGapBakerConfig
+        : { address: this.delegationInfo.value }
 
     this.setBaker(config)
   }
