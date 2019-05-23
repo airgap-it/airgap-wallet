@@ -4,6 +4,9 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ 'delegation-baker-detail.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentEditPopover($event)" color="secondary"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -17,6 +20,9 @@
             {{ bakerConfig?.name }}
           </h2>
           <p>{{ bakerConfig?.address }}</p>
+          <ion-text color="danger" *ngIf="bakerConfigError">
+            <p>{{ bakerConfigError | translate }}</p>
+          </ion-text>
         </ion-label>
       </ion-item>
       <ng-template #bakerAvatarSkeleton>
@@ -82,7 +88,8 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
-              {{ bakerConfig?.fee.toNumber() * 100 | number }} %
+              <span *ngIf="bakerConfig?.fee">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</span>
+              <span *ngIf="!bakerConfig?.fee">Unknown</span>
             </h2>
             <ng-template #bakerConfigSkeleton>
               <div>
@@ -98,8 +105,13 @@
           <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
-              {{ 'delegation-baker-detail.cycles' | translate: { cycles: bakerConfig?.payout.cycles } }}
-              <small>{{ bakerConfig?.payout.time }}</small>
+              <span *ngIf="bakerConfig?.payout.time">
+                {{ 'delegation-baker-detail.cycles' | translate: { cycles: bakerConfig?.payout.cycles } }}
+                <small>{{ bakerConfig?.payout.time }}</small>
+              </span>
+              <span *ngIf="!bakerConfig?.payout.time">
+                Unknown
+              </span>
             </h2>
             <h3>{{ 'delegation-baker-detail.payout-schedule' | translate }}</h3>
             <ng-template #bakerConfigSkeleton>
@@ -191,12 +203,12 @@
   </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button *ngIf="isDelegated" shape="round" color="primary" (click)="done()">
+    <ion-button *ngIf="isDelegated && delegationInfo.value === bakerConfig.address" shape="round" color="primary" (click)="done()">
       {{ 'delegation-baker-detail.done' | translate }}
     </ion-button>
 
     <ion-button
-      *ngIf="!isDelegated"
+      *ngIf="!(isDelegated && delegationInfo.value === bakerConfig.address)"
       shape="round"
       color="primary"
       (click)="delegate()"

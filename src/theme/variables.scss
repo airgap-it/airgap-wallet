@@ -122,6 +122,10 @@
     --padding-start: 0.5rem;
     --padding-end: 0.5rem;
   }
+
+  ion-alert {
+    --max-width: calc(100% - 32px);
+  }
 }
 
 .ion-color-white {

@@ -347,6 +347,7 @@
     "title": "Baker Detail",
     "accepts-delegation": "Accepts Delegation",
     "fee": "Fee",
+    "invalid-address": "This address is invalid.",
     "payout-schedule": "Payout Schedule",
     "your-delegation": "Your Delegation",
     "your-balance": "Your Balance",
@@ -382,5 +383,15 @@
     "vote_label": "Vote",
     "change-vote_label": "Change Vote",
     "done_label": "Done"
+  },
+  "delegate-edit-popover": {
+    "delegation-settings_label": "Delegation Settings",
+    "change-baker_label": "Change Baker",
+    "change-baker-to-airgap_label": "Change to tezosAirGap Baker",
+    "heading": "Enter the bakers address",
+    "text": "Enter the address provided to you by the baker.",
+    "baker-address_label": "Baker address",
+    "cancel_label": "Cancel",
+    "set-baker_label": "Set Baker"
   }
 }
