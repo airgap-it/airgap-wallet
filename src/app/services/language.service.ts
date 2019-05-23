@@ -24,38 +24,4 @@ export class LanguageService {
       buttons
     }
   }
-
-  /*
-  async getTranslatedAlertConfig(options: AlertOptions): Promise<AlertOptions> {
-    const translationKeys = [
-      options.header,
-      options.subHeader,
-      options.message,
-      ...options.buttons.map(button => {
-        if (typeof button === 'string') {
-          return button
-        } else {
-          return button.text
-        }
-      })
-    ]
-
-    const values = await this.translateService.get(translationKeys).toPromise()
-
-    return {
-      ...options,
-      header: values[options.header],
-      subHeader: values[options.subHeader],
-      message: values[options.message],
-      buttons: options.buttons.map(button => {
-        if (typeof button === 'string') {
-          button = values[button]
-        } else {
-          button.text = values[button.text]
-        }
-        return button
-      })
-    }
-  }
-  */
 }
