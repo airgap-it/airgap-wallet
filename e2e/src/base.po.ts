@@ -1,6 +1,7 @@
-import { browser, by, element, ExpectedConditions } from 'protractor'
-import { slugify } from './utils'
 import * as fs from 'fs'
+import { browser, by, element, ExpectedConditions } from 'protractor'
+
+import { slugify } from './utils'
 
 export class PageObjectBase {
   private time: Date
