@@ -315,6 +315,13 @@ export class AccountTransactionListPage {
 
     const addr: string = this.wallet.receivingPublicAddress
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+
+    // remove duplicates from pendingTransactions
+    const txHashes = this.transactions.map(value => value.hash)
+    this.pendingTransactions = this.pendingTransactions.filter(value => {
+      return txHashes.indexOf(value.hash) === -1
+    })
+
     if (this.pendingTransactions.length > 0) {
       this.pendingTransactions = this.pendingTransactions.map(pendingTx => {
         pendingTx.fee = new BigNumber(pendingTx.fee)
