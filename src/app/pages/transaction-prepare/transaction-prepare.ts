@@ -44,16 +44,18 @@ export class TransactionPreparePage {
       address = info.address || ''
       wallet = info.wallet
     }
+    this.setWallet(wallet)
 
     this.transactionForm = formBuilder.group({
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-      amount: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])],
+      amount: [0, Validators.compose([Validators.required, RegexValidator.validate(wallet.coinProtocol.decimals)])],
       feeLevel: [0, [Validators.required]],
-      fee: [0, Validators.compose([Validators.required, RegexValidator.validate(/^[0-9]+((\.|,){1}[0-9]*)?$/g)])],
+      fee: [0, Validators.compose([Validators.required, RegexValidator.validate(wallet.coinProtocol.feeDecimals)])],
       isAdvancedMode: [false, []]
     })
 
-    this.useWallet(wallet)
+    this.useWallet()
+
     this.onChanges()
   }
 
@@ -68,10 +70,11 @@ export class TransactionPreparePage {
       }
     })
   }
-
-  public useWallet(wallet: AirGapMarketWallet) {
+  public setWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
+  }
 
+  public useWallet() {
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
       this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
