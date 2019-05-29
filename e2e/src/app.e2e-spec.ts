@@ -19,6 +19,7 @@ describe('new App', () => {
     const text = await page.getParagraphText()
 
     await page.takeScreenshot('introduction')
+
     /*
     await expect(text).toContain(
       'Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.'
@@ -92,12 +93,11 @@ describe('new App', () => {
     await page.takeScreenshot('portfolio-import-ae')
   })*/
 
-  it('should open import page and import an account to portfolio', async () => {
-    /*
+  fit('should open import page and import an account to portfolio', async () => {
     const button0 = element(by.css('#dismiss-button'))
     await button0.click()
     await page.waitForAngular()
-*/
+
     for (const account of accounts) {
       const button = element(by.css('#tab-button-settings'))
       await button.click()
@@ -114,6 +114,33 @@ describe('new App', () => {
       await button4.click()
       await page.waitForAngular()
       await page.takeScreenshot(`portfolio-${account.symbol}`)
+
+      browser
+        .manage()
+        .logs()
+        .get('performance')
+        .then(browserLogs => {
+          // console.log('logs', browserLogs)
+          browserLogs.forEach(browserLog => {
+            const message = JSON.parse(browserLog.message).message
+            if (message.method === 'Network.responseReceived') {
+              if (message.params && message.params.response && message.params.response.url) {
+                const url: string = message.params.response.url
+                if (
+                  url === 'data:text/html,<html></html>' ||
+                  url.startsWith('http://localhost:4200/') ||
+                  url.startsWith('data:application/octet-stream;base64,') /* && url.endsWith('.js')*/
+                ) {
+                  return
+                }
+                console.log(message)
+                console.log(message.params.response.securityDetails)
+                console.log(message.params.response.timing)
+              }
+            }
+          })
+        })
+        .catch(console.error)
 
       const walletGroups = element.all(by.css('.walletGroups'))
       // console.log(walletGroups.getText())

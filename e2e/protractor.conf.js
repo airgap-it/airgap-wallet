@@ -71,7 +71,15 @@ const headful = {
       'profile.content_settings.exceptions.clipboard': {
         'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
       }
+    },
+    perfLoggingPrefs: {
+      enableNetwork: true,
+      enablePage: true
     }
+  },
+  loggingPrefs: {
+    performance: 'ALL',
+    browser: 'ALL'
   }
 }
 
