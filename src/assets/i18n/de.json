@@ -5,6 +5,8 @@
   "account-transaction-list.no-transactions_text": "Es wurden noch keine Transaktionen mit diesem Konto durchgeführt.",
   "account-transaction-list.receive_label": "Empfangen",
   "account-transaction-list.send_label": "Versenden",
+  "account-transaction-list.add-tokens_label": "Tokens hinzufügen",
+  "back-button": "Zurück",
   "introduction.title": "Der Neue Krypto-Wallet Standard",
   "introduction.highest.label": "Höchste Sicherheit",
   "introduction.highest.text": "Mit dem AirGap <b>zwei-Geräte Ansatz</b> wird der sicher Umgang mit Geheimschlüssel zugänglicher.</p>",

@@ -89,7 +89,7 @@
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
               <span *ngIf="bakerConfig?.fee">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</span>
-              <span *ngIf="!bakerConfig?.fee">Unknown</span>
+              <span *ngIf="!bakerConfig?.fee">{{ 'delegation-baker-detail.unknown' | translate }}</span>
             </h2>
             <ng-template #bakerConfigSkeleton>
               <div>
@@ -110,7 +110,7 @@
                 <small>{{ bakerConfig?.payout.time }}</small>
               </span>
               <span *ngIf="!bakerConfig?.payout.time">
-                Unknown
+                {{ 'delegation-baker-detail.unknown' | translate }}
               </span>
             </h2>
             <h3>{{ 'delegation-baker-detail.payout-schedule' | translate }}</h3>

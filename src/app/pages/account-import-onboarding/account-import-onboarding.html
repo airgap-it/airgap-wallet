@@ -51,18 +51,18 @@
     <ion-buttons *ngIf="!isBegin" slot="end">
       <ion-button flat color="primary" (click)="slides.slidePrev()">
         <ion-icon name="arrow-back"></ion-icon>
-        Back
+        {{ 'account-import-onboarding.back' | translate }}
       </ion-button>
     </ion-buttons>
     <ion-buttons *ngIf="!isEnd" slot="end">
       <ion-button flat color="primary" (click)="slides.slideNext()">
-        Next
+        {{ 'account-import-onboarding.next' | translate }}
         <ion-icon name="arrow-forward"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-buttons *ngIf="isEnd" slot="end">
       <ion-button flat color="primary" (click)="openVault()">
-        Open Vault
+        {{ 'account-import-onboarding.open_vault' | translate }}
         <ion-icon name="arrow-forward"></ion-icon>
       </ion-button>
     </ion-buttons>
