@@ -1,118 +1,112 @@
+// tslint:disable:no-implicit-dependencies
 import * as clipboardy from 'clipboardy'
-import { by, element } from 'protractor'
+import { browser, by, element } from 'protractor'
 
-import { AppPage } from './app.po'
 import { accounts } from './constants'
+import { AccountImportPage } from './pages/account-import.po'
+import { AccountTransactionListPage } from './pages/account-transaction-list.po'
+import { AppPage } from './pages/app.po'
+import { PortfolioPage } from './pages/portfolio.po'
+import { SettingsPage } from './pages/settings.po'
+import { TransactionPreparePage } from './pages/transaction-prepare.po'
+import { TransactionQrPage } from './pages/transaction-qr.po'
 
-const time = new Date()
+const time: Date = new Date()
 
-describe('new App', () => {
+describe('AirGap Wallet', () => {
   let page: AppPage
+  let portfolioPage: PortfolioPage
+  let settingsPage: SettingsPage
+  let accountImportPage: AccountImportPage
+  let accountTransactionListPage: AccountTransactionListPage
+  let transactionQrPage: TransactionQrPage
+  let transactionPreparePage: TransactionPreparePage
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000
     page = new AppPage('app-root', '/', time)
+
+    await page.load()
+  })
+
+  beforeEach(async () => {
+    page = new AppPage('app-root', '/', time)
+    portfolioPage = new PortfolioPage('app-root', '/tabs/portfolio', time)
+    settingsPage = new SettingsPage('app-root', '/tabs/settings', time)
+    accountImportPage = new AccountImportPage('app-root', null, time)
+    accountTransactionListPage = new AccountTransactionListPage('app-root', null, time)
+    transactionQrPage = new TransactionQrPage('app-root', null, time)
+    transactionPreparePage = new TransactionPreparePage('app-root', null, time)
+    browser
+      .executeScript(() => {
+        localStorage.clear()
+      })
+      .catch(console.error)
     await page.load()
   })
 
   it('should load introduction modal', async () => {
-    const text = await page.getParagraphText()
-
     await page.takeScreenshot('introduction')
 
-    /*
+    const text: string = await page.getParagraphText()
+
     await expect(text).toContain(
       'Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.'
     )
-*/
   })
 
   it('should dismiss introduction modal and show empty portfolio', async () => {
-    const button = element(by.css('#dismiss-button'))
-    await button.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
 
     await page.takeScreenshot('portfolio')
   })
 
   it('should load add initial coin modal', async () => {
-    const button = element(by.css('#add-initial-coin-button'))
-    await button.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
+
+    await portfolioPage.clickAddInitialCoin()
 
     await page.takeScreenshot('add-coin')
   })
 
   it('should open scan page', async () => {
-    const button = element(by.css('#tab-button-scan'))
-    await button.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
+
+    await page.clickScanTab()
+
+    await page.sleep(500)
 
     await page.takeScreenshot('scan')
   })
 
   it('should open exchange page', async () => {
-    const button = element(by.css('#tab-button-exchange'))
-    await button.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
+
+    await page.clickExchangeTab()
 
     await page.takeScreenshot('exchange')
   })
 
   it('should open settings page', async () => {
-    const button = element(by.css('#tab-button-settings'))
-    await button.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
+
+    await page.clickSettingsTab()
 
     await page.takeScreenshot('settings')
   })
-  /*
-  it('should open import page and import an account to portfolio', async () => {
-    const button = element(by.css('#tab-button-settings'))
-    await button.click()
-    await page.waitForAngular()
-
-    // clipboardy.writeSync(AccountSyncAe)
-
-    const button2 = element(by.css('#paste-clipboard'))
-    await button2.click()
-    await page.waitForAngular()
-    await page.takeScreenshot('import-ae')
-
-    const button3 = element(by.css('#dismiss'))
-    await button3.click()
-    await page.waitForAngular()
-
-    await button2.click()
-    await page.waitForAngular()
-    await page.takeScreenshot('import-ae')
-
-    const button4 = element(by.css('#import'))
-    await button4.click()
-    await page.waitForAngular()
-    await page.takeScreenshot('portfolio-import-ae')
-  })*/
 
   fit('should open import page and import an account to portfolio', async () => {
-    const button0 = element(by.css('#dismiss-button'))
-    await button0.click()
-    await page.waitForAngular()
+    await page.clickDismissButton()
 
     for (const account of accounts) {
-      const button = element(by.css('#tab-button-settings'))
-      await button.click()
-      await page.waitForAngular()
+      await page.clickSettingsTab()
 
       clipboardy.writeSync(account.sync)
 
-      const button2 = element(by.css('#paste-clipboard'))
-      await button2.click()
-      await page.waitForAngular()
+      await settingsPage.clickPasteFromClipboard()
       await page.takeScreenshot(`import-${account.symbol}`)
 
-      const button4 = element(by.css('#import'))
-      await button4.click()
-      await page.waitForAngular()
+      await accountImportPage.clickImport()
       await page.takeScreenshot(`portfolio-${account.symbol}`)
 
       browser

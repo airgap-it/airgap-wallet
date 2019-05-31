@@ -63,11 +63,13 @@ const headful = {
 
   chromeOptions: {
     // args: ['--lang=de-DE'],
+    args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
     mobileEmulation: {
       deviceName: 'iPhone X'
     },
     prefs: {
       // 'intl.accept_languages': 'zh-CN',
+      'profile.managed_default_content_settings.media_stream': 1,
       'profile.content_settings.exceptions.clipboard': {
         'http://localhost:4200,*': { last_modified: Date.now(), setting: 1 }
       }

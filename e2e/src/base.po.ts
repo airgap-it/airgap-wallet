@@ -1,11 +1,12 @@
+// tslint:disable:no-implicit-dependencies
 import * as fs from 'fs'
-import { browser, by, element, ExpectedConditions } from 'protractor'
+import { browser, by, element, ElementFinder, ExpectedConditions, promise } from 'protractor'
 
 import { slugify } from './utils'
 
 export class PageObjectBase {
-  private time: Date
-  private path: string
+  private readonly time: Date
+  private readonly path: string
   protected tag: string
 
   constructor(tag: string, path: string, time: Date = new Date()) {
@@ -14,80 +15,90 @@ export class PageObjectBase {
     this.time = time
   }
 
-  load() {
+  public load(): promise.Promise<void> {
     return browser.get(this.path)
   }
 
-  rootElement() {
+  public rootElement(): ElementFinder {
     return element(by.css(this.tag))
   }
 
-  waitUntilInvisible() {
-    browser.wait(ExpectedConditions.invisibilityOf(this.rootElement()), 3000)
+  public waitUntilInvisible(): promise.Promise<void> {
+    return browser.wait(ExpectedConditions.invisibilityOf(this.rootElement()), 3000)
   }
 
-  waitUntilPresent() {
-    browser.wait(ExpectedConditions.presenceOf(this.rootElement()), 3000)
+  public waitUntilPresent(): promise.Promise<void> {
+    return browser.wait(ExpectedConditions.presenceOf(this.rootElement()), 3000)
   }
 
-  waitUntilNotPresent() {
-    browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(this.rootElement())), 3000)
+  public waitUntilNotPresent(): promise.Promise<void> {
+    return browser.wait(ExpectedConditions.not(ExpectedConditions.presenceOf(this.rootElement())), 3000)
   }
 
-  waitUntilVisible() {
-    browser.wait(ExpectedConditions.visibilityOf(this.rootElement()), 3000)
+  public waitUntilVisible(): promise.Promise<void> {
+    return browser.wait(ExpectedConditions.visibilityOf(this.rootElement()), 3000)
   }
 
-  waitForAngular() {
+  public waitForAngular(): promise.Promise<void> {
     return browser.waitForAngular()
   }
 
-  sleep(time: number) {
+  public sleep(time: number): promise.Promise<void> {
     return browser.sleep(time)
   }
 
-  getTitle() {
+  public getTitle(): promise.Promise<string> {
     return element(by.css(`${this.tag} ion-title`)).getText()
   }
 
-  protected enterInputText(sel: string, text: string) {
-    const el = element(by.css(`${this.tag} ${sel}`))
-    const inp = el.element(by.css('input'))
-    inp.sendKeys(text)
+  public getParagraphText(): promise.Promise<string> {
+    return element(by.deepCss('app-root ion-content')).getText()
   }
 
-  protected enterTextareaText(sel: string, text: string) {
-    const el = element(by.css(`${this.tag} ${sel}`))
-    const inp = el.element(by.css('textarea'))
-    inp.sendKeys(text)
+  protected enterInputText(sel: string, text: string): promise.Promise<void> {
+    const inputElement: ElementFinder = element(by.css(`${this.tag} ${sel}`))
+    const input: ElementFinder = inputElement.element(by.css('input'))
+
+    return input.sendKeys(text)
   }
 
-  protected clickButton(sel: string) {
-    const el = element(by.css(`${this.tag} ${sel}`))
-    browser.wait(ExpectedConditions.elementToBeClickable(el))
-    el.click()
+  protected enterTextareaText(sel: string, text: string): promise.Promise<void> {
+    const textareaElement: ElementFinder = element(by.css(`${this.tag} ${sel}`))
+    const input: ElementFinder = textareaElement.element(by.css('textarea'))
+
+    return input.sendKeys(text)
   }
 
-  async takeScreenshot(name: string) {
-    await browser.imageComparison.checkScreen(name)
+  protected async clickButton(sel: string): Promise<void> {
+    const button: ElementFinder = element(by.css(`${this.tag} ${sel}`))
+    await browser.wait(ExpectedConditions.elementToBeClickable(button))
 
+    await button.click()
+
+    return this.waitForAngular()
+  }
+
+  public async takeScreenshot(name: string): Promise<void> {
+    return browser.imageComparison.checkScreen(name)
+    /*
     return browser
       .takeScreenshot()
       .then(async png => {
-        const config = await browser.getProcessedConfig()
+        const config: any = await browser.getProcessedConfig()
 
-        const platform = config.capabilities.chromeOptions.mobileEmulation
+        const platform: string = config.capabilities.chromeOptions.mobileEmulation
           ? slugify(config.capabilities.chromeOptions.mobileEmulation.deviceName)
           : 'desktop'
 
         console.log(platform, 'screenshot', name)
 
         const stream = fs.createWriteStream(
-          `./screenshots/${platform}/${this.tag}-${this.time.getTime()}-${name}.png` /* node >10 { recursive: true }*/
+          `./screenshots/${platform}/${this.tag}-${this.time.getTime()}-${name}.png`
         )
         stream.write(Buffer.from(png, 'base64'))
         stream.end()
       })
       .catch(error => console.error('Cannot take screenshot', error))
+    */
   }
 }
