@@ -1,10 +1,11 @@
 import { TezosKtProtocol } from 'airgap-coin-lib'
 
 import { Action } from '../Action'
+import { WalletActionInfo } from '../ActionGroup'
 
 export class ViewDelegationAction extends Action<any, any, any> {
   public readonly identifier: string = 'tezos-delegate-action'
-  public readonly info = {
+  public readonly info: WalletActionInfo = {
     name: 'account-transaction-list.delegation-status_label',
     icon: 'md-information-circle'
   }

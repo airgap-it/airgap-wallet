@@ -10,7 +10,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
-interface IAccountWrapper {
+export interface IAccountWrapper {
   selected: boolean
   wallet: AirGapMarketWallet
 }
@@ -23,7 +23,7 @@ interface IAccountWrapper {
 export class SubAccountAddPage {
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
-  public actionCallback: any
+  public actionCallback: (context) => void
 
   public subProtocolType: SubProtocolType
   public subProtocolTypes = SubProtocolType
@@ -106,14 +106,7 @@ export class SubAccountAddPage {
   }
 
   public addSubAccounts() {
-    //this.actionCallback()
-    this.subAccounts
-      .filter(account => account.selected)
-      .map(account => account.wallet)
-      .forEach(wallet => {
-        this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-      })
-    this.location.back()
+    this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider })
   }
 
   public async prepareOriginate() {

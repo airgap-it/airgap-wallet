@@ -6,13 +6,18 @@ import { DataServiceKey } from '../services/data/data.service'
 import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
-import { Action } from './Action'
+import { Action, ActionInfo } from './Action'
 import { AddTokenAction } from './actions/add-token-action'
 import { DelegateAction } from './actions/delegate-action'
 import { ImportAccountAction } from './actions/import-account-action'
 import { ViewDelegationAction } from './actions/view-delegation-action'
 
 // tslint:disable:max-classes-per-file
+
+export interface WalletActionInfo extends ActionInfo {
+  name: string
+  icon: string
+}
 
 export class ActionGroup {
   constructor(private readonly callerContext: AccountTransactionListPage) {}
@@ -110,6 +115,10 @@ export class ActionGroup {
           .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
           .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
+    }
+
+    addTokenAction.completeFunction = async (): Promise<void> => {
+      this.callerContext.location.back()
     }
 
     return [addTokenAction]

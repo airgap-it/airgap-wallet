@@ -23,29 +23,33 @@ export interface ActionProgress<U> {
   info: U
 }
 
+export interface ActionInfo {
+  [key: string]: string | undefined
+}
+
 /**
  * We have all the methods as readonly properties to prevent users from accidentally overwriting them.
  */
-export abstract class Action<T, U, V> {
+export abstract class Action<CONTEXT, PROGRESS, RESULT> {
   public readonly identifier: string = 'action'
-  public info: { [key: string]: string | undefined } = {}
+  public info: ActionInfo = {}
 
-  public prepareFunction: () => Promise<T> = () => undefined
-  public handlerFunction: (context: T) => Promise<V> = () => undefined
-  public progressFunction: (progress: ActionProgress<U>) => Promise<void> = () => undefined
-  public completeFunction: (result?: V) => Promise<void> = () => undefined
+  public prepareFunction: () => Promise<CONTEXT> = () => undefined
+  public handlerFunction: (context: CONTEXT) => Promise<RESULT> = () => undefined
+  public progressFunction: (progress: ActionProgress<PROGRESS>) => Promise<void> = () => undefined
+  public completeFunction: (result?: RESULT) => Promise<void> = () => undefined
   public errorFunction: (error: Error) => Promise<void> = () => undefined
   public cancelFunction: () => Promise<void> = () => undefined
 
-  private progress: ActionProgress<U> | undefined
+  private progress: ActionProgress<PROGRESS> | undefined
   private state: ActionState = ActionState.READY
 
-  public readonly perform: () => Promise<V> = async () => {
+  public readonly perform: () => Promise<RESULT> = async () => {
     console.log(`${this.identifier}-PERFORM`)
 
-    const context: T = await this.onPrepare()
-    const result: V = await this.handler(context)
-    await this.onComplete(result)
+    const context: CONTEXT = await this.onPrepare()
+    const result: RESULT = await this.handler(context)
+    await this.onComplete(context, result)
 
     return result
   }
@@ -54,7 +58,7 @@ export abstract class Action<T, U, V> {
     return this.state
   }
 
-  public readonly getProgress: () => Promise<ActionProgress<U> | undefined> = async () => {
+  public readonly getProgress: () => Promise<ActionProgress<PROGRESS> | undefined> = async () => {
     return this.progress
   }
 
@@ -62,31 +66,31 @@ export abstract class Action<T, U, V> {
     await this.onCancel()
   }
 
-  protected readonly onPrepare: () => Promise<T> = async () => {
+  protected readonly onPrepare: () => Promise<CONTEXT> = async () => {
     console.log(`${this.identifier}-ONPREPARE`)
 
     this.state = ActionState.PREPARING
 
-    const context: T = await this.prepareFunction()
+    const context: CONTEXT = await this.prepareFunction()
 
     this.state = ActionState.PREPARED
 
     return context
   }
 
-  protected readonly handler: (context: T) => Promise<V> = async (context: T) => {
+  protected readonly handler: (context: CONTEXT) => Promise<RESULT> = async (context: CONTEXT) => {
     console.log(`${this.identifier}-HANDLER`)
 
     this.state = ActionState.EXECUTING
 
-    const result: V = await this.handlerFunction(context)
+    const result: RESULT = await this.handlerFunction(context)
 
     this.state = ActionState.EXECUTED
 
     return result
   }
 
-  protected readonly onProgress: (progress: ActionProgress<U>) => Promise<void> = async (progress: ActionProgress<U>) => {
+  protected readonly onProgress: (progress: ActionProgress<PROGRESS>) => Promise<void> = async (progress: ActionProgress<PROGRESS>) => {
     console.log(`${this.identifier}-ONPROGRESS`)
 
     this.progress = progress
@@ -94,7 +98,7 @@ export abstract class Action<T, U, V> {
     return this.progressFunction(progress)
   }
 
-  protected readonly onComplete: (result?: V) => Promise<void> = async (result?: V) => {
+  protected readonly onComplete: (context: CONTEXT, result?: RESULT) => Promise<void> = async (context: CONTEXT, result?: RESULT) => {
     console.log(`${this.identifier}-ONCOMPLETE`)
 
     this.state = ActionState.COMPLETING
