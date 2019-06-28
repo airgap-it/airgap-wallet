@@ -50,7 +50,7 @@ export class ProtocolsProvider {
   }
 
   public getEnabledSubProtocols() {
-    return ['eth-erc20-ae']
+    return ['eth-erc20-ae', 'eth-erc20-xchf']
   }
 
   public addProtocols() {
