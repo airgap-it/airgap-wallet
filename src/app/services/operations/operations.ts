@@ -22,12 +22,6 @@ import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-export enum ActionType {
-  IMPORT_ACCOUNT,
-  ADD_TOKEN,
-  DELEGATE
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -220,17 +214,5 @@ export class OperationsProvider {
 
   private hideLoader(loader: HTMLIonLoadingElement) {
     loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-  }
-
-  public getActionsForCoin(identifier: string): ActionType[] {
-    if (identifier === ProtocolSymbols.ETH) {
-      return [ActionType.ADD_TOKEN]
-    } else if (identifier === ProtocolSymbols.XTZ) {
-      return [ActionType.IMPORT_ACCOUNT, ActionType.DELEGATE]
-    } else if (identifier === ProtocolSymbols.XTZ_KT) {
-      return [ActionType.DELEGATE]
-    } else {
-      return []
-    }
   }
 }

@@ -4,25 +4,17 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
+import { Action } from '../../models/Action'
+import { ActionGroup } from '../../models/ActionGroup'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ActionType, OperationsProvider } from '../../services/operations/operations'
+import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { ActionGroup, Action } from 'src/app/models/ActionGroup'
-// import 'core-js/es7/object'
-
-interface CoinAction {
-  type: ActionType
-  name: string
-  icon: string
-  action(): void
-}
 
 declare let cordova
 
@@ -53,7 +45,7 @@ export class AccountTransactionListPage {
   // XTZ
   public isKtDelegated: boolean = false
 
-  public actions: CoinAction[] = []
+  public actions: Action<any, any, any>[]
 
   public lottieConfig = {
     path: '/assets/animations/loading.json'
@@ -61,7 +53,6 @@ export class AccountTransactionListPage {
 
   private readonly TRANSACTION_LIMIT: number = 10
   private readonly actionGroup: ActionGroup
-  public newActions: Action<any, any, any>[]
 
   constructor(
     public readonly location: Location,
@@ -99,7 +90,7 @@ export class AccountTransactionListPage {
     }
 
     this.actionGroup = new ActionGroup(this)
-    this.newActions = this.actionGroup.getActions()
+    this.actions = this.actionGroup.getActions()
 
     this.init()
   }
@@ -317,12 +308,14 @@ export class AccountTransactionListPage {
     return ktAddresses
   }
 
+  /*
   private replaceAction(type: ActionType, action: CoinAction) {
     const index = this.actions.findIndex(action => action.type === type)
     if (index >= 0) {
       this.actions.splice(index, 1, action)
     }
   }
+	*/
 
   public showToast(message: string) {
     const toast = this.toastController
