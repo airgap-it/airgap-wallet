@@ -23,6 +23,7 @@ interface IAccountWrapper {
 export class SubAccountAddPage {
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
+  public actionCallback: any
 
   public subProtocolType: SubProtocolType
   public subProtocolTypes = SubProtocolType
@@ -40,6 +41,7 @@ export class SubAccountAddPage {
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
+      this.actionCallback = info.actionCallback
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
     }
@@ -104,6 +106,7 @@ export class SubAccountAddPage {
   }
 
   public addSubAccounts() {
+    //this.actionCallback()
     this.subAccounts
       .filter(account => account.selected)
       .map(account => account.wallet)

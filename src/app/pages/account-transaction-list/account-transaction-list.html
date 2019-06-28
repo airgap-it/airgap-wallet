@@ -10,9 +10,9 @@
   </ion-toolbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
   <ion-row padding-top padding-horizontal>
-    <ion-button *ngFor="let action of actions" color="secondary" (click)="action.action()" shape="round" size="small" fill="outline">
-      <ion-icon slot="start" [name]="action.icon"></ion-icon>
-      {{ action.name | translate }}
+    <ion-button *ngFor="let action of newActions" color="secondary" (click)="action.perform()" shape="round" size="small" fill="outline">
+      <ion-icon slot="start" [name]="action.info.icon"></ion-icon>
+      {{ action.info.name | translate }}
     </ion-button>
   </ion-row>
 </ion-header>

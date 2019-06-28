@@ -14,6 +14,7 @@ import { ActionType, OperationsProvider } from '../../services/operations/operat
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { ActionGroup, Action } from 'src/app/models/ActionGroup'
 // import 'core-js/es7/object'
 
 interface CoinAction {
@@ -31,9 +32,9 @@ declare let cordova
   styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
-  public isRefreshing = false
-  public initialTransactionsLoaded = false
-  public infiniteEnabled = false
+  public isRefreshing: boolean = false
+  public initialTransactionsLoaded: boolean = false
+  public infiniteEnabled: boolean = false
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
   public transactions: IAirGapTransaction[] = []
@@ -58,20 +59,22 @@ export class AccountTransactionListPage {
     path: '/assets/animations/loading.json'
   }
 
-  private readonly TRANSACTION_LIMIT = 10
+  private readonly TRANSACTION_LIMIT: number = 10
+  private readonly actionGroup: ActionGroup
+  public newActions: Action<any, any, any>[]
 
   constructor(
-    private readonly location: Location,
-    private readonly router: Router,
+    public readonly location: Location,
+    public readonly router: Router,
     private readonly route: ActivatedRoute,
     public popoverCtrl: PopoverController,
     public accountProvider: AccountProvider,
     public http: HttpClient,
     private readonly platform: Platform,
-    private readonly operationsProvider: OperationsProvider,
+    public readonly operationsProvider: OperationsProvider,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
-    private readonly dataService: DataService
+    public readonly dataService: DataService
   ) {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special
@@ -95,25 +98,13 @@ export class AccountTransactionListPage {
       this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
 
+    this.actionGroup = new ActionGroup(this)
+    this.newActions = this.actionGroup.getActions()
+
     this.init()
   }
 
   public async init() {
-    const supportedActions = this.operationsProvider.getActionsForCoin(this.wallet.protocolIdentifier)
-
-    supportedActions.forEach(action => {
-      if (action === ActionType.IMPORT_ACCOUNT) {
-        this.actions.push(this.getImportAccountAction())
-      } else if (action === ActionType.ADD_TOKEN) {
-        this.actions.push(this.getAddTokenAction())
-      } else if (action === ActionType.DELEGATE) {
-        this.actions.push(this.getDelegateAction())
-      } else {
-        const assertNever = (x: never) => undefined
-        assertNever(action)
-      }
-    })
-
     const lastTx: {
       protocol: string
       accountIdentifier: string
@@ -127,66 +118,6 @@ export class AccountTransactionListPage {
       lastTx.date > new Date().getTime() - 5 * 60 * 1000
     ) {
       this.hasPendingTransactions = true
-    }
-  }
-
-  public getImportAccountAction(): CoinAction {
-    return {
-      type: ActionType.IMPORT_ACCOUNT,
-      name: 'account-transaction-list.import-accounts_label',
-      icon: 'add',
-      action: async () => {
-        const protocol = new TezosKtProtocol()
-        const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
-
-        if (ktAddresses.length === 0) {
-          this.showToast('No accounts to import.')
-        } else {
-          for (const [index, ktAddress] of ktAddresses.entries()) {
-            await this.operationsProvider.addKtAddress(this.wallet, index, ktAddresses)
-          }
-
-          await this.location.back()
-          this.showToast('Accounts imported')
-        }
-      }
-    }
-  }
-
-  private getAddTokenAction(): CoinAction {
-    return {
-      type: ActionType.ADD_TOKEN,
-      name: 'account-transaction-list.add-tokens_label',
-      icon: 'add',
-      action: () => {
-        this.openAccountAddPage(SubProtocolType.TOKEN, this.wallet)
-      }
-    }
-  }
-
-  private getDelegateAction(): CoinAction {
-    return {
-      type: ActionType.DELEGATE,
-      name: 'account-transaction-list.delegate_label',
-      icon: 'logo-usd',
-      action: async () => {
-        this.openDelegateSelection()
-      }
-    }
-  }
-
-  private getStatusAction(ktAddresses?: string[]): CoinAction {
-    return {
-      type: ActionType.DELEGATE,
-      name: 'account-transaction-list.delegation-status_label',
-      icon: 'md-information-circle',
-      action: async () => {
-        let wallet = this.wallet
-        if (ktAddresses) {
-          wallet = await this.operationsProvider.addKtAddress(this.wallet, 0, ktAddresses)
-        }
-        this.openDelegateSelection(wallet)
-      }
     }
   }
 
@@ -373,15 +304,15 @@ export class AccountTransactionListPage {
   public async isDelegated(): Promise<void> {
     const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
-    const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
-    this.replaceAction(ActionType.DELEGATE, action)
+    // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
+    // this.replaceAction(ActionType.DELEGATE, action)
   }
 
   public async getKtAddresses() {
     const protocol = new TezosKtProtocol()
     const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
-    const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
-    this.replaceAction(ActionType.DELEGATE, action)
+    // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
+    // this.replaceAction(ActionType.DELEGATE, action)
 
     return ktAddresses
   }
@@ -393,7 +324,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  private showToast(message: string) {
+  public showToast(message: string) {
     const toast = this.toastController
       .create({
         duration: 3000,
@@ -404,22 +335,5 @@ export class AccountTransactionListPage {
       .then(toast => {
         toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
-  }
-
-  public openDelegateSelection(wallet?: AirGapMarketWallet) {
-    const info = {
-      wallet: wallet || this.wallet
-    }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  public openAccountAddPage(subProtocolType: SubProtocolType, wallet: AirGapMarketWallet) {
-    const info = {
-      subProtocolType,
-      wallet
-    }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }
