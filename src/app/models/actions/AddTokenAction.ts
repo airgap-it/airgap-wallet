@@ -1,10 +1,10 @@
 import { Location } from '@angular/common'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { Action, ActionProgress } from 'airgap-coin-lib/dist/actions/Action'
 
 import { IAccountWrapper } from '../../pages/sub-account-add/sub-account-add'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { Action, ActionProgress } from '../Action'
 import { WalletActionInfo } from '../ActionGroup'
 
 export interface AddTokenActionContext {

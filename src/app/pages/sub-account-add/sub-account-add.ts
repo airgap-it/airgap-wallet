@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
-import { AddTokenActionContext } from '../../models/actions/add-token-action'
+import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

@@ -1,4 +1,7 @@
 import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { Action, ActionInfo } from 'airgap-coin-lib/dist/actions/Action'
+import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
@@ -6,13 +9,9 @@ import { DataServiceKey } from '../services/data/data.service'
 import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
-import { Action, ActionInfo } from './Action'
-import { AddTokenAction, AddTokenActionContext } from './actions/add-token-action'
-import { DelegateAction, DelegateActionContext, DelegateActionResult } from './actions/delegate-action'
+import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { AirGapDelegateAction, DelegateActionEnvironment } from './actions/DelegateAction'
-import { ImportAccountAction, ImportAccoutActionContext } from './actions/import-account-action'
-
-// tslint:disable:max-classes-per-file
+import { AirGapGetKtAccountsAction } from './actions/GetKtAccountsAction'
 
 export interface WalletActionInfo extends ActionInfo {
   name: string
@@ -40,7 +39,7 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any, any>[] {
-    const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
+    const importAccountAction: AirGapGetKtAccountsAction = new AirGapGetKtAccountsAction({ publicKey: this.callerContext.wallet.publicKey })
 
     importAccountAction.completeFunction = async (context: ImportAccoutActionContext, ktAddresses: string[]): Promise<void> => {
       console.log('IMPORT ACCOUNT ACTION', ktAddresses)

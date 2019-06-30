@@ -1,11 +1,10 @@
 import { Router } from '@angular/router'
 import { LoadingController, ToastController } from '@ionic/angular'
+import { DelegateAction, DelegateActionContext, DelegateActionResult } from 'airgap-coin-lib/dist/actions/DelegateAction'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletActionInfo } from '../ActionGroup'
-
-import { DelegateAction, DelegateActionContext, DelegateActionResult } from './delegate-action'
 
 export interface DelegateActionEnvironment {
   toastController: ToastController
