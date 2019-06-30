@@ -33,23 +33,31 @@ export interface ActionInfo {
 export abstract class Action<CONTEXT, PROGRESS, RESULT> {
   public readonly identifier: string = 'action'
   public info: ActionInfo = {}
+  public context: CONTEXT
 
   public prepareFunction: () => Promise<CONTEXT> = () => undefined
+  public beforeHandler: () => Promise<void> = () => undefined
   public handlerFunction: (context: CONTEXT) => Promise<RESULT> = () => undefined
-  public progressFunction: (progress: ActionProgress<PROGRESS>) => Promise<void> = () => undefined
-  public completeFunction: (result?: RESULT) => Promise<void> = () => undefined
-  public errorFunction: (error: Error) => Promise<void> = () => undefined
-  public cancelFunction: () => Promise<void> = () => undefined
+  public afterHandler: () => Promise<void> = () => undefined
+  public progressFunction: (context: CONTEXT, progress: ActionProgress<PROGRESS>) => Promise<void> = () => undefined
+  public completeFunction: (context: CONTEXT, result?: RESULT) => Promise<void> = () => undefined
+  public errorFunction: (context: CONTEXT, error: Error) => Promise<void> = () => undefined
+  public cancelFunction: (context: CONTEXT) => Promise<void> = () => undefined
 
+  protected data: { [key: string]: unknown } = {}
   private progress: ActionProgress<PROGRESS> | undefined
   private state: ActionState = ActionState.READY
 
   public readonly perform: () => Promise<RESULT> = async () => {
     console.log(`${this.identifier}-PERFORM`)
 
-    const context: CONTEXT = await this.onPrepare()
-    const result: RESULT = await this.handler(context)
-    await this.onComplete(context, result)
+    await this.onPrepare() // TODO: Should we not call this if the context is already provided?
+
+    await this.beforeHandler()
+    const result: RESULT = await this.handler()
+    await this.afterHandler()
+
+    await this.onComplete(result)
 
     return result
   }
@@ -66,24 +74,26 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
     await this.onCancel()
   }
 
-  protected readonly onPrepare: () => Promise<CONTEXT> = async () => {
+  protected readonly onPrepare: () => Promise<void> = async () => {
     console.log(`${this.identifier}-ONPREPARE`)
 
     this.state = ActionState.PREPARING
 
-    const context: CONTEXT = await this.prepareFunction()
+    const preparedContext: CONTEXT | undefined = await this.prepareFunction()
+    if (preparedContext) {
+      // We only overwrite the context if onPrepare returns one
+      this.context = preparedContext
+    }
 
     this.state = ActionState.PREPARED
-
-    return context
   }
 
-  protected readonly handler: (context: CONTEXT) => Promise<RESULT> = async (context: CONTEXT) => {
+  protected readonly handler: () => Promise<RESULT> = async () => {
     console.log(`${this.identifier}-HANDLER`)
 
     this.state = ActionState.EXECUTING
 
-    const result: RESULT = await this.handlerFunction(context)
+    const result: RESULT = await this.handlerFunction(this.context)
 
     this.state = ActionState.EXECUTED
 
@@ -95,15 +105,15 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
 
     this.progress = progress
 
-    return this.progressFunction(progress)
+    return this.progressFunction(this.context, progress)
   }
 
-  protected readonly onComplete: (context: CONTEXT, result?: RESULT) => Promise<void> = async (context: CONTEXT, result?: RESULT) => {
+  protected readonly onComplete: (result?: RESULT) => Promise<void> = async (result?: RESULT) => {
     console.log(`${this.identifier}-ONCOMPLETE`)
 
     this.state = ActionState.COMPLETING
 
-    await this.completeFunction(result)
+    await this.completeFunction(this.context, result)
 
     this.state = ActionState.COMPLETED
   }
@@ -113,7 +123,7 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
 
     this.state = ActionState.ERRORING
 
-    await this.errorFunction(error)
+    await this.errorFunction(this.context, error)
 
     this.state = ActionState.ERRORING
   }
@@ -123,7 +133,7 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
 
     this.state = ActionState.CANCELLING
 
-    await this.cancelFunction()
+    await this.cancelFunction(this.context)
 
     this.state = ActionState.CANCELLED
   }

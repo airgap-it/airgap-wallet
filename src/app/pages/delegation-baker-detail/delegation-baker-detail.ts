@@ -1,22 +1,23 @@
 import { Location } from '@angular/common'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ToastController, PopoverController } from '@ionic/angular'
-import { AirGapMarketWallet, BakerInfo, DelegationRewardInfo, TezosKtProtocol, DelegationInfo } from 'airgap-coin-lib'
+import { LoadingController, PopoverController, ToastController } from '@ionic/angular'
+import { OverlayEventDetail } from '@ionic/core'
+import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
+import { DelegateActionEnvironment } from 'src/app/models/actions/DelegateAction'
 
-import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
+import { DelegateActionContext } from '../../models/actions/delegate-action'
+import { DataService } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { BakerConfig, RemoteConfigProvider } from '../../services/remote-config/remote-config'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
-import { OverlayEventDetail } from '@ionic/core'
 
 type Moment = moment.Moment
 
-const hoursPerCycle = 68
+const hoursPerCycle: number = 68
 
 @Component({
   selector: 'page-delegation-baker-detail',
@@ -42,11 +43,14 @@ export class DelegationBakerDetailPage {
 
   private airGapBaker: BakerConfig
 
+  private readonly actionCallback: (context: DelegateActionContext<DelegateActionEnvironment>) => void
+
   constructor(
     public location: Location,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     public toastController: ToastController,
+    private readonly loadingController: LoadingController,
     public operationsProvider: OperationsProvider,
     public remoteConfigProvider: RemoteConfigProvider,
     private readonly dataService: DataService,
@@ -55,6 +59,7 @@ export class DelegationBakerDetailPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
+      this.actionCallback = info.actionCallback
     }
   }
 
@@ -131,8 +136,8 @@ export class DelegationBakerDetailPage {
       ...config
     }
 
-    const ktProtocol = new TezosKtProtocol()
-    const re = new RegExp(ktProtocol.addressValidationPattern)
+    const ktProtocol: TezosKtProtocol = new TezosKtProtocol()
+    const re: RegExp = new RegExp(ktProtocol.addressValidationPattern)
     if (re.exec(this.bakerConfig.address)) {
       // Valid address
       this.bakerConfigError = undefined
@@ -152,37 +157,24 @@ export class DelegationBakerDetailPage {
     return time.add(hoursPerCycle * 7 + this.bakerConfig.payout.cycles, 'h')
   }
 
-  public async delegate() {
-    try {
-      if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ) {
-        const pageOptions = await this.operationsProvider.prepareOriginate(this.wallet, this.bakerConfig.address)
-        this.dataService.setData(DataServiceKey.INTERACTION, pageOptions.params)
-        this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      } else {
-        const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet, this.bakerConfig.address)
-        this.dataService.setData(DataServiceKey.INTERACTION, pageOptions.params)
-        this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public async delegate(): Promise<void> {
+    this.actionCallback({
+      wallet: this.wallet,
+      delegate: this.bakerConfig.address,
+      env: {
+        toastController: this.toastController,
+        loadingController: this.loadingController,
+        dataService: this.dataService,
+        router: this.router
       }
-    } catch (error) {
-      handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)(error)
-
-      this.toastController
-        .create({
-          message: error.message,
-          duration: 3000,
-          position: 'bottom'
-        })
-        .then(toast => {
-          toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
-        })
-    }
+    })
   }
 
-  public async done() {
+  public async done(): Promise<void> {
     this.location.back()
   }
 
-  public async presentEditPopover(event) {
+  public async presentEditPopover(event: Event): Promise<void> {
     const popover: HTMLIonPopoverElement = await this.popoverCtrl.create({
       component: DelegateEditPopoverComponent,
       componentProps: {

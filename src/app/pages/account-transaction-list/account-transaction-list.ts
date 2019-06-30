@@ -2,9 +2,11 @@ import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Platform, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
+import { DelegateAction, DelegateActionContext, DelegateActionResult } from 'src/app/models/actions/delegate-action'
+import { AirGapDelegateAction, DelegateActionEnvironment } from 'src/app/models/actions/DelegateAction'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { Action } from '../../models/Action'
@@ -65,6 +67,7 @@ export class AccountTransactionListPage {
     public readonly operationsProvider: OperationsProvider,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
+    private readonly loadingController: LoadingController,
     public readonly dataService: DataService
   ) {
     if (this.route.snapshot.data.special) {
@@ -272,16 +275,22 @@ export class AccountTransactionListPage {
           this.location.back()
         },
         onUndelegate: async () => {
-          const pageOptions = await this.operationsProvider.prepareDelegate(this.wallet)
-          const info = {
-            wallet: pageOptions.params.wallet,
-            airGapTx: pageOptions.params.airGapTx,
-            data: pageOptions.params.data
+          // TODO: Should we move this to it's own file?
+          const delegateAction: AirGapDelegateAction = new AirGapDelegateAction()
+          delegateAction.prepareFunction = async (): Promise<DelegateActionContext<DelegateActionEnvironment>> => {
+            return {
+              wallet: this.wallet,
+              delegate: undefined,
+              env: {
+                toastController: this.toastController,
+                loadingController: this.loadingController,
+                dataService: this.dataService,
+                router: this.router
+              }
+            }
           }
-          this.dataService.setData(DataServiceKey.INTERACTION, info)
-          this.router
-            .navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION)
-            .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+          await delegateAction.perform()
         }
       },
       event,
@@ -293,15 +302,15 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const { isDelegated } = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
   }
 
-  public async getKtAddresses() {
-    const protocol = new TezosKtProtocol()
-    const ktAddresses = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+  public async getKtAddresses(): Promise<string[]> {
+    const protocol: TezosKtProtocol = new TezosKtProtocol()
+    const ktAddresses: string[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 

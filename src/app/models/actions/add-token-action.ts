@@ -1,3 +1,4 @@
+import { Location } from '@angular/common'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { IAccountWrapper } from '../../pages/sub-account-add/sub-account-add'
@@ -9,6 +10,7 @@ import { WalletActionInfo } from '../ActionGroup'
 export interface AddTokenActionContext {
   subAccounts: IAccountWrapper[]
   accountProvider: AccountProvider
+  location: Location
 }
 
 export class AddTokenAction extends Action<AddTokenActionContext, ActionProgress<void>, void> {

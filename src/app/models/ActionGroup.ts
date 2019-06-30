@@ -1,4 +1,4 @@
-import { TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
@@ -7,10 +7,10 @@ import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { Action, ActionInfo } from './Action'
-import { AddTokenAction } from './actions/add-token-action'
-import { DelegateAction } from './actions/delegate-action'
-import { ImportAccountAction } from './actions/import-account-action'
-import { ViewDelegationAction } from './actions/view-delegation-action'
+import { AddTokenAction, AddTokenActionContext } from './actions/add-token-action'
+import { DelegateAction, DelegateActionContext, DelegateActionResult } from './actions/delegate-action'
+import { AirGapDelegateAction, DelegateActionEnvironment } from './actions/DelegateAction'
+import { ImportAccountAction, ImportAccoutActionContext } from './actions/import-account-action'
 
 // tslint:disable:max-classes-per-file
 
@@ -23,25 +23,30 @@ export class ActionGroup {
   constructor(private readonly callerContext: AccountTransactionListPage) {}
 
   public getActions(): Action<any, any, any>[] {
-    if (this.callerContext.protocolIdentifier === ProtocolSymbols.XTZ) {
+    const actionMap: Map<string, () => Action<any, any, any>[]> = new Map()
+    actionMap.set(ProtocolSymbols.XTZ, () => {
       return this.getTezosActions()
-    } else if (this.callerContext.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    })
+    actionMap.set(ProtocolSymbols.XTZ_KT, () => {
       return this.getTezosKtActions()
-    } else if (this.callerContext.protocolIdentifier === ProtocolSymbols.ETH) {
+    })
+    actionMap.set(ProtocolSymbols.ETH, () => {
       return this.getEthereumActions()
-    }
+    })
 
-    return []
+    const actionFunction: () => Action<any, any, any>[] | undefined = actionMap.get(this.callerContext.protocolIdentifier)
+
+    return actionFunction ? actionFunction() : []
   }
 
   private getTezosActions(): Action<any, any, any>[] {
     const importAccountAction: ImportAccountAction = new ImportAccountAction()
 
-    importAccountAction.prepareFunction = async (): Promise<any> => {
+    importAccountAction.prepareFunction = async (): Promise<ImportAccoutActionContext> => {
       return { publicKey: this.callerContext.wallet.publicKey }
     }
 
-    importAccountAction.completeFunction = async (ktAddresses: string[]): Promise<void> => {
+    importAccountAction.completeFunction = async (context: ImportAccoutActionContext, ktAddresses: string[]): Promise<void> => {
       console.log('IMPORT ACCOUNT ACTION', ktAddresses)
       if (ktAddresses.length === 0) {
         this.callerContext.showToast('No accounts to import.')
@@ -55,14 +60,14 @@ export class ActionGroup {
       }
     }
 
-    const delegateAction: DelegateAction = new DelegateAction()
+    const delegateAction: AirGapDelegateAction = new AirGapDelegateAction()
 
-    delegateAction.prepareFunction = async (): Promise<any> => {
-      return new Promise(async resolve => {
-        const protocol = new TezosKtProtocol()
-        const ktAddresses = await protocol.getAddressesFromPublicKey(this.callerContext.wallet.publicKey)
+    delegateAction.prepareFunction = async (): Promise<DelegateActionContext<DelegateActionEnvironment>> => {
+      return new Promise<DelegateActionContext<DelegateActionEnvironment>>(async resolve => {
+        const protocol: TezosKtProtocol = new TezosKtProtocol()
+        const ktAddresses: string[] = await protocol.getAddressesFromPublicKey(this.callerContext.wallet.publicKey)
 
-        let wallet = this.callerContext.wallet
+        let wallet: AirGapMarketWallet = this.callerContext.wallet
         if (ktAddresses) {
           wallet = await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, 0, ktAddresses)
         }
@@ -82,7 +87,7 @@ export class ActionGroup {
   }
 
   private getTezosKtActions(): Action<any, any, any>[] {
-    const viewDelegationAction: ViewDelegationAction = new ViewDelegationAction()
+    const viewDelegationAction: AirGapDelegateAction = new AirGapDelegateAction()
 
     viewDelegationAction.prepareFunction = async (): Promise<any> => {
       return new Promise(resolve => {
@@ -100,7 +105,7 @@ export class ActionGroup {
     return [viewDelegationAction]
   }
 
-  private getEthereumActions(): Action<any, any, any>[] {
+  private getEthereumActions(): Action<AddTokenActionContext, any, any>[] {
     const addTokenAction: AddTokenAction = new AddTokenAction()
 
     addTokenAction.prepareFunction = async (): Promise<any> => {
@@ -117,8 +122,8 @@ export class ActionGroup {
       })
     }
 
-    addTokenAction.completeFunction = async (): Promise<void> => {
-      this.callerContext.location.back()
+    addTokenAction.completeFunction = async (context: AddTokenActionContext): Promise<void> => {
+      context.location.back()
     }
 
     return [addTokenAction]

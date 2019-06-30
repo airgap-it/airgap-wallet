@@ -17,7 +17,6 @@ import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { InteractionSelectionPage } from '../../pages/interaction-selection/interaction-selection'
 import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -60,36 +59,6 @@ export class OperationsProvider {
     Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
       this.getDelegationStatusOfAddress(entry[0], true).catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
     })
-  }
-
-  public async prepareOriginate(wallet: AirGapMarketWallet, delegate?: string) {
-    const loader = await this.getAndShowLoader()
-
-    const protocol = new TezosProtocol()
-
-    try {
-      const originateTx = await protocol.originate(wallet.publicKey, delegate)
-      const serializedTx = await this.serializeTx(wallet, originateTx)
-
-      return this.getPageDetails(wallet, originateTx, serializedTx)
-    } finally {
-      this.hideLoader(loader)
-    }
-  }
-
-  public async prepareDelegate(wallet: AirGapMarketWallet, delegateTargetAddress?: string) {
-    const loader = await this.getAndShowLoader()
-
-    const protocol = new TezosKtProtocol()
-
-    try {
-      const delegateTx = await protocol.delegate(wallet.publicKey, wallet.receivingPublicAddress, delegateTargetAddress)
-      const serializedTx = await this.serializeTx(wallet, delegateTx)
-
-      return this.getPageDetails(wallet, delegateTx, serializedTx)
-    } finally {
-      this.hideLoader(loader)
-    }
   }
 
   private async serializeTx(
@@ -174,32 +143,6 @@ export class OperationsProvider {
     await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
 
     return wallet
-  }
-
-  private async getPageDetails(
-    wallet: AirGapMarketWallet,
-    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction,
-    serializedTx: string
-  ) {
-    let airGapTx
-
-    try {
-      airGapTx = await wallet.coinProtocol.getTransactionDetails({
-        publicKey: wallet.publicKey,
-        transaction
-      })
-    } catch (e) {
-      handleErrorSentry(ErrorCategory.COINLIB)(e)
-    }
-
-    return {
-      page: InteractionSelectionPage,
-      params: {
-        wallet,
-        airGapTx,
-        data: 'airgap-vault://?d=' + serializedTx
-      }
-    }
   }
 
   private async getAndShowLoader() {
