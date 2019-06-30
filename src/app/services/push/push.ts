@@ -42,17 +42,12 @@ export class PushProvider {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly storageProvider: StorageProvider,
     private readonly modalController: ModalController,
-    private readonly toastController: ToastController,
-    private readonly accountProvider: AccountProvider,
-    private readonly popoverController: PopoverController,
-    private readonly languageService: LanguageService,
-    private readonly alertController: AlertController,
-    private readonly loadingController: LoadingController,
-    private readonly dataService: DataService,
-    private readonly router: Router
+    private readonly toastController: ToastController
   ) {
     this.initPush()
   }
+
+  public notificationCallback = (notification: NotificationEventResponse): void => undefined
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
@@ -157,55 +152,8 @@ export class PushProvider {
           toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
         })
 
-      // We need a timeout because otherwise routing might fail
-      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
-        const originWallet: AirGapMarketWallet = this.accountProvider
-          .getWalletList()
-          .find((wallet: AirGapMarketWallet) =>
-            wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
-          )
-        setTimeout(() => {
-          const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
-            wallet: originWallet,
-            tipAddress: notification.additionalData.tipAddress,
-            amount: notification.additionalData.tipAmount,
-            env: {
-              popoverController: this.popoverController,
-              languageService: this.languageService,
-              alertController: this.alertController,
-              toastController: this.toastController,
-              dataService: this.dataService,
-              router: this.router
-            }
-          })
-
-          tipAction.perform()
-        }, 2000)
-      }
-
-      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
-        const originWallet: AirGapMarketWallet = this.accountProvider
-          .getWalletList()
-          .find((wallet: AirGapMarketWallet) =>
-            wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
-          )
-        setTimeout(() => {
-          const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
-            wallet: originWallet,
-            delegateAddress: notification.additionalData.delegateAddress,
-            env: {
-              popoverController: this.popoverController,
-              languageService: this.languageService,
-              loadingController: this.loadingController,
-              alertController: this.alertController,
-              toastController: this.toastController,
-              dataService: this.dataService,
-              router: this.router
-            }
-          })
-
-          delegateAlertAction.perform()
-        }, 2000)
+      if (this.notificationCallback) {
+        this.notificationCallback(notification)
       }
     })
 
