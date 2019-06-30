@@ -1,22 +1,29 @@
 import { Router } from '@angular/router'
-import { ToastController } from '@ionic/angular'
+import { AlertController, PopoverController, ToastController } from '@ionic/angular'
+import { AlertOptions } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { LanguageService } from '../../services/language.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { Action, ActionProgress } from '../Action'
 import { WalletActionInfo } from '../ActionGroup'
 
-export interface TipUsActionContext<T> {
-  wallet: AirGapMarketWallet
-  tipAddress: string
-  env: T
-}
-
 export interface TipUsActionEnvironment {
+  popoverController: PopoverController
+  languageService: LanguageService
+  alertController: AlertController
   toastController: ToastController
   dataService: DataService
   router: Router
+}
+
+export interface TipUsActionContext<T> {
+  wallet: AirGapMarketWallet
+  tipAddress: string
+  amount: string
+  isAccepted?: boolean
+  env: T
 }
 
 export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvironment>, ActionProgress<void>, void> {
@@ -26,27 +33,65 @@ export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvi
     icon: 'logo-usd'
   }
 
+  constructor(context: TipUsActionContext<TipUsActionEnvironment>) {
+    super(context)
+    console.log('CONSTRUCTOR')
+  }
+
+  public readonly prepareFunction = async (): Promise<void> => {
+    console.log('ASDASD')
+
+    return new Promise<void>(async (resolve, reject) => {
+      const translatedAlert: AlertOptions = await this.context.env.languageService.getTranslatedAlert(
+        'delegate-edit-popover.heading',
+        'delegate-edit-popover.text',
+        [
+          {
+            name: 'bakerAddress',
+            id: 'baker-address',
+            placeholder: 'delegate-edit-popover.baker-address_label'
+          }
+        ],
+        [
+          {
+            text: 'delegate-edit-popover.cancel_label',
+            role: 'cancel',
+            cssClass: 'secondary',
+            handler: (): void => {
+              // this.context.env.popoverController.dismiss()
+              this.context.isAccepted = false
+              resolve()
+            }
+          },
+          {
+            text: 'delegate-edit-popover.set-baker_label',
+            handler: (): void => {
+              // this.context.env.popoverController.dismiss()
+              this.context.isAccepted = true
+              resolve()
+            }
+          }
+        ]
+      )
+      const alert: HTMLIonAlertElement = await this.context.env.alertController.create(translatedAlert)
+
+      await alert.present()
+    })
+  }
+
   public readonly handlerFunction = async (): Promise<void> => {
-    console.log('TODO')
-  }
+    if (this.context.isAccepted) {
+      this.context.env.dataService.setData(DataServiceKey.DETAIL, {
+        wallet: this.context.wallet,
+        address: this.context.tipAddress,
+        amount: this.context.amount
+      })
 
-  public readonly completeFunction = async (context: TipUsActionContext<TipUsActionEnvironment>, result: void): Promise<void> => {
-    context.env.dataService.setData(DataServiceKey.INTERACTION, {
-      wallet: context.wallet
-    })
-    context.env.router
-      .navigateByUrl(`/interaction-selection/${DataServiceKey.INTERACTION}`)
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  public readonly errorFunction = async (context: TipUsActionContext<TipUsActionEnvironment>, error: Error): Promise<void> => {
-    handleErrorSentry(ErrorCategory.OTHER)(`${this.identifier}-${error}`)
-
-    const toast: HTMLIonToastElement = await context.env.toastController.create({
-      message: error.message,
-      duration: 3000,
-      position: 'bottom'
-    })
-    toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+      this.context.env.router
+        .navigateByUrl(`/transaction-prepare/${DataServiceKey.DETAIL}`)
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } else {
+      // Do nothing
+    }
   }
 }

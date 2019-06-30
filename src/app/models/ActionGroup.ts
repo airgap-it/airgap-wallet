@@ -40,11 +40,7 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any, any>[] {
-    const importAccountAction: ImportAccountAction = new ImportAccountAction()
-
-    importAccountAction.prepareFunction = async (): Promise<ImportAccoutActionContext> => {
-      return { publicKey: this.callerContext.wallet.publicKey }
-    }
+    const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
 
     importAccountAction.completeFunction = async (context: ImportAccoutActionContext, ktAddresses: string[]): Promise<void> => {
       console.log('IMPORT ACCOUNT ACTION', ktAddresses)

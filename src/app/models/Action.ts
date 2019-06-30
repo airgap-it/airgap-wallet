@@ -35,7 +35,7 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
   public info: ActionInfo = {}
   public context: CONTEXT
 
-  public prepareFunction: () => Promise<CONTEXT> = () => undefined
+  public prepareFunction: () => Promise<CONTEXT | void> = () => undefined
   public beforeHandler: () => Promise<void> = () => undefined
   public handlerFunction: (context: CONTEXT) => Promise<RESULT> = () => undefined
   public afterHandler: () => Promise<void> = () => undefined
@@ -48,10 +48,14 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
   private progress: ActionProgress<PROGRESS> | undefined
   private state: ActionState = ActionState.READY
 
+  constructor(context?: CONTEXT) {
+    this.context = context
+  }
+
   public readonly perform: () => Promise<RESULT> = async () => {
     console.log(`${this.identifier}-PERFORM`)
 
-    await this.onPrepare() // TODO: Should we not call this if the context is already provided?
+    await this.onPrepare()
 
     await this.beforeHandler()
     const result: RESULT = await this.handler()
@@ -79,7 +83,7 @@ export abstract class Action<CONTEXT, PROGRESS, RESULT> {
 
     this.state = ActionState.PREPARING
 
-    const preparedContext: CONTEXT | undefined = await this.prepareFunction()
+    const preparedContext: CONTEXT | void = await this.prepareFunction()
     if (preparedContext) {
       // We only overwrite the context if onPrepare returns one
       this.context = preparedContext
