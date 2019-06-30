@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
-import { ModalController, Platform, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, ModalController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { DelegateAlertAction } from 'src/app/models/actions/DelegateAlertAction'
+import { AirGapTipUsAction } from 'src/app/models/actions/TipUsAction'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
+import { AccountProvider } from '../account/account.provider'
+import { DataService } from '../data/data.service'
+import { LanguageService } from '../language.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
@@ -36,7 +42,14 @@ export class PushProvider {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly storageProvider: StorageProvider,
     private readonly modalController: ModalController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly accountProvider: AccountProvider,
+    private readonly popoverController: PopoverController,
+    private readonly languageService: LanguageService,
+    private readonly alertController: AlertController,
+    private readonly loadingController: LoadingController,
+    private readonly dataService: DataService,
+    private readonly router: Router
   ) {
     this.initPush()
   }
@@ -143,6 +156,57 @@ export class PushProvider {
         .then(toast => {
           toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
         })
+
+      // We need a timeout because otherwise routing might fail
+      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
+        const originWallet: AirGapMarketWallet = this.accountProvider
+          .getWalletList()
+          .find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
+          )
+        setTimeout(() => {
+          const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
+            wallet: originWallet,
+            tipAddress: notification.additionalData.tipAddress,
+            amount: notification.additionalData.tipAmount,
+            env: {
+              popoverController: this.popoverController,
+              languageService: this.languageService,
+              alertController: this.alertController,
+              toastController: this.toastController,
+              dataService: this.dataService,
+              router: this.router
+            }
+          })
+
+          tipAction.perform()
+        }, 2000)
+      }
+
+      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
+        const originWallet: AirGapMarketWallet = this.accountProvider
+          .getWalletList()
+          .find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
+          )
+        setTimeout(() => {
+          const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
+            wallet: originWallet,
+            delegateAddress: notification.additionalData.delegateAddress,
+            env: {
+              popoverController: this.popoverController,
+              languageService: this.languageService,
+              loadingController: this.loadingController,
+              alertController: this.alertController,
+              toastController: this.toastController,
+              dataService: this.dataService,
+              router: this.router
+            }
+          })
+
+          delegateAlertAction.perform()
+        }, 2000)
+      }
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {

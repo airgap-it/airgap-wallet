@@ -1,39 +1,41 @@
 import { Router } from '@angular/router'
-import { AlertController, PopoverController, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action, ActionProgress } from 'airgap-coin-lib/dist/actions/Action'
+import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
 
-import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DataService } from '../../services/data/data.service'
 import { LanguageService } from '../../services/language.service'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletActionInfo } from '../ActionGroup'
 
-export interface TipUsActionEnvironment {
+import { AirGapDelegateAction, DelegateActionEnvironment } from './DelegateAction'
+
+export interface DelegateAlertActionEnvironment {
   popoverController: PopoverController
   languageService: LanguageService
+  loadingController: LoadingController
   alertController: AlertController
   toastController: ToastController
   dataService: DataService
   router: Router
 }
 
-export interface TipUsActionContext<T> {
+export interface DelegateAlertActionContext<T> {
   wallet: AirGapMarketWallet
-  tipAddress: string
-  amount: string
+  delegateAddress: string
   isAccepted?: boolean
   env: T
 }
 
-export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvironment>, ActionProgress<void>, void> {
+export class DelegateAlertAction extends Action<DelegateAlertActionContext<DelegateAlertActionEnvironment>, ActionProgress<void>, void> {
   public readonly identifier: string = 'tip-us-action'
   public readonly info: WalletActionInfo = {
     name: 'Tip Us',
     icon: 'logo-usd'
   }
 
-  constructor(context: TipUsActionContext<TipUsActionEnvironment>) {
+  constructor(context: DelegateAlertActionContext<DelegateAlertActionEnvironment>) {
     super(context)
     console.log('CONSTRUCTOR')
   }
@@ -43,12 +45,12 @@ export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvi
 
     return new Promise<void>(async (resolve, reject) => {
       const translatedAlert: AlertOptions = await this.context.env.languageService.getTranslatedAlert(
-        'action-alert-tip.heading',
-        'action-alert-tip.text',
+        'action-alert-delegation.heading',
+        'action-alert-delegation.text',
         [],
         [
           {
-            text: 'action-alert-tip.cancel_label',
+            text: 'action-alert-delegation.cancel_label',
             role: 'cancel',
             cssClass: 'secondary',
             handler: (): void => {
@@ -57,7 +59,7 @@ export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvi
             }
           },
           {
-            text: 'action-alert-tip.ok_label',
+            text: 'action-alert-delegation.ok_label',
             handler: (): void => {
               this.context.isAccepted = true
               resolve()
@@ -73,15 +75,22 @@ export class AirGapTipUsAction extends Action<TipUsActionContext<TipUsActionEnvi
 
   public readonly handlerFunction = async (): Promise<void> => {
     if (this.context.isAccepted) {
-      this.context.env.dataService.setData(DataServiceKey.DETAIL, {
-        wallet: this.context.wallet,
-        address: this.context.tipAddress,
-        amount: this.context.amount
-      })
+      const delegateAction: AirGapDelegateAction = new AirGapDelegateAction()
 
-      this.context.env.router
-        .navigateByUrl(`/transaction-prepare/${DataServiceKey.DETAIL}`)
-        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      delegateAction.prepareFunction = async (): Promise<DelegateActionContext<DelegateActionEnvironment>> => {
+        return {
+          wallet: this.context.wallet,
+          delegate: this.context.delegateAddress,
+          env: {
+            toastController: this.context.env.toastController,
+            loadingController: this.context.env.loadingController,
+            dataService: this.context.env.dataService,
+            router: this.context.env.router
+          }
+        }
+      }
+
+      await delegateAction.perform()
     } else {
       // Do nothing
     }
