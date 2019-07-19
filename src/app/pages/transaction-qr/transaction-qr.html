@@ -15,7 +15,7 @@
   </ion-row>
 
   <ion-row justify-content-center padding-vertical>
-    <qr-clipboard *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" level="L" size="400"></qr-clipboard>
+    <qr-clipboard *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
     <ion-text>
       <h1 *ngIf="qrDataTooBig">
         {{ 'transaction-qr.qr-data-too-big_warning' | translate }}
