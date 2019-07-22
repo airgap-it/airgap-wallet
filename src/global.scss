@@ -89,11 +89,12 @@ qr-clipboard {
 }
 
 /* FAB with a button, bottom padding fix for ios devices */
-.content-ios ion-fab[bottom] {
-  bottom: calc(10px + env(safe-area-inset-bottom));
-}
-ion-fab .col {
-  padding: 0 10px;
+.ios {
+  .can-go-back {
+    ion-fab.fab-vertical-bottom {
+      bottom: 24px;
+    }
+  }
 }
 /* Fixes card padding & margin */
 ion-card {
