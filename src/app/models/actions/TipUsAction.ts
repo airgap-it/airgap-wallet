@@ -1,5 +1,5 @@
 import { Router } from '@angular/router'
-import { AlertController, PopoverController, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action, ActionProgress } from 'airgap-coin-lib/dist/actions/Action'
@@ -11,6 +11,7 @@ import { WalletActionInfo } from '../ActionGroup'
 
 export interface TipUsActionEnvironment {
   popoverController: PopoverController
+  loadingController: LoadingController
   languageService: LanguageService
   alertController: AlertController
   toastController: ToastController

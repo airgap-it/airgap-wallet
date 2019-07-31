@@ -5,14 +5,26 @@ import { AlertController, LoadingController, PopoverController, ToastController 
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
-import { DelegateAlertAction } from 'src/app/models/actions/DelegateAlertAction'
-import { AirGapTipUsAction } from 'src/app/models/actions/TipUsAction'
 
+import { DelegateActionEnvironment } from '../../models/actions/DelegateAction'
+import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
+import { AirGapTipUsAction, TipUsActionEnvironment } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
 import { LanguageService } from '../language.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
+
+enum NotificationKind {
+  CTA_Tip = 'cta_tip',
+  CTA_Delegate = 'cta_delegate'
+}
+interface CTAInfo {
+  kind: NotificationKind
+  fromAddress: string
+  toAddress: string
+  amount: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -52,23 +64,29 @@ export class AccountProvider {
 
     this.pushProvider.notificationCallback = (notification: NotificationEventResponse): void => {
       // We need a timeout because otherwise routing might fail
+
+      const env: TipUsActionEnvironment | DelegateActionEnvironment = {
+        popoverController: this.popoverController,
+        loadingController: this.loadingController,
+        languageService: this.languageService,
+        alertController: this.alertController,
+        toastController: this.toastController,
+        dataService: this.dataService,
+        router: this.router
+      }
+
       if (notification && notification.additionalData && notification.additionalData.ctaTip) {
+        const tippingInfo: CTAInfo = notification.additionalData
+
         const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
-          wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
+          wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
         )
         setTimeout(() => {
           const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
             wallet: originWallet,
-            tipAddress: notification.additionalData.tipAddress,
-            amount: notification.additionalData.tipAmount,
-            env: {
-              popoverController: this.popoverController,
-              languageService: this.languageService,
-              alertController: this.alertController,
-              toastController: this.toastController,
-              dataService: this.dataService,
-              router: this.router
-            }
+            tipAddress: tippingInfo.toAddress,
+            amount: tippingInfo.amount,
+            env
           })
 
           tipAction.perform()
@@ -76,6 +94,8 @@ export class AccountProvider {
       }
 
       if (notification && notification.additionalData && notification.additionalData.ctaTip) {
+        const tippingInfo: CTAInfo = notification.additionalData
+
         const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
           wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
         )
@@ -83,15 +103,7 @@ export class AccountProvider {
           const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
             wallet: originWallet,
             delegateAddress: notification.additionalData.delegateAddress,
-            env: {
-              popoverController: this.popoverController,
-              languageService: this.languageService,
-              loadingController: this.loadingController,
-              alertController: this.alertController,
-              toastController: this.toastController,
-              dataService: this.dataService,
-              router: this.router
-            }
+            env
           })
 
           delegateAlertAction.perform()
