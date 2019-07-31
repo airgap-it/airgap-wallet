@@ -75,39 +75,39 @@ export class AccountProvider {
         router: this.router
       }
 
-      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
+      if (notification && notification.additionalData) {
         const tippingInfo: CTAInfo = notification.additionalData
 
-        const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
-          wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
-        )
-        setTimeout(() => {
-          const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
-            wallet: originWallet,
-            tipAddress: tippingInfo.toAddress,
-            amount: tippingInfo.amount,
-            env
-          })
+        if (tippingInfo.kind === NotificationKind.CTA_Tip) {
+          const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
+          )
+          setTimeout(() => {
+            const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
+              wallet: originWallet,
+              tipAddress: tippingInfo.toAddress,
+              amount: tippingInfo.amount,
+              env
+            })
 
-          tipAction.perform()
-        }, 2000)
-      }
+            tipAction.perform()
+          }, 2000)
+        }
 
-      if (notification && notification.additionalData && notification.additionalData.ctaTip) {
-        const tippingInfo: CTAInfo = notification.additionalData
+        if (tippingInfo.kind === NotificationKind.CTA_Delegate) {
+          const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
+          )
+          setTimeout(() => {
+            const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
+              wallet: originWallet,
+              delegateAddress: tippingInfo.toAddress,
+              env
+            })
 
-        const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
-          wallet.addresses.some((address: string) => address === notification.additionalData.fromWallet)
-        )
-        setTimeout(() => {
-          const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
-            wallet: originWallet,
-            delegateAddress: notification.additionalData.delegateAddress,
-            env
-          })
-
-          delegateAlertAction.perform()
-        }, 2000)
+            delegateAlertAction.perform()
+          }, 2000)
+        }
       }
     }
   }
