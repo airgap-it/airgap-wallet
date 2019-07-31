@@ -7,10 +7,10 @@ import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
-import { AirGapDelegateAction, DelegateActionEnvironment } from 'src/app/models/actions/DelegateAction'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
+import { AirGapDelegateAction, DelegateActionEnvironment } from '../../models/actions/DelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -49,7 +49,7 @@ export class AccountTransactionListPage {
 
   public actions: Action<any, any, any>[]
 
-  public lottieConfig = {
+  public lottieConfig: { path: string } = {
     path: '/assets/animations/loading.json'
   }
 
@@ -315,6 +315,14 @@ export class AccountTransactionListPage {
     // this.replaceAction(ActionType.DELEGATE, action)
 
     return ktAddresses
+  }
+
+  public openDelegateSelection() {
+    const info = {
+      wallet: this.wallet
+    }
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   /*
