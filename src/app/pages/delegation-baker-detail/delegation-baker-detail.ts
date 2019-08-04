@@ -4,10 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
-import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
-import { DelegateActionEnvironment } from 'src/app/models/actions/DelegateAction'
+import { AirGapDelegateActionContext } from 'src/app/models/actions/DelegateAction'
 
 import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
 import { DataService } from '../../services/data/data.service'
@@ -43,7 +42,7 @@ export class DelegationBakerDetailPage {
 
   private airGapBaker: BakerConfig
 
-  private readonly actionCallback: (context: DelegateActionContext<DelegateActionEnvironment>) => void
+  private readonly actionCallback: (context: AirGapDelegateActionContext) => void
 
   constructor(
     public location: Location,
@@ -161,12 +160,10 @@ export class DelegationBakerDetailPage {
     this.actionCallback({
       wallet: this.wallet,
       delegate: this.bakerConfig.address,
-      env: {
-        toastController: this.toastController,
-        loadingController: this.loadingController,
-        dataService: this.dataService,
-        router: this.router
-      }
+      toastController: this.toastController,
+      loadingController: this.loadingController,
+      dataService: this.dataService,
+      router: this.router
     })
   }
 
