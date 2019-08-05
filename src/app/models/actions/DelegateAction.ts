@@ -47,9 +47,7 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
 
   private setupOnComplete(context: AirGapDelegateActionContext) {
     this.delegateAction.onComplete = async result => {
-      if (this.data.loader) {
-        this.data.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-      }
+      this.dismissLoader()
 
       context.dataService.setData(DataServiceKey.INTERACTION, {
         wallet: context.wallet,
@@ -64,6 +62,7 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
 
   private setupOnError(context: AirGapDelegateActionContext) {
     this.onError = async error => {
+      this.dismissLoader()
       handleErrorSentry(ErrorCategory.OTHER)(`${this.identifier}-${error}`)
 
       const toast: HTMLIonToastElement = await context.toastController.create({
@@ -72,6 +71,12 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+    }
+  }
+
+  private dismissLoader() {
+    if (this.data.loader) {
+      this.data.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     }
   }
 }
