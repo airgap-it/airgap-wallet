@@ -6,9 +6,8 @@ import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 
-import { DelegateActionEnvironment } from '../../models/actions/DelegateAction'
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
-import { AirGapTipUsAction, TipUsActionEnvironment } from '../../models/actions/TipUsAction'
+import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
 import { LanguageService } from '../language.service'
 import { PushProvider } from '../push/push'
@@ -65,7 +64,7 @@ export class AccountProvider {
     this.pushProvider.notificationCallback = (notification: NotificationEventResponse): void => {
       // We need a timeout because otherwise routing might fail
 
-      const env: TipUsActionEnvironment | DelegateActionEnvironment = {
+      const env = {
         popoverController: this.popoverController,
         loadingController: this.loadingController,
         languageService: this.languageService,
@@ -87,10 +86,10 @@ export class AccountProvider {
               wallet: originWallet,
               tipAddress: tippingInfo.toAddress,
               amount: tippingInfo.amount,
-              env
+              ...env
             })
 
-            tipAction.perform()
+            tipAction.start()
           }, 2000)
         }
 
@@ -101,11 +100,11 @@ export class AccountProvider {
           setTimeout(() => {
             const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
               wallet: originWallet,
-              delegateAddress: tippingInfo.toAddress,
-              env
+              delegate: tippingInfo.toAddress,
+              ...env
             })
 
-            delegateAlertAction.perform()
+            delegateAlertAction.start()
           }, 2000)
         }
       }

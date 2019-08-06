@@ -5,12 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapDelegateAction, DelegateActionEnvironment } from '../../models/actions/DelegateAction'
+import { AirGapDelegateAction, AirGapDelegateActionContext } from '../../models/actions/DelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -47,7 +46,7 @@ export class AccountTransactionListPage {
   // XTZ
   public isKtDelegated: boolean = false
 
-  public actions: Action<any, any, any>[]
+  public actions: Action<any, any>[]
 
   public lottieConfig: { path: string } = {
     path: '/assets/animations/loading.json'
@@ -276,21 +275,16 @@ export class AccountTransactionListPage {
         },
         onUndelegate: async () => {
           // TODO: Should we move this to it's own file?
-          const delegateAction: AirGapDelegateAction = new AirGapDelegateAction()
-          delegateAction.prepareFunction = async (): Promise<DelegateActionContext<DelegateActionEnvironment>> => {
-            return {
-              wallet: this.wallet,
-              delegate: undefined,
-              env: {
-                toastController: this.toastController,
-                loadingController: this.loadingController,
-                dataService: this.dataService,
-                router: this.router
-              }
-            }
-          }
+          const delegateAction: AirGapDelegateAction = new AirGapDelegateAction({
+            wallet: this.wallet,
+            delegate: undefined,
+            toastController: this.toastController,
+            loadingController: this.loadingController,
+            dataService: this.dataService,
+            router: this.router
+          })
 
-          await delegateAction.perform()
+          await delegateAction.start()
         }
       },
       event,

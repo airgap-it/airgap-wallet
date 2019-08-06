@@ -1,50 +1,44 @@
-import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { Action, ActionProgress } from 'airgap-coin-lib/dist/actions/Action'
-import { DelegateActionContext } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
-import { DataService } from '../../services/data/data.service'
 import { LanguageService } from '../../services/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
-import { AirGapDelegateAction, DelegateActionEnvironment } from './DelegateAction'
+import { AirGapDelegateAction, AirGapDelegateActionContext } from './DelegateAction'
 
-export interface DelegateAlertActionEnvironment {
+export interface DelegateAlertActionContext extends AirGapDelegateActionContext {
+  isAccepted?: boolean
   popoverController: PopoverController
   languageService: LanguageService
-  loadingController: LoadingController
   alertController: AlertController
-  toastController: ToastController
-  dataService: DataService
-  router: Router
 }
 
-export interface DelegateAlertActionContext<T> {
-  wallet: AirGapMarketWallet
-  delegateAddress: string
-  isAccepted?: boolean
-  env: T
-}
-
-export class DelegateAlertAction extends Action<DelegateAlertActionContext<DelegateAlertActionEnvironment>, ActionProgress<void>, void> {
+export class DelegateAlertAction extends Action<void, DelegateAlertActionContext> {
   public readonly identifier: string = 'tip-us-action'
   public readonly info: WalletActionInfo = {
     name: 'Tip Us',
     icon: 'logo-usd'
   }
+  private readonly delegateAction: AirGapDelegateAction
 
-  constructor(context: DelegateAlertActionContext<DelegateAlertActionEnvironment>) {
+  constructor(context: DelegateAlertActionContext) {
     super(context)
-    console.log('CONSTRUCTOR')
+    this.delegateAction = new AirGapDelegateAction(context)
   }
 
-  public readonly prepareFunction = async (): Promise<void> => {
-    console.log('ASDASD')
+  protected async perform(): Promise<void> {
+    await this.showAlert()
+    if (this.context.isAccepted) {
+      await this.delegateAction.start()
+    } else {
+      // Do nothing
+    }
+  }
 
+  private async showAlert(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      const translatedAlert: AlertOptions = await this.context.env.languageService.getTranslatedAlert(
+      const translatedAlert: AlertOptions = await this.context.languageService.getTranslatedAlert(
         'action-alert-delegation.heading',
         'action-alert-delegation.text',
         [],
@@ -67,32 +61,9 @@ export class DelegateAlertAction extends Action<DelegateAlertActionContext<Deleg
           }
         ]
       )
-      const alert: HTMLIonAlertElement = await this.context.env.alertController.create(translatedAlert)
+      const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
 
       await alert.present()
     })
-  }
-
-  public readonly handlerFunction = async (): Promise<void> => {
-    if (this.context.isAccepted) {
-      const delegateAction: AirGapDelegateAction = new AirGapDelegateAction()
-
-      delegateAction.prepareFunction = async (): Promise<DelegateActionContext<DelegateActionEnvironment>> => {
-        return {
-          wallet: this.context.wallet,
-          delegate: this.context.delegateAddress,
-          env: {
-            toastController: this.context.env.toastController,
-            loadingController: this.context.env.loadingController,
-            dataService: this.context.env.dataService,
-            router: this.context.env.router
-          }
-        }
-      }
-
-      await delegateAction.perform()
-    } else {
-      // Do nothing
-    }
   }
 }
