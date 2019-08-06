@@ -15,15 +15,7 @@ export interface AirGapDelegateActionContext extends DelegateActionContext {
 }
 
 export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDelegateActionContext> {
-  public readonly info: WalletActionInfo = {
-    name: 'account-transaction-list.delegate_label',
-    icon: 'logo-usd'
-  }
-
-  protected data: {
-    loader: HTMLIonLoadingElement | undefined
-  }
-
+  private loader: HTMLIonLoadingElement | undefined
   private readonly delegateAction: DelegateAction<AirGapDelegateActionContext>
 
   public constructor(context: AirGapDelegateActionContext) {
@@ -34,14 +26,13 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
   }
 
   protected async perform(): Promise<DelegateActionResult> {
-    const loader: HTMLIonLoadingElement = await this.delegateAction.context.loadingController.create({
+    this.loader = await this.delegateAction.context.loadingController.create({
       message: 'Preparing transaction...'
     })
 
-    await loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-    this.data.loader = loader
-
+    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     await this.delegateAction.start()
+
     return this.delegateAction.result
   }
 
@@ -75,8 +66,8 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
   }
 
   private dismissLoader() {
-    if (this.data.loader) {
-      this.data.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+    if (this.loader) {
+      this.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     }
   }
 }

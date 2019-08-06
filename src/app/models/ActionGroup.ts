@@ -10,7 +10,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/DelegateAction'
-import { AirGapGetKtAccountsAction } from './actions/GetKtAccountsAction'
+import { ButtonAction } from './actions/ButtonAction'
 
 export interface WalletActionInfo {
   name: string
@@ -38,7 +38,7 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any>[] {
-    const importAccountAction = new AirGapGetKtAccountsAction({ publicKey: this.callerContext.wallet.publicKey })
+    const importAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
 
     importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
       console.log('IMPORT ACCOUNT ACTION', ktAddresses)
@@ -54,8 +54,8 @@ export class ActionGroup {
       }
     }
 
-    const prepareDelegateActionContext = new SimpleAction(
-      new Promise<AirGapDelegateActionContext>(async resolve => {
+    const prepareDelegateActionContext = new SimpleAction(() => {
+      return new Promise<AirGapDelegateActionContext>(async resolve => {
         let wallet: AirGapMarketWallet = this.callerContext.wallet
         const importAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         try {
@@ -71,16 +71,22 @@ export class ActionGroup {
           .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
           .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
-    )
+    })
 
     const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
 
-    return [importAccountAction, delegateAction]
+    const importButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.import-accounts_label', icon: 'add' },
+      importAccountAction
+    )
+    const delegateButtonAction = new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd' }, delegateAction)
+
+    return [importButtonAction, delegateButtonAction]
   }
 
   private getTezosKtActions(): Action<any, any>[] {
-    const prepareDelegateActionContext = new SimpleAction(
-      new Promise<AirGapDelegateActionContext>(async resolve => {
+    const prepareDelegateActionContext = new SimpleAction(() => {
+      return new Promise<AirGapDelegateActionContext>(async resolve => {
         const info = {
           wallet: this.callerContext.wallet,
           actionCallback: resolve
@@ -90,16 +96,20 @@ export class ActionGroup {
           .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
           .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
-    )
+    })
 
     const viewDelegationAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
+    const viewDelegateButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd' },
+      viewDelegationAction
+    )
 
-    return [viewDelegationAction]
+    return [viewDelegateButtonAction]
   }
 
   private getEthereumActions(): Action<any, any>[] {
-    const prepareAddTokenActionContext = new SimpleAction(
-      new Promise<AddTokenActionContext>(async resolve => {
+    const prepareAddTokenActionContext = new SimpleAction(() => {
+      return new Promise<AddTokenActionContext>(async resolve => {
         const info = {
           subProtocolType: SubProtocolType.TOKEN,
           wallet: this.callerContext.wallet,
@@ -110,13 +120,15 @@ export class ActionGroup {
           .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
           .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
-    )
+    })
 
     const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
     addTokenAction.onComplete = async (): Promise<void> => {
       addTokenAction.getLinkedAction().context.location.back()
     }
 
-    return [addTokenAction]
+    const addTokenButtonAction = new ButtonAction({ name: 'account-transaction-list.add-tokens_label', icon: 'add' }, addTokenAction)
+
+    return [addTokenButtonAction]
   }
 }
