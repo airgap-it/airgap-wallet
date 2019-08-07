@@ -46,22 +46,20 @@
     <ion-list lines="none" padding-bottom>
       <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
         <ion-avatar slot="start">
-          <identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></identicon>
-          <identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></identicon>
+          <identicon [address]="tx.isInbound ? tx.from[0] : tx.to[0]"></identicon>
         </ion-avatar>
         <ion-label>
           <h2>
             <ion-icon *ngIf="tx.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
             <ion-icon *ngIf="!tx.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
             <span class="font--weight__bold" color="black">
-              {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10} }}
+              {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </span>
           </h2>
         </ion-label>
         <ion-text color="blackLight">
           <h3 class="typography--mono">
-            <ng-container *ngIf="tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
-            <ng-container *ngIf="!tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
+            {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
           </h3>
         </ion-text>
       </ion-item>
@@ -186,16 +184,22 @@
           <ion-row justify-content-end>
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
-                'HH:mm' } }}
+                {{
+                  t.timestamp
+                    | amFromUnix
+                    | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
+                }}
               </p>
             </ion-text>
           </ion-row>
           <ion-row justify-content-end>
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
-                'L' } }}
+                {{
+                  t.timestamp
+                    | amFromUnix
+                    | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
+                }}
               </p>
             </ion-text>
           </ion-row>
