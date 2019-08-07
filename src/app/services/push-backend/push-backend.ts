@@ -34,7 +34,7 @@ export class PushBackendProvider {
 
   public async getPendingTxs(address: string, protocolIdentifier: string): Promise<object> {
     return this.http
-      .get(`${TRANSACTION_BACKEND_URL}api/v1/txs/pending?address=` + address + '&protocolIdentifier=' + protocolIdentifier, {
+      .get(`${TRANSACTION_BACKEND_URL}api/v1/txs/pending?address=${address}&protocolIdentifier=${protocolIdentifier}`, {
         headers: { 'Content-Type': 'application/json' }
       })
       .toPromise()
