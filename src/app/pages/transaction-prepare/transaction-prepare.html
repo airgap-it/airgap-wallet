@@ -183,7 +183,14 @@
   </form>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button size="default" color="primary" (click)="prepareTransaction()" [disabled]="transactionForm.invalid" shape="round">
+    <ion-button
+      id="prepare"
+      size="default"
+      color="primary"
+      (click)="prepareTransaction()"
+      [disabled]="transactionForm.invalid"
+      shape="round"
+    >
       <ion-icon slot="start" name="open"></ion-icon>
       {{ 'transaction-prepare.create-transaction' | translate }}
     </ion-button>

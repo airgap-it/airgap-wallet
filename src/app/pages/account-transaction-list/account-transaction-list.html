@@ -5,7 +5,9 @@
     </ion-buttons>
     <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'account-transaction-list.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="presentEditPopover($event)" color="secondary"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+      <ion-button id="edit-popover" (click)="presentEditPopover($event)" color="secondary">
+        <ion-icon slot="icon-only" name="more"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
@@ -218,13 +220,14 @@
   <ion-fab vertical="bottom" slot="fixed">
     <ion-row>
       <ion-col>
-        <ion-button expand="full" size="default" color="primary" (click)="openReceivePage()" shape="round">
+        <ion-button id="receive" expand="full" size="default" color="primary" (click)="openReceivePage()" shape="round">
           <ion-icon slot="start" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
           {{ 'account-transaction-list.receive_label' | translate }}
         </ion-button>
       </ion-col>
       <ion-col>
         <ion-button
+          id="send"
           expand="full"
           size="default"
           color="primary"

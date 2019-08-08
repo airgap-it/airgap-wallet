@@ -15,7 +15,7 @@
   </ion-row>
 
   <ion-row justify-content-center padding-vertical>
-    <qr-clipboard *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
+    <qr-clipboard id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
     <ion-text>
       <h1 *ngIf="qrDataTooBig">
         {{ 'transaction-qr.qr-data-too-big_warning' | translate }}
@@ -27,7 +27,7 @@
   <signed-transaction *ngIf="!airGapTx" [syncProtocolString]="preparedDataQR"></signed-transaction>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button size="default" color="primary" (click)="done()" shape="round">
+    <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">
       {{ 'transaction-qr.done_label' | translate }}
     </ion-button>
   </ion-fab>
