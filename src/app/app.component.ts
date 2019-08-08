@@ -109,8 +109,8 @@ export class AppComponent {
 
   public async ngAfterViewInit() {
     await this.platform.ready()
-    this.translate.get('back-button').subscribe(() => {
-      const back = this.translate.instant('back-button')
+    this.translate.get(['back-button']).subscribe((translated: { [key: string]: string | undefined }) => {
+      const back: string = translated['back-button']
       this.config.set('backButtonText', back)
     })
     if (this.platform.is('cordova')) {
