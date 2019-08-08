@@ -80,7 +80,7 @@ describe('TransactionPrepare Page', () => {
     const feeAmount = element.querySelector('#fee-amount')
     const feeAmountAdvanced = element.querySelector('#fee-amount-advanced')
 
-    component.useWallet(ethWallet)
+    component.setWallet(ethWallet)
     expect(component.transactionForm.value.fee).toEqual(
       ethWallet.coinProtocol.feeDefaults.low.toFixed(-1 * ethWallet.coinProtocol.feeDefaults.low.e + 1)
     )
@@ -114,9 +114,29 @@ describe('TransactionPrepare Page', () => {
     const el = fixture.debugElement.nativeElement
     const feeAmount = el.querySelector('#fee-amount')
     const feeAmountAdvanced = el.querySelector('#fee-amount-advanced')
-    component.useWallet(ethWallet)
+    component.setWallet(ethWallet)
     expect(feeAmount.textContent.trim()).toEqual('$0.021')
     expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
+  })
+
+  it('should only give an error if the amount has more than the allowed digits', () => {
+    component.setWallet(ethWallet)
+    const validAmounts = [19, 108, 4.345234523452345, 0.0000000000000001, 0.0000000000000001]
+    validAmounts.forEach(validAmount => {
+      component.transactionForm.controls['amount'].setValue(validAmount)
+      fixture.detectChanges()
+
+      expect(fixture.componentInstance.transactionForm.controls['amount'].valid).toBe(true)
+    })
+
+    const invalidAmounts = [0.0000000000000000001, -1.24]
+    invalidAmounts.forEach(invalidAmount => {
+      component.setWallet(ethWallet)
+      component.transactionForm.controls['amount'].setValue(invalidAmount)
+      fixture.detectChanges()
+
+      expect(fixture.componentInstance.transactionForm.controls['amount'].valid).toBe(false)
+    })
   })
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
