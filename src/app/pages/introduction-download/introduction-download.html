@@ -17,7 +17,7 @@
 
   <ion-button id="btn-generate-secret" color="primary" (click)="downloadAndroid()" shape="round" margin-top>
     <ion-icon slot="start" name="logo-android"></ion-icon>
-    Android
+    {{ 'introduction-download.android' | translate }}
   </ion-button>
 
   <p padding-bottom>
@@ -26,7 +26,7 @@
 
   <ion-button id="btn-import-secret" color="primary" (click)="downloadIos()" shape="round">
     <ion-icon slot="start" name="phone-portrait"></ion-icon>
-    iOS
+    {{ 'introduction-download.iOS' | translate }}
   </ion-button>
 
   <p padding-bottom>{{ 'introduction-download.app-store_text' | translate }}</p>

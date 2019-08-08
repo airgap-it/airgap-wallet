@@ -3,7 +3,7 @@ import { Router } from '@angular/router'
 import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { Platform } from '@ionic/angular'
+import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 
 import { AccountProvider } from './services/account/account.provider'
@@ -14,11 +14,9 @@ import { ProtocolsProvider } from './services/protocols/protocols'
 import { PushProvider } from './services/push/push'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
-// import { TransactionQrPage } from '../pages/transaction-qr/transaction-qr'
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
@@ -39,7 +37,8 @@ export class AppComponent {
     private readonly deepLinkProvider: DeepLinkProvider,
     private readonly pushProvider: PushProvider,
     private readonly router: Router,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly config: Config
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -110,6 +109,10 @@ export class AppComponent {
 
   public async ngAfterViewInit() {
     await this.platform.ready()
+    this.translate.get(['back-button']).subscribe((translated: { [key: string]: string | undefined }) => {
+      const back: string = translated['back-button']
+      this.config.set('backButtonText', back)
+    })
     if (this.platform.is('cordova')) {
       this.deeplinks
         .route({

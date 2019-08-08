@@ -60,14 +60,16 @@
       "medium_text": "Secure communication through app switching."
     },
     "vault-install_label": "Install AirGap Vault",
-    "continue_label": "Let's Go"
+    "continue_label": "Back"
   },
 
   "introduction-download": {
     "title": "Install AirGap Vault",
     "heading": "Let's install AirGap Vault!",
     "text": "There are a few ways to install AirGap Vault, choose the one that fits the best for you.",
+    "android": "Android",    
     "play-store_text": "Install AirGap Vault directly from the Google Play Store for this or a dedicated device.",
+    "iOS": "iOS",
     "app-store_text": "Install AirGap Vault directly from the App Store for this or a dedicated device.",
     "linux-distro_label": "Linux Distribution",
     "install-distro_text": "Install AirGap Vault Distribution on a dedicated computer for signing transactions air gapped.",
@@ -229,6 +231,8 @@
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
 
+  "back-button": "Back",
+
   "wallet-edit-popover-component": {
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
@@ -236,6 +240,13 @@
     "copy-address_label": "Copy Address",
     "delete_label": "Delete"
   },
+
+  "account-edit-popover-component": {
+    "header": "Confirm Account Removal",
+    "message": "Do you want to remove this account? You can always sync it again from your vault.",
+    "delete": "Remove",
+    "cancel": "Cancel"
+  },  
 
   "tabs": {
     "wallets": "Accounts",
@@ -284,7 +295,10 @@
         "text": "The account can now be imported to AirGap Wallet.",
         "description": "You’re now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
       }
-    }
+    },
+    "back": "Back",
+    "next": "Next",
+    "open_vault": "Open Vault"
   },
 
   "sub-account-import": {
@@ -357,7 +371,9 @@
     "your-rewards": "Your Rewards",
     "cycles": "{{cycles}} Cycles",
     "delegate": "Delegate",
-    "done": "Done"
+    "done": "Done", 
+    "unknown": "Unknown"
+
   },
   "introduction-push": {
     "title": "Push Notifications",
@@ -365,6 +381,16 @@
     "description": "First you have to grant AirGap Wallet the push notification permission.",
     "grant-permission_label": "Grant Permission"
   },
+  "portfolio-item": {
+    "active": "active"
+  },
+  "tezos-delegation-stats": {
+    "cycle": "Cycle",  
+    "reward": "Reward", 
+    "payout": "Payout"
+  },  
+
+  
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",

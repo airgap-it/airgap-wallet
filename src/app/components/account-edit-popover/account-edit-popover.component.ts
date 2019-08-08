@@ -7,6 +7,7 @@ import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   templateUrl: 'account-edit-popover.component.html',
@@ -27,6 +28,7 @@ export class AccountEditPopoverComponent {
     private readonly walletsProvider: AccountProvider,
     private readonly viewCtrl: PopoverController,
     private readonly clipboardProvider: ClipboardProvider,
+    private readonly translateService: TranslateService,
     private readonly operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
@@ -60,18 +62,18 @@ export class AccountEditPopoverComponent {
   public delete() {
     const alert = this.alertCtrl
       .create({
-        header: 'Confirm Wallet Removal',
-        message: 'Do you want to remove this wallet? You can always sync it again from your vault.',
+        header: this.translateService.instant('account-edit-popover-component.header'),
+        message: this.translateService.instant('account-edit-popover-component.message'),
         buttons: [
           {
-            text: 'Cancel',
+            text: this.translateService.instant('account-edit-popover-component.cancel'),
             role: 'cancel',
             handler: () => {
               this.dismissPopover()
             }
           },
           {
-            text: 'Delete',
+            text: this.translateService.instant('account-edit-popover-component.delete'),
             handler: () => {
               this.walletsProvider
                 .removeWallet(this.wallet)
