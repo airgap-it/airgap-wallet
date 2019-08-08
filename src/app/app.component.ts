@@ -3,8 +3,9 @@ import { Router } from '@angular/router'
 import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { Platform, Config } from '@ionic/angular'
+import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
 import { DataService, DataServiceKey } from './services/data/data.service'
@@ -37,7 +38,7 @@ export class AppComponent {
     private readonly pushProvider: PushProvider,
     private readonly router: Router,
     private readonly dataService: DataService,
-    public config: Config
+    private readonly config: Config
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
   }
@@ -47,6 +48,8 @@ export class AppComponent {
 
     this.loadLanguages(supportedLanguages)
     this.protocolsProvider.addProtocols()
+
+    await this.platform.ready()
 
     if (this.platform.is('cordova')) {
       this.statusBar.styleDefault()
