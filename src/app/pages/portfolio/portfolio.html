@@ -6,10 +6,11 @@
 
   <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
     <ng-container *ngIf="walletGroupsArray.length; else noItems">
-      <ion-list lines="none" no-padding *ngFor="let walletGroup of walletGroupsArray">
+      <ion-list class="walletGroups" lines="none" no-padding *ngFor="let walletGroup of walletGroupsArray">
         <ion-card>
           <portfolio-item
             *ngIf="walletGroup.mainWallet"
+            class="mainWallet"
             [wallet]="walletGroup.mainWallet"
             [maxDigits]="8"
             tappable
