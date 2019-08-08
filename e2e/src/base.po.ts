@@ -79,6 +79,8 @@ export class PageObjectBase {
   }
 
   public async takeScreenshot(name: string): Promise<void> {
+    await browser.sleep(500)
+
     return browser.imageComparison.checkScreen(name)
     /*
     return browser
