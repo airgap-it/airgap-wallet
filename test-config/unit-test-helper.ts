@@ -4,7 +4,7 @@ import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Push } from '@ionic-native/push/ngx'
-import { AlertController, IonicModule, NavController, Platform, ToastController } from '@ionic/angular'
+import { AlertController, IonicModule, LoadingController, NavController, Platform, ToastController } from '@ionic/angular'
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
@@ -63,7 +63,8 @@ export class UnitHelper {
       { provide: Platform, useValue: this.mockRefs.platform },
       Push,
       { provide: ToastController, useValue: this.mockRefs.toastController },
-      { provide: AlertController, useValue: this.mockRefs.alertController }
+      { provide: AlertController, useValue: this.mockRefs.alertController },
+      { provide: LoadingController, useValue: this.mockRefs.loadingController }
     ]
 
     if (!useIonicOnlyTestBed) {
