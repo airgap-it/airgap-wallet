@@ -11,7 +11,7 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
-import { RegexValidator } from '../../validators/RegexValidator'
+import { DecimalValidator } from '../../validators/DecimalValidator'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -48,9 +48,9 @@ export class TransactionPreparePage {
 
     this.transactionForm = formBuilder.group({
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-      amount: [0, Validators.compose([Validators.required, RegexValidator.validate(wallet.coinProtocol.decimals)])],
+      amount: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
       feeLevel: [0, [Validators.required]],
-      fee: [0, Validators.compose([Validators.required, RegexValidator.validate(wallet.coinProtocol.feeDecimals)])],
+      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
       isAdvancedMode: [false, []]
     })
 

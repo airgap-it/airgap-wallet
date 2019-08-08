@@ -1,8 +1,9 @@
-import { RegexValidator } from './RegexValidator'
 import { TestBed } from '@angular/core/testing'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('RegexValidator', () => {
+import { DecimalValidator } from './DecimalValidator'
+
+describe('DecimalValidator', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()
@@ -17,6 +18,6 @@ describe('RegexValidator', () => {
   })
 
   it('should correctly evaluate regex', () => {
-    expect(RegexValidator.isValid(18, 0.0000000000000001)).toBe(true)
+    expect(DecimalValidator.isValid(18, 0.0000000000000001)).toBe(true)
   })
 })
