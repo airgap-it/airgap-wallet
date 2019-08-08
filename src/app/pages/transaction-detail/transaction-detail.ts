@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 import { Transaction } from '../../models/transaction.model'
 
@@ -27,20 +27,20 @@ export class TransactionDetailPage {
 
   public openBlockexplorer() {
     const transaction: any = this.transaction
-    const hash = transaction.hash
+    const hash: string = transaction.hash
 
-    const protocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
+    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
+
+    let blockexplorer: string = protocol.blockExplorer
 
     if (hash) {
-      const blockexplorer = protocol.getBlockExplorerLinkForTxId(hash)
-
-      this.openUrl(blockexplorer)
+      blockexplorer = protocol.getBlockExplorerLinkForTxId(hash)
     } else {
-      // TODO: Remove AE specific code, but add an alert that there was an error.
-      if (this.transaction.protocolIdentifier.startsWith('ae')) {
-        this.openUrl(`https://explorer.aepps.com/#/account/${this.transaction.isInbound ? this.transaction.to : this.transaction.from}`)
-      }
+      blockexplorer = protocol.getBlockExplorerLinkForAddress(
+        this.transaction.isInbound ? this.transaction.to[0] : this.transaction.from[0]
+      )
     }
+    this.openUrl(blockexplorer)
   }
 
   private openUrl(url: string) {

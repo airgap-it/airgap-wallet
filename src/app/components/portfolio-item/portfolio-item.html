@@ -18,7 +18,7 @@
     <ng-container *ngIf="!isToken">
       <ion-text color="blackLight">
         <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono">
-          <ion-badge slot="end" color="primary" *ngIf="isActive">active</ion-badge>
+          <ion-badge slot="end" color="primary" *ngIf="isActive">{{ 'portfolio-item.active' | translate }}</ion-badge>
           {{ wallet.receivingPublicAddress | shortenString }}
         </h3>
       </ion-text>

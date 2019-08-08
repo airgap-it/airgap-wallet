@@ -14,8 +14,10 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+// import 'core-js/es7/object'
 
 declare let cordova
 
@@ -35,6 +37,7 @@ export class AccountTransactionListPage {
   public protocolIdentifier: string
 
   public hasPendingTransactions: boolean = false
+  public pendingTransactions: IAirGapTransaction[] = []
 
   // AE-Migration Stuff
   public aeTxEnabled: boolean = false
@@ -67,7 +70,8 @@ export class AccountTransactionListPage {
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,
-    public readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly pushBackendProvider: PushBackendProvider
   ) {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special
@@ -233,6 +237,27 @@ export class AccountTransactionListPage {
     const transactions = await this.getTransactions()
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
+
+    const addr: string = this.wallet.receivingPublicAddress
+    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+
+    // remove duplicates from pendingTransactions
+    const txHashes = this.transactions.map(value => value.hash)
+    this.pendingTransactions = this.pendingTransactions.filter(value => {
+      return txHashes.indexOf(value.hash) === -1
+    })
+
+    if (this.pendingTransactions.length > 0) {
+      this.pendingTransactions = this.pendingTransactions.map(pendingTx => {
+        pendingTx.fee = new BigNumber(pendingTx.fee)
+        pendingTx.amount = new BigNumber(pendingTx.amount)
+
+        return pendingTx
+      })
+      this.hasPendingTransactions = true
+    } else {
+      this.hasPendingTransactions = false
+    }
 
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
