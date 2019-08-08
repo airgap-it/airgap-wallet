@@ -1,5 +1,5 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { Action, SimpleAction, LinkedAction } from 'airgap-coin-lib/dist/actions/Action'
+import { Action, LinkedAction, SimpleAction } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
@@ -9,8 +9,8 @@ import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/DelegateAction'
 import { ButtonAction } from './actions/ButtonAction'
+import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/DelegateAction'
 
 export interface WalletActionInfo {
   name: string

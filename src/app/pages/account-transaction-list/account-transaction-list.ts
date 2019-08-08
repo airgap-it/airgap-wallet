@@ -59,19 +59,19 @@ export class AccountTransactionListPage {
   private readonly actionGroup: ActionGroup
 
   constructor(
-    public readonly location: Location,
-    public readonly router: Router,
     private readonly route: ActivatedRoute,
-    public popoverCtrl: PopoverController,
-    public accountProvider: AccountProvider,
-    public http: HttpClient,
     private readonly platform: Platform,
-    public readonly operationsProvider: OperationsProvider,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,
-    private readonly dataService: DataService,
-    private readonly pushBackendProvider: PushBackendProvider
+    private readonly pushBackendProvider: PushBackendProvider,
+    public readonly location: Location,
+    public readonly router: Router,
+    public readonly operationsProvider: OperationsProvider,
+    public readonly popoverCtrl: PopoverController,
+    public readonly accountProvider: AccountProvider,
+    public readonly http: HttpClient,
+    public readonly dataService: DataService
   ) {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special
