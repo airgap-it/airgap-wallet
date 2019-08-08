@@ -109,6 +109,8 @@ describe('AirGap Wallet', () => {
       await accountImportPage.clickImport()
       await page.takeScreenshot(`portfolio-${account.symbol}`)
 
+      /*
+      // TODO: Implement performance testing
       browser
         .manage()
         .logs()
@@ -123,7 +125,7 @@ describe('AirGap Wallet', () => {
                 if (
                   url === 'data:text/html,<html></html>' ||
                   url.startsWith('http://localhost:4200/') ||
-                  url.startsWith('data:application/octet-stream;base64,') /* && url.endsWith('.js')*/
+                  url.startsWith('data:application/octet-stream;base64,') // && url.endsWith('.js')
                 ) {
                   return
                 }
@@ -135,6 +137,7 @@ describe('AirGap Wallet', () => {
           })
         })
         .catch(console.error)
+      */
 
       const walletGroups = element.all(by.css('.walletGroups'))
       // console.log(walletGroups.getText())
