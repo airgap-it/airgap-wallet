@@ -49,7 +49,7 @@ export class ActionGroup {
           await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, index, ktAddresses)
         }
 
-        this.callerContext.location.back()
+        this.callerContext.router.navigateByUrl('/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
         this.callerContext.showToast('Accounts imported')
       }
     }
