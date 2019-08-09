@@ -74,7 +74,7 @@ build_ios:
     - echo "$IOS_BUILD_JSON" > build.json
     - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
-    - sudo xcode-select -s /Applications/Xcode_10.1.app/Contents/Developer
+    - export DEVELOPER_DIR=$XCODE_PATH
     - sed -i -e "s/ios-CFBundleVersion=\"0.0.0\"/ios-CFBundleVersion=\"1.0.$CI_PIPELINE_ID\"/g" config.xml
     - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
     - nvm use v10.13.0
@@ -88,7 +88,7 @@ build_ios:
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates
     - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -sdk iphoneos -configuration AppStoreDistribution archive -archivePath platforms/ios/AirGap\ Wallet.xcarchive
     - xcodebuild -exportArchive -archivePath platforms/ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath platforms/ios/ -allowProvisioningUpdates
-    - /Applications/Xcode_10.1.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
+    - xcrun altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   artifacts:
     paths:
       - platforms/ios/AirGap\ Wallet.ipa
