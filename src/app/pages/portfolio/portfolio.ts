@@ -69,7 +69,15 @@ export class PortfolioPage {
       })
 
       groups.sort((group1: WalletGroup, group2: WalletGroup) => {
-        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        if (group1.mainWallet && group2.mainWallet) {
+          return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        } else if (group1.mainWallet) {
+          return -1
+        } else if (group2.mainWallet) {
+          return 1
+        } else {
+          return 0
+        }
       })
 
       this.walletGroups.next(groups)
