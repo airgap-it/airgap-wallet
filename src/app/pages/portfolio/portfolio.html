@@ -9,6 +9,7 @@
       <ion-list class="walletGroups" lines="none" no-padding *ngFor="let walletGroup of walletGroupsArray">
         <ion-card>
           <portfolio-item
+            *ngIf="walletGroup.mainWallet"
             class="mainWallet"
             [wallet]="walletGroup.mainWallet"
             [maxDigits]="8"

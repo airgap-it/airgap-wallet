@@ -39,22 +39,45 @@ export class PortfolioPage {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
-    this.wallets.subscribe(wallets => {
+    this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
       this.calculateTotal(wallets)
 
       const groups: WalletGroup[] = []
-      wallets.forEach(wallet => {
-        if (((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol) {
-          return
+
+      const walletMap: Map<string, WalletGroup> = new Map()
+
+      wallets.forEach((wallet: AirGapMarketWallet) => {
+        const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
+        if (walletMap.has(wallet.publicKey)) {
+          const group: WalletGroup = walletMap.get(wallet.publicKey)
+          if (isSubProtocol) {
+            group.subWallets.push(wallet)
+          } else {
+            group.mainWallet = wallet
+          }
+        } else {
+          if (isSubProtocol) {
+            walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
+          } else {
+            walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
+          }
         }
-        groups.push({
-          mainWallet: wallet,
-          subWallets: wallets.filter(subWallet => wallet !== subWallet && wallet.publicKey === subWallet.publicKey)
-        })
       })
 
-      groups.sort((group1, group2) => {
-        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+      walletMap.forEach((value: WalletGroup) => {
+        groups.push(value)
+      })
+
+      groups.sort((group1: WalletGroup, group2: WalletGroup) => {
+        if (group1.mainWallet && group2.mainWallet) {
+          return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        } else if (group1.mainWallet) {
+          return -1
+        } else if (group2.mainWallet) {
+          return 1
+        } else {
+          return 0
+        }
       })
 
       this.walletGroups.next(groups)

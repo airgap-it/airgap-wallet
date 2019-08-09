@@ -1,11 +1,29 @@
 import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
+import { NotificationEventResponse } from '@ionic-native/push/ngx'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 
+import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
+import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
+import { DataService } from '../data/data.service'
+import { LanguageService } from '../language.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
+
+enum NotificationKind {
+  CTA_Tip = 'cta_tip',
+  CTA_Delegate = 'cta_delegate'
+}
+interface CTAInfo {
+  kind: NotificationKind
+  fromAddress: string
+  toAddress: string
+  amount: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -27,11 +45,70 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
-  constructor(private readonly storageProvider: StorageProvider, private readonly pushProvider: PushProvider) {
+  constructor(
+    private readonly storageProvider: StorageProvider,
+    private readonly pushProvider: PushProvider,
+    private readonly popoverController: PopoverController,
+    private readonly languageService: LanguageService,
+    private readonly alertController: AlertController,
+    private readonly toastController: ToastController,
+    private readonly loadingController: LoadingController,
+    private readonly dataService: DataService,
+    private readonly router: Router
+  ) {
     this.loadWalletsFromStorage().catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
+
+    this.pushProvider.notificationCallback = (notification: NotificationEventResponse): void => {
+      // We need a timeout because otherwise routing might fail
+
+      const env = {
+        popoverController: this.popoverController,
+        loadingController: this.loadingController,
+        languageService: this.languageService,
+        alertController: this.alertController,
+        toastController: this.toastController,
+        dataService: this.dataService,
+        router: this.router
+      }
+
+      if (notification && notification.additionalData) {
+        const tippingInfo: CTAInfo = notification.additionalData
+
+        if (tippingInfo.kind === NotificationKind.CTA_Tip) {
+          const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
+          )
+          setTimeout(() => {
+            const tipAction: AirGapTipUsAction = new AirGapTipUsAction({
+              wallet: originWallet,
+              tipAddress: tippingInfo.toAddress,
+              amount: tippingInfo.amount,
+              ...env
+            })
+
+            tipAction.start()
+          }, 2000)
+        }
+
+        if (tippingInfo.kind === NotificationKind.CTA_Delegate) {
+          const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>
+            wallet.addresses.some((address: string) => address === tippingInfo.fromAddress)
+          )
+          setTimeout(() => {
+            const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
+              wallet: originWallet,
+              delegate: tippingInfo.toAddress,
+              ...env
+            })
+
+            delegateAlertAction.start()
+          }, 2000)
+        }
+      }
+    }
   }
 
   public triggerWalletChanged() {

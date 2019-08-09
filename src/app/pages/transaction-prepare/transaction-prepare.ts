@@ -38,17 +38,19 @@ export class TransactionPreparePage {
   ) {
     let address = ''
     let wallet
+    let amount = 0
 
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       address = info.address || ''
+      amount = info.amount || 0
       wallet = info.wallet
     }
     this.setWallet(wallet)
 
     this.transactionForm = formBuilder.group({
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-      amount: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
+      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
       isAdvancedMode: [false, []]

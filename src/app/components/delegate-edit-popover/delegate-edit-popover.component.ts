@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
-import { AlertController, PopoverController, NavParams } from '@ionic/angular'
+import { AlertController, NavParams, PopoverController } from '@ionic/angular'
+
 import { LanguageService } from '../../services/language.service'
 
 @Component({

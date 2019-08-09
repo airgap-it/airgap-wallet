@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
 import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
-import { ModalController, Platform, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, ModalController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { DelegateAlertAction } from 'src/app/models/actions/DelegateAlertAction'
+import { AirGapTipUsAction } from 'src/app/models/actions/TipUsAction'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
+import { AccountProvider } from '../account/account.provider'
+import { DataService } from '../data/data.service'
+import { LanguageService } from '../language.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
@@ -40,6 +46,8 @@ export class PushProvider {
   ) {
     this.initPush()
   }
+
+  public notificationCallback = (notification: NotificationEventResponse): void => undefined
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
@@ -143,6 +151,10 @@ export class PushProvider {
         .then(toast => {
           toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
         })
+
+      if (this.notificationCallback) {
+        this.notificationCallback(notification)
+      }
     })
 
     pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
