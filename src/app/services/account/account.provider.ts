@@ -23,6 +23,8 @@ interface CTAInfo {
   fromAddress: string
   toAddress: string
   amount: string
+  alertTitle: string
+  alertDescription: string
 }
 
 @Injectable({
@@ -86,11 +88,13 @@ export class AccountProvider {
               wallet: originWallet,
               tipAddress: tippingInfo.toAddress,
               amount: tippingInfo.amount,
+              alertTitle: tippingInfo.alertTitle,
+              alertDescription: tippingInfo.alertDescription,
               ...env
             })
 
             tipAction.start()
-          }, 2000)
+          }, 3500)
         }
 
         if (tippingInfo.kind === NotificationKind.CTA_Delegate) {
@@ -101,11 +105,13 @@ export class AccountProvider {
             const delegateAlertAction: DelegateAlertAction = new DelegateAlertAction({
               wallet: originWallet,
               delegate: tippingInfo.toAddress,
+              alertTitle: tippingInfo.alertTitle,
+              alertDescription: tippingInfo.alertDescription,
               ...env
             })
 
             delegateAlertAction.start()
-          }, 2000)
+          }, 3500)
         }
       }
     }

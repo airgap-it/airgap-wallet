@@ -13,6 +13,8 @@ export interface TipUsActionContext {
   wallet: AirGapMarketWallet
   tipAddress: string
   amount: string
+  alertTitle: string
+  alertDescription: string
   isAccepted?: boolean
   popoverController: PopoverController
   loadingController: LoadingController
@@ -71,6 +73,14 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
           }
         ]
       )
+
+      if (this.context.alertTitle) {
+        translatedAlert.header = this.context.alertTitle
+      }
+      if (this.context.alertDescription) {
+        translatedAlert.message = this.context.alertDescription
+      }
+
       const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
 
       await alert.present()
