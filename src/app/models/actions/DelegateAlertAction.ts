@@ -1,4 +1,4 @@
-import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
+import { AlertController, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
@@ -12,6 +12,8 @@ export interface DelegateAlertActionContext extends AirGapDelegateActionContext 
   popoverController: PopoverController
   languageService: LanguageService
   alertController: AlertController
+  alertTitle: string
+  alertDescription: string
 }
 
 export class DelegateAlertAction extends Action<void, DelegateAlertActionContext> {
@@ -61,6 +63,13 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
           }
         ]
       )
+      if (this.context.alertTitle) {
+        translatedAlert.header = this.context.alertTitle
+      }
+      if (this.context.alertDescription) {
+        translatedAlert.message = this.context.alertDescription
+      }
+
       const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
 
       await alert.present()
