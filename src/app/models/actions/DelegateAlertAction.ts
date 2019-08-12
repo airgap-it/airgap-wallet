@@ -70,7 +70,6 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
         translatedAlert.message = this.context.alertDescription
       }
 
-      console.log(translatedAlert)
       const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
 
       await alert.present()
