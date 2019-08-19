@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core'
+import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
@@ -33,16 +33,13 @@ export class PortfolioPage {
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService,
-    private readonly qrScanner: QRScanner,
-    private readonly ngZone: NgZone
+    private readonly dataService: DataService
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
       this.calculateTotal(wallets)
-      console.log('after calculating')
 
       this.refreshWalletGroups(wallets)
     })
