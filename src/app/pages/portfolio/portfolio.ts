@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
@@ -34,57 +34,75 @@ export class PortfolioPage {
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly qrScanner: QRScanner
+    private readonly qrScanner: QRScanner,
+    private readonly ngZone: NgZone
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
       this.calculateTotal(wallets)
+      console.log('after calculating')
 
-      const groups: WalletGroup[] = []
-
-      const walletMap: Map<string, WalletGroup> = new Map()
-
-      wallets.forEach((wallet: AirGapMarketWallet) => {
-        const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
-        if (walletMap.has(wallet.publicKey)) {
-          const group: WalletGroup = walletMap.get(wallet.publicKey)
-          if (isSubProtocol) {
-            group.subWallets.push(wallet)
-          } else {
-            group.mainWallet = wallet
-          }
-        } else {
-          if (isSubProtocol) {
-            walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
-          } else {
-            walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
-          }
-        }
-      })
-
-      walletMap.forEach((value: WalletGroup) => {
-        groups.push(value)
-      })
-
-      groups.sort((group1: WalletGroup, group2: WalletGroup) => {
-        if (group1.mainWallet && group2.mainWallet) {
-          return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
-        } else if (group1.mainWallet) {
-          return -1
-        } else if (group2.mainWallet) {
-          return 1
-        } else {
-          return 0
-        }
-      })
-
-      this.walletGroups.next(groups)
+      this.refreshWalletGroups(wallets)
     })
     this.walletsProvider.walledChangedObservable.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList())
     })
+  }
+
+  private refreshWalletGroups(wallets: AirGapMarketWallet[]) {
+    const groups: WalletGroup[] = []
+
+    const walletMap: Map<string, WalletGroup> = new Map()
+
+    wallets.forEach((wallet: AirGapMarketWallet) => {
+      const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
+      if (walletMap.has(wallet.publicKey)) {
+        const group: WalletGroup = walletMap.get(wallet.publicKey)
+        if (isSubProtocol) {
+          group.subWallets.push(wallet)
+        } else {
+          group.mainWallet = wallet
+        }
+      } else {
+        if (isSubProtocol) {
+          walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
+        } else {
+          walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
+        }
+      }
+    })
+
+    walletMap.forEach((value: WalletGroup) => {
+      groups.push(value)
+    })
+
+    groups.sort((group1: WalletGroup, group2: WalletGroup) => {
+      if (group1.mainWallet && group2.mainWallet) {
+        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+      } else if (group1.mainWallet) {
+        return -1
+      } else if (group2.mainWallet) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+
+    // TODO: Find a solution to this
+    /*
+    It seems like this is an Ionic / Angular bug. If a wallet is deleted on a sub-page
+    (which is how it is done currently), then the UI end up in a weird state. There is no
+    crash, but some wallets are not shown and empty cards are being displayed. To resolve this,
+    the app has to be restarted or another wallet has to be added. When investigating,
+    we saw that it is related to the transition phase. If the observable emits at the same time
+    as the transition is happening, then this weird state occurs. If we simply wait, everything
+    works as intended. 
+    */
+    setTimeout(() => {
+      this.walletGroups.next(groups)
+    }, 500)
   }
 
   public ionViewDidEnter() {
