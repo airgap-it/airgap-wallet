@@ -71,6 +71,10 @@
     "play-store_text": "Install AirGap Vault directly from the Google Play Store for this or a dedicated device.",
     "iOS": "iOS",
     "app-store_text": "Install AirGap Vault directly from the App Store for this or a dedicated device.",
+    "iOS-device-iOS_text": "Install AirGap Vault from the App Store on this device.",
+    "iOS-device-android_text": "Install AirGap Vault from the Play Store on a dedicated device.",
+    "android-device-iOS_text": "Install AirGap Vault from the App Store on a dedicated device.",
+    "android-device-android_text": "Install AirGap Vault from the Play Store on this device.",
     "linux-distro_label": "Linux Distribution",
     "install-distro_text": "Install AirGap Vault Distribution on a dedicated computer for signing transactions air gapped.",
     "go_label": "Let's Go"
