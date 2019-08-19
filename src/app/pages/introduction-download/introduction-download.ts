@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { ModalController, Platform } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
@@ -8,13 +9,33 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   templateUrl: 'introduction-download.html'
 })
 export class IntroductionDownloadPage {
-  constructor(private readonly platform: Platform, public viewController: ModalController) {}
+  public appStoreText: string = 'android-device-iOS_text'
+  public playStoreText: string = 'iOS-device-android_text'
 
-  public dismiss(shouldCloseAllModals = false) {
+  constructor(
+    private readonly platform: Platform,
+    public viewController: ModalController,
+    private readonly translateService: TranslateService
+  ) {
+    if (!this.translateService.currentLang.startsWith('en')) {
+      this.appStoreText = 'app-store_text'
+      this.playStoreText = 'play-store_text'
+    } else {
+      if (this.platform.is('ios')) {
+        this.appStoreText = 'iOS-device-iOS_text'
+        this.playStoreText = 'iOS-device-android_text'
+      } else if (this.platform.is('android')) {
+        this.appStoreText = 'android-device-iOS_text'
+        this.playStoreText = 'android-device-android_text'
+      }
+    }
+  }
+
+  public dismiss(shouldCloseAllModals: boolean = false): void {
     this.viewController.dismiss(shouldCloseAllModals).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public downloadAndroid() {
+  public downloadAndroid(): void {
     if (this.platform.is('android')) {
       window.open('https://play.google.com/store/apps/details?id=it.airgap.vault', '_system')
     } else if (this.platform.is('cordova')) {
@@ -25,7 +46,7 @@ export class IntroductionDownloadPage {
     this.dismiss(true)
   }
 
-  public downloadIos() {
+  public downloadIos(): void {
     if (this.platform.is('ios')) {
       window.open('itms-apps://itunes.apple.com/app/id1417126841', '_system')
     } else if (this.platform.is('cordova')) {
@@ -36,7 +57,7 @@ export class IntroductionDownloadPage {
     this.dismiss(true)
   }
 
-  public downloadDistribution() {
+  public downloadDistribution(): void {
     if (this.platform.is('cordova')) {
       window.open('https://github.com/airgap-it/airgap-distro', '_system')
     } else {
