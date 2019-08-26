@@ -139,31 +139,8 @@ export class TransactionConfirmPage {
         this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        const alert = this.alertCtrl
-          .create({
-            header: 'Transaction broadcasted!',
-            message: 'Your transaction has been successfully broadcasted',
-            buttons: [
-              {
-                text: 'Open Blockexplorer',
-                handler: () => {
-                  const blockexplorer = this.protocol.getBlockExplorerLinkForTxId(txId)
-                  this.openUrl(blockexplorer)
 
-                  this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-                }
-              },
-              {
-                text: 'Ok',
-                handler: () => {
-                  this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-                }
-              }
-            ]
-          })
-          .then(alert => {
-            alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
+        this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
         const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
@@ -185,21 +162,62 @@ export class TransactionConfirmPage {
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        const toast = this.toastCtrl
-          .create({
-            duration: TOAST_ERROR_DURATION,
-            message: 'Transaction broadcasting failed: ' + error,
-            showCloseButton: true,
-            position: 'bottom'
+        // TODO: Remove this special error case once we remove web3 from the coin-lib
+        if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
+          (this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
+            if (signed.hash) {
+              this.showTransactionSuccessfulAlert(signed.hash)
+            } else {
+              handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+            }
           })
-          .then(toast => {
-            toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
+        } else {
+          this.toastCtrl
+            .create({
+              duration: TOAST_ERROR_DURATION,
+              message: 'Transaction broadcasting failed: ' + error,
+              showCloseButton: true,
+              position: 'bottom'
+            })
+            .then(toast => {
+              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            })
+            .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+        }
         this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
   }
 
-  private openUrl(url: string) {
+  private showTransactionSuccessfulAlert(transactionHash: string): void {
+    this.alertCtrl
+      .create({
+        header: 'Transaction broadcasted!',
+        message: 'Your transaction has been successfully broadcasted',
+        buttons: [
+          {
+            text: 'Open Blockexplorer',
+            handler: (): void => {
+              const blockexplorer: string = this.protocol.getBlockExplorerLinkForTxId(transactionHash)
+              this.openUrl(blockexplorer)
+
+              this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            }
+          },
+          {
+            text: 'Ok',
+            handler: (): void => {
+              this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            }
+          }
+        ]
+      })
+      .then((alert: HTMLIonAlertElement) => {
+        alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
+  private openUrl(url: string): void {
     if (this.platform.is('ios') || this.platform.is('android')) {
       cordova.InAppBrowser.open(url, '_system', 'location=true')
     } else {
