@@ -162,6 +162,7 @@ export class TransactionConfirmPage {
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
+        // TODO: Remove this special error case once we remove web3 from the coin-lib
         if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
           (this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
             if (signed.hash) {
