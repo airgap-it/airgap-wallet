@@ -139,7 +139,7 @@ export class TransactionConfirmPage {
         this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        const alert = this.alertCtrl
+        this.alertCtrl
           .create({
             header: 'Transaction broadcasted!',
             message: 'Your transaction has been successfully broadcasted',
@@ -164,6 +164,7 @@ export class TransactionConfirmPage {
           .then(alert => {
             alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
+          .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
 
         // POST TX TO BACKEND
         const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
@@ -185,16 +186,31 @@ export class TransactionConfirmPage {
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        const toast = this.toastCtrl
-          .create({
-            duration: TOAST_ERROR_DURATION,
-            message: 'Transaction broadcasting failed: ' + error,
-            showCloseButton: true,
-            position: 'bottom'
-          })
-          .then(toast => {
-            toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
+        if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
+          this.toastCtrl
+            .create({
+              duration: TOAST_ERROR_DURATION,
+              message: 'Transaction broadcast',
+              showCloseButton: true,
+              position: 'bottom'
+            })
+            .then(toast => {
+              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            })
+            .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+        } else {
+          this.toastCtrl
+            .create({
+              duration: TOAST_ERROR_DURATION,
+              message: 'Transaction broadcasting failed: ' + error,
+              showCloseButton: true,
+              position: 'bottom'
+            })
+            .then(toast => {
+              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            })
+            .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+        }
         this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
   }
