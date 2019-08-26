@@ -68,4 +68,13 @@ export class IntroductionDownloadPage {
     }
     this.dismiss(true)
   }
+
+  public openGuide(): void {
+    if (this.platform.is('cordova')) {
+      window.open('https://medium.com/airgap-it/airgap-the-step-by-step-guide-c4c3d3fe9a05', '_system')
+    } else {
+      window.open('https://medium.com/airgap-it/airgap-the-step-by-step-guide-c4c3d3fe9a05', '_blank')
+    }
+    this.dismiss(true)
+  }
 }

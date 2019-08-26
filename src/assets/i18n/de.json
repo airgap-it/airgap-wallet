@@ -21,6 +21,8 @@
   "introduction.wallet_install_label": "AirGap Wallet installieren",
   "introduction.continue_label": "Loslegen",
   "introduction-download.title": "AirGap Vault Installieren",
+  "introduction-download.description": "Unklar wie AirGap Vault oder AirGap Wallet installiert werden sollten? Wir haben eine detailierte Anleitungen mit einer Schritt für Schritt Anleitung.",
+  "introduction-download.guide-link_label": "Anleitung anzeigen",
   "introduction-download.heading": "AirGap Vault Aufsetzen",
   "introduction-download.text": "Es gibt mehrere Möglichkeiten wie AirGap Vault installiert werden kann, wählen Sie diejenige aus die am besten auf Sie zutrifft.",
   "introduction-download.play-store_text": "Installieren Sie AirGap Vault direkt aus dem Google Play Store für dieses oder auf einem dedizierten Gerät.",
