@@ -165,9 +165,9 @@ export class TransactionConfirmPage {
         if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
           (this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
             if (signed.hash) {
-              handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
-            } else {
               this.showTransactionSuccessfulAlert(signed.hash)
+            } else {
+              handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
             }
           })
         } else {
