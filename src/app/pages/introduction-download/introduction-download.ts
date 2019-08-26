@@ -11,12 +11,15 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 export class IntroductionDownloadPage {
   public appStoreText: string = 'android-device-iOS_text'
   public playStoreText: string = 'iOS-device-android_text'
+  public isIOS: boolean = true
 
   constructor(
     private readonly platform: Platform,
     public viewController: ModalController,
     private readonly translateService: TranslateService
   ) {
+    this.isIOS = this.platform.is('ios')
+
     if (!this.translateService.currentLang.startsWith('en')) {
       this.appStoreText = 'app-store_text'
       this.playStoreText = 'play-store_text'
