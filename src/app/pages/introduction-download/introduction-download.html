@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header no-border>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -10,33 +10,43 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content class="ion-padding">
   <h1>{{ 'introduction-download.heading' | translate }}</h1>
 
-  <p padding-bottom>{{ 'introduction-download.text' | translate }}</p>
+  <ion-button class="ion-margin-top" color="primary" (click)="openGuide()" shape="round">
+    <ion-icon slot="start" name="open"></ion-icon>
+    {{ 'introduction-download.guide-link_label' | translate }}
+  </ion-button>
+  <p class="ion-padding-bottom">{{ 'introduction-download.description' | translate }}</p>
+
+  <h5 *ngIf="!isIOS">{{ 'introduction-download.text' | translate }}</h5>
 
   <ion-button id="btn-import-secret" color="primary" (click)="downloadIos()" shape="round">
     <ion-icon slot="start" name="phone-portrait"></ion-icon>
     {{ 'introduction-download.iOS' | translate }}
   </ion-button>
 
-  <p padding-bottom>{{ 'introduction-download.' + appStoreText | translate }}</p>
+  <p>{{ 'introduction-download.' + appStoreText | translate }}</p>
 
-  <ion-button id="btn-generate-secret" color="primary" (click)="downloadAndroid()" shape="round" margin-top>
-    <ion-icon slot="start" name="logo-android"></ion-icon>
-    {{ 'introduction-download.android' | translate }}
-  </ion-button>
+  <ng-container *ngIf="!isIOS">
+    <!-- TODO: We have to hide this to get through the review. We should re-add this later and open a dispute to get it resolved -->
 
-  <p padding-bottom>
-    {{ 'introduction-download.' + playStoreText | translate }}
-  </p>
+    <ion-button class="ion-margin-top" id="btn-generate-secret" color="primary" (click)="downloadAndroid()" shape="round">
+      <ion-icon slot="start" name="logo-android"></ion-icon>
+      {{ 'introduction-download.android' | translate }}
+    </ion-button>
 
-  <ion-button id="btn-recover-secret" color="primary" (click)="downloadDistribution()" shape="round">
-    <ion-icon slot="start" name="desktop"></ion-icon>
-    {{ 'introduction-download.linux-distro_label' | translate }}
-  </ion-button>
+    <p class="ion-padding-bottom">
+      {{ 'introduction-download.' + playStoreText | translate }}
+    </p>
 
-  <p>{{ 'introduction-download.install-distro_text' | translate }}</p>
+    <ion-button id="btn-recover-secret" color="primary" (click)="downloadDistribution()" shape="round">
+      <ion-icon slot="start" name="desktop"></ion-icon>
+      {{ 'introduction-download.linux-distro_label' | translate }}
+    </ion-button>
+
+    <p>{{ 'introduction-download.install-distro_text' | translate }}</p>
+  </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="dismiss()">{{ 'introduction-download.go_label' | translate }}</ion-button>

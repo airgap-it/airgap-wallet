@@ -66,6 +66,8 @@
   "introduction-download": {
     "title": "Install AirGap Vault",
     "heading": "Let's install AirGap Vault!",
+    "description": "Not sure how and where to install AirGap Vault and AirGap Wallet? We have a detailed step by step guide with all the instructions.",
+    "guide-link_label": "Show Guide",
     "text": "There are a few ways to install AirGap Vault, choose the one that fits the best for you.",
     "android": "Android",    
     "play-store_text": "Install AirGap Vault directly from the Google Play Store for this or a dedicated device.",
