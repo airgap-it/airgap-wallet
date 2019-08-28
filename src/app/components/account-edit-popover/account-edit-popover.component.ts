@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -7,7 +8,6 @@ import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   templateUrl: 'account-edit-popover.component.html',

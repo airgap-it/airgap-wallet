@@ -15,7 +15,7 @@
   <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
     <ion-slide padding-horizontal>
       <div class="slide-zoom">
-        <img src="/assets/img/account-import-onboarding-slide_1.png" />
+        <img [src]="'/assets/img/' + slide1" />
         <ion-text>
           <p text-left [innerHTML]="'account-import-onboarding.slides.slide-1.text' | translate"></p>
         </ion-text>
@@ -26,20 +26,20 @@
     </ion-slide>
     <ion-slide padding-horizontal>
       <div class="slide-zoom">
-        <img src="/assets/img/account-import-onboarding-slide_2.png" />
+        <img [src]="'/assets/img/' + slide2" />
         <p text-left [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
       </div>
     </ion-slide>
     <ion-slide padding-horizontal>
       <div class="slide-zoom">
-        <img src="/assets/img/account-import-onboarding-slide_3.png" />
+        <img [src]="'/assets/img/' + slide3" />
         <p text-left [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
         <p text-left [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
       </div>
     </ion-slide>
     <ion-slide padding-horizontal>
       <div class="slide-zoom">
-        <img src="/assets/img/account-import-onboarding-slide_4.png" />
+        <img [src]="'/assets/img/' + slide4" />
         <p text-left [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
         <p text-left [innerHTML]="'account-import-onboarding.slides.slide-4.description' | translate: { protocolName: protocol.name }"></p>
       </div>

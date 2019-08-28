@@ -6,7 +6,7 @@ import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
-const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
+const DEEPLINK_VAULT_ADD_ACCOUNT: string = `airgap-vault://add-account/`
 
 @Component({
   selector: 'page-account-import-onboarding',
@@ -14,6 +14,11 @@ const DEEPLINK_VAULT_ADD_ACCOUNT = `airgap-vault://add-account/`
   styleUrls: ['./account-import-onboarding.scss']
 })
 export class AccountImportOnboardingPage implements OnInit {
+  public slide1: string = 'account-import-onboarding-slide_1.png'
+  public slide2: string = 'account-import-onboarding-slide_2.png'
+  public slide3: string = 'account-import-onboarding-slide_3.png'
+  public slide4: string = 'account-import-onboarding-slide_4.png'
+
   @ViewChild(IonSlides)
   public slides: IonSlides
   public slideOpts = {
@@ -31,9 +36,16 @@ export class AccountImportOnboardingPage implements OnInit {
   public isBegin: boolean = true
   public isEnd: boolean = false
 
-  constructor(private readonly route: ActivatedRoute, public platform: Platform, private readonly deeplinkProvider: DeepLinkProvider) {}
+  constructor(private readonly route: ActivatedRoute, public platform: Platform, private readonly deeplinkProvider: DeepLinkProvider) {
+    if (this.platform.is('ios')) {
+      this.slide1 = 'account-import-onboarding-slide_1-ios.png'
+      this.slide2 = 'account-import-onboarding-slide_2-ios.png'
+      this.slide3 = 'account-import-onboarding-slide_3-ios.png'
+      this.slide4 = 'account-import-onboarding-slide_4-ios.png'
+    }
+  }
 
-  public ngOnInit() {
+  public ngOnInit(): void {
     if (this.route.snapshot.data.special) {
       this.protocol = getProtocolByIdentifier(this.route.snapshot.data.special)
       console.log(this.protocol)
