@@ -19,6 +19,8 @@
   </ion-row>
 </ion-header>
 
+
+ 
 <ion-content>
   <tezos-delegation-card
     *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
@@ -45,6 +47,7 @@
         </ion-button>
       </ion-col>
     </ion-row>
+
     <ion-list lines="none" padding-bottom>
       <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
         <ion-avatar slot="start">
@@ -65,7 +68,9 @@
           </h3>
         </ion-text>
       </ion-item>
-      <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content"><ion-spinner color="black"></ion-spinner></div>
+      <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+        <ion-spinner color="black"></ion-spinner>
+      </div>
     </ion-list>
   </ng-container>
 
@@ -75,8 +80,19 @@
         <p>{{ 'account-transaction-list.transactions_label' | translate }}</p>
       </ion-text>
     </ion-col>
+
+    <ion-col size="10" padding *ngIf="showLinkToBlockExplorer">
+      <ion-text class="font--weight__bold" color="secondary">
+        <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
+      </ion-text>
+        <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round">
+          <ion-icon name="open"></ion-icon>
+          {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
+        </ion-button>
+    </ion-col>
+     
     <ion-col size="1" no-padding class="justify--content__end">
-      <ion-spinner *ngIf="isRefreshing" color="primary" name="dots"></ion-spinner>
+      <ion-spinner *ngIf="isRefreshing && !showLinkToBlockExplorer" color="primary" name="dots"></ion-spinner>
     </ion-col>
     <ion-col size="1"></ion-col>
   </ion-row>
@@ -208,7 +224,7 @@
         </ion-col>
       </ion-row>
     </ion-item>
-    <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+    <div *ngIf="isRefreshing && !initialTransactionsLoaded && !showLinkToBlockExplorer" class="loading-content">
       <ion-spinner color="black"></ion-spinner>
     </div>
   </ion-list>

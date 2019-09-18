@@ -17,6 +17,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -30,6 +31,8 @@ export class AccountTransactionListPage {
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
   public infiniteEnabled: boolean = false
+  public showLinkToBlockExplorer: boolean = false
+
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
   public transactions: IAirGapTransaction[] = []
@@ -233,6 +236,11 @@ export class AccountTransactionListPage {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
+
+    await promiseTimeout(30000, this.getTransactions()).catch(() => {
+      // either the txs are taking too long to load or there is actually a network error
+      this.showLinkToBlockExplorer = true
+    })
 
     const transactions = await this.getTransactions()
 

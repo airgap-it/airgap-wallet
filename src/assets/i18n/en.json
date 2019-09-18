@@ -16,6 +16,7 @@
     "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
     "send_label": "Send",
+    "tx_not_loading": "The transactions can currently not be loaded, please refer to the block explorer to view the latest transactions",
     "aeternity": {
       "same-phase": {
         "heading": "<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
