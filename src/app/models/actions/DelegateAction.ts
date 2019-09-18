@@ -5,7 +5,6 @@ import { DelegateAction, DelegateActionContext, DelegateActionResult } from 'air
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { WalletActionInfo } from '../ActionGroup'
 
 export interface AirGapDelegateActionContext extends DelegateActionContext {
   toastController: ToastController
