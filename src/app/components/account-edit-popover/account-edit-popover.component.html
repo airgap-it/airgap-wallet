@@ -6,6 +6,10 @@
     <ion-icon name="clipboard" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.copy-address_label' | translate }}
   </ion-item>
+  <ion-item id="blockexplorer" button detail="false" (click)="openBlockExplorer()">
+    <ion-icon name="open" color="dark" slot="end"></ion-icon>
+    {{ 'wallet-edit-popover-component.block_explorer' | translate }}
+  </ion-item>
   <ion-item id="delete" button detail="false" (click)="delete()">
     <ion-icon name="trash" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.delete_label' | translate }}

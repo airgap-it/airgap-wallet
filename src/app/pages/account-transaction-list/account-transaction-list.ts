@@ -9,7 +9,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from '../../models/actions/DelegateAction'
+import { AirGapDelegateAction } from '../../models/actions/DelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -17,6 +17,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -30,6 +31,8 @@ export class AccountTransactionListPage {
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
   public infiniteEnabled: boolean = false
+  public showLinkToBlockExplorer: boolean = false
+
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
   public transactions: IAirGapTransaction[] = []
@@ -234,7 +237,14 @@ export class AccountTransactionListPage {
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
 
-    const transactions = await this.getTransactions()
+    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
+
+    await promiseTimeout(30000, transactionPromise).catch(() => {
+      // either the txs are taking too long to load or there is actually a network error
+      this.showLinkToBlockExplorer = true
+    })
+
+    const transactions: IAirGapTransaction[] = await transactionPromise
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
@@ -354,7 +364,7 @@ export class AccountTransactionListPage {
 	*/
 
   public showToast(message: string) {
-    const toast = this.toastController
+    this.toastController
       .create({
         duration: 3000,
         message,
