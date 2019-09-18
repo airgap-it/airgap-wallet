@@ -244,7 +244,8 @@
     "undelegate_label": "Undelegate",
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
-    "delete_label": "Delete"
+    "delete_label": "Delete",
+    "block_explorer": "Open Blockexplorer"
   },
 
   "account-edit-popover-component": {

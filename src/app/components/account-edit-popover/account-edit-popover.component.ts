@@ -1,13 +1,15 @@
 import { Component } from '@angular/core'
-import { AlertController, NavParams, PopoverController } from '@ionic/angular'
+import { AlertController, NavParams, PopoverController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+
+declare let cordova
 
 @Component({
   templateUrl: 'account-edit-popover.component.html',
@@ -27,6 +29,7 @@ export class AccountEditPopoverComponent {
     private readonly navParams: NavParams,
     private readonly walletsProvider: AccountProvider,
     private readonly viewCtrl: PopoverController,
+    private readonly platform: Platform,
     private readonly clipboardProvider: ClipboardProvider,
     private readonly translateService: TranslateService,
     private readonly operationsProvider: OperationsProvider
@@ -39,6 +42,21 @@ export class AccountEditPopoverComponent {
   public async copyAddressToClipboard() {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
     await this.dismissPopover()
+  }
+
+  public openBlockExplorer() {
+    const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocolIdentifier)
+
+    let blockexplorer: string = protocol.blockExplorer
+    blockexplorer = protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    this.openUrl(blockexplorer)
+  }
+  private openUrl(url: string) {
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      cordova.InAppBrowser.open(url, '_system', 'location=true')
+    } else {
+      window.open(url, '_blank')
+    }
   }
 
   public async ngOnInit() {
