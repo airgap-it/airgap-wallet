@@ -1,11 +1,12 @@
-export async function promiseTimeout(ms, promise): Promise<void> {
+export async function promiseTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   // Create a promise that rejects in <ms> milliseconds
-  let timeout = new Promise((resolve, reject) => {
-    let id = setTimeout(() => {
-      clearTimeout(id)
-      reject('Timed out in ' + ms + 'ms.')
-    }, ms)
-  })
+  const timeout: Promise<T> = new Promise<T>(
+    (resolve, reject): void => {
+      setTimeout(() => {
+        reject(`Timed out in ${ms} ms.`)
+      }, ms)
+    }
+  )
 
   // Returns a race between our timeout and the passed in promise
   return Promise.race([promise, timeout])

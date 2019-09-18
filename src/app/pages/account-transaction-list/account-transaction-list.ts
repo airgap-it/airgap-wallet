@@ -237,12 +237,14 @@ export class AccountTransactionListPage {
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
 
-    await promiseTimeout(30000, this.getTransactions()).catch(() => {
+    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
+
+    await promiseTimeout(30000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
     })
 
-    const transactions = await this.getTransactions()
+    const transactions: IAirGapTransaction[] = await transactionPromise
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
