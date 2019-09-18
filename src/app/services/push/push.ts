@@ -64,6 +64,8 @@ export class PushProvider {
   }
 
   public async setupPush() {
+    await this.platform.ready()
+
     if (this.platform.is('android')) {
       this.register()
     } else if (this.platform.is('ios')) {

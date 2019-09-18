@@ -27,6 +27,8 @@ import { MomentModule } from 'ngx-moment'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ComponentsModule } from './components/components.module'
+import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
+import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
 import { PipesModule } from './pipes/pipes.module'
@@ -52,7 +54,7 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage],
+  entryComponents: [ProtocolSelectPage, IntroductionPushPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -80,7 +82,8 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     PipesModule,
     ComponentsModule,
-    ProtocolSelectPageModule
+    ProtocolSelectPageModule,
+    IntroductionPushPageModule
   ],
   providers: [
     StatusBar,
