@@ -9,7 +9,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from '../../models/actions/DelegateAction'
+import { AirGapDelegateAction } from '../../models/actions/DelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -354,7 +354,7 @@ export class AccountTransactionListPage {
 	*/
 
   public showToast(message: string) {
-    const toast = this.toastController
+    this.toastController
       .create({
         duration: 3000,
         message,
