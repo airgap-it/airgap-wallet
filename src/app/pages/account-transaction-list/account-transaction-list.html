@@ -59,12 +59,12 @@
               {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </span>
           </h2>
+          <ion-text color="blackLight">
+            <h3 class="typography--mono">
+              {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
+            </h3>
+          </ion-text>
         </ion-label>
-        <ion-text color="blackLight">
-          <h3 class="typography--mono">
-            {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
-          </h3>
-        </ion-text>
       </ion-item>
       <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
         <ion-spinner color="black"></ion-spinner>
