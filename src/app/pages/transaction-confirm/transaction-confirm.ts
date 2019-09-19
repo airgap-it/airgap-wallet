@@ -164,9 +164,16 @@ export class TransactionConfirmPage {
 
         // TODO: Remove this special error case once we remove web3 from the coin-lib
         if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
-          (this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
+          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
             if (signed.hash) {
               this.showTransactionSuccessfulAlert(signed.hash)
+              // POST TX TO BACKEND
+              // necessary for the transaction backend
+              signed.amount = signed.amount.toString()
+              signed.fee = signed.fee.toString()
+              signed.signedTx = this.signedTx
+              this.pushBackendProvider.postPendingTx(signed) // Don't await
+              // END POST TX TO BACKEND
             } else {
               handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
             }
