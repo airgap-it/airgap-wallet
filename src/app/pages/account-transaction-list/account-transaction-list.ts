@@ -5,7 +5,9 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { DelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
+import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
@@ -17,7 +19,6 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -346,22 +347,14 @@ export class AccountTransactionListPage {
     return ktAddresses
   }
 
-  public openDelegateSelection() {
-    const info = {
-      wallet: this.wallet
-    }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  /*
-  private replaceAction(type: ActionType, action: CoinAction) {
-    const index = this.actions.findIndex(action => action.type === type)
-    if (index >= 0) {
-      this.actions.splice(index, 1, action)
+  public async openDelegateSelection(): Promise<void> {
+    const delegateAction: DelegateAction<any> | undefined = this.actions.find(
+      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation' 
+    ) as DelegateAction<any>
+    if (delegateAction) {
+      await delegateAction.start()
     }
   }
-	*/
 
   public showToast(message: string) {
     this.toastController
