@@ -8,22 +8,22 @@
 </ion-header>
 
 <ion-content>
-  <p [innerHTML]="'select-wallet.text' | translate" padding-horizontal></p>
+  <p [innerHTML]="'select-wallet.text' | translate" class="ion-padding-horizontal"></p>
   <ion-text color="primary">
-    <p class="font--weight__bold" padding-horizontal>
+    <p class="font--weight__bold ion-padding-horizontal">
       {{ 'select-wallet.compatible_label' | translate }}
     </p>
   </ion-text>
-  <ion-list lines="none" margin-top *ngFor="let wallet of compatibleWallets">
+  <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of compatibleWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
   </ion-list>
 
   <ion-text color="primary">
-    <p class="font--weight__bold" padding-horizontal>
+    <p class="font--weight__bold ion-padding-horizontal">
       {{ 'select-wallet.incompatible_label' | translate }}
     </p>
   </ion-text>
-  <ion-list lines="none" margin-top *ngFor="let wallet of incompatibleWallets">
+  <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of incompatibleWallets">
     <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
   </ion-list>
 </ion-content>

@@ -55,7 +55,7 @@
         </div>
       </ng-template>
     </ion-col>
-    <ion-col size="12" no-padding text-right>
+    <ion-col size="12" class="ion-no-padding ion-text-right">
       <p *ngIf="wallet.currentBalance; else syncingPrice">
         <ion-text color="blackLight">
           <span *ngIf="wallet.currentBalance?.toNumber() > 0">${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}</span>
@@ -93,12 +93,12 @@
       </h3>
     </ion-label>
     <ion-row class="items--right" slot="end">
-      <ion-col size="12" no-padding text-right>
+      <ion-col size="12" class="ion-no-padding ion-text-right">
         <p>
           <ion-skeleton-text animated></ion-skeleton-text>
         </p>
       </ion-col>
-      <ion-col size="12" no-padding text-right>
+      <ion-col size="12" class="ion-no-padding ion-text-right">
         <p>
           <ion-skeleton-text animated></ion-skeleton-text>
         </p>

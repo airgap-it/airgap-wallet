@@ -1,12 +1,12 @@
 <ion-content>
-  <ion-row class="portfolio--hero" justify-content-center align-items-center>
-    <h1 no-margin>${{ total | number: '1.2-2' }}</h1>
+  <ion-row class="portfolio--hero ion-justify-content-center ion-align-items-center">
+    <h1 class="ion-no-margin">${{ total | number: '1.2-2' }}</h1>
   </ion-row>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
     <ng-container *ngIf="walletGroupsArray.length; else noItems">
-      <ion-list class="walletGroups" lines="none" no-padding *ngFor="let walletGroup of walletGroupsArray">
+      <ion-list class="walletGroups ion-no-padding" lines="none" *ngFor="let walletGroup of walletGroupsArray">
         <ion-card>
           <portfolio-item
             *ngIf="walletGroup.mainWallet"
@@ -27,14 +27,14 @@
       </ion-list>
     </ng-container>
     <ng-template #noItems>
-      <ion-row class="container__empty" padding justify-content-center>
+      <ion-row class="container__empty" class="ion-padding ion-justify-content-center">
         <img src="assets/img/sync_wallet_onboarding_1.svg" />
         <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
       </ion-row>
     </ng-template>
   </ng-container>
   <ng-template #loading>
-    <ion-list lines="none" margin-top>
+    <ion-list lines="none" class="ion-margin-top">
       <ion-card>
         <portfolio-item></portfolio-item>
       </ion-card>
