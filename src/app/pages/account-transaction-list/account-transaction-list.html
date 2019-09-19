@@ -11,7 +11,7 @@
     </ion-buttons>
   </ion-toolbar>
   <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
-  <ion-row padding-top padding-horizontal>
+  <ion-row class="ion-padding-top ion-padding-horizontal">
     <ion-button *ngFor="let action of actions" color="secondary" (click)="action.start()" shape="round" size="small" fill="outline">
       <ion-icon slot="start" [name]="action.context.icon"></ion-icon>
       {{ action.context.name | translate }}
@@ -31,22 +31,22 @@
 
   <ng-container *ngIf="hasPendingTransactions">
     <ion-row padding-horizontal>
-      <ion-col size="12" no-padding padding-top>
+      <ion-col size="12" class="ion-no-padding ion-padding-top">
         <ion-text color="primary">
           <p class="font--weight__bold">
             {{ 'account-transaction-list.pending-transactions.label' | translate }}
           </p>
         </ion-text>
       </ion-col>
-      <ion-col size="12" no-padding>
-        <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round" slot="start" size="small">
+      <ion-col size="12" class="ion-no-padding">
+        <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
           <ion-icon slot="start" name="open"></ion-icon>
           {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
         </ion-button>
       </ion-col>
     </ion-row>
 
-    <ion-list lines="none" padding-bottom>
+    <ion-list lines="none" class="ion-padding-bottom">
       <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
         <ion-avatar slot="start">
           <identicon [address]="tx.isInbound ? tx.from[0] : tx.to[0]"></identicon>
@@ -72,25 +72,25 @@
     </ion-list>
   </ng-container>
 
-  <ion-row align-items-center>
-    <ion-col size="10" padding>
+  <ion-row class="ion-align-items-center">
+    <ion-col size="10" class="ion-padding">
       <ion-text class="font--weight__bold" color="primary">
         <p>{{ 'account-transaction-list.transactions_label' | translate }}</p>
       </ion-text>
     </ion-col>
 
-    <ion-col size="1" no-padding class="justify--content__end">
+    <ion-col size="1" class="justify--content__end ion-no-padding">
       <ion-spinner *ngIf="isRefreshing && !showLinkToBlockExplorer" color="primary" name="dots"></ion-spinner>
     </ion-col>
     <ion-col size="1"></ion-col>
   </ion-row>
 
   <ion-row>
-    <ion-col padding *ngIf="showLinkToBlockExplorer">
+    <ion-col class="ion-padding" *ngIf="showLinkToBlockExplorer">
       <ion-text class="font--weight__bold" color="secondary">
         <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
       </ion-text>
-      <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round">
+      <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round">
         <ion-icon name="open"></ion-icon>
         {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
       </ion-button>
@@ -99,8 +99,8 @@
 
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <div padding-horizontal class="empty-list" *ngIf="!isRefreshing && showAeMigrationScreen()">
-    <img padding-vertical src="../../assets/img/ae-token-migration.svg" />
+  <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showAeMigrationScreen()">
+    <img class="ion-padding-vertical" src="../../assets/img/ae-token-migration.svg" />
     <ion-text color="primary">
       <h5>
         {{ aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
@@ -119,7 +119,7 @@
     ></p>
   </div>
 
-  <ion-row padding justify-content-center align-items-center *ngIf="!isRefreshing && showAeMigrationBanner()">
+  <ion-row class="ion-padding ion-justify-content-center ion-align-items-center" *ngIf="!isRefreshing && showAeMigrationBanner()">
     <ion-col size="4"><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
     <ion-col size="1"></ion-col>
     <ion-col size="7">
@@ -151,13 +151,12 @@
   </ion-row>
 
   <div
-    padding-horizontal
     [ngClass]="{ 'empty--list__container': showAeMigrationBanner() }"
-    class="empty-list"
+    class="empty-list ion-padding-horizontal"
     *ngIf="!isRefreshing && showNoTransactionScreen()"
   >
     <img
-      padding-vertical
+      class="ion-padding-vertical"
       [ngClass]="{ 'empty--list__image': showAeMigrationBanner() }"
       src="../../assets/img/empty-state-no-transaction.svg"
     />
@@ -175,7 +174,7 @@
     </span>
   </div>
 
-  <ion-list lines="none" padding-bottom>
+  <ion-list lines="none" class="ion-padding-bottom">
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar slot="start">
         <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon>
@@ -199,26 +198,20 @@
         </ion-text>
       </ion-label>
       <ion-row class="items--right" slot="end">
-        <ion-col no-padding>
-          <ion-row justify-content-end>
+        <ion-col class="ion-no-padding">
+          <ion-row class="ion-justify-content-end">
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{
-                  t.timestamp
-                    | amFromUnix
-                    | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
-                }}
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
+                'HH:mm' } }}
               </p>
             </ion-text>
           </ion-row>
-          <ion-row justify-content-end>
+          <ion-row class="ion-justify-content-end">
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{
-                  t.timestamp
-                    | amFromUnix
-                    | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
-                }}
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
+                'L' } }}
               </p>
             </ion-text>
           </ion-row>
