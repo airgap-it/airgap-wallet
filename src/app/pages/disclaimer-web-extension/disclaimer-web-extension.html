@@ -1,22 +1,22 @@
-<ion-content padding>
+<ion-content class="ion-padding">
   <h1 [innerHTML]="'web-extension-disclaimer.heading' | translate"></h1>
 
   <img src="assets/img/airgap_onboarding_wallet-notebook.svg" />
 
-  <p padding-bottom>
+  <p class="ion-padding-bottom">
     <strong>{{ 'web-extension-disclaimer.text' | translate }}</strong>
   </p>
-  <ul no-padding>
+  <ul class="ion-no-padding">
     <li>{{ 'web-extension-disclaimer.list.item-1_text' | translate }}</li>
     <br />
     <li>{{ 'web-extension-disclaimer.list.item-2_text' | translate }}</li>
   </ul>
-  <h6 padding-vertical>
+  <h6 class="ion-padding-vertical">
     {{ 'web-extension-disclaimer.description' | translate }}
   </h6>
 </ion-content>
 <ion-footer no-border>
-  <ion-toolbar padding transparent>
+  <ion-toolbar class="ion-padding" transparent>
     <ion-button size="default" color="primary" (click)="accept()" shape="round" slot="end">
       {{ 'web-extension-disclaimer.accept_label' | translate }}
     </ion-button>
