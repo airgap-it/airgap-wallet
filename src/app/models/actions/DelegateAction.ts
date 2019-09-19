@@ -30,7 +30,12 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
     })
 
     await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-    await this.delegateAction.start()
+
+    try {
+      await this.delegateAction.start()
+    } catch (error) {
+      await this.onError(error)
+    }
 
     return this.delegateAction.result
   }
