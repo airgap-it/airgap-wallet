@@ -90,8 +90,8 @@
       <ion-text class="font--weight__bold" color="secondary">
         <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
       </ion-text>
-      <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round">
-        <ion-icon name="open"></ion-icon>
+      <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" class="ion-margin-top">
+        <ion-icon name="open" slot="start"></ion-icon>
         {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
       </ion-button>
     </ion-col>
