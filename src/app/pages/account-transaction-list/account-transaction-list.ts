@@ -5,11 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { DelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
+import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from '../../models/actions/DelegateAction'
+import { AirGapDelegateAction } from '../../models/actions/DelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -30,6 +32,8 @@ export class AccountTransactionListPage {
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
   public infiniteEnabled: boolean = false
+  public showLinkToBlockExplorer: boolean = false
+
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
   public transactions: IAirGapTransaction[] = []
@@ -234,7 +238,14 @@ export class AccountTransactionListPage {
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
 
-    const transactions = await this.getTransactions()
+    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
+
+    await promiseTimeout(30000, transactionPromise).catch(() => {
+      // either the txs are taking too long to load or there is actually a network error
+      this.showLinkToBlockExplorer = true
+    })
+
+    const transactions: IAirGapTransaction[] = await transactionPromise
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
@@ -336,25 +347,17 @@ export class AccountTransactionListPage {
     return ktAddresses
   }
 
-  public openDelegateSelection() {
-    const info = {
-      wallet: this.wallet
-    }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  /*
-  private replaceAction(type: ActionType, action: CoinAction) {
-    const index = this.actions.findIndex(action => action.type === type)
-    if (index >= 0) {
-      this.actions.splice(index, 1, action)
+  public async openDelegateSelection(): Promise<void> {
+    const delegateAction: DelegateAction<any> | undefined = this.actions.find(
+      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation' 
+    ) as DelegateAction<any>
+    if (delegateAction) {
+      await delegateAction.start()
     }
   }
-	*/
 
   public showToast(message: string) {
-    const toast = this.toastController
+    this.toastController
       .create({
         duration: 3000,
         message,

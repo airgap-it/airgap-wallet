@@ -5,7 +5,6 @@ import { DelegateAction, DelegateActionContext, DelegateActionResult } from 'air
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { WalletActionInfo } from '../ActionGroup'
 
 export interface AirGapDelegateActionContext extends DelegateActionContext {
   toastController: ToastController
@@ -31,7 +30,12 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
     })
 
     await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-    await this.delegateAction.start()
+
+    try {
+      await this.delegateAction.start()
+    } catch (error) {
+      await this.onError(error)
+    }
 
     return this.delegateAction.result
   }

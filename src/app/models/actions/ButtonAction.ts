@@ -1,20 +1,19 @@
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { Action, RepeatableAction } from 'airgap-coin-lib/dist/actions/Action'
 
 export interface ButtonActionContext {
   name: string
   icon: string
+  identifier: string
 }
 
-export class ButtonAction<Result, Context> extends Action<Result, ButtonActionContext> {
-  private readonly action: Action<Result, Context>
-
-  public constructor(context: ButtonActionContext, action: Action<Result, Context>) {
-    super(context)
-    this.action = action
+export class ButtonAction<Result, Context> extends RepeatableAction<Result, Context, ButtonActionContext> {
+  public get identifier(): string {
+    return this.context.identifier
   }
 
-  protected async perform(): Promise<Result> {
-    await this.action.start()
-    return this.action.result
+  public set identifier(value: string) {}
+
+  public constructor(context: ButtonActionContext, actionFactory: () => Action<Result, Context>) {
+    super(context, actionFactory)
   }
 }
