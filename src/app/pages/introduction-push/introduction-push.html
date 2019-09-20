@@ -12,12 +12,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-  <ion-row justify-content-center align-items-center class="row--height__100">
-    <ion-col text-center>
-      <h3 padding-horizontal no-margin [innerHTML]="'introduction-push.heading' | translate"></h3>
+<ion-content class="ion-padding">
+  <ion-row class="row--height__100 ion-justify-content-center ion-align-items-center ">
+    <ion-col class="ion-text-center">
+      <h3 class="ion-padding-horizontal ion-no-margin" [innerHTML]="'introduction-push.heading' | translate"></h3>
       <img src="../assets/img/push_onboarding.svg" />
-      <p padding-horizontal>
+      <p class="ion-padding-horizontal">
         {{ 'introduction-push.description' | translate }}
       </p>
       <ion-button shape="round" color="primary" (click)="promptForPushPermission()">

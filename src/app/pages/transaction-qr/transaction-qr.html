@@ -9,12 +9,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding margin-bottom>
+<ion-content class="ion-padding ion-margin-bottom">
   <ion-row>
     <h5 [innerHTML]="'transaction-qr.text' | translate"></h5>
   </ion-row>
 
-  <ion-row justify-content-center padding-vertical>
+  <ion-row class="ion-justify-content-center ion-padding-vertical">
     <qr-clipboard id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
     <ion-text>
       <h1 *ngIf="qrDataTooBig">
@@ -23,7 +23,7 @@
     </ion-text>
   </ion-row>
 
-  <from-to *ngIf="airGapTx" padding-horizontal [transaction]="airGapTx"></from-to>
+  <from-to *ngIf="airGapTx" class="ion-padding-horizontal" [transaction]="airGapTx"></from-to>
   <signed-transaction *ngIf="!airGapTx" [syncProtocolString]="preparedDataQR"></signed-transaction>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

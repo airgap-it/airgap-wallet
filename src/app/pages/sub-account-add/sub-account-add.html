@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-row padding>
+  <ion-row class="ion-padding">
     <ion-text class="font--weight__bold" color="primary">
       <span>{{ typeLabel | translate }}</span>
     </ion-text>
@@ -20,8 +20,8 @@
     [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
   ></empty-state>
 
-  <ion-row *ngFor="let subAccount of subAccounts; let i = index" no-padding>
-    <ion-col size="10" no-padding>
+  <ion-row class="ion-no-padding" *ngFor="let subAccount of subAccounts; let i = index">
+    <ion-col size="10" class="ion-no-padding">
       <portfolio-item
         [isToken]="subProtocolType === subProtocolTypes.TOKEN"
         [wallet]="subAccount.wallet"
@@ -30,7 +30,7 @@
         (click)="toggleAccount(subAccount)"
       ></portfolio-item>
     </ion-col>
-    <ion-col size="2" class="content--align__center-center" no-padding>
+    <ion-col size="2" class="content--align__center-center ion-no-padding">
       <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
     </ion-col>
   </ion-row>
