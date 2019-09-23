@@ -121,6 +121,13 @@ const routes: Routes = [
       special: DataResolverService
     },
     loadChildren: './pages/delegation-baker-detail/delegation-baker-detail.module#DelegationBakerDetailPageModule'
+  },
+  {
+    path: 'delegation-cosmos',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: './pages/delegation-cosmos/delegation-cosmos.module#DelegationCosmosPageModule'
   }
 ]
 @NgModule({

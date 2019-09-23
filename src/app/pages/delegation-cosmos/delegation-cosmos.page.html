@@ -1,0 +1,185 @@
+<!--TODO: take https://www.mintscan.io/validators/cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0 & https://app.lunie.io/validators/cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0 as a reference -->
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'delegation-cosmos.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12">
+      <ion-item lines="none" class="ion-no-padding">
+        <ion-avatar slot="start"><identicon [address]="'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'"></identicon></ion-avatar>
+        <ion-label>
+          <h2 class="font--weight__bold" ion-text color="black">
+            stake.fish
+          </h2>
+          <p>cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0</p>
+        </ion-label>
+      </ion-item>
+      <!--TODO: show if loading 
+
+      <ng-template #bakerAvatarSkeleton>
+        <div>
+          <ion-item lines="none" class="ion-no-padding">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ng-template>
+    --></ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal ion-padding-bottom">
+    <ion-col size="12" class="ion-no-padding">
+      <!--TODO: get status of cosmos validator active/inactive-->
+      <p>{{ 'delegation-cosmos.status-active_label' | translate }}</p>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <div class="progress--container">
+        <!--TODO: calculate percentage of self bond (total amount & self amount) -->
+        <div class="progress--current" [style.width]="'80%'"></div>
+      </div>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <ion-row>
+        <ion-col size="6" class="ion-no-padding">
+          <small>0.16%</small>
+          <!--TODO: show if loading 
+          <ng-template #bakerInfoSkeleton>
+            <div>
+              <p class="ion-no-margin">
+                <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+              </p>
+            </div>
+          </ng-template>
+          -->
+        </ion-col>
+        <ion-col size="6" class="ion-no-padding ion-text-right">
+          <small>
+            20,000 / 11,874,951
+          </small>
+          <!--TODO: show if loading 
+
+          <ng-template #bakerInfoBalanceSkeleton>
+            <div class="justify--content__end">
+              <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+            </div>
+          </ng-template>
+        --></ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="logo-usd"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black">
+              <span>4%</span>
+            </h2>
+            <!--TODO: show if loading 
+
+            <ng-template #bakerConfigSkeleton>
+              <div>
+                <h2>
+                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h2>
+              </div>
+            </ng-template>
+          -->
+            <h3>{{ 'delegation-cosmos.comission_label' | translate }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold" ion-text color="black">
+              10.25%
+            </h2>
+            <h3>{{ 'delegation-cosmos.rewards_label' | translate }}</h3>
+            <!--TODO: show if loading 
+            <ng-template #bakerConfigSkeleton>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </h3>
+            </ng-template>
+          --></ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-no-margin ion-ion-text">
+          {{ 'delegation-cosmos.your-delegation.label' | translate }}
+        </p>
+      </ion-text>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <p>{{ 'delegation-cosmos.your-delegation.text' | translate }}</p>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal padding-top align-items-center amount__container">
+    <ion-col size="9" class="amount--container__input ion-no-padding">
+      <ion-item clasS="ion-no-padding" lines="none">
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">Amount</ion-label>
+        <ion-input type="number" id="amount-input" placeholder="0.0"></ion-input>
+      </ion-item>
+      <ion-text class="ion-no-margin" color="blackLight">
+        <!--TODO: dollar value -->
+        <p class="ion-no-margin">$</p>
+      </ion-text>
+    </ion-col>
+    <ion-col size="3" class="ion-no-padding">
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button shape="round" size="small" color="secondary">
+            MAX
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col size="12">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="wallet"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold ion-ion-text " color="black">
+              11231
+            </h2>
+            <h3>{{ 'delegation-cosmos.your-balance_label' | translate }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-margin-bottom"></ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary">{{ 'delegation-cosmos.delegate_label' | translate }}</ion-button>
+  </ion-fab>
+</ion-content>

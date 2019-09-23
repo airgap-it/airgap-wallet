@@ -1,0 +1,30 @@
+.amount__container {
+  .item-inner {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+  ion-input {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin: 0;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+  .amount--container__input,
+  .amount--container__input .item-inner {
+    padding-right: 0;
+  }
+}
+.progress--container {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 232, 204, 0.12);
+}
+.progress--current {
+  height: inherit;
+  background-color: var(--ion-color-primary);
+}
+.border--container {
+  border: 1px solid var(--ion-color-secondary);
+  border-radius: 50%;
+}
