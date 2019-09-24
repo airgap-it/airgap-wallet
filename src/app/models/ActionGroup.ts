@@ -1,3 +1,4 @@
+import { AirGapCosmosDelegateActionContext, AirGapCosmosDelegateAction } from './actions/CosmosDelegateAction'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action, LinkedAction, SimpleAction } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
@@ -11,6 +12,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
 import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/DelegateAction'
+import { CosmosDelegateAction } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
 
 export interface WalletActionInfo {
   name: string
@@ -46,7 +48,6 @@ export class ActionGroup {
       () => {
         const importAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
-          console.log('IMPORT ACCOUNT ACTION', ktAddresses)
           if (ktAddresses.length === 0) {
             this.callerContext.showToast('No accounts to import.')
           } else {
@@ -122,17 +123,17 @@ export class ActionGroup {
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
         const prepareDelegateActionContext = new SimpleAction(() => {
-          return new Promise<AirGapDelegateActionContext>(async resolve => {
+          return new Promise<AirGapCosmosDelegateActionContext>(async resolve => {
             let wallet: AirGapMarketWallet = this.callerContext.wallet
             const info = {
               wallet,
               actionCallback: resolve
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router.navigateByUrl('/delegation-cosmos/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.callerContext.router.navigateByUrl('/delegation-cosmos/' + DataServiceKey.DETAIL).catch(console.error)
           })
         })
-        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
+        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapCosmosDelegateAction)
 
         return delegateAction
       }

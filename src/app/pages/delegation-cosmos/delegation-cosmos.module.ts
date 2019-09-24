@@ -8,6 +8,7 @@ import { ComponentsModule } from '../../components/components.module'
 import { IonicModule } from '@ionic/angular'
 
 import { DelegationCosmosPage } from './delegation-cosmos.page'
+import { PipesModule } from 'src/app/pipes/pipes.module'
 
 const routes: Routes = [
   {
@@ -17,7 +18,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, RouterModule.forChild(routes)],
+  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, PipesModule, RouterModule.forChild(routes)],
   declarations: [DelegationCosmosPage]
 })
 export class DelegationCosmosPageModule {}

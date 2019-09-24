@@ -123,7 +123,7 @@ const routes: Routes = [
     loadChildren: './pages/delegation-baker-detail/delegation-baker-detail.module#DelegationBakerDetailPageModule'
   },
   {
-    path: 'delegation-cosmos/',
+    path: 'delegation-cosmos/:id',
     resolve: {
       special: DataResolverService
     },
