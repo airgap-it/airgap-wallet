@@ -31,6 +31,9 @@ export class ActionGroup {
     actionMap.set(ProtocolSymbols.ETH, () => {
       return this.getEthereumActions()
     })
+    actionMap.set(ProtocolSymbols.COSMOS, () => {
+      return this.getCosmosActions()
+    })
 
     const actionFunction: () => Action<any, any>[] | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
@@ -112,6 +115,30 @@ export class ActionGroup {
     )
 
     return [viewDelegateButtonAction]
+  }
+
+  private getCosmosActions(): Action<any, any>[] {
+    const delegateButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
+      () => {
+        const prepareDelegateActionContext = new SimpleAction(() => {
+          return new Promise<AirGapDelegateActionContext>(async resolve => {
+            let wallet: AirGapMarketWallet = this.callerContext.wallet
+            const info = {
+              wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router.navigateByUrl('/delegation-cosmos/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
+
+        return delegateAction
+      }
+    )
+
+    return [delegateButtonAction]
   }
 
   private getEthereumActions(): Action<any, any>[] {
