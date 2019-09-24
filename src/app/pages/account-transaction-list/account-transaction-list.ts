@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { DelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
 import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 
@@ -348,9 +348,9 @@ export class AccountTransactionListPage {
   }
 
   public async openDelegateSelection(): Promise<void> {
-    const delegateAction: DelegateAction<any> | undefined = this.actions.find(
-      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation' 
-    ) as DelegateAction<any>
+    const delegateAction: TezosDelegateAction<any> | undefined = this.actions.find(
+      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation'
+    ) as TezosDelegateAction<any>
     if (delegateAction) {
       await delegateAction.start()
     }

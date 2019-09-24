@@ -101,7 +101,7 @@ export class OperationsProvider {
       const airGapTx = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
-      })
+      })[0]
 
       const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
 

@@ -1,30 +1,30 @@
 import { Router } from '@angular/router'
 import { LoadingController, ToastController } from '@ionic/angular'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { DelegateAction, DelegateActionContext, DelegateActionResult } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import { TezosDelegateAction, TezosDelegateActionContext, TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/DelegateAction'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
-export interface AirGapDelegateActionContext extends DelegateActionContext {
+export interface AirGapDelegateActionContext extends TezosDelegateActionContext {
   toastController: ToastController
   loadingController: LoadingController
   dataService: DataService
   router: Router
 }
 
-export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDelegateActionContext> {
+export class AirGapDelegateAction extends Action<TezosDelegateActionResult, AirGapDelegateActionContext> {
   private loader: HTMLIonLoadingElement | undefined
-  private readonly delegateAction: DelegateAction<AirGapDelegateActionContext>
+  private readonly delegateAction: TezosDelegateAction<AirGapDelegateActionContext>
 
   public constructor(context: AirGapDelegateActionContext) {
     super(context)
-    this.delegateAction = new DelegateAction(context)
+    this.delegateAction = new TezosDelegateAction(context)
     this.setupOnComplete(context)
     this.setupOnError(context)
   }
 
-  protected async perform(): Promise<DelegateActionResult> {
+  protected async perform(): Promise<TezosDelegateActionResult> {
     this.loader = await this.delegateAction.context.loadingController.create({
       message: 'Preparing transaction...'
     })
@@ -46,7 +46,7 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
 
       context.dataService.setData(DataServiceKey.INTERACTION, {
         wallet: context.wallet,
-        airGapTx: result.airGapTx,
+        airGapTxs: result.airGapTxs,
         data: result.dataUrl
       })
       context.router
