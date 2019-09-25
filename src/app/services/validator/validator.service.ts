@@ -10,6 +10,7 @@ export interface Uptime {
 export interface ValidatorInfos {
   rate: string
   status: string
+  totalDelegationBalance: string
 }
 
 export interface CosmosValidatorObject {
@@ -39,18 +40,23 @@ export interface CosmosValidatorObject {
   providedIn: 'root'
 })
 export class ValidatorService {
-  private readonly cosmoStationUrl = 'https://api.cosmostation.io/v1/staking/validators'
+  private readonly cosmoStationBaseUrl = 'https://api.cosmostation.io/v1/'
   constructor(private readonly http: HttpClient) {}
 
-  public async getValidatorInfos(validatorName: string): Promise<ValidatorInfos> {
+  public async getValidatorInfos(operator_address: string): Promise<ValidatorInfos> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     return new Promise(resolve => {
-      this.http.get<Array<CosmosValidatorObject>>(this.cosmoStationUrl).subscribe((response: Array<CosmosValidatorObject>) => {
-        const validator = response.find((validator: CosmosValidatorObject) => validator.operator_address === validatorName)
-        if (validator) {
-          resolve({ rate: `${(parseFloat(validator.rate) * 100).toString()}%`, status: statusCodes[validator.status] })
-        }
-      })
+      this.http
+        .get<CosmosValidatorObject>(`${this.cosmoStationBaseUrl}/staking/validator/${operator_address}`)
+        .subscribe((validator: CosmosValidatorObject) => {
+          if (validator) {
+            resolve({
+              rate: `${(parseFloat(validator.rate) * 100).toString()}%`,
+              status: statusCodes[validator.status],
+              totalDelegationBalance: `${(parseFloat(validator.tokens) / 1000).toString()}`
+            })
+          }
+        })
     })
   }
 }

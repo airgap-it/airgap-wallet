@@ -18,6 +18,7 @@ export class DelegationCosmosPage {
   public validatorInfos: ValidatorInfos
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
+  public totalDelegationBalance: string | undefined
 
   private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
 
@@ -41,6 +42,7 @@ export class DelegationCosmosPage {
     this.validatorInfos = await this.validatorService.getValidatorInfos(this.validatorAddress)
     this.validatorCommission = this.validatorInfos.rate
     this.validatorStatus = this.validatorInfos.status
+    this.totalDelegationBalance = this.validatorInfos.totalDelegationBalance
   }
 
   public async delegate(): Promise<void> {
