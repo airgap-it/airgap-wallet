@@ -43,7 +43,7 @@ export class ValidatorService {
   private readonly cosmoStationBaseUrl = 'https://api.cosmostation.io/v1/'
   constructor(private readonly http: HttpClient) {}
 
-  public async getValidatorInfos(operator_address: string): Promise<ValidatorInfos> {
+  public async getValidatorInfos(operator_address: string): Promise<any> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     return new Promise(resolve => {
       this.http
@@ -55,13 +55,12 @@ export class ValidatorService {
               status: statusCodes[validator.status],
               totalDelegationBalance: `${(parseFloat(validator.tokens) / 1000).toString()}` // TODO display in a nice format
             })
-          } else {
-            resolve({
-              rate: 'unknown',
-              status: 'unknown',
-              totalDelegationBalance: 'unknown'
-            })
           }
+          resolve({
+            rate: 'unknown',
+            status: 'unknown',
+            totalDelegationBalance: 'unknown'
+          })
         })
     })
   }
