@@ -46,8 +46,7 @@
   </ion-row>
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
-      <!--TODO: get status of cosmos validator active/inactive-->
-      <p>{{ 'delegation-cosmos.status-active_label' | translate }}</p>
+      <p>{{ validatorStatus }}</p>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
@@ -93,7 +92,7 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black">
-              <span>4%</span>
+              <span>{{ validatorCommission }}</span>
             </h2>
             <!--TODO: show if loading 
 
@@ -171,7 +170,7 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              11231
+              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>{{ 'delegation-cosmos.your-balance_label' | translate }}</h3>
           </ion-label>
@@ -183,6 +182,6 @@
   <ion-row class="ion-margin-bottom"></ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary">{{ 'delegation-cosmos.delegate_label' | translate }}</ion-button>
+    <ion-button shape="round" color="primary" (click)="delegate()">{{ 'delegation-cosmos.delegate_label' | translate }}</ion-button>
   </ion-fab>
 </ion-content>
