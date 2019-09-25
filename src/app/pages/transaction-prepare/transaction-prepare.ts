@@ -114,22 +114,22 @@ export class TransactionPreparePage {
           switch (val) {
             case 0:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+                this.wallet.coinProtocol.feeDefaults.low.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
               )
               break
             case 1:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
               )
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.high.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+                this.wallet.coinProtocol.feeDefaults.high.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
               )
               break
             default:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
               )
           }
         })
@@ -177,7 +177,7 @@ export class TransactionPreparePage {
   private setMaxAmount(fee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
     const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.minus(new BigNumber(fee))
+    const amountWithoutFees = amount.toNumber() > 0 ? amount.minus(new BigNumber(fee)) : 0
     this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
       emitEvent: false
     })
