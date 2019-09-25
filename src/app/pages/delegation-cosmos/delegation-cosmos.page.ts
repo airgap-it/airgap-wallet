@@ -23,7 +23,7 @@ export class DelegationCosmosPage {
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
   public totalDelegationBalance: string | undefined
-  public amount: number | undefined
+  public amount: number = 0
   public sendMaxAmount: boolean = false
 
   private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
