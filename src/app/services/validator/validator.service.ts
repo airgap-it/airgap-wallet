@@ -48,7 +48,7 @@ export class ValidatorService {
       this.http.get<Array<CosmosValidatorObject>>(this.cosmoStationUrl).subscribe((response: Array<CosmosValidatorObject>) => {
         const validator = response.find((validator: CosmosValidatorObject) => validator.operator_address === validatorName)
         if (validator) {
-          resolve({ rate: `${(parseFloat(validator.rate) * 100).toString()}$`, status: statusCodes[validator.status] })
+          resolve({ rate: `${(parseFloat(validator.rate) * 100).toString()}%`, status: statusCodes[validator.status] })
         }
       })
     })
