@@ -53,7 +53,13 @@ export class ValidatorService {
             resolve({
               rate: `${(parseFloat(validator.rate) * 100).toString()}%`,
               status: statusCodes[validator.status],
-              totalDelegationBalance: `${(parseFloat(validator.tokens) / 1000).toString()}`
+              totalDelegationBalance: `${(parseFloat(validator.tokens) / 1000).toString()}` // TODO display in a nice format
+            })
+          } else {
+            resolve({
+              rate: 'unknown',
+              status: 'unknown',
+              totalDelegationBalance: 'unknown'
             })
           }
         })
