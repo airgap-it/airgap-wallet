@@ -1,3 +1,4 @@
+import { DrawChartService } from './../draw-chart/draw-chart.service'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { NotificationEventResponse } from '@ionic-native/push/ngx'
@@ -50,6 +51,7 @@ export class AccountProvider {
   constructor(
     private readonly storageProvider: StorageProvider,
     private readonly pushProvider: PushProvider,
+    private readonly drawChartProvider: DrawChartService,
     private readonly popoverController: PopoverController,
     private readonly languageService: LanguageService,
     private readonly alertController: AlertController,
@@ -233,7 +235,7 @@ export class AccountProvider {
     this.walletList.push(wallet)
 
     this.wallets.next(this.walletList)
-
+    this.drawChartProvider.drawChart()
     return this.persist()
   }
 
@@ -254,6 +256,7 @@ export class AccountProvider {
     this.pushProvider.unregisterWallets([walletToRemove]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
     this.wallets.next(this.walletList)
+    this.drawChartProvider.drawChart()
 
     return this.persist()
   }

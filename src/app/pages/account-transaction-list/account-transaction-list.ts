@@ -349,7 +349,7 @@ export class AccountTransactionListPage {
 
   public async openDelegateSelection(): Promise<void> {
     const delegateAction: DelegateAction<any> | undefined = this.actions.find(
-      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation' 
+      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation'
     ) as DelegateAction<any>
     if (delegateAction) {
       await delegateAction.start()

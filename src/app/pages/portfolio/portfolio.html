@@ -1,7 +1,8 @@
-<ion-content>
-  <ion-row class="portfolio--hero ion-justify-content-center ion-align-items-center">
-    <h1 class="ion-no-margin">${{ total | number: '1.2-2' }}</h1>
-  </ion-row>
+<ion-header no-border no-shadow>
+  <ion-toolbar color="translucent"></ion-toolbar>
+</ion-header>
+<ion-content fullscreen="true">
+  <chart [total]="total"></chart>
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">

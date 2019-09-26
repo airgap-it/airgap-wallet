@@ -43,7 +43,6 @@ export class ActionGroup {
       () => {
         const importAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
-          console.log('IMPORT ACCOUNT ACTION', ktAddresses)
           if (ktAddresses.length === 0) {
             this.callerContext.showToast('No accounts to import.')
           } else {
@@ -65,10 +64,12 @@ export class ActionGroup {
         const prepareDelegateActionContext = new SimpleAction(() => {
           return new Promise<AirGapDelegateActionContext>(async resolve => {
             let wallet: AirGapMarketWallet = this.callerContext.wallet
-            const importAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
+            const importAction = new ImportAccountAction({ publicKey: wallet.publicKey })
             try {
               await importAction.start()
-              wallet = await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, 0, importAction.result)
+              if (importAction.result.length > 0) {
+                wallet = await this.callerContext.operationsProvider.addKtAddress(wallet, 0, importAction.result)
+              }
             } catch {}
             const info = {
               wallet,
