@@ -40,6 +40,14 @@ identicon {
 .color__primary {
   color: var(--ion-color-primary);
 }
+
+.color__percentage_up {
+  color: green;
+}
+.color__percentage_down {
+  color: red;
+}
+
 .style__strong {
   font-weight: bold;
 }
