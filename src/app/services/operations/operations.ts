@@ -98,10 +98,10 @@ export class OperationsProvider {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
       const rawUnsignedTx: any = await wallet.prepareTransaction([address], [amount], fee, data)
 
-      const airGapTx = await wallet.coinProtocol.getTransactionDetails({
+      const airGapTx: IAirGapTransaction = (await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
-      })[0]
+      }))[0]
 
       const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
 
