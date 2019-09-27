@@ -1,8 +1,8 @@
 import { ValidatorService, ValidatorInfos } from './../../services/validator/validator.service'
-import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
+import { AirGapCosmosDelegateActionContext, CosmosDelegationInfo } from './../../models/actions/CosmosDelegateAction'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Component } from '@angular/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, CosmosProtocol } from 'airgap-coin-lib'
 import { ToastController, LoadingController } from '@ionic/angular'
 import { DataService } from 'src/app/services/data/data.service'
 import BigNumber from 'bignumber.js'
@@ -17,7 +17,8 @@ import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 export class DelegationCosmosPage {
   public wallet: AirGapMarketWallet
   public delegationForm: FormGroup
-
+  public addressDelegated: boolean
+  public delegatedAmount: string
   private readonly validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
   public validatorInfos: ValidatorInfos
   public validatorCommission: string | undefined
@@ -40,6 +41,7 @@ export class DelegationCosmosPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
+      this.isAddressDelegated()
       this.actionCallback = info.actionCallback
       this.getValidatorInfos()
       this.delegationForm = formBuilder.group({
@@ -54,6 +56,24 @@ export class DelegationCosmosPage {
     })
   }
 
+  public async isAddressDelegated() {
+    const protocol = new CosmosProtocol()
+    const delegationInfo: CosmosDelegationInfo = await protocol.isAddressDelegated(this.wallet.addresses[0])
+    if (delegationInfo.isDelegated) {
+      this.addressDelegated = true
+
+      // TODO this is in uatom
+      const delegatedAmount = new BigNumber(
+        parseFloat(delegationInfo.delegationInfo.find(delegation => (delegation.validator_address = this.validatorAddress)).shares)
+      ).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      this.delegationForm.controls.amount.setValue(delegatedAmount.toFixed(), {
+        emitEvent: false
+      })
+    } else {
+      this.addressDelegated = false
+    }
+  }
+
   public async getValidatorInfos() {
     this.validatorInfos = await this.validatorService.getValidatorInfos(this.validatorAddress)
     this.validatorCommission = this.validatorInfos.rate
@@ -63,10 +83,8 @@ export class DelegationCosmosPage {
 
   public async delegate(): Promise<void> {
     const { amount: formAmount } = this.delegationForm.value
-    console.log('this.wallet.coinProtocol.decimals', this.wallet.coinProtocol.decimals)
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
-
-    const jgd = {
+    this.actionCallback({
       wallet: this.wallet,
       validatorAddress: this.validatorAddress,
       amount: amount,
@@ -75,9 +93,22 @@ export class DelegationCosmosPage {
       loadingController: this.loadingController,
       dataService: this.dataService,
       router: this.router
-    }
-    console.log('JGD', jgd)
-    this.actionCallback(jgd)
+    })
+  }
+
+  public async undelegate(): Promise<void> {
+    const { amount: formAmount } = this.delegationForm.value
+    const delegatedAmount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+    this.actionCallback({
+      wallet: this.wallet,
+      validatorAddress: this.validatorAddress,
+      amount: delegatedAmount,
+      undelegate: true,
+      toastController: this.toastController,
+      loadingController: this.loadingController,
+      dataService: this.dataService,
+      router: this.router
+    })
   }
 
   public toggleMaxAmount() {
@@ -88,7 +119,7 @@ export class DelegationCosmosPage {
   }
 
   private setMaxAmount() {
-    const amount = this.wallet.currentBalance.shiftedBy(Math.abs(this.wallet.coinProtocol.decimals))
+    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
     this.delegationForm.controls.amount.setValue(amount.toFixed(), {
       emitEvent: false
     })

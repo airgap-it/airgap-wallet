@@ -134,8 +134,11 @@
         </p>
       </ion-text>
     </ion-col>
-    <ion-col size="12" class="ion-no-padding">
-      <p>{{ 'delegation-cosmos.your-delegation.text' | translate }}</p>
+    <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
+      <p>{{ 'delegation-cosmos.your-delegation.delegate_text' | translate }}</p>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
+      <p>{{ 'delegation-cosmos.your-delegation.undelegate_text' | translate }}</p>
     </ion-col>
   </ion-row>
   <form [formGroup]="delegationForm" padding-bottom>
@@ -198,6 +201,11 @@
   <ion-row class="ion-margin-bottom"></ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()">{{ 'delegation-cosmos.delegate_label' | translate }}</ion-button>
+    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="!addressDelegated">
+      {{ 'delegation-cosmos.delegate_label' | translate }}
+    </ion-button>
+    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="addressDelegated">
+      {{ 'delegation-cosmos.undelegate_label' | translate }}
+    </ion-button>
   </ion-fab>
 </ion-content>

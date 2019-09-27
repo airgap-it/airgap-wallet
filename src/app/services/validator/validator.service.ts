@@ -1,3 +1,5 @@
+import { CosmosProtocol } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 
@@ -45,6 +47,7 @@ export class ValidatorService {
 
   public async getValidatorInfos(operator_address: string): Promise<any> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
+    const protocol = new CosmosProtocol()
     return new Promise(resolve => {
       this.http
         .get<CosmosValidatorObject>(`${this.cosmoStationBaseUrl}/staking/validator/${operator_address}`)
@@ -53,7 +56,7 @@ export class ValidatorService {
             resolve({
               rate: `${(parseFloat(validator.rate) * 100).toString()}%`,
               status: statusCodes[validator.status],
-              totalDelegationBalance: `${(parseFloat(validator.tokens) / 1000).toString()}` // TODO display in a nice format
+              totalDelegationBalance: `${new BigNumber(validator.tokens).shiftedBy(-1 * protocol.decimals).toString()}` // TODO display in a nice format
             })
           }
           resolve({

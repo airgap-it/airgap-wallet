@@ -388,11 +388,13 @@
     "status-inactive_label": "inactive",
     "your-rewards_label": "Your Rewards",
     "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",    
     "commission_label": "Commission",
     "rewards_label": "Rewards",
     "your-delegation": {
       "label": "Your Delegation",
-      "text": "Select the amount you want to delegate."
+      "delegate_text": "Select the amount you want to delegate.",
+      "undelegate_text": "You are currently delegated to this validator. Select the amount you want to undelegate."
     },
     "your-balance_label": "Your Current Balance"
   },

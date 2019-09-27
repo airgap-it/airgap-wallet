@@ -9,6 +9,15 @@ import {
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
+export interface RpcDelegationResponse {
+  delegator_address: string
+  validator_address: string
+  shares: string
+}
+export interface CosmosDelegationInfo {
+  isDelegated: boolean
+  delegationInfo?: Array<RpcDelegationResponse>
+}
 export interface AirGapCosmosDelegateActionContext extends CosmosDelegateActionContext {
   toastController: ToastController
   loadingController: LoadingController
@@ -46,10 +55,9 @@ export class AirGapCosmosDelegateAction extends Action<CosmosDelegateActionResul
   private setupOnComplete(context: AirGapCosmosDelegateActionContext) {
     this.delegateAction.onComplete = async result => {
       this.dismissLoader()
-
       context.dataService.setData(DataServiceKey.INTERACTION, {
         wallet: context.wallet,
-        airGapTxs: result.airGapTxs,
+        airGapTx: result.airGapTxs[0],
         data: result.dataUrl
       })
       context.router
