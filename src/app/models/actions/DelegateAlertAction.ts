@@ -5,7 +5,7 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { LanguageService } from '../../services/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
-import { AirGapDelegateAction, AirGapDelegateActionContext } from './DelegateAction'
+import { AirGapDelegateAction, AirGapDelegateActionContext } from './TezosDelegateAction'
 
 export interface DelegateAlertActionContext extends AirGapDelegateActionContext {
   isAccepted?: boolean

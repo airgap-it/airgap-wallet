@@ -11,7 +11,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/DelegateAction'
+import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/TezosDelegateAction'
 import { CosmosDelegateAction } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
 
 export interface WalletActionInfo {
