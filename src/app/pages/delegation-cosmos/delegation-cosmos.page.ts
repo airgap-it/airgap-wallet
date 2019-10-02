@@ -125,7 +125,7 @@ export class DelegationCosmosPage {
 
   private setMaxAmount() {
     let amount
-    if (this.isAddressDelegated) {
+    if (this.addressDelegated) {
       amount = this.delegatedAmount
     } else {
       amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
