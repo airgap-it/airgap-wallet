@@ -45,9 +45,10 @@ export class SignedTransactionComponent {
     if (this.signedTx) {
       const protocol = getProtocolByIdentifier(this.signedTx.protocol)
       try {
-        this.airGapTx = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)[0]
+        this.airGapTx = (await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction))[0]
         this.fallbackActivated = false
       } catch (e) {
+        console.error(e)
         this.fallbackActivated = true
         this.rawTxData = this.signedTx.payload as SignedTransaction
         handleErrorSentry(ErrorCategory.COINLIB)(e)
