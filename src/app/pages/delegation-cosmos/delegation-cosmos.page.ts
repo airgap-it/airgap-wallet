@@ -18,8 +18,8 @@ export class DelegationCosmosPage {
   public wallet: AirGapMarketWallet
   public delegationForm: FormGroup
   public addressDelegated: boolean
-  public delegatedAmount: string
-  private readonly validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public delegatedAmount: BigNumber
+  private validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
   public validatorInfos: ValidatorInfos
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
@@ -41,14 +41,17 @@ export class DelegationCosmosPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.isAddressDelegated()
       this.actionCallback = info.actionCallback
-      this.getValidatorInfos()
       this.delegationForm = formBuilder.group({
         amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
       })
       this.onChanges()
     }
+  }
+
+  public async ionViewDidEnter() {
+    await this.isAddressDelegated()
+    await this.getValidatorInfos()
   }
   public onChanges(): void {
     this.delegationForm.get('amount').valueChanges.subscribe(() => {
@@ -61,12 +64,12 @@ export class DelegationCosmosPage {
     const delegationInfo: CosmosDelegationInfo = await protocol.isAddressDelegated(this.wallet.addresses[0])
     if (delegationInfo.isDelegated) {
       this.addressDelegated = true
+      this.validatorAddress = delegationInfo.delegationInfo[0].validator_address // TODO what if we're delegated to multiple validators
 
-      // TODO this is in uatom
-      const delegatedAmount = new BigNumber(
+      this.delegatedAmount = new BigNumber(
         parseFloat(delegationInfo.delegationInfo.find(delegation => (delegation.validator_address = this.validatorAddress)).shares)
       ).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-      this.delegationForm.controls.amount.setValue(delegatedAmount.toFixed(), {
+      this.delegationForm.controls.amount.setValue(this.delegatedAmount.toFixed(), {
         emitEvent: false
       })
     } else {
@@ -119,7 +122,12 @@ export class DelegationCosmosPage {
   }
 
   private setMaxAmount() {
-    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    let amount
+    if (this.isAddressDelegated) {
+      amount = this.delegatedAmount
+    } else {
+      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    }
     this.delegationForm.controls.amount.setValue(amount.toFixed(), {
       emitEvent: false
     })
