@@ -9,33 +9,10 @@ export interface Uptime {
   over_blocks: number
 }
 
-export interface ValidatorInfos {
+export interface CosmosValidatorInfo {
   rate: string
   status: string
   totalDelegationBalance: string
-}
-
-export interface CosmosValidatorObject {
-  rank: number
-  operator_address: string
-  consensus_pubkey: string
-  jailed: boolean
-  status: number
-  tokens: string
-  delegator_shares: string
-  moniker: string
-  identity: string
-  website: string
-  details: string
-  unbonding_height: string
-  unbonding_time: Date
-  rate: string
-  max_rate: string
-  max_change_rate: string
-  update_time: Date
-  uptime: Uptime
-  min_self_delegation: string
-  keybase_url: string
 }
 
 @Injectable({
@@ -45,26 +22,22 @@ export class ValidatorService {
   private readonly cosmoStationBaseUrl = 'https://api.cosmostation.io/v1/'
   constructor(private readonly http: HttpClient) {}
 
-  public async getValidatorInfos(operator_address: string): Promise<any> {
+  public async getValidatorInfos(address: string): Promise<CosmosValidatorInfo> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     const protocol = new CosmosProtocol()
-    return new Promise(resolve => {
-      this.http
-        .get<CosmosValidatorObject>(`${this.cosmoStationBaseUrl}/staking/validator/${operator_address}`)
-        .subscribe((validator: CosmosValidatorObject) => {
-          if (validator) {
-            resolve({
-              rate: `${(parseFloat(validator.rate) * 100).toString()}%`,
-              status: statusCodes[validator.status],
-              totalDelegationBalance: `${new BigNumber(validator.tokens).shiftedBy(-1 * protocol.decimals).toString()}` // TODO display in a nice format
-            })
-          }
-          resolve({
-            rate: 'unknown',
-            status: 'unknown',
-            totalDelegationBalance: 'unknown'
-          })
-        })
-    })
+    try {
+      const validator = await protocol.fetchValidator(address)
+      return {
+        rate: `${(parseFloat(validator.commission.rate) * 100).toString()}%`,
+        status: statusCodes[validator.status],
+        totalDelegationBalance: `${new BigNumber(validator.tokens).shiftedBy(-1 * protocol.decimals).toString()}` // TODO display in a nice format
+      }
+    } catch {
+      return {
+        rate: 'unknown',
+        status: 'unknown',
+        totalDelegationBalance: 'unknown'
+      }
+    }
   }
 }

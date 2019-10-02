@@ -6,7 +6,7 @@ import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
-import { AirGapDelegateActionContext } from 'src/app/models/actions/TezosDelegateAction'
+import { AirGapTezosDelegateActionContext } from 'src/app/models/actions/TezosDelegateAction'
 
 import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
 import { DataService } from '../../services/data/data.service'
@@ -42,7 +42,7 @@ export class DelegationBakerDetailPage {
 
   private airGapBaker: BakerConfig
 
-  private readonly actionCallback: (context: AirGapDelegateActionContext) => void
+  private readonly actionCallback: (context: AirGapTezosDelegateActionContext) => void
 
   constructor(
     public location: Location,

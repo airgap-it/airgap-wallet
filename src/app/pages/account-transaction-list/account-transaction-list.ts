@@ -11,7 +11,7 @@ import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapDelegateAction } from '../../models/actions/TezosDelegateAction'
+import { AirGapTezosDelegateAction } from '../../models/actions/TezosDelegateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -311,7 +311,7 @@ export class AccountTransactionListPage {
         },
         onUndelegate: async () => {
           // TODO: Should we move this to it's own file?
-          const delegateAction: AirGapDelegateAction = new AirGapDelegateAction({
+          const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction({
             wallet: this.wallet,
             delegate: undefined,
             toastController: this.toastController,

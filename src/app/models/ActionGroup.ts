@@ -11,7 +11,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
-import { AirGapDelegateAction, AirGapDelegateActionContext } from './actions/TezosDelegateAction'
+import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
 import { CosmosDelegateAction } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
 
 export interface WalletActionInfo {
@@ -67,7 +67,7 @@ export class ActionGroup {
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
         const prepareDelegateActionContext = new SimpleAction(() => {
-          return new Promise<AirGapDelegateActionContext>(async resolve => {
+          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
             let wallet: AirGapMarketWallet = this.callerContext.wallet
             const importAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
             try {
@@ -84,7 +84,7 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
+        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapTezosDelegateAction)
 
         return delegateAction
       }
@@ -98,7 +98,7 @@ export class ActionGroup {
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'view-delegation' },
       () => {
         const prepareDelegateActionContext = new SimpleAction(() => {
-          return new Promise<AirGapDelegateActionContext>(async resolve => {
+          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
             const info = {
               wallet: this.callerContext.wallet,
               actionCallback: resolve
@@ -109,7 +109,7 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const viewDelegationAction = new LinkedAction(prepareDelegateActionContext, AirGapDelegateAction)
+        const viewDelegationAction = new LinkedAction(prepareDelegateActionContext, AirGapTezosDelegateAction)
 
         return viewDelegationAction
       }

@@ -6,18 +6,18 @@ import { TezosDelegateAction, TezosDelegateActionContext, TezosDelegateActionRes
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
-export interface AirGapDelegateActionContext extends TezosDelegateActionContext {
+export interface AirGapTezosDelegateActionContext extends TezosDelegateActionContext {
   toastController: ToastController
   loadingController: LoadingController
   dataService: DataService
   router: Router
 }
 
-export class AirGapDelegateAction extends Action<TezosDelegateActionResult, AirGapDelegateActionContext> {
+export class AirGapTezosDelegateAction extends Action<TezosDelegateActionResult, AirGapTezosDelegateActionContext> {
   private loader: HTMLIonLoadingElement | undefined
-  private readonly delegateAction: TezosDelegateAction<AirGapDelegateActionContext>
+  private readonly delegateAction: TezosDelegateAction<AirGapTezosDelegateActionContext>
 
-  public constructor(context: AirGapDelegateActionContext) {
+  public constructor(context: AirGapTezosDelegateActionContext) {
     super(context)
     this.delegateAction = new TezosDelegateAction(context)
     this.setupOnComplete(context)
@@ -40,7 +40,7 @@ export class AirGapDelegateAction extends Action<TezosDelegateActionResult, AirG
     return this.delegateAction.result
   }
 
-  private setupOnComplete(context: AirGapDelegateActionContext) {
+  private setupOnComplete(context: AirGapTezosDelegateActionContext) {
     this.delegateAction.onComplete = async result => {
       this.dismissLoader()
 
@@ -55,7 +55,7 @@ export class AirGapDelegateAction extends Action<TezosDelegateActionResult, AirG
     }
   }
 
-  private setupOnError(context: AirGapDelegateActionContext) {
+  private setupOnError(context: AirGapTezosDelegateActionContext) {
     this.onError = async error => {
       this.dismissLoader()
       handleErrorSentry(ErrorCategory.OTHER)(`${this.identifier}-${error}`)

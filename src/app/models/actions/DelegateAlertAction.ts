@@ -5,9 +5,9 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { LanguageService } from '../../services/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
-import { AirGapDelegateAction, AirGapDelegateActionContext } from './TezosDelegateAction'
+import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './TezosDelegateAction'
 
-export interface DelegateAlertActionContext extends AirGapDelegateActionContext {
+export interface DelegateAlertActionContext extends AirGapTezosDelegateActionContext {
   isAccepted?: boolean
   popoverController: PopoverController
   languageService: LanguageService
@@ -22,11 +22,11 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
     name: 'Tip Us',
     icon: 'logo-usd'
   }
-  private readonly delegateAction: AirGapDelegateAction
+  private readonly delegateAction: AirGapTezosDelegateAction
 
   constructor(context: DelegateAlertActionContext) {
     super(context)
-    this.delegateAction = new AirGapDelegateAction(context)
+    this.delegateAction = new AirGapTezosDelegateAction(context)
   }
 
   protected async perform(): Promise<void> {

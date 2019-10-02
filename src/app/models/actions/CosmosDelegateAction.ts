@@ -9,15 +9,6 @@ import {
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
-export interface RpcDelegationResponse {
-  delegator_address: string
-  validator_address: string
-  shares: string
-}
-export interface CosmosDelegationInfo {
-  isDelegated: boolean
-  delegationInfo?: Array<RpcDelegationResponse>
-}
 export interface AirGapCosmosDelegateActionContext extends CosmosDelegateActionContext {
   toastController: ToastController
   loadingController: LoadingController
