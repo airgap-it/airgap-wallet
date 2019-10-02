@@ -19,7 +19,8 @@ export class DelegationCosmosPage {
   public delegationForm: FormGroup
   public addressDelegated: boolean
   public delegatedAmount: BigNumber
-  private validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public validatorAlias: string
   public validatorInfos: ValidatorInfos
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
@@ -80,6 +81,7 @@ export class DelegationCosmosPage {
   public async getValidatorInfos() {
     this.validatorInfos = await this.validatorService.getValidatorInfos(this.validatorAddress)
     this.validatorCommission = this.validatorInfos.rate
+    this.validatorAlias = this.validatorInfos.alias
     this.validatorStatus = this.validatorInfos.status
     this.totalDelegationBalance = this.validatorInfos.totalDelegationBalance
   }

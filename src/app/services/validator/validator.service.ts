@@ -10,6 +10,7 @@ export interface Uptime {
 }
 
 export interface ValidatorInfos {
+  alias: string
   rate: string
   status: string
   totalDelegationBalance: string
@@ -45,7 +46,7 @@ export class ValidatorService {
   private readonly cosmoStationBaseUrl = 'https://api.cosmostation.io/v1/'
   constructor(private readonly http: HttpClient) {}
 
-  public async getValidatorInfos(operator_address: string): Promise<any> {
+  public async getValidatorInfos(operator_address: string): Promise<ValidatorInfos> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     const protocol = new CosmosProtocol()
     return new Promise(resolve => {
@@ -54,12 +55,14 @@ export class ValidatorService {
         .subscribe((validator: CosmosValidatorObject) => {
           if (validator) {
             resolve({
+              alias: validator.moniker,
               rate: `${(parseFloat(validator.rate) * 100).toString()}%`,
               status: statusCodes[validator.status],
               totalDelegationBalance: `${new BigNumber(validator.tokens).shiftedBy(-1 * protocol.decimals).toString()}` // TODO display in a nice format
             })
           }
           resolve({
+            alias: 'unknown',
             rate: 'unknown',
             status: 'unknown',
             totalDelegationBalance: 'unknown'
