@@ -19,8 +19,9 @@ export class DelegationCosmosPage {
   public wallet: AirGapMarketWallet
   public delegationForm: FormGroup
   public addressDelegated: boolean
-  public delegatedAmount: string
-  private readonly validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public delegatedAmount: BigNumber
+  public validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public validatorAlias: string
   public validatorInfo: CosmosValidatorInfo
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
@@ -42,15 +43,19 @@ export class DelegationCosmosPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.checkAddressDelegations()
       this.actionCallback = info.actionCallback
-      this.getValidatorInfo()
       this.delegationForm = formBuilder.group({
         amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
       })
       this.onChanges()
     }
   }
+
+  public async ionViewDidEnter() {
+    await this.checkAddressDelegations()
+    await this.getValidatorInfo()
+  }
+
   public onChanges(): void {
     this.delegationForm.get('amount').valueChanges.subscribe(() => {
       this.sendMaxAmount = false
@@ -61,13 +66,12 @@ export class DelegationCosmosPage {
     const protocol = new CosmosProtocol()
     const delegations: CosmosDelegation[] = await protocol.fetchDelegations(this.wallet.addresses[0])
     if (delegations.length > 0) {
+      const delegation = delegations[0] // TODO what if we're delegated to multiple validators
       this.addressDelegated = true
+      this.validatorAddress = delegation.validator_address
 
-      // TODO this is in uatom
-      const delegatedAmount = new BigNumber(
-        parseFloat(delegations.find(delegation => delegation.validator_address == this.validatorAddress).shares)
-      ).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-      this.delegationForm.controls.amount.setValue(delegatedAmount.toFixed(), {
+      this.delegatedAmount = new BigNumber(parseFloat(delegation.shares)).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      this.delegationForm.controls.amount.setValue(this.delegatedAmount.toFixed(), {
         emitEvent: false
       })
     } else {
@@ -76,8 +80,9 @@ export class DelegationCosmosPage {
   }
 
   public async getValidatorInfo() {
-    this.validatorInfo = await this.validatorService.getValidatorInfos(this.validatorAddress)
+    this.validatorInfo = await this.validatorService.getValidatorInfo(this.validatorAddress)
     this.validatorCommission = this.validatorInfo.rate
+    this.validatorAlias = this.validatorInfo.alias
     this.validatorStatus = this.validatorInfo.status
     this.totalDelegationBalance = this.validatorInfo.totalDelegationBalance
   }
@@ -120,7 +125,12 @@ export class DelegationCosmosPage {
   }
 
   private setMaxAmount() {
-    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    let amount
+    if (this.addressDelegated) {
+      amount = this.delegatedAmount
+    } else {
+      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    }
     this.delegationForm.controls.amount.setValue(amount.toFixed(), {
       emitEvent: false
     })

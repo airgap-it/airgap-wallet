@@ -10,40 +10,37 @@
 
 <ion-content>
   <ion-row class="ion-padding-horizontal">
-    <ion-col size="12">
+    <ion-col size="12" *ngIf="validatorInfo; else bakerAvatarSkeleton">
       <ion-item lines="none" class="ion-no-padding">
-        <!--TODO: validator address -->
-        <ion-avatar slot="start"><identicon [address]="'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'"></identicon></ion-avatar>
+        <ion-avatar slot="start"><identicon [address]="validatorAddress"></identicon></ion-avatar>
         <ion-label>
-          <!--TODO: validator name (if possible)-->
           <h2 class="font--weight__bold" ion-text color="black">
-            stake.fish
+            {{ validatorAlias }}
           </h2>
-          <!--TODO: validator address -->
-          <p>cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0</p>
+          <p>{{ validatorAddress }}</p>
         </ion-label>
       </ion-item>
-      <!--TODO: show if loading 
-
-      <ng-template #bakerAvatarSkeleton>
-        <div>
-          <ion-item lines="none" class="ion-no-padding">
-            <ion-avatar slot="start">
-              <ion-skeleton-text animated></ion-skeleton-text>
-            </ion-avatar>
-            <ion-label>
-              <h2>
-                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
-              </h2>
-              <p>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </p>
-            </ion-label>
-          </ion-item>
-        </div>
-      </ng-template>
-    --></ion-col>
+    </ion-col>
   </ion-row>
+
+  <ng-template #bakerAvatarSkeleton>
+    <div>
+      <ion-item lines="none" class="ion-no-padding">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <h2>
+            <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+          </h2>
+          <p>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </p>
+        </ion-label>
+      </ion-item>
+    </div>
+  </ng-template>
+
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
       <p>{{ validatorStatus }}</p>
@@ -89,10 +86,9 @@
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else bakerConfigSkeleton">
               <span>{{ validatorCommission }}</span>
             </h2>
-            <!--TODO: show if loading 
 
             <ng-template #bakerConfigSkeleton>
               <div>
@@ -101,7 +97,7 @@
                 </h2>
               </div>
             </ng-template>
-          -->
+
             <h3>{{ 'delegation-cosmos.commission_label' | translate }}</h3>
           </ion-label>
         </ion-item>
