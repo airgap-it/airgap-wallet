@@ -7,7 +7,8 @@ import {
   IAirGapTransaction,
   SyncProtocolUtils,
   TezosKtProtocol,
-  TezosProtocol
+  TezosProtocol,
+  CosmosProtocol
 } from 'airgap-coin-lib'
 import { RawAeternityTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/aeternity-transactions.serializer'
 import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/bitcoin-transactions.serializer'
@@ -40,7 +41,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(address)
+      const isDelegated = await this.checkDelegated(address)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -79,9 +80,19 @@ export class OperationsProvider {
     })
   }
 
-  public async checkDelegated(address: string): Promise<DelegationInfo> {
-    const protocol = new TezosKtProtocol()
+  public async checkDelegated(address: string): Promise<boolean> {
+    if (address.startsWith('cosmos')) {
+      // TODO: this is ugly and needs to be re-implemented properly
+      const protocol = new CosmosProtocol()
+      const delegations = await protocol.fetchDelegations(address)
+      return delegations.length > 0
+    } else {
+      return (await this.fetchDelegationInfo(address)).isDelegated
+    }
+  }
 
+  public async fetchDelegationInfo(address: string): Promise<DelegationInfo> {
+    const protocol = new TezosKtProtocol()
     return protocol.isAddressDelegated(address)
   }
 

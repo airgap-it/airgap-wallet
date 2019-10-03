@@ -67,7 +67,7 @@ export class DelegationBakerDetailPage {
     const airGapBakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
     this.airGapBaker = airGapBakerConfig
 
-    this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    this.delegationInfo = await this.operationsProvider.fetchDelegationInfo(this.wallet.receivingPublicAddress)
     this.isDelegated = this.delegationInfo.isDelegated
 
     // If baker is not us, we can't display more info

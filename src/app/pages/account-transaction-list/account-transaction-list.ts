@@ -332,8 +332,7 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
-    this.isKtDelegated = isDelegated
+    this.isKtDelegated = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
   }
