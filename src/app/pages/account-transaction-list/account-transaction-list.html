@@ -87,10 +87,10 @@
 
   <ion-row>
     <ion-col padding *ngIf="showLinkToBlockExplorer">
-      <ion-text class="font--weight__bold" color="secondary">
+      <ion-text color="secondary">
         <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
       </ion-text>
-      <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round">
+      <ion-button (click)="openBlockexplorer()" fill="outline" ion-button color="secondary" shape="round" size="small">
         <ion-icon name="open"></ion-icon>
         {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
       </ion-button>
@@ -203,22 +203,16 @@
           <ion-row justify-content-end>
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{
-                  t.timestamp
-                    | amFromUnix
-                    | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
-                }}
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
+                'HH:mm' } }}
               </p>
             </ion-text>
           </ion-row>
           <ion-row justify-content-end>
             <ion-text color="blackLight">
               <p *ngIf="t.timestamp">
-                {{
-                  t.timestamp
-                    | amFromUnix
-                    | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
-                }}
+                {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse:
+                'L' } }}
               </p>
             </ion-text>
           </ion-row>
