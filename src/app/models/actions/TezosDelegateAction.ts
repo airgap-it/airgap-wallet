@@ -1,7 +1,11 @@
 import { Router } from '@angular/router'
 import { LoadingController, ToastController } from '@ionic/angular'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { TezosDelegateAction, TezosDelegateActionContext, TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import {
+  TezosDelegateAction,
+  TezosDelegateActionContext,
+  TezosDelegateActionResult
+} from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

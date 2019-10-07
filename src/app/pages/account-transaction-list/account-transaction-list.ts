@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
+import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { BigNumber } from 'bignumber.js'
 import { promiseTimeout } from 'src/app/helpers/promise-timeout'
 
