@@ -128,6 +128,10 @@ const routes: Routes = [
       special: DataResolverService
     },
     loadChildren: './pages/delegation-cosmos/delegation-cosmos.module#DelegationCosmosPageModule'
+  },
+  {
+    path: 'delegation-validator-list',
+    loadChildren: './pages/delegation-validator-list/delegation-validator-list.module#DelegationValidatorListPageModule'
   }
 ]
 @NgModule({

@@ -456,8 +456,12 @@
     "baker-address_label": "Baker address",
     "cancel_label": "Cancel",
     "set-baker_label": "Set Baker"
-	},
-	
+  },
+  "delegation-validator-list": {
+    "title": "Validator List",
+    "your-validators_label": "Your Validators",
+    "validators_label": "Validators"
+  },
 	"action-alert-tip": {
 		"heading": "Thank you for using AirGap!",
 		"text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",

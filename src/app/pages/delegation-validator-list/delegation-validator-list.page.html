@@ -1,0 +1,180 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'delegation-validator-list.title' | translate }}</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <!--TODO search for validator-->
+    <ion-searchbar mode="md"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-start ion-padding-vertical">
+  <!--TODO: show if delegations-->
+  <ng-container>
+    <ion-row>
+      <ion-col size="12">
+        <ion-text color="primary">
+          <p class="font--weight__bold ion-no-margin ion-ion-text">
+            {{ 'delegation-validator-list.your-validators_label' | translate }}
+          </p>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+    <ion-list lines="none">
+      <!--TODO: navigate to delegation-cosmos-->
+      <ion-item class="ion-no-padding">
+        <ion-avatar slot="start"><identicon [address]="'cosmos'"></identicon></ion-avatar>
+        <ion-label>
+          <ion-text color="black">
+            <ion-row class="ion-no-padding ">
+              <ion-col size="9" class="ion-no-padding">
+                <!--TODO: Add validator alias-->
+                <h2 class="font--weight__bold">
+                  Validator
+                </h2>
+              </ion-col>
+              <ion-col size="3" class="ion-text-end ion-no-padding">
+                <!--TODO: Add Comission-->
+                <p class="ion-no-margin">12%</p>
+              </ion-col>
+            </ion-row>
+          </ion-text>
+          <ion-row class="ion-no-padding">
+            <ion-col size="4" class="ion-no-padding">
+              <ion-text color="blackLight">
+                <!--TODO: Add address-->
+                <p class="ion-no-margin typography--mono">cosmos...</p>
+              </ion-text>
+            </ion-col>
+            <ion-col size="8" class="ion-text-end ion-no-padding">
+              <ion-text color="blackLight">
+                <!--TODO: Add validator balance-->
+                <p class="ion-no-margin">123123 ATOMs</p>
+              </ion-text>
+            </ion-col>
+          </ion-row>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+  <!--TODO: show all validators-->
+  <ion-row>
+    <ion-col size="12">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-no-margin ion-ion-text">
+          {{ 'delegation-validator-list.validators_label' | translate }}
+        </p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+  <ion-list lines="none">
+    <!--TODO: navigate to delegation-cosmos-->
+
+    <ion-item class="ion-no-padding">
+      <ion-avatar slot="start"><identicon [address]="'cosmos'"></identicon></ion-avatar>
+      <ion-label>
+        <ion-text color="black">
+          <ion-row class="ion-no-padding ">
+            <ion-col size="9" class="ion-no-padding">
+              <!--TODO: Add validator alias-->
+              <h2 class="font--weight__bold">
+                Validator
+              </h2>
+            </ion-col>
+            <ion-col size="3" class="ion-text-end ion-no-padding">
+              <!--TODO: Add Comission-->
+              <p class="ion-no-margin">12%</p>
+            </ion-col>
+          </ion-row>
+        </ion-text>
+        <ion-row class="ion-no-padding">
+          <ion-col size="4" class="ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add address-->
+              <p class="ion-no-margin typography--mono">cosmos...</p>
+            </ion-text>
+          </ion-col>
+          <ion-col size="8" class="ion-text-end ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add validator balance-->
+              <p class="ion-no-margin">123123 ATOMs</p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-label>
+    </ion-item>
+    <ion-item class="ion-no-padding">
+      <!--TODO: navigate to delegation-cosmos-->
+
+      <ion-avatar slot="start"><identicon [address]="'cosmos'"></identicon></ion-avatar>
+      <ion-label>
+        <ion-text color="black">
+          <ion-row class="ion-no-padding ">
+            <ion-col size="9" class="ion-no-padding">
+              <!--TODO: Add validator alias-->
+              <h2 class="font--weight__bold">
+                Validator
+              </h2>
+            </ion-col>
+            <ion-col size="3" class="ion-text-end ion-no-padding">
+              <!--TODO: Add Comission-->
+              <p class="ion-no-margin">12%</p>
+            </ion-col>
+          </ion-row>
+        </ion-text>
+        <ion-row class="ion-no-padding">
+          <ion-col size="4" class="ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add address-->
+              <p class="ion-no-margin typography--mono">cosmos...</p>
+            </ion-text>
+          </ion-col>
+          <ion-col size="8" class="ion-text-end ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add validator balance-->
+              <p class="ion-no-margin">123123 ATOMs</p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-label>
+    </ion-item>
+    <ion-item class="ion-no-padding">
+      <!--TODO: navigate to delegation-cosmos-->
+
+      <ion-avatar slot="start"><identicon [address]="'cosmos'"></identicon></ion-avatar>
+      <ion-label>
+        <ion-text color="black">
+          <ion-row class="ion-no-padding ">
+            <ion-col size="9" class="ion-no-padding">
+              <!--TODO: Add validator alias-->
+              <h2 class="font--weight__bold">
+                Validator
+              </h2>
+            </ion-col>
+            <ion-col size="3" class="ion-text-end ion-no-padding">
+              <!--TODO: Add Comission-->
+              <p class="ion-no-margin">12%</p>
+            </ion-col>
+          </ion-row>
+        </ion-text>
+        <ion-row class="ion-no-padding">
+          <ion-col size="4" class="ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add address-->
+              <p class="ion-no-margin typography--mono">cosmos...</p>
+            </ion-text>
+          </ion-col>
+          <ion-col size="8" class="ion-text-end ion-no-padding">
+            <ion-text color="blackLight">
+              <!--TODO: Add validator balance-->
+              <p class="ion-no-margin">123123 ATOMs</p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
