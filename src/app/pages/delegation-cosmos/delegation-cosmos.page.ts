@@ -28,6 +28,7 @@ export class DelegationCosmosPage {
   public totalDelegationBalance: string | undefined
   public amount: number = 0
   public sendMaxAmount: boolean = false
+  public delegationOption: string = 'delegate'
 
   private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
 
