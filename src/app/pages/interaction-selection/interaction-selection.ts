@@ -43,6 +43,7 @@ export class InteractionSelectionPage {
   }
 
   public sameDeviceSign() {
+    console.log(this.preparedDataQR)
     this.deepLinkProvider
       .sameDeviceDeeplink(this.preparedDataQR)
       .then(() => {

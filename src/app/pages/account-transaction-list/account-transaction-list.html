@@ -21,13 +21,22 @@
 
 <ion-content>
   <tezos-delegation-card
-    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
+    *ngIf="wallet.protocolIdentifier === 'xtz'"
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
     [delegateAmount]="wallet.currentBalance"
     (onDelegatedClick)="openDelegateSelection()"
     (onUndelegatedClick)="openDelegateSelection()"
   ></tezos-delegation-card>
+  <card-actionable
+    *ngIf="wallet.protocolIdentifier === 'xtz-kt'"
+    [imageLeft]="false"
+    [imageName]="'babylon-migration.svg'"
+    [text]="'account-transaction-list.migrate-babylon_card.text' | translate"
+    [heading]="'account-transaction-list.migrate-babylon_card.heading' | translate"
+    tappable
+    (click)="openPreparePage()"
+  ></card-actionable>
 
   <ng-container *ngIf="hasPendingTransactions">
     <ion-row padding-horizontal>

@@ -106,9 +106,17 @@ export class PortfolioPage {
     this.doRefresh().catch(handleErrorSentry())
   }
 
-  public openDetail(wallet: AirGapMarketWallet) {
-    this.dataService.setData(DataServiceKey.WALLET, wallet)
-    this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public openDetail(mainWallet: AirGapMarketWallet, subWallet?: AirGapMarketWallet) {
+    const info = subWallet
+      ? {
+          mainWallet: mainWallet,
+          wallet: subWallet
+        }
+      : {
+          wallet: mainWallet
+        }
+    this.dataService.setData(DataServiceKey.WALLET, info)
+    this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(console.error)
   }
 
   public openAccountAddPage() {
@@ -129,7 +137,6 @@ export class PortfolioPage {
   }
 
   public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
-    console.log('calculating total')
     let newTotal = 0
     const cryptoToFiatPipe = new CryptoToFiatPipe()
 

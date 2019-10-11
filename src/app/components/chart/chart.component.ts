@@ -54,7 +54,9 @@ export class ChartComponent {
 
     let myOptions = {}
 
-    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
+    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart).catch(() => {
+      return [0]
+    })
     this.chartDatasets[0].data = this.rawData
 
     for (let i = 0; i < this.rawData.length; i++) {
