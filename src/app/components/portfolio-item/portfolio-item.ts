@@ -56,7 +56,10 @@ export class PortfolioItemComponent {
   }
 
   public async ngOnChanges() {
-    if (this.wallet && this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (
+      this.wallet &&
+      (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT)
+    ) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(this.wallet.receivingPublicAddress)
     }
   }

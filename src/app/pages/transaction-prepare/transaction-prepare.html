@@ -38,6 +38,7 @@
             <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
               <ion-label color="blackLight" position="stacked">{{ 'Send To' | translate }}</ion-label>
               <ion-textarea
+                [attr.disabled]="forceMigration"
                 [placeholder]="wallet.coinProtocol.addressPlaceholder"
                 formControlName="address"
                 id="address-input"
@@ -77,23 +78,27 @@
         </ion-text>
       </ion-col>
     </ion-row>
-    <ion-row class="address-to__buttons ion-padding-horizontal ion-padding-bottom">
-      <ion-button fill="outline" size="small" color="secondary" shape="round" (click)="pasteClipboard()">
+    <ion-row padding-horizontal padding-bottom class="address-to__buttons">
+      <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="pasteClipboard()">
         {{ 'transaction-prepare.paste_label' | translate }}
       </ion-button>
-      <ion-button fill="outline" size="small" color="secondary" shape="round" (click)="openScanner()">
+      <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="openScanner()">
         <ion-icon slot="start" name="md-barcode"></ion-icon>
         {{ 'transaction-prepare.to-address-scan_label' | translate }}
       </ion-button>
     </ion-row>
     <div class="divider--line"></div>
-    <ion-row class="ion-padding-horizontal ion-padding-top ion-align-items-center amount__container">
-      <ion-col size="9" class="amount--container__input ion-no-padding">
-        <ion-item class="ion-no-padding" lines="none">
-          <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-            {{ 'transaction-prepare.amount_label' | translate }}
-          </ion-label>
-          <ion-input formControlName="amount" type="number" id="amount-input" placeholder="0.0"></ion-input>
+    <ion-row padding-horizontal padding-top align-items-center class="amount__container">
+      <ion-col size="9" class="amount--container__input" no-padding>
+        <ion-item no-padding lines="none">
+          <ion-label color="blackLight" no-margin position="stacked">{{ 'transaction-prepare.amount_label' | translate }}</ion-label>
+          <ion-input
+            [attr.disabled]="forceMigration"
+            formControlName="amount"
+            type="number"
+            id="amount-input"
+            placeholder="0.0"
+          ></ion-input>
         </ion-item>
         <ion-text class="ion-no-margin" color="blackLight">
           <p class="ion-no-margin">${{ transactionForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
@@ -135,10 +140,12 @@
         </ion-item>
       </ion-col>
     </ion-row>
-    <ion-row nowrap class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-item class="ion-no-padding" lines="none">
+    <ion-row nowrap padding-horizontal>
+      <ion-col size="12" no-padding>
+        <ion-item no-padding lines="none">
           <ion-range
+            [attr.disabled]="forceMigration"
+            no-padding
             min="0"
             max="2"
             step="1"
@@ -165,7 +172,7 @@
       <ion-col size="12">
         <ion-item class="advanced-item" class="ion-no-padding">
           <ion-label position="stacked"></ion-label>
-          <ion-input id="fee-input" formControlName="fee" type="string" class="ion-no-padding"></ion-input>
+          <ion-input [attr.disabled]="forceMigration" id="fee-input" formControlName="fee" type="string" no-padding></ion-input>
           <span slot="end" class="input--placeholder">
             {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
           </span>
@@ -193,6 +200,19 @@
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button
+      *ngIf="!forceMigration"
+      id="prepare"
+      size="default"
+      color="primary"
+      (click)="prepareTransaction()"
+      [disabled]="transactionForm.invalid"
+      shape="round"
+    >
+      <ion-icon slot="start" name="open"></ion-icon>
+      {{ 'transaction-prepare.create-transaction' | translate }}
+    </ion-button>
+    <ion-button
+      *ngIf="forceMigration"
       id="prepare"
       size="default"
       color="primary"

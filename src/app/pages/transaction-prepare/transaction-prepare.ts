@@ -24,6 +24,7 @@ export class TransactionPreparePage {
   public amountForm: FormGroup
 
   public sendMaxAmount = false
+  public forceMigration = false
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -45,16 +46,21 @@ export class TransactionPreparePage {
       address = info.address || ''
       amount = info.amount || 0
       wallet = info.wallet
-    }
-    this.setWallet(wallet)
+      this.setWallet(wallet)
 
-    this.transactionForm = formBuilder.group({
-      address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
-      feeLevel: [0, [Validators.required]],
-      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
-      isAdvancedMode: [false, []]
-    })
+      this.transactionForm = formBuilder.group({
+        address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
+        amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
+        feeLevel: [0, [Validators.required]],
+        fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
+        isAdvancedMode: [false, []]
+      })
+
+      if (info.forceMigration) {
+        this.forceMigration = info.forceMigration
+        this.setMaxAmount('0')
+      }
+    }
 
     this.useWallet()
 
@@ -178,7 +184,7 @@ export class TransactionPreparePage {
   private setMaxAmount(fee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
     const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.minus(new BigNumber(fee))
+    const amountWithoutFees = amount.toNumber() > 0 ? amount.minus(new BigNumber(fee)) : 0
     this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
       emitEvent: false
     })

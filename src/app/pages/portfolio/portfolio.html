@@ -18,11 +18,11 @@
             (click)="openDetail(walletGroup.mainWallet)"
           ></portfolio-item>
           <portfolio-item
-            *ngFor="let wallet of walletGroup.subWallets"
-            [wallet]="wallet"
+            *ngFor="let subWallet of walletGroup.subWallets"
+            [wallet]="subWallet"
             [maxDigits]="8"
             tappable
-            (click)="openDetail(wallet)"
+            (click)="openDetail(walletGroup.mainWallet, subWallet)"
           ></portfolio-item>
         </ion-card>
       </ion-list>

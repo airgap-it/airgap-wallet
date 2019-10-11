@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
-import { AlertController, NavParams, PopoverController, Platform } from '@ionic/angular'
+import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
@@ -61,7 +61,7 @@ export class AccountEditPopoverComponent {
 
   public async ngOnInit() {
     // tezos
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }

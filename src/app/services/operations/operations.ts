@@ -95,9 +95,14 @@ export class OperationsProvider {
     const loader = await this.getAndShowLoader()
 
     try {
+      let rawUnsignedTx
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      const rawUnsignedTx: any = await wallet.prepareTransaction([address], [amount], fee, data)
-
+      if (wallet.coinProtocol.identifier === ProtocolSymbols.XTZ_KT) {
+        const tezosKtProtocol = new TezosKtProtocol()
+        rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
+      } else {
+        rawUnsignedTx = await wallet.prepareTransaction([address], [amount], fee, data)
+      }
       const airGapTx = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
