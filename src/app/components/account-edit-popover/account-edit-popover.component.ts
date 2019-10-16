@@ -61,8 +61,10 @@ export class AccountEditPopoverComponent {
 
   public async ngOnInit() {
     // tezos
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
+    }
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
     }
     // tezos end

@@ -14,7 +14,7 @@
     <ion-icon name="trash" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.delete_label' | translate }}
   </ion-item>
-  <ion-item *ngIf="isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
+  <ion-item *ngIf="!isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
     <ion-icon name="close" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.undelegate_label' | translate }}
   </ion-item>
