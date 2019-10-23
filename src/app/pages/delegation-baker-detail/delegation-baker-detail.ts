@@ -68,7 +68,7 @@ export class DelegationBakerDetailPage {
 
     this.airGapBaker = airGapBakerConfig
 
-    this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, true)
     this.isDelegated = this.delegationInfo.isDelegated
 
     // If baker is not us, we can't display more info

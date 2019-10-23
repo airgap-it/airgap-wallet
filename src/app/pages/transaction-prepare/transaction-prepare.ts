@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
@@ -115,6 +115,15 @@ export class TransactionPreparePage {
           })
         })
       })
+    } else if (this.wallet.protocolIdentifier === 'xtz-kt' && this.forceMigration) {
+      if (this.forceMigration) {
+        this._ngZone.run(() => {
+          const protocol = this.wallet.coinProtocol as TezosKtProtocol
+          this.transactionForm.controls.fee.setValue(
+            protocol.migrationFee.shiftedBy(-protocol.feeDecimals).toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+          )
+        })
+      }
     } else {
       this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
         this._ngZone.run(() => {

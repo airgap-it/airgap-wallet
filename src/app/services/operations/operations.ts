@@ -40,7 +40,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(address)
+      const { isDelegated } = await this.checkDelegated(address, false)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -79,10 +79,10 @@ export class OperationsProvider {
     })
   }
 
-  public async checkDelegated(address: string): Promise<DelegationInfo> {
+  public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
     const protocol = new TezosKtProtocol()
 
-    return protocol.isAddressDelegated(address)
+    return protocol.isAddressDelegated(address, fetchExtraInfo)
   }
 
   public async prepareTransaction(
