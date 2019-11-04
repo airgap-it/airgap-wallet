@@ -1,14 +1,16 @@
-import { WalletActionInfo } from './../../models/ActionGroup'
 import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController, Platform, PopoverController, ToastController, AlertController } from '@ionic/angular'
+import { AlertController, LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { DelegateAction } from 'airgap-coin-lib/dist/actions/DelegateAction'
 import { BigNumber } from 'bignumber.js'
 import { promiseTimeout } from 'src/app/helpers/promise-timeout'
+import { AirGapTezosMigrateAction } from 'src/app/models/actions/TezosMigrateAction'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { ActionGroup } from '../../models/ActionGroup'
@@ -20,9 +22,8 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { TranslateService } from '@ngx-translate/core'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { AirGapTezosMigrateAction } from 'src/app/models/actions/TezosMigrateAction'
+
+import { WalletActionInfo } from './../../models/ActionGroup'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -48,13 +49,6 @@ export class AccountTransactionListPage {
 
   public hasPendingTransactions: boolean = false
   public pendingTransactions: IAirGapTransaction[] = []
-
-  // AE-Migration Stuff
-  public aeTxEnabled: boolean = false
-  public aeTxListEnabled: boolean = false
-  public aeMigratedTokens: BigNumber = new BigNumber(0)
-  public aeCurrentPhase: string = ''
-  public aePhaseEnd: string = ''
 
   // XTZ
   public isKtDelegated: boolean = false
@@ -91,15 +85,6 @@ export class AccountTransactionListPage {
     }
 
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
-    if (this.protocolIdentifier === ProtocolSymbols.AE) {
-      this.http
-        .get(`https://api-airgap.gke.papers.tech/api/v1/protocol/ae/migrations/pending/${this.wallet.addresses[0]}`)
-        .subscribe((result: any) => {
-          this.aeMigratedTokens = new BigNumber(result.phase.balance)
-          this.aeCurrentPhase = result.phase.name
-          this.aePhaseEnd = result.phase.endTimestamp
-        })
-    }
 
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.mainWallet = info.mainWallet
@@ -133,29 +118,8 @@ export class AccountTransactionListPage {
     }
   }
 
-  /**
-   * This is the "small" banner on top of the transaction.
-   * This should be shown if the user has balance on mainnet,
-   * but also balance on the next migration phase.
-   */
-  public showAeMigrationBanner() {
-    return this.walletIsAe() && (this.wallet.currentBalance.gt(0) || this.transactions.length > 0) && this.aeMigratedTokens.gt(0)
-  }
-
-  /**
-   * This is the full page screen informing the user about token migration
-   * It should be shown when the user has migration balance, but no mainnet balance.
-   */
-  public showAeMigrationScreen() {
-    return this.walletIsAe() && (this.wallet.currentBalance.eq(0) && this.transactions.length === 0) && this.aeMigratedTokens.gt(0)
-  }
-
   public showNoTransactionScreen() {
-    return this.transactions.length === 0 && !this.showAeMigrationScreen()
-  }
-
-  public walletIsAe() {
-    return this.wallet.protocolIdentifier === ProtocolSymbols.AE
+    return this.transactions.length === 0
   }
 
   public ionViewWillEnter() {
@@ -219,21 +183,7 @@ export class AccountTransactionListPage {
       event.target.complete()
     }
 
-    // this can safely be removed after AE has made the switch to mainnet
-    if (this.protocolIdentifier === ProtocolSymbols.AE) {
-      this.http.get('https://api-airgap.gke.papers.tech/status').subscribe((result: any) => {
-        this.aeTxEnabled = result.transactionsEnabled
-        this.aeTxListEnabled = result.txListEnabled
-        if (this.aeTxListEnabled) {
-          this.loadInitialTransactions().catch(handleErrorSentry())
-        } else {
-          this.transactions = []
-          this.isRefreshing = false
-        }
-      })
-    } else {
-      this.loadInitialTransactions().catch(handleErrorSentry())
-    }
+    this.loadInitialTransactions().catch(handleErrorSentry())
   }
 
   public async doInfinite(event) {

@@ -108,81 +108,6 @@
 
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showAeMigrationScreen()">
-    <img class="ion-padding-vertical" src="../../assets/img/ae-token-migration.svg" />
-    <ion-text color="primary">
-      <h5>
-        {{ aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
-      </h5>
-    </ion-text>
-    <p
-      [innerHTML]="
-        'account-transaction-list.aeternity.same-phase.text'
-          | translate
-            : {
-                migratedTokens:
-                  aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 },
-                phaseEnd: aePhaseEnd | amFromUnix | amDateFormat: 'MMMM'
-              }
-      "
-    ></p>
-  </div>
-
-  <ion-row class="ion-padding ion-justify-content-center ion-align-items-center" *ngIf="!isRefreshing && showAeMigrationBanner()">
-    <ion-col size="4"><img src="../../assets/img/ae-token-migration.svg" /></ion-col>
-    <ion-col size="1"></ion-col>
-    <ion-col size="7">
-      <p [innerHTML]="'account-transaction-list.aeternity.same-phase.heading' | translate: { currentPhase: aeCurrentPhase }"></p>
-      <p
-        [innerHTML]="
-          'account-transaction-list.aeternity.same-phase.text'
-            | translate
-              : {
-                  migratedTokens:
-                    aeMigratedTokens.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 },
-                  phaseEnd: aePhaseEnd | amFromUnix | amDateFormat: 'MMMM'
-                }
-        "
-      ></p>
-
-      <!--
-        <strong ion-text color="primary">{{ aeCurrentPhase }} Migration Successful</strong>
-        <p>
-          Your balance of
-          <strong ion-text color="primary">
-            {{ aeMigratedTokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
-          </strong>
-          will become available with the next hardfork at
-          <strong ion-text color="primary">{{ aePhaseEnd | amFromUnix | amDateFormat: 'LL' }}</strong>
-        </p>
-      -->
-    </ion-col>
-  </ion-row>
-
-  <div
-    [ngClass]="{ 'empty--list__container': showAeMigrationBanner() }"
-    class="empty-list ion-padding-horizontal"
-    *ngIf="!isRefreshing && showNoTransactionScreen()"
-  >
-    <img
-      class="ion-padding-vertical"
-      [ngClass]="{ 'empty--list__image': showAeMigrationBanner() }"
-      src="../../assets/img/empty-state-no-transaction.svg"
-    />
-    <p *ngIf="protocolIdentifier !== 'ae' || (protocolIdentifier === 'ae' && aeTxListEnabled)">
-      {{ 'account-transaction-list.aeternity.no-transactions_text' | translate }}
-    </p>
-    <span *ngIf="protocolIdentifier === 'ae' && !aeTxListEnabled">
-      <p>
-        {{ 'account-transaction-list.aeternity.tx-list-disabled.text' | translate }}
-      </p>
-      <ion-button size="default" color="secondary" (click)="openBlockexplorer()" shape="round" icon-end>
-        {{ 'account-transaction-list.aeternity.tx-list-disabled.blockexplorer_label' | translate }}
-        <ion-icon name="open"></ion-icon>
-      </ion-button>
-    </span>
-  </div>
-
   <ion-list lines="none" class="ion-padding-bottom">
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
       <ion-avatar slot="start">
@@ -251,7 +176,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="protocolIdentifier === 'ae' && (!aeTxEnabled || wallet.currentBalance.toNumber() === 0)"
+          [disabled]="wallet.currentBalance.toNumber() === 0"
           shape="round"
         >
           <ion-icon slot="start" name="send"></ion-icon>
