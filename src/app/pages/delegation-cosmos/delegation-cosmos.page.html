@@ -338,10 +338,10 @@
   <!--TODO: Set "Delegate", "Undelegate" and "Claim Rewards" depending on the active tab-->
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="!addressDelegated">
+    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'">
       {{ 'delegation-cosmos.delegate_label' | translate }}
     </ion-button>
-    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="addressDelegated">
+    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'">
       {{ 'delegation-cosmos.undelegate_label' | translate }}
     </ion-button>
   </ion-fab>
