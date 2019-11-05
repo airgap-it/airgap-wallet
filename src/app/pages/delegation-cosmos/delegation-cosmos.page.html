@@ -135,7 +135,6 @@
   </ion-segment>
   <ng-container *ngIf="delegationOption === 'delegate'">
     <ion-row class="ion-padding-horizontal">
-      <!--TODO: pass {{accountBalance}} and {{amountDelegated}} -->
       <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
         <p>{{ 'delegation-cosmos.delegation.text' | translate: { accountBalance: accountBalance } }}</p>
       </ion-col>
@@ -146,48 +145,10 @@
         </p>
       </ion-col>
     </ion-row>
-    <!--TODO: create component -->
-    <form [formGroup]="delegationForm" padding-bottom>
-      <ion-row class="ion-padding-horizontal padding-top align-items-center amount__container">
-        <ion-col size="9" class="amount--container__input ion-no-padding">
-          <ion-item clasS="ion-no-padding" lines="none">
-            <ion-label color="blackLight" class="ion-no-margin" position="stacked">Amount</ion-label>
-            <ion-input type="number" formControlName="amount" id="amount-input" placeholder="0.0"></ion-input>
-          </ion-item>
-          <ion-text class="ion-no-margin" color="blackLight">
-            <p no-margin>${{ delegationForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="3" class="ion-no-padding">
-          <ion-toolbar>
-            <ion-buttons slot="end">
-              <ion-button
-                shape="round"
-                [fill]="sendMaxAmount ? 'solid' : 'outline'"
-                size="small"
-                color="secondary"
-                (click)="toggleMaxAmount()"
-              >
-                {{ 'transaction-prepare.fee.max_label' | translate }}
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-col>
-      </ion-row>
-      <ion-row padding-horizontal padding-bottom>
-        <ion-col size="12" *ngIf="!delegationForm.controls['amount'].valid">
-          <ion-text no-margin color="danger">
-            <p no-margin>
-              {{ 'transaction-prepare.error.amount_label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-      </ion-row>
-    </form>
+    <amount [wallet]="wallet"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
-      <!--TODO: pass {{accountBalance}} and {{amountDelegated}} -->
       <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
         <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
       </ion-col>
@@ -195,44 +156,7 @@
         <p>{{ 'delegation-cosmos.undelegate.undelegated_text' | translate: { delegatedAmount: delegatedAmount } }}</p>
       </ion-col>
     </ion-row>
-    <!--TODO: create component -->
-    <form [formGroup]="delegationForm" padding-bottom>
-      <ion-row class="ion-padding-horizontal padding-top align-items-center amount__container">
-        <ion-col size="9" class="amount--container__input ion-no-padding">
-          <ion-item clasS="ion-no-padding" lines="none">
-            <ion-label color="blackLight" class="ion-no-margin" position="stacked">Amount</ion-label>
-            <ion-input type="number" formControlName="amount" id="amount-input" placeholder="0.0"></ion-input>
-          </ion-item>
-          <ion-text class="ion-no-margin" color="blackLight">
-            <p no-margin>${{ delegationForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="3" class="ion-no-padding">
-          <ion-toolbar>
-            <ion-buttons slot="end">
-              <ion-button
-                shape="round"
-                [fill]="sendMaxAmount ? 'solid' : 'outline'"
-                size="small"
-                color="secondary"
-                (click)="toggleMaxAmount()"
-              >
-                {{ 'transaction-prepare.fee.max_label' | translate }}
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-col>
-      </ion-row>
-      <ion-row padding-horizontal padding-bottom>
-        <ion-col size="12" *ngIf="!delegationForm.controls['amount'].valid">
-          <ion-text no-margin color="danger">
-            <p no-margin>
-              {{ 'transaction-prepare.error.amount_label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-      </ion-row>
-    </form>
+    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
@@ -243,44 +167,6 @@
         <p>{{ 'delegation-cosmos.rewards.claim-rewards_text' | translate: { delegationReward: delegationReward } }}</p>
       </ion-col>
     </ion-row>
-    <!--TODO: create component -->
-    <form [formGroup]="delegationForm" padding-bottom>
-      <ion-row class="ion-padding-horizontal padding-top align-items-center amount__container">
-        <ion-col size="9" class="amount--container__input ion-no-padding">
-          <ion-item clasS="ion-no-padding" lines="none">
-            <ion-label color="blackLight" class="ion-no-margin" position="stacked">Amount</ion-label>
-            <ion-input type="number" formControlName="amount" id="amount-input" placeholder="0.0"></ion-input>
-          </ion-item>
-          <ion-text class="ion-no-margin" color="blackLight">
-            <p no-margin>${{ delegationForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="3" class="ion-no-padding">
-          <ion-toolbar>
-            <ion-buttons slot="end">
-              <ion-button
-                shape="round"
-                [fill]="sendMaxAmount ? 'solid' : 'outline'"
-                size="small"
-                color="secondary"
-                (click)="toggleMaxAmount()"
-              >
-                {{ 'transaction-prepare.fee.max_label' | translate }}
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-col>
-      </ion-row>
-      <ion-row padding-horizontal padding-bottom>
-        <ion-col size="12" *ngIf="!delegationForm.controls['amount'].valid">
-          <ion-text no-margin color="danger">
-            <p no-margin>
-              {{ 'transaction-prepare.error.amount_label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-      </ion-row>
-    </form>
   </ng-container>
 
   <ion-row class="ion-padding-horizontal">
@@ -323,7 +209,7 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              {{ delegationReward | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ delegationReward }}
             </h2>
             <h3>{{ 'delegation-cosmos.your-account.rewards_label' | translate }}</h3>
           </ion-label>

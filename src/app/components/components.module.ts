@@ -25,6 +25,7 @@ import { SignedTransactionComponent } from './signed-transaction/signed-transact
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
+import { AmountComponent } from './amount/amount.component'
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     FromToComponent,
     SwapComponent,
     AccountEditPopoverComponent,
+    AmountComponent,
     CardActionableComponent,
     EmptyStateComponent,
     CurrencySymbolComponent,
@@ -61,6 +63,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     IdenticonComponent,
     HexagonIconComponent,
     AddressRowComponent,
+    AmountComponent,
     FromToComponent,
     SwapComponent,
     AccountEditPopoverComponent,

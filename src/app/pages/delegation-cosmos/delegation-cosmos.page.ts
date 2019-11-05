@@ -3,7 +3,7 @@ import { AirGapCosmosDelegateActionContext } from './../../models/actions/Cosmos
 import { ActivatedRoute, Router } from '@angular/router'
 import { Component } from '@angular/core'
 import { AirGapMarketWallet, CosmosProtocol } from 'airgap-coin-lib'
-import { ToastController, LoadingController } from '@ionic/angular'
+import { ToastController, LoadingController, AlertController } from '@ionic/angular'
 import { DataService } from 'src/app/services/data/data.service'
 import BigNumber from 'bignumber.js'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'
@@ -42,7 +42,8 @@ export class DelegationCosmosPage {
     private readonly loadingController: LoadingController,
     private readonly router: Router,
     private readonly validatorService: ValidatorService,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly alertCtrl: AlertController
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -75,8 +76,10 @@ export class DelegationCosmosPage {
       this.addressDelegated = true
       this.validatorAddress = delegation.validator_address
 
-      this.delegatedAmount = new BigNumber(parseFloat(delegation.shares)).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-      this.delegatableBalance = this.currentBalance.minus(this.delegatedAmount).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
+      this.delegatedAmount = rawDelegatedAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      const rawDelegatableBalance = this.currentBalance.minus(rawDelegatedAmount)
+      this.delegatableBalance = rawDelegatableBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
       this.delegationForm.controls.amount.setValue(this.delegatedAmount.toFixed(), {
         emitEvent: false
       })
@@ -91,7 +94,8 @@ export class DelegationCosmosPage {
     this.validatorAlias = this.validatorInfo.alias
     this.validatorStatus = this.validatorInfo.status
     this.totalDelegationBalance = this.validatorInfo.totalDelegationBalance
-    this.delegationReward = await this.fetchRewardForDelegation(this.wallet.addresses[0], this.validatorAddress)
+    const rawDelegationReward = await this.fetchTotalReward(this.wallet.addresses[0])
+    this.delegationReward = rawDelegationReward.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
   }
 
   public async delegate(): Promise<void> {
@@ -126,12 +130,21 @@ export class DelegationCosmosPage {
 
   public async withdrawDelegationRewards(): Promise<void> {
     const protocol = new CosmosProtocol()
-    protocol.withdrawDelegationRewards(this.wallet.addresses[0], this.validatorAddress, 5)
+    protocol.withdrawDelegationRewards(this.wallet.addresses[0], this.validatorAddress, 5).then(response => {
+      const alert = this.alertCtrl
+        .create({
+          header: 'You claimed rewards',
+          message: response
+        })
+        .then(alert => {
+          alert.present()
+        })
+    })
   }
 
-  public async fetchRewardForDelegation(delegatorAddress: string, validatorAddress: string): Promise<BigNumber> {
+  public async fetchTotalReward(delegatorAddress: string): Promise<BigNumber> {
     const protocol = new CosmosProtocol()
-    return protocol.fetchRewardForDelegation(delegatorAddress, validatorAddress)
+    return protocol.fetchTotalReward(delegatorAddress)
   }
 
   public toggleMaxAmount() {
