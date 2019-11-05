@@ -1,5 +1,15 @@
 <span>
-  <from-to *ngIf="airGapTx" [transaction]="airGapTx"></from-to>
+  <ng-container *ngIf="airGapTxs && airGapTxs.length > 1">
+    Total Operations: {{ aggregatedInfo.numberOfTxs }}
+    <br />
+    Total Amount: {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier,
+    maxDigits: undefined } }}
+    <br />
+    Total Fee: {{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier } }}
+  </ng-container>
+  <ng-container *ngIf="airGapTxs">
+    <from-to *ngFor="let airGapTx of airGapTxs" [transaction]="airGapTx"></from-to>
+  </ng-container>
   <span *ngIf="fallbackActivated">
     <ion-row>
       <ion-col size="2" class="ion-margin-top">

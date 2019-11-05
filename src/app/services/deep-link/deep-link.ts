@@ -110,7 +110,7 @@ export class DeepLinkProvider {
     console.log('identifier', identifier)
 
     const wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
-    const airGapTx = await wallet.coinProtocol.getTransactionDetails({
+    const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
     })
@@ -129,7 +129,7 @@ export class DeepLinkProvider {
 
     return {
       wallet,
-      airGapTx,
+      airGapTxs,
       serializedTx
     }
   }

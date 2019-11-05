@@ -159,10 +159,10 @@ export class TransactionPreparePage {
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
+      const { airGapTxs, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
-        airGapTx,
+        airGapTxs,
         data: 'airgap-vault://?d=' + serializedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)

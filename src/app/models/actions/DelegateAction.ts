@@ -46,7 +46,7 @@ export class AirGapDelegateAction extends Action<DelegateActionResult, AirGapDel
 
       context.dataService.setData(DataServiceKey.INTERACTION, {
         wallet: context.wallet,
-        airGapTx: result.airGapTx,
+        airGapTxs: result.airGapTxs,
         data: result.dataUrl
       })
       context.router
