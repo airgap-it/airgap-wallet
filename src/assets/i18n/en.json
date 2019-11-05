@@ -391,6 +391,7 @@
     "undelegate_label": "Undelegate",    
     "commission_label": "Commission",
     "rewards_label": "Rewards",
+    "withdraw_rewards_label": "Claim Rewards",    
     "your-account": {
       "label": "Your Account",
       "balance_label": "Current Balance",
@@ -400,15 +401,15 @@
     "delegation": {
       "label": "Your Delegation",
       "text": "Select the amount you want to delegate, you can delegate up to {{accountBalance}}",
-      "delegated_text": "You have currently {{amountDelegated}} delegated to this validator, you can additionally delegate up to {{accountBalance}}"
+      "delegated_text": "You have currently {{delegatedAmount}} ATOM delegated to this validator, you can additionally delegate up to {{delegatableBalance}} ATOM"
     },
     "undelegate": {
       "text": "You have currently not delegated to this validator.",
-      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to {{amountDelegated}}"
+      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to {{delegatedAmount}} ATOM"
     },
     "rewards": {
       "text": "You currently have no rewards to claim",
-      "claim-rewards_text": "You can claim up to {{amountRewards}} in rewards."
+      "claim-rewards_text": "You can claim up to {{delegationReward}} in rewards for this delegation."
     }
    
   },

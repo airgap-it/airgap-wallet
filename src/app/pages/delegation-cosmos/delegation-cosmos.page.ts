@@ -29,6 +29,9 @@ export class DelegationCosmosPage {
   public amount: number = 0
   public sendMaxAmount: boolean = false
   public delegationOption: string = 'delegate'
+  public currentBalance: BigNumber | undefined
+  public delegatableBalance: BigNumber
+  public delegationReward: BigNumber
 
   private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
 
@@ -44,6 +47,7 @@ export class DelegationCosmosPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
+      this.currentBalance = this.wallet.currentBalance
       this.actionCallback = info.actionCallback
       this.delegationForm = formBuilder.group({
         amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
@@ -72,6 +76,7 @@ export class DelegationCosmosPage {
       this.validatorAddress = delegation.validator_address
 
       this.delegatedAmount = new BigNumber(parseFloat(delegation.shares)).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      this.delegatableBalance = this.currentBalance.minus(this.delegatedAmount).shiftedBy(-1 * this.wallet.coinProtocol.decimals)
       this.delegationForm.controls.amount.setValue(this.delegatedAmount.toFixed(), {
         emitEvent: false
       })
@@ -86,6 +91,7 @@ export class DelegationCosmosPage {
     this.validatorAlias = this.validatorInfo.alias
     this.validatorStatus = this.validatorInfo.status
     this.totalDelegationBalance = this.validatorInfo.totalDelegationBalance
+    this.delegationReward = await this.fetchRewardForDelegation(this.wallet.addresses[0], this.validatorAddress)
   }
 
   public async delegate(): Promise<void> {
@@ -116,6 +122,16 @@ export class DelegationCosmosPage {
       dataService: this.dataService,
       router: this.router
     })
+  }
+
+  public async withdrawDelegationRewards(): Promise<void> {
+    const protocol = new CosmosProtocol()
+    protocol.withdrawDelegationRewards(this.wallet.addresses[0], this.validatorAddress, 5)
+  }
+
+  public async fetchRewardForDelegation(delegatorAddress: string, validatorAddress: string): Promise<BigNumber> {
+    const protocol = new CosmosProtocol()
+    return protocol.fetchRewardForDelegation(delegatorAddress, validatorAddress)
   }
 
   public toggleMaxAmount() {

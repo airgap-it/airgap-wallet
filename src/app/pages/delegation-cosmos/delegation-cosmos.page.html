@@ -137,10 +137,13 @@
     <ion-row class="ion-padding-horizontal">
       <!--TODO: pass {{accountBalance}} and {{amountDelegated}} -->
       <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
-        <p>{{ 'delegation-cosmos.delegation.text' | translate }}</p>
+        <p>{{ 'delegation-cosmos.delegation.text' | translate: { accountBalance: accountBalance } }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>{{ 'delegation-cosmos.delegation.delegated_text' | translate }}</p>
+        <p>
+          {{ 'delegation-cosmos.delegation.delegated_text' | translate: { delegatedAmount: delegatedAmount, delegatableBalance:
+          delegatableBalance.toNumber() } }}
+        </p>
       </ion-col>
     </ion-row>
     <!--TODO: create component -->
@@ -189,7 +192,7 @@
         <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>{{ 'delegation-cosmos.undelegate.undelegated_text' | translate }}</p>
+        <p>{{ 'delegation-cosmos.undelegate.undelegated_text' | translate: { delegatedAmount: delegatedAmount } }}</p>
       </ion-col>
     </ion-row>
     <!--TODO: create component -->
@@ -233,14 +236,11 @@
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
-      <!--TODO: pass {{amountRewards}} -->
-      <!--TODO: *ngif no rewards available -->
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
+      <ion-col size="12" class="ion-no-padding" *ngIf="!delegationReward">
         <p>{{ 'delegation-cosmos.rewards.text' | translate }}</p>
       </ion-col>
-      <!--TODO: *ngif rewards available -->
-      <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>{{ 'delegation-cosmos.rewards.claim-rewards_text' | translate }}</p>
+      <ion-col size="12" class="ion-no-padding" *ngIf="delegationReward">
+        <p>{{ 'delegation-cosmos.rewards.claim-rewards_text' | translate: { delegationReward: delegationReward } }}</p>
       </ion-col>
     </ion-row>
     <!--TODO: create component -->
@@ -312,8 +312,7 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              <!--TODO: Set delegation amount-->
-              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ delegatedAmount }}
             </h2>
             <h3>{{ 'delegation-cosmos.your-account.delegation_label' | translate }}</h3>
           </ion-label>
@@ -324,8 +323,7 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              <!--TODO: Set unclaimed rewards amount-->
-              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ delegationReward | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>{{ 'delegation-cosmos.your-account.rewards_label' | translate }}</h3>
           </ion-label>
@@ -335,14 +333,16 @@
   </ion-row>
 
   <ion-row class="ion-margin-bottom"></ion-row>
-  <!--TODO: Set "Delegate", "Undelegate" and "Claim Rewards" depending on the active tab-->
-
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'">
       {{ 'delegation-cosmos.delegate_label' | translate }}
     </ion-button>
     <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'">
       {{ 'delegation-cosmos.undelegate_label' | translate }}
+    </ion-button>
+
+    <ion-button shape="round" color="primary" (click)="withdrawDelegationRewards()" *ngIf="delegationOption === 'rewards'">
+      {{ 'delegation-cosmos.withdraw_rewards_label' | translate }}
     </ion-button>
   </ion-fab>
 </ion-content>
