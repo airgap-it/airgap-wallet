@@ -50,6 +50,11 @@ export class ValidatorService {
     return this.protocol.fetchDelegations(address)
   }
 
+  public async fetchTotalDelegatedAmount(address: string): Promise<BigNumber> {
+    const delegations = await this.protocol.fetchDelegations(address)
+    return new BigNumber(delegations.map(delegation => parseFloat(delegation.shares)).reduce((a, b) => a + b, 0))
+  }
+
   public async fetchValidator(address: string): Promise<CosmosValidator> {
     return this.protocol.fetchValidator(address)
   }

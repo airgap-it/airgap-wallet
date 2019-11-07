@@ -87,7 +87,6 @@ export class DelegationCosmosPage {
       const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
       this.delegatedAmount = rawDelegatedAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
       const rawDelegatableBalance = this.currentBalance.minus(rawDelegatedAmount)
-      this.delegatableBalance = rawDelegatableBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
       this.delegationForm.controls.amount.setValue(this.delegatedAmount.toFixed(), {
         emitEvent: false
       })
@@ -95,8 +94,9 @@ export class DelegationCosmosPage {
       console.log('address is not delegated')
       this.addressDelegated = false
       this.canUndelegate = false
-      this.delegatableBalance = this.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
     }
+    const rawDelegatableBalance = await this.validatorService.fetchTotalDelegatedAmount(this.wallet.addresses[0])
+    this.delegatableBalance = rawDelegatableBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
     if (this.delegatableBalance < 0 + this.wallet.coinProtocol.feeDefaults.low.toNumber()) {
       this.canDelegate = false
     }
