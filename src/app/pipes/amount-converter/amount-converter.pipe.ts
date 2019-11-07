@@ -7,7 +7,6 @@ import { BigNumber } from 'bignumber.js'
 })
 export class AmountConverterPipe implements PipeTransform {
   public transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
-    console.log('AmountConverterPipe', value)
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }
@@ -38,7 +37,6 @@ export class AmountConverterPipe implements PipeTransform {
     })
     const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
 
-    console.log('transformed', `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`)
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 
