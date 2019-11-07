@@ -10,10 +10,11 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
   styleUrls: ['./delegation-validator-list.page.scss']
 })
 export class DelegationValidatorListPage {
-  public validators: CosmosValidator[]
+  public allValidators: CosmosValidator[]
+  public myValidators: CosmosValidator[]
   public delegations: CosmosDelegation[]
+  public wallet: AirGapMarketWallet
 
-  private wallet: AirGapMarketWallet
   constructor(private readonly validatorService: ValidatorService, private readonly route: ActivatedRoute) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -24,12 +25,12 @@ export class DelegationValidatorListPage {
   }
 
   private async fetchValidatorList() {
-    this.validators = await this.validatorService.fetchValidators()
+    this.allValidators = await this.validatorService.fetchValidators()
   }
 
   private async fetchDelegations(address: string) {
-    const delegations = await this.validatorService.fetchDelegations(address)
-    const validatorPromise = delegations.map(delegation => this.validatorService.fetchValidator(delegation.validator_address))
-    this.validators = await Promise.all(validatorPromise)
+    this.delegations = await this.validatorService.fetchDelegations(address)
+    const validatorPromise = this.delegations.map(delegation => this.validatorService.fetchValidator(delegation.validator_address))
+    this.myValidators = await Promise.all(validatorPromise)
   }
 }

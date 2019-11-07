@@ -1,3 +1,4 @@
+import { PipesModule } from './../../pipes/pipes.module'
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
@@ -17,7 +18,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, RouterModule.forChild(routes)],
+  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, PipesModule, RouterModule.forChild(routes)],
   declarations: [DelegationValidatorListPage]
 })
 export class DelegationValidatorListPageModule {}

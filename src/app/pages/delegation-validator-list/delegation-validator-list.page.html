@@ -12,8 +12,7 @@
 </ion-header>
 
 <ion-content class="ion-padding-start ion-padding-vertical">
-  <!--TODO: show if delegations-->
-  <ng-container>
+  <ng-container *ngIf="delegations">
     <ion-row>
       <ion-col size="12">
         <ion-text color="primary">
@@ -23,7 +22,7 @@
         </ion-text>
       </ion-col>
     </ion-row>
-    <ion-list lines="none">
+    <ion-list lines="none" *ngFor="let myValidator of myValidators">
       <!--TODO: navigate to delegation-cosmos-->
       <ion-item class="ion-no-padding">
         <ion-avatar slot="start"><identicon [address]="'cosmos'"></identicon></ion-avatar>
@@ -31,28 +30,26 @@
           <ion-text color="black">
             <ion-row class="ion-no-padding ">
               <ion-col size="9" class="ion-no-padding">
-                <!--TODO: Add validator alias-->
                 <h2 class="font--weight__bold">
-                  Validator
+                  {{ myValidator.description.moniker }}
                 </h2>
               </ion-col>
               <ion-col size="3" class="ion-text-end ion-no-padding">
-                <!--TODO: Add Comission-->
-                <p class="ion-no-margin">12%</p>
+                <p class="ion-no-margin">{{ myValidator.commission.rate | percentage }} commission</p>
               </ion-col>
             </ion-row>
           </ion-text>
           <ion-row class="ion-no-padding">
             <ion-col size="4" class="ion-no-padding">
               <ion-text color="blackLight">
-                <!--TODO: Add address-->
-                <p class="ion-no-margin typography--mono">cosmos...</p>
+                <p class="ion-no-margin typography--mono">{{ myValidator.operator_address }}</p>
               </ion-text>
             </ion-col>
             <ion-col size="8" class="ion-text-end ion-no-padding">
               <ion-text color="blackLight">
-                <!--TODO: Add validator balance-->
-                <p class="ion-no-margin">123123 ATOMs</p>
+                <p class="ion-no-margin">
+                  {{ myValidator.tokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+                </p>
               </ion-text>
             </ion-col>
           </ion-row>
