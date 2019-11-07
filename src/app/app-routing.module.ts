@@ -130,7 +130,7 @@ const routes: Routes = [
     loadChildren: './pages/delegation-cosmos/delegation-cosmos.module#DelegationCosmosPageModule'
   },
   {
-    path: 'delegation-validator-list',
+    path: 'delegation-validator-list/',
     loadChildren: './pages/delegation-validator-list/delegation-validator-list.module#DelegationValidatorListPageModule'
   }
 ]

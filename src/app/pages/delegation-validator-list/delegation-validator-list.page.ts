@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 
 @Component({
-  selector: 'app-delegation-validator-list',
+  selector: 'delegation-validator-list',
   templateUrl: './delegation-validator-list.page.html',
   styleUrls: ['./delegation-validator-list.page.scss']
 })

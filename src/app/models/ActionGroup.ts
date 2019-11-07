@@ -123,7 +123,7 @@ export class ActionGroup {
               actionCallback: resolve
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router.navigateByUrl('/delegation-cosmos/' + DataServiceKey.DETAIL).catch(console.error)
+            this.callerContext.router.navigateByUrl('/delegation-validator-list/').catch(console.error)
           })
         })
         const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapCosmosDelegateAction)
