@@ -1,8 +1,10 @@
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ValidatorService } from './../../services/validator/validator.service'
 import { Component, OnInit } from '@angular/core'
 import { CosmosValidator, CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'delegation-validator-list',
@@ -17,7 +19,12 @@ export class DelegationValidatorListPage {
   public myValidators: CosmosValidator[]
   public wallet: AirGapMarketWallet
 
-  constructor(private readonly validatorService: ValidatorService, private readonly route: ActivatedRoute) {
+  constructor(
+    private readonly validatorService: ValidatorService,
+    private readonly route: ActivatedRoute,
+    public readonly router: Router,
+    public readonly dataService: DataService
+  ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
@@ -38,5 +45,14 @@ export class DelegationValidatorListPage {
 
   public setFilteredItems(searchTerm: string) {
     this.filteredValidators = this.allValidators.filter(validator => validator.description.moniker.toLowerCase().startsWith(searchTerm))
+  }
+
+  public navigate(validatorAddress: string) {
+    const info = {
+      validatorAddress: validatorAddress,
+      wallet: this.wallet
+    }
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router.navigateByUrl('/delegation-cosmos/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

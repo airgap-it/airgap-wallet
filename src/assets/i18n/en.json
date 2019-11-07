@@ -411,7 +411,7 @@
     },
     "delegation": {
       "label": "Your Delegation",
-      "text": "Select the amount you want to delegate, you can delegate up to {{accountBalance}}",
+      "text": "Select the amount you want to delegate, you can delegate up to {{delegatableBalance}}",
       "delegated_text": "You have currently {{delegatedAmount}} ATOM delegated to this validator, you can additionally delegate up to {{delegatableBalance}} ATOM"
     },
     "undelegate": {

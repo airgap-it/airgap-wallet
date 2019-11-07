@@ -20,7 +20,7 @@ export class DelegationCosmosPage {
   public delegationForm: FormGroup
   public addressDelegated: boolean
   public delegatedAmount: BigNumber
-  public validatorAddress: string = 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0'
+  public validatorAddress: string
   public validatorAlias: string
   public validatorInfo: CosmosValidatorInfo
   public validatorCommission: string | undefined
@@ -48,6 +48,10 @@ export class DelegationCosmosPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
+      this.validatorAddress = info.validatorAddress
+      console.log('info', info)
+      console.log('validatorAddress', this.validatorAddress)
+
       this.currentBalance = this.wallet.currentBalance
       this.actionCallback = info.actionCallback
       this.delegationForm = formBuilder.group({
@@ -71,11 +75,13 @@ export class DelegationCosmosPage {
   public async checkAddressDelegations() {
     const protocol = new CosmosProtocol()
     const delegations: CosmosDelegation[] = await protocol.fetchDelegations(this.wallet.addresses[0])
-    if (delegations.length > 0) {
-      const delegation = delegations[0] // TODO what if we're delegated to multiple validators
-      this.addressDelegated = true
-      this.validatorAddress = delegation.validator_address
+    console.log('delegations', delegations)
+    console.log('this.validatorAddress', this.validatorAddress)
 
+    const index = delegations.findIndex(delegation => delegation.validator_address === this.validatorAddress)
+    if (index > -1) {
+      const delegation = delegations[index]
+      this.addressDelegated = true
       const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
       this.delegatedAmount = rawDelegatedAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
       const rawDelegatableBalance = this.currentBalance.minus(rawDelegatedAmount)
@@ -89,12 +95,13 @@ export class DelegationCosmosPage {
   }
 
   public async getValidatorInfo() {
+    console.log('getValidatorInfo', this.validatorAddress)
     this.validatorInfo = await this.validatorService.getValidatorInfo(this.validatorAddress)
     this.validatorCommission = this.validatorInfo.rate
     this.validatorAlias = this.validatorInfo.alias
     this.validatorStatus = this.validatorInfo.status
     this.totalDelegationBalance = this.validatorInfo.totalDelegationBalance
-    const rawDelegationReward = await this.fetchTotalReward(this.wallet.addresses[0])
+    const rawDelegationReward = await this.fetchRewardForDelegation(this.wallet.addresses[0], this.validatorAddress)
     this.delegationReward = rawDelegationReward.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
   }
 
@@ -144,9 +151,9 @@ export class DelegationCosmosPage {
     })
   }
 
-  public async fetchTotalReward(delegatorAddress: string): Promise<BigNumber> {
+  public async fetchRewardForDelegation(delegatorAddress: string, validatorAddress: string): Promise<BigNumber> {
     const protocol = new CosmosProtocol()
-    return protocol.fetchTotalReward(delegatorAddress)
+    return protocol.fetchRewardForDelegation(delegatorAddress, validatorAddress)
   }
 
   public toggleMaxAmount() {

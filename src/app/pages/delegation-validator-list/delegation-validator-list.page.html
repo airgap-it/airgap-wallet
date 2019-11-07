@@ -6,24 +6,23 @@
     <ion-title>{{ 'delegation-validator-list.title' | translate }}</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <!--TODO search for validator-->
     <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-start ion-padding-vertical">
+  <ion-row>
+    <ion-col size="12">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-no-margin ion-ion-text">
+          {{ 'delegation-validator-list.your-validators_label' | translate }}
+        </p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
   <ng-container *ngIf="myValidators">
-    <ion-row>
-      <ion-col size="12">
-        <ion-text color="primary">
-          <p class="font--weight__bold ion-no-margin ion-ion-text">
-            {{ 'delegation-validator-list.your-validators_label' | translate }}
-          </p>
-        </ion-text>
-      </ion-col>
-    </ion-row>
     <ion-list lines="none" *ngFor="let validator of myValidators">
-      <ion-item class="ion-no-padding">
+      <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
         <ion-avatar slot="start"><identicon [address]="validator.operator_address"></identicon></ion-avatar>
         <ion-label>
           <ion-text color="black">
@@ -57,18 +56,18 @@
     </ion-list>
   </ng-container>
 
-  <ng-container>
-    <ion-row>
-      <ion-col size="12">
-        <ion-text color="primary">
-          <p class="font--weight__bold ion-no-margin ion-ion-text">
-            {{ 'delegation-validator-list.validators_label' | translate }}
-          </p>
-        </ion-text>
-      </ion-col>
-    </ion-row>
+  <ion-row>
+    <ion-col size="12">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-no-margin ion-ion-text">
+          {{ 'delegation-validator-list.validators_label' | translate }}
+        </p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+  <ng-container *ngIf="filteredValidators">
     <ion-list lines="none" *ngFor="let validator of filteredValidators">
-      <ion-item class="ion-no-padding">
+      <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
         <ion-avatar slot="start">
           <identicon [address]="validator.operator_address"></identicon>
         </ion-avatar>
