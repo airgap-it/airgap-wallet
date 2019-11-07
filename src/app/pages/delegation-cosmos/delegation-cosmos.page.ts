@@ -130,7 +130,9 @@ export class DelegationCosmosPage {
 
   public async withdrawDelegationRewards(): Promise<void> {
     const protocol = new CosmosProtocol()
-    protocol.withdrawDelegationRewards(this.wallet.addresses[0], this.validatorAddress, 5).then(response => {
+    const bigNumber = new BigNumber(protocol.feeDefaults.medium * 1000)
+    protocol.withdrawDelegationRewards(this.wallet.addresses[0], this.validatorAddress, bigNumber).then(response => {
+      console.log('response', response)
       const alert = this.alertCtrl
         .create({
           header: 'You claimed rewards',
