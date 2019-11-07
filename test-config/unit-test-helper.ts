@@ -1,3 +1,5 @@
+import { MarketDataService } from './../src/app/services/market-data/market-data.service'
+import { DrawChartService } from './../src/app/services/draw-chart/draw-chart.service'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -59,6 +61,7 @@ export class UnitHelper {
       })
     ]
     const mandatoryProviders: any[] = [
+      DrawChartService,
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
       Push,

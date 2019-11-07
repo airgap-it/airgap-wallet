@@ -40,6 +40,40 @@ export class AmountConverterPipe implements PipeTransform {
     return `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
   }
 
+  public transformValueOnly(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): number {
+    if (BigNumber.isBigNumber(value)) {
+      value = value.toNumber()
+    }
+    if (!args.protocolIdentifier || (!value && value !== 0) || isNaN(Number(value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
+      /* console.warn(
+        `AmountConverterPipe: necessary properties missing!\n` +
+          `Protocol: ${args.protocolIdentifier}\n` +
+          `Value: ${value}\n` +
+          `maxDigits: ${args.maxDigits}`
+      ) */
+      return undefined
+    }
+
+    let protocol
+
+    try {
+      protocol = getProtocolByIdentifier(args.protocolIdentifier)
+    } catch (e) {
+      return undefined
+    }
+
+    const BN = BigNumber.clone({
+      FORMAT: {
+        decimalSeparator: `.`,
+        groupSeparator: `'`,
+        groupSize: 3
+      }
+    })
+    const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
+
+    return parseFloat(this.formatBigNumber(amount, args.maxDigits))
+  }
+
   public formatBigNumber(value: BigNumber, maxDigits?: number): string {
     if (!maxDigits) {
       return value.toFormat()

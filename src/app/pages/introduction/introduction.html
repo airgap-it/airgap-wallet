@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding forceOverflow="false">
+<ion-content class="ion-padding" forceOverflow="false">
   <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isBrowser">
     <ion-segment-button value="highest">
       <ion-label>{{ 'introduction.highest.label' | translate }}</ion-label>
@@ -24,7 +24,7 @@
       <p [innerHTML]="'introduction.highest.text' | translate"></p>
     </ion-row>
 
-    <ion-row padding-top align-items-center>
+    <ion-row class="ion-padding-top ion-align-items-center">
       <ion-col size="5" *ngIf="isBrowser"><img src="assets/img/airgap_onboarding_wallet-notebook.svg" /></ion-col>
       <ion-col size="5" *ngIf="!isBrowser"><img src="assets/img/airgap_onboarding_wallet.svg" /></ion-col>
       <ion-col size="7">
@@ -33,14 +33,14 @@
       </ion-col>
     </ion-row>
 
-    <ion-row padding-vertical align-items-center>
-      <ion-col size="5" text-center><img class="connector--img" src="assets/img/qrcode.svg" /></ion-col>
+    <ion-row class="ion-padding-vertical ion-align-items-center">
+      <ion-col size="5" class="ion-text-center"><img class="connector--img" src="assets/img/qrcode.svg" /></ion-col>
       <ion-col size="7">
         <strong>{{ 'introduction.communication.highest_text' | translate }}</strong>
       </ion-col>
     </ion-row>
 
-    <ion-row align-items-center>
+    <ion-row class="ion-align-items-center">
       <ion-col size="5"><img src="assets/img/airgap_onboarding_vault.svg" /></ion-col>
       <ion-col size="7">
         <h5>{{ 'introduction.vault.heading' | translate }}</h5>
@@ -54,7 +54,7 @@
       <p [innerHTML]="'introduction.medium.text' | translate"></p>
     </ion-row>
 
-    <ion-row padding-top align-items-center>
+    <ion-row class="ion-padding-top ion-align-items-center">
       <ion-col size="5"><img src="assets/img/airgap_onboarding_wallet.svg" /></ion-col>
       <ion-col size="7">
         <h5>{{ 'introduction.wallet.heading' | translate }}</h5>
@@ -62,14 +62,14 @@
       </ion-col>
     </ion-row>
 
-    <ion-row padding-vertical align-items-center>
+    <ion-row class="ion-padding-vertical ion-align-items-center">
       <ion-col size="5" text-center><img class="connector--img" src="assets/img/clone.svg" /></ion-col>
       <ion-col size="7">
         <strong>{{ 'introduction.communication.medium_text' | translate }}</strong>
       </ion-col>
     </ion-row>
 
-    <ion-row align-items-center>
+    <ion-row class="ion-align-items-center">
       <ion-col size="5"><img src="assets/img/airgap_onboarding_vault.svg" /></ion-col>
       <ion-col size="7">
         <h5>{{ 'introduction.vault.heading' | translate }}</h5>

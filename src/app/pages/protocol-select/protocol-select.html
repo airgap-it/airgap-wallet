@@ -15,7 +15,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content class="ion-padding">
   <ion-list lines="none">
     <ion-radio-group ngDefaultControl [(ngModel)]="selectedProtocol" (ngModelChange)="onModelChange($event)" lines="none">
       <currency-item *ngFor="let protocol of filteredProtocols" [protocol]="protocol" [radioList]="true"></currency-item>

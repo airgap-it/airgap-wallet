@@ -4,9 +4,10 @@
     "transactions_label": "Transactions",
     "add-tokens_label": "Add Tokens",
     "import-accounts_label": "Import Accounts",
-    "delegate_label": "Delegate",
+    "delegate_label": "Delegation",
     "undelegate_label": "Undelegate",
     "vote_label": "Voting",
+    "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
     "pending-transactions": {
       "label": "Pending Transactions",
@@ -35,6 +36,16 @@
     "not-delegated_card": {
       "heading": "Delegate Tezos",
       "text": "You have <strong>{{amount}}</strong> undelegated. If you delegate now you can earn a share each cycle."
+    },
+    "migrate-babylon_card": {
+      "heading": "Account Migration",
+      "text": "Delegatable <strong>kt accounts</strong> have been deprecated, to redelegate transfer your XTZs to your <strong>tz account</strong>."
+    },
+    "migrate-alert": {
+      "header": "KT Balance Migration",
+      "message": "Do you want to transfer <strong>{{amount}}</strong> from this KT address to its corresponding XTZ address?",
+      "cancel": "Cancel",
+      "confirm": "Migrate"
     }
   },
 

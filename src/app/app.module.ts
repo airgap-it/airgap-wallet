@@ -1,3 +1,6 @@
+import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
+import { MarketDataService } from './services/market-data/market-data.service'
+import { ChartsModule } from 'ng2-charts'
 import { CommonModule } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -23,7 +26,6 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 import { LottieAnimationViewModule } from 'ng-lottie'
 import { MomentModule } from 'ngx-moment'
-
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ComponentsModule } from './components/components.module'
@@ -47,6 +49,7 @@ import { ScannerProvider } from './services/scanner/scanner'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { DrawChartService } from './services/draw-chart/draw-chart.service'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -58,6 +61,7 @@ export function createTranslateLoader(http: HttpClient) {
   exports: [],
   imports: [
     BrowserModule,
+    ChartsModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
@@ -91,6 +95,9 @@ export function createTranslateLoader(http: HttpClient) {
     BarcodeScanner,
     QRScanner,
     Keyboard,
+    AmountConverterPipe,
+    MarketDataService,
+    DrawChartService,
     Deeplinks,
     Clipboard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

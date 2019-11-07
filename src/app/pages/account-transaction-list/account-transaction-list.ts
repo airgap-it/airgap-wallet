@@ -1,8 +1,9 @@
+import { WalletActionInfo } from './../../models/ActionGroup'
 import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import { LoadingController, Platform, PopoverController, ToastController, AlertController } from '@ionic/angular'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
@@ -19,6 +20,9 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { TranslateService } from '@ngx-translate/core'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
+import { AirGapTezosMigrateAction } from 'src/app/models/actions/TezosMigrateAction'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -36,6 +40,8 @@ export class AccountTransactionListPage {
 
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
+  public mainWallet?: AirGapMarketWallet
+
   public transactions: IAirGapTransaction[] = []
 
   public protocolIdentifier: string
@@ -65,20 +71,23 @@ export class AccountTransactionListPage {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly platform: Platform,
+    public readonly alertCtrl: AlertController,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,
     private readonly pushBackendProvider: PushBackendProvider,
     public readonly location: Location,
     public readonly router: Router,
+    public readonly translateService: TranslateService,
     public readonly operationsProvider: OperationsProvider,
     public readonly popoverCtrl: PopoverController,
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
     public readonly dataService: DataService
   ) {
+    const info = this.route.snapshot.data.special
     if (this.route.snapshot.data.special) {
-      this.wallet = this.route.snapshot.data.special
+      this.wallet = info.wallet
     }
 
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
@@ -93,10 +102,12 @@ export class AccountTransactionListPage {
     }
 
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+      this.mainWallet = info.mainWallet
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === ProtocolSymbols.XTZ) {
       this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
+      this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
 
     this.actionGroup = new ActionGroup(this)
@@ -152,12 +163,25 @@ export class AccountTransactionListPage {
   }
 
   public openPreparePage() {
-    const info = {
-      wallet: this.wallet,
-      address: ''
+    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+      const action = new AirGapTezosMigrateAction({
+        wallet: this.wallet,
+        mainWallet: this.mainWallet,
+        alertCtrl: this.alertCtrl,
+        translateService: this.translateService,
+        dataService: this.dataService,
+        router: this.router
+      })
+      action.start()
+    } else {
+      const info = {
+        wallet: this.wallet,
+        address: ''
+      }
+      this.dataService.setData(DataServiceKey.DETAIL, info)
+
+      this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage() {
@@ -185,7 +209,7 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null) {
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
 
@@ -332,7 +356,8 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    this.isKtDelegated = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress)
+    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, false)
+    this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
   }

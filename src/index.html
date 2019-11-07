@@ -18,6 +18,18 @@
     <!-- add to homescreen for ios -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <script>
+      function getChromeVersion() {
+        var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)
+        return raw ? parseInt(raw[2], 10) : false
+      }
+      if (getChromeVersion() === 77) {
+        window.TransformStream = null
+        window.WritableStream = null
+        window.ReadableStream = null
+      }
+    </script>
     <script src="cordova.js"></script>
   </head>
 

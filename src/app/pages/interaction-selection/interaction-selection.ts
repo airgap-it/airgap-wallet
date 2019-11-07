@@ -14,7 +14,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 export class InteractionSelectionPage {
   public preparedDataQR: string = ''
   private readonly wallet: AirGapMarketWallet
-  private readonly airGapTx: IAirGapTransaction
+  private readonly airGapTxs: IAirGapTransaction[]
 
   constructor(
     private readonly router: Router,
@@ -25,7 +25,7 @@ export class InteractionSelectionPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.airGapTx = info.airGapTx
+      this.airGapTxs = info.airGapTxs
       this.preparedDataQR = info.data
     }
   }
@@ -35,7 +35,7 @@ export class InteractionSelectionPage {
   public offlineDeviceSign() {
     const info = {
       wallet: this.wallet,
-      airGapTx: this.airGapTx,
+      airGapTx: this.airGapTxs,
       data: this.preparedDataQR
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
@@ -43,6 +43,7 @@ export class InteractionSelectionPage {
   }
 
   public sameDeviceSign() {
+    console.log(this.preparedDataQR)
     this.deepLinkProvider
       .sameDeviceDeeplink(this.preparedDataQR)
       .then(() => {

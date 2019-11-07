@@ -1,0 +1,53 @@
+<ion-row class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
+  <h1 class="ion-no-margin">${{ total | number: '1.2-2' }}</h1>
+</ion-row>
+<ion-row class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
+  <ion-text [color]="percentageChange >= 0 ? 'primary' : 'danger'">
+    <small>
+      <span *ngIf="percentageChange >= 0">+</span>
+      <span>{{ percentageChange }}%</span>
+    </small>
+  </ion-text>
+</ion-row>
+<div>
+  <canvas
+    baseChart
+    #baseChart="base-chart"
+    width="700"
+    height="200px"
+    [chartType]="chartType"
+    [datasets]="chartDatasets"
+    [labels]="chartLabels"
+    [colors]="chartColors"
+    [options]="chartOptions"
+    [legend]="false"
+  ></canvas>
+</div>
+<ion-row class="ion-padding-horizontal ion-padding-bottom ion-align-items-end ion-justify-content-center">
+  <ion-button
+    [color]="currentChart !== 'allTime' && rawData.length > 0 ? 'primary' : 'secondary'"
+    size="small"
+    fill="clear"
+    (click)="drawChart('allTime')"
+  >
+    1y
+  </ion-button>
+
+  <ion-button
+    [color]="currentChart !== 'last7d' && rawData.length > 0 ? 'primary' : 'secondary'"
+    size="small"
+    fill="clear"
+    (click)="drawChart('last7d')"
+  >
+    7d
+  </ion-button>
+
+  <ion-button
+    [color]="currentChart !== 'last24h' && rawData.length > 0 ? 'primary' : 'secondary'"
+    size="small"
+    fill="clear"
+    (click)="drawChart('last24h')"
+  >
+    24h
+  </ion-button>
+</ion-row>

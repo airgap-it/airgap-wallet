@@ -1,3 +1,4 @@
+import { ChartComponent } from './chart/chart.component'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -6,6 +7,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 import { MomentModule } from 'ngx-moment'
+import { ChartsModule } from 'ng2-charts'
 
 import { PipesModule } from '../pipes/pipes.module'
 
@@ -31,6 +33,7 @@ import { AmountComponent } from './amount/amount.component'
   declarations: [
     PortfolioItemComponent,
     IdenticonComponent,
+    ChartComponent,
     HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
@@ -55,11 +58,14 @@ import { AmountComponent } from './amount/amount.component'
     MaterialIconsModule,
     PipesModule,
     MomentModule,
+    ChartsModule,
     TranslateModule,
     QRCodeModule
   ],
   exports: [
     PortfolioItemComponent,
+    ChartComponent,
+
     IdenticonComponent,
     HexagonIconComponent,
     AddressRowComponent,

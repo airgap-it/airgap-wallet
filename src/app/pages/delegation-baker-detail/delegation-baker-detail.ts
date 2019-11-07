@@ -65,9 +65,11 @@ export class DelegationBakerDetailPage {
   public async ionViewDidEnter() {
     // get baker 0, always airgap for now
     const airGapBakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
+
     this.airGapBaker = airGapBakerConfig
 
-    this.delegationInfo = await this.operationsProvider.fetchDelegationInfo(this.wallet.receivingPublicAddress)
+    this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, true)
+
     this.isDelegated = this.delegationInfo.isDelegated
 
     // If baker is not us, we can't display more info

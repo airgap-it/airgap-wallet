@@ -28,7 +28,7 @@ export class ActionGroup {
       return this.getTezosActions()
     })
     actionMap.set(ProtocolSymbols.XTZ_KT, () => {
-      return this.getTezosKtActions()
+      return this.getTezosKTActions()
     })
     actionMap.set(ProtocolSymbols.ETH, () => {
       return this.getEthereumActions()
@@ -69,11 +69,6 @@ export class ActionGroup {
         const prepareDelegateActionContext = new SimpleAction(() => {
           return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
             let wallet: AirGapMarketWallet = this.callerContext.wallet
-            const importAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
-            try {
-              await importAction.start()
-              wallet = await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, 0, importAction.result)
-            } catch {}
             const info = {
               wallet,
               actionCallback: resolve
@@ -89,13 +84,12 @@ export class ActionGroup {
         return delegateAction
       }
     )
-
-    return [importButtonAction, delegateButtonAction]
+    return [delegateButtonAction, importButtonAction]
   }
 
-  private getTezosKtActions(): Action<any, any>[] {
-    const viewDelegateButtonAction = new ButtonAction(
-      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'view-delegation' },
+  private getTezosKTActions(): Action<any, any>[] {
+    const migrateAction = new ButtonAction(
+      { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
       () => {
         const prepareDelegateActionContext = new SimpleAction(() => {
           return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
@@ -114,8 +108,7 @@ export class ActionGroup {
         return viewDelegationAction
       }
     )
-
-    return [viewDelegateButtonAction]
+    return [migrateAction]
   }
 
   private getCosmosActions(): Action<any, any>[] {

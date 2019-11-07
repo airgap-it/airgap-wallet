@@ -41,7 +41,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const isDelegated = await this.checkDelegated(address)
+      const { isDelegated } = await this.checkDelegated(address, false)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -80,20 +80,22 @@ export class OperationsProvider {
     })
   }
 
-  public async checkDelegated(address: string): Promise<boolean> {
+  public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
     if (address.startsWith('cosmos')) {
       // TODO: this is ugly and needs to be re-implemented properly
       const protocol = new CosmosProtocol()
       const delegations = await protocol.fetchDelegations(address)
-      return delegations.length > 0
+
+      return {
+        isDelegated: delegations.length > 0 ? true : false
+      }
     } else {
-      return (await this.fetchDelegationInfo(address)).isDelegated
+      return await this.fetchDelegationInfo(address, fetchExtraInfo)
     }
   }
-
-  public async fetchDelegationInfo(address: string): Promise<DelegationInfo> {
+  public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
     const protocol = new TezosKtProtocol()
-    return protocol.isAddressDelegated(address)
+    return protocol.isAddressDelegated(address, fetchExtraInfo)
   }
 
   public async prepareTransaction(
@@ -102,21 +104,26 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber,
     data?: any
-  ): Promise<{ airGapTx: IAirGapTransaction; serializedTx: string }> {
+  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTx: string }> {
     const loader = await this.getAndShowLoader()
 
     try {
+      let rawUnsignedTx
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      const rawUnsignedTx: any = await wallet.prepareTransaction([address], [amount], fee, data)
-
-      const airGapTx: IAirGapTransaction = (await wallet.coinProtocol.getTransactionDetails({
+      if (wallet.coinProtocol.identifier === ProtocolSymbols.XTZ_KT) {
+        const tezosKtProtocol = new TezosKtProtocol()
+        rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
+      } else {
+        rawUnsignedTx = await wallet.prepareTransaction([address], [amount], fee, data)
+      }
+      const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
-      }))[0]
+      })
 
       const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
 
-      return { airGapTx, serializedTx }
+      return { airGapTxs, serializedTx }
     } catch (error) {
       handleErrorSentry(ErrorCategory.COINLIB)(error)
 

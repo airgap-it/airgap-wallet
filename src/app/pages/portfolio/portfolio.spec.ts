@@ -1,6 +1,7 @@
+import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
+import { MarketDataService } from './../../services/market-data/market-data.service'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
-
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { PortfolioPage } from './portfolio'
@@ -14,7 +15,7 @@ describe('PortfolioPage', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [QRScanner],
+        providers: [QRScanner, MarketDataService, AmountConverterPipe],
         declarations: [PortfolioPage]
       })
     )

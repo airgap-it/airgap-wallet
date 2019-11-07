@@ -1,6 +1,6 @@
-<ion-row lines="none" no-padding align-items-center>
+<ion-row lines="none" class="ion-no-padding ion-align-items-center">
   <ion-col size="3">
-    <ion-row justify-content-center>
+    <ion-row class="ion-justify-content-center">
       <ion-avatar>
         <identicon [address]="address"></identicon>
       </ion-avatar>
@@ -8,7 +8,7 @@
     </ion-row>
   </ion-col>
   <ion-col size="9">
-    <ion-label class="typography--uppercase" no-margin stacked *ngIf="label">{{ label }}</ion-label>
+    <ion-label class="typography--uppercase ion-no-margin" position="stacked" *ngIf="label">{{ label }}</ion-label>
     <div item-content class="text--selectable typography--mono">
       {{ address }}
     </div>

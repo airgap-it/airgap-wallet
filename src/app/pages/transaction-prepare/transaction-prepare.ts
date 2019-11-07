@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardProvider } from '../../services/clipboard/clipboard'
@@ -24,6 +24,7 @@ export class TransactionPreparePage {
   public amountForm: FormGroup
 
   public sendMaxAmount = false
+  public forceMigration = false
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -45,16 +46,21 @@ export class TransactionPreparePage {
       address = info.address || ''
       amount = info.amount || 0
       wallet = info.wallet
-    }
-    this.setWallet(wallet)
+      this.setWallet(wallet)
 
-    this.transactionForm = formBuilder.group({
-      address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
-      feeLevel: [0, [Validators.required]],
-      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
-      isAdvancedMode: [false, []]
-    })
+      this.transactionForm = formBuilder.group({
+        address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
+        amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
+        feeLevel: [0, [Validators.required]],
+        fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
+        isAdvancedMode: [false, []]
+      })
+
+      if (info.forceMigration) {
+        this.forceMigration = info.forceMigration
+        this.setMaxAmount('0')
+      }
+    }
 
     this.useWallet()
 
@@ -108,6 +114,15 @@ export class TransactionPreparePage {
           })
         })
       })
+    } else if (this.wallet.protocolIdentifier === 'xtz-kt' && this.forceMigration) {
+      if (this.forceMigration) {
+        this._ngZone.run(() => {
+          const protocol = this.wallet.coinProtocol as TezosKtProtocol
+          this.transactionForm.controls.fee.setValue(
+            protocol.migrationFee.shiftedBy(-protocol.feeDecimals).toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+          )
+        })
+      }
     } else {
       this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
         this._ngZone.run(() => {
@@ -143,10 +158,10 @@ export class TransactionPreparePage {
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
+      const { airGapTxs, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
-        airGapTx,
+        airGapTxs,
         data: 'airgap-vault://?d=' + serializedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
