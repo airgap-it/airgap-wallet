@@ -32,6 +32,8 @@ export class DelegationCosmosPage {
   public currentBalance: BigNumber | undefined
   public delegatableBalance: BigNumber
   public delegationReward: BigNumber
+  public canDelegate: boolean = true
+  public canUndelegate: boolean = true
 
   private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
 
@@ -90,7 +92,13 @@ export class DelegationCosmosPage {
         emitEvent: false
       })
     } else {
+      console.log('address is not delegated')
       this.addressDelegated = false
+      this.canUndelegate = false
+      this.delegatableBalance = this.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    }
+    if (this.delegatableBalance < 0 + this.wallet.coinProtocol.feeDefaults.low.toNumber()) {
+      this.canDelegate = false
     }
   }
 

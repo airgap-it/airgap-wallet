@@ -20,7 +20,7 @@
       </ion-text>
     </ion-col>
   </ion-row>
-  <ng-container *ngIf="myValidators">
+  <ng-container *ngIf="myValidators; else loadingTemplate">
     <ion-list lines="none" *ngFor="let validator of myValidators">
       <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
         <ion-avatar slot="start"><identicon [address]="validator.operator_address"></identicon></ion-avatar>
@@ -66,7 +66,7 @@
     </ion-col>
   </ion-row>
   <ng-container *ngIf="filteredValidators">
-    <ion-list lines="none" *ngFor="let validator of filteredValidators">
+    <ion-list lines="none" *ngFor="let validator of filteredValidators; else: loadingTemplate">
       <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
         <ion-avatar slot="start">
           <identicon [address]="validator.operator_address"></identicon>
@@ -101,5 +101,12 @@
         </ion-label>
       </ion-item>
     </ion-list>
+    <ng-template #loadingTemplate>
+      <div>
+        <p class="ion-no-margin">
+          <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+        </p>
+      </div>
+    </ng-template>
   </ng-container>
 </ion-content>

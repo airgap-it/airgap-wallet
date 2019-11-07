@@ -1,7 +1,7 @@
 <form [formGroup]="delegationForm" padding-bottom>
   <ion-row class="ion-padding-horizontal padding-top align-items-center amount__container">
     <ion-col size="9" class="amount--container__input ion-no-padding">
-      <ion-item clasS="ion-no-padding" lines="none">
+      <ion-item clasS="ion-no-padding" lines="none" [disabled]="disabled">
         <ion-label color="blackLight" class="ion-no-margin" position="stacked">Amount</ion-label>
         <ion-input type="number" formControlName="amount" id="amount-input" placeholder="0.0"></ion-input>
       </ion-item>
@@ -12,7 +12,14 @@
     <ion-col size="3" class="ion-no-padding">
       <ion-toolbar>
         <ion-buttons slot="end">
-          <ion-button shape="round" [fill]="sendMaxAmount ? 'solid' : 'outline'" size="small" color="secondary" (click)="toggleMaxAmount()">
+          <ion-button
+            shape="round"
+            [fill]="sendMaxAmount ? 'solid' : 'outline'"
+            size="small"
+            color="secondary"
+            (click)="toggleMaxAmount()"
+            [disabled]="disabled"
+          >
             {{ 'transaction-prepare.fee.max_label' | translate }}
           </ion-button>
         </ion-buttons>

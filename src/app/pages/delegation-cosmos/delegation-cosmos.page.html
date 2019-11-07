@@ -135,8 +135,9 @@
   </ion-segment>
   <ng-container *ngIf="delegationOption === 'delegate'">
     <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
-        <p>{{ 'delegation-cosmos.delegation.text' | translate: { delegatableBalance: delegatableBalance } }}</p>
+      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated && delegatableBalance">
+        <!-- <p>{{ 'delegation-cosmos.delegation.text' }}</p> -->
+        <p>{{ 'delegation-cosmos.delegation.text' | translate: { delegatableBalance: delegatableBalance.toNumber() } }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
         <p>
@@ -145,7 +146,7 @@
         </p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet"></amount>
+    <amount [wallet]="wallet" [disabled]="!canDelegate"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
@@ -156,7 +157,7 @@
         <p>{{ 'delegation-cosmos.undelegate.undelegated_text' | translate: { delegatedAmount: delegatedAmount } }}</p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount"></amount>
+    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
@@ -220,14 +221,20 @@
 
   <ion-row class="ion-margin-bottom"></ion-row>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'">
+    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'" [disabled]="!canDelegate">
       {{ 'delegation-cosmos.delegate_label' | translate }}
     </ion-button>
-    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'">
+    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'" [disabled]="!canUndelegate">
       {{ 'delegation-cosmos.undelegate_label' | translate }}
     </ion-button>
 
-    <ion-button shape="round" color="primary" (click)="withdrawDelegationRewards()" *ngIf="delegationOption === 'rewards'">
+    <ion-button
+      shape="round"
+      color="primary"
+      (click)="withdrawDelegationRewards()"
+      *ngIf="delegationOption === 'rewards'"
+      [disabled]="!delegationReward"
+    >
       {{ 'delegation-cosmos.withdraw_rewards_label' | translate }}
     </ion-button>
   </ion-fab>

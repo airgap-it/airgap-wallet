@@ -12,12 +12,15 @@ export class AmountComponent {
   public delegationForm: FormGroup
   public amount: number = 0
   public sendMaxAmount: boolean = false
-
+  public amountControl
   @Input()
   public wallet: AirGapMarketWallet
 
   @Input()
   public capMaxAmount: number
+
+  @Input()
+  public disabled: boolean = false
 
   constructor(public formBuilder: FormBuilder) {
     this.delegationForm = this.formBuilder.group({
