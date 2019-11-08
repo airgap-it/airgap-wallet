@@ -411,16 +411,16 @@
     },
     "delegation": {
       "label": "Your Delegation",
-      "text": "Select the amount you want to delegate, you can delegate up to {{delegatableBalance}}",
-      "delegated_text": "You have currently {{delegatedAmount}} ATOM delegated to this validator, you can additionally delegate up to {{delegatableBalance}} ATOM"
+      "text": "Select the amount you want to delegate, you can delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>.",
+      "delegated_text": "You have currently <span class=\"style__strong color__primary\">{{delegatedAmount}}</span> delegated to this validator, you can additionally delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>."
     },
     "undelegate": {
       "text": "You have currently not delegated to this validator.",
-      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to {{delegatedAmount}} ATOM"
+      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{delegatedAmount}}</span>."
     },
     "rewards": {
       "text": "You currently have no rewards to claim",
-      "claim-rewards_text": "You can claim up to {{delegationReward}} in rewards for this delegation."
+      "claim-rewards_text": "You can claim up to <span class=\"style__strong color__primary\">{{delegationReward}}</span> in rewards for this delegation."
     }
    
   },
