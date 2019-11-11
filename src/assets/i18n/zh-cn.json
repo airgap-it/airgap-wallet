@@ -3,7 +3,7 @@
     "account-transaction-list.transactions_label": "交易",
     "account-transaction-list.receive_label": "收款",
     "account-transaction-list.send_label": "付款",
-    "account-transaction-list.aeternity.no-transactions_text": "本账户尚无转账记录",
+    "account-transaction-list.no-transactions_text": "本账户尚无转账记录",
     "introduction.title": "新加密钱包标准",
     "introduction.highest.label": "最高安全级别",
     "introduction.highest.text": "AirGap的<b>两套设备结合使用</b>的方法，使得安全密钥操作更便捷。",
