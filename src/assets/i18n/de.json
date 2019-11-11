@@ -1,7 +1,6 @@
 {
   "account-transaction-list.title": "Konto",
   "account-transaction-list.transactions_label": "Transaktionen",
-  "account-transaction-list.ae-mainnet_text": "Ihre Token können nach dem æternity mainnet launch verschoben werden.",
   "account-transaction-list.no-transactions_text": "Es wurden noch keine Transaktionen mit diesem Konto durchgeführt.",
   "account-transaction-list.receive_label": "Empfangen",
   "account-transaction-list.send_label": "Versenden",

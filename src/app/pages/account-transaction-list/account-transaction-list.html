@@ -107,6 +107,12 @@
   </ion-row>
 
   <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showNoTransactionScreen()">
+    <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
+    <p>
+      {{ 'account-transaction-list.no-transactions_text' | translate }}
+    </p>
+  </div>
 
   <ion-list lines="none" class="ion-padding-bottom">
     <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">

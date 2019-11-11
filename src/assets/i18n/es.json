@@ -1,9 +1,9 @@
 {
   "account-transaction-list.title": "Cuenta",
   "account-transaction-list.transactions_label": "Transacciones",
-  "account-transaction-list.ae-mainnet_text": "Sus tokens se volverán transferibles después de que se haya lanzado la red principal de æternity",
   "account-transaction-list.receive_label": "Recibir",
   "account-transaction-list.send_label": "Enviar",
+  "account-transaction-list.no-transactions_text": "Aún no hay transacciones para esta cuenta.",
   "introduction.title": "El nuevo estandar de billetera crypto",
   "introduction.highest.label": "Seguridad alta",
   "introduction.highest.text": "Con el <b>enfoque de dos dispositivos</b> de AirGap el manejo seguro de claves se vuelve más accesible.</p>",
