@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
+import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 @Injectable()
 export class DrawChartService {
-  public currentChart = 'last24h'
-  public chartSubject = new BehaviorSubject('last24h')
+  public currentChart = TimeUnit.Minutes
+  public chartSubject = new BehaviorSubject(TimeUnit.Minutes)
 
   getChartObservable() {
     return this.chartSubject.asObservable()
@@ -12,14 +13,14 @@ export class DrawChartService {
 
   drawChart() {
     switch (this.currentChart) {
-      case 'last24h':
-        this.chartSubject.next('last24h')
+      case TimeUnit.Minutes:
+        this.chartSubject.next(TimeUnit.Minutes)
         break
-      case 'last7d':
-        this.chartSubject.next('last7d')
+      case TimeUnit.Hours:
+        this.chartSubject.next(TimeUnit.Hours)
         break
-      case 'allTime':
-        this.chartSubject.next('allTime')
+      case TimeUnit.Days:
+        this.chartSubject.next(TimeUnit.Days)
         break
     }
   }
