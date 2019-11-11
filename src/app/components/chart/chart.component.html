@@ -25,28 +25,28 @@
 </div>
 <ion-row class="ion-padding-horizontal ion-padding-bottom ion-align-items-end ion-justify-content-center">
   <ion-button
-    [color]="currentChart !== 'allTime' && rawData.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentChart !== 'days' && rawData.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
-    (click)="drawChart('allTime')"
+    (click)="drawChart('days')"
   >
     1y
   </ion-button>
 
   <ion-button
-    [color]="currentChart !== 'last7d' && rawData.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentChart !== 'hours' && rawData.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
-    (click)="drawChart('last7d')"
+    (click)="drawChart('hours')"
   >
     7d
   </ion-button>
 
   <ion-button
-    [color]="currentChart !== 'last24h' && rawData.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentChart !== 'minutes' && rawData.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
-    (click)="drawChart('last24h')"
+    (click)="drawChart('minutes')"
   >
     24h
   </ion-button>

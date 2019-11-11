@@ -3,6 +3,7 @@ import { MarketDataService } from './../../services/market-data/market-data.serv
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
 import { Component, ViewChild, Input } from '@angular/core'
 import { Subscription } from 'rxjs'
+import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 /**
  * Generated class for the ChartComponent component.
@@ -21,7 +22,7 @@ export class ChartComponent {
   @ViewChild('baseChart') public chart?: BaseChartDirective
 
   public date: Date
-  public currentChart = 'last24h'
+  public currentChart: TimeUnit | string = TimeUnit.Minutes
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -45,7 +46,7 @@ export class ChartComponent {
 
   public lineChartType: string = 'line'
 
-  public async drawChart(timeInterval: string) {
+  public async drawChart(timeInterval: TimeUnit | string) {
     this.chartData = {}
     this.chartLabels = []
     this.chartDatasets = [{ data: [], label: 'Price' }]
@@ -53,10 +54,7 @@ export class ChartComponent {
     this.currentChart = timeInterval
 
     let myOptions = {}
-
-    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart).catch(() => {
-      return [0]
-    })
+    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
     this.chartDatasets[0].data = this.rawData
 
     for (let i = 0; i < this.rawData.length; i++) {
@@ -134,7 +132,7 @@ export class ChartComponent {
   }
 
   public setLabel24h() {
-    this.currentChart = 'last24h'
+    this.currentChart = TimeUnit.Minutes
   }
 
   async displayPercentageChange(rawData: any) {
