@@ -1,6 +1,8 @@
 import { IAirGapTransaction } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
+// tslint:disable:max-classes-per-file
+
 export class TransactionParameter {
   public label: string
   public value: string
@@ -8,10 +10,10 @@ export class TransactionParameter {
 }
 
 export class Transaction implements IAirGapTransaction {
-  public amount: BigNumber
+  public amount: string
   public blockHeight: string
   public data: string
-  public fee: BigNumber
+  public fee: string
   public from: string[]
   public hash: string
 
@@ -26,18 +28,11 @@ export class Transaction implements IAirGapTransaction {
   public payload: string
   public publicKey: string
 
-  constructor(
-    from: string[],
-    to: string[],
-    amount: string | BigNumber,
-    fee: string | BigNumber,
-    protocolIdentifier: string,
-    payload?: string
-  ) {
+  constructor(from: string[], to: string[], amount: string, fee: string, protocolIdentifier: string, payload?: string) {
     this.from = from
     this.to = to
-    this.amount = new BigNumber(amount)
-    this.fee = new BigNumber(fee)
+    this.amount = amount
+    this.fee = fee
     this.protocolIdentifier = protocolIdentifier
     this.payload = payload
   }

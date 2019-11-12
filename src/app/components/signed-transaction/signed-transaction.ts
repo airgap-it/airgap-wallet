@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnChanges } from '@angular/core'
 import {
-  DeserializedSyncProtocol,
+  ICoinProtocol,
+  Serializer,
   getProtocolByIdentifier,
   IAirGapTransaction,
   SignedTransaction,
-  SyncProtocolUtils
+  IACMessageDefinitionObject
 } from 'airgap-coin-lib'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -15,9 +16,9 @@ import BigNumber from 'bignumber.js'
   templateUrl: 'signed-transaction.html',
   styleUrls: ['./signed-transaction.scss']
 })
-export class SignedTransactionComponent {
+export class SignedTransactionComponent implements OnChanges {
   @Input()
-  public signedTx: DeserializedSyncProtocol
+  public signedTxs: IACMessageDefinitionObject[] // TODO: Type
 
   @Input()
   public syncProtocolString: string
@@ -39,22 +40,23 @@ export class SignedTransactionComponent {
     //
   }
 
-  public async ngOnChanges() {
+  public async ngOnChanges(): Promise<void> {
     if (this.syncProtocolString) {
       try {
-        const syncUtils = new SyncProtocolUtils()
-        const parts = this.syncProtocolString.split('?d=')
-        this.signedTx = await syncUtils.deserialize(parts[parts.length - 1])
+        const serializer: Serializer = new Serializer()
+        const parts: string[] = this.syncProtocolString.split('?d=')
+        this.signedTxs = await serializer.deserialize([parts[parts.length - 1]])
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
 
-    if (this.signedTx) {
-      const protocol = getProtocolByIdentifier(this.signedTx.protocol)
+    // TODO: Handle multiple messages
+    if (this.signedTxs.length > 0) {
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTxs[0].protocol)
       try {
-        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTxs[0].payload as SignedTransaction)
         if (
           this.airGapTxs.length > 1 &&
           this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
@@ -69,7 +71,7 @@ export class SignedTransactionComponent {
       } catch (e) {
         console.error(e)
         this.fallbackActivated = true
-        this.rawTxData = this.signedTx.payload as SignedTransaction
+        this.rawTxData = this.signedTxs[0].payload as SignedTransaction
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }

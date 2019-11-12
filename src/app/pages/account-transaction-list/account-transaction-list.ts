@@ -234,8 +234,8 @@ export class AccountTransactionListPage {
 
     if (this.pendingTransactions.length > 0) {
       this.pendingTransactions = this.pendingTransactions.map(pendingTx => {
-        pendingTx.fee = new BigNumber(pendingTx.fee)
-        pendingTx.amount = new BigNumber(pendingTx.amount)
+        pendingTx.fee = new BigNumber(pendingTx.fee).toString(10)
+        pendingTx.amount = new BigNumber(pendingTx.amount).toString(10)
 
         return pendingTx
       })
