@@ -46,6 +46,7 @@ export class DelegationCosmosPage {
   public totalDelegationBalance: BigNumber | undefined
   public selfDelegationBalance: BigNumber
   public amount: BigNumber
+  public percentage: string | undefined
   public sendMaxAmount: boolean = false
   public delegationOption: string = "delegate"
   public currentBalance: BigNumber | undefined
@@ -150,6 +151,10 @@ export class DelegationCosmosPage {
     this.validatorAlias = this.validatorInfo.alias
     this.validatorStatus = this.validatorInfo.status
     this.totalDelegationBalance = this.validatorInfo.totalDelegationBalance
+    this.percentage = `${this.selfDelegationBalance
+      .div(this.totalDelegationBalance)
+      .times(100)
+      .toFixed(2)}%`
     const rawDelegationReward = await this.fetchRewardForDelegation(
       this.wallet.addresses[0],
       this.validatorAddress

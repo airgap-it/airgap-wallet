@@ -50,13 +50,13 @@
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
         <!--TODO: calculate percentage of self bond (total amount & self amount) -->
-        <div class="progress--current" [style.width]="'80%'"></div>
+        <div class="progress--current" [style.width]="percentage"></div>
       </div>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <ion-row>
         <ion-col size="6" class="ion-no-padding">
-          <small>0.16%</small>
+          <small>{{percentage}}</small>
           <!--TODO: show if loading 
           <ng-template #bakerInfoSkeleton>
             <div>
@@ -151,10 +151,10 @@
     <ion-segment-button value="delegate">
       <ion-label>Delegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="undelegate" [disabled]="!canDelegate">
+    <ion-segment-button value="undelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="rewards" [disabled]="!canDelegate">
+    <ion-segment-button value="rewards">
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
