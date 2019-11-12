@@ -85,7 +85,7 @@ export class DelegationCosmosPage {
       const delegation = delegations[index]
       this.addressDelegated = true
       const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
-      this.delegatedAmount = rawDelegatedAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      this.delegatedAmount = rawDelegatedAmount
     } else {
       console.log('address is not delegated')
       this.addressDelegated = false
@@ -94,7 +94,7 @@ export class DelegationCosmosPage {
     const totalDelegatedAmount = await this.validatorService.fetchTotalDelegatedAmount(this.wallet.addresses[0])
     const rawDelegatableBalance = new BigNumber(this.wallet.currentBalance - totalDelegatedAmount.toNumber())
     console.log('rawDelegatableBalance', rawDelegatableBalance)
-    this.delegatableBalance = rawDelegatableBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    this.delegatableBalance = rawDelegatableBalance
     if (this.delegatableBalance < 0 + this.wallet.coinProtocol.feeDefaults.low.toNumber()) {
       this.canDelegate = false
     }

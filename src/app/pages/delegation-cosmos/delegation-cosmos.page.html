@@ -165,7 +165,7 @@
         ></p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatableBalance.toNumber()" [disabled]="!canDelegate"></amount>
+    <amount [wallet]="wallet" [capMaxAmount]="delegatableBalance" [disabled]="!canDelegate"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
