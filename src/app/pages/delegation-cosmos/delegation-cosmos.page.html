@@ -45,7 +45,7 @@
 
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
-      <p>{{ validatorStatus }}</p>
+      <p class="ion-no-margin">{{ validatorStatus }}</p>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
@@ -126,7 +126,7 @@
             <h2 class="font--weight__bold" ion-text color="black">
               10.25%
             </h2>
-            <h3>{{ 'delegation-cosmos.rewards_label' | translate }}</h3>
+            <h3>{{ 'delegation-cosmos.voting-power_label' | translate }}</h3>
             <!--TODO: show if loading 
             <ng-template #bakerConfigSkeleton>
               <h2>
@@ -146,27 +146,43 @@
     <ion-segment-button value="delegate">
       <ion-label>Delegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="undelegate">
+    <ion-segment-button value="undelegate" [disabled]="!canDelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="rewards">
+    <ion-segment-button value="rewards" [disabled]="!canDelegate">
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
   <ng-container *ngIf="delegationOption === 'delegate' && delegatableBalance">
     <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding">
-        <ng-container *ngIf="!addressDelegated">
-          <p
-            [innerHTML]="'delegation-cosmos.delegation.text' | translate: { delegatableBalance: delegatableBalance.toNumber() }"
-          ></p>
-        </ng-container>
-        <ng-container *ngIf="addressDelegated">
-          <p
-            [innerHTML]="'delegation-cosmos.delegation.delegated_text' | translate: { delegatedAmount: delegatedAmount, delegatableBalance:
-          delegatableBalance.toNumber() }"
-          ></p>
-        </ng-container>
+      <ion-col
+        size="12"
+        class="ion-no-padding"
+        *ngIf="!addressDelegated && delegatableBalance"
+      >
+        <p
+          [innerHTML]="
+            'delegation-cosmos.delegation.text'
+              | translate
+                : {
+                    delegatableBalance:
+                      delegatableBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
+                  }
+          "
+        ></p>
+      </ion-col>
+      <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
+        <p
+          [innerHTML]="
+            'delegation-cosmos.delegation.delegated_text'
+              | translate
+                : {
+                    delegatedAmount: delegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 },
+                    delegatableBalance:
+                      delegatableBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
+                  }
+          "
+        ></p>
       </ion-col>
     </ion-row>
     <amount
@@ -181,10 +197,13 @@
         <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>
-          {{ 'delegation-cosmos.undelegate.undelegated_text' | translate: {
-          delegatedAmount: delegatedAmount } }}
-        </p>
+        <p
+          [innerHTML]="
+            'delegation-cosmos.undelegate.undelegated_text'
+              | translate
+                : { delegatedAmount: delegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }
+          "
+        ></p>
       </ion-col>
     </ion-row>
     <amount
@@ -199,10 +218,13 @@
         <p>{{ 'delegation-cosmos.rewards.text' | translate }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="delegationReward">
-        <p>
-          {{ 'delegation-cosmos.rewards.claim-rewards_text' | translate: {
-          delegationReward: delegationReward } }}
-        </p>
+        <p
+          [innerHTML]="
+            'delegation-cosmos.rewards.claim-rewards_text'
+              | translate
+                : { delegationReward: delegationReward | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }
+          "
+        ></p>
       </ion-col>
     </ion-row>
   </ng-container>
@@ -245,7 +267,11 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              {{ delegatedAmount }}
+              <ng-container *ngIf="!delegatedAmount">
+                0 ATOMs
+              </ng-container>
+              {{ delegatedAmount | amountConverter: { protocolIdentifier:
+              wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
               {{ 'delegation-cosmos.your-account.delegation_label' | translate
@@ -262,7 +288,11 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              {{ delegationReward }}
+              <ng-container *ngIf="!delegationReward">
+                0 ATOMs
+              </ng-container>
+              {{ delegationReward | amountConverter: { protocolIdentifier:
+              wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
               {{ 'delegation-cosmos.your-account.rewards_label' | translate }}

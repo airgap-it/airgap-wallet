@@ -6,24 +6,32 @@
     <ion-title>{{ 'delegation-validator-list.title' | translate }}</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionChange)="setFilteredItems(searchTerm)"
+    ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-start ion-padding-vertical">
-  <ion-row>
-    <ion-col size="12">
-      <ion-text color="primary">
-        <p class="font--weight__bold ion-no-margin ion-ion-text">
-          {{ 'delegation-validator-list.your-validators_label' | translate }}
-        </p>
-      </ion-text>
-    </ion-col>
-  </ion-row>
   <ng-container *ngIf="myValidators">
+    <ion-row>
+      <ion-col size="12">
+        <ion-text color="primary">
+          <p class="font--weight__bold ion-no-margin ion-ion-text">
+            {{ 'delegation-validator-list.your-validators_label' | translate }}
+          </p>
+        </ion-text>
+      </ion-col>
+    </ion-row>
     <ion-list lines="none" *ngFor="let validator of myValidators">
-      <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
-        <ion-avatar slot="start"><identicon [address]="validator.operator_address"></identicon></ion-avatar>
+      <ion-item
+        class="ion-no-padding"
+        (click)="navigate(validator.operator_address)"
+      >
+        <ion-avatar slot="start"
+          ><identicon [address]="validator.operator_address"></identicon
+        ></ion-avatar>
         <ion-label>
           <ion-text color="black">
             <ion-row class="ion-no-padding ">
@@ -33,20 +41,25 @@
                 </h2>
               </ion-col>
               <ion-col size="3" class="ion-text-end ion-no-padding">
-                <p class="ion-no-margin">{{ validator.commission.rate | percentage }} commission</p>
+                <p class="ion-no-margin">
+                  {{ validator.commission.rate | percentage }}
+                </p>
               </ion-col>
             </ion-row>
           </ion-text>
           <ion-row class="ion-no-padding">
             <ion-col size="4" class="ion-no-padding">
               <ion-text color="blackLight">
-                <p class="ion-no-margin typography--mono">{{ validator.operator_address | shortenString }}</p>
+                <p class="ion-no-margin typography--mono">
+                  {{ validator.operator_address | shortenString }}
+                </p>
               </ion-text>
             </ion-col>
             <ion-col size="8" class="ion-text-end ion-no-padding">
               <ion-text color="blackLight">
                 <p class="ion-no-margin">
-                  {{ validator.tokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+                  {{ validator.tokens | amountConverter: { protocolIdentifier:
+                  wallet.protocolIdentifier, maxDigits: 8 } }}
                 </p>
               </ion-text>
             </ion-col>
@@ -67,7 +80,10 @@
   </ion-row>
   <ng-container *ngIf="filteredValidators; else loadingTemplate">
     <ion-list lines="none" *ngFor="let validator of filteredValidators">
-      <ion-item class="ion-no-padding" (click)="navigate(validator.operator_address)">
+      <ion-item
+        class="ion-no-padding"
+        (click)="navigate(validator.operator_address)"
+      >
         <ion-avatar slot="start">
           <identicon [address]="validator.operator_address"></identicon>
         </ion-avatar>
@@ -80,20 +96,25 @@
                 </h2>
               </ion-col>
               <ion-col size="3" class="ion-text-end ion-no-padding">
-                <p class="ion-no-margin">{{ validator.commission.rate | percentage }} commission</p>
+                <p class="ion-no-margin">
+                  {{ validator.commission.rate | percentage }}
+                </p>
               </ion-col>
             </ion-row>
           </ion-text>
           <ion-row class="ion-no-padding">
             <ion-col size="4" class="ion-no-padding">
               <ion-text color="blackLight">
-                <p class="ion-no-margin typography--mono">{{ validator.operator_address | shortenString }}</p>
+                <p class="ion-no-margin typography--mono">
+                  {{ validator.operator_address | shortenString }}
+                </p>
               </ion-text>
             </ion-col>
             <ion-col size="8" class="ion-text-end ion-no-padding">
               <ion-text color="blackLight">
                 <p class="ion-no-margin">
-                  {{ validator.tokens | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+                  {{ validator.tokens | amountConverter: { protocolIdentifier:
+                  wallet.protocolIdentifier, maxDigits: 8 } }}
                 </p>
               </ion-text>
             </ion-col>
@@ -101,12 +122,52 @@
         </ion-label>
       </ion-item>
     </ion-list>
-    <ng-template #loadingTemplate>
-      <div>
-        <h2>
-          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-        </h2>
-      </div>
-    </ng-template>
   </ng-container>
+  <ng-template #loadingTemplate>
+    <ion-item class="ion-no-padding" lines="none">
+      <ion-avatar slot="start">
+        <identicon></identicon>
+      </ion-avatar>
+      <ion-label>
+        <ion-text color="black">
+          <ion-row class="ion-no-padding ">
+            <ion-col size="9" class="ion-no-padding">
+              <h2 class="font--weight__bold">
+                <ion-skeleton-text
+                  animated
+                  style="width: 80%"
+                ></ion-skeleton-text>
+              </h2>
+            </ion-col>
+            <ion-col size="3" class="ion-text-end ion-no-padding">
+              <ion-skeleton-text
+                animated
+                style="width: 100%"
+              ></ion-skeleton-text>
+            </ion-col>
+          </ion-row>
+        </ion-text>
+        <ion-row class="ion-no-padding">
+          <ion-col size="4" class="ion-no-padding">
+            <ion-text>
+              <ion-skeleton-text
+                animated
+                style="width: 80%"
+              ></ion-skeleton-text>
+            </ion-text>
+          </ion-col>
+          <ion-col size="8" class="ion-no-padding">
+            <ion-text>
+              <p class="ion-no-margin">
+                <ion-skeleton-text
+                  animated
+                  style="width: 100%"
+                ></ion-skeleton-text>
+              </p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-label>
+    </ion-item>
+  </ng-template>
 </ion-content>
