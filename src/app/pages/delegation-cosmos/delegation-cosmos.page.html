@@ -12,7 +12,9 @@
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12" *ngIf="validatorInfo; else bakerAvatarSkeleton">
       <ion-item lines="none" class="ion-no-padding">
-        <ion-avatar slot="start"><identicon [address]="validatorAddress"></identicon></ion-avatar>
+        <ion-avatar slot="start">
+          <identicon [address]="validatorAddress"></identicon>
+        </ion-avatar>
         <ion-label>
           <h2 class="font--weight__bold" ion-text color="black">
             {{ validatorAlias }}
@@ -74,7 +76,8 @@
               <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
             </div>
           </ng-template>
-        --></ion-col>
+        -->
+        </ion-col>
       </ion-row>
     </ion-col>
   </ion-row>
@@ -82,18 +85,29 @@
     <ion-col size="12">
       <ion-card>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else bakerConfigSkeleton">
+            <h2
+              class="font--weight__bold"
+              ion-text
+              color="black"
+              *ngIf="validatorCommission; else bakerConfigSkeleton"
+            >
               <span>{{ validatorCommission }}</span>
             </h2>
 
             <ng-template #bakerConfigSkeleton>
               <div>
                 <h2>
-                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  <ion-skeleton-text
+                    animated
+                    style="width: 80%"
+                  ></ion-skeleton-text>
                 </h2>
               </div>
             </ng-template>
@@ -102,7 +116,12 @@
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
+            <ion-icon name="sync"></ion-icon>
+          </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold" ion-text color="black">
               10.25%
@@ -117,7 +136,8 @@
                 <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
               </h3>
             </ng-template>
-          --></ion-label>
+          -->
+          </ion-label>
         </ion-item>
       </ion-card>
     </ion-col>
@@ -133,20 +153,27 @@
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
-  <ng-container *ngIf="delegationOption === 'delegate'">
+  <ng-container *ngIf="delegationOption === 'delegate' && delegatableBalance">
     <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated && delegatableBalance">
-        <!-- <p>{{ 'delegation-cosmos.delegation.text' }}</p> -->
-        <p>{{ 'delegation-cosmos.delegation.text' | translate: { delegatableBalance: delegatableBalance.toNumber() } }}</p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>
-          {{ 'delegation-cosmos.delegation.delegated_text' | translate: { delegatedAmount: delegatedAmount, delegatableBalance:
-          delegatableBalance.toNumber() } }}
-        </p>
+      <ion-col size="12" class="ion-no-padding">
+        <ng-container *ngIf="!addressDelegated">
+          <p
+            [innerHTML]="'delegation-cosmos.delegation.text' | translate: { delegatableBalance: delegatableBalance.toNumber() }"
+          ></p>
+        </ng-container>
+        <ng-container *ngIf="addressDelegated">
+          <p
+            [innerHTML]="'delegation-cosmos.delegation.delegated_text' | translate: { delegatedAmount: delegatedAmount, delegatableBalance:
+          delegatableBalance.toNumber() }"
+          ></p>
+        </ng-container>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [disabled]="!canDelegate"></amount>
+    <amount
+      [wallet]="wallet"
+      [capMaxAmount]="delegatableBalance.toNumber()"
+      [disabled]="!canDelegate"
+    ></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
@@ -154,10 +181,17 @@
         <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p>{{ 'delegation-cosmos.undelegate.undelegated_text' | translate: { delegatedAmount: delegatedAmount } }}</p>
+        <p>
+          {{ 'delegation-cosmos.undelegate.undelegated_text' | translate: {
+          delegatedAmount: delegatedAmount } }}
+        </p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate"></amount>
+    <amount
+      [wallet]="wallet"
+      [capMaxAmount]="delegatedAmount"
+      [disabled]="!canUndelegate"
+    ></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
@@ -165,7 +199,10 @@
         <p>{{ 'delegation-cosmos.rewards.text' | translate }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding" *ngIf="delegationReward">
-        <p>{{ 'delegation-cosmos.rewards.claim-rewards_text' | translate: { delegationReward: delegationReward } }}</p>
+        <p>
+          {{ 'delegation-cosmos.rewards.claim-rewards_text' | translate: {
+          delegationReward: delegationReward } }}
+        </p>
       </ion-col>
     </ion-row>
   </ng-container>
@@ -183,36 +220,53 @@
     <ion-col size="12">
       <ion-card>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="wallet"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ wallet.currentBalance?.toNumber() | amountConverter: {
+              protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
-            <h3>{{ 'delegation-cosmos.your-account.balance_label' | translate }}</h3>
+            <h3>
+              {{ 'delegation-cosmos.your-account.balance_label' | translate }}
+            </h3>
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="contacts"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
               {{ delegatedAmount }}
             </h2>
-            <h3>{{ 'delegation-cosmos.your-account.delegation_label' | translate }}</h3>
+            <h3>
+              {{ 'delegation-cosmos.your-account.delegation_label' | translate
+              }}
+            </h3>
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
               {{ delegationReward }}
             </h2>
-            <h3>{{ 'delegation-cosmos.your-account.rewards_label' | translate }}</h3>
+            <h3>
+              {{ 'delegation-cosmos.your-account.rewards_label' | translate }}
+            </h3>
           </ion-label>
         </ion-item>
       </ion-card>
@@ -221,10 +275,22 @@
 
   <ion-row class="ion-margin-bottom"></ion-row>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'" [disabled]="!canDelegate">
+    <ion-button
+      shape="round"
+      color="primary"
+      (click)="delegate()"
+      *ngIf="delegationOption === 'delegate'"
+      [disabled]="!canDelegate"
+    >
       {{ 'delegation-cosmos.delegate_label' | translate }}
     </ion-button>
-    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'" [disabled]="!canUndelegate">
+    <ion-button
+      shape="round"
+      color="primary"
+      (click)="undelegate()"
+      *ngIf="delegationOption === 'undelegate'"
+      [disabled]="!canUndelegate"
+    >
       {{ 'delegation-cosmos.undelegate_label' | translate }}
     </ion-button>
 

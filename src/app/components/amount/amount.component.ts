@@ -1,12 +1,12 @@
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { FormGroup, FormBuilder, Validators } from '@angular/forms'
-import { Component, Input } from '@angular/core'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { AirGapMarketWallet } from "airgap-coin-lib"
+import { FormGroup, FormBuilder, Validators } from "@angular/forms"
+import { Component, Input } from "@angular/core"
+import { DecimalValidator } from "src/app/validators/DecimalValidator"
 
 @Component({
-  selector: 'amount',
-  templateUrl: './amount.component.html',
-  styleUrls: ['./amount.component.scss']
+  selector: "amount",
+  templateUrl: "./amount.component.html",
+  styleUrls: ["./amount.component.scss"]
 })
 export class AmountComponent {
   public delegationForm: FormGroup
@@ -30,7 +30,13 @@ export class AmountComponent {
 
   public IonViewDidEnter() {
     this.delegationForm = this.formBuilder.group({
-      amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
+      amount: [
+        this.amount,
+        Validators.compose([
+          Validators.required,
+          DecimalValidator.validate(this.wallet.coinProtocol.decimals)
+        ])
+      ]
     })
   }
   public toggleMaxAmount() {
@@ -45,9 +51,11 @@ export class AmountComponent {
     if (this.capMaxAmount) {
       amount = this.capMaxAmount
     } else {
-      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+      amount = this.wallet.currentBalance.shiftedBy(
+        -1 * this.wallet.coinProtocol.decimals
+      )
     }
-    this.delegationForm.controls.amount.setValue(amount.toFixed(), {
+    this.delegationForm.controls.amount.setValue(amount, {
       emitEvent: false
     })
   }
