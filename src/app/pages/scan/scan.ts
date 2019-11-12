@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, ViewChild, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
@@ -18,23 +18,38 @@ export class ScanPage extends ScanBasePage {
   @ViewChild('scanner')
   public zxingScanner: ZXingScannerComponent
 
+  public percentageScanned: number = 0
+
+  private parts: Set<string> = new Set()
+
   constructor(
     protected platform: Platform,
     protected scanner: ScannerProvider,
     protected permissionsProvider: PermissionsProvider,
     private readonly schemeRouting: SchemeRoutingProvider,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly ngZone: NgZone
   ) {
     super(platform, scanner, permissionsProvider)
     this.isBrowser = !this.platform.is('cordova')
   }
 
+  public async ionViewWillEnter(): Promise<void> {
+    this.parts = new Set()
+    this.percentageScanned = 0
+  }
+
   public async checkScan(resultString: string) {
     console.log('got new text', resultString)
-    this.schemeRouting
-      .handleNewSyncRequest(this.router, resultString, () => {
-        this.startScan()
-      })
-      .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+    this.parts.add(resultString)
+    console.log('now checking ', Array.from(this.parts))
+    this.ngZone.run(() => {
+      this.schemeRouting
+        .handleNewSyncRequest(this.router, Array.from(this.parts), (scanResult: { availablePages: number[]; totalPages: number }) => {
+          this.percentageScanned = Math.max(0, Math.min(100, (scanResult.availablePages.length / scanResult.totalPages) * 100))
+          this.startScan()
+        })
+        .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+    })
   }
 }

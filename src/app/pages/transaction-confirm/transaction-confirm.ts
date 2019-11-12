@@ -3,11 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  DeserializedSyncProtocol,
   getProtocolByIdentifier,
   ICoinProtocol,
   SignedTransaction,
-  TezosKtProtocol
+  TezosKtProtocol,
+  IACMessageDefinitionObject
 } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -33,7 +33,7 @@ const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  public signedTransactionSync: DeserializedSyncProtocol
+  public signedTransactionSync: IACMessageDefinitionObject[]
   private signedTx: string
   public protocol: ICoinProtocol
 
@@ -60,9 +60,10 @@ export class TransactionConfirmPage {
       this.signedTransactionSync = info.signedTransactionSync
     }
 
+    // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
-    this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
+    this.signedTx = (this.signedTransactionSync[0].payload as SignedTransaction).transaction
+    this.protocol = getProtocolByIdentifier(this.signedTransactionSync[0].protocol)
   }
 
   public async broadcastTransaction() {
@@ -125,14 +126,15 @@ export class TransactionConfirmPage {
         }
 
         // TODO: Remove once we introduce pending transaction handling
+        // TODO: Multi messages
         // tslint:disable-next-line:no-unnecessary-type-assertion
-        const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
+        const signedTxWrapper = this.signedTransactionSync[0].payload as SignedTransaction
         const lastTx: {
           protocol: string
           accountIdentifier: string
           date: number
         } = {
-          protocol: this.signedTransactionSync.protocol,
+          protocol: this.signedTransactionSync[0].protocol,
           accountIdentifier: signedTxWrapper.accountIdentifier,
           date: new Date().getTime()
         }
@@ -143,7 +145,7 @@ export class TransactionConfirmPage {
         this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
-        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
+        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync[0]
           .payload as SignedTransaction))[0] as any
         // necessary for the transaction backend
         signed.amount = signed.amount.toString()
@@ -165,20 +167,22 @@ export class TransactionConfirmPage {
 
         // TODO: Remove this special error case once we remove web3 from the coin-lib
         if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
-          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
-            if (signed.hash) {
-              this.showTransactionSuccessfulAlert(signed.hash)
-              // POST TX TO BACKEND
-              // necessary for the transaction backend
-              signed.amount = signed.amount.toString()
-              signed.fee = signed.fee.toString()
-              signed.signedTx = this.signedTx
-              this.pushBackendProvider.postPendingTx(signed) // Don't await
-              // END POST TX TO BACKEND
-            } else {
-              handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync[0].payload as SignedTransaction) as any).then(
+            signed => {
+              if (signed.hash) {
+                this.showTransactionSuccessfulAlert(signed.hash)
+                // POST TX TO BACKEND
+                // necessary for the transaction backend
+                signed.amount = signed.amount.toString()
+                signed.fee = signed.fee.toString()
+                signed.signedTx = this.signedTx
+                this.pushBackendProvider.postPendingTx(signed) // Don't await
+                // END POST TX TO BACKEND
+              } else {
+                handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+              }
             }
-          })
+          )
         } else {
           this.toastCtrl
             .create({

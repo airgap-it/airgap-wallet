@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { EncodedType, SyncProtocolUtils } from 'airgap-coin-lib'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 import { AccountProvider } from './../account/account.provider'
+import { Serializer, IACMessageType } from 'airgap-coin-lib'
 
 declare let window: any
 
@@ -115,17 +115,18 @@ export class DeepLinkProvider {
       transaction: rawUnsignedTx
     })
 
-    const syncProtocol = new SyncProtocolUtils()
-    const serializedTx = await syncProtocol.serialize({
-      version: 1,
-      protocol: wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: wallet.publicKey,
-        transaction: rawUnsignedTx,
-        callback: 'airgap-wallet://?d='
+    const serializer: Serializer = new Serializer()
+    const serializedTx: string[] = await serializer.serialize([
+      {
+        protocol: wallet.coinProtocol.identifier,
+        type: IACMessageType.TransactionSignRequest,
+        payload: {
+          publicKey: wallet.publicKey,
+          transaction: rawUnsignedTx,
+          callback: 'airgap-wallet://?d='
+        }
       }
-    })
+    ])
 
     return {
       wallet,

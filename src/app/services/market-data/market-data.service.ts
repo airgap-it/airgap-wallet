@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core'
 import { AirGapMarketWallet, IAirGapTransaction, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { TimeUnit, MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
+import BigNumber from 'bignumber.js'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -31,8 +32,8 @@ export class MarketDataService {
     // TODO fetch more than 50 txs?
     const protocol = getProtocolByIdentifier(wallet.protocolIdentifier)
     transactions.forEach(transaction => {
-      let amount = transaction.amount.shiftedBy(-1 * protocol.decimals).toNumber()
-      const fee = transaction.fee.shiftedBy(-1 * protocol.decimals).toNumber() //
+      let amount = new BigNumber(transaction.amount).shiftedBy(-1 * protocol.decimals).toNumber()
+      const fee = new BigNumber(transaction.fee).shiftedBy(-1 * protocol.decimals).toNumber() //
       let selfTx: boolean
       if (transaction.to[0] === transaction.from[0]) {
         selfTx = true

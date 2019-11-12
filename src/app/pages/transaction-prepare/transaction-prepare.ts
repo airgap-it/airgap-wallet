@@ -85,31 +85,33 @@ export class TransactionPreparePage {
   public useWallet() {
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
-      this.wallet.coinProtocol.feeDefaults.low.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+      new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(
+        Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+      )
     )
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
       this.http.get('https://api-airgap.gke.papers.tech/fees').subscribe((result: any) => {
         if (result && result.low && result.medium && result.high) {
-          this.wallet.coinProtocol.feeDefaults.low = new BigNumber(result.low)
-          this.wallet.coinProtocol.feeDefaults.medium = new BigNumber(result.medium)
-          this.wallet.coinProtocol.feeDefaults.high = new BigNumber(result.high)
-          this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low.toFixed())
+          this.wallet.coinProtocol.feeDefaults.low = new BigNumber(result.low).toString(10)
+          this.wallet.coinProtocol.feeDefaults.medium = new BigNumber(result.medium).toString(10)
+          this.wallet.coinProtocol.feeDefaults.high = new BigNumber(result.high).toString(10)
+          this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low)
         }
         this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
           this._ngZone.run(() => {
             switch (val) {
               case 0:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low.toFixed())
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low)
                 break
               case 1:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium)
                 break
               case 2:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.high.toFixed())
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.high)
                 break
               default:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium.toFixed())
+                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium)
             }
           })
         })
@@ -119,7 +121,9 @@ export class TransactionPreparePage {
         this._ngZone.run(() => {
           const protocol = this.wallet.coinProtocol as TezosKtProtocol
           this.transactionForm.controls.fee.setValue(
-            protocol.migrationFee.shiftedBy(-protocol.feeDecimals).toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
+            protocol.migrationFee
+              .shiftedBy(-protocol.feeDecimals)
+              .toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
           )
         })
       }
@@ -129,22 +133,30 @@ export class TransactionPreparePage {
           switch (val) {
             case 0:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.low.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(
+                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                )
               )
               break
             case 1:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                )
               )
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.high.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
+                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                )
               )
               break
             default:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                )
               )
           }
         })
