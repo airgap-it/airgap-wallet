@@ -91,6 +91,12 @@ identicon {
   -ms-user-select: text;
 }
 
+ion-list-header {
+  ion-label {
+    font-size: 14px;
+  }
+}
+
 qr-clipboard {
   padding: 20px;
   background-color: white;
