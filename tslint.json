@@ -3,6 +3,7 @@
   "rulesDirectory": "node_modules/codelyzer",
 
   "rules": {
+    "strict-comparisons": true,
     "semicolon": [true, "never"],
     "member-access": [true],
     "member-ordering": [
