@@ -42,7 +42,9 @@ export class DelegationCosmosPage {
   public validatorInfo: CosmosValidatorInfo
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
-  public totalDelegationBalance: string | undefined
+  public totalDelegationBalance: BigNumber | undefined
+  public selfDelegationBalance: BigNumber
+
   public amount: BigNumber
   public sendMaxAmount: boolean = false
   public delegationOption: string = "delegate"
@@ -136,6 +138,11 @@ export class DelegationCosmosPage {
 
   public async getValidatorInfo() {
     console.log("getValidatorInfo", this.validatorAddress)
+
+    this.selfDelegationBalance = await this.validatorService.fetchSelfDelegation(
+      this.validatorAddress
+    )
+
     this.validatorInfo = await this.validatorService.getValidatorInfo(
       this.validatorAddress
     )

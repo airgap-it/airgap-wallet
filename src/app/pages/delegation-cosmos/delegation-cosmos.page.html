@@ -68,9 +68,14 @@
           -->
         </ion-col>
         <ion-col size="6" class="ion-no-padding ion-text-right">
-          <small>20,000 / {{ totalDelegationBalance }}</small>
+          <small
+            >{{ selfDelegationBalance| amountConverter: { protocolIdentifier:
+            wallet.protocolIdentifier, maxDigits: 10 } }} / {{
+            totalDelegationBalance | amountConverter: { protocolIdentifier:
+            wallet.protocolIdentifier, maxDigits: 10 } }}</small
+          >
           <!--TODO: show if loading 
-
+ 
           <ng-template #bakerInfoBalanceSkeleton>
             <div class="justify--content__end">
               <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
