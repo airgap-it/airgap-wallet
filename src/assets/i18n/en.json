@@ -401,7 +401,7 @@
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",    
     "commission_label": "Commission",
-    "rewards_label": "Rewards",
+    "voting-power_label": "Voting Power",
     "withdraw_rewards_label": "Claim Rewards",    
     "your-account": {
       "label": "Your Account",
