@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js"
 import { AirGapMarketWallet } from "airgap-coin-lib"
 import { FormGroup, FormBuilder, Validators } from "@angular/forms"
 import { Component, Input } from "@angular/core"
@@ -17,7 +18,7 @@ export class AmountComponent {
   public wallet: AirGapMarketWallet
 
   @Input()
-  public capMaxAmount: number
+  public capMaxAmount: BigNumber
 
   @Input()
   public disabled: boolean = false
@@ -49,7 +50,9 @@ export class AmountComponent {
   private setMaxAmount() {
     let amount
     if (this.capMaxAmount) {
-      amount = this.capMaxAmount
+      amount = this.capMaxAmount.shiftedBy(
+        -1 * this.wallet.coinProtocol.decimals
+      )
     } else {
       amount = this.wallet.currentBalance.shiftedBy(
         -1 * this.wallet.coinProtocol.decimals
