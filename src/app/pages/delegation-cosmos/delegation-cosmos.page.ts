@@ -1,3 +1,4 @@
+import { ProtocolSymbols } from "./../../services/protocols/protocols"
 import {
   handleErrorSentry,
   ErrorCategory
@@ -42,7 +43,7 @@ export class DelegationCosmosPage {
   public validatorCommission: string | undefined
   public validatorStatus: string | undefined
   public totalDelegationBalance: string | undefined
-  public amount: number = 0
+  public amount: BigNumber
   public sendMaxAmount: boolean = false
   public delegationOption: string = "delegate"
   public currentBalance: BigNumber | undefined
@@ -152,14 +153,10 @@ export class DelegationCosmosPage {
   }
 
   public async delegate(): Promise<void> {
-    const { amount: formAmount } = this.delegationForm.value
-    const amount = new BigNumber(formAmount).shiftedBy(
-      this.wallet.coinProtocol.decimals
-    )
     this.actionCallback({
       wallet: this.wallet,
       validatorAddress: this.validatorAddress,
-      amount: amount,
+      amount: this.amount,
       undelegate: false,
       toastController: this.toastController,
       loadingController: this.loadingController,
@@ -169,14 +166,10 @@ export class DelegationCosmosPage {
   }
 
   public async undelegate(): Promise<void> {
-    const { amount: formAmount } = this.delegationForm.value
-    const delegatedAmount = new BigNumber(formAmount).shiftedBy(
-      this.wallet.coinProtocol.decimals
-    )
     this.actionCallback({
       wallet: this.wallet,
       validatorAddress: this.validatorAddress,
-      amount: delegatedAmount,
+      amount: this.amount,
       undelegate: true,
       toastController: this.toastController,
       loadingController: this.loadingController,
@@ -224,24 +217,7 @@ export class DelegationCosmosPage {
     return protocol.fetchRewardForDelegation(delegatorAddress, validatorAddress)
   }
 
-  public toggleMaxAmount() {
-    this.sendMaxAmount = !this.sendMaxAmount
-    if (this.sendMaxAmount) {
-      this.setMaxAmount()
-    }
-  }
-
-  private setMaxAmount() {
-    let amount
-    if (this.addressDelegated) {
-      amount = this.delegatedAmount
-    } else {
-      amount = this.wallet.currentBalance.shiftedBy(
-        -1 * this.wallet.coinProtocol.decimals
-      )
-    }
-    this.delegationForm.controls.amount.setValue(amount.toFixed(), {
-      emitEvent: false
-    })
+  public setFormAmount(amount: any) {
+    this.amount = amount
   }
 }
