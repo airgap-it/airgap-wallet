@@ -76,7 +76,8 @@
               <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
             </div>
           </ng-template>
-        --></ion-col>
+        -->
+        </ion-col>
       </ion-row>
     </ion-col>
   </ion-row>
@@ -84,18 +85,29 @@
     <ion-col size="12">
       <ion-card>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else bakerConfigSkeleton">
+            <h2
+              class="font--weight__bold"
+              ion-text
+              color="black"
+              *ngIf="validatorCommission; else bakerConfigSkeleton"
+            >
               <span>{{ validatorCommission }}</span>
             </h2>
 
             <ng-template #bakerConfigSkeleton>
               <div>
                 <h2>
-                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  <ion-skeleton-text
+                    animated
+                    style="width: 80%"
+                  ></ion-skeleton-text>
                 </h2>
               </div>
             </ng-template>
@@ -104,7 +116,10 @@
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="sync"></ion-icon>
           </ion-avatar>
           <ion-label>
@@ -121,7 +136,8 @@
                 <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
               </h3>
             </ng-template>
-          --></ion-label>
+          -->
+          </ion-label>
         </ion-item>
       </ion-card>
     </ion-col>
@@ -139,7 +155,11 @@
   </ion-segment>
   <ng-container *ngIf="delegationOption === 'delegate' && delegatableBalance">
     <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated && delegatableBalance">
+      <ion-col
+        size="12"
+        class="ion-no-padding"
+        *ngIf="!addressDelegated && delegatableBalance"
+      >
         <p
           [innerHTML]="
             'delegation-cosmos.delegation.text'
@@ -165,7 +185,12 @@
         ></p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatableBalance" [disabled]="!canDelegate"></amount>
+    <amount
+      [wallet]="wallet"
+      [capMaxAmount]="delegatableBalance"
+      [disabled]="!canDelegate"
+      (amountEmitter)="setFormAmount($event)"
+    ></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
@@ -182,7 +207,12 @@
         ></p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate"></amount>
+    <amount
+      [wallet]="wallet"
+      [capMaxAmount]="delegatedAmount"
+      [disabled]="!canUndelegate"
+      (amountEmitter)="setFormAmount($event)"
+    ></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
@@ -214,12 +244,16 @@
     <ion-col size="12">
       <ion-card>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="wallet"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ wallet.currentBalance?.toNumber() | amountConverter: {
+              protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
               {{ 'delegation-cosmos.your-account.balance_label' | translate }}
@@ -227,7 +261,10 @@
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="contacts"></ion-icon>
           </ion-avatar>
           <ion-label>
@@ -235,15 +272,20 @@
               <ng-container *ngIf="!delegatedAmount">
                 0 ATOMs
               </ng-container>
-              {{ delegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ delegatedAmount | amountConverter: { protocolIdentifier:
+              wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
-              {{ 'delegation-cosmos.your-account.delegation_label' | translate }}
+              {{ 'delegation-cosmos.your-account.delegation_label' | translate
+              }}
             </h3>
           </ion-label>
         </ion-item>
         <ion-item lines="none">
-          <ion-avatar slot="start" class="content--align__center-center border--container">
+          <ion-avatar
+            slot="start"
+            class="content--align__center-center border--container"
+          >
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
@@ -251,7 +293,8 @@
               <ng-container *ngIf="!delegationReward">
                 0 ATOMs
               </ng-container>
-              {{ delegationReward | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ delegationReward | amountConverter: { protocolIdentifier:
+              wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
               {{ 'delegation-cosmos.your-account.rewards_label' | translate }}
@@ -264,10 +307,22 @@
 
   <ion-row class="ion-margin-bottom"></ion-row>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()" *ngIf="delegationOption === 'delegate'" [disabled]="!canDelegate">
+    <ion-button
+      shape="round"
+      color="primary"
+      (click)="delegate()"
+      *ngIf="delegationOption === 'delegate'"
+      [disabled]="!canDelegate"
+    >
       {{ 'delegation-cosmos.delegate_label' | translate }}
     </ion-button>
-    <ion-button shape="round" color="primary" (click)="undelegate()" *ngIf="delegationOption === 'undelegate'" [disabled]="!canUndelegate">
+    <ion-button
+      shape="round"
+      color="primary"
+      (click)="undelegate()"
+      *ngIf="delegationOption === 'undelegate'"
+      [disabled]="!canUndelegate"
+    >
       {{ 'delegation-cosmos.undelegate_label' | translate }}
     </ion-button>
 
