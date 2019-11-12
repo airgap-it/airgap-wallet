@@ -148,10 +148,10 @@
     </ion-col>
   </ion-row>
   <ion-segment [(ngModel)]="delegationOption" class="ion-padding-horizontal">
-    <ion-segment-button value="delegate">
+    <ion-segment-button value="delegate" [disabled]="!canDelegate">
       <ion-label>Delegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="undelegate">
+    <ion-segment-button value="undelegate" [disabled]="!canUndelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
     <ion-segment-button value="rewards">
