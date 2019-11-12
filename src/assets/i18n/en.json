@@ -14,21 +14,9 @@
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
       "open-blockexplorer_label": "Open Blockexplorer"
     },
-    "ae-mainnet_text": "Your tokens will become transferable after the æternity mainnet has launched",
     "receive_label": "Receive",
     "send_label": "Send",
     "tx_not_loading": "The transactions can currently not be loaded, please refer to the block explorer to view the latest transactions",
-    "aeternity": {
-      "same-phase": {
-        "heading": "<span class=\"style__strong color__primary\">{{currentPhase}} Migration Successful</span>",
-        "text": "Your balance of <span class=\"style__strong color__primary\">{{migratedTokens}}</span> will become available with the next hardfork at <span class=\"style__strong color__primary\">the end of {{phaseEnd}}</span>"
-      },
-      "no-transactions_text": "There are no transactions yet for this account.",
-      "tx-list-disabled": {
-        "text": "Currently unable to display the transaction history. Please refer to the Blockexplorer.",
-        "blockexplorer_label": "Open Blockexplorer"
-      }
-    },
     "has-delegated_card": {
       "heading": "<strong>{{amount}}</strong> Delegated",
       "text": "Your XTZ are delegated and being baked, you can check your rewards for each cycle."
@@ -46,7 +34,8 @@
       "message": "Do you want to transfer <strong>{{amount}}</strong> from this KT address to its corresponding XTZ address?",
       "cancel": "Cancel",
       "confirm": "Migrate"
-    }
+    },
+    "no-transactions_text": "There are no transactions yet for this account."
   },
 
   "introduction": {
