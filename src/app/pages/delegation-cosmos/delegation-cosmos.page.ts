@@ -1,4 +1,9 @@
 import {
+  handleErrorSentry,
+  ErrorCategory
+} from "src/app/services/sentry-error-handler/sentry-error-handler"
+import { DataServiceKey } from "./../../services/data/data.service"
+import {
   ValidatorService,
   CosmosValidatorInfo
 } from "./../../services/validator/validator.service"
@@ -16,6 +21,10 @@ import BigNumber from "bignumber.js"
 import { FormGroup, FormBuilder, Validators } from "@angular/forms"
 import { DecimalValidator } from "src/app/validators/DecimalValidator"
 import { CosmosDelegation } from "airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient"
+import {
+  CosmosUnsignedTransactionSerializer,
+  UnsignedCosmosTransaction
+} from "airgap-coin-lib/dist/serializer/unsigned-transactions/cosmos-transactions.serializer"
 
 @Component({
   selector: "page-delegation-cosmos",
@@ -176,11 +185,35 @@ export class DelegationCosmosPage {
     })
   }
   public async withdrawDelegationRewards(): Promise<void> {
+    console.log("withdrawDelegationRewards")
+
     const protocol = new CosmosProtocol()
-    const cosmosTransaction = protocol.withdrawDelegationRewards(
+    const cosmosTransaction = await protocol.withdrawDelegationRewards(
       this.wallet.publicKey,
       [this.validatorAddress]
     )
+    console.log("cosmosTransaction", cosmosTransaction)
+    const serializer = new CosmosUnsignedTransactionSerializer()
+    const unsignedCosmosTx: UnsignedCosmosTransaction = {
+      publicKey: this.wallet.publicKey,
+      transaction: cosmosTransaction
+    }
+
+    const serializedTx = serializer.serialize(unsignedCosmosTx)
+    console.log("serializedTx", serializedTx)
+
+    const airGapTxs = cosmosTransaction.toAirGapTransactions("cosmos")
+    const info = {
+      wallet: this.wallet,
+      airGapTxs,
+      data: "airgap-vault://?d=" + serializedTx
+    }
+    console.log("airGapTxs", airGapTxs)
+
+    this.dataService.setData(DataServiceKey.INTERACTION, info)
+    this.router
+      .navigateByUrl("/interaction-selection/" + DataServiceKey.INTERACTION)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async fetchRewardForDelegation(
