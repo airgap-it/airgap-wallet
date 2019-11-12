@@ -54,9 +54,7 @@ export class ValidatorService {
   }
 
   public async fetchSelfDelegation(address: string): Promise<BigNumber> {
-    const selfDelegation = await this.protocol.fetchSelfDelegationAmount(
-      address
-    )
+    const selfDelegation = await this.protocol.fetchSelfDelegation(address)
     return new BigNumber(selfDelegation.shares)
   }
 
