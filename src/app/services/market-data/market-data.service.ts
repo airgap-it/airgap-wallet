@@ -1,11 +1,9 @@
 import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
-import { CryptoToFiatPipe } from './../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { AccountProvider } from './../account/account.provider'
 import { Injectable } from '@angular/core'
 import { AirGapMarketWallet, IAirGapTransaction, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { TimeUnit, MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
-import * as cryptocompare from 'cryptocompare'
-import { transition } from '@angular/animations'
+import { CachingService, CachingServiceKey } from '../caching/caching.service'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -20,38 +18,36 @@ export interface TransactionHistoryObject {
   isInbound: boolean
 }
 
-/*
-  Generated class for the MarketDataProvider provider.
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
-*/
 @Injectable()
 export class MarketDataService {
-  constructor(public walletsProvider: AccountProvider, private readonly amountConverterPipe: AmountConverterPipe) {}
+  constructor(
+    public walletsProvider: AccountProvider,
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly cachingService: CachingService
+  ) {}
 
-  async getTransactionHistory(wallet: AirGapMarketWallet): Promise<Array<TransactionHistoryObject>> {
+  async getTransactionHistory(wallet: AirGapMarketWallet, transactions: IAirGapTransaction[]): Promise<Array<TransactionHistoryObject>> {
     let txHistory: Array<TransactionHistoryObject> = []
-    let promise = wallet.fetchTransactions(50, 0).then((transactions: Array<IAirGapTransaction>) => {
-      // TODO fetch more than 50 txs?
-      const protocol = getProtocolByIdentifier(wallet.protocolIdentifier)
-      transactions.forEach(transaction => {
-        let amount = transaction.amount.shiftedBy(-1 * protocol.decimals).toNumber()
-        const fee = transaction.fee.shiftedBy(-1 * protocol.decimals).toNumber() //
-        let selfTx: boolean
-        if (transaction.to[0] === transaction.from[0]) {
-          selfTx = true
-        }
-        txHistory.push({ timestamp: transaction.timestamp, amount: amount, fee: fee, isInbound: transaction.isInbound, selfTx: selfTx })
-      })
+    // TODO fetch more than 50 txs?
+    const protocol = getProtocolByIdentifier(wallet.protocolIdentifier)
+    transactions.forEach(transaction => {
+      let amount = transaction.amount.shiftedBy(-1 * protocol.decimals).toNumber()
+      const fee = transaction.fee.shiftedBy(-1 * protocol.decimals).toNumber() //
+      let selfTx: boolean
+      if (transaction.to[0] === transaction.from[0]) {
+        selfTx = true
+      }
+      txHistory.push({ timestamp: transaction.timestamp, amount: amount, fee: fee, isInbound: transaction.isInbound, selfTx: selfTx })
     })
-    await promise
 
     return txHistory
   }
 
-  async fetchBalanceAfterEachTransaction(wallet: AirGapMarketWallet): Promise<Array<BalanceAtTimestampObject>> {
-    let txHistory: Array<TransactionHistoryObject> = await this.getTransactionHistory(wallet)
+  async fetchBalanceAfterEachTransaction(
+    wallet: AirGapMarketWallet,
+    transactions: IAirGapTransaction[]
+  ): Promise<Array<BalanceAtTimestampObject>> {
+    let txHistory: Array<TransactionHistoryObject> = await this.getTransactionHistory(wallet, transactions)
     let balancesByTimestamp: Array<BalanceAtTimestampObject> = []
 
     let currentBalance = this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
@@ -93,74 +89,13 @@ export class MarketDataService {
     return balancesAfterEachTransaction.find(object => object.timestamp === closestTimestamp).balance
   }
 
-  public fetchMarketPrices(limit: number, timeUnit, coinProtocol: string): Promise<MarketDataSample[]> {
-    return new Promise((resolve, reject) => {
-      this.algoSelector(limit, timeUnit, coinProtocol)
-        .then(marketSample => {
-          resolve(marketSample)
-        })
-        .catch()
-    })
-  }
-
-  private algoSelector(limit: number, timeUnit: TimeUnit, coinProtocol: string): Promise<MarketDataSample[]> {
-    let marketSample = []
-    const baseSymbol = 'USD'
-    return new Promise((resolve, reject) => {
-      let promise: Promise<MarketDataSample>
-      if (timeUnit === 'days') {
-        promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {
-          // TODO set limit according to date of first transaction
-          limit: limit - 1
-        })
-      } else if (timeUnit === 'hours') {
-        promise = cryptocompare.histoHour(coinProtocol.toUpperCase(), baseSymbol, {
-          limit: limit - 1
-        })
-      } else if (timeUnit === 'minutes') {
-        promise = cryptocompare.histoMinute(coinProtocol.toUpperCase(), baseSymbol, {
-          limit: limit - 1
-        })
-      } else {
-        promise = Promise.reject('Invalid time unit')
-      }
-      promise
-        .then(prices => {
-          for (const idx in prices) {
-            const marketDataObject = {
-              time: prices[idx].time,
-              close: prices[idx].close,
-              high: prices[idx].high,
-              low: prices[idx].low,
-              volumefrom: prices[idx].volumefrom,
-              volumeto: prices[idx].volumeto
-            } as MarketDataSample
-            marketSample.push(marketDataObject)
-          }
-          resolve(marketSample)
-        })
-        .catch(console.error)
-    })
-  }
-
-  async fetchValuesSingleWallet(wallet: AirGapMarketWallet, interval: string): Promise<number[]> {
+  async fetchValuesSingleWallet(
+    wallet: AirGapMarketWallet,
+    priceSamples: MarketDataSample[],
+    transactions: IAirGapTransaction[]
+  ): Promise<number[]> {
     let walletValues: Array<number> = []
-    let priceSamples: MarketDataSample[] = []
-    switch (interval) {
-      case 'last24h':
-        const unfiteredPriceSamples = await this.fetchMarketPrices(24 * 60, TimeUnit.Minutes, wallet.coinProtocol.marketSymbol)
-        priceSamples = unfiteredPriceSamples.filter((value, index, Arr) => {
-          return index % 20 === 0
-        })
-        break
-      case 'last7d':
-        priceSamples = await this.fetchMarketPrices(7 * 24, TimeUnit.Hours, wallet.coinProtocol.marketSymbol)
-        break
-      case 'allTime':
-        priceSamples = await this.fetchMarketPrices(365, TimeUnit.Days, wallet.coinProtocol.marketSymbol)
-        break
-    }
-    let balancesAfterEachTransaction: Array<BalanceAtTimestampObject> = await this.fetchBalanceAfterEachTransaction(wallet)
+    let balancesAfterEachTransaction: Array<BalanceAtTimestampObject> = await this.fetchBalanceAfterEachTransaction(wallet, transactions)
     priceSamples.forEach((priceSample: MarketDataSample) => {
       const realTimeBalance = MarketDataService.balanceAtTimestamp(priceSample.time, balancesAfterEachTransaction)
       let avgDailyPrice = (priceSample.high + priceSample.low) / 2
@@ -170,20 +105,37 @@ export class MarketDataService {
     return walletValues
   }
 
-  async fetchAllValues(interval: string): Promise<number[]> {
-    let allWalletValues = [0, 0]
-    for (let wallet of this.walletsProvider.getWalletList()) {
-      let walletValues = await this.fetchValuesSingleWallet(wallet, interval)
-      walletValues.forEach(function(walletValue, idx) {
-        if (Number.isNaN(walletValue) === false) {
-          if (allWalletValues[idx] > 0) {
-            allWalletValues[idx] += walletValue
-          } else {
-            allWalletValues[idx] = walletValue
-          }
+  async fetchAllValues(interval: TimeUnit | string): Promise<number[]> {
+    return new Promise<number[]>(resolve => {
+      this.walletsProvider.wallets.subscribe(async wallets => {
+        // TODO fetchMarketData() only once for each protocolIdentifier
+        const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.protocolIdentifier))
+        const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
+        const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
+        const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
+        let allWalletValues = [0, 0]
+        for (let [index, wallet] of wallets.entries()) {
+          this.cachingService.setPriceData(
+            { timeUnit: interval, protocolIdentifier: wallet.protocolIdentifier, key: CachingServiceKey.PRICESAMPLES },
+            priceSamples[index]
+          )
+          this.cachingService.setTransactionData(
+            { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
+            transactionsByWallet[index]
+          )
+          let walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
+          walletValues.forEach(function(walletValue, idx) {
+            if (Number.isNaN(walletValue) === false) {
+              if (allWalletValues[idx] > 0) {
+                allWalletValues[idx] += walletValue
+              } else {
+                allWalletValues[idx] = walletValue
+              }
+            }
+          })
         }
+        resolve(allWalletValues)
       })
-    }
-    return allWalletValues
+    })
   }
 }

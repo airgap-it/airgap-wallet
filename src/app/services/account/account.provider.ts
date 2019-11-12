@@ -34,6 +34,8 @@ interface CTAInfo {
 export class AccountProvider {
   private readonly walletList: AirGapMarketWallet[] = []
   public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
+  public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
+
   public refreshPageSubject: Subject<void> = new Subject()
 
   private activeAccount: AirGapMarketWallet
@@ -60,7 +62,11 @@ export class AccountProvider {
     private readonly dataService: DataService,
     private readonly router: Router
   ) {
-    this.loadWalletsFromStorage().catch(console.error)
+    this.loadWalletsFromStorage()
+      .then(() => {
+        this.walletsHaveLoaded.next(true)
+      })
+      .catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
