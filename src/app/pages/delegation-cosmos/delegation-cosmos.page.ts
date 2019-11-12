@@ -37,6 +37,7 @@ export class DelegationCosmosPage {
   public delegationForm: FormGroup
   public addressDelegated: boolean
   public delegatedAmount: BigNumber
+  public totalDelegatedAmount: BigNumber
   public validatorAddress: string
   public validatorAlias: string
   public validatorInfo: CosmosValidatorInfo
@@ -44,7 +45,6 @@ export class DelegationCosmosPage {
   public validatorStatus: string | undefined
   public totalDelegationBalance: BigNumber | undefined
   public selfDelegationBalance: BigNumber
-
   public amount: BigNumber
   public sendMaxAmount: boolean = false
   public delegationOption: string = "delegate"
@@ -122,11 +122,11 @@ export class DelegationCosmosPage {
       this.addressDelegated = false
       this.canUndelegate = false
     }
-    const totalDelegatedAmount = await this.validatorService.fetchTotalDelegatedAmount(
+    this.totalDelegatedAmount = await this.validatorService.fetchTotalDelegatedAmount(
       this.wallet.addresses[0]
     )
     const rawDelegatableBalance = new BigNumber(
-      this.wallet.currentBalance - totalDelegatedAmount.toNumber()
+      this.wallet.currentBalance - this.totalDelegatedAmount.toNumber()
     )
     console.log("rawDelegatableBalance", rawDelegatableBalance)
     this.delegatableBalance = rawDelegatableBalance

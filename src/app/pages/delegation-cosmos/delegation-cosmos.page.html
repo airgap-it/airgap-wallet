@@ -274,10 +274,10 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              <ng-container *ngIf="!delegatedAmount">
+              <ng-container *ngIf="!totalDelegatedAmount">
                 0 ATOMs
               </ng-container>
-              {{ delegatedAmount | amountConverter: { protocolIdentifier:
+              {{ totalDelegatedAmount | amountConverter: { protocolIdentifier:
               wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
