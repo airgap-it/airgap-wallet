@@ -50,13 +50,13 @@
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
         <!--TODO: calculate percentage of self bond (total amount & self amount) -->
-        <div class="progress--current" [style.width]="'80%'"></div>
+        <div class="progress--current" [style.width]="percentage"></div>
       </div>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <ion-row>
         <ion-col size="6" class="ion-no-padding">
-          <small>0.16%</small>
+          <small>{{percentage}}</small>
           <!--TODO: show if loading 
           <ng-template #bakerInfoSkeleton>
             <div>
@@ -68,9 +68,12 @@
           -->
         </ion-col>
         <ion-col size="6" class="ion-no-padding ion-text-right">
-          <small>20,000 / {{ totalDelegationBalance }}</small>
+          <small>
+            {{ selfDelegationBalance| amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }} / {{
+            totalDelegationBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+          </small>
           <!--TODO: show if loading 
-
+ 
           <ng-template #bakerInfoBalanceSkeleton>
             <div class="justify--content__end">
               <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
@@ -127,13 +130,13 @@
     </ion-col>
   </ion-row>
   <ion-segment [(ngModel)]="delegationOption" class="ion-padding-horizontal">
-    <ion-segment-button value="delegate">
+    <ion-segment-button value="delegate" [disabled]="!canDelegate">
       <ion-label>Delegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="undelegate" [disabled]="!canDelegate">
+    <ion-segment-button value="undelegate" [disabled]="!canUndelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="rewards" [disabled]="!canDelegate">
+    <ion-segment-button value="rewards">
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
@@ -165,7 +168,12 @@
         ></p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatableBalance" [disabled]="!canDelegate"></amount>
+    <amount
+      [wallet]="wallet"
+      [capMaxAmount]="delegatableBalance"
+      [disabled]="!canDelegate"
+      (amountEmitter)="setFormAmount($event)"
+    ></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'undelegate'">
     <ion-row class="ion-padding-horizontal">
@@ -182,7 +190,7 @@
         ></p>
       </ion-col>
     </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate"></amount>
+    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate" (amountEmitter)="setFormAmount($event)"></amount>
   </ng-container>
   <ng-container *ngIf="delegationOption === 'rewards'">
     <ion-row class="ion-padding-horizontal">
@@ -232,10 +240,10 @@
           </ion-avatar>
           <ion-label>
             <h2 class="font--weight__bold ion-ion-text " color="black">
-              <ng-container *ngIf="!delegatedAmount">
+              <ng-container *ngIf="!totalDelegatedAmount">
                 0 ATOMs
               </ng-container>
-              {{ delegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              {{ totalDelegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
               {{ 'delegation-cosmos.your-account.delegation_label' | translate }}

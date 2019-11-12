@@ -13,7 +13,7 @@ export interface CosmosValidatorInfo {
   alias: string
   rate: string
   status: string
-  totalDelegationBalance: string
+  totalDelegationBalance: BigNumber
 }
 
 @Injectable({
@@ -30,14 +30,14 @@ export class ValidatorService {
         alias: validator.description.moniker,
         rate: `${(parseFloat(validator.commission.rate) * 100).toString()}%`,
         status: statusCodes[validator.status],
-        totalDelegationBalance: `${new BigNumber(validator.tokens).shiftedBy(-1 * this.protocol.decimals).toString()}` // TODO display in a nice format
+        totalDelegationBalance: new BigNumber(validator.tokens)
       }
     } catch {
       return {
         alias: 'unknown',
         rate: 'unknown',
         status: 'unknown',
-        totalDelegationBalance: 'unknown'
+        totalDelegationBalance: undefined
       }
     }
   }
@@ -48,6 +48,11 @@ export class ValidatorService {
 
   public async fetchDelegations(address: string): Promise<CosmosDelegation[]> {
     return this.protocol.fetchDelegations(address)
+  }
+
+  public async fetchSelfDelegation(address: string): Promise<BigNumber> {
+    const selfDelegation = await this.protocol.fetchSelfDelegationAmount(address)
+    return new BigNumber(selfDelegation.shares)
   }
 
   public async fetchTotalDelegatedAmount(address: string): Promise<BigNumber> {
