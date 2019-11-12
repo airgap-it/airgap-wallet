@@ -47,7 +47,7 @@ export class AmountComponent {
     } else {
       amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
     }
-    this.delegationForm.controls.amount.setValue(amount.toFixed(), {
+    this.delegationForm.controls.amount.setValue(amount, {
       emitEvent: false
     })
   }
