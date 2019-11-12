@@ -73,9 +73,6 @@ export class DelegationCosmosPage {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.validatorAddress = info.validatorAddress
-      console.log("info", info)
-      console.log("validatorAddress", this.validatorAddress)
-
       this.currentBalance = this.wallet.currentBalance
       this.actionCallback = info.actionCallback
       this.delegationForm = formBuilder.group({
@@ -107,9 +104,6 @@ export class DelegationCosmosPage {
     const delegations: CosmosDelegation[] = await protocol.fetchDelegations(
       this.wallet.addresses[0]
     )
-    console.log("delegations", delegations)
-    console.log("this.validatorAddress", this.validatorAddress)
-
     const index = delegations.findIndex(
       delegation => delegation.validator_address === this.validatorAddress
     )
@@ -119,7 +113,6 @@ export class DelegationCosmosPage {
       const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
       this.delegatedAmount = rawDelegatedAmount
     } else {
-      console.log("address is not delegated")
       this.addressDelegated = false
       this.canUndelegate = false
     }
@@ -129,7 +122,6 @@ export class DelegationCosmosPage {
     const rawDelegatableBalance = new BigNumber(
       this.wallet.currentBalance - this.totalDelegatedAmount.toNumber()
     )
-    console.log("rawDelegatableBalance", rawDelegatableBalance)
     this.delegatableBalance = rawDelegatableBalance
 
     if (this.delegatableBalance.lt(this.wallet.coinProtocol.feeDefaults.low)) {
@@ -138,8 +130,6 @@ export class DelegationCosmosPage {
   }
 
   public async getValidatorInfo() {
-    console.log("getValidatorInfo", this.validatorAddress)
-
     this.selfDelegationBalance = await this.validatorService.fetchSelfDelegation(
       this.validatorAddress
     )
@@ -190,14 +180,11 @@ export class DelegationCosmosPage {
     })
   }
   public async withdrawDelegationRewards(): Promise<void> {
-    console.log("withdrawDelegationRewards")
-
     const protocol = new CosmosProtocol()
     const cosmosTransaction = await protocol.withdrawDelegationRewards(
       this.wallet.publicKey,
       [this.validatorAddress]
     )
-    console.log("cosmosTransaction", cosmosTransaction)
     const serializer = new CosmosUnsignedTransactionSerializer()
     const unsignedCosmosTx: UnsignedCosmosTransaction = {
       publicKey: this.wallet.publicKey,
@@ -205,16 +192,12 @@ export class DelegationCosmosPage {
     }
 
     const serializedTx = serializer.serialize(unsignedCosmosTx)
-    console.log("serializedTx", serializedTx)
-
     const airGapTxs = cosmosTransaction.toAirGapTransactions("cosmos")
     const info = {
       wallet: this.wallet,
       airGapTxs,
       data: "airgap-vault://?d=" + serializedTx
     }
-    console.log("airGapTxs", airGapTxs)
-
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router
       .navigateByUrl("/interaction-selection/" + DataServiceKey.INTERACTION)
