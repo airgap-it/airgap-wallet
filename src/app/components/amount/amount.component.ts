@@ -15,7 +15,7 @@ export class AmountComponent {
   public sendMaxAmount: boolean = false
   public amountControl
   @Input()
-  public wallet: AirGapMarketWallet
+  public wallet?: AirGapMarketWallet
 
   @Input()
   public capMaxAmount: BigNumber

@@ -10,11 +10,11 @@ export class CryptoToFiatPipe implements PipeTransform {
     if (
       !args ||
       !args.currentMarketPrice ||
-      !(args.currentMarketPrice instanceof BigNumber) ||
+      !BigNumber.isBigNumber(args.currentMarketPrice) ||
       isNaN(args.currentMarketPrice.toNumber()) ||
       !args.protocolIdentifier ||
       !value ||
-      !(value instanceof BigNumber) ||
+      !BigNumber.isBigNumber(value) ||
       isNaN(value.toNumber())
     ) {
       /* console.warn(

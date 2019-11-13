@@ -85,9 +85,7 @@ export class TransactionPreparePage {
   public useWallet() {
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
-      new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(
-        Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
-      )
+      new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
     )
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
@@ -134,28 +132,28 @@ export class TransactionPreparePage {
             case 0:
               this.transactionForm.controls.fee.setValue(
                 new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(
-                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
               break
             case 1:
               this.transactionForm.controls.fee.setValue(
                 new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
-                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
-                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
               break
             default:
               this.transactionForm.controls.fee.setValue(
                 new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
-                  Math.abs(new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
           }

@@ -64,9 +64,6 @@ export class DelegationCosmosPage {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.validatorAddress = info.validatorAddress
-      console.log('info', info)
-      console.log('validatorAddress', this.validatorAddress)
-
       this.currentBalance = this.wallet.currentBalance
       this.actionCallback = info.actionCallback
       this.delegationForm = formBuilder.group({
@@ -90,9 +87,6 @@ export class DelegationCosmosPage {
   public async checkAddressDelegations() {
     const protocol = new CosmosProtocol()
     const delegations: CosmosDelegation[] = await protocol.fetchDelegations(this.wallet.addresses[0])
-    console.log('delegations', delegations)
-    console.log('this.validatorAddress', this.validatorAddress)
-
     const index = delegations.findIndex(delegation => delegation.validator_address === this.validatorAddress)
     if (index > -1) {
       const delegation = delegations[index]
@@ -100,13 +94,11 @@ export class DelegationCosmosPage {
       const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
       this.delegatedAmount = rawDelegatedAmount
     } else {
-      console.log('address is not delegated')
       this.addressDelegated = false
       this.canUndelegate = false
     }
     this.totalDelegatedAmount = await this.validatorService.fetchTotalDelegatedAmount(this.wallet.addresses[0])
     const rawDelegatableBalance = new BigNumber(this.wallet.currentBalance - this.totalDelegatedAmount.toNumber())
-    console.log('rawDelegatableBalance', rawDelegatableBalance)
     this.delegatableBalance = rawDelegatableBalance
 
     if (this.delegatableBalance.lt(this.wallet.coinProtocol.feeDefaults.low)) {
@@ -115,8 +107,6 @@ export class DelegationCosmosPage {
   }
 
   public async getValidatorInfo() {
-    console.log('getValidatorInfo', this.validatorAddress)
-
     this.selfDelegationBalance = await this.validatorService.fetchSelfDelegation(this.validatorAddress)
 
     this.validatorInfo = await this.validatorService.getValidatorInfo(this.validatorAddress)
@@ -185,8 +175,6 @@ export class DelegationCosmosPage {
       airGapTxs,
       data: 'airgap-vault://?d=' + serializedTx
     }
-    console.log('airGapTxs', airGapTxs)
-
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

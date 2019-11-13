@@ -1,4 +1,4 @@
-<form [formGroup]="delegationForm" class="ion-padding-bottom">
+<form *ngIf="wallet" [formGroup]="delegationForm" class="ion-padding-bottom">
   <ion-row class="ion-padding-horizontal padding-top ion-align-items-center amount__container">
     <ion-col size="9" class="amount--container__input ion-no-padding">
       <ion-item clasS="ion-no-padding" lines="none" [disabled]="disabled">
