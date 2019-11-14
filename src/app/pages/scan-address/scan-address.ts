@@ -17,7 +17,7 @@ export class ScanAddressPage extends ScanBasePage {
   private readonly callback: (address: string) => void
   private callbackCalled: boolean = false
 
-  @ViewChild('addressScanner')
+  @ViewChild('addressScanner', { static: true })
   public zxingScanner: ZXingScannerComponent
 
   constructor(

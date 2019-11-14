@@ -19,7 +19,7 @@ export class ChartComponent {
   @Input()
   public total: number
 
-  @ViewChild('baseChart') public chart?: BaseChartDirective
+  @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
   public date: Date
   public currentChart: TimeUnit | string = TimeUnit.Minutes
