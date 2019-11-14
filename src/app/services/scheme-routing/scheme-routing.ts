@@ -3,11 +3,11 @@ import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  DeserializedSyncProtocol,
-  EncodedType,
   supportedProtocols,
-  SyncProtocolUtils,
-  SyncWalletRequest
+  IACMessageType,
+  IACMessageDefinitionObject,
+  Serializer,
+  AccountShareResponse
 } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -21,7 +21,7 @@ export class SchemeRoutingProvider {
   private router: Router
 
   private readonly syncSchemeHandlers: {
-    [key in EncodedType]: (deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function) => Promise<boolean>
+    [key in IACMessageType]: (deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function) => Promise<boolean>
   }
 
   constructor(
@@ -30,54 +30,81 @@ export class SchemeRoutingProvider {
     private readonly dataService: DataService
   ) {
     this.syncSchemeHandlers = {
-      [EncodedType.WALLET_SYNC]: this.handleWalletSync.bind(this),
-      [EncodedType.UNSIGNED_TRANSACTION]: this.syncTypeNotSupportedAlert.bind(this),
-      [EncodedType.SIGNED_TRANSACTION]: this.handleSignedTransaction.bind(this),
-      [EncodedType.MESSAGE_SIGN_REQUEST]: this.syncTypeNotSupportedAlert.bind(this),
-      [EncodedType.MESSAGE_SIGN_RESPONSE]: this.syncTypeNotSupportedAlert.bind(this)
+      [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
+      [IACMessageType.MetadataResponse]: this.syncTypeNotSupportedAlert.bind(this),
+      [IACMessageType.AccountShareRequest]: this.syncTypeNotSupportedAlert.bind(this),
+      [IACMessageType.AccountShareResponse]: this.handleWalletSync.bind(this),
+      [IACMessageType.TransactionSignRequest]: this.syncTypeNotSupportedAlert.bind(this),
+      [IACMessageType.TransactionSignResponse]: this.handleSignedTransaction.bind(this),
+      [IACMessageType.MessageSignRequest]: this.syncTypeNotSupportedAlert.bind(this),
+      [IACMessageType.MessageSignResponse]: this.syncTypeNotSupportedAlert.bind(this)
     }
   }
 
   public async handleNewSyncRequest(
     router: Router,
-    rawString: string,
-    scanAgainCallback: Function = (): void => {
+    rawString: string | string[],
+    scanAgainCallback: Function = (scanResult: { currentPage: number; totalPageNumber: number }): void => {
       /* */
     }
   ): Promise<void> {
     this.router = router
-    const syncProtocol: SyncProtocolUtils = new SyncProtocolUtils()
+    const serializer: Serializer = new Serializer()
 
     try {
+      // TODO: Refactor ASAP
+      if (Array.isArray(rawString)) {
+        try {
+          const deserializedSync = await serializer.deserialize(rawString)
+
+          if (deserializedSync[0].type in IACMessageType) {
+            // Only handle types that we know
+            // TODO: Support multi txs
+            this.syncSchemeHandlers[deserializedSync[0].type](deserializedSync[0], scanAgainCallback).catch(
+              handleErrorSentry(ErrorCategory.SCHEME_ROUTING)
+            )
+
+            return
+          } else {
+            this.syncTypeNotSupportedAlert(deserializedSync[0], scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+
+            return
+          }
+        } catch (err) {
+          scanAgainCallback(err)
+        }
+
+        return
+      }
       const url: URL = new URL(rawString)
       let data: string = rawString // Fallback to support raw data QRs
       data = url.searchParams.get('d')
 
-      // try {
-      const deserializedSync: DeserializedSyncProtocol = await syncProtocol.deserialize(data)
+      try {
+        const deserializedSync = await serializer.deserialize([data])
 
-      if (deserializedSync.type in EncodedType) {
-        // Only handle types that we know
-        this.syncSchemeHandlers[deserializedSync.type](deserializedSync, scanAgainCallback).catch(
-          handleErrorSentry(ErrorCategory.SCHEME_ROUTING)
-        )
+        if (deserializedSync[0].type in IACMessageType) {
+          // Only handle types that we know
+          // TODO: Support multi txs
+          this.syncSchemeHandlers[deserializedSync[0].type](deserializedSync[0], scanAgainCallback).catch(
+            handleErrorSentry(ErrorCategory.SCHEME_ROUTING)
+          )
 
-        return
-      } else {
-        this.syncTypeNotSupportedAlert(deserializedSync, scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+          return
+        } else {
+          this.syncTypeNotSupportedAlert(deserializedSync[0], scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
 
-        return
-      }
-      // }
-      /* Temporarily comment out to catch bitcoin:xxx cases
-      catch (error) {
+          return
+        }
+      } catch (error) {
+        // Temporarily comment out to catch bitcoin:xxx cases
+        scanAgainCallback(error)
         console.error('Deserialization of sync failed', error)
       }
-      */
     } catch (error) {
-      console.warn(error)
+      console.warn('x', error)
 
-      const splits: string[] = rawString.split(':')
+      const splits: string[] = (rawString as string).split(':')
       if (splits.length > 1) {
         const [address]: string[] = splits[1].split('?')
         const wallets: AirGapMarketWallet[] = this.accountProvider.getWalletList()
@@ -123,7 +150,7 @@ export class SchemeRoutingProvider {
         }
       } else {
         const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(
-          rawString
+          rawString as string
         )
         if (compatibleWallets.length > 0) {
           const info = {
@@ -140,9 +167,9 @@ export class SchemeRoutingProvider {
     }
   }
 
-  public async handleWalletSync(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function): Promise<void> {
+  public async handleWalletSync(deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function): Promise<void> {
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    const walletSync: SyncWalletRequest = deserializedSync.payload as SyncWalletRequest
+    const walletSync: AccountShareResponse = deserializedSync.payload as AccountShareResponse
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       deserializedSync.protocol,
       walletSync.publicKey,
@@ -155,7 +182,7 @@ export class SchemeRoutingProvider {
     }
   }
 
-  public async handleSignedTransaction(deserializedSync: DeserializedSyncProtocol, scanAgainCallback: Function): Promise<void> {
+  public async handleSignedTransaction(deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function): Promise<void> {
     if (this.router) {
       const info = {
         signedTransactionSync: deserializedSync
@@ -204,7 +231,10 @@ export class SchemeRoutingProvider {
     }
   }
 */
-  private async syncTypeNotSupportedAlert(deserializedSyncProtocol: DeserializedSyncProtocol, scanAgainCallback: Function): Promise<void> {
+  private async syncTypeNotSupportedAlert(
+    _deserializedSyncProtocol: IACMessageDefinitionObject,
+    scanAgainCallback: Function
+  ): Promise<void> {
     const cancelButton = {
       text: 'Okay!',
       role: 'cancel',

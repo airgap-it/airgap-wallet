@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnChanges } from '@angular/core'
 import {
-  DeserializedSyncProtocol,
+  ICoinProtocol,
+  Serializer,
   getProtocolByIdentifier,
   IAirGapTransaction,
   SignedTransaction,
-  SyncProtocolUtils
+  IACMessageDefinitionObject
 } from 'airgap-coin-lib'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -15,9 +16,9 @@ import BigNumber from 'bignumber.js'
   templateUrl: 'signed-transaction.html',
   styleUrls: ['./signed-transaction.scss']
 })
-export class SignedTransactionComponent {
+export class SignedTransactionComponent implements OnChanges {
   @Input()
-  public signedTx: DeserializedSyncProtocol
+  public signedTx: IACMessageDefinitionObject | undefined // TODO: Type
 
   @Input()
   public syncProtocolString: string
@@ -39,20 +40,21 @@ export class SignedTransactionComponent {
     //
   }
 
-  public async ngOnChanges() {
+  public async ngOnChanges(): Promise<void> {
     if (this.syncProtocolString) {
       try {
-        const syncUtils = new SyncProtocolUtils()
-        const parts = this.syncProtocolString.split('?d=')
-        this.signedTx = await syncUtils.deserialize(parts[parts.length - 1])
+        const serializer: Serializer = new Serializer()
+        const parts: string[] = this.syncProtocolString.split('?d=')
+        this.signedTx = await serializer.deserialize([parts[parts.length - 1]])[0]
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
 
+    // TODO: Handle multiple messages
     if (this.signedTx) {
-      const protocol = getProtocolByIdentifier(this.signedTx.protocol)
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTx.protocol)
       try {
         this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
         if (

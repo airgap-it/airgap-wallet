@@ -1,10 +1,7 @@
-import { CosmosProtocol } from "airgap-coin-lib"
-import { BigNumber } from "bignumber.js"
-import { Injectable } from "@angular/core"
-import {
-  CosmosValidator,
-  CosmosDelegation
-} from "airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient"
+import { CosmosProtocol } from 'airgap-coin-lib'
+import { BigNumber } from 'bignumber.js'
+import { Injectable } from '@angular/core'
+import { CosmosValidator, CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 
 export interface Uptime {
   address: string
@@ -20,13 +17,13 @@ export interface CosmosValidatorInfo {
 }
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class ValidatorService {
   public protocol = new CosmosProtocol()
 
   public async getValidatorInfo(address: string): Promise<CosmosValidatorInfo> {
-    const statusCodes = { 0: "jailed", 1: "inactive", 2: "active" }
+    const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     try {
       const validator = await this.protocol.fetchValidator(address)
       return {
@@ -37,9 +34,9 @@ export class ValidatorService {
       }
     } catch {
       return {
-        alias: "unknown",
-        rate: "unknown",
-        status: "unknown",
+        alias: 'unknown',
+        rate: 'unknown',
+        status: 'unknown',
         totalDelegationBalance: undefined
       }
     }
@@ -60,11 +57,7 @@ export class ValidatorService {
 
   public async fetchTotalDelegatedAmount(address: string): Promise<BigNumber> {
     const delegations = await this.protocol.fetchDelegations(address)
-    return new BigNumber(
-      delegations
-        .map(delegation => parseFloat(delegation.shares))
-        .reduce((a, b) => a + b, 0)
-    )
+    return new BigNumber(delegations.map(delegation => parseFloat(delegation.shares)).reduce((a, b) => a + b, 0))
   }
 
   public async fetchValidator(address: string): Promise<CosmosValidator> {
