@@ -28,3 +28,29 @@ export function generateGUID(): string {
   }
   // tslint:enable
 }
+
+export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]> {
+  return promise
+    .then<[null, T]>((data: T) => [null, data])
+    .catch<[U, undefined]>((err: U) => {
+      if (errorExt) {
+        Object.assign(err, errorExt)
+      }
+
+      return [err, undefined]
+    })
+}
+
+export function partition<T>(array: T[], isValid: (element: T) => boolean): [T[], T[]] {
+  const pass: T[] = []
+  const fail: T[] = []
+  array.forEach((element: T) => {
+    if (isValid(element)) {
+      pass.push(element)
+    } else {
+      fail.push(element)
+    }
+  })
+
+  return [pass, fail]
+}

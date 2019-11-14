@@ -69,17 +69,20 @@ export class OperationsProvider {
   ): Promise<string[]> {
     const serializer: Serializer = new Serializer()
 
-    return serializer.serialize([
-      {
-        protocol: wallet.coinProtocol.identifier,
-        type: IACMessageType.TransactionSignRequest,
-        payload: {
-          publicKey: wallet.publicKey,
-          transaction: transaction as any, // TODO: Type
-          callback: 'airgap-wallet://?d='
+    return serializer.serialize(
+      [
+        {
+          protocol: wallet.coinProtocol.identifier,
+          type: IACMessageType.TransactionSignRequest,
+          payload: {
+            publicKey: wallet.publicKey,
+            transaction: transaction as any, // TODO: Type
+            callback: 'airgap-wallet://?d='
+          }
         }
-      }
-    ])
+      ],
+      10
+    )
   }
 
   public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
@@ -106,7 +109,7 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber,
     data?: any
-  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTx: string[] }> {
+  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTxChunks: string[] }> {
     const loader = await this.getAndShowLoader()
 
     try {
@@ -123,9 +126,9 @@ export class OperationsProvider {
         transaction: rawUnsignedTx
       })
 
-      const serializedTx: string[] = await this.serializeTx(wallet, rawUnsignedTx)
+      const serializedTxChunks: string[] = await this.serializeTx(wallet, rawUnsignedTx)
 
-      return { airGapTxs, serializedTx }
+      return { airGapTxs, serializedTxChunks }
     } catch (error) {
       handleErrorSentry(ErrorCategory.COINLIB)(error)
 

@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 
 @Component({
   selector: 'page-account-address',
@@ -17,7 +17,7 @@ export class AccountAddressPage {
     private readonly location: Location,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly clipboardProvider: ClipboardProvider
+    private readonly clipboardProvider: ClipboardService
   ) {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special

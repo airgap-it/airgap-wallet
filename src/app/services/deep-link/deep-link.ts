@@ -116,17 +116,20 @@ export class DeepLinkProvider {
     })
 
     const serializer: Serializer = new Serializer()
-    const serializedTx: string[] = await serializer.serialize([
-      {
-        protocol: wallet.coinProtocol.identifier,
-        type: IACMessageType.TransactionSignRequest,
-        payload: {
-          publicKey: wallet.publicKey,
-          transaction: rawUnsignedTx,
-          callback: 'airgap-wallet://?d='
+    const serializedTx: string[] = await serializer.serialize(
+      [
+        {
+          protocol: wallet.coinProtocol.identifier,
+          type: IACMessageType.TransactionSignRequest,
+          payload: {
+            publicKey: wallet.publicKey,
+            transaction: rawUnsignedTx,
+            callback: 'airgap-wallet://?d='
+          }
         }
-      }
-    ])
+      ],
+      10
+    )
 
     return {
       wallet,

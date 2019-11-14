@@ -6,7 +6,7 @@ import { LoadingController } from '@ionic/angular'
 import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -33,7 +33,7 @@ export class TransactionPreparePage {
     private readonly route: ActivatedRoute,
     private readonly _ngZone: NgZone,
     private readonly http: HttpClient,
-    private readonly clipboardProvider: ClipboardProvider,
+    private readonly clipboardProvider: ClipboardService,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService
   ) {
@@ -168,11 +168,11 @@ export class TransactionPreparePage {
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
+      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: 'airgap-vault://?d=' + serializedTx
+        data: serializedTxChunks
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

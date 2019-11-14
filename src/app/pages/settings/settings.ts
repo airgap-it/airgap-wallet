@@ -3,7 +3,7 @@ import { Router } from '@angular/router'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
@@ -22,7 +22,7 @@ export class SettingsPage {
     private readonly translateService: TranslateService,
     public platform: Platform,
     public alertCtrl: AlertController,
-    private readonly clipboardProvider: ClipboardProvider,
+    private readonly clipboardProvider: ClipboardService,
     private readonly schemeRoutingProvider: SchemeRoutingProvider
   ) {}
 

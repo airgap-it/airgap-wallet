@@ -11,7 +11,7 @@ import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
 import BigNumber from 'bignumber.js'
@@ -53,7 +53,7 @@ describe('TransactionPrepare Page', () => {
           { provide: StatusBar, useClass: StatusBarMock },
           { provide: SplashScreen, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },
-          ClipboardProvider,
+          ClipboardService,
           {
             provide: ActivatedRoute,
             useValue: routeInfo
