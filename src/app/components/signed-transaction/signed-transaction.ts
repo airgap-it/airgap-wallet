@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js'
 })
 export class SignedTransactionComponent implements OnChanges {
   @Input()
-  public signedTxs: IACMessageDefinitionObject[] // TODO: Type
+  public signedTx: IACMessageDefinitionObject | undefined // TODO: Type
 
   @Input()
   public syncProtocolString: string
@@ -45,7 +45,7 @@ export class SignedTransactionComponent implements OnChanges {
       try {
         const serializer: Serializer = new Serializer()
         const parts: string[] = this.syncProtocolString.split('?d=')
-        this.signedTxs = await serializer.deserialize([parts[parts.length - 1]])
+        this.signedTx = await serializer.deserialize([parts[parts.length - 1]])[0]
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
@@ -53,10 +53,10 @@ export class SignedTransactionComponent implements OnChanges {
     }
 
     // TODO: Handle multiple messages
-    if (this.signedTxs.length > 0) {
-      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTxs[0].protocol)
+    if (this.signedTx) {
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTx.protocol)
       try {
-        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTxs[0].payload as SignedTransaction)
+        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
         if (
           this.airGapTxs.length > 1 &&
           this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
@@ -71,7 +71,7 @@ export class SignedTransactionComponent implements OnChanges {
       } catch (e) {
         console.error(e)
         this.fallbackActivated = true
-        this.rawTxData = this.signedTxs[0].payload as SignedTransaction
+        this.rawTxData = this.signedTx.payload as SignedTransaction
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
