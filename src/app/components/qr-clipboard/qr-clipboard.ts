@@ -26,7 +26,7 @@ export class QrClipboardComponent implements OnDestroy {
   constructor(private readonly clipboardService: ClipboardService) {
     this.timeout = setInterval(() => {
       this.activeChunk = ++this.activeChunk % this.qrdataArray.length
-    }, 100)
+    }, 250)
   }
 
   public async copyToClipboard(): Promise<void> {
