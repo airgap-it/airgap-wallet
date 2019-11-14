@@ -143,7 +143,7 @@ export class AppComponent {
     const deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     const info = {
       wallet: deeplinkInfo.wallet,
-      airGapTx: deeplinkInfo.airGapTx,
+      airGapTxs: deeplinkInfo.airGapTxs,
       data: 'airgap-vault://?d=' + deeplinkInfo.serializedTx
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)

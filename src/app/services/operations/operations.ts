@@ -91,7 +91,7 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber,
     data?: any
-  ): Promise<{ airGapTx: IAirGapTransaction; serializedTx: string }> {
+  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTx: string }> {
     const loader = await this.getAndShowLoader()
 
     try {
@@ -103,14 +103,14 @@ export class OperationsProvider {
       } else {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount], fee, data)
       }
-      const airGapTx = await wallet.coinProtocol.getTransactionDetails({
+      const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
       })
 
       const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
 
-      return { airGapTx, serializedTx }
+      return { airGapTxs, serializedTx }
     } catch (error) {
       handleErrorSentry(ErrorCategory.COINLIB)(error)
 

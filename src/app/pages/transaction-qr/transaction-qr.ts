@@ -1,11 +1,12 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { Transaction } from '../../models/transaction.model'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'page-transaction-qr',
@@ -14,9 +15,16 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 export class TransactionQrPage {
   public preparedDataQR: string = ''
   public wallet: AirGapMarketWallet = null
-  public airGapTx: Transaction = null
+  public airGapTxs: Transaction[] = null
   public isBrowser: boolean = false
   public qrDataTooBig: boolean = false
+  public aggregatedInfo:
+    | {
+        numberOfTxs: number
+        totalAmount: BigNumber
+        totalFees: BigNumber
+      }
+    | undefined
 
   constructor(
     private readonly router: Router,
@@ -27,9 +35,20 @@ export class TransactionQrPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.airGapTx = info.airGapTx
+      this.airGapTxs = info.airGapTxs
       this.preparedDataQR = info.data
       this.qrDataTooBig = this.preparedDataQR.length > 2800
+
+      if (
+        this.airGapTxs.length > 1 &&
+        this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
+      ) {
+        this.aggregatedInfo = {
+          numberOfTxs: this.airGapTxs.length,
+          totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+          totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
+        }
+      }
     }
     this.isBrowser = !this.platform.is('cordova')
   }

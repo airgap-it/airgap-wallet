@@ -32,7 +32,9 @@ export class SchemeRoutingProvider {
     this.syncSchemeHandlers = {
       [EncodedType.WALLET_SYNC]: this.handleWalletSync.bind(this),
       [EncodedType.UNSIGNED_TRANSACTION]: this.syncTypeNotSupportedAlert.bind(this),
-      [EncodedType.SIGNED_TRANSACTION]: this.handleSignedTransaction.bind(this)
+      [EncodedType.SIGNED_TRANSACTION]: this.handleSignedTransaction.bind(this),
+      [EncodedType.MESSAGE_SIGN_REQUEST]: this.syncTypeNotSupportedAlert.bind(this),
+      [EncodedType.MESSAGE_SIGN_RESPONSE]: this.syncTypeNotSupportedAlert.bind(this)
     }
   }
 

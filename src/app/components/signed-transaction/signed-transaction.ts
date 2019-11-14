@@ -8,6 +8,7 @@ import {
 } from 'airgap-coin-lib'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'signed-transaction',
@@ -21,8 +22,16 @@ export class SignedTransactionComponent {
   @Input()
   public syncProtocolString: string
 
-  public airGapTx: IAirGapTransaction
+  public airGapTxs: IAirGapTransaction[]
   public fallbackActivated: boolean = false
+
+  public aggregatedInfo:
+    | {
+        numberOfTxs: number
+        totalAmount: BigNumber
+        totalFees: BigNumber
+      }
+    | undefined
 
   public rawTxData: SignedTransaction
 
@@ -45,7 +54,17 @@ export class SignedTransactionComponent {
     if (this.signedTx) {
       const protocol = getProtocolByIdentifier(this.signedTx.protocol)
       try {
-        this.airGapTx = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        if (
+          this.airGapTxs.length > 1 &&
+          this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
+        ) {
+          this.aggregatedInfo = {
+            numberOfTxs: this.airGapTxs.length,
+            totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+            totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
+          }
+        }
         this.fallbackActivated = false
       } catch (e) {
         this.fallbackActivated = true
