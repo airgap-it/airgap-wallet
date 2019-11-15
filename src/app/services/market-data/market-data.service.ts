@@ -109,14 +109,14 @@ export class MarketDataService {
     return new Promise<number[]>(resolve => {
       this.walletsProvider.wallets.subscribe(async wallets => {
         // TODO fetchMarketData() only once for each protocolIdentifier
-        const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.protocolIdentifier))
+        const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.coinProtocol.marketSymbol))
         const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
         const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
         const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
         let allWalletValues = [0, 0]
         for (let [index, wallet] of wallets.entries()) {
           this.cachingService.setPriceData(
-            { timeUnit: interval, protocolIdentifier: wallet.protocolIdentifier, key: CachingServiceKey.PRICESAMPLES },
+            { timeUnit: interval, protocolIdentifier: wallet.coinProtocol.marketSymbol, key: CachingServiceKey.PRICESAMPLES },
             priceSamples[index]
           )
           this.cachingService.setTransactionData(
