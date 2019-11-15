@@ -461,7 +461,8 @@
   "delegation-validator-list": {
     "title": "Validator List",
     "your-validators_label": "Your Validators",
-    "validators_label": "Validators"
+    "validators_label": "Validators",
+    "no_validators_found_label": "No validators matching your search have been found"
   },
 	"action-alert-tip": {
 		"heading": "Thank you for using AirGap!",
