@@ -2,13 +2,20 @@ import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  DelegationInfo,
-  IAirGapTransaction,
-  TezosKtProtocol,
   CosmosProtocol,
+  DelegationInfo,
+  IACMessageType,
+  IAirGapTransaction,
   Serializer,
-  IACMessageType
+  TezosKtProtocol
 } from 'airgap-coin-lib'
+import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
+import {
+  RawAeternityTransaction,
+  RawBitcoinTransaction,
+  RawEthereumTransaction,
+  RawTezosTransaction
+} from 'airgap-coin-lib/dist/serializer/types'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -16,12 +23,6 @@ import { map } from 'rxjs/operators'
 import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import {
-  RawTezosTransaction,
-  RawEthereumTransaction,
-  RawBitcoinTransaction,
-  RawAeternityTransaction
-} from 'airgap-coin-lib/dist/serializer/types'
 
 @Injectable({
   providedIn: 'root'
@@ -63,9 +64,9 @@ export class OperationsProvider {
     })
   }
 
-  private async serializeTx(
+  public async serializeTx(
     wallet: AirGapMarketWallet,
-    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction
+    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction | CosmosTransaction
   ): Promise<string[]> {
     const serializer: Serializer = new Serializer()
 
@@ -86,7 +87,7 @@ export class OperationsProvider {
   }
 
   public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
-    if (address.startsWith('cosmos')) {
+    if (address && address.startsWith('cosmos')) {
       // TODO: this is ugly and needs to be re-implemented properly
       const protocol = new CosmosProtocol()
       const delegations = await protocol.fetchDelegations(address)
@@ -95,7 +96,7 @@ export class OperationsProvider {
         isDelegated: delegations.length > 0 ? true : false
       }
     } else {
-      return await this.fetchDelegationInfo(address, fetchExtraInfo)
+      return this.fetchDelegationInfo(address, fetchExtraInfo)
     }
   }
   public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {

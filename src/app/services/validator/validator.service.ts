@@ -46,6 +46,13 @@ export class ValidatorService {
     return this.protocol.fetchValidators()
   }
 
+  public async fetchVotingPower(address: string): Promise<BigNumber> {
+    const validators = await this.protocol.fetchValidators()
+    const validatedAmount = new BigNumber(validators.find(validator => validator.operator_address === address).delegator_shares)
+    const totalDelegatedAmount = new BigNumber(validators.map(validator => parseFloat(validator.delegator_shares)).reduce((a, b) => a + b))
+    return validatedAmount.div(totalDelegatedAmount)
+  }
+
   public async fetchDelegations(address: string): Promise<CosmosDelegation[]> {
     return this.protocol.fetchDelegations(address)
   }

@@ -45,41 +45,29 @@
 
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
-      <p class="ion-no-margin">{{ validatorStatus }}</p>
+      <p *ngIf="validatorStatus; else validatorBalanceSkeleton" class="ion-no-margin">{{ validatorStatus }}</p>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
-        <!--TODO: calculate percentage of self bond (total amount & self amount) -->
         <div class="progress--current" [style.width]="percentage"></div>
       </div>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <ion-row>
-        <ion-col size="6" class="ion-no-padding">
-          <small>{{percentage}}</small>
-          <!--TODO: show if loading 
-          <ng-template #bakerInfoSkeleton>
-            <div>
-              <p class="ion-no-margin">
-                <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
-              </p>
-            </div>
-          </ng-template>
-          -->
+        <ion-col size="3" class="ion-no-padding">
+          <small *ngIf="percentage; else validatorBalanceSkeleton">{{percentage}}</small>
         </ion-col>
-        <ion-col size="6" class="ion-no-padding ion-text-right">
-          <small>
+        <ion-col size="9" class="ion-no-padding ion-text-right">
+          <small *ngIf="selfDelegationBalance; else validatorBalanceSkeleton">
             {{ selfDelegationBalance| amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }} / {{
             totalDelegationBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
           </small>
-          <!--TODO: show if loading 
- 
-          <ng-template #bakerInfoBalanceSkeleton>
-            <div class="justify--content__end">
+          <ng-template #validatorBalanceSkeleton>
+            <small>
               <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
-            </div>
+            </small>
           </ng-template>
-        --></ion-col>
+        </ion-col>
       </ion-row>
     </ion-col>
   </ion-row>
@@ -91,11 +79,11 @@
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else bakerConfigSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else validatorSkeleton">
               <span>{{ validatorCommission }}</span>
             </h2>
 
-            <ng-template #bakerConfigSkeleton>
+            <ng-template #validatorSkeleton>
               <div>
                 <h2>
                   <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
@@ -111,8 +99,8 @@
             <ion-icon name="sync"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black">
-              10.25%
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="votingPower; else validatorSkeleton">
+              {{ votingPower | percentage }}
             </h2>
             <h3>{{ 'delegation-cosmos.voting-power_label' | translate }}</h3>
             <!--TODO: show if loading 
@@ -140,11 +128,12 @@
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
-  <ng-container *ngIf="delegationOption === 'delegate' && delegatableBalance">
-    <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated && delegatableBalance">
-        <p
-          [innerHTML]="
+  <div class="segment--container">
+    <ng-container *ngIf="delegationOption === 'delegate' && delegatableBalance">
+      <ion-row class="ion-padding-horizontal">
+        <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated && delegatableBalance">
+          <p
+            [innerHTML]="
             'delegation-cosmos.delegation.text'
               | translate
                 : {
@@ -152,11 +141,11 @@
                       delegatableBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
                   }
           "
-        ></p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p
-          [innerHTML]="
+          ></p>
+        </ion-col>
+        <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
+          <p
+            [innerHTML]="
             'delegation-cosmos.delegation.delegated_text'
               | translate
                 : {
@@ -165,49 +154,55 @@
                       delegatableBalance.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
                   }
           "
-        ></p>
-      </ion-col>
-    </ion-row>
-    <amount
-      [wallet]="wallet"
-      [capMaxAmount]="delegatableBalance"
-      [disabled]="!canDelegate"
-      (amountEmitter)="setFormAmount($event)"
-    ></amount>
-  </ng-container>
-  <ng-container *ngIf="delegationOption === 'undelegate'">
-    <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
-        <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
-        <p
-          [innerHTML]="
+          ></p>
+        </ion-col>
+      </ion-row>
+      <amount
+        [wallet]="wallet"
+        [capMaxAmount]="delegatableBalance"
+        [disabled]="!canDelegate"
+        (amountEmitter)="setFormAmount($event)"
+      ></amount>
+    </ng-container>
+    <ng-container *ngIf="delegationOption === 'undelegate'">
+      <ion-row class="ion-padding-horizontal">
+        <ion-col size="12" class="ion-no-padding" *ngIf="!addressDelegated">
+          <p>{{ 'delegation-cosmos.undelegate.text' | translate }}</p>
+        </ion-col>
+        <ion-col size="12" class="ion-no-padding" *ngIf="addressDelegated">
+          <p
+            [innerHTML]="
             'delegation-cosmos.undelegate.undelegated_text'
               | translate
                 : { delegatedAmount: delegatedAmount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }
           "
-        ></p>
-      </ion-col>
-    </ion-row>
-    <amount [wallet]="wallet" [capMaxAmount]="delegatedAmount" [disabled]="!canUndelegate" (amountEmitter)="setFormAmount($event)"></amount>
-  </ng-container>
-  <ng-container *ngIf="delegationOption === 'rewards'">
-    <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding" *ngIf="!delegationReward">
-        <p>{{ 'delegation-cosmos.rewards.text' | translate }}</p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding" *ngIf="delegationReward">
-        <p
-          [innerHTML]="
+          ></p>
+        </ion-col>
+      </ion-row>
+      <amount
+        [wallet]="wallet"
+        [capMaxAmount]="delegatedAmount"
+        [disabled]="!canUndelegate"
+        (amountEmitter)="setFormAmount($event)"
+      ></amount>
+    </ng-container>
+    <ng-container *ngIf="delegationOption === 'rewards'">
+      <ion-row class="ion-padding-horizontal">
+        <ion-col size="12" class="ion-no-padding" *ngIf="!delegationReward">
+          <p>{{ 'delegation-cosmos.rewards.text' | translate }}</p>
+        </ion-col>
+        <ion-col size="12" class="ion-no-padding" *ngIf="delegationReward">
+          <p
+            [innerHTML]="
             'delegation-cosmos.rewards.claim-rewards_text'
               | translate
                 : { delegationReward: delegationReward | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }
           "
-        ></p>
-      </ion-col>
-    </ion-row>
-  </ng-container>
+          ></p>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+  </div>
 
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12" class="ion-no-padding">

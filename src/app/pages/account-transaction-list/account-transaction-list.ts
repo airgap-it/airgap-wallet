@@ -214,7 +214,7 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    await promiseTimeout(30000, transactionPromise).catch(() => {
+    await promiseTimeout(3000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
     })
@@ -223,7 +223,11 @@ export class AccountTransactionListPage {
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
+    this.isRefreshing = false
+    this.initialTransactionsLoaded = true
+
     const addr: string = this.wallet.receivingPublicAddress
+
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
     // remove duplicates from pendingTransactions
@@ -243,9 +247,6 @@ export class AccountTransactionListPage {
     } else {
       this.hasPendingTransactions = false
     }
-
-    this.isRefreshing = false
-    this.initialTransactionsLoaded = true
 
     this.accountProvider.triggerWalletChanged()
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
