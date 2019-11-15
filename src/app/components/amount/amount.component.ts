@@ -1,13 +1,13 @@
-import { BigNumber } from "bignumber.js"
-import { AirGapMarketWallet } from "airgap-coin-lib"
-import { FormGroup, FormBuilder, Validators } from "@angular/forms"
-import { Component, Input, EventEmitter, Output } from "@angular/core"
-import { DecimalValidator } from "src/app/validators/DecimalValidator"
+import { BigNumber } from 'bignumber.js'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
+import { Component, Input, EventEmitter, Output } from '@angular/core'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 @Component({
-  selector: "amount",
-  templateUrl: "./amount.component.html",
-  styleUrls: ["./amount.component.scss"]
+  selector: 'amount',
+  templateUrl: './amount.component.html',
+  styleUrls: ['./amount.component.scss']
 })
 export class AmountComponent {
   public delegationForm: FormGroup
@@ -15,7 +15,7 @@ export class AmountComponent {
   public sendMaxAmount: boolean = false
   public amountControl
   @Input()
-  public wallet: AirGapMarketWallet
+  public wallet?: AirGapMarketWallet
 
   @Input()
   public capMaxAmount: BigNumber
@@ -35,13 +35,7 @@ export class AmountComponent {
 
   public IonViewDidEnter() {
     this.delegationForm = this.formBuilder.group({
-      amount: [
-        this.amount,
-        Validators.compose([
-          Validators.required,
-          DecimalValidator.validate(this.wallet.coinProtocol.decimals)
-        ])
-      ]
+      amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
     })
   }
   public toggleMaxAmount() {
@@ -54,9 +48,7 @@ export class AmountComponent {
   onChanges(): void {
     this.delegationForm.valueChanges.subscribe((val: any) => {
       if (val && val.amount) {
-        this.amountEmitter.emit(
-          new BigNumber(val.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-        )
+        this.amountEmitter.emit(new BigNumber(val.amount).shiftedBy(this.wallet.coinProtocol.decimals))
       }
     })
   }
@@ -64,13 +56,9 @@ export class AmountComponent {
   private setMaxAmount() {
     let amount
     if (this.capMaxAmount) {
-      amount = this.capMaxAmount
-        .shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-        .toNumber()
+      amount = this.capMaxAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals).toNumber()
     } else {
-      amount = this.wallet.currentBalance
-        .shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-        .toNumber()
+      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals).toNumber()
     }
     this.delegationForm.controls.amount.setValue(amount, {
       emitEvent: true

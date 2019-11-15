@@ -85,7 +85,7 @@ export class TransactionPreparePage {
   public useWallet() {
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
-      this.wallet.coinProtocol.feeDefaults.low.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+      this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
     )
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
@@ -129,22 +129,22 @@ export class TransactionPreparePage {
           switch (val) {
             case 0:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.low.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                this.wallet.coinProtocol.feeDefaults.low.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
               break
             case 1:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.high.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                this.wallet.coinProtocol.feeDefaults.high.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
               break
             default:
               this.transactionForm.controls.fee.setValue(
-                this.wallet.coinProtocol.feeDefaults.medium.toFixed(Math.abs(this.wallet.coinProtocol.feeDefaults.low.e + 1))
+                this.wallet.coinProtocol.feeDefaults.medium.toFixed(-1 * this.wallet.coinProtocol.feeDefaults.low.e + 1)
               )
           }
         })
