@@ -22,6 +22,8 @@ export class ScanPage extends ScanBasePage {
 
   private parts: Set<string> = new Set()
 
+  public isMultiQr: boolean = false
+
   constructor(
     protected platform: Platform,
     protected scanner: ScannerProvider,
@@ -35,8 +37,10 @@ export class ScanPage extends ScanBasePage {
   }
 
   public async ionViewWillEnter(): Promise<void> {
+    super.ionViewWillEnter()
     this.parts = new Set()
     this.percentageScanned = 0
+    this.isMultiQr = true
   }
 
   public async checkScan(resultString: string) {
@@ -46,7 +50,10 @@ export class ScanPage extends ScanBasePage {
     this.ngZone.run(() => {
       this.schemeRouting
         .handleNewSyncRequest(this.router, Array.from(this.parts), (scanResult: { availablePages: number[]; totalPages: number }) => {
-          this.percentageScanned = Math.max(0, Math.min(100, (scanResult.availablePages.length / scanResult.totalPages) * 100))
+          if (scanResult && scanResult.availablePages) {
+            this.isMultiQr = true
+            this.percentageScanned = Math.max(0, Math.min(1, scanResult.availablePages.length / scanResult.totalPages))
+          }
           this.startScan()
         })
         .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
