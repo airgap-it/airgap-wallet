@@ -190,6 +190,7 @@ export class DelegationCosmosPage {
       publicKey: this.wallet.publicKey,
       transaction: cosmosTransaction
     }
+    console.log("unsignedCosmosTx", unsignedCosmosTx)
 
     const serializedTx = serializer.serialize(unsignedCosmosTx)
     const airGapTxs = cosmosTransaction.toAirGapTransactions("cosmos")
@@ -198,6 +199,9 @@ export class DelegationCosmosPage {
       airGapTxs,
       data: "airgap-vault://?d=" + serializedTx
     }
+    console.log("info", info)
+    console.log("serializedTx", serializedTx)
+
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router
       .navigateByUrl("/interaction-selection/" + DataServiceKey.INTERACTION)
