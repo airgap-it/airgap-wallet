@@ -67,7 +67,7 @@
     </ion-list>
   </ng-container>
 
-  <ng-container *ngIf="filteredValidators; else loadingTemplate">
+  <ng-container *ngIf="filteredValidators && filteredValidators.length > 0">
     <ion-list lines="none">
       <ion-list-header>
         <ion-label>
@@ -118,6 +118,20 @@
       </ng-container>
     </ion-list>
   </ng-container>
+  <ng-container
+    *ngIf="filteredValidators && filteredValidators.length === 0; else checkLoadingTemplate"
+  >
+    <ion-text color="danger" class="font--weight__bold ion-ion-text ion-margin">
+      {{ 'delegation-validator-list.no_validators_found_label' | translate }}
+    </ion-text>
+  </ng-container>
+
+  <ng-template
+    #checkLoadingTemplate
+    *ngIf="filteredValidators; else loadingTemplate"
+  >
+  </ng-template>
+
   <ng-template #loadingTemplate>
     <ion-list lines="none">
       <ion-item>
