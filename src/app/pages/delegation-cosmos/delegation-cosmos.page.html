@@ -79,11 +79,11 @@
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else validatorComnissionSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else validatorSkeleton">
               <span>{{ validatorCommission }}</span>
             </h2>
 
-            <ng-template #validatorComnissionSkeleton>
+            <ng-template #validatorSkeleton>
               <div>
                 <h2>
                   <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
@@ -99,8 +99,8 @@
             <ion-icon name="sync"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black">
-              10.25%
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="votingPower; else validatorSkeleton">
+              {{ votingPower | percentage }}
             </h2>
             <h3>{{ 'delegation-cosmos.voting-power_label' | translate }}</h3>
             <!--TODO: show if loading 
