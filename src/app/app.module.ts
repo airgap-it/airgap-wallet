@@ -36,7 +36,7 @@ import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-selec
 import { PipesModule } from './pipes/pipes.module'
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
-import { ClipboardProvider } from './services/clipboard/clipboard'
+import { ClipboardService } from './services/clipboard/clipboard'
 import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { OperationsProvider } from './services/operations/operations'
@@ -107,7 +107,7 @@ export function createTranslateLoader(http: HttpClient) {
     AccountProvider,
     StorageProvider,
     SchemeRoutingProvider,
-    ClipboardProvider,
+    ClipboardService,
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,

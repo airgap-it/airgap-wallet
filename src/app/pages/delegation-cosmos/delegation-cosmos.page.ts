@@ -1,19 +1,26 @@
-import { OperationsProvider } from './../../services/operations/operations'
-import { ProtocolSymbols } from './../../services/protocols/protocols'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { DataServiceKey } from './../../services/data/data.service'
-import { ValidatorService, CosmosValidatorInfo } from './../../services/validator/validator.service'
-import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
-import { ActivatedRoute, Router } from '@angular/router'
 import { Component } from '@angular/core'
-import { AirGapMarketWallet, CosmosProtocol } from 'airgap-coin-lib'
-import { ToastController, LoadingController } from '@ionic/angular'
-import { DataService } from 'src/app/services/data/data.service'
-import BigNumber from 'bignumber.js'
-import { FormGroup, FormBuilder, Validators } from '@angular/forms'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, ToastController } from '@ionic/angular'
+import {
+  AirGapMarketWallet,
+  CosmosProtocol,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  Serializer,
+  UnsignedCosmosTransaction
+} from 'airgap-coin-lib'
 import { CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
+import BigNumber from 'bignumber.js'
+import { DataService } from 'src/app/services/data/data.service'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
+import { DataServiceKey } from './../../services/data/data.service'
+import { OperationsProvider } from './../../services/operations/operations'
+import { ProtocolSymbols } from './../../services/protocols/protocols'
+import { CosmosValidatorInfo, ValidatorService } from './../../services/validator/validator.service'
 
 @Component({
   selector: 'page-delegation-cosmos',
@@ -147,9 +154,26 @@ export class DelegationCosmosPage {
     })
   }
   public async withdrawDelegationRewards(): Promise<void> {
+    console.log('withdrawDelegationRewards')
+
     const protocol = new CosmosProtocol()
     const cosmosTransaction: CosmosTransaction = await protocol.withdrawDelegationRewards(this.wallet.publicKey, [this.validatorAddress])
+    console.log('cosmosTransaction', cosmosTransaction)
+    const serializer: Serializer = new Serializer()
+
+    const unsignedCosmosTx: UnsignedCosmosTransaction = {
+      publicKey: this.wallet.publicKey,
+      transaction: cosmosTransaction
+    }
+
+    const transaction: IACMessageDefinitionObject = {
+      protocol: protocol.identifier,
+      type: IACMessageType.TransactionSignRequest,
+      payload: unsignedCosmosTx
+    }
+
     const serializedTx = await this.operationsProvider.serializeTx(this.wallet, cosmosTransaction)
+    console.log('serializedTx', serializedTx)
 
     const airGapTxs = cosmosTransaction.toAirGapTransactions('cosmos')
     const info = {

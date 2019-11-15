@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -30,7 +30,7 @@ export class AccountEditPopoverComponent {
     private readonly walletsProvider: AccountProvider,
     private readonly viewCtrl: PopoverController,
     private readonly platform: Platform,
-    private readonly clipboardProvider: ClipboardProvider,
+    private readonly clipboardProvider: ClipboardService,
     private readonly translateService: TranslateService,
     private readonly operationsProvider: OperationsProvider
   ) {

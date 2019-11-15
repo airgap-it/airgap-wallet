@@ -13,6 +13,10 @@
       {{ 'scan.text' | translate }}
     </p>
   </ion-text>
+  <br />
+
+  <ion-progress-bar *ngIf="isMultiQr" style="height: 20px" color="secondary" [value]="percentageScanned"></ion-progress-bar>
+
   <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center ">
     <ion-col class="guides--container content--align__center-center">
       <img class="guides--container__img" src="assets/img/qr_code_guides.svg" />

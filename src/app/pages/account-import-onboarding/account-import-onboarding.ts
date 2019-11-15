@@ -19,7 +19,7 @@ export class AccountImportOnboardingPage implements OnInit {
   public slide3: string = 'account-import-onboarding-slide_3.png'
   public slide4: string = 'account-import-onboarding-slide_4.png'
 
-  @ViewChild(IonSlides)
+  @ViewChild(IonSlides, { static: true })
   public slides: IonSlides
   public slideOpts = {
     initialSlide: 0,

@@ -7,7 +7,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 @Injectable({
   providedIn: 'root'
 })
-export class ClipboardProvider {
+export class ClipboardService {
   constructor(
     private readonly platform: Platform,
     private readonly clipboard: Clipboard,

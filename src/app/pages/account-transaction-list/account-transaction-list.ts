@@ -1,51 +1,37 @@
-import { Location } from "@angular/common"
-import { HttpClient } from "@angular/common/http"
-import { Component } from "@angular/core"
-import { ActivatedRoute, Router } from "@angular/router"
-import {
-  AlertController,
-  LoadingController,
-  Platform,
-  PopoverController,
-  ToastController
-} from "@ionic/angular"
-import { TranslateService } from "@ngx-translate/core"
-import {
-  AirGapMarketWallet,
-  DelegationInfo,
-  IAirGapTransaction,
-  TezosKtProtocol
-} from "airgap-coin-lib"
-import { Action } from "airgap-coin-lib/dist/actions/Action"
-import { TezosDelegateAction } from "airgap-coin-lib/dist/actions/TezosDelegateAction"
-import { BigNumber } from "bignumber.js"
-import { promiseTimeout } from "src/app/helpers/promise-timeout"
-import { AirGapTezosMigrateAction } from "src/app/models/actions/TezosMigrateAction"
-import { ShortenStringPipe } from "src/app/pipes/shorten-string/shorten-string.pipe"
+import { Location } from '@angular/common'
+import { HttpClient } from '@angular/common/http'
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
+import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
+import { BigNumber } from 'bignumber.js'
+import { promiseTimeout } from 'src/app/helpers/promise-timeout'
+import { AirGapTezosMigrateAction } from 'src/app/models/actions/TezosMigrateAction'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
-import { AccountEditPopoverComponent } from "../../components/account-edit-popover/account-edit-popover.component"
-import { ActionGroup } from "../../models/ActionGroup"
-import { AirGapTezosDelegateAction } from "../../models/actions/TezosDelegateAction"
-import { AccountProvider } from "../../services/account/account.provider"
-import { DataService, DataServiceKey } from "../../services/data/data.service"
-import { OperationsProvider } from "../../services/operations/operations"
-import { ProtocolSymbols } from "../../services/protocols/protocols"
-import { PushBackendProvider } from "../../services/push-backend/push-backend"
-import {
-  ErrorCategory,
-  handleErrorSentry
-} from "../../services/sentry-error-handler/sentry-error-handler"
-import { SettingsKey, StorageProvider } from "../../services/storage/storage"
+import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
+import { ActionGroup } from '../../models/ActionGroup'
+import { AirGapTezosDelegateAction } from '../../models/actions/TezosDelegateAction'
+import { AccountProvider } from '../../services/account/account.provider'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { PushBackendProvider } from '../../services/push-backend/push-backend'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
-import { WalletActionInfo } from "./../../models/ActionGroup"
+import { WalletActionInfo } from './../../models/ActionGroup'
 // import 'core-js/es7/object'
 
 declare let cordova
 
 @Component({
-  selector: "page-account-transaction-list",
-  templateUrl: "account-transaction-list.html",
-  styleUrls: ["./account-transaction-list.scss"]
+  selector: 'page-account-transaction-list',
+  templateUrl: 'account-transaction-list.html',
+  styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
   public isRefreshing: boolean = false
@@ -70,7 +56,7 @@ export class AccountTransactionListPage {
   public actions: Action<any, any>[]
 
   public lottieConfig: { path: string } = {
-    path: "/assets/animations/loading.json"
+    path: '/assets/animations/loading.json'
   }
 
   private readonly TRANSACTION_LIMIT: number = 10
@@ -154,51 +140,40 @@ export class AccountTransactionListPage {
     } else {
       const info = {
         wallet: this.wallet,
-        address: ""
+        address: ''
       }
       this.dataService.setData(DataServiceKey.DETAIL, info)
 
-      this.router
-        .navigateByUrl("/transaction-prepare/" + DataServiceKey.DETAIL)
-        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
   public openReceivePage() {
     this.dataService.setData(DataServiceKey.DETAIL, this.wallet)
-    this.router
-      .navigateByUrl("/account-address/" + DataServiceKey.DETAIL)
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openTransactionDetailPage(transaction: IAirGapTransaction) {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
-    this.router
-      .navigateByUrl("/transaction-detail/" + DataServiceKey.DETAIL)
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openBlockexplorer() {
-    const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(
-      this.wallet.addresses[0]
-    )
+    const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.openUrl(blockexplorer)
   }
 
   private openUrl(url: string) {
-    if (this.platform.is("ios") || this.platform.is("android")) {
-      cordova.InAppBrowser.open(url, "_system", "location=true")
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      cordova.InAppBrowser.open(url, '_system', 'location=true')
     } else {
-      window.open(url, "_blank")
+      window.open(url, '_blank')
     }
   }
 
   public doRefresh(event: any = null) {
-    if (
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT
-    ) {
+    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
 
@@ -217,21 +192,12 @@ export class AccountTransactionListPage {
     }
 
     const offset = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
-    const newTransactions = await this.getTransactions(
-      this.TRANSACTION_LIMIT,
-      offset
-    )
+    const newTransactions = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
 
-    this.transactions = this.mergeTransactions(
-      this.transactions,
-      newTransactions
-    )
+    this.transactions = this.mergeTransactions(this.transactions, newTransactions)
     this.txOffset = this.transactions.length
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(
-      this.accountProvider.getAccountIdentifier(this.wallet),
-      this.transactions
-    )
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
       this.infiniteEnabled = false
@@ -243,14 +209,10 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(
-          this.accountProvider.getAccountIdentifier(this.wallet)
-        )) || []
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
     }
 
-    const transactionPromise: Promise<
-      IAirGapTransaction[]
-    > = this.getTransactions()
+    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
     await promiseTimeout(3000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
@@ -266,10 +228,7 @@ export class AccountTransactionListPage {
 
     const addr: string = this.wallet.receivingPublicAddress
 
-    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(
-      addr,
-      this.protocolIdentifier
-    )) as IAirGapTransaction[]
+    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
     // remove duplicates from pendingTransactions
     const txHashes = this.transactions.map(value => value.hash)
@@ -279,8 +238,8 @@ export class AccountTransactionListPage {
 
     if (this.pendingTransactions.length > 0) {
       this.pendingTransactions = this.pendingTransactions.map(pendingTx => {
-        pendingTx.fee = new BigNumber(pendingTx.fee)
-        pendingTx.amount = new BigNumber(pendingTx.amount)
+        pendingTx.fee = new BigNumber(pendingTx.fee).toString(10)
+        pendingTx.amount = new BigNumber(pendingTx.amount).toString(10)
 
         return pendingTx
       })
@@ -290,47 +249,31 @@ export class AccountTransactionListPage {
     }
 
     this.accountProvider.triggerWalletChanged()
-    await this.storageProvider.setCache<IAirGapTransaction[]>(
-      this.accountProvider.getAccountIdentifier(this.wallet),
-      this.transactions
-    )
+    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
   }
 
-  public async getTransactions(
-    limit: number = 10,
-    offset: number = 0
-  ): Promise<IAirGapTransaction[]> {
-    const results = await Promise.all([
-      this.wallet.fetchTransactions(limit, offset),
-      this.wallet.synchronize()
-    ])
+  public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
+    const results = await Promise.all([this.wallet.fetchTransactions(limit, offset), this.wallet.synchronize()])
 
     return results[0]
   }
 
-  public mergeTransactions(
-    oldTransactions,
-    newTransactions
-  ): IAirGapTransaction[] {
+  public mergeTransactions(oldTransactions, newTransactions): IAirGapTransaction[] {
     if (!oldTransactions) {
       return newTransactions
     }
     const transactionMap = new Map<string, IAirGapTransaction>(
-      oldTransactions.map(
-        (tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx]
-      )
+      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
     )
 
     newTransactions.forEach(tx => {
       transactionMap.set(tx.hash, tx)
     })
 
-    return Array.from(transactionMap.values()).sort(
-      (a, b) => b.timestamp - a.timestamp
-    )
+    return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
   }
 
   public async presentEditPopover(event) {
@@ -343,16 +286,14 @@ export class AccountTransactionListPage {
         },
         onUndelegate: async () => {
           // TODO: Should we move this to it's own file?
-          const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction(
-            {
-              wallet: this.wallet,
-              delegate: undefined,
-              toastController: this.toastController,
-              loadingController: this.loadingController,
-              dataService: this.dataService,
-              router: this.router
-            }
-          )
+          const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction({
+            wallet: this.wallet,
+            delegate: undefined,
+            toastController: this.toastController,
+            loadingController: this.loadingController,
+            dataService: this.dataService,
+            router: this.router
+          })
 
           await delegateAction.start()
         }
@@ -366,12 +307,7 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const {
-      isDelegated
-    }: DelegationInfo = await this.operationsProvider.checkDelegated(
-      this.wallet.receivingPublicAddress,
-      false
-    )
+    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, false)
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
@@ -379,9 +315,7 @@ export class AccountTransactionListPage {
 
   public async getKtAddresses(): Promise<string[]> {
     const protocol: TezosKtProtocol = new TezosKtProtocol()
-    const ktAddresses: string[] = await protocol.getAddressesFromPublicKey(
-      this.wallet.publicKey
-    )
+    const ktAddresses: string[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 
@@ -389,12 +323,8 @@ export class AccountTransactionListPage {
   }
 
   public async openDelegateSelection(): Promise<void> {
-    const delegateAction:
-      | TezosDelegateAction<any>
-      | undefined = this.actions.find(
-      (action: Action<any, any>) =>
-        action.identifier === "delegate-action" ||
-        action.identifier === "view-delegation"
+    const delegateAction: TezosDelegateAction<any> | undefined = this.actions.find(
+      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation'
     ) as TezosDelegateAction<any>
     if (delegateAction) {
       await delegateAction.start()
@@ -407,7 +337,7 @@ export class AccountTransactionListPage {
         duration: 3000,
         message,
         showCloseButton: true,
-        position: "bottom"
+        position: 'bottom'
       })
       .then(toast => {
         toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))

@@ -3,11 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  DeserializedSyncProtocol,
   getProtocolByIdentifier,
   ICoinProtocol,
   SignedTransaction,
-  TezosKtProtocol
+  TezosKtProtocol,
+  IACMessageDefinitionObject
 } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -33,7 +33,7 @@ const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  public signedTransactionSync: DeserializedSyncProtocol
+  public signedTransactionSync: IACMessageDefinitionObject
   private signedTx: string
   public protocol: ICoinProtocol
 
@@ -60,6 +60,7 @@ export class TransactionConfirmPage {
       this.signedTransactionSync = info.signedTransactionSync
     }
 
+    // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
@@ -125,6 +126,7 @@ export class TransactionConfirmPage {
         }
 
         // TODO: Remove once we introduce pending transaction handling
+        // TODO: Multi messages
         // tslint:disable-next-line:no-unnecessary-type-assertion
         const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
         const lastTx: {
