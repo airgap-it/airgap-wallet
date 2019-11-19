@@ -11,12 +11,12 @@
 
 <ion-content class="ion-no-padding">
   <form [formGroup]="transactionForm" class="ion-padding-bottom">
-    <ion-row padding-horizontal padding-top>
+    <ion-row class="ion-padding-horizontal ion-padding-top">
       <ion-col size="10" class="ion-no-padding">
         <ion-row>
           <ion-col class="balance__container ion-no-padding">
             <ion-row>
-              <p no-margin class="font--size__large">
+              <p class="ion-no-margin" class="font--size__large">
                 <strong>
                   {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
                   }}
@@ -78,7 +78,7 @@
         </ion-text>
       </ion-col>
     </ion-row>
-    <ion-row padding-horizontal padding-bottom class="address-to__buttons">
+    <ion-row class="ion-padding-horizontal ion-padding-bottom" class="address-to__buttons">
       <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="pasteClipboard()">
         {{ 'transaction-prepare.paste_label' | translate }}
       </ion-button>
@@ -88,10 +88,12 @@
       </ion-button>
     </ion-row>
     <div class="divider--line"></div>
-    <ion-row padding-horizontal padding-top align-items-center class="amount__container">
-      <ion-col size="9" class="amount--container__input" no-padding>
-        <ion-item no-padding lines="none">
-          <ion-label color="blackLight" no-margin position="stacked">{{ 'transaction-prepare.amount_label' | translate }}</ion-label>
+    <ion-row class="ion-padding-horizontal ion-padding-top ion-align-items-center" class="amount__container">
+      <ion-col size="9" class="ion-no-padding amount--container__input">
+        <ion-item class="ion-no-padding" lines="none">
+          <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+            {{ 'transaction-prepare.amount_label' | translate }}
+          </ion-label>
           <ion-input
             [attr.disabled]="forceMigration"
             formControlName="amount"
@@ -140,12 +142,11 @@
         </ion-item>
       </ion-col>
     </ion-row>
-    <ion-row nowrap padding-horizontal>
-      <ion-col size="12" no-padding>
-        <ion-item no-padding lines="none">
+    <ion-row nowrap class="ion-padding-horizontal">
+      <ion-col size="12" class="ion-no-padding">
+        <ion-item class="ion-no-padding" lines="none">
           <ion-range
             [attr.disabled]="forceMigration"
-            no-padding
             min="0"
             max="2"
             step="1"
@@ -172,7 +173,7 @@
       <ion-col size="12">
         <ion-item class="advanced-item" class="ion-no-padding">
           <ion-label position="stacked"></ion-label>
-          <ion-input [attr.disabled]="forceMigration" id="fee-input" formControlName="fee" type="string" no-padding></ion-input>
+          <ion-input [attr.disabled]="forceMigration" id="fee-input" formControlName="fee" type="string" class="ion-no-padding"></ion-input>
           <span slot="end" class="input--placeholder">
             {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
           </span>
