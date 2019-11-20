@@ -40,7 +40,7 @@ export class ScanPage extends ScanBasePage {
     super.ionViewWillEnter()
     this.parts = new Set()
     this.percentageScanned = 0
-    this.isMultiQr = true
+    this.isMultiQr = false
   }
 
   public async checkScan(resultString: string) {
