@@ -40,7 +40,7 @@ export class DelegationCosmosPage {
   public validatorStatus: string | undefined
   public totalDelegationBalance: BigNumber | undefined
   public selfDelegationBalance: BigNumber
-  public amount: BigNumber
+  public amount: BigNumber = new BigNumber(0)
   public percentage: string | undefined
   public votingPower: BigNumber | undefined
 
