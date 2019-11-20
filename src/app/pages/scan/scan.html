@@ -4,8 +4,7 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ 'scan.title' | translate }}</ion-title>
-    <!--TODO: add max qr number and current-->
-    <ion-title slot="end" *ngIf="isMultiQr">1/6</ion-title>
+    <ion-title slot="end" *ngIf="isMultiQr">{{ numberOfQrsScanned }}/{{ numberOfQrsTotal }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

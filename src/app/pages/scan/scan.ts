@@ -19,6 +19,8 @@ export class ScanPage extends ScanBasePage {
   public zxingScanner: ZXingScannerComponent
 
   public percentageScanned: number = 0
+  public numberOfQrsScanned: number = 0
+  public numberOfQrsTotal: number = 0
 
   private parts: Set<string> = new Set()
 
@@ -52,6 +54,8 @@ export class ScanPage extends ScanBasePage {
         .handleNewSyncRequest(this.router, Array.from(this.parts), (scanResult: { availablePages: number[]; totalPages: number }) => {
           if (scanResult && scanResult.availablePages) {
             this.isMultiQr = true
+            this.numberOfQrsScanned = scanResult.availablePages.length
+            this.numberOfQrsTotal = scanResult.totalPages
             this.percentageScanned = Math.max(0, Math.min(1, scanResult.availablePages.length / scanResult.totalPages))
           }
           this.startScan()
