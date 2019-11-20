@@ -11,7 +11,7 @@ import {
 } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { partition, to } from '../../utils/utils'
+import { parseIACUrl, partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
@@ -103,18 +103,7 @@ export class SchemeRoutingProvider {
     this.router = router
     const serializer: Serializer = new Serializer()
 
-    function x(url: string, parameter: string): string[] {
-      const parsedUrl: URL = new URL(url)
-
-      return (
-        parsedUrl.searchParams
-          .get(parameter)
-          .split(',')
-          .filter(el => el !== '') || []
-      )
-    }
-
-    const toDecode: string[] = Array.isArray(data) ? data : data.split(',')
+    const toDecode: string[] = parseIACUrl(data, 'd')
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(serializer.deserialize(toDecode))
 
     if (error && !error.message) {
