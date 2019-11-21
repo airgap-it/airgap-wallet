@@ -153,3 +153,9 @@ page-account-import-onboarding {
   font-size: 14px;
   word-wrap: break-word;
 }
+page-settings {
+  ion-range {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
