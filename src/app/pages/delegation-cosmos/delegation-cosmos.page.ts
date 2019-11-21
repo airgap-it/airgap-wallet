@@ -21,6 +21,7 @@ import { DataServiceKey } from './../../services/data/data.service'
 import { OperationsProvider } from './../../services/operations/operations'
 import { ProtocolSymbols } from './../../services/protocols/protocols'
 import { CosmosValidatorInfo, ValidatorService } from './../../services/validator/validator.service'
+import { serializedDataToUrlString } from '../../utils/utils'
 
 @Component({
   selector: 'page-delegation-cosmos',
@@ -179,7 +180,7 @@ export class DelegationCosmosPage {
     const info = {
       wallet: this.wallet,
       airGapTxs,
-      data: 'airgap-vault://?d=' + serializedTx
+      data: serializedDataToUrlString(serializedTx)
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

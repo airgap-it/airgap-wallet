@@ -79,6 +79,11 @@ export function parseIACUrl(url: string | string[], parameter: string): string[]
 
   // In case one of the elements contains a chunked string, we have to flatten it.
   result = result.reduce((pv: string[], cv: string) => [...pv, ...cv.split(',')], [])
+  // result = result.map((value: string) => value.split(',')).flat()
 
   return result.filter((el: string) => el !== '')
+}
+
+export function serializedDataToUrlString(data: string | string[], host: string = 'airgap-vault://', parameter: string = 'd'): string {
+  return `${host}?${parameter}=${Array.isArray(data) ? data.join(',') : data}`
 }

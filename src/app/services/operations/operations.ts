@@ -23,6 +23,7 @@ import { map } from 'rxjs/operators'
 import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SerializerService } from '../serializer/serializer.service'
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,8 @@ export class OperationsProvider {
   constructor(
     private readonly accountProvider: AccountProvider,
     private readonly loadingController: LoadingController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly serializerService: SerializerService
   ) {}
 
   public setDelegationStatusOfAddress(address: string, delegated: boolean) {
@@ -68,22 +70,17 @@ export class OperationsProvider {
     wallet: AirGapMarketWallet,
     transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction | CosmosTransaction
   ): Promise<string[]> {
-    const serializer: Serializer = new Serializer()
-
-    return serializer.serialize(
-      [
-        {
-          protocol: wallet.coinProtocol.identifier,
-          type: IACMessageType.TransactionSignRequest,
-          payload: {
-            publicKey: wallet.publicKey,
-            transaction: transaction as any, // TODO: Type
-            callback: 'airgap-wallet://?d='
-          }
+    return this.serializerService.serialize([
+      {
+        protocol: wallet.coinProtocol.identifier,
+        type: IACMessageType.TransactionSignRequest,
+        payload: {
+          publicKey: wallet.publicKey,
+          transaction: transaction as any, // TODO: Type
+          callback: 'airgap-wallet://?d='
         }
-      ],
-      10
-    )
+      }
+    ])
   }
 
   public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {

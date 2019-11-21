@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { IACMessageType } from 'airgap-coin-lib'
 
+import { serializedDataToUrlString } from '../../utils/utils'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SerializerService } from '../serializer/serializer.service'
 
 import { AccountProvider } from './../account/account.provider'
-import { Serializer, IACMessageType } from 'airgap-coin-lib'
 
 declare let window: any
 
@@ -17,12 +19,12 @@ export class DeepLinkProvider {
     private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly translateService: TranslateService,
-    private readonly accountProvider: AccountProvider
+    private readonly accountProvider: AccountProvider,
+    private readonly serializerService: SerializerService
   ) {}
 
   public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
-    const defaultAppUrl: string = 'airgap-vault://'
-    const deeplinkUrl: string = url.includes('://') ? url : [defaultAppUrl, url].join('')
+    const deeplinkUrl: string = url.includes('://') ? url : serializedDataToUrlString(url)
 
     return new Promise((resolve, reject) => {
       let sApp
@@ -118,21 +120,17 @@ export class DeepLinkProvider {
       transaction: rawUnsignedTx
     })
 
-    const serializer: Serializer = new Serializer()
-    const serializedTx: string[] = await serializer.serialize(
-      [
-        {
-          protocol: wallet.coinProtocol.identifier,
-          type: IACMessageType.TransactionSignRequest,
-          payload: {
-            publicKey: wallet.publicKey,
-            transaction: rawUnsignedTx,
-            callback: 'airgap-wallet://?d='
-          }
+    const serializedTx: string[] = await this.serializerService.serialize([
+      {
+        protocol: wallet.coinProtocol.identifier,
+        type: IACMessageType.TransactionSignRequest,
+        payload: {
+          publicKey: wallet.publicKey,
+          transaction: rawUnsignedTx,
+          callback: 'airgap-wallet://?d='
         }
-      ],
-      10
-    )
+      }
+    ])
 
     return {
       wallet,

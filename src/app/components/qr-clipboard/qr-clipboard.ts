@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core'
+import { serializedDataToUrlString } from 'src/app/utils/utils'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
@@ -14,7 +15,8 @@ export class QrClipboardComponent implements OnDestroy {
 
   @Input()
   set qrdata(value: string | string[]) {
-    this.qrdataArray = Array.isArray(value) ? value : [value]
+    const array: string[] = Array.isArray(value) ? value : [value]
+    this.qrdataArray = array.length === 1 ? [serializedDataToUrlString(array)] : array
   }
 
   @Input()

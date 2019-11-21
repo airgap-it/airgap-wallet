@@ -50,6 +50,7 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
+import { SerializerService } from './services/serializer/serializer.service'
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -118,7 +119,8 @@ export function createTranslateLoader(http: HttpClient) {
     AppInfoProvider,
     PushProvider,
     Push,
-    PushBackendProvider
+    PushBackendProvider,
+    SerializerService
   ],
   bootstrap: [AppComponent]
 })

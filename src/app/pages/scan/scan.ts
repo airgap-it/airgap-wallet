@@ -1,4 +1,4 @@
-import { Component, ViewChild, NgZone } from '@angular/core'
+import { Component, NgZone, ViewChild } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'

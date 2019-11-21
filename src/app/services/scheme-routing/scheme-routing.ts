@@ -1,17 +1,11 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
-import {
-  AccountShareResponse,
-  AirGapMarketWallet,
-  IACMessageDefinitionObject,
-  IACMessageType,
-  Serializer,
-  supportedProtocols
-} from 'airgap-coin-lib'
+import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, supportedProtocols } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { parseIACUrl, partition, to } from '../../utils/utils'
+import { SerializerService } from '../../services/serializer/serializer.service'
+import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
@@ -34,7 +28,8 @@ export class SchemeRoutingProvider {
   constructor(
     private readonly alertController: AlertController,
     private readonly accountProvider: AccountProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly serializerService: SerializerService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -101,17 +96,14 @@ export class SchemeRoutingProvider {
     }
   ): Promise<IACResult> {
     this.router = router
-    const serializer: Serializer = new Serializer()
-
-    const toDecode: string[] = parseIACUrl(data, 'd')
-    const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(serializer.deserialize(toDecode))
+    const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
 
     if (error && !error.message) {
       scanAgainCallback(error)
 
       return IACResult.PARTIAL
     } else if (error && error.message) {
-      await this.handlePaymentUrl(toDecode[0], scanAgainCallback)
+      await this.handlePaymentUrl(Array.isArray(data) ? data[0] : data, scanAgainCallback)
 
       return IACResult.SUCCESS
     }

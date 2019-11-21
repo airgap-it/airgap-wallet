@@ -10,6 +10,7 @@ import {
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import BigNumber from 'bignumber.js'
+import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
 @Component({
   selector: 'signed-transaction',
@@ -36,16 +37,14 @@ export class SignedTransactionComponent implements OnChanges {
 
   public rawTxData: SignedTransaction
 
-  constructor() {
+  constructor(private readonly serializerService: SerializerService) {
     //
   }
 
   public async ngOnChanges(): Promise<void> {
     if (this.syncProtocolString) {
       try {
-        const serializer: Serializer = new Serializer()
-        const parts: string[] = this.syncProtocolString.split('?d=')
-        this.signedTx = await serializer.deserialize([parts[parts.length - 1]])[0]
+        this.signedTx = await this.serializerService.deserialize(this.syncProtocolString)[0]
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
