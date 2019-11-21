@@ -1,4 +1,3 @@
-<!--TODO: take https://www.mintscan.io/validators/cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0 & https://app.lunie.io/validators/cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0 as a reference -->
 <ion-header no-border no-shadow>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -10,8 +9,8 @@
 
 <ion-content>
   <ion-row class="ion-padding-horizontal">
-    <ion-col size="12" *ngIf="validatorInfo; else bakerAvatarSkeleton">
-      <ion-item lines="none" class="ion-no-padding">
+    <ion-col size="12">
+      <ion-item lines="none" class="ion-no-padding" *ngIf="validatorInfo; else validatorAvatarSkeleton">
         <ion-avatar slot="start">
           <identicon [address]="validatorAddress"></identicon>
         </ion-avatar>
@@ -22,26 +21,23 @@
           <p>{{ validatorAddress }}</p>
         </ion-label>
       </ion-item>
+      <ng-template #validatorAvatarSkeleton>
+        <ion-item lines="none" class="ion-no-padding">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <h2>
+              <ion-skeleton-text animated style="width: 40%;height:19px;"></ion-skeleton-text>
+            </h2>
+            <p>
+              <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ng-template>
     </ion-col>
   </ion-row>
-
-  <ng-template #bakerAvatarSkeleton>
-    <div>
-      <ion-item lines="none" class="ion-no-padding">
-        <ion-avatar slot="start">
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </ion-avatar>
-        <ion-label>
-          <h2>
-            <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
-          </h2>
-          <p>
-            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-          </p>
-        </ion-label>
-      </ion-item>
-    </div>
-  </ng-template>
 
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
@@ -79,14 +75,14 @@
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else validatorSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="validatorCommission; else validatorLoadingSkeleton">
               <span>{{ validatorCommission }}</span>
             </h2>
 
-            <ng-template #validatorSkeleton>
+            <ng-template #validatorLoadingSkeleton>
               <div>
                 <h2>
-                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 80%;height:19px;"></ion-skeleton-text>
                 </h2>
               </div>
             </ng-template>
@@ -99,20 +95,11 @@
             <ion-icon name="sync"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="votingPower; else validatorSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="votingPower; else validatorLoadingSkeleton">
               {{ votingPower | percentage }}
             </h2>
             <h3>{{ 'delegation-cosmos.voting-power_label' | translate }}</h3>
-            <!--TODO: show if loading 
-            <ng-template #bakerConfigSkeleton>
-              <h2>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h2>
-              <h3>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h3>
-            </ng-template>
-          --></ion-label>
+          </ion-label>
         </ion-item>
       </ion-card>
     </ion-col>
@@ -221,7 +208,7 @@
             <ion-icon name="wallet"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold ion-ion-text " color="black">
+            <h2 class="font--weight__bold ion-ion-text" color="black">
               {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>
