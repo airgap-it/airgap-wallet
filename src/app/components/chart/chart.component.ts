@@ -26,8 +26,12 @@ export class ChartComponent {
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
-
+  public chartOptions = {}
+  public chartColors: {}[] = []
+  public lineChartType: string = 'line'
   public chartData = {}
+  public myOptions = {}
+
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
   // public historicData$: Observable<MarketDataSample[]>
   public subscription: Subscription
@@ -36,15 +40,74 @@ export class ChartComponent {
 
   constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {
     this.chartSubjectSubscription = this.drawChartProvider.getChartObservable().subscribe(data => {
+      this.chartOptions = {
+        layout: {
+          padding: {
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0
+          }
+        },
+        animation: {
+          duration: 1250 // general animation time
+        },
+        hover: {
+          animationDuration: 250 // duration of animations when hovering an item
+        },
+        responsiveAnimationDuration: 0, // animation duration after a resize
+        legend: {
+          display: false
+        },
+        responsive: true,
+        scaleFontColor: 'white',
+        type: 'line',
+        scales: {
+          yAxes: [
+            {
+              display: false,
+              gridLines: {
+                display: false
+              }
+            }
+          ],
+          xAxes: [
+            {
+              display: false,
+              gridLines: {
+                display: false
+              }
+            }
+          ]
+        },
+        elements: {
+          point: {
+            radius: 1
+          },
+          line: {
+            tension: 0 // disables bezier curves
+          }
+        },
+        annotation: {
+          annotations: [
+            {
+              type: 'line',
+              mode: 'vertical',
+              scaleID: 'x-axis-0',
+              borderColor: 'orange',
+              borderWidth: 2,
+              label: {
+                enabled: true,
+                fontColor: 'orange',
+                content: 'LineAnno'
+              }
+            }
+          ]
+        }
+      }
       this.drawChart(data)
     })
   }
-
-  public chartOptions = {}
-
-  public chartColors: {}[] = []
-
-  public lineChartType: string = 'line'
 
   public async drawChart(timeInterval: TimeUnit | string) {
     this.chartData = {}
@@ -53,7 +116,6 @@ export class ChartComponent {
 
     this.currentChart = timeInterval
 
-    let myOptions = {}
     this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
     this.chartDatasets[0].data = this.rawData
 
@@ -61,73 +123,7 @@ export class ChartComponent {
       // x-axis labeling
       this.chartLabels.push(' ')
     }
-    myOptions = {
-      layout: {
-        padding: {
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0
-        }
-      },
-      animation: {
-        duration: 1250 // general animation time
-      },
-      hover: {
-        animationDuration: 250 // duration of animations when hovering an item
-      },
-      responsiveAnimationDuration: 0, // animation duration after a resize
-      legend: {
-        display: false
-      },
-      responsive: true,
-      scaleFontColor: 'white',
-      type: 'line',
-      scales: {
-        yAxes: [
-          {
-            display: false,
-            gridLines: {
-              display: false
-            }
-          }
-        ],
-        xAxes: [
-          {
-            display: false,
-            gridLines: {
-              display: false
-            }
-          }
-        ]
-      },
-      elements: {
-        point: {
-          radius: 1
-        },
-        line: {
-          tension: 0 // disables bezier curves
-        }
-      },
-      annotation: {
-        annotations: [
-          {
-            type: 'line',
-            mode: 'vertical',
-            scaleID: 'x-axis-0',
-            borderColor: 'orange',
-            borderWidth: 2,
-            label: {
-              enabled: true,
-              fontColor: 'orange',
-              content: 'LineAnno'
-            }
-          }
-        ]
-      }
-    }
 
-    this.chartOptions = myOptions
     this.percentageChange = await this.displayPercentageChange(this.rawData)
   }
 

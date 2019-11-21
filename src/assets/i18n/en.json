@@ -246,7 +246,7 @@
     "undelegate_label": "Undelegate",
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
-    "delete_label": "Delete",
+    "delete_label": "Remove",
     "block_explorer": "Open Blockexplorer"
   },
 
@@ -425,8 +425,8 @@
   },
   "tezos-delegation-stats": {
     "cycle": "Cycle",  
-    "reward": "Reward", 
-    "payout": "Payout"
+    "reward": "Expected Reward", 
+    "payout": "Earliest Payout"
   },  
 
   

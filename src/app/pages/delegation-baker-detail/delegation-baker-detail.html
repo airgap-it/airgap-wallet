@@ -33,7 +33,7 @@
             </ion-avatar>
             <ion-label>
               <h2>
-                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%;height:19px;"></ion-skeleton-text>
               </h2>
               <p>
                 <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
@@ -87,16 +87,14 @@
             <ion-icon name="logo-usd"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerLoadingSkeleton">
               <span *ngIf="bakerConfig?.fee">{{ bakerConfig?.fee.toNumber() * 100 | number }} %</span>
               <span *ngIf="!bakerConfig?.fee">{{ 'delegation-baker-detail.unknown' | translate }}</span>
             </h2>
-            <ng-template #bakerConfigSkeleton>
-              <div>
-                <h2>
-                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-                </h2>
-              </div>
+            <ng-template #bakerLoadingSkeleton>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%; height:19px;"></ion-skeleton-text>
+              </h2>
             </ng-template>
             <h3>{{ 'delegation-baker-detail.fee' | translate }}</h3>
           </ion-label>
@@ -104,7 +102,7 @@
         <ion-item lines="none">
           <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerConfigSkeleton">
+            <h2 class="font--weight__bold" ion-text color="black" *ngIf="bakerConfig; else bakerLoadingSkeleton">
               <span *ngIf="bakerConfig?.payout.time">
                 {{ 'delegation-baker-detail.cycles' | translate: { cycles: bakerConfig?.payout.cycles } }}
                 <small>{{ bakerConfig?.payout.time }}</small>
@@ -114,14 +112,6 @@
               </span>
             </h2>
             <h3>{{ 'delegation-baker-detail.payout-schedule' | translate }}</h3>
-            <ng-template #bakerConfigSkeleton>
-              <h2>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h2>
-              <h3>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h3>
-            </ng-template>
           </ion-label>
         </ion-item>
       </ion-card>
@@ -153,37 +143,21 @@
             <ion-icon name="alarm"></ion-icon>
           </ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold ion-ion-text" color="black" *ngIf="avgRoIPerCycle; else avgRoiSkeleton">
+            <h2 class="font--weight__bold ion-ion-text" color="black" *ngIf="avgRoIPerCycle; else bakerLoadingSkeleton">
               {{ avgRoIPerCycle?.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
             </h2>
             <h3>{{ 'delegation-baker-detail.estimated-return' | translate }}</h3>
-            <ng-template #avgRoiSkeleton>
-              <h2>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h2>
-              <h3>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h3>
-            </ng-template>
           </ion-label>
         </ion-item>
         <ion-item lines="none">
           <ion-avatar slot="start" class="content--align__center-center border--container"><ion-icon name="sync"></ion-icon></ion-avatar>
           <ion-label>
-            <h2 class="font--weight__bold ion-ion-text" color="black" *ngIf="nextPayout; else nextPayoutSkeleton">
+            <h2 class="font--weight__bold ion-ion-text" color="black" *ngIf="nextPayout; else bakerLoadingSkeleton">
               {{ nextPayout | amTimeAgo }}
             </h2>
             <h3>
               {{ (isDelegated ? 'delegation-baker-detail.next-payout' : 'delegation-baker-detail.first-payout') | translate }}
             </h3>
-            <ng-template #nextPayoutSkeleton>
-              <h2>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h2>
-              <h3>
-                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-              </h3>
-            </ng-template>
           </ion-label>
         </ion-item>
       </ion-card>
