@@ -15,7 +15,7 @@
 
       <ng-container *ngIf="transaction.fee">
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.fee_label' | translate }}</ion-label>
-        <div class="ion-padding-bottom">
+        <div [ngClass]="transaction.timestamp ? 'ion-padding-bottom' : ''">
           <span class="typography--mono">
             {{ transaction.fee | feeConverter: { protocolIdentifier: transaction.protocolIdentifier } }}
           </span>
