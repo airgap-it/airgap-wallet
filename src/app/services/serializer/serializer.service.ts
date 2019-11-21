@@ -14,8 +14,8 @@ export class SerializerService {
   private readonly v1Tov2Mapping: Map<number, number> = new Map<number, number>()
   private readonly v2Tov1Mapping: Map<number, number> = new Map<number, number>()
 
-  public chunkSize: number = 250
   public useV2: boolean = false
+  public chunkSize: number = 250
   public displayTimePerChunk: number = 500
 
   constructor() {
@@ -39,7 +39,7 @@ export class SerializerService {
   public async deserialize(chunks: string | string[]): Promise<IACMessageDefinitionObject[]> {
     const parsedChunks: string[] = parseIACUrl(chunks, 'd')
     try {
-      return this.deserializeV2(parsedChunks)
+      return await this.deserializeV2(parsedChunks)
     } catch (error) {
       return [await this.deserializeV1(parsedChunks[0])]
     }
