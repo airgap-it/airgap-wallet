@@ -7,6 +7,7 @@ import { ClipboardService } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
+import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
 declare var window: any
 declare var cordova: any
@@ -23,7 +24,8 @@ export class SettingsPage {
     public platform: Platform,
     public alertCtrl: AlertController,
     private readonly clipboardProvider: ClipboardService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider
+    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    public readonly serializerService: SerializerService
   ) {}
 
   public about() {
@@ -157,5 +159,18 @@ export class SettingsPage {
         console.error('Error: ' + err)
       }
     )
+  }
+
+  public switchSerializerVersion(event: TouchEvent): void {
+    console.log((event.detail as any).checked)
+    this.serializerService.useV2 = (event.detail as any).checked
+  }
+  public qrMsChanged(event: TouchEvent): void {
+    console.log((event.detail as any).value)
+    this.serializerService.displayTimePerChunk = (event.detail as any).value
+  }
+  public qrBytesChanged(event: TouchEvent): void {
+    console.log((event.detail as any).value)
+    this.serializerService.chunkSize = (event.detail as any).value
   }
 }
