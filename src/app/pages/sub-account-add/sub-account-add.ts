@@ -1,7 +1,8 @@
+import { BigNumber } from 'bignumber.js'
 import { Location } from '@angular/common'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, addSubProtocol } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
@@ -40,6 +41,7 @@ export class SubAccountAddPage {
       this.actionCallback = info.actionCallback
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
+      console.log('info', info)
     }
 
     function assertUnreachable(x: never): void {
@@ -56,6 +58,7 @@ export class SubAccountAddPage {
 
     if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
+        const enabledsubProtocols = this.protocolsProvider.getEnabledSubProtocols()
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
           const wallet = new AirGapMarketWallet(
             subProtocol.identifier,
@@ -66,7 +69,10 @@ export class SubAccountAddPage {
           const exists = this.accountProvider.walletExists(wallet)
           if (!exists) {
             wallet.addresses = this.wallet.addresses
-            wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+            wallet.currentBalance = new BigNumber(0)
+            console.log('new wallet', wallet)
+            wallet.synchronize().catch(error => console.error(error))
+            // handleErrorSentry(ErrorCategory.COINLIB))
             this.subAccounts.push({ selected: false, wallet })
           }
         }

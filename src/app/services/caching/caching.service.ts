@@ -36,13 +36,11 @@ export class CachingService {
 
   public async setTransactionData(identifier: TransactionIdentifier, value: any): Promise<any> {
     const uniqueId = `${identifier.publicKey}_${identifier.key}`
-
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
   public setPriceData(identifier: PriceSampleIdentifier, value: any): Promise<any> {
     const uniqueId = `${identifier.timeUnit}_${identifier.protocolIdentifier}_${identifier.key}`
-
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
@@ -70,8 +68,10 @@ export class CachingService {
     return new Promise<MarketDataSample[]>(async resolve => {
       const cachedData: StorageObject = await this.storage.get(uniqueId)
       if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
+        console.log('there is cached market data for', coinProtocol)
         resolve(cachedData.value)
       } else {
+        console.log('there NO cached market data for', coinProtocol)
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
           promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {

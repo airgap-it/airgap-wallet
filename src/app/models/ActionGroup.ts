@@ -84,7 +84,31 @@ export class ActionGroup {
         return delegateAction
       }
     )
-    return [delegateButtonAction, importButtonAction]
+    const addTokenButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
+      () => {
+        const prepareAddTokenActionContext = new SimpleAction(() => {
+          return new Promise<AddTokenActionContext>(async resolve => {
+            const info = {
+              subProtocolType: SubProtocolType.TOKEN,
+              wallet: this.callerContext.wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+        addTokenAction.onComplete = async (): Promise<void> => {
+          addTokenAction.getLinkedAction().context.location.back()
+        }
+
+        return addTokenAction
+      }
+    )
+    return [delegateButtonAction, importButtonAction, addTokenButtonAction]
   }
 
   private getTezosKTActions(): Action<any, any>[] {
