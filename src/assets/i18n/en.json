@@ -425,8 +425,8 @@
   },
   "tezos-delegation-stats": {
     "cycle": "Cycle",  
-    "reward": "Reward", 
-    "payout": "Payout"
+    "reward": "Expected Reward", 
+    "payout": "Earliest Payout"
   },  
 
   
