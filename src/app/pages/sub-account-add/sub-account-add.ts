@@ -69,11 +69,12 @@ export class SubAccountAddPage {
           const exists = this.accountProvider.walletExists(wallet)
           if (!exists) {
             wallet.addresses = this.wallet.addresses
-            wallet.currentBalance = new BigNumber(0)
-            console.log('new wallet', wallet)
-            wallet.synchronize().catch(error => console.error(error))
-            // handleErrorSentry(ErrorCategory.COINLIB))
-            this.subAccounts.push({ selected: false, wallet })
+            wallet
+              .synchronize()
+              .then(() => {
+                this.subAccounts.push({ selected: false, wallet })
+              })
+              .catch(handleErrorSentry(ErrorCategory.COINLIB))
           }
         }
       })
