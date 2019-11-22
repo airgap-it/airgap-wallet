@@ -1,116 +1,107 @@
-import { BaseChartDirective } from 'ng2-charts'
-import { MarketDataService } from './../../services/market-data/market-data.service'
-import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
-import { Component, ViewChild, Input } from '@angular/core'
-import { Subscription } from 'rxjs'
+import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
 import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { BaseChartDirective } from 'ng2-charts'
+import { Subscription } from 'rxjs'
 
-/**
- * Generated class for the ChartComponent component.
- *
- * See https://angular.io/api/core/Component for more info on Angular
- * Components.
- */
+import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
+import { MarketDataService } from './../../services/market-data/market-data.service'
+
 @Component({
   selector: 'chart',
   templateUrl: 'chart.component.html'
 })
-export class ChartComponent {
+export class ChartComponent implements AfterViewInit, OnDestroy {
   @Input()
   public total: number
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
-  public date: Date
   public currentChart: TimeUnit | string = TimeUnit.Minutes
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
-  public chartOptions = {}
+  public chartOptions: any = {}
   public chartColors: {}[] = []
-  public lineChartType: string = 'line'
-  public chartData = {}
-  public myOptions = {}
 
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
-  // public historicData$: Observable<MarketDataSample[]>
-  public subscription: Subscription
+
   public rawData: number[] = []
-  chartSubjectSubscription: Subscription
+
+  private readonly subscription: Subscription
 
   constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {
-    this.chartSubjectSubscription = this.drawChartProvider.getChartObservable().subscribe(data => {
-      this.chartOptions = {
-        layout: {
-          padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0
-          }
-        },
-        animation: {
-          duration: 1250 // general animation time
-        },
-        hover: {
-          animationDuration: 250 // duration of animations when hovering an item
-        },
-        responsiveAnimationDuration: 0, // animation duration after a resize
-        legend: {
-          display: false
-        },
-        responsive: true,
-        scaleFontColor: 'white',
-        type: 'line',
-        scales: {
-          yAxes: [
-            {
-              display: false,
-              gridLines: {
-                display: false
-              }
-            }
-          ],
-          xAxes: [
-            {
-              display: false,
-              gridLines: {
-                display: false
-              }
-            }
-          ]
-        },
-        elements: {
-          point: {
-            radius: 1
-          },
-          line: {
-            tension: 0 // disables bezier curves
-          }
-        },
-        annotation: {
-          annotations: [
-            {
-              type: 'line',
-              mode: 'vertical',
-              scaleID: 'x-axis-0',
-              borderColor: 'orange',
-              borderWidth: 2,
-              label: {
-                enabled: true,
-                fontColor: 'orange',
-                content: 'LineAnno'
-              }
-            }
-          ]
+    this.chartOptions = {
+      layout: {
+        padding: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
         }
+      },
+      animation: {
+        duration: 1250 // general animation time
+      },
+      hover: {
+        animationDuration: 250 // duration of animations when hovering an item
+      },
+      responsiveAnimationDuration: 0, // animation duration after a resize
+      legend: {
+        display: false
+      },
+      responsive: true,
+      scaleFontColor: 'white',
+      type: 'line',
+      scales: {
+        yAxes: [
+          {
+            display: false,
+            gridLines: {
+              display: false
+            }
+          }
+        ],
+        xAxes: [
+          {
+            display: false,
+            gridLines: {
+              display: false
+            }
+          }
+        ]
+      },
+      elements: {
+        point: {
+          radius: 1
+        },
+        line: {
+          tension: 0 // disables bezier curves
+        }
+      },
+      annotation: {
+        annotations: [
+          {
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x-axis-0',
+            borderColor: 'orange',
+            borderWidth: 2,
+            label: {
+              enabled: true,
+              fontColor: 'orange',
+              content: 'LineAnno'
+            }
+          }
+        ]
       }
-      this.drawChart(data)
+    }
+
+    this.subscription = this.drawChartProvider.getChartObservable().subscribe(async data => {
+      await this.drawChart(data)
     })
   }
 
-  public async drawChart(timeInterval: TimeUnit | string) {
-    this.chartData = {}
+  public async drawChart(timeInterval: TimeUnit | string): Promise<void> {
     this.chartLabels = []
     this.chartDatasets = [{ data: [], label: 'Price' }]
 
@@ -127,28 +118,30 @@ export class ChartComponent {
     this.percentageChange = await this.displayPercentageChange(this.rawData)
   }
 
-  public setLabel24h() {
+  public setLabel24h(): void {
     this.currentChart = TimeUnit.Minutes
   }
 
-  async displayPercentageChange(rawData: any) {
-    let firstValue = rawData.find(value => value > 0)
+  public async displayPercentageChange(rawData: number[]): Promise<number> {
+    const firstValue: number = rawData.find(value => value > 0)
     if (firstValue !== undefined) {
-      let lastValue = rawData.slice(-1)[0]
-      let percentageChange = ((lastValue - firstValue) / firstValue) * 100
+      const lastValue: number = rawData.slice(-1)[0]
+      const percentageChange: number = ((lastValue - firstValue) / firstValue) * 100
+
       return Number(parseFloat(String(Math.round(percentageChange * 100) / 100)).toFixed(2))
     }
+
     return 0
   }
 
-  public ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     this.chartDatasets = [{ data: [], label: 'Price' }]
     this.chartLabels = []
 
     if (this.chart) {
       const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
 
-      const color1 = '26E8CD' // rgb(122, 141, 169)
+      const color1: string = '26E8CD' // rgb(122, 141, 169)
 
       const gradientStroke1: CanvasGradient = ctx.createLinearGradient(0, 10, 0, 0)
       gradientStroke1.addColorStop(0, `#${color1}`)
@@ -168,7 +161,7 @@ export class ChartComponent {
     }
   }
 
-  public ngOnDestroy() {
-    this.chartSubjectSubscription.unsubscribe()
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }
