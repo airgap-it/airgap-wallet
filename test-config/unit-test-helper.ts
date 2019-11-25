@@ -62,6 +62,7 @@ export class UnitHelper {
     ]
     const mandatoryProviders: any[] = [
       DrawChartService,
+      { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
       Push,

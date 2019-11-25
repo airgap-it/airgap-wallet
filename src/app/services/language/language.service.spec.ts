@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing'
 
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
+
 import { LanguageService } from './language.service'
-import { UnitHelper } from '../../../test-config/unit-test-helper'
 
 describe('LanguageService', () => {
   let unitHelper: UnitHelper
