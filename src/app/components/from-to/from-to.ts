@@ -10,4 +10,6 @@ import { Transaction } from '../../models/transaction.model'
 export class FromToComponent {
   @Input()
   public transaction: Transaction
+
+  public displayRawData: boolean = false
 }
