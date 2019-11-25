@@ -2,7 +2,7 @@ import { AlertController, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
-import { LanguageService } from '../../services/language.service'
+import { LanguageService } from '../../services/language/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './TezosDelegateAction'

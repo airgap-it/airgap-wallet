@@ -12,7 +12,7 @@ import { AirGapTipUsAction } from 'src/app/models/actions/TipUsAction'
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { AccountProvider } from '../account/account.provider'
 import { DataService } from '../data/data.service'
-import { LanguageService } from '../language.service'
+import { LanguageService } from '../language/language.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
