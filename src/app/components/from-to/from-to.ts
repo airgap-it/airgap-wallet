@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core'
+import { IAirGapTransaction } from 'airgap-coin-lib'
 
 import { Transaction } from '../../models/transaction.model'
 
@@ -9,7 +10,7 @@ import { Transaction } from '../../models/transaction.model'
 })
 export class FromToComponent {
   @Input()
-  public transaction: Transaction
+  public transaction: Transaction | IAirGapTransaction
 
   public displayRawData: boolean = false
 }
