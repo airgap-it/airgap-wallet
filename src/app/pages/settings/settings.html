@@ -89,7 +89,7 @@
     </ion-item>
     <ion-item>
       {{ 'settings.qr.enable-new-serializer_label' | translate }}
-      <ion-toggle [(ngModel)]="serializerService.useV2" (ionChange)="switchSerializerVersion($event)" slot="end"></ion-toggle>
+      <ion-toggle [(ngModel)]="serializerService.useV2" slot="end"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>
@@ -97,16 +97,7 @@
       </ion-label>
     </ion-item>
     <ion-item>
-      <ion-range
-        [(ngModel)]="serializerService.displayTimePerChunk "
-        (ionChange)="qrMsChanged($event)"
-        min="50"
-        max="2000"
-        step="50"
-        pin
-        snaps="true"
-        color="secondary"
-      >
+      <ion-range [(ngModel)]="serializerService.displayTimePerChunk " min="50" max="2000" step="50" pin snaps="true" color="secondary">
         <ion-label slot="start">50 ms</ion-label>
         <ion-label slot="end">2000 ms</ion-label>
       </ion-range>
@@ -117,16 +108,7 @@
       </ion-label>
     </ion-item>
     <ion-item>
-      <ion-range
-        [(ngModel)]="serializerService.chunkSize"
-        (ionChange)="qrBytesChanged($event)"
-        min="10"
-        max="500"
-        step="10"
-        pin
-        snaps="true"
-        color="secondary"
-      >
+      <ion-range [(ngModel)]="serializerService.chunkSize" min="10" max="500" step="10" pin snaps="true" color="secondary">
         <ion-label slot="start">10 bytes</ion-label>
         <ion-label slot="end">500 bytes</ion-label>
       </ion-range>

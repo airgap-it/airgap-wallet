@@ -119,6 +119,7 @@ export class OperationsProvider {
       } else {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
+
       const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
