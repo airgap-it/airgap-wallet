@@ -8,6 +8,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:stats": "ng build --stats-json",
+    "build:analyze": "npm run build:stats && webpack-bundle-analyzer ./www/stats.json",
     "lint": "ng lint",
     "sonar-scanner": "sonar-scanner",
     "clean": "ionic-app-scripts clean",
@@ -167,6 +169,7 @@
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "~3.5.3",
     "uglify-js": "^3.6.7",
+    "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.1",
     "ws": "^6.2.1",
     "xcode": "^2.0.0"
