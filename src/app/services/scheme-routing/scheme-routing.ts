@@ -9,7 +9,7 @@ import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-enum IACResult {
+export enum IACResult {
   SUCCESS = 0,
   PARTIAL = 1,
   ERROR = 2
