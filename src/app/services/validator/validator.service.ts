@@ -1,7 +1,7 @@
-import { CosmosProtocol } from 'airgap-coin-lib'
-import { BigNumber } from 'bignumber.js'
 import { Injectable } from '@angular/core'
-import { CosmosValidator, CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
+import { CosmosProtocol } from 'airgap-coin-lib'
+import { CosmosDelegation, CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
+import { BigNumber } from 'bignumber.js'
 
 export interface Uptime {
   address: string
@@ -25,7 +25,8 @@ export class ValidatorService {
   public async getValidatorInfo(address: string): Promise<CosmosValidatorInfo> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     try {
-      const validator = await this.protocol.fetchValidator(address)
+      const validator: CosmosValidator = await this.protocol.fetchValidator(address)
+
       return {
         alias: validator.description.moniker,
         rate: `${(parseFloat(validator.commission.rate) * 100).toString()}%`,
@@ -47,9 +48,14 @@ export class ValidatorService {
   }
 
   public async fetchVotingPower(address: string): Promise<BigNumber> {
-    const validators = await this.protocol.fetchValidators()
-    const validatedAmount = new BigNumber(validators.find(validator => validator.operator_address === address).delegator_shares)
-    const totalDelegatedAmount = new BigNumber(validators.map(validator => parseFloat(validator.delegator_shares)).reduce((a, b) => a + b))
+    const validators: CosmosValidator[] = await this.protocol.fetchValidators()
+    const validatedAmount = new BigNumber(
+      validators.find((validator: CosmosValidator) => validator.operator_address === address).delegator_shares
+    )
+    const totalDelegatedAmount = new BigNumber(
+      validators.map((validator: CosmosValidator) => parseFloat(validator.delegator_shares)).reduce((a, b) => a + b)
+    )
+
     return validatedAmount.div(totalDelegatedAmount)
   }
 
@@ -58,12 +64,14 @@ export class ValidatorService {
   }
 
   public async fetchSelfDelegation(address: string): Promise<BigNumber> {
-    const selfDelegation = await this.protocol.fetchSelfDelegation(address)
+    const selfDelegation: CosmosDelegation = await this.protocol.fetchSelfDelegation(address)
+
     return new BigNumber(selfDelegation.shares)
   }
 
   public async fetchTotalDelegatedAmount(address: string): Promise<BigNumber> {
-    const delegations = await this.protocol.fetchDelegations(address)
+    const delegations: CosmosDelegation[] = await this.protocol.fetchDelegations(address)
+
     return new BigNumber(delegations.map(delegation => parseFloat(delegation.shares)).reduce((a, b) => a + b, 0))
   }
 

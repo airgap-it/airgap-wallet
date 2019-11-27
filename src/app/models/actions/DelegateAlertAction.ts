@@ -39,7 +39,7 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
   }
 
   private async showAlert(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>(async resolve => {
       const translatedAlert: AlertOptions = await this.context.languageService.getTranslatedAlert(
         'action-alert-delegation.heading',
         'action-alert-delegation.text',

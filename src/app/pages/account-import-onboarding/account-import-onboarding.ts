@@ -27,7 +27,7 @@ export class AccountImportOnboardingPage implements OnInit {
     pagination: {
       el: '.swiper-pagination',
       type: 'custom',
-      renderCustom: (swiper, current, total) => {
+      renderCustom: (_swiper, current, total): string => {
         return this.customProgressBar(current, total)
       }
     }
@@ -52,22 +52,17 @@ export class AccountImportOnboardingPage implements OnInit {
     }
   }
 
-  public ionSlideDidChange() {
-    this.slides.getActiveIndex().then(val => {
-      if (val == 0) {
-        this.isBegin = true
-      } else {
-        this.isBegin = false
-      }
-      if (val == 3) {
-        this.isEnd = true
-      } else {
-        this.isEnd = false
-      }
-    })
+  public ionSlideDidChange(): void {
+    this.slides
+      .getActiveIndex()
+      .then((val: number) => {
+        this.isBegin = val === 0
+        this.isEnd = val === 3
+      })
+      .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  public openVault() {
+  public openVault(): void {
     this.deeplinkProvider
       .sameDeviceDeeplink(`${DEEPLINK_VAULT_ADD_ACCOUNT}${this.protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))

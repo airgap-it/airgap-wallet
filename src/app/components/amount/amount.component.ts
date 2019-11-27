@@ -1,8 +1,9 @@
-import { BigNumber } from 'bignumber.js'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { FormGroup, FormBuilder, Validators } from '@angular/forms'
-import { Component, Input, EventEmitter, Output } from '@angular/core'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { BigNumber } from 'bignumber.js'
+
+import { DecimalValidator } from '../../validators/DecimalValidator'
 
 @Component({
   selector: 'amount',
@@ -24,7 +25,7 @@ export class AmountComponent {
   public disabled: boolean = false
 
   @Output()
-  public amountEmitter: EventEmitter<BigNumber> = new EventEmitter<BigNumber>()
+  public readonly amountEmitter: EventEmitter<BigNumber> = new EventEmitter<BigNumber>()
 
   constructor(public formBuilder: FormBuilder) {
     this.delegationForm = this.formBuilder.group({
@@ -45,7 +46,7 @@ export class AmountComponent {
     }
   }
 
-  onChanges(): void {
+  public onChanges(): void {
     this.delegationForm.valueChanges.subscribe((val: any) => {
       if (val && val.amount) {
         this.amountEmitter.emit(new BigNumber(val.amount).shiftedBy(this.wallet.coinProtocol.decimals))

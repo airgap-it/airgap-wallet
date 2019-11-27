@@ -4,10 +4,10 @@ import { AlertController, LoadingController, Platform, ToastController } from '@
 import {
   AirGapMarketWallet,
   getProtocolByIdentifier,
+  IACMessageDefinitionObject,
   ICoinProtocol,
   SignedTransaction,
-  TezosKtProtocol,
-  IACMessageDefinitionObject
+  TezosKtProtocol
 } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -73,18 +73,15 @@ export class TransactionConfirmPage {
 
     loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-    const interval = setTimeout(() => {
+    const interval = setTimeout(async () => {
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      const toast = this.toastCtrl
-        .create({
-          duration: TOAST_DURATION,
-          message: 'Transaction queued. It might take some time until your TX shows up!',
-          showCloseButton: true,
-          position: 'bottom'
-        })
-        .then(toast => {
-          toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        })
+      const toast: HTMLIonToastElement = await this.toastCtrl.create({
+        duration: TOAST_DURATION,
+        message: 'Transaction queued. It might take some time until your TX shows up!',
+        showCloseButton: true,
+        position: 'bottom'
+      })
+      toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
 
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)

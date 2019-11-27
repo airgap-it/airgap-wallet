@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 @Pipe({
@@ -12,6 +11,7 @@ export class PercentagePipe implements PipeTransform {
     }
     const amount = new BigNumber(value)
     const percentage = amount.shiftedBy(2).toFixed(2)
+
     return `${percentage}%`
   }
 }

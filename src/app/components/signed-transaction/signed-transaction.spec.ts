@@ -1,9 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { SignedTransactionComponent } from './signed-transaction'
-import { Serializer, IACMessageType } from 'airgap-coin-lib'
 
 describe('SignedTransactionComponent', () => {
   let signedTransactionFixture: ComponentFixture<SignedTransactionComponent>

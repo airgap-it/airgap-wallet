@@ -1,20 +1,18 @@
-import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { BigNumber } from 'bignumber.js'
-import { promiseTimeout } from 'src/app/helpers/promise-timeout'
-import { AirGapTezosMigrateAction } from 'src/app/models/actions/TezosMigrateAction'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
+import { promiseTimeout } from '../../helpers/promise-timeout'
 import { ActionGroup } from '../../models/ActionGroup'
 import { AirGapTezosDelegateAction } from '../../models/actions/TezosDelegateAction'
+import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -23,7 +21,6 @@ import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
-import { WalletActionInfo } from './../../models/ActionGroup'
 // import 'core-js/es7/object'
 
 declare let cordova
@@ -63,21 +60,21 @@ export class AccountTransactionListPage {
   private readonly actionGroup: ActionGroup
 
   constructor(
-    private readonly route: ActivatedRoute,
-    private readonly platform: Platform,
     public readonly alertCtrl: AlertController,
-    private readonly storageProvider: StorageProvider,
-    private readonly toastController: ToastController,
-    private readonly loadingController: LoadingController,
-    private readonly pushBackendProvider: PushBackendProvider,
-    public readonly location: Location,
+    public readonly navController: NavController,
     public readonly router: Router,
     public readonly translateService: TranslateService,
     public readonly operationsProvider: OperationsProvider,
     public readonly popoverCtrl: PopoverController,
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
-    public readonly dataService: DataService
+    public readonly dataService: DataService,
+    private readonly route: ActivatedRoute,
+    private readonly platform: Platform,
+    private readonly storageProvider: StorageProvider,
+    private readonly toastController: ToastController,
+    private readonly loadingController: LoadingController,
+    private readonly pushBackendProvider: PushBackendProvider
   ) {
     const info = this.route.snapshot.data.special
     if (this.route.snapshot.data.special) {
@@ -101,7 +98,7 @@ export class AccountTransactionListPage {
     this.init()
   }
 
-  public async init() {
+  public async init(): Promise<void> {
     const lastTx: {
       protocol: string
       accountIdentifier: string
@@ -118,15 +115,15 @@ export class AccountTransactionListPage {
     }
   }
 
-  public showNoTransactionScreen() {
+  public showNoTransactionScreen(): boolean {
     return this.transactions.length === 0
   }
 
-  public ionViewWillEnter() {
+  public ionViewWillEnter(): void {
     this.doRefresh()
   }
 
-  public openPreparePage() {
+  public openPreparePage(): void {
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
@@ -148,23 +145,23 @@ export class AccountTransactionListPage {
     }
   }
 
-  public openReceivePage() {
+  public openReceivePage(): void {
     this.dataService.setData(DataServiceKey.DETAIL, this.wallet)
     this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public openTransactionDetailPage(transaction: IAirGapTransaction) {
+  public openTransactionDetailPage(transaction: IAirGapTransaction): void {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
     this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public openBlockexplorer() {
+  public openBlockexplorer(): void {
     const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.openUrl(blockexplorer)
   }
 
-  private openUrl(url: string) {
+  private openUrl(url: string): void {
     if (this.platform.is('ios') || this.platform.is('android')) {
       cordova.InAppBrowser.open(url, '_system', 'location=true')
     } else {
@@ -172,7 +169,7 @@ export class AccountTransactionListPage {
     }
   }
 
-  public doRefresh(event: any = null) {
+  public doRefresh(event: any = null): void {
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.operationsProvider.refreshAllDelegationStatuses()
     }
@@ -186,13 +183,13 @@ export class AccountTransactionListPage {
     this.loadInitialTransactions().catch(handleErrorSentry())
   }
 
-  public async doInfinite(event) {
+  public async doInfinite(event): Promise<void> {
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
 
-    const offset = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
-    const newTransactions = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
+    const offset: number = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
+    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
     this.txOffset = this.transactions.length
@@ -231,7 +228,7 @@ export class AccountTransactionListPage {
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
     // remove duplicates from pendingTransactions
-    const txHashes = this.transactions.map(value => value.hash)
+    const txHashes: string[] = this.transactions.map(value => value.hash)
     this.pendingTransactions = this.pendingTransactions.filter(value => {
       return txHashes.indexOf(value.hash) === -1
     })
@@ -256,16 +253,19 @@ export class AccountTransactionListPage {
   }
 
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
-    const results = await Promise.all([this.wallet.fetchTransactions(limit, offset), this.wallet.synchronize()])
+    const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
+      this.wallet.fetchTransactions(limit, offset),
+      this.wallet.synchronize()
+    ])
 
-    return results[0]
+    return transactions
   }
 
-  public mergeTransactions(oldTransactions, newTransactions): IAirGapTransaction[] {
+  public mergeTransactions(oldTransactions: IAirGapTransaction[], newTransactions: IAirGapTransaction[]): IAirGapTransaction[] {
     if (!oldTransactions) {
       return newTransactions
     }
-    const transactionMap = new Map<string, IAirGapTransaction>(
+    const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
       oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
     )
 
@@ -276,15 +276,15 @@ export class AccountTransactionListPage {
     return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
   }
 
-  public async presentEditPopover(event) {
+  public async presentEditPopover(event): Promise<void> {
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        onDelete: () => {
-          this.location.back()
+        onDelete: (): void => {
+          this.navController.back()
         },
-        onUndelegate: async () => {
+        onUndelegate: async (): Promise<void> => {
           // TODO: Should we move this to it's own file?
           const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction({
             wallet: this.wallet,
@@ -331,16 +331,13 @@ export class AccountTransactionListPage {
     }
   }
 
-  public showToast(message: string) {
-    this.toastController
-      .create({
-        duration: 3000,
-        message,
-        showCloseButton: true,
-        position: 'bottom'
-      })
-      .then(toast => {
-        toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      })
+  public async showToast(message: string): Promise<void> {
+    const toast: HTMLIonToastElement = await this.toastController.create({
+      duration: 3000,
+      message,
+      showCloseButton: true,
+      position: 'bottom'
+    })
+    toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

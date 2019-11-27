@@ -1,11 +1,11 @@
-import { async, TestBed } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { SplashScreen } from '@ionic-native/splash-screen'
 import { StatusBar } from '@ionic-native/status-bar'
-import { AlertController, NavController, Platform } from '@ionic/angular'
+import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 
-import { AlertControllerMock, PlatformMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
+import { PlatformMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
@@ -13,8 +13,8 @@ import { SchemeRoutingProvider } from './scheme-routing'
 
 describe('SchemeRoutingProvider Provider', () => {
   let schemeRoutingProvider: SchemeRoutingProvider
-  let storageProvider: Storage
-  let navController: NavController
+  // let storageProvider: Storage
+  // let navController: NavController
   let router: Router
 
   let unitHelper: UnitHelper
@@ -38,8 +38,9 @@ describe('SchemeRoutingProvider Provider', () => {
 
   beforeEach(() => {
     schemeRoutingProvider = TestBed.get(SchemeRoutingProvider)
-    storageProvider = TestBed.get(Storage)
-    navController = TestBed.get(NavController)
+    router = TestBed.get(Router)
+    // storageProvider = TestBed.get(Storage)
+    // navController = TestBed.get(NavController)
   })
 
   it('should be created', () => {

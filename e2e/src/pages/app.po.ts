@@ -1,5 +1,4 @@
 // tslint:disable:no-implicit-dependencies
-import { by, element, ElementFinder } from 'protractor'
 
 import { PageObjectBase } from '../base.po'
 

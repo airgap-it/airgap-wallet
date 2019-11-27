@@ -1,27 +1,21 @@
 import { Component } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, ToastController } from '@ionic/angular'
-import {
-  AirGapMarketWallet,
-  CosmosProtocol,
-  IACMessageDefinitionObject,
-  IACMessageType,
-  Serializer,
-  UnsignedCosmosTransaction
-} from 'airgap-coin-lib'
+import { LoadingController, ToastController } from '@ionic/angular'
+import { AirGapMarketWallet, CosmosProtocol, IAirGapTransaction } from 'airgap-coin-lib'
 import { CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import BigNumber from 'bignumber.js'
-import { DataService } from 'src/app/services/data/data.service'
-import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+
+import { DataService } from '../../services/data/data.service'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { serializedDataToUrlString } from '../../utils/utils'
+import { DecimalValidator } from '../../validators/DecimalValidator'
+
 import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
 import { DataServiceKey } from './../../services/data/data.service'
 import { OperationsProvider } from './../../services/operations/operations'
-import { ProtocolSymbols } from './../../services/protocols/protocols'
 import { CosmosValidatorInfo, ValidatorService } from './../../services/validator/validator.service'
-import { serializedDataToUrlString } from '../../utils/utils'
 
 @Component({
   selector: 'page-delegation-cosmos',
@@ -78,7 +72,7 @@ export class DelegationCosmosPage {
     }
   }
 
-  public async ionViewDidEnter() {
+  public async ionViewDidEnter(): Promise<void> {
     await this.checkAddressDelegations()
     await this.getValidatorInfo()
   }
@@ -89,15 +83,15 @@ export class DelegationCosmosPage {
     })
   }
 
-  public async checkAddressDelegations() {
-    const address = this.wallet.addresses[0]
-    const protocol = new CosmosProtocol()
+  public async checkAddressDelegations(): Promise<void> {
+    const address: string = this.wallet.addresses[0]
+    const protocol: CosmosProtocol = new CosmosProtocol()
     const delegations: CosmosDelegation[] = await protocol.fetchDelegations(address)
-    const index = delegations.findIndex(delegation => delegation.validator_address === this.validatorAddress)
+    const index: number = delegations.findIndex((delegation: CosmosDelegation) => delegation.validator_address === this.validatorAddress)
     if (index > -1) {
-      const delegation = delegations[index]
+      const delegation: CosmosDelegation = delegations[index]
       this.addressDelegated = true
-      const rawDelegatedAmount = new BigNumber(parseFloat(delegation.shares))
+      const rawDelegatedAmount: BigNumber = new BigNumber(parseFloat(delegation.shares))
       this.delegatedAmount = rawDelegatedAmount
     } else {
       this.addressDelegated = false
@@ -105,7 +99,7 @@ export class DelegationCosmosPage {
     }
     this.totalDelegatedAmount = await this.validatorService.fetchTotalDelegatedAmount(address)
     this.votingPower = await this.validatorService.fetchVotingPower(this.validatorAddress)
-    const rawDelegatableBalance = new BigNumber(this.wallet.currentBalance - this.totalDelegatedAmount.toNumber())
+    const rawDelegatableBalance: BigNumber = new BigNumber(this.wallet.currentBalance - this.totalDelegatedAmount.toNumber())
     this.delegatableBalance = rawDelegatableBalance
 
     if (this.delegatableBalance.lt(this.wallet.coinProtocol.feeDefaults.low)) {
@@ -113,7 +107,7 @@ export class DelegationCosmosPage {
     }
   }
 
-  public async getValidatorInfo() {
+  public async getValidatorInfo(): Promise<void> {
     this.selfDelegationBalance = await this.validatorService.fetchSelfDelegation(this.validatorAddress)
 
     this.validatorInfo = await this.validatorService.getValidatorInfo(this.validatorAddress)
@@ -125,7 +119,7 @@ export class DelegationCosmosPage {
       .div(this.totalDelegationBalance)
       .times(100)
       .toFixed(2)}%`
-    const rawDelegationReward = await this.fetchRewardForDelegation(this.wallet.addresses[0], this.validatorAddress)
+    const rawDelegationReward: BigNumber = await this.fetchRewardForDelegation(this.wallet.addresses[0], this.validatorAddress)
     this.delegationReward = rawDelegationReward.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
   }
 
@@ -155,43 +149,28 @@ export class DelegationCosmosPage {
     })
   }
   public async withdrawDelegationRewards(): Promise<void> {
-    console.log('withdrawDelegationRewards')
-
-    const protocol = new CosmosProtocol()
+    const protocol: CosmosProtocol = new CosmosProtocol()
     const cosmosTransaction: CosmosTransaction = await protocol.withdrawDelegationRewards(this.wallet.publicKey, [this.validatorAddress])
-    console.log('cosmosTransaction', cosmosTransaction)
-    const serializer: Serializer = new Serializer()
 
-    const unsignedCosmosTx: UnsignedCosmosTransaction = {
-      publicKey: this.wallet.publicKey,
-      transaction: cosmosTransaction
-    }
+    const serializedTxs: string[] = await this.operationsProvider.serializeTx(this.wallet, cosmosTransaction)
 
-    const transaction: IACMessageDefinitionObject = {
-      protocol: protocol.identifier,
-      type: IACMessageType.TransactionSignRequest,
-      payload: unsignedCosmosTx
-    }
-
-    const serializedTx = await this.operationsProvider.serializeTx(this.wallet, cosmosTransaction)
-    console.log('serializedTx', serializedTx)
-
-    const airGapTxs = cosmosTransaction.toAirGapTransactions('cosmos')
+    const airGapTxs: IAirGapTransaction[] = cosmosTransaction.toAirGapTransactions('cosmos')
     const info = {
       wallet: this.wallet,
       airGapTxs,
-      data: serializedDataToUrlString(serializedTx)
+      data: serializedDataToUrlString(serializedTxs)
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async fetchRewardForDelegation(delegatorAddress: string, validatorAddress: string): Promise<BigNumber> {
-    const protocol = new CosmosProtocol()
+    const protocol: CosmosProtocol = new CosmosProtocol()
+
     return protocol.fetchRewardForDelegation(delegatorAddress, validatorAddress)
   }
 
-  public setFormAmount(amount: any) {
+  public setFormAmount(amount: BigNumber): void {
     this.amount = amount
   }
 }

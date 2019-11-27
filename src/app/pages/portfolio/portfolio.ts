@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
 import { Observable, ReplaySubject } from 'rxjs'
 
@@ -109,7 +108,7 @@ export class PortfolioPage {
   public openDetail(mainWallet: AirGapMarketWallet, subWallet?: AirGapMarketWallet) {
     const info = subWallet
       ? {
-          mainWallet: mainWallet,
+          mainWallet,
           wallet: subWallet
         }
       : {

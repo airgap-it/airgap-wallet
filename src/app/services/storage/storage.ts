@@ -32,7 +32,7 @@ interface IBroadcastTransaction {
   date: number
 }
 
-type SettingsKeyReturnType = {
+interface SettingsKeyReturnType {
   [SettingsKey.INTRODUCTION]: boolean
   [SettingsKey.WALLET_INTRODUCTION]: boolean
   [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean

@@ -1,7 +1,6 @@
-import { AirGapCosmosDelegateActionContext, AirGapCosmosDelegateAction } from './actions/CosmosDelegateAction'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action, LinkedAction, SimpleAction } from 'airgap-coin-lib/dist/actions/Action'
-import { ImportAccountAction } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
+import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
@@ -11,8 +10,10 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
+import { AirGapCosmosDelegateAction, AirGapCosmosDelegateActionContext } from './actions/CosmosDelegateAction'
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
-import { CosmosDelegateAction } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
+import { TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
+import { CosmosDelegateActionResult } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
 
 export interface WalletActionInfo {
   name: string
@@ -43,15 +44,15 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any>[] {
-    const importButtonAction = new ButtonAction(
+    const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
       { name: 'account-transaction-list.import-accounts_label', icon: 'add', identifier: 'import-accounts' },
       () => {
-        const importAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
+        const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
           if (ktAddresses.length === 0) {
             this.callerContext.showToast('No accounts to import.')
           } else {
-            for (const [index, ktAddress] of ktAddresses.entries()) {
+            for (const [index] of ktAddresses.entries()) {
               await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, index, ktAddresses)
             }
 
@@ -63,12 +64,12 @@ export class ActionGroup {
         return importAccountAction
       }
     )
-    const delegateButtonAction = new ButtonAction(
+    const delegateButtonAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
-        const prepareDelegateActionContext = new SimpleAction(() => {
+        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
           return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
-            let wallet: AirGapMarketWallet = this.callerContext.wallet
+            const wallet: AirGapMarketWallet = this.callerContext.wallet
             const info = {
               wallet,
               actionCallback: resolve
@@ -79,19 +80,23 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapTezosDelegateAction)
+        const delegateAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
+          prepareDelegateActionContext,
+          AirGapTezosDelegateAction
+        )
 
         return delegateAction
       }
     )
+
     return [delegateButtonAction, importButtonAction]
   }
 
   private getTezosKTActions(): Action<any, any>[] {
-    const migrateAction = new ButtonAction(
+    const migrateAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
       { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
       () => {
-        const prepareDelegateActionContext = new SimpleAction(() => {
+        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
           return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
             const info = {
               wallet: this.callerContext.wallet,
@@ -103,21 +108,25 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const viewDelegationAction = new LinkedAction(prepareDelegateActionContext, AirGapTezosDelegateAction)
+        const viewDelegationAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
+          prepareDelegateActionContext,
+          AirGapTezosDelegateAction
+        )
 
         return viewDelegationAction
       }
     )
+
     return [migrateAction]
   }
 
   private getCosmosActions(): Action<any, any>[] {
-    const delegateButtonAction = new ButtonAction(
+    const delegateButtonAction: ButtonAction<CosmosDelegateActionResult, void> = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
-        const prepareDelegateActionContext = new SimpleAction(() => {
+        const prepareDelegateActionContext: SimpleAction<AirGapCosmosDelegateActionContext> = new SimpleAction(() => {
           return new Promise<AirGapCosmosDelegateActionContext>(async resolve => {
-            let wallet: AirGapMarketWallet = this.callerContext.wallet
+            const wallet: AirGapMarketWallet = this.callerContext.wallet
             const info = {
               wallet,
               actionCallback: resolve
@@ -128,7 +137,10 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const delegateAction = new LinkedAction(prepareDelegateActionContext, AirGapCosmosDelegateAction)
+        const delegateAction: LinkedAction<CosmosDelegateActionResult, AirGapCosmosDelegateActionContext> = new LinkedAction(
+          prepareDelegateActionContext,
+          AirGapCosmosDelegateAction
+        )
 
         return delegateAction
       }
@@ -138,10 +150,10 @@ export class ActionGroup {
   }
 
   private getEthereumActions(): Action<any, any>[] {
-    const addTokenButtonAction = new ButtonAction(
+    const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
       () => {
-        const prepareAddTokenActionContext = new SimpleAction(() => {
+        const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
           return new Promise<AddTokenActionContext>(async resolve => {
             const info = {
               subProtocolType: SubProtocolType.TOKEN,
@@ -154,7 +166,7 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+        const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
         addTokenAction.onComplete = async (): Promise<void> => {
           addTokenAction.getLinkedAction().context.location.back()
         }

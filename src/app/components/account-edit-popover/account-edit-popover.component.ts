@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
@@ -15,7 +15,7 @@ declare let cordova
   templateUrl: 'account-edit-popover.component.html',
   styleUrls: ['./account-edit-popover.component.scss']
 })
-export class AccountEditPopoverComponent {
+export class AccountEditPopoverComponent implements OnInit {
   private readonly wallet: AirGapMarketWallet
   private readonly onDelete: Function
   private readonly onUndelegate: Function
@@ -39,19 +39,19 @@ export class AccountEditPopoverComponent {
     this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
-  public async copyAddressToClipboard() {
+  public async copyAddressToClipboard(): Promise<void> {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
     await this.dismissPopover()
   }
 
-  public openBlockExplorer() {
+  public openBlockExplorer(): void {
     const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocolIdentifier)
 
     let blockexplorer: string = protocol.blockExplorer
     blockexplorer = protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
     this.openUrl(blockexplorer)
   }
-  private openUrl(url: string) {
+  private openUrl(url: string): void {
     if (this.platform.is('ios') || this.platform.is('android')) {
       cordova.InAppBrowser.open(url, '_system', 'location=true')
     } else {
@@ -59,7 +59,7 @@ export class AccountEditPopoverComponent {
     }
   }
 
-  public async ngOnInit() {
+  public async ngOnInit(): Promise<void> {
     // tezos
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
@@ -70,7 +70,7 @@ export class AccountEditPopoverComponent {
     // tezos end
   }
 
-  public async undelegate() {
+  public async undelegate(): Promise<void> {
     await this.dismissPopover()
     if (this.onUndelegate) {
       this.onUndelegate()
@@ -79,43 +79,40 @@ export class AccountEditPopoverComponent {
     }
   }
 
-  public delete() {
-    const alert = this.alertCtrl
-      .create({
-        header: this.translateService.instant('account-edit-popover-component.header'),
-        message: this.translateService.instant('account-edit-popover-component.message'),
-        buttons: [
-          {
-            text: this.translateService.instant('account-edit-popover-component.cancel'),
-            role: 'cancel',
-            handler: () => {
-              this.dismissPopover()
-            }
-          },
-          {
-            text: this.translateService.instant('account-edit-popover-component.delete'),
-            handler: () => {
-              this.walletsProvider
-                .removeWallet(this.wallet)
-                .then(() => {
-                  this.dismissPopover()
-                  if (this.onDelete) {
-                    this.onDelete()
-                  } else {
-                    handleErrorSentry(ErrorCategory.OTHER)('onDelete not defined')
-                  }
-                })
-                .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-            }
+  public async delete(): Promise<void> {
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('account-edit-popover-component.header'),
+      message: this.translateService.instant('account-edit-popover-component.message'),
+      buttons: [
+        {
+          text: this.translateService.instant('account-edit-popover-component.cancel'),
+          role: 'cancel',
+          handler: () => {
+            this.dismissPopover()
           }
-        ]
-      })
-      .then(alert => {
-        alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      })
+        },
+        {
+          text: this.translateService.instant('account-edit-popover-component.delete'),
+          handler: () => {
+            this.walletsProvider
+              .removeWallet(this.wallet)
+              .then(() => {
+                this.dismissPopover()
+                if (this.onDelete) {
+                  this.onDelete()
+                } else {
+                  handleErrorSentry(ErrorCategory.OTHER)('onDelete not defined')
+                }
+              })
+              .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+          }
+        }
+      ]
+    })
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
-  public dismissPopover() {
+  public dismissPopover(): Promise<boolean | void> {
     return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

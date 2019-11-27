@@ -68,11 +68,11 @@ export class TransactionPreparePage {
   }
 
   public onChanges(): void {
-    this.transactionForm.get('amount').valueChanges.subscribe(val => {
+    this.transactionForm.get('amount').valueChanges.subscribe(() => {
       this.sendMaxAmount = false
     })
 
-    this.transactionForm.get('fee').valueChanges.subscribe(val => {
+    this.transactionForm.get('fee').valueChanges.subscribe((val: string) => {
       if (this.sendMaxAmount) {
         this.setMaxAmount(val)
       }
@@ -117,7 +117,7 @@ export class TransactionPreparePage {
     } else if (this.wallet.protocolIdentifier === 'xtz-kt' && this.forceMigration) {
       if (this.forceMigration) {
         this._ngZone.run(() => {
-          const protocol = this.wallet.coinProtocol as TezosKtProtocol
+          const protocol: TezosKtProtocol = this.wallet.coinProtocol as TezosKtProtocol
           this.transactionForm.controls.fee.setValue(
             protocol.migrationFee
               .shiftedBy(-protocol.feeDecimals)
