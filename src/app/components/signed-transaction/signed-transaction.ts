@@ -1,16 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import {
-  ICoinProtocol,
-  Serializer,
-  getProtocolByIdentifier,
-  IAirGapTransaction,
-  SignedTransaction,
-  IACMessageDefinitionObject
-} from 'airgap-coin-lib'
+import { getProtocolByIdentifier, IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import BigNumber from 'bignumber.js'
-import { SerializerService } from 'src/app/services/serializer/serializer.service'
+import { SerializerService } from '../../services/serializer/serializer.service'
 
 @Component({
   selector: 'signed-transaction',

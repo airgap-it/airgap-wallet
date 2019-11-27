@@ -14,14 +14,13 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
-import BigNumber from 'bignumber.js'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
   const ethTransaction = new WalletMock().ethTransaction
 
-  const btcWallet = new WalletMock().btcWallet
-  const btcTransaction = new WalletMock().btcTransaction
+  // const btcWallet = new WalletMock().btcWallet
+  // const btcTransaction = new WalletMock().btcTransaction
 
   let fixture: ComponentFixture<TransactionPreparePage>
   let component: TransactionPreparePage
@@ -126,27 +125,27 @@ describe('TransactionPrepare Page', () => {
     component.setWallet(ethWallet)
     const validAmounts = [19, 108, 4.345234523452345, 0.0000000000000001, 0.0000000000000001]
     validAmounts.forEach(validAmount => {
-      component.transactionForm.controls['amount'].setValue(validAmount)
+      component.transactionForm.controls.amount.setValue(validAmount)
       fixture.detectChanges()
 
-      expect(fixture.componentInstance.transactionForm.controls['amount'].valid).toBe(true)
+      expect(fixture.componentInstance.transactionForm.controls.amount.valid).toBe(true)
     })
 
     const invalidAmounts = [0.0000000000000000001, -1.24]
     invalidAmounts.forEach(invalidAmount => {
       component.setWallet(ethWallet)
-      component.transactionForm.controls['amount'].setValue(invalidAmount)
+      component.transactionForm.controls.amount.setValue(invalidAmount)
       fixture.detectChanges()
 
-      expect(fixture.componentInstance.transactionForm.controls['amount'].valid).toBe(false)
+      expect(fixture.componentInstance.transactionForm.controls.amount.valid).toBe(false)
     })
   })
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
     // TODO: Move this test to "operationsProvider"
-    component.transactionForm.controls['address'].setValue(ethWallet.addresses[0])
-    component.transactionForm.controls['amount'].setValue(10)
-    component.transactionForm.controls['fee'].setValue(10)
+    component.transactionForm.controls.address.setValue(ethWallet.addresses[0])
+    component.transactionForm.controls.amount.setValue(10)
+    component.transactionForm.controls.fee.setValue(10)
 
     await component.prepareTransaction()
     /*

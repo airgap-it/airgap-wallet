@@ -1,8 +1,5 @@
 // tslint:disable:no-implicit-dependencies
-import * as fs from 'fs'
 import { browser, by, element, ElementFinder, ExpectedConditions, promise } from 'protractor'
-
-import { slugify } from './utils'
 
 export class PageObjectBase {
   private readonly time: Date

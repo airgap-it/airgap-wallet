@@ -41,7 +41,7 @@ export class ScanBasePage {
   public ionViewDidEnter(): void {
     if (!this.platform.is('cordova')) {
       this.hasCameraPermission = true
-      this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
+      this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
       if (this.selectedDevice) {

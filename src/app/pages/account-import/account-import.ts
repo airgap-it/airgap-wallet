@@ -71,18 +71,16 @@ export class AccountImportPage {
       )
 
       if (!this.walletImportable) {
-        const alert = this.alertCtrl
-          .create({
-            header: 'Account Not Supported',
-            message: 'We currently only support Ethereum and Aeternity accounts.'
-          })
-          .then(alert => {
-            alert.present()
-          })
+        const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+          header: 'Account Not Supported',
+          message: 'We currently only support Ethereum and Aeternity accounts.'
+        })
+
+        alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
       }
     }
 
-    const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
+    const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
 
     airGapWorker.onmessage = event => {
       this.wallet.addresses = event.data.addresses

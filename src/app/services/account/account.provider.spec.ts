@@ -67,7 +67,7 @@ describe('AccountProvider', () => {
   })
 
   it('should successfully add and persist BTC wallets', async () => {
-    let wallet = new AirGapMarketWallet(
+    const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       'btc',
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
@@ -80,15 +80,15 @@ describe('AccountProvider', () => {
   })
 
   it('should update wallet observalbe when adding a wallet', async done => {
-    let wallet = new AirGapMarketWallet(
+    const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       'btc',
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`
     )
 
-    let numOfTimesCalled = 0
-    accountProvider.wallets.subscribe(values => {
+    let numOfTimesCalled: number = 0
+    accountProvider.wallets.subscribe(() => {
       numOfTimesCalled++
       if (numOfTimesCalled >= 3) {
         // Needs to be 3 times

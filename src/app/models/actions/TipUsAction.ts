@@ -49,7 +49,7 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
   }
 
   private async showAlert(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>(async resolve => {
       const translatedAlert: AlertOptions = await this.context.languageService.getTranslatedAlert(
         'action-alert-tip.heading',
         'action-alert-tip.text',

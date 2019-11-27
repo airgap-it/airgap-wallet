@@ -3,15 +3,6 @@ import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtoco
 
 import { tokens } from './tokens'
 
-interface SubProtocolInfo {
-  symbol: string
-  name: string
-  marketSymbol: string
-
-  identifier: string
-  data: [string]
-}
-
 interface SubAccount {
   protocol: string
   subProtocols: GenericERC20Configuration[]

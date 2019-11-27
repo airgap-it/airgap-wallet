@@ -1,5 +1,4 @@
-import { TezosKtProtocol } from 'airgap-coin-lib'
-import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
+import { ImportAccountAction } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 
 import { WalletActionInfo } from '../ActionGroup'
 
