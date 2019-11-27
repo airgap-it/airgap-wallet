@@ -16,7 +16,7 @@
         <ion-row>
           <ion-col class="balance__container ion-no-padding">
             <ion-row>
-              <p class="ion-no-margin" class="font--size__large">
+              <p class="font--size__large ion-no-margin">
                 <strong>
                   {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
                   }}
@@ -170,7 +170,7 @@
       </ion-col>
     </ion-row>
     <ion-row class="ion-padding-horizontal" *ngIf="transactionForm.get('isAdvancedMode').value">
-      <ion-col size="12">
+      <ion-col size="12" class="ion-no-padding">
         <ion-item class="advanced-item" class="ion-no-padding">
           <ion-label position="stacked"></ion-label>
           <ion-input [attr.disabled]="forceMigration" id="fee-input" formControlName="fee" type="string" class="ion-no-padding"></ion-input>
