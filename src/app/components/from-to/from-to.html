@@ -42,9 +42,13 @@
 
   <address-row *ngFor="let address of transaction.to" [address]="address" label="{{ 'from-to.to_label' | translate }}"></address-row>
 
-  <ion-item class="ion-no-padding" lines="none">
-    <ion-label>{{ 'from-to.transaction-details_label' | translate }}</ion-label>
-    <ion-toggle [(ngModel)]="displayRawData" slot="end"></ion-toggle>
-  </ion-item>
-  <pre *ngIf="displayRawData" class="ion-no-margin">{{ transaction.transactionDetails | json }}</pre>
+  <ion-row class="rawdata--container" *ngIf="transaction.transactionDetails">
+    <ion-col class="ion-no-padding">
+      <ion-item class="ion-no-padding" lines="none">
+        <ion-label>{{ 'from-to.transaction-details_label' | translate }}</ion-label>
+        <ion-toggle [(ngModel)]="displayRawData" slot="end"></ion-toggle>
+      </ion-item>
+      <pre *ngIf="displayRawData" class="ion-no-margin">{{ transaction.transactionDetails | json }}</pre>
+    </ion-col>
+  </ion-row>
 </ng-container>
