@@ -1,3 +1,4 @@
+import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
 import {
@@ -116,6 +117,16 @@ export class OperationsProvider {
       if (wallet.coinProtocol.identifier === ProtocolSymbols.XTZ_KT) {
         const tezosKtProtocol = new TezosKtProtocol()
         rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
+      } else if (wallet.coinProtocol.identifier === ProtocolSymbols.TZBTC) {
+        const protocol = new TezosBTC()
+
+        rawUnsignedTx = await protocol.transfer(
+          wallet.addresses[0],
+          address,
+          amount.toString(10),
+          fee.times(20).toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
+          wallet.publicKey
+        )
       } else {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
