@@ -24,7 +24,7 @@ export enum ProtocolSymbols {
   ETH = 'eth',
   XTZ = 'xtz',
   XTZ_KT = 'xtz-kt',
-  TZBTC = 'tzbtc',
+  TZBTC = 'xtz-btc',
   COSMOS = 'cosmos'
 }
 

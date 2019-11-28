@@ -25,6 +25,7 @@ export class TransactionPreparePage {
 
   public sendMaxAmount = false
   public forceMigration = false
+  public disableFees = false
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -55,7 +56,9 @@ export class TransactionPreparePage {
         fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
         isAdvancedMode: [false, []]
       })
-
+      if (info.disableFees) {
+        this.disableFees = info.disableFees
+      }
       if (info.forceMigration) {
         this.forceMigration = info.forceMigration
         this.setMaxAmount('0')
@@ -202,7 +205,7 @@ export class TransactionPreparePage {
   private setMaxAmount(fee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
     const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.toNumber() > 0 ? amount.minus(new BigNumber(fee)) : 0
+    const amountWithoutFees = amount.minus(new BigNumber(fee)) > 0 ? amount.minus(new BigNumber(fee)) : 0
     this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
       emitEvent: false
     })

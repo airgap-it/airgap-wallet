@@ -146,7 +146,7 @@
       <ion-col size="12" class="ion-no-padding">
         <ion-item class="ion-no-padding" lines="none">
           <ion-range
-            [attr.disabled]="forceMigration"
+            [attr.disabled]="forceMigration || disableFees"
             min="0"
             max="2"
             step="1"
@@ -180,7 +180,7 @@
         </ion-item>
       </ion-col>
     </ion-row>
-    <ion-row class="fee-amount__help ion-padding-horizontal">
+    <ion-row class="fee-amount__help ion-padding-horizontal" *ngIf="!disableFees">
       <ion-text color="blackLight">
         <p class="ion-no-margin">
           <span id="fee-amount">

@@ -1,3 +1,4 @@
+import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
@@ -127,6 +128,7 @@ export class AccountTransactionListPage {
   }
 
   public openPreparePage() {
+    let info
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
@@ -137,15 +139,20 @@ export class AccountTransactionListPage {
         router: this.router
       })
       action.start()
+    } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
+      info = {
+        wallet: this.wallet,
+        address: '',
+        disableFees: true
+      }
     } else {
-      const info = {
+      info = {
         wallet: this.wallet,
         address: ''
       }
-      this.dataService.setData(DataServiceKey.DETAIL, info)
-
-      this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage() {
