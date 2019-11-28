@@ -56,9 +56,6 @@ export class PortfolioItemComponent {
   }
 
   public async ngOnChanges() {
-    if (this.wallet) {
-      console.log('WALLET', this.wallet)
-    }
     if (
       this.wallet &&
       (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT || this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS)

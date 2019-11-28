@@ -59,10 +59,6 @@ export class ProtocolsProvider {
   public addProtocols() {
     addSubProtocol('xtz', new TezosKtProtocol())
     addSubProtocol('xtz', new TezosBTC())
-
-    const protocol = new TezosProtocol()
-
-    console.log('Tezos subprotocols', protocol.subProtocols)
     this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         addSubProtocol(
