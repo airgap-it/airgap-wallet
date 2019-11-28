@@ -89,11 +89,9 @@ export class TransactionConfirmPage {
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
 
-    console.log('this.signedTx', this.signedTx)
     this.protocol
       .broadcastTransaction(this.signedTx)
       .then(async txId => {
-        console.log('txId', txId)
         if (interval) {
           clearInterval(interval)
         }
