@@ -16,7 +16,7 @@ export class SerializerService {
   private readonly v2Tov1Mapping: Map<number, number> = new Map<number, number>()
 
   private _useV2: boolean = false
-  private _chunkSize: number = 250
+  private _chunkSize: number = 100
   private _displayTimePerChunk: number = 500
 
   get useV2(): boolean {

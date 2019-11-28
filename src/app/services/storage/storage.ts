@@ -60,7 +60,7 @@ const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.LAST_TX_BROADCAST]: undefined,
   [SettingsKey.USER_ID]: undefined,
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
-  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 250,
+  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 500,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: 100
 }
 
