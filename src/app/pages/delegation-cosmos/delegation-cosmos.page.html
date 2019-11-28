@@ -111,7 +111,7 @@
     <ion-segment-button value="undelegate" [disabled]="!canUndelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="rewards">
+    <ion-segment-button value="rewards" [disabled]="!canUndelegate">
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>
