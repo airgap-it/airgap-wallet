@@ -14,8 +14,16 @@ export class LanguageService {
     const translationKeys = [header, message, ...inputs.map(input => input.placeholder), ...buttons.map(button => button.text)]
 
     const values = await this.translateService.get(translationKeys).toPromise()
-    inputs.forEach(input => (input.placeholder = values[input.placeholder]))
-    buttons.forEach(button => (button.text = values[button.text]))
+    inputs.forEach(input => {
+      input.placeholder = values[input.placeholder]
+
+      return input
+    })
+    buttons.forEach(button => {
+      button.text = values[button.text]
+
+      return button
+    })
 
     return {
       header: values[header],
