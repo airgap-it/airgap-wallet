@@ -51,7 +51,7 @@
     <ion-col size="12" class="ion-no-padding">
       <ion-row>
         <ion-col size="3" class="ion-no-padding">
-          <small *ngIf="percentage; else validatorBalanceSkeleton">{{percentage}}</small>
+          <small *ngIf="percentage; else validatorBalanceSkeleton">{{ percentage }}</small>
         </ion-col>
         <ion-col size="9" class="ion-no-padding ion-text-right">
           <small *ngIf="selfDelegationBalance; else validatorBalanceSkeleton">
@@ -111,7 +111,7 @@
     <ion-segment-button value="undelegate" [disabled]="!canUndelegate">
       <ion-label>Undelegate</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="rewards">
+    <ion-segment-button value="rewards" [disabled]="!canUndelegate">
       <ion-label>Rewards</ion-label>
     </ion-segment-button>
   </ion-segment>

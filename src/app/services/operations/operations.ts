@@ -1,15 +1,7 @@
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
-import {
-  AirGapMarketWallet,
-  CosmosProtocol,
-  DelegationInfo,
-  IACMessageType,
-  IAirGapTransaction,
-  Serializer,
-  TezosKtProtocol
-} from 'airgap-coin-lib'
+import { AirGapMarketWallet, CosmosProtocol, DelegationInfo, IACMessageType, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import {
   RawAeternityTransaction,
@@ -99,6 +91,7 @@ export class OperationsProvider {
   }
   public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
     const protocol = new TezosKtProtocol()
+
     return protocol.isAddressDelegated(address, fetchExtraInfo)
   }
 
@@ -130,6 +123,7 @@ export class OperationsProvider {
       } else {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
+
       const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx

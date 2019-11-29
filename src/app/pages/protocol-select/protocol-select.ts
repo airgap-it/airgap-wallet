@@ -19,23 +19,24 @@ export class ProtocolSelectPage {
     this.searchTermChanged()
   }
 
-  public dismiss() {
-    this.viewCtrl.dismiss()
+  public async dismiss(): Promise<void> {
+    await this.viewCtrl.dismiss()
   }
 
-  public onModelChange($event) {
-    this.viewCtrl.dismiss(this.selectedProtocol)
+  public async onModelChange(): Promise<void> {
+    await this.viewCtrl.dismiss(this.selectedProtocol)
   }
 
-  public searchTermChanged() {
+  public searchTermChanged(): void {
     this.filteredProtocols = this.filterProtocols()
   }
 
-  private filterProtocols() {
-    const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
+  private filterProtocols(): ICoinProtocol[] {
+    const lowerCaseSearchTerm: string = this.searchTerm.toLowerCase()
 
     return this.protocols.filter(
-      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+      (protocol: ICoinProtocol) =>
+        protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
   }
 }

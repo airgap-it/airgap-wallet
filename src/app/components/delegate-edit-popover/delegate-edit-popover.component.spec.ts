@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { NavParams } from '@ionic/angular'
+
+import { NavParamsMock } from '../../../../test-config/mocks-ionic'
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { DelegateEditPopoverComponent } from './delegate-edit-popover.component'
-import { UnitHelper } from '../../../../test-config/unit-test-helper'
-import { NavParamsMock } from 'test-config/mocks-ionic'
-import { NavParams } from '@ionic/angular'
 
 describe('DelegateEditPopoverComponent', () => {
   let component: DelegateEditPopoverComponent

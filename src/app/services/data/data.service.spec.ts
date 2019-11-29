@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing'
 
-import { DataService } from './data.service'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+
+import { DataService } from './data.service'
 
 describe('DataService', () => {
   let unitHelper: UnitHelper

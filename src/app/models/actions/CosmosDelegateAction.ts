@@ -6,6 +6,7 @@ import {
   CosmosDelegateActionContext,
   CosmosDelegateActionResult
 } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
+
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 

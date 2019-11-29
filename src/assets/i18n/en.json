@@ -129,6 +129,12 @@
     "select-account": {
       "title": "Select Account",
       "text": "Select an account for the Chrome Extension"
+    },
+    "qr": {
+      "settings_label": "QR Settings",
+      "enable-new-serializer_label": "Enable new serializer",
+      "page-time_label": "QR Page Time",
+      "page-size_label": "QR Max Size"
     }
   },
 
@@ -232,7 +238,8 @@
     "time_label": "Time",
     "data_label": "Data",
     "from_label": "From",
-    "to_label": "To"
+    "to_label": "To",
+    "transaction-details_label": "Display extra transaction details"
   },
 
   "signed-transaction": {

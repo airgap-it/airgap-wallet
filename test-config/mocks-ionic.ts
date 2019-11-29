@@ -1,42 +1,37 @@
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { Platform } from '@ionic/angular'
-
 // tslint:disable:max-classes-per-file
 
-const newSpy = (name: string, returnValue: any): jasmine.Spy => jasmine.createSpy(name).and.returnValue(returnValue)
-
-class ComponentMock {}
+const newSpy: (name: string, returnValue: any) => jasmine.Spy = (name: string, returnValue: any): jasmine.Spy =>
+  jasmine.createSpy(name).and.returnValue(returnValue)
 
 export type Spied<T> = { [Method in keyof T]: jasmine.Spy }
 
 export class RouterMock {
-  public navigateByUrl = jasmine.createSpy('navigateByUrl').and.returnValue(Promise.resolve())
-  public navigate = jasmine.createSpy('navigate').and.returnValue(Promise.resolve())
+  public navigateByUrl: jasmine.Spy = jasmine.createSpy('navigateByUrl').and.returnValue(Promise.resolve())
+  public navigate: jasmine.Spy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve())
 }
 
 export class ModalControllerMock {
-  public create = jasmine.createSpy('create').and.returnValue(
+  public create: jasmine.Spy = jasmine.createSpy('create').and.returnValue(
     Promise.resolve({
       present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
       onDidDismiss: jasmine.createSpy('onDidDismiss').and.returnValue(Promise.resolve())
     })
   )
-  public dismiss = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+  public dismiss: jasmine.Spy = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
 }
 
 export class AlertControllerMock {
-  public create = jasmine.createSpy('create').and.returnValue(
+  public create: jasmine.Spy = jasmine.createSpy('create').and.returnValue(
     Promise.resolve({
       present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
       onDidDismiss: jasmine.createSpy('onDidDismiss').and.returnValue(Promise.resolve())
     })
   )
-  public dismiss = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
+  public dismiss: jasmine.Spy = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
 }
 
 export class LoadingControllerMock {
-  public create = jasmine.createSpy('create').and.returnValue(
+  public create: jasmine.Spy = jasmine.createSpy('create').and.returnValue(
     Promise.resolve({
       present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
       onDidDismiss: jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
@@ -45,7 +40,7 @@ export class LoadingControllerMock {
 }
 
 export class ToastControllerMock {
-  public create = jasmine.createSpy('create').and.returnValue(
+  public create: jasmine.Spy = jasmine.createSpy('create').and.returnValue(
     Promise.resolve({
       present: jasmine.createSpy('present').and.returnValue(Promise.resolve()),
       onDidDismiss: jasmine.createSpy('dismiss').and.returnValue(Promise.resolve())
@@ -60,22 +55,27 @@ export class MockActivatedRouteSnapshot {
     this._data = data
   }
 
-  get data() {
+  get data(): any {
     return this._data
   }
 }
 export class DeviceProviderMock {
-  public isRooted = 0
+  public isRooted: boolean = false
+  public isElectron: boolean = false
 
-  public checkForRoot() {
-    return Promise.resolve(this.isRooted)
+  public async checkForRoot(): Promise<boolean> {
+    return this.isRooted
+  }
+
+  public async checkForElectron(): Promise<boolean> {
+    return this.isElectron
   }
 }
 
 export class NavParamsMock {
   public static params: any = {}
 
-  public static setParams(value: any) {
+  public static setParams(value: any): void {
     NavParamsMock.params = value
   }
 
@@ -102,7 +102,7 @@ export class PlatformMock {
     return true
   }
 
-  public hasFocus(ele: HTMLElement): boolean {
+  public hasFocus(_ele: HTMLElement): boolean {
     return true
   }
 
@@ -112,10 +112,11 @@ export class PlatformMock {
 
   public is(): boolean {
     console.log('MOCK IS NOT CORDOVA ')
+
     return false
   }
 
-  public getElementComputedStyle(container: any): any {
+  public getElementComputedStyle(_container: any): any {
     return {
       paddingLeft: '10',
       paddingTop: '10',
@@ -128,7 +129,7 @@ export class PlatformMock {
     return callback
   }
 
-  public registerListener(ele: any, eventName: string, callback: any): Function {
+  public registerListener(_ele: any, _eventName: string, _callback: any): Function {
     return () => true
   }
 
@@ -136,7 +137,7 @@ export class PlatformMock {
     return window
   }
 
-  public raf(callback: any): number {
+  public raf(_callback: any): number {
     return 1
   }
 
@@ -144,7 +145,7 @@ export class PlatformMock {
     return setTimeout(callback, timer)
   }
 
-  public cancelTimeout(id: any) {
+  public cancelTimeout(_id: any): void {
     // do nothing
   }
 
@@ -155,13 +156,13 @@ export class PlatformMock {
 
 export class NavControllerMock {
   public pop(): any {
-    return new Promise(function(resolve: Function): void {
+    return new Promise((resolve: Function): void => {
       resolve()
     })
   }
 
-  public push(ctrl: any, args: any): any {
-    return new Promise(function(resolve: Function): void {
+  public push(_ctrl: any, _args: any): any {
+    return new Promise((resolve: Function): void => {
       resolve()
     })
   }
@@ -178,7 +179,7 @@ export class NavControllerMock {
     return true
   }
 
-  public registerChildNav(nav: any): void {
+  public registerChildNav(_nav: any): void {
     return
   }
 }

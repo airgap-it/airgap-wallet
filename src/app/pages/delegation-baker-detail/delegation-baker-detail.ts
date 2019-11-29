@@ -1,14 +1,13 @@
-import { Location } from '@angular/common'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController, PopoverController, ToastController } from '@ionic/angular'
+import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
-import { AirGapTezosDelegateActionContext } from 'src/app/models/actions/TezosDelegateAction'
 
 import { DelegateEditPopoverComponent } from '../../components/delegate-edit-popover/delegate-edit-popover.component'
+import { AirGapTezosDelegateActionContext } from '../../models/actions/TezosDelegateAction'
 import { DataService } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { BakerConfig, RemoteConfigProvider } from '../../services/remote-config/remote-config'
@@ -45,15 +44,15 @@ export class DelegationBakerDetailPage {
   private readonly actionCallback: (context: AirGapTezosDelegateActionContext) => void
 
   constructor(
-    public location: Location,
+    public readonly navController: NavController,
+    public readonly toastController: ToastController,
+    public readonly operationsProvider: OperationsProvider,
+    public readonly remoteConfigProvider: RemoteConfigProvider,
+    public readonly popoverCtrl: PopoverController,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    public toastController: ToastController,
     private readonly loadingController: LoadingController,
-    public operationsProvider: OperationsProvider,
-    public remoteConfigProvider: RemoteConfigProvider,
-    private readonly dataService: DataService,
-    public popoverCtrl: PopoverController
+    private readonly dataService: DataService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -62,7 +61,7 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  public async ionViewDidEnter() {
+  public async ionViewDidEnter(): Promise<void> {
     // get baker 0, always airgap for now
     const airGapBakerConfig = (await this.remoteConfigProvider.tezosBakers())[0]
 
@@ -73,7 +72,11 @@ export class DelegationBakerDetailPage {
     this.isDelegated = this.delegationInfo.isDelegated
 
     // If baker is not us, we can't display more info
-    const config =
+    const config:
+      | BakerConfig
+      | {
+          address: string
+        } =
       !this.delegationInfo.value || this.delegationInfo.value === airGapBakerConfig.address
         ? airGapBakerConfig
         : { address: this.delegationInfo.value }
@@ -82,7 +85,7 @@ export class DelegationBakerDetailPage {
   }
 
   public async calculateBakerStats(): Promise<void> {
-    const kt = new TezosKtProtocol()
+    const kt: TezosKtProtocol = new TezosKtProtocol()
 
     this.bakerInfo = await kt.bakerInfo(this.bakerConfig.address)
 
@@ -96,7 +99,7 @@ export class DelegationBakerDetailPage {
 
       // we are already delegating, and to this address
       if (this.delegationInfo.isDelegated && this.delegationInfo.value === this.bakerConfig.address) {
-        const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
+        const delegatedCycles: DelegationRewardInfo[] = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
 
         this.nextPayout = delegatedCycles.length > 0 ? delegatedCycles[0].payout : this.addPayoutDelayToMoment(moment()).toDate()
 
@@ -110,7 +113,7 @@ export class DelegationBakerDetailPage {
       }
 
       this.avgRoIPerCyclePercentage = this.delegationRewards
-        .map(delegationInfo => {
+        .map((delegationInfo: DelegationRewardInfo) => {
           return delegationInfo.totalRewards.plus(delegationInfo.totalFees).div(delegationInfo.stakingBalance)
         })
         .reduce((avg, value) => {
@@ -124,7 +127,7 @@ export class DelegationBakerDetailPage {
     }
   }
 
-  public setBaker(config: Partial<BakerConfig>): void {
+  public async setBaker(config: Partial<BakerConfig>): Promise<void> {
     this.bakerConfig = {
       name: 'unknown',
       address: '',
@@ -142,7 +145,7 @@ export class DelegationBakerDetailPage {
     if (re.exec(this.bakerConfig.address)) {
       // Valid address
       this.bakerConfigError = undefined
-      this.calculateBakerStats()
+      await this.calculateBakerStats()
     } else {
       // Invalid address
       this.bakerConfigError = 'delegation-baker-detail.invalid-address'
@@ -170,7 +173,7 @@ export class DelegationBakerDetailPage {
   }
 
   public async done(): Promise<void> {
-    this.location.back()
+    this.navController.back()
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
@@ -193,12 +196,12 @@ export class DelegationBakerDetailPage {
 
     popover
       .onDidDismiss()
-      .then(({ data }: OverlayEventDetail<unknown>) => {
+      .then(async ({ data }: OverlayEventDetail<unknown>) => {
         if (isBakerAddressObject(data)) {
           console.log(data.bakerAddress)
-          this.setBaker({ address: data.bakerAddress })
+          await this.setBaker({ address: data.bakerAddress })
         } else if (isChangeToAirGapObject(data) && data.changeToAirGap) {
-          this.setBaker(this.airGapBaker)
+          await this.setBaker(this.airGapBaker)
         } else {
           console.log('Did not receive valid baker address object')
         }

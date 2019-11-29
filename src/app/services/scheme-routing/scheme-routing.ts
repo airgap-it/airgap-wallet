@@ -9,7 +9,7 @@ import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-enum IACResult {
+export enum IACResult {
   SUCCESS = 0,
   PARTIAL = 1,
   ERROR = 2
@@ -91,7 +91,7 @@ export class SchemeRoutingProvider {
   public async handleNewSyncRequest(
     router: Router,
     data: string | string[],
-    scanAgainCallback: Function = (scanResult: { currentPage: number; totalPageNumber: number }): void => {
+    scanAgainCallback: Function = (_scanResult: { currentPage: number; totalPageNumber: number }): void => {
       /* */
     }
   ): Promise<IACResult> {
@@ -120,7 +120,7 @@ export class SchemeRoutingProvider {
     }
   }
 
-  public async handleWalletSync(deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function): Promise<void> {
+  public async handleWalletSync(deserializedSync: IACMessageDefinitionObject): Promise<boolean> {
     const walletSync: AccountShareResponse = deserializedSync.payload as AccountShareResponse
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       deserializedSync.protocol,
@@ -131,23 +131,31 @@ export class SchemeRoutingProvider {
     if (this.router) {
       this.dataService.setData(DataServiceKey.WALLET, wallet)
       this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+      return true
     }
+
+    return false
   }
 
-  public async handleSignedTransaction(deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function): Promise<void> {
+  public async handleSignedTransaction(deserializedSync: IACMessageDefinitionObject): Promise<boolean> {
     if (this.router) {
       const info = {
         signedTransactionSync: deserializedSync
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+      return true
     }
+
+    return false
   }
 
   private async syncTypeNotSupportedAlert(
     _deserializedSyncProtocol: IACMessageDefinitionObject,
     scanAgainCallback: Function
-  ): Promise<void> {
+  ): Promise<boolean> {
     const cancelButton = {
       text: 'Okay!',
       role: 'cancel',
@@ -158,6 +166,8 @@ export class SchemeRoutingProvider {
     this.showAlert('Sync type not supported', 'Please use another app to scan this QR.', [cancelButton]).catch(
       handleErrorSentry(ErrorCategory.NAVIGATION)
     )
+
+    return false
   }
 
   public async showAlert(title: string, message: string, buttons: any): Promise<void> {

@@ -4,15 +4,6 @@ import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 
 import { tokens } from './tokens'
 
-interface SubProtocolInfo {
-  symbol: string
-  name: string
-  marketSymbol: string
-
-  identifier: string
-  data: [string]
-}
-
 interface SubAccount {
   protocol: string
   subProtocols: GenericERC20Configuration[]

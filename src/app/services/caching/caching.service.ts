@@ -89,13 +89,14 @@ export class CachingService {
           promise = Promise.reject('Invalid time unit')
         }
         promise
-          .then(prices => {
+          .then((prices: MarketDataSample[]) => {
+            let filteredPrices: MarketDataSample[] = prices
             if (timeUnit === 'minutes') {
-              prices = prices.filter((value, index, Arr) => {
+              filteredPrices = prices.filter((_value, index) => {
                 return index % 20 === 0
               })
             }
-            const marketSample: MarketDataSample[] = prices.map(price => {
+            const marketSample: MarketDataSample[] = filteredPrices.map((price: MarketDataSample) => {
               return {
                 time: price.time,
                 close: price.close,
@@ -113,10 +114,11 @@ export class CachingService {
     })
   }
 
-  public getData(publicKey) {
+  public getData(publicKey): unknown | undefined {
     if (this.data[publicKey]) {
       return this.data[publicKey]
-    } else {
     }
+
+    return undefined
   }
 }

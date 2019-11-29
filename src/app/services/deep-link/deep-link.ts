@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { IACMessageType } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { serializedDataToUrlString } from '../../utils/utils'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -27,7 +27,7 @@ export class DeepLinkProvider {
     const deeplinkUrl: string = url.includes('://') ? url : serializedDataToUrlString(url)
 
     return new Promise((resolve, reject) => {
-      let sApp
+      let sApp: { start(successCallback: () => void, errorCallback: (error: any) => void): void }
 
       if (this.platform.is('android')) {
         sApp = window.startApp.set({
@@ -59,63 +59,57 @@ export class DeepLinkProvider {
     })
   }
 
-  public showDeeplinkOnlyOnDevicesAlert() {
+  public showDeeplinkOnlyOnDevicesAlert(): void {
     this.translateService
       .get(['deep-link.not-supported-alert.title', 'deep-link.not-supported-alert.message', 'deep-link.not-supported-alert.ok'])
-      .subscribe(translated => {
-        const alert = this.alertCtrl
-          .create({
-            header: translated['deep-link.not-supported-alert.title'],
-            message: translated['deep-link.not-supported-alert.message'],
-            backdropDismiss: false,
-            buttons: [
-              {
-                text: translated['deep-link.not-supported-alert.ok'],
-                role: 'cancel'
-              }
-            ]
-          })
-          .then(alert => {
-            alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
-          })
+      .subscribe(async translated => {
+        const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+          header: translated['deep-link.not-supported-alert.title'],
+          message: translated['deep-link.not-supported-alert.message'],
+          backdropDismiss: false,
+          buttons: [
+            {
+              text: translated['deep-link.not-supported-alert.ok'],
+              role: 'cancel'
+            }
+          ]
+        })
+        alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
       })
   }
 
-  public showAppNotFoundAlert() {
+  public showAppNotFoundAlert(): void {
     this.translateService
       .get(['deep-link.app-not-found.title', 'deep-link.app-not-found.message', 'deep-link.app-not-found.ok'], {
         otherAppName: 'AirGap Vault'
       })
-      .subscribe(translated => {
-        const alert = this.alertCtrl
-          .create({
-            header: translated['deep-link.app-not-found.title'],
-            message: translated['deep-link.app-not-found.message'],
-            backdropDismiss: false,
-            buttons: [
-              {
-                text: translated['deep-link.app-not-found.ok'],
-                role: 'cancel'
-              }
-            ]
-          })
-          .then(alert => {
-            alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
-          })
+      .subscribe(async translated => {
+        const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+          header: translated['deep-link.app-not-found.title'],
+          message: translated['deep-link.app-not-found.message'],
+          backdropDismiss: false,
+          buttons: [
+            {
+              text: translated['deep-link.app-not-found.ok'],
+              role: 'cancel'
+            }
+          ]
+        })
+        alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
       })
   }
-  // TODO: Move to provider
-  public async walletDeepLink() {
-    const url = new URL(location.href)
-    const publicKey = url.searchParams.get('publicKey')
-    const rawUnsignedTx = JSON.parse(url.searchParams.get('rawUnsignedTx'))
-    const identifier = url.searchParams.get('identifier')
+
+  public async walletDeepLink(): Promise<{ wallet: AirGapMarketWallet; airGapTxs: IAirGapTransaction[]; serializedTx: string[] }> {
+    const url: URL = new URL(location.href)
+    const publicKey: string = url.searchParams.get('publicKey')
+    const rawUnsignedTx: unknown = JSON.parse(url.searchParams.get('rawUnsignedTx'))
+    const identifier: string = url.searchParams.get('identifier')
     console.log('publicKey', publicKey)
     console.log('rawUnsignedTx', rawUnsignedTx)
     console.log('identifier', identifier)
 
-    const wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
-    const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
+    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
+    const airGapTxs: IAirGapTransaction[] = await wallet.coinProtocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
     })
@@ -126,7 +120,7 @@ export class DeepLinkProvider {
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
-          transaction: rawUnsignedTx,
+          transaction: rawUnsignedTx as any,
           callback: 'airgap-wallet://?d='
         }
       }

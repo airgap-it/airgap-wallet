@@ -3,6 +3,7 @@ import { IACMessageDefinitionObject, Serializer } from 'airgap-coin-lib'
 import { DeserializedSyncProtocol, SyncProtocolUtils } from 'airgap-coin-lib/dist/serializer/v1/serializer'
 
 import { parseIACUrl } from '../../utils/utils'
+import { SettingsKey, StorageProvider } from '../storage/storage'
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +15,38 @@ export class SerializerService {
   private readonly v1Tov2Mapping: Map<number, number> = new Map<number, number>()
   private readonly v2Tov1Mapping: Map<number, number> = new Map<number, number>()
 
-  public useV2: boolean = false
-  public chunkSize: number = 250
-  public displayTimePerChunk: number = 500
+  private _useV2: boolean = false
+  private _chunkSize: number = 100
+  private _displayTimePerChunk: number = 500
 
-  constructor() {
+  get useV2(): boolean {
+    return this._useV2
+  }
+
+  set useV2(value: boolean) {
+    this.storageService.set(SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2, value)
+    this._useV2 = value
+  }
+
+  get chunkSize(): number {
+    return this._chunkSize
+  }
+
+  set chunkSize(value: number) {
+    this.storageService.set(SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE, value)
+    this._chunkSize = value
+  }
+
+  get displayTimePerChunk(): number {
+    return this._displayTimePerChunk
+  }
+
+  set displayTimePerChunk(value: number) {
+    this.storageService.set(SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME, value)
+    this._displayTimePerChunk = value
+  }
+
+  constructor(private readonly storageService: StorageProvider) {
     this.v1Tov2Mapping.set(2, 4) // AccountShareResponse
     this.v1Tov2Mapping.set(0, 5) // TransactionSignRequest
     this.v1Tov2Mapping.set(1, 6) // TransactionSignResponse
@@ -41,6 +69,10 @@ export class SerializerService {
     try {
       return await this.deserializeV2(parsedChunks)
     } catch (error) {
+      if (error && error.availablePages && error.totalPages) {
+        throw error
+      }
+
       return [await this.deserializeV1(parsedChunks[0])]
     }
   }

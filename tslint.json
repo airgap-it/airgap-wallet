@@ -5,6 +5,9 @@
   "rules": {
     "prettier": true,
     "strict-comparisons": true,
+    "component-class-suffix": [true, "Component", "Page"],
+    "directive-selector": [true, "attribute", "airgap", "camelCase"],
+    "component-selector": [true, "element", "airgap", "kebab-case"],
     "semicolon": [true, "never"],
     "member-access": [true],
     "member-ordering": [

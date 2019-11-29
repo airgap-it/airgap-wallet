@@ -1,9 +1,9 @@
-import { BigNumber } from 'bignumber.js'
-import { Location } from '@angular/common'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, addSubProtocol } from 'airgap-coin-lib'
+import { NavController } from '@ionic/angular'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -31,7 +31,7 @@ export class SubAccountAddPage {
   public typeLabel: string = ''
 
   constructor(
-    public location: Location,
+    private readonly navController: NavController,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
     private readonly protocolsProvider: ProtocolsProvider
@@ -44,29 +44,24 @@ export class SubAccountAddPage {
       console.log('info', info)
     }
 
-    function assertUnreachable(x: never): void {
-      /* */
-    }
-
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
       this.typeLabel = 'add-sub-account.accounts_label'
     } else if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.typeLabel = 'add-sub-account.tokens_label'
     } else {
-      assertUnreachable(this.subProtocolType)
+      assertNever(this.subProtocolType)
     }
 
     if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
-        const enabledsubProtocols = this.protocolsProvider.getEnabledSubProtocols()
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
-          const wallet = new AirGapMarketWallet(
+          const wallet: AirGapMarketWallet = new AirGapMarketWallet(
             subProtocol.identifier,
             this.wallet.publicKey,
             this.wallet.isExtendedPublicKey,
             this.wallet.derivationPath
           )
-          const exists = this.accountProvider.walletExists(wallet)
+          const exists: boolean = this.accountProvider.walletExists(wallet)
           if (!exists) {
             wallet.addresses = this.wallet.addresses
             wallet
@@ -81,11 +76,11 @@ export class SubAccountAddPage {
     }
   }
 
-  public toggleAccount(account: IAccountWrapper) {
+  public toggleAccount(account: IAccountWrapper): void {
     account.selected = !account.selected
   }
 
-  public addSubAccounts() {
-    this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider, location: this.location })
+  public addSubAccounts(): void {
+    this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider, location: this.navController })
   }
 }
