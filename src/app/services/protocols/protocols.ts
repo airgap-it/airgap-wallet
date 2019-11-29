@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtocol, TezosProtocol } from 'airgap-coin-lib'
+import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtocol } from 'airgap-coin-lib'
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 
 import { tokens } from './tokens'
