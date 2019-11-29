@@ -2,10 +2,10 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
-import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+
 import { ValidatorService } from './../../services/validator/validator.service'
 
 @Component({
@@ -21,8 +21,6 @@ export class DelegationValidatorListPage {
   public myValidators: CosmosValidator[]
   public wallet: AirGapMarketWallet
 
-  private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
-
   constructor(
     private readonly validatorService: ValidatorService,
     private readonly route: ActivatedRoute,
@@ -32,7 +30,6 @@ export class DelegationValidatorListPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.actionCallback = info.actionCallback
       this.fetchDelegations(this.wallet.addresses[0])
       this.fetchValidatorList()
     }
@@ -55,8 +52,7 @@ export class DelegationValidatorListPage {
   public navigate(validatorAddress: string) {
     const info = {
       validatorAddress,
-      wallet: this.wallet,
-      actionCallback: this.actionCallback
+      wallet: this.wallet
     }
     this.dataService.setData(DataServiceKey.DETAIL, info)
     this.router.navigateByUrl('/delegation-cosmos/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

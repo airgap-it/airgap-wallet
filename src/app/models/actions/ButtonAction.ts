@@ -1,4 +1,5 @@
-import { Action, RepeatableAction } from 'airgap-coin-lib/dist/actions/Action'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { RepeatableAction } from 'airgap-coin-lib/dist/actions/RepeatableAction'
 
 export interface ButtonActionContext {
   name: string

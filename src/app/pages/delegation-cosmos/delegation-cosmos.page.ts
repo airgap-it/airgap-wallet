@@ -7,12 +7,12 @@ import { CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNo
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import BigNumber from 'bignumber.js'
 
+import { AirGapCosmosDelegateAction } from '../../models/actions/CosmosDelegateAction'
 import { DataService } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { serializedDataToUrlString } from '../../utils/utils'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 
-import { AirGapCosmosDelegateActionContext } from './../../models/actions/CosmosDelegateAction'
 import { DataServiceKey } from './../../services/data/data.service'
 import { OperationsProvider } from './../../services/operations/operations'
 import { CosmosValidatorInfo, ValidatorService } from './../../services/validator/validator.service'
@@ -47,8 +47,6 @@ export class DelegationCosmosPage {
   public canDelegate: boolean = true
   public canUndelegate: boolean = true
 
-  private readonly actionCallback: (context: AirGapCosmosDelegateActionContext) => void
-
   constructor(
     private readonly route: ActivatedRoute,
     public formBuilder: FormBuilder,
@@ -64,7 +62,6 @@ export class DelegationCosmosPage {
       this.wallet = info.wallet
       this.validatorAddress = info.validatorAddress
       this.currentBalance = this.wallet.currentBalance
-      this.actionCallback = info.actionCallback
       this.delegationForm = formBuilder.group({
         amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
       })
@@ -124,34 +121,43 @@ export class DelegationCosmosPage {
   }
 
   public async delegate(): Promise<void> {
-    this.actionCallback({
-      wallet: this.wallet,
-      validatorAddress: this.validatorAddress,
-      amount: this.amount,
-      undelegate: false,
+    const delegateAction: AirGapCosmosDelegateAction = new AirGapCosmosDelegateAction({
       toastController: this.toastController,
       loadingController: this.loadingController,
       dataService: this.dataService,
-      router: this.router
+      router: this.router,
+      wallet: this.wallet,
+      validatorAddress: this.validatorAddress,
+      amount: this.amount,
+      undelegate: false
     })
+
+    await delegateAction.start()
   }
 
   public async undelegate(): Promise<void> {
-    this.actionCallback({
-      wallet: this.wallet,
-      validatorAddress: this.validatorAddress,
-      amount: this.amount,
-      undelegate: true,
+    const delegateAction: AirGapCosmosDelegateAction = new AirGapCosmosDelegateAction({
       toastController: this.toastController,
       loadingController: this.loadingController,
       dataService: this.dataService,
-      router: this.router
+      router: this.router,
+      wallet: this.wallet,
+      validatorAddress: this.validatorAddress,
+      amount: this.amount,
+      undelegate: false
     })
+
+    await delegateAction.start()
   }
+
   public async withdrawDelegationRewards(): Promise<void> {
     const protocol: CosmosProtocol = new CosmosProtocol()
     const cosmosTransaction: CosmosTransaction = await protocol.withdrawDelegationRewards(this.wallet.publicKey, [this.validatorAddress])
 
+    this.serializeAndNavigate(cosmosTransaction)
+  }
+
+  public async serializeAndNavigate(cosmosTransaction: CosmosTransaction): Promise<void> {
     const serializedTxs: string[] = await this.operationsProvider.serializeTx(this.wallet, cosmosTransaction)
 
     const airGapTxs: IAirGapTransaction[] = cosmosTransaction.toAirGapTransactions('cosmos')

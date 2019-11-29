@@ -1,6 +1,9 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { Action, LinkedAction, SimpleAction } from 'airgap-coin-lib/dist/actions/Action'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
+import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
+import { SimpleAction } from 'airgap-coin-lib/dist/actions/SimpleAction'
+import { TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
@@ -10,10 +13,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
-import { AirGapCosmosDelegateAction, AirGapCosmosDelegateActionContext } from './actions/CosmosDelegateAction'
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
-import { TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
-import { CosmosDelegateActionResult } from 'airgap-coin-lib/dist/actions/CosmosDelegateAction'
 
 export interface WalletActionInfo {
   name: string
@@ -121,28 +121,23 @@ export class ActionGroup {
   }
 
   private getCosmosActions(): Action<any, any>[] {
-    const delegateButtonAction: ButtonAction<CosmosDelegateActionResult, void> = new ButtonAction(
+    const delegateButtonAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapCosmosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapCosmosDelegateActionContext>(async resolve => {
+        const prepareDelegateAction: SimpleAction<void> = new SimpleAction(() => {
+          return new Promise<void>(async resolve => {
             const wallet: AirGapMarketWallet = this.callerContext.wallet
             const info = {
-              wallet,
-              actionCallback: resolve
+              wallet
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl('/delegation-validator-list/' + DataServiceKey.DETAIL)
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            resolve()
           })
         })
-        const delegateAction: LinkedAction<CosmosDelegateActionResult, AirGapCosmosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapCosmosDelegateAction
-        )
-
-        return delegateAction
+        return prepareDelegateAction
       }
     )
 
