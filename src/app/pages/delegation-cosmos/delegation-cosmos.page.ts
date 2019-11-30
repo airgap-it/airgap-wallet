@@ -10,7 +10,6 @@ import BigNumber from 'bignumber.js'
 import { AirGapCosmosDelegateAction } from '../../models/actions/CosmosDelegateAction'
 import { DataService } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { serializedDataToUrlString } from '../../utils/utils'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 
 import { DataServiceKey } from './../../services/data/data.service'
@@ -164,7 +163,7 @@ export class DelegationCosmosPage {
     const info = {
       wallet: this.wallet,
       airGapTxs,
-      data: serializedDataToUrlString(serializedTxs)
+      data: serializedTxs
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
