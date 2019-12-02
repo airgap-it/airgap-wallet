@@ -14,6 +14,12 @@
     <ion-icon name="trash" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.delete_label' | translate }}
   </ion-item>
+  <ion-item *ngIf="importAccountAction">
+    <ion-button color="secondary" (click)="importAccountAction.start()" shape="round" size="small" fill="outline">
+      <ion-icon slot="start" [name]="importAccountAction.context.icon"></ion-icon>
+      {{ importAccountAction.context.name | translate }}
+    </ion-button>
+  </ion-item>
   <ion-item *ngIf="!isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
     <ion-icon name="close" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.undelegate_label' | translate }}

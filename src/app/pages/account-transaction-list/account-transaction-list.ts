@@ -287,6 +287,7 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
+        importAccountAction: this.actionGroup.getImportAccountsAction(),
         onDelete: (): void => {
           this.navController.back()
         },
