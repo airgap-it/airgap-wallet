@@ -1,4 +1,4 @@
-import { CosmosValidator, CosmosDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
+import { CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet, IAirGapTransaction, CosmosProtocol } from 'airgap-coin-lib'
@@ -49,11 +49,6 @@ export class CachingService {
 
   public setValidators(value: CosmosValidator[]): Promise<any> {
     const uniqueId = CachingServiceKey.VALIDATORS
-    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
-  }
-
-  public setDelegations(address: string, value: CosmosDelegation[]): Promise<any> {
-    const uniqueId = `${address}_${CachingServiceKey.DELEGATIONS}`
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
@@ -137,22 +132,6 @@ export class CachingService {
         const validators = await protocol.fetchValidators()
         this.setValidators(validators)
         resolve(validators)
-      }
-    })
-  }
-
-  public async fetchDelegations(address: string): Promise<CosmosDelegation[]> {
-    const uniqueId = `${address}_${CachingServiceKey.DELEGATIONS}`
-    return new Promise<CosmosDelegation[]>(async resolve => {
-      const delegationsObject: StorageObject = await this.storage.get(uniqueId)
-      if (delegationsObject && delegationsObject.timestamp > Date.now() - 30 * 60 * 1000) {
-        console.log('FROM CACHE: delegations')
-        resolve(delegationsObject.value)
-      } else {
-        const protocol = new CosmosProtocol()
-        const delegations = await protocol.fetchDelegations(address)
-        this.setDelegations(address, delegations)
-        resolve(delegations)
       }
     })
   }

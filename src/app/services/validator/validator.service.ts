@@ -63,7 +63,7 @@ export class ValidatorService {
   }
 
   public async fetchDelegations(address: string): Promise<CosmosDelegation[]> {
-    return this.cachingService.fetchDelegations(address)
+    return this.protocol.fetchDelegations(address)
   }
 
   public async fetchSelfDelegation(address: string): Promise<BigNumber> {
