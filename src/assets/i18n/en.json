@@ -470,6 +470,7 @@
     "title": "Validator List",
     "your-validators_label": "Your Validators",
     "validators_label": "Validators",
+    "sort_label": "Sort Validators",
     "no_validators_found_label": "No validators matching your search have been found"
   },
 	"action-alert-tip": {

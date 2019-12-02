@@ -38,6 +38,7 @@ export class DelegationValidatorListPage {
   private async fetchValidatorList() {
     this.allValidators = await this.validatorService.fetchValidators()
     this.filteredValidators = this.allValidators
+    console.log('filteredValidators', this.filteredValidators)
   }
 
   private async fetchDelegations(address: string) {
@@ -47,6 +48,10 @@ export class DelegationValidatorListPage {
 
   public setFilteredItems(searchTerm: string) {
     this.filteredValidators = this.allValidators.filter(validator => validator.description.moniker.toLowerCase().startsWith(searchTerm))
+  }
+
+  public sortValidators() {
+    this.filteredValidators = this.allValidators.sort((a, b) => parseFloat(a.tokens) - parseFloat(b.tokens)).reverse()
   }
 
   public navigate(validatorAddress: string) {

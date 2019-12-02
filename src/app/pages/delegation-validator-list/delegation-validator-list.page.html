@@ -8,6 +8,9 @@
   <ion-toolbar>
     <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
   </ion-toolbar>
+  <ion-button (click)="sortValidators()" shape="round" size="small" fill="outline">
+    {{ 'delegation-validator-list.sort_label' | translate }}
+  </ion-button>
 </ion-header>
 
 <ion-content>
