@@ -1,24 +1,75 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnDestroy } from '@angular/core'
 
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
+import { SerializerService } from '../../services/serializer/serializer.service'
+import { serializedDataToUrlString } from '../../utils/utils'
 
 @Component({
   selector: 'qr-clipboard',
   templateUrl: 'qr-clipboard.html'
 })
-export class QrClipboardComponent {
+export class QrClipboardComponent implements OnDestroy {
+  private _rawValue: string | string[]
+  private _shouldPrefixSingleQrWithUrl: boolean = true
+
   @Input()
   public level: string = 'L'
 
+  public qrdataArray: string[] = ['']
+
   @Input()
-  public qrdata: any = ''
+  set qrdata(value: string | string[]) {
+    this._rawValue = value
+    this.convertToDataArray()
+  }
+
+  @Input()
+  set shouldPrefixSingleQrWithUrl(value: boolean) {
+    this._shouldPrefixSingleQrWithUrl = value
+    this.convertToDataArray()
+  }
 
   @Input()
   public size: number = 300
 
-  constructor(private readonly clipboardProvider: ClipboardProvider) {}
+  public activeChunk: number = 0
 
-  public async copyToClipboard() {
-    await this.clipboardProvider.copyAndShowToast(this.qrdata)
+  private readonly timeout: NodeJS.Timeout
+  constructor(private readonly clipboardService: ClipboardService, private readonly serializerService: SerializerService) {
+    this.timeout = setInterval(() => {
+      this.activeChunk = ++this.activeChunk % this.qrdataArray.length
+    }, this.serializerService.displayTimePerChunk)
+  }
+
+  private convertToDataArray(): void {
+    const array: string[] = Array.isArray(this._rawValue) ? this._rawValue : [this._rawValue]
+    if (array.length === 1) {
+      const chunk: string = array[0]
+      const shouldPrefix: boolean = !chunk.includes('://') && this._shouldPrefixSingleQrWithUrl
+
+      this.qrdataArray = [shouldPrefix ? serializedDataToUrlString(chunk) : chunk]
+    } else {
+      this.qrdataArray = array
+    }
+  }
+
+  public async copyToClipboard(): Promise<void> {
+    let copyString: string = ''
+    if (this._rawValue.length === 1) {
+      const chunk: string = this._rawValue[0]
+      const shouldPrefix: boolean = !chunk.includes('://') && this._shouldPrefixSingleQrWithUrl
+
+      copyString = shouldPrefix ? serializedDataToUrlString(chunk) : chunk
+    } else {
+      copyString = typeof this._rawValue === 'string' ? this._rawValue : this._rawValue.join(',')
+    }
+
+    await this.clipboardService.copyAndShowToast(copyString)
+  }
+
+  public ngOnDestroy(): void {
+    if (this.timeout) {
+      clearInterval(this.timeout)
+    }
   }
 }

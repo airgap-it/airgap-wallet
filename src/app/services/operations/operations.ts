@@ -1,18 +1,13 @@
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
+import { AirGapMarketWallet, CosmosProtocol, DelegationInfo, IACMessageType, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import {
-  AirGapMarketWallet,
-  DelegationInfo,
-  EncodedType,
-  IAirGapTransaction,
-  SyncProtocolUtils,
-  TezosKtProtocol,
-  TezosProtocol
-} from 'airgap-coin-lib'
-import { RawAeternityTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/aeternity-transactions.serializer'
-import { RawBitcoinTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/bitcoin-transactions.serializer'
-import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/ethereum-transactions.serializer'
-import { RawTezosTransaction } from 'airgap-coin-lib/dist/serializer/unsigned-transactions/tezos-transactions.serializer'
+  RawAeternityTransaction,
+  RawBitcoinTransaction,
+  RawEthereumTransaction,
+  RawTezosTransaction
+} from 'airgap-coin-lib/dist/serializer/types'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -20,6 +15,7 @@ import { map } from 'rxjs/operators'
 import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SerializerService } from '../serializer/serializer.service'
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +26,8 @@ export class OperationsProvider {
   constructor(
     private readonly accountProvider: AccountProvider,
     private readonly loadingController: LoadingController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly serializerService: SerializerService
   ) {}
 
   public setDelegationStatusOfAddress(address: string, delegated: boolean) {
@@ -61,25 +58,37 @@ export class OperationsProvider {
     })
   }
 
-  private async serializeTx(
+  public async serializeTx(
     wallet: AirGapMarketWallet,
-    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction
-  ) {
-    const syncProtocol = new SyncProtocolUtils()
-
-    return syncProtocol.serialize({
-      version: 1,
-      protocol: wallet.coinProtocol.identifier,
-      type: EncodedType.UNSIGNED_TRANSACTION,
-      payload: {
-        publicKey: wallet.publicKey,
-        transaction,
-        callback: 'airgap-wallet://?d='
+    transaction: RawTezosTransaction | RawEthereumTransaction | RawBitcoinTransaction | RawAeternityTransaction | CosmosTransaction
+  ): Promise<string[]> {
+    return this.serializerService.serialize([
+      {
+        protocol: wallet.coinProtocol.identifier,
+        type: IACMessageType.TransactionSignRequest,
+        payload: {
+          publicKey: wallet.publicKey,
+          transaction: transaction as any, // TODO: Type
+          callback: 'airgap-wallet://?d='
+        }
       }
-    })
+    ])
   }
 
   public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
+    if (address && address.startsWith('cosmos')) {
+      // TODO: this is ugly and needs to be re-implemented properly
+      const protocol = new CosmosProtocol()
+      const delegations = await protocol.fetchDelegations(address)
+
+      return {
+        isDelegated: delegations.length > 0 ? true : false
+      }
+    } else {
+      return this.fetchDelegationInfo(address, fetchExtraInfo)
+    }
+  }
+  public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
     const protocol = new TezosKtProtocol()
 
     return protocol.isAddressDelegated(address, fetchExtraInfo)
@@ -91,7 +100,7 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber,
     data?: any
-  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTx: string }> {
+  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTxChunks: string[] }> {
     const loader = await this.getAndShowLoader()
 
     try {
@@ -101,16 +110,17 @@ export class OperationsProvider {
         const tezosKtProtocol = new TezosKtProtocol()
         rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
       } else {
-        rawUnsignedTx = await wallet.prepareTransaction([address], [amount], fee, data)
+        rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
+
       const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
       })
 
-      const serializedTx = await this.serializeTx(wallet, rawUnsignedTx)
+      const serializedTxChunks: string[] = await this.serializeTx(wallet, rawUnsignedTx)
 
-      return { airGapTxs, serializedTx }
+      return { airGapTxs, serializedTxChunks }
     } catch (error) {
       handleErrorSentry(ErrorCategory.COINLIB)(error)
 

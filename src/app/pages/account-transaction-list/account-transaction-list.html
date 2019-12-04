@@ -39,7 +39,7 @@
   ></card-actionable>
 
   <ng-container *ngIf="hasPendingTransactions">
-    <ion-row padding-horizontal>
+    <ion-row class="ion-padding-horizontal">
       <ion-col size="12" class="ion-no-padding ion-padding-top">
         <ion-text color="primary">
           <p class="font--weight__bold">
@@ -106,7 +106,7 @@
     </ion-col>
   </ion-row>
 
-  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
   <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showNoTransactionScreen()">
     <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
     <p>

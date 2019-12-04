@@ -5,7 +5,6 @@ import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airg
 import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
-import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -60,24 +59,20 @@ export class SwapComponent {
   @Output()
   private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
-  constructor(
-    public alertCtrl: AlertController,
-    public modalController: ModalController,
-    private readonly walletsProvider: AccountProvider
-  ) {}
+  constructor(public alertCtrl: AlertController, public modalController: ModalController) {}
 
-  public amountSet(amount: string) {
+  public amountSet(amount: string): void {
     this._amount = amount
     this.amountSetEmitter.emit(amount)
   }
 
-  public walletSet(wallet: AirGapMarketWallet) {
+  public walletSet(wallet: AirGapMarketWallet): void {
     this.walletSetEmitter.emit(wallet)
     this.expandWalletSelection = false
   }
 
-  public async doRadio() {
-    const protocols = []
+  public async doRadio(): Promise<void> {
+    const protocols: ICoinProtocol[] = []
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
         protocols.push(getProtocolByIdentifier(supportedProtocol))
@@ -86,7 +81,7 @@ export class SwapComponent {
       }
     })
 
-    const modal = await this.modalController.create({
+    const modal: HTMLIonModalElement = await this.modalController.create({
       component: ProtocolSelectPage,
       componentProps: {
         selectedProtocol: this.selectedProtocol.identifier,
@@ -94,11 +89,14 @@ export class SwapComponent {
       }
     })
 
-    modal.onDidDismiss().then((protocolIdentifier: any) => {
-      if (protocolIdentifier && protocolIdentifier.data) {
-        this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
-      }
-    })
+    modal
+      .onDidDismiss()
+      .then((protocolIdentifier: any) => {
+        if (protocolIdentifier && protocolIdentifier.data) {
+          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
+        }
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
 
     modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }

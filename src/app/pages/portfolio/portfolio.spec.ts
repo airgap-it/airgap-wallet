@@ -1,8 +1,9 @@
-import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
-import { MarketDataService } from './../../services/market-data/market-data.service'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
+
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
+import { MarketDataService } from '../../services/market-data/market-data.service'
 
 import { PortfolioPage } from './portfolio'
 

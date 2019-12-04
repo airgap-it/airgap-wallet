@@ -1,4 +1,4 @@
-import { Location } from '@angular/common'
+import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
@@ -10,7 +10,7 @@ import { WalletActionInfo } from '../ActionGroup'
 export interface AddTokenActionContext {
   subAccounts: IAccountWrapper[]
   accountProvider: AccountProvider
-  location: Location
+  location: NavController
 }
 
 export class AddTokenAction extends Action<void, AddTokenActionContext> {

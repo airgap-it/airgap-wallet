@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { NavController, Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
@@ -17,15 +17,14 @@ export class ScanAddressPage extends ScanBasePage {
   private readonly callback: (address: string) => void
   private callbackCalled: boolean = false
 
-  @ViewChild('addressScanner')
+  @ViewChild('addressScanner', { static: true })
   public zxingScanner: ZXingScannerComponent
 
   constructor(
-    protected platform: Platform,
-    protected scanner: ScannerProvider,
-    protected permissionsProvider: PermissionsProvider,
+    protected readonly platform: Platform,
+    protected readonly scanner: ScannerProvider,
+    protected readonly permissionsProvider: PermissionsProvider,
     private readonly navCtrl: NavController,
-    private readonly router: Router,
     private readonly route: ActivatedRoute
   ) {
     super(platform, scanner, permissionsProvider)
@@ -36,13 +35,13 @@ export class ScanAddressPage extends ScanBasePage {
     this.isBrowser = !this.platform.is('cordova')
   }
 
-  public checkScan(resultString: string) {
+  public checkScan(resultString: string): void {
     console.log('got new text', resultString)
 
     this.handleQRScanned(resultString)
   }
 
-  public handleQRScanned(text: string) {
+  public handleQRScanned(text: string): void {
     if (!this.callbackCalled) {
       console.log('scan callback', text)
       this.callbackCalled = true
@@ -60,13 +59,16 @@ export class ScanAddressPage extends ScanBasePage {
     }
   }
 
-  private sendAddressToParent(text: string) {
+  private sendAddressToParent(text: string): void {
     if (this.callback) {
       // Strip "scheme" and "parameters" from URIs
-      let address = text
-      const [scheme, path] = text.split(':')
+      // TODO: Use URL
+      let address: string = text
+
+      // ignore first element
+      const [, path]: string[] = text.split(':')
       if (path) {
-        const splits = path.split('?')
+        const splits: string[] = path.split('?')
         address = splits[0]
       }
       this.callback(address.trim())

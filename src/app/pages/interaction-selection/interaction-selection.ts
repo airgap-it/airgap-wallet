@@ -35,7 +35,7 @@ export class InteractionSelectionPage {
   public offlineDeviceSign() {
     const info = {
       wallet: this.wallet,
-      airGapTx: this.airGapTxs,
+      airGapTxs: this.airGapTxs,
       data: this.preparedDataQR
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)

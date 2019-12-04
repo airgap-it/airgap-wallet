@@ -1,6 +1,3 @@
-import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
-import { MarketDataService } from './services/market-data/market-data.service'
-import { ChartsModule } from 'ng2-charts'
 import { CommonModule } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -25,7 +22,9 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 import { LottieAnimationViewModule } from 'ng-lottie'
+import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
+
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ComponentsModule } from './components/components.module'
@@ -33,12 +32,15 @@ import { IntroductionPushPage } from './pages/introduction-push/introduction-pus
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
+import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
 import { PipesModule } from './pipes/pipes.module'
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
-import { ClipboardProvider } from './services/clipboard/clipboard'
+import { ClipboardService } from './services/clipboard/clipboard'
 import { DeepLinkProvider } from './services/deep-link/deep-link'
+import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
+import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PermissionsProvider } from './services/permissions/permissions'
 import { ProtocolsProvider } from './services/protocols/protocols'
@@ -47,11 +49,11 @@ import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
 import { ScannerProvider } from './services/scanner/scanner'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
+import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
-import { DrawChartService } from './services/draw-chart/draw-chart.service'
 
-export function createTranslateLoader(http: HttpClient) {
+export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
 }
 
@@ -107,7 +109,7 @@ export function createTranslateLoader(http: HttpClient) {
     AccountProvider,
     StorageProvider,
     SchemeRoutingProvider,
-    ClipboardProvider,
+    ClipboardService,
     PermissionsProvider,
     ProtocolsProvider,
     DeepLinkProvider,
@@ -118,7 +120,8 @@ export function createTranslateLoader(http: HttpClient) {
     AppInfoProvider,
     PushProvider,
     Push,
-    PushBackendProvider
+    PushBackendProvider,
+    SerializerService
   ],
   bootstrap: [AppComponent]
 })

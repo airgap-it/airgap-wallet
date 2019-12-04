@@ -3,7 +3,7 @@
 </ion-header>
 <ion-content fullscreen="true">
   <chart [total]="total"></chart>
-  <ion-refresher (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
   <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
     <ng-container *ngIf="walletGroupsArray.length; else noItems">

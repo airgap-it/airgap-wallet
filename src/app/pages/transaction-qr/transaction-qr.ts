@@ -2,11 +2,10 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import BigNumber from 'bignumber.js'
 
-import { Transaction } from '../../models/transaction.model'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'page-transaction-qr',
@@ -15,7 +14,7 @@ import BigNumber from 'bignumber.js'
 export class TransactionQrPage {
   public preparedDataQR: string = ''
   public wallet: AirGapMarketWallet = null
-  public airGapTxs: Transaction[] = null
+  public airGapTxs: IAirGapTransaction[] = null
   public isBrowser: boolean = false
   public qrDataTooBig: boolean = false
   public aggregatedInfo:

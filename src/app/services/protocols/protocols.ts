@@ -3,15 +3,6 @@ import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtoco
 
 import { tokens } from './tokens'
 
-interface SubProtocolInfo {
-  symbol: string
-  name: string
-  marketSymbol: string
-
-  identifier: string
-  data: [string]
-}
-
 interface SubAccount {
   protocol: string
   subProtocols: GenericERC20Configuration[]
@@ -22,7 +13,8 @@ export enum ProtocolSymbols {
   BTC = 'btc',
   ETH = 'eth',
   XTZ = 'xtz',
-  XTZ_KT = 'xtz-kt'
+  XTZ_KT = 'xtz-kt',
+  COSMOS = 'cosmos'
 }
 
 @Injectable({

@@ -91,6 +91,12 @@ identicon {
   -ms-user-select: text;
 }
 
+ion-list-header {
+  ion-label {
+    font-size: 14px;
+  }
+}
+
 qr-clipboard {
   padding: 20px;
   background-color: white;
@@ -147,7 +153,9 @@ page-account-import-onboarding {
   font-size: 14px;
   word-wrap: break-word;
 }
-
-.typography--uppercase {
-  text-transform: uppercase;
+page-settings {
+  ion-range {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }

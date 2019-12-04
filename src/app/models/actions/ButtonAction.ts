@@ -1,4 +1,5 @@
-import { Action, RepeatableAction } from 'airgap-coin-lib/dist/actions/Action'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { RepeatableAction } from 'airgap-coin-lib/dist/actions/RepeatableAction'
 
 export interface ButtonActionContext {
   name: string
@@ -11,7 +12,9 @@ export class ButtonAction<Result, Context> extends RepeatableAction<Result, Cont
     return this.context.identifier
   }
 
-  public set identifier(value: string) {}
+  public set identifier(_value: string) {
+    // TODO: Does this have to be empty?
+  }
 
   public constructor(context: ButtonActionContext, actionFactory: () => Action<Result, Context>) {
     super(context, actionFactory)

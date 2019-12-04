@@ -1,9 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-
-import { Transaction } from '../../models/transaction.model'
+import { getProtocolByIdentifier, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
 
 declare let cordova
 
@@ -12,7 +10,7 @@ declare let cordova
   templateUrl: 'transaction-detail.html'
 })
 export class TransactionDetailPage {
-  public transaction: Transaction
+  public transaction: IAirGapTransaction
   public lottieConfig: any
 
   constructor(private readonly platform: Platform, private readonly route: ActivatedRoute) {
