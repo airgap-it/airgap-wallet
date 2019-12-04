@@ -91,6 +91,7 @@
   "scan": {
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",
+    "multi-qr_text": "This transaction consists of multiple QR codes. Keep your camera on the changing QRs and wait until all codes are scanned.",
     "empty-state_heading": "In order to scan QR codes, AirGap Wallet needs the <span class=\"style__strong color__primary\">camera permission</span>.",
     "grant-permission_label": "Grant permission"
   },
@@ -128,6 +129,12 @@
     "select-account": {
       "title": "Select Account",
       "text": "Select an account for the Chrome Extension"
+    },
+    "qr": {
+      "settings_label": "QR Settings",
+      "enable-new-serializer_label": "Enable new serializer",
+      "page-time_label": "QR Page Time",
+      "page-size_label": "QR Max Size"
     }
   },
 
@@ -231,7 +238,8 @@
     "time_label": "Time",
     "data_label": "Data",
     "from_label": "From",
-    "to_label": "To"
+    "to_label": "To",
+    "transaction-details_label": "Display extra transaction details"
   },
 
   "signed-transaction": {
@@ -245,7 +253,7 @@
     "undelegate_label": "Undelegate",
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
-    "delete_label": "Delete",
+    "delete_label": "Remove",
     "block_explorer": "Open Blockexplorer"
   },
 
@@ -381,7 +389,37 @@
     "delegate": "Delegate",
     "done": "Done", 
     "unknown": "Unknown"
-
+  },
+  "delegation-cosmos": {
+    "title": "Validator Detail",
+    "status-active_label": "active",
+    "status-inactive_label": "inactive",
+    "your-rewards_label": "Your Rewards",
+    "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",    
+    "commission_label": "Commission",
+    "voting-power_label": "Voting Power",
+    "withdraw_rewards_label": "Claim Rewards",    
+    "your-account": {
+      "label": "Your Account",
+      "balance_label": "Current Balance",
+      "delegation_label": "Currently Delegated",
+      "rewards_label": "Unclaimed Rewards"
+    },
+    "delegation": {
+      "label": "Your Delegation",
+      "text": "Select the amount you want to delegate, you can delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>.",
+      "delegated_text": "You have currently <span class=\"style__strong color__primary\">{{delegatedAmount}}</span> delegated to this validator, you can additionally delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>."
+    },
+    "undelegate": {
+      "text": "You have currently not delegated to this validator.",
+      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{delegatedAmount}}</span>."
+    },
+    "rewards": {
+      "text": "You currently have no rewards to claim",
+      "claim-rewards_text": "You can claim up to <span class=\"style__strong color__primary\">{{delegationReward}}</span> in rewards for this delegation."
+    }
+   
   },
   "introduction-push": {
     "title": "Push Notifications",
@@ -394,8 +432,8 @@
   },
   "tezos-delegation-stats": {
     "cycle": "Cycle",  
-    "reward": "Reward", 
-    "payout": "Payout"
+    "reward": "Expected Reward", 
+    "payout": "Earliest Payout"
   },  
 
   
@@ -427,8 +465,14 @@
     "baker-address_label": "Baker address",
     "cancel_label": "Cancel",
     "set-baker_label": "Set Baker"
-	},
-	
+  },
+  "delegation-validator-list": {
+    "title": "Validator List",
+    "your-validators_label": "Your Validators",
+    "validators_label": "Validators",
+    "sort_label": "Sort Validators",
+    "no_validators_found_label": "No validators matching your search have been found"
+  },
 	"action-alert-tip": {
 		"heading": "Thank you for using AirGap!",
 		"text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
@@ -441,5 +485,6 @@
 		"text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
 		"cancel_label": "No",
 		"ok_label": "Yes!"
-	}
+  }
+
 }

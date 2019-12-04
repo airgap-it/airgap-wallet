@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  DeserializedSyncProtocol,
   getProtocolByIdentifier,
+  IACMessageDefinitionObject,
   ICoinProtocol,
   SignedTransaction,
   TezosKtProtocol
@@ -33,7 +33,7 @@ const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  public signedTransactionSync: DeserializedSyncProtocol
+  public signedTransactionSync: IACMessageDefinitionObject
   private signedTx: string
   public protocol: ICoinProtocol
 
@@ -60,6 +60,7 @@ export class TransactionConfirmPage {
       this.signedTransactionSync = info.signedTransactionSync
     }
 
+    // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
     this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
@@ -72,18 +73,15 @@ export class TransactionConfirmPage {
 
     loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-    const interval = setTimeout(() => {
+    const interval = setTimeout(async () => {
       loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      const toast = this.toastCtrl
-        .create({
-          duration: TOAST_DURATION,
-          message: 'Transaction queued. It might take some time until your TX shows up!',
-          showCloseButton: true,
-          position: 'bottom'
-        })
-        .then(toast => {
-          toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-        })
+      const toast: HTMLIonToastElement = await this.toastCtrl.create({
+        duration: TOAST_DURATION,
+        message: 'Transaction queued. It might take some time until your TX shows up!',
+        showCloseButton: true,
+        position: 'bottom'
+      })
+      toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
 
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
@@ -125,6 +123,7 @@ export class TransactionConfirmPage {
         }
 
         // TODO: Remove once we introduce pending transaction handling
+        // TODO: Multi messages
         // tslint:disable-next-line:no-unnecessary-type-assertion
         const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
         const lastTx: {
@@ -143,7 +142,8 @@ export class TransactionConfirmPage {
         this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
-        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)) as any
+        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
+          .payload as SignedTransaction))[0] as any
         // necessary for the transaction backend
         signed.amount = signed.amount.toString()
         signed.fee = signed.fee.toString()

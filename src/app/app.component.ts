@@ -17,6 +17,7 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
@@ -83,7 +84,8 @@ export class AppComponent {
 
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
-      const sub = this.accountProvider.wallets.subscribe(wallets => {
+      // TODO: Use wallet changed observable?
+      const sub = this.accountProvider.wallets.subscribe(() => {
         this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()
@@ -143,8 +145,8 @@ export class AppComponent {
     const deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
     const info = {
       wallet: deeplinkInfo.wallet,
-      airGapTx: deeplinkInfo.airGapTx,
-      data: 'airgap-vault://?d=' + deeplinkInfo.serializedTx
+      airGapTxs: deeplinkInfo.airGapTxs,
+      data: deeplinkInfo.serializedTx
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

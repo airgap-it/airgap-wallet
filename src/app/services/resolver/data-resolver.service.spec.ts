@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing'
+
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { DataResolverService } from './data-resolver.service'

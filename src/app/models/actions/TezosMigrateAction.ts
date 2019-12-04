@@ -1,10 +1,11 @@
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
+import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { Action } from 'airgap-coin-lib/dist/actions/Action'
+
+import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { Router } from '@angular/router'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 export interface AirGapTezosMigrateActionContext {

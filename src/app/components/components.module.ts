@@ -1,4 +1,3 @@
-import { ChartComponent } from './chart/chart.component'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -6,14 +5,16 @@ import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
 import { MaterialIconsModule } from 'ionic2-material-icons'
-import { MomentModule } from 'ngx-moment'
 import { ChartsModule } from 'ng2-charts'
+import { MomentModule } from 'ngx-moment'
 
 import { PipesModule } from '../pipes/pipes.module'
 
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { AddressRowComponent } from './address-row/address-row'
+import { AmountComponent } from './amount/amount.component'
 import { CardActionableComponent } from './card-actionable/card-actionable'
+import { ChartComponent } from './chart/chart.component'
 import { CurrencyItemComponent } from './currency-item/currency-item'
 import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
@@ -38,6 +39,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     FromToComponent,
     SwapComponent,
     AccountEditPopoverComponent,
+    AmountComponent,
     CardActionableComponent,
     EmptyStateComponent,
     CurrencySymbolComponent,
@@ -67,6 +69,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     IdenticonComponent,
     HexagonIconComponent,
     AddressRowComponent,
+    AmountComponent,
     FromToComponent,
     SwapComponent,
     AccountEditPopoverComponent,

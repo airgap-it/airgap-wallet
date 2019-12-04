@@ -1,53 +1,67 @@
-import { Component, Input } from '@angular/core'
-import {
-  DeserializedSyncProtocol,
-  getProtocolByIdentifier,
-  IAirGapTransaction,
-  SignedTransaction,
-  SyncProtocolUtils
-} from 'airgap-coin-lib'
+import { Component, Input, OnChanges } from '@angular/core'
+import { getProtocolByIdentifier, IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { SerializerService } from '../../services/serializer/serializer.service'
 
 @Component({
   selector: 'signed-transaction',
   templateUrl: 'signed-transaction.html',
   styleUrls: ['./signed-transaction.scss']
 })
-export class SignedTransactionComponent {
+export class SignedTransactionComponent implements OnChanges {
   @Input()
-  public signedTx: DeserializedSyncProtocol
+  public signedTx: IACMessageDefinitionObject | undefined // TODO: Type
 
   @Input()
   public syncProtocolString: string
 
-  public airGapTx: IAirGapTransaction
+  public airGapTxs: IAirGapTransaction[]
   public fallbackActivated: boolean = false
+
+  public aggregatedInfo:
+    | {
+        numberOfTxs: number
+        totalAmount: BigNumber
+        totalFees: BigNumber
+      }
+    | undefined
 
   public rawTxData: SignedTransaction
 
-  constructor() {
+  constructor(private readonly serializerService: SerializerService) {
     //
   }
 
-  public async ngOnChanges() {
+  public async ngOnChanges(): Promise<void> {
     if (this.syncProtocolString) {
       try {
-        const syncUtils = new SyncProtocolUtils()
-        const parts = this.syncProtocolString.split('?d=')
-        this.signedTx = await syncUtils.deserialize(parts[parts.length - 1])
+        this.signedTx = await this.serializerService.deserialize(this.syncProtocolString)[0]
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
 
+    // TODO: Handle multiple messages
     if (this.signedTx) {
-      const protocol = getProtocolByIdentifier(this.signedTx.protocol)
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTx.protocol)
       try {
-        this.airGapTx = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        if (
+          this.airGapTxs.length > 1 &&
+          this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
+        ) {
+          this.aggregatedInfo = {
+            numberOfTxs: this.airGapTxs.length,
+            totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+            totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
+          }
+        }
         this.fallbackActivated = false
       } catch (e) {
+        console.error(e)
         this.fallbackActivated = true
         this.rawTxData = this.signedTx.payload as SignedTransaction
         handleErrorSentry(ErrorCategory.COINLIB)(e)

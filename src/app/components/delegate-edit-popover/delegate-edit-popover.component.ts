@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 
-import { LanguageService } from '../../services/language.service'
+import { LanguageService } from '../../services/language/language.service'
 
 @Component({
   selector: 'app-delegate-edit-popover',

@@ -28,3 +28,62 @@ export function generateGUID(): string {
   }
   // tslint:enable
 }
+
+export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]> {
+  return promise
+    .then<[null, T]>((data: T) => [null, data])
+    .catch<[U, undefined]>((err: U) => {
+      if (errorExt) {
+        Object.assign(err, errorExt)
+      }
+
+      return [err, undefined]
+    })
+}
+
+export function partition<T>(array: T[], isValid: (element: T) => boolean): [T[], T[]] {
+  const pass: T[] = []
+  const fail: T[] = []
+  array.forEach((element: T) => {
+    if (isValid(element)) {
+      pass.push(element)
+    } else {
+      fail.push(element)
+    }
+  })
+
+  return [pass, fail]
+}
+
+function readParameterFromUrl(url: string, parameter: string): string {
+  try {
+    const parsedUrl: URL = new URL(url)
+
+    return parsedUrl.searchParams.get(parameter)
+  } catch (error) {
+    return url
+  }
+}
+
+export function parseIACUrl(url: string | string[], parameter: string): string[] {
+  let result: string[] | undefined
+  if (Array.isArray(url)) {
+    result = url.map((chunk: string) => readParameterFromUrl(chunk, parameter))
+  } else {
+    try {
+      result = readParameterFromUrl(url, parameter).split(',')
+    } catch (error) {
+      result = url.split(',')
+    }
+  }
+
+  // In case one of the elements contains a chunked string, we have to flatten it.
+  result = result.reduce((pv: string[], cv: string) => [...pv, ...cv.split(',')], [])
+  // result = result.map((value: string) => value.split(',')).flat()
+
+  return result.filter((el: string) => el !== '')
+}
+
+export function serializedDataToUrlString(data: string | string[], host: string = 'airgap-vault://', parameter: string = 'd'): string {
+  return `${host}?${parameter}=${Array.isArray(data) ? data.join(',') : data}`
+}

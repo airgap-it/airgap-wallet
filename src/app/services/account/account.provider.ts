@@ -1,4 +1,3 @@
-import { DrawChartService } from './../draw-chart/draw-chart.service'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { NotificationEventResponse } from '@ionic-native/push/ngx'
@@ -10,7 +9,8 @@ import { auditTime, map, take } from 'rxjs/operators'
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
-import { LanguageService } from '../language.service'
+import { DrawChartService } from '../draw-chart/draw-chart.service'
+import { LanguageService } from '../language/language.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
@@ -19,6 +19,7 @@ enum NotificationKind {
   CTA_Tip = 'cta_tip',
   CTA_Delegate = 'cta_delegate'
 }
+
 interface CTAInfo {
   kind: NotificationKind
   fromAddress: string
@@ -242,6 +243,7 @@ export class AccountProvider {
 
     this.wallets.next(this.walletList)
     this.drawChartProvider.drawChart()
+
     return this.persist()
   }
 

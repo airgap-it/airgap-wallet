@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
+import { AlertButton, AlertInput, AlertOptions } from '@ionic/core'
 import { TranslateService } from '@ngx-translate/core'
-import { AlertOptions, AlertButton, AlertInput } from '@ionic/core'
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +10,20 @@ export class LanguageService {
   constructor(private readonly translateService: TranslateService) {}
 
   // TODO: add missing fields and handle empty/unused fields
-  async getTranslatedAlert(header: string, message: string, inputs: AlertInput[], buttons: AlertButton[]): Promise<AlertOptions> {
+  public async getTranslatedAlert(header: string, message: string, inputs: AlertInput[], buttons: AlertButton[]): Promise<AlertOptions> {
     const translationKeys = [header, message, ...inputs.map(input => input.placeholder), ...buttons.map(button => button.text)]
 
     const values = await this.translateService.get(translationKeys).toPromise()
-    inputs.forEach(input => (input.placeholder = values[input.placeholder]))
-    buttons.forEach(button => (button.text = values[button.text]))
+    inputs.forEach(input => {
+      input.placeholder = values[input.placeholder]
+
+      return input
+    })
+    buttons.forEach(button => {
+      button.text = values[button.text]
+
+      return button
+    })
 
     return {
       header: values[header],

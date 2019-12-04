@@ -1,9 +1,9 @@
-import { Location } from '@angular/common'
 import { Component } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
+import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-import { ClipboardProvider } from '../../services/clipboard/clipboard'
+import { ClipboardService } from '../../services/clipboard/clipboard'
 
 @Component({
   selector: 'page-account-address',
@@ -14,21 +14,20 @@ export class AccountAddressPage {
   public wallet: AirGapMarketWallet
 
   constructor(
-    private readonly location: Location,
-    private readonly router: Router,
+    private readonly navController: NavController,
     private readonly route: ActivatedRoute,
-    private readonly clipboardProvider: ClipboardProvider
+    private readonly clipboardProvider: ClipboardService
   ) {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special
     }
   }
 
-  public async copyAddressToClipboard() {
+  public async copyAddressToClipboard(): Promise<void> {
     await this.clipboardProvider.copyAndShowToast(this.wallet.receivingPublicAddress)
   }
 
-  public async done() {
-    this.location.back()
+  public async done(): Promise<void> {
+    await this.navController.pop()
   }
 }

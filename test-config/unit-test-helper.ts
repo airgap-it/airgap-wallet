@@ -1,5 +1,3 @@
-import { MarketDataService } from './../src/app/services/market-data/market-data.service'
-import { DrawChartService } from './../src/app/services/draw-chart/draw-chart.service'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -13,6 +11,7 @@ import { MomentModule } from 'ngx-moment'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
+import { DrawChartService } from '../src/app/services/draw-chart/draw-chart.service'
 
 import {
   AlertControllerMock,
@@ -62,6 +61,7 @@ export class UnitHelper {
     ]
     const mandatoryProviders: any[] = [
       DrawChartService,
+      { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
       Push,

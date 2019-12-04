@@ -8,40 +8,40 @@ export class ScanBasePage {
   public zxingScanner: ZXingScannerComponent
   public availableDevices: MediaDeviceInfo[]
   public selectedDevice: MediaDeviceInfo
-  public scannerEnabled = true
+  public scannerEnabled: boolean = true
 
-  public isBrowser = false
+  public isBrowser: boolean = false
 
-  public hasCameras = false
+  public hasCameras: boolean = false
 
-  public hasCameraPermission = false
+  public hasCameraPermission: boolean = false
 
   constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {}
 
-  public async ionViewWillEnter() {
+  public async ionViewWillEnter(): Promise<void> {
     if (this.platform.is('cordova')) {
       await this.platform.ready()
       await this.checkCameraPermissionsAndActivate()
     }
   }
 
-  public async requestPermission() {
+  public async requestPermission(): Promise<void> {
     await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
     await this.checkCameraPermissionsAndActivate()
   }
 
-  public async checkCameraPermissionsAndActivate() {
-    const permission = await this.permissionsProvider.hasCameraPermission()
+  public async checkCameraPermissionsAndActivate(): Promise<void> {
+    const permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
     if (permission === PermissionStatus.GRANTED) {
       this.hasCameraPermission = true
       this.startScan()
     }
   }
 
-  public ionViewDidEnter() {
+  public ionViewDidEnter(): void {
     if (!this.platform.is('cordova')) {
       this.hasCameraPermission = true
-      this.zxingScanner.camerasNotFound.subscribe((devices: MediaDeviceInfo[]) => {
+      this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
       if (this.selectedDevice) {
@@ -56,7 +56,7 @@ export class ScanBasePage {
     }
   }
 
-  public ionViewWillLeave() {
+  public ionViewWillLeave(): void {
     if (this.platform.is('cordova')) {
       this.scanner.destroy()
     } else {
@@ -64,7 +64,7 @@ export class ScanBasePage {
     }
   }
 
-  public startScan() {
+  public startScan(): void {
     if (this.platform.is('cordova')) {
       this.scanner.show()
       this.scanner.scan(
@@ -81,7 +81,7 @@ export class ScanBasePage {
     }
   }
 
-  public checkScan(resultString: string) {
+  public checkScan(resultString: string): void {
     console.error(`The checkScan method needs to be overwritten. Ignoring text ${resultString}`)
   }
 }

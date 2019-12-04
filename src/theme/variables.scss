@@ -178,6 +178,15 @@ ion-avatar {
   min-height: 48px;
 }
 
+page-account-address {
+  identicon,
+  identicon img,
+  ion-avatar {
+    width: 64px;
+    height: 64px;
+  }
+}
+
 .item__image[slot='start'] {
   margin: 8px 16px 8px 0;
 }
