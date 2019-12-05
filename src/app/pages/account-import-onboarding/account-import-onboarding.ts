@@ -33,6 +33,8 @@ export class AccountImportOnboardingPage implements OnInit {
     }
   }
   public protocol: ICoinProtocol
+  public subProtocol: ICoinProtocol | undefined
+
   public isBegin: boolean = true
   public isEnd: boolean = false
 
@@ -47,8 +49,11 @@ export class AccountImportOnboardingPage implements OnInit {
 
   public ngOnInit(): void {
     if (this.route.snapshot.data.special) {
-      this.protocol = getProtocolByIdentifier(this.route.snapshot.data.special)
-      console.log(this.protocol)
+      const info = this.route.snapshot.data.special
+      this.protocol = getProtocolByIdentifier(info.mainProtocolIdentifier)
+      if (info.subProtocolIdentifier) {
+        this.subProtocol = getProtocolByIdentifier(info.subProtocolIdentifier)
+      }
     }
   }
 
