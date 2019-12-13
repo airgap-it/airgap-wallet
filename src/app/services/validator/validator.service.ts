@@ -32,7 +32,7 @@ export class ValidatorService {
 
       return {
         alias: validator.description.moniker,
-        rate: `${(parseFloat(validator.commission.rate) * 100).toString()}%`,
+        rate: `${(parseFloat(validator.commission.commission_rates.rate) * 100).toString()}%`,
         status: statusCodes[validator.status],
         totalDelegationBalance: new BigNumber(validator.tokens)
       }
