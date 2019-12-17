@@ -8,6 +8,7 @@ import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { CommunicationService } from '../communication/communication.service'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -29,7 +30,8 @@ export class SchemeRoutingProvider {
     private readonly alertController: AlertController,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
-    private readonly serializerService: SerializerService
+    private readonly serializerService: SerializerService,
+    private readonly communicationService: CommunicationService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -96,6 +98,18 @@ export class SchemeRoutingProvider {
     }
   ): Promise<IACResult> {
     this.router = router
+
+    // Check if it's a wallet communication request
+    try {
+      if (typeof data === 'string') {
+        const json = JSON.parse(data)
+        if (json.pubKey && json.relayServer) {
+          console.log('WALLET COMMUNICATION')
+          await this.communicationService.openChannel(json.pubKey, json.relayServer)
+        }
+      }
+    } catch (e) {}
+
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
 
     if (error && !error.message) {
