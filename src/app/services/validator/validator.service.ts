@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { CosmosProtocol } from 'airgap-coin-lib'
 import { CosmosDelegation, CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { BigNumber } from 'bignumber.js'
+import { CachingService } from '../caching/caching.service'
 
 export interface Uptime {
   address: string
@@ -22,6 +23,8 @@ export interface CosmosValidatorInfo {
 export class ValidatorService {
   public protocol = new CosmosProtocol()
 
+  constructor(private readonly cachingService: CachingService) {}
+
   public async getValidatorInfo(address: string): Promise<CosmosValidatorInfo> {
     const statusCodes = { 0: 'jailed', 1: 'inactive', 2: 'active' }
     try {
@@ -29,7 +32,7 @@ export class ValidatorService {
 
       return {
         alias: validator.description.moniker,
-        rate: `${(parseFloat(validator.commission.rate) * 100).toString()}%`,
+        rate: `${(parseFloat(validator.commission.commission_rates.rate) * 100).toString()}%`,
         status: statusCodes[validator.status],
         totalDelegationBalance: new BigNumber(validator.tokens)
       }
@@ -44,7 +47,7 @@ export class ValidatorService {
   }
 
   public async fetchValidators(): Promise<CosmosValidator[]> {
-    return this.protocol.fetchValidators()
+    return this.cachingService.fetchValidators()
   }
 
   public async fetchVotingPower(address: string): Promise<BigNumber> {

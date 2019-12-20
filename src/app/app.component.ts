@@ -16,7 +16,7 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
-import { generateGUID, serializedDataToUrlString } from './utils/utils'
+import { generateGUID } from './utils/utils'
 
 @Component({
   selector: 'app-root',
@@ -146,7 +146,7 @@ export class AppComponent {
     const info = {
       wallet: deeplinkInfo.wallet,
       airGapTxs: deeplinkInfo.airGapTxs,
-      data: serializedDataToUrlString(deeplinkInfo.serializedTx)
+      data: deeplinkInfo.serializedTx
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

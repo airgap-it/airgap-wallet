@@ -1,13 +1,16 @@
+import { CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, CosmosProtocol } from 'airgap-coin-lib'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 
 export enum CachingServiceKey {
   PRICESAMPLES = 'pricesamples',
-  TRANSACTIONS = 'transactions'
+  TRANSACTIONS = 'transactions',
+  VALIDATORS = 'validators',
+  DELEGATIONS = 'delegations'
 }
 
 export interface TransactionIdentifier {
@@ -41,6 +44,11 @@ export class CachingService {
 
   public setPriceData(identifier: PriceSampleIdentifier, value: any): Promise<any> {
     const uniqueId = `${identifier.timeUnit}_${identifier.protocolIdentifier}_${identifier.key}`
+    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
+  }
+
+  public setValidators(value: CosmosValidator[]): Promise<any> {
+    const uniqueId = CachingServiceKey.VALIDATORS
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
@@ -114,11 +122,26 @@ export class CachingService {
     })
   }
 
+  public async fetchValidators(): Promise<CosmosValidator[]> {
+    const uniqueId = CachingServiceKey.VALIDATORS
+    return new Promise<CosmosValidator[]>(async resolve => {
+      const validatorsObject: StorageObject = await this.storage.get(uniqueId)
+      if (validatorsObject && validatorsObject.timestamp > Date.now() - 30 * 60 * 1000) {
+        console.log('FROM CACHE: validators')
+        resolve(validatorsObject.value)
+      } else {
+        const protocol = new CosmosProtocol()
+        const validators = await protocol.fetchValidators()
+        this.setValidators(validators)
+        resolve(validators)
+      }
+    })
+  }
+
   public getData(publicKey): unknown | undefined {
     if (this.data[publicKey]) {
       return this.data[publicKey]
     }
-
     return undefined
   }
 }

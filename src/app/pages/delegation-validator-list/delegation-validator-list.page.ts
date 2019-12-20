@@ -30,14 +30,17 @@ export class DelegationValidatorListPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.fetchDelegations(this.wallet.addresses[0])
-      this.fetchValidatorList()
     }
+  }
+
+  public ngOnInit() {
+    this.fetchValidatorList()
+    this.fetchDelegations(this.wallet.addresses[0])
   }
 
   private async fetchValidatorList() {
     this.allValidators = await this.validatorService.fetchValidators()
-    this.filteredValidators = this.allValidators
+    this.filteredValidators = this.allValidators.sort((a, b) => parseFloat(a.tokens) - parseFloat(b.tokens)).reverse()
   }
 
   private async fetchDelegations(address: string) {

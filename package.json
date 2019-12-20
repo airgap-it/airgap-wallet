@@ -79,8 +79,8 @@
     "bignumber.js": "8.0.1",
     "chart.js": "^2.8.0",
     "com.lampa.startapp": "^6.1.6",
-    "cordova-android": "7.1.4",
-    "cordova-android-support-gradle-release": "^1.4.7",
+    "cordova-android": "8.1.0",
+    "cordova-android-support-gradle-release": "3.0.1",
     "cordova-clipboard": "^1.2.1",
     "cordova-ios": "5.0.1",
     "cordova-plugin-add-swift-support": "^1.7.2",
@@ -181,7 +181,7 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-x-socialsharing": {
-        "ANDROID_SUPPORT_V4_VERSION": "26.1.0"
+        "ANDROID_SUPPORT_V4_VERSION": "28.+"
       },
       "cordova-plugin-app-version": {},
       "cordova-plugin-inappbrowser": {},
@@ -193,17 +193,17 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-clipboard": {},
       "cordova.plugins.diagnostic": {
-        "ANDROID_SUPPORT_VERSION": "26.1.0"
+        "ANDROID_SUPPORT_VERSION": "28.+"
       },
       "cordova-plugin-ionic-webview": {
-        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "26.1.0"
+        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "28.+"
       },
       "phonegap-plugin-push": {
-        "ANDROID_SUPPORT_V13_VERSION": "26.1.0",
+        "ANDROID_SUPPORT_V13_VERSION": "28.+",
         "FCM_VERSION": "11.6.2"
       },
       "cordova-android-support-gradle-release": {
-        "ANDROID_SUPPORT_VERSION": "26.1.0"
+        "ANDROID_SUPPORT_VERSION": "28.+"
       },
       "ionic-plugin-deeplinks": {
         "URL_SCHEME": "airgap-wallet",
