@@ -15,7 +15,8 @@ export enum SettingsKey {
   SETTINGS_SERIALIZER_ENABLE_V2 = 'SETTINGS_SERIALIZER_ENABLE_V2',
   SETTINGS_SERIALIZER_CHUNK_TIME = 'SETTINGS_SERIALIZER_CHUNK_TIME',
   SETTINGS_SERIALIZER_CHUNK_SIZE = 'SETTINGS_SERIALIZER_CHUNK_SIZE',
-  COMMUNICATION_PRIVATE_SEED = 'COMMUNICATION_PRIVATE_SEED'
+  COMMUNICATION_PRIVATE_SEED = 'COMMUNICATION_PRIVATE_SEED',
+  COMMUNICATION_KNOWN_PEERS = 'COMMUNICATION_KNOWN_PEERS'
 }
 
 interface IPartialAirGapWallet {
@@ -33,6 +34,11 @@ interface IBroadcastTransaction {
   date: number
 }
 
+interface ICommunicationPair {
+  pubKey: string
+  relayServer: string
+}
+
 interface SettingsKeyReturnType {
   [SettingsKey.INTRODUCTION]: boolean
   [SettingsKey.WALLET_INTRODUCTION]: boolean
@@ -47,6 +53,7 @@ interface SettingsKeyReturnType {
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: number
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: number
   [SettingsKey.COMMUNICATION_PRIVATE_SEED]: string | undefined
+  [SettingsKey.COMMUNICATION_KNOWN_PEERS]: ICommunicationPair[]
 }
 
 type SettingsKeyReturnDefaults = { [key in SettingsKey]: SettingsKeyReturnType[key] }
@@ -64,7 +71,8 @@ const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 500,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: 100,
-  [SettingsKey.COMMUNICATION_PRIVATE_SEED]: undefined
+  [SettingsKey.COMMUNICATION_PRIVATE_SEED]: undefined,
+  [SettingsKey.COMMUNICATION_KNOWN_PEERS]: []
 }
 
 @Injectable({
@@ -75,13 +83,13 @@ export class StorageProvider {
 
   public async get<K extends SettingsKey>(key: K): Promise<SettingsKeyReturnType[K]> {
     const value: SettingsKeyReturnType[K] = (await this.storage.get(key)) || defaultValues[key]
-    console.log(`[SETTINGS_SERVICE:get] ${key}, returned: ${value}`)
+    console.log(`[SETTINGS_SERVICE:get] ${key}, returned:`, value)
 
     return value
   }
 
   public async set<K extends SettingsKey>(key: K, value: SettingsKeyReturnType[K]): Promise<any> {
-    console.log(`[SETTINGS_SERVICE:set] ${key}, ${value}`)
+    console.log(`[SETTINGS_SERVICE:set] ${key}`, value)
 
     return this.storage.set(key, value)
   }

@@ -24,14 +24,32 @@ export class CommunicationService {
     }
     this.client = new WalletCommunicationClient('BEACON', seed, 1, true)
     await this.client.start()
+    const knownPeers = await this.storageService.get(SettingsKey.COMMUNICATION_KNOWN_PEERS)
+    knownPeers.forEach(peer => {
+      this.listen(peer.pubKey) // TODO: Prevent channels from being opened multiple times
+    })
   }
 
-  public async openChannel(pubKey: string, relayServer: string) {
+  public async addPeer(pubKey: string, relayServer: string) {
+    // We got a new pairing request. Let's check if we're already connected and save the pubkey.
+    const knownPeers = await this.storageService.get(SettingsKey.COMMUNICATION_KNOWN_PEERS)
+    if (!knownPeers.some(peer => peer.pubKey === pubKey)) {
+      knownPeers.push({
+        pubKey,
+        relayServer
+      })
+      this.storageService.set(SettingsKey.COMMUNICATION_KNOWN_PEERS, knownPeers)
+    }
+    console.log('opening channel')
+    await this.client.openChannel(pubKey, relayServer) // TODO: Should we have a confirmation here?
+    this.listen(pubKey) // TODO: Prevent channels from being opened multiple times
+  }
+
+  public async listen(pubKey: string) {
     if (!this.client) {
       throw new Error('Client not ready')
     }
-    console.log('opening channel')
-    this.client.openChannel(pubKey, relayServer) // TODO: Should we have a confirmation here?
+    console.log('listening to', pubKey)
 
     this.client.listenForEncryptedMessage(pubKey, message => {
       console.log('WALLET gotEncryptedMessage:', message)

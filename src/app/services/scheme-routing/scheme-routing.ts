@@ -105,7 +105,7 @@ export class SchemeRoutingProvider {
         const json = JSON.parse(data)
         if (json.pubKey && json.relayServer) {
           console.log('WALLET COMMUNICATION')
-          await this.communicationService.openChannel(json.pubKey, json.relayServer)
+          await this.communicationService.addPeer(json.pubKey, json.relayServer)
         }
       }
     } catch (e) {}
