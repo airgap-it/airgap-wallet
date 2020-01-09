@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
-import { MessageTypes, PermissionRequest } from '@airgap/beacon-sdk/dist/client/Messages'
+import { MessageTypes, PermissionRequest, BaseRequest } from '@airgap/beacon-sdk/dist/client/Messages'
 import { AlertController } from '@ionic/angular'
 
 @Injectable({
@@ -57,9 +57,10 @@ export class CommunicationService {
       console.log('typeof', typeof message)
       try {
         const serializer = new Serializer()
-        const deserializedMessage = serializer.deserialize(message.toString()) as PermissionRequest
+        const deserializedMessage = serializer.deserialize(message.toString()) as BaseRequest
         console.log('deserializedMessage.id', deserializedMessage.id)
         if (deserializedMessage.type === MessageTypes.PermissionRequest) {
+          const permissionRequest = deserializedMessage as PermissionRequest
           this.alertController
             .create({
               header: 'Permission request',
@@ -70,7 +71,7 @@ export class CommunicationService {
                   type: 'checkbox',
                   label: 'Read Address',
                   value: 'read_address',
-                  checked: true
+                  checked: permissionRequest.scope.indexOf('read_address') >= 0
                 },
 
                 {
@@ -78,15 +79,15 @@ export class CommunicationService {
                   type: 'checkbox',
                   label: 'Sign',
                   value: 'sign',
-                  checked: true
+                  checked: permissionRequest.scope.indexOf('sign') >= 0
                 },
 
                 {
-                  name: 'payment_request',
+                  name: 'operation_request',
                   type: 'checkbox',
-                  label: 'Payment request',
-                  value: 'payment_request',
-                  checked: true
+                  label: 'Operation request',
+                  value: 'operation_request',
+                  checked: permissionRequest.scope.indexOf('operation_request') >= 0
                 },
 
                 {
@@ -94,20 +95,20 @@ export class CommunicationService {
                   type: 'checkbox',
                   label: 'Threshold',
                   value: 'threshold',
-                  checked: true
+                  checked: permissionRequest.scope.indexOf('threshold') >= 0
                 }
               ],
               buttons: [
                 {
                   text: 'Ok',
-                  handler: () => {
+                  handler: grantedPermissions => {
                     console.log('SATISFIED')
                     const permissionResponse = {
-                      id: 'string',
+                      id: permissionRequest.id,
                       type: MessageTypes.PermissionResponse,
-                      address: 'string',
-                      networks: ['1', '2'],
-                      permissions: ['PermissionScope[]']
+                      address: 'string', // TODO: Get address
+                      networks: ['mainnet'],
+                      permissions: grantedPermissions
                     }
                     const serializedMessage = serializer.serialize(permissionResponse)
                     this.client.sendMessage(pubKey, serializedMessage)
