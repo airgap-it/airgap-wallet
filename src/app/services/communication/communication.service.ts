@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
-import { MessageTypes, PermissionRequest, BaseRequest } from '@airgap/beacon-sdk/dist/client/Messages'
+import { MessageTypes, PermissionRequest, BaseRequest, PermissionResponse } from '@airgap/beacon-sdk/dist/client/Messages'
 import { AlertController } from '@ionic/angular'
 
 @Injectable({
@@ -103,14 +103,17 @@ export class CommunicationService {
                   text: 'Ok',
                   handler: grantedPermissions => {
                     console.log('SATISFIED')
-                    const permissionResponse = {
+                    const response: PermissionResponse = {
                       id: permissionRequest.id,
                       type: MessageTypes.PermissionResponse,
-                      address: 'string', // TODO: Get address
-                      networks: ['mainnet'],
-                      permissions: grantedPermissions
+                      permissions: {
+                        pubkey: '',
+                        networks: ['mainnet'],
+                        scopes: grantedPermissions
+                      }
                     }
-                    const serializedMessage = serializer.serialize(permissionResponse)
+
+                    const serializedMessage = serializer.serialize(response)
                     this.client.sendMessage(pubKey, serializedMessage)
                     console.log('WALLET ALLOWED PERMISSION')
                   }
