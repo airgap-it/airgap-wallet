@@ -26,9 +26,9 @@ export class CommunicationService {
     this.client = new WalletCommunicationClient('BEACON', seed, 1, true)
     await this.client.start()
     const knownPeers = await this.storageService.get(SettingsKey.COMMUNICATION_KNOWN_PEERS)
-    knownPeers.forEach(peer => {
-      this.listen(peer.pubKey) // TODO: Prevent channels from being opened multiple times
-    })
+
+    const connectionPromises = knownPeers.map(async peer => this.listen(peer.pubKey)) // TODO: Prevent channels from being opened multiple times
+    await Promise.all(connectionPromises)
   }
 
   public async addPeer(pubKey: string, relayServer: string) {
@@ -57,90 +57,23 @@ export class CommunicationService {
 
       console.log('typeof', typeof message)
       try {
-        this.presentModal()
         const serializer = new Serializer()
         const deserializedMessage = serializer.deserialize(message.toString()) as BaseRequest
         console.log('deserializedMessage.id', deserializedMessage.id)
-        /*
-        if (deserializedMessage.type === MessageTypes.PermissionRequest) {
-          const permissionRequest = deserializedMessage as PermissionRequest
-          this.alertController
-            .create({
-              header: 'Permission request',
-              message: 'Do you want to give the dapp permissions to do all the things?',
-              inputs: [
-                {
-                  name: 'read_address',
-                  type: 'checkbox',
-                  label: 'Read Address',
-                  value: 'read_address',
-                  checked: permissionRequest.scope.indexOf('read_address') >= 0
-                },
 
-                {
-                  name: 'sign',
-                  type: 'checkbox',
-                  label: 'Sign',
-                  value: 'sign',
-                  checked: permissionRequest.scope.indexOf('sign') >= 0
-                },
-
-                {
-                  name: 'operation_request',
-                  type: 'checkbox',
-                  label: 'Operation request',
-                  value: 'operation_request',
-                  checked: permissionRequest.scope.indexOf('operation_request') >= 0
-                },
-
-                {
-                  name: 'threshold',
-                  type: 'checkbox',
-                  label: 'Threshold',
-                  value: 'threshold',
-                  checked: permissionRequest.scope.indexOf('threshold') >= 0
-                }
-              ],
-              buttons: [
-                {
-                  text: 'Ok',
-                  handler: grantedPermissions => {
-                    console.log('SATISFIED')
-                    const response: PermissionResponse = {
-                      id: permissionRequest.id,
-                      type: MessageTypes.PermissionResponse,
-                      permissions: {
-                        pubkey: '',
-                        networks: ['mainnet'],
-                        scopes: grantedPermissions
-                      }
-                    }
-
-                    const serializedMessage = serializer.serialize(response)
-                    this.client.sendMessage(pubKey, serializedMessage)
-                    console.log('WALLET ALLOWED PERMISSION')
-                  }
-                },
-                {
-                  text: 'Cancel',
-                  role: 'cancel'
-                }
-              ]
-            })
-            .then(alert => {
-              alert.present()
-            })
-
-            
-        }
-        */
+        this.presentModal(deserializedMessage, { pubKey })
       } catch (error) {}
     })
   }
 
-  async presentModal() {
+  async presentModal(request: BaseRequest, dappInfo: { pubKey: string }) {
     const modal = await this.modalController.create({
-      component: BeaconRequestPage
+      component: BeaconRequestPage,
+      componentProps: {
+        request,
+        dappInfo,
+        client: this.client
+      }
     })
     return await modal.present()
   }

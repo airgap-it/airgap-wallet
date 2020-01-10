@@ -3,60 +3,77 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ 'extension-connection.title' | translate }}</ion-title>
+    <ion-title>{{ 'beacon-request.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div *ngIf="action === 'accountShare'" class="request--container">
-    <ion-row>
-      <ion-col class="ion-text-center" size="3">
-        <ion-avatar>
-          <identicon [address]="dappId"></identicon>
-        </ion-avatar>
-      </ion-col>
-      <ion-col>
-        <div class="divider--line"></div>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <ion-icon name="checkmark-circle-outline" color="secondary" size="large" margin-top></ion-icon>
-      </ion-col>
-      <ion-col>
-        <div class="divider--line"></div>
-      </ion-col>
-      <ion-col class="ion-text-center" size="3">
-        <ion-avatar>
-          <identicon [address]="address"></identicon>
-        </ion-avatar>
-      </ion-col>
+  <ng-container *ngIf="request">
+    <div *ngIf="request.type === 'permission_request'" class="request--container">
+      <ion-row>
+        <ion-col class="ion-text-center" size="3">
+          <ion-avatar>
+            <identicon [address]="dappInfo.pubKey"></identicon>
+          </ion-avatar>
+        </ion-col>
+        <ion-col>
+          <div class="divider--line"></div>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <ion-icon name="checkmark-circle-outline" color="secondary" size="large" class="ion-margin-top"></ion-icon>
+        </ion-col>
+        <ion-col>
+          <div class="divider--line"></div>
+        </ion-col>
+        <ion-col class="ion-text-center" size="3">
+          <ion-avatar>
+            <identicon [address]="address"></identicon>
+          </ion-avatar>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col class="ion-text-left" size="4">
+          <h5 class="ion-no-margin">{{ dappInfo.pubKey | shortenString }}</h5>
+        </ion-col>
+        <ion-col class="ion-text-right" size="4" push="4">
+          <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <ion-row *ngIf="request.type === 'permission_request'">
+      <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requestorName: dappInfo.pubKey }"></h2>
+      <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
+
+      <ion-list>
+        <ion-item *ngFor="let input of inputs">
+          <ion-label>{{ input.label }}</ion-label>
+          <ion-checkbox [(ngModel)]="input.checked" slot="start"></ion-checkbox>
+        </ion-item>
+      </ion-list>
     </ion-row>
-    <ion-row>
-      <ion-col class="ion-text-left" size="4">
-        <h5 no-margin>{{ dappId | shortenString }}</h5>
-      </ion-col>
-      <ion-col class="ion-text-right" size="4" push="4">
-        <h5 no-margin>{{ address | shortenString }}</h5>
-      </ion-col>
-    </ion-row>
-  </div>
 
-  <ion-row *ngIf="action === 'accountShare'">
-    <h2 [innerHTML]="'extension-connection.request.heading' | translate: { requestorName: sdkId }"></h2>
-    <p padding-top>{{ 'extension-connection.request.text' | translate }}</p>
-  </ion-row>
+    <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
+      Not implemented
+    </div>
 
-  <h2 *ngIf="action === 'prepareTransaction'">{{ 'extension-connection.sign-data_label' | translate }}</h2>
-  <pre *ngIf="action === 'prepareTransaction'">{{ data | json }}</pre>
+    <div *ngIf="request.type === 'operation_request'" class="request--container">
+      Not implemented
+    </div>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="secondary" (click)="dismiss()">
-      {{ 'extension-connection.dismiss_label' | translate }}
-    </ion-button>
-    <ion-button shape="round" color="primary" (click)="accountShare()" *ngIf="action === 'accountShare'">
-      {{ 'extension-connection.connect_label' | translate }}
-    </ion-button>
-    <ion-button shape="round" color="primary" (click)="prepareTransaction()" *ngIf="action === 'prepareTransaction'">
-      {{ 'extension-connection.prepare-data_label' | translate }}
-    </ion-button>
-  </ion-fab>
+    <div *ngIf="request.type === 'broadcast_request'" class="request--container">
+      Not implemented
+    </div>
+
+    <pre *ngIf="request.type !== 'permission_request'">{{ request | json }}</pre>
+
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-button shape="round" color="secondary" (click)="dismiss()">
+        {{ 'beacon-request.dismiss_label' | translate }}
+      </ion-button>
+      <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
+        {{ 'beacon-request.connect_label' | translate }}
+      </ion-button>
+    </ion-fab>
+  </ng-container>
 </ion-content>

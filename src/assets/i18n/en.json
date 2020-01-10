@@ -485,6 +485,17 @@
 		"text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
 		"cancel_label": "No",
 		"ok_label": "Yes!"
+	},
+	
+  "beacon-request": {
+    "title": "Connection Request",
+    "sign-data_label": "Do you want to sign the following data?:",
+    "request": {
+      "heading": "<span class=\"style__strong color__primary\">{{ requestorName }}</span> would like to connect to your account.",
+      "text": "This website is requesting acces to view your current account address. Always make sure you trust the websites you interact with."
+    },
+    "connect_label": "Connect",
+    "prepare-data_label": "Prepare Data",
+    "dismiss_label": "Dismiss"
   }
-
 }
