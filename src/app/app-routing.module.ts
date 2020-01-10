@@ -139,6 +139,10 @@ const routes: Routes = [
     },
     loadChildren: () =>
       import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
+  },
+  {
+    path: 'beacon-request',
+    loadChildren: () => import('./pages/beacon-request/beacon-request.module').then(m => m.BeaconRequestPageModule)
   }
 ]
 @NgModule({

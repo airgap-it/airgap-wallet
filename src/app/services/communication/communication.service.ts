@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
-import { MessageTypes, PermissionRequest, BaseRequest, PermissionResponse } from '@airgap/beacon-sdk/dist/client/Messages'
-import { AlertController } from '@ionic/angular'
+import { BaseRequest } from '@airgap/beacon-sdk/dist/client/Messages'
+import { ModalController } from '@ionic/angular'
+import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommunicationService {
   private client: WalletCommunicationClient | undefined
-  constructor(private readonly storageService: StorageProvider, private readonly alertController: AlertController) {
+  constructor(private readonly storageService: StorageProvider, private readonly modalController: ModalController) {
     this.init()
   }
 
@@ -56,9 +57,11 @@ export class CommunicationService {
 
       console.log('typeof', typeof message)
       try {
+        this.presentModal()
         const serializer = new Serializer()
         const deserializedMessage = serializer.deserialize(message.toString()) as BaseRequest
         console.log('deserializedMessage.id', deserializedMessage.id)
+        /*
         if (deserializedMessage.type === MessageTypes.PermissionRequest) {
           const permissionRequest = deserializedMessage as PermissionRequest
           this.alertController
@@ -127,9 +130,19 @@ export class CommunicationService {
             .then(alert => {
               alert.present()
             })
+
+            
         }
+        */
       } catch (error) {}
     })
+  }
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: BeaconRequestPage
+    })
+    return await modal.present()
   }
 
   public async sendMessage(pubKey: string, message: string) {

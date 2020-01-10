@@ -52,6 +52,8 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
+import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -59,7 +61,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage, IntroductionPushPage],
+  entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -89,7 +91,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     PipesModule,
     ComponentsModule,
     ProtocolSelectPageModule,
-    IntroductionPushPageModule
+    IntroductionPushPageModule,
+    BeaconRequestPageModule
   ],
   providers: [
     StatusBar,
