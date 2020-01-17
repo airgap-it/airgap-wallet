@@ -14,7 +14,7 @@
   <ion-list>
     <ion-item-sliding *ngFor="let peer of connectedPeers">
       <ion-item>
-        {{ peer.pubKey }}
+        {{ peer.name }}
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="removePeer(peer)">Delete</ion-item-option>
