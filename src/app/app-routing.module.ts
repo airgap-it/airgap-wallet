@@ -143,6 +143,10 @@ const routes: Routes = [
   {
     path: 'beacon-request',
     loadChildren: () => import('./pages/beacon-request/beacon-request.module').then(m => m.BeaconRequestPageModule)
+  },
+  {
+    path: 'settings-beacon',
+    loadChildren: () => import('./pages/settings-beacon/settings-beacon.module').then(m => m.SettingsBeaconPageModule)
   }
 ]
 @NgModule({

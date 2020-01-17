@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>settings-beacon</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="removeAllPeers()">Remove all</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item-sliding *ngFor="let peer of connectedPeers">
+      <ion-item>
+        {{ peer.pubKey }}
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="removePeer(peer)">Delete</ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

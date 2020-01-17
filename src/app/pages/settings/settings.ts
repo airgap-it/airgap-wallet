@@ -32,6 +32,10 @@ export class SettingsPage {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  public beaconSettings(): void {
+    this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
   public share(): void {
     const options = {
       message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',

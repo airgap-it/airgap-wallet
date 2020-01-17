@@ -78,6 +78,11 @@
       {{ 'settings.about_label' | translate }}
       <ion-icon name="ios-arrow-forward" slot="end"></ion-icon>
     </ion-item>
+    <ion-item (click)="beaconSettings()">
+      <ion-icon name="ios-information-circle-outline" slot="start"></ion-icon>
+      {{ 'settings.beacon-settings_label' | translate }}
+      <ion-icon name="ios-arrow-forward" slot="end"></ion-icon>
+    </ion-item>
   </ion-list>
   <ion-list no-border lines="none">
     <ion-list-header class="ion-no-margin" lines="none">
