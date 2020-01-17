@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-import { CommunicationService } from './communication.service'
+import { BeaconService } from './beacon.service'
 
-describe('CommunicationService', () => {
+describe('BeaconService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()
@@ -19,7 +19,7 @@ describe('CommunicationService', () => {
   })
 
   it('should be created', () => {
-    const service: CommunicationService = TestBed.get(CommunicationService)
+    const service: BeaconService = TestBed.get(BeaconService)
     expect(service).toBeTruthy()
   })
 })

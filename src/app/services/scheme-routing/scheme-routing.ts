@@ -8,7 +8,7 @@ import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { CommunicationService } from '../communication/communication.service'
+import { BeaconService } from '../beacon/beacon.service'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -31,7 +31,7 @@ export class SchemeRoutingProvider {
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly serializerService: SerializerService,
-    private readonly communicationService: CommunicationService
+    private readonly beaconService: BeaconService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -105,7 +105,7 @@ export class SchemeRoutingProvider {
         const json = JSON.parse(data)
         if (json.pubKey && json.relayServer) {
           console.log('WALLET COMMUNICATION')
-          await this.communicationService.addPeer(json.pubKey, json.relayServer)
+          await this.beaconService.addPeer(json.pubKey, json.relayServer)
         }
       }
     } catch (e) {}

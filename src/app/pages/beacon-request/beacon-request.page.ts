@@ -13,6 +13,7 @@ import {
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -32,7 +33,11 @@ export class BeaconRequestPage implements OnInit {
 
   responseHandler: (() => Promise<void>) | undefined
 
-  constructor(private readonly modalController: ModalController, private readonly accountService: AccountProvider) {}
+  constructor(
+    private readonly modalController: ModalController,
+    private readonly accountService: AccountProvider,
+    private readonly beaconService: BeaconService
+  ) {}
 
   ngOnInit() {
     if (isUnknownObject(this.request) && this.request.type === MessageTypes.PermissionRequest) {
@@ -114,7 +119,7 @@ export class BeaconRequestPage implements OnInit {
       }
       const serialized = new Serializer().serialize(response)
 
-      this.client.sendMessage(this.dappInfo.pubKey, serialized)
+      this.beaconService.respond(request.id, serialized)
     }
   }
 
