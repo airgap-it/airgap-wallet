@@ -101,14 +101,14 @@ export class SchemeRoutingProvider {
 
     // Check if it's a wallet communication request
     try {
-      if (typeof data === 'string') {
-        const json = JSON.parse(data)
-        if (json.pubKey && json.relayServer) {
-          console.log('WALLET COMMUNICATION')
-          await this.beaconService.addPeer(json.pubKey, json.relayServer)
-        }
+      const json = JSON.parse(typeof data === 'string' ? data : data[0])
+      if (json.pubKey && json.relayServer) {
+        console.log('WALLET COMMUNICATION')
+        await this.beaconService.addPeer(json.pubKey, json.relayServer)
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log('wallet communication interpretation failed', e)
+    }
 
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
 
