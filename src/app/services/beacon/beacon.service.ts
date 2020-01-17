@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-import { BaseRequest } from '@airgap/beacon-sdk/dist/client/Messages'
 import { WalletClient } from '@airgap/beacon-sdk/dist/client/clients/WalletClient'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
+import { BaseMessage } from '@airgap/beacon-sdk/dist/client/Messages'
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,7 @@ export class BeaconService {
     this.client.addPeer({ pubKey, relayServer } as any)
   }
 
-  async presentModal(request: BaseRequest, dappInfo: { pubKey: string }) {
+  async presentModal(request: BaseMessage, dappInfo: { pubKey: string }) {
     console.log('presentModal')
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
