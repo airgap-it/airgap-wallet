@@ -27,7 +27,7 @@ export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknow
 export class BeaconRequestPage implements OnInit {
   request: BaseMessage
   address: string
-  dappInfo: { pubKey: string }
+  dappInfo: { name: string; pubKey: string }
   client: WalletCommunicationClient
   inputs?: any
 
