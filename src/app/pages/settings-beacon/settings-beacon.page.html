@@ -11,6 +11,12 @@
 </ion-header>
 
 <ion-content>
+  <div *ngIf="connectedPeers.length === 0" class="empty-list ion-padding-horizontal">
+    <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
+    <p>
+      Not connected to any peers
+    </p>
+  </div>
   <ion-list lines="none">
     <ion-item-sliding *ngFor="let peer of connectedPeers">
       <ion-item>
