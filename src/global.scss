@@ -134,6 +134,14 @@ page-transaction-qr {
   }
 }
 
+app-beacon-request {
+  identicon,
+  identicon img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 /* Account onboarding progress bar styling */
 page-account-import-onboarding {
   .swiper-pagination-custom {

@@ -41,17 +41,21 @@
       </ion-row>
     </div>
 
-    <ion-row *ngIf="request.type === 'permission_request'">
+    <ng-container *ngIf="request.type === 'permission_request'">
       <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: dappInfo.name }"></h2>
       <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
-
-      <ion-list>
-        <ion-item *ngFor="let input of inputs">
-          <ion-label>{{ input.label }}</ion-label>
-          <ion-checkbox [(ngModel)]="input.checked" slot="start"></ion-checkbox>
-        </ion-item>
-      </ion-list>
-    </ion-row>
+      <ion-row class="ion-no-padding">
+        <ion-col class="ion-no-padding">
+          <ion-list lines="none">
+            <ion-item *ngFor="let input of inputs">
+              <ion-icon name="{{input.icon}}" slot="start"></ion-icon>
+              <ion-label>{{ input.label }}</ion-label>
+              <ion-checkbox [(ngModel)]="input.checked" slot="end"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ng-container>
 
     <ion-row *ngIf="request.type === 'broadcast_request'">
       <p class="ion-padding-top">{{ 'beacon-request.sign-data_label' | translate }}</p>
