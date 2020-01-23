@@ -42,7 +42,7 @@
     </div>
 
     <ion-row *ngIf="request.type === 'permission_request'">
-      <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requestorName: dappInfo.name }"></h2>
+      <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: dappInfo.name }"></h2>
       <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
 
       <ion-list>
