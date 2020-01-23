@@ -490,7 +490,7 @@
 	
   "beacon-request": {
     "title": "Connection Request",
-    "sign-data_label": "Do you want to sign the following data?:",
+    "sign-data_label": "Do you want to sign the following data?",
     "request": {
       "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
       "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."
