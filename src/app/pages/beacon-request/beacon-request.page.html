@@ -53,15 +53,15 @@
       </ion-list>
     </ion-row>
 
+    <ion-row *ngIf="request.type === 'broadcast_request'">
+      <p class="ion-padding-top">{{ 'beacon-request.sign-data_label' | translate }}</p>
+    </ion-row>
+
     <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
       Not implemented
     </div>
 
     <div *ngIf="request.type === 'operation_request'" class="request--container">
-      Not implemented
-    </div>
-
-    <div *ngIf="request.type === 'broadcast_request'" class="request--container">
       Not implemented
     </div>
 
@@ -73,6 +73,9 @@
       </ion-button>
       <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
         {{ 'beacon-request.connect_label' | translate }}
+      </ion-button>
+      <ion-button *ngIf="request.type === 'broadcast_request'" shape="round" color="primary" (click)="done()">
+        {{ 'beacon-request.prepare-data_label' | translate }}
       </ion-button>
     </ion-fab>
   </ng-container>

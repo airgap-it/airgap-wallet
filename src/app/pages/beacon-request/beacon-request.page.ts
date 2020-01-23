@@ -1,18 +1,22 @@
+import { Router } from '@angular/router'
 import { Component, OnInit } from '@angular/core'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { ModalController } from '@ionic/angular'
+
 import {
   BaseMessage,
   MessageTypes,
   SignPayloadRequest,
   OperationRequest,
-  BroadcastRequest,
   PermissionResponse,
-  PermissionRequest
+  PermissionRequest,
+  BroadcastRequest
 } from '@airgap/beacon-sdk/dist/client/Messages'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { IACMessageDefinitionObject, IACMessageType } from 'airgap-coin-lib'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
@@ -36,6 +40,8 @@ export class BeaconRequestPage implements OnInit {
   constructor(
     private readonly modalController: ModalController,
     private readonly accountService: AccountProvider,
+    private readonly dataService: DataService,
+    private readonly router: Router,
     private readonly beaconService: BeaconService
   ) {}
 
@@ -131,7 +137,26 @@ export class BeaconRequestPage implements OnInit {
     console.log(request)
   }
 
-  private async broadcastRequest(request: BroadcastRequest): Promise<void> {
-    console.log(request)
+  private async broadcastRequest(_request: BroadcastRequest): Promise<void> {
+    // const signedTx = request.signedTransaction[0]
+    let signedTransactionSync: IACMessageDefinitionObject = {
+      type: IACMessageType.MessageSignResponse,
+      protocol: 'xtz',
+      payload: {
+        accountIdentifier: '',
+        // transaction: signedTx // wait for SDK to correctly serialize
+        transaction:
+          '1ef017b560494ae7b102be63f4d64e64d70114ff4652df23f34ae4460645b3266b00641b67c32672f0b11263b89b05b51e42faa64a3f940ad8d79101904e0000c64ac48e550c2c289af4c5ce5fe52ca7ba7a91d1a411745313e154eff8d118f16c00641b67c32672f0b11263b89b05b51e42faa64a3fdc0bd9d79101bc5000000000641b67c32672f0b11263b89b05b51e42faa64a3f0085dcfbba4a00c5b4f89914c1819ccd8466f6328b74073d50406394e59fe32d89e62112fec2d5a9bc1e6787206fe50e26f90999ae3061ca76247b57e08b6e490a'
+      }
+    }
+
+    this.responseHandler = async () => {
+      const info = {
+        signedTransactionSync: signedTransactionSync
+      }
+
+      this.dataService.setData(DataServiceKey.TRANSACTION, info)
+      this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 }
