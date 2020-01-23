@@ -33,7 +33,7 @@
       </ion-row>
       <ion-row>
         <ion-col class="ion-text-left" size="4">
-          <h5 class="ion-no-margin">{{ request.name | shortenString }}</h5>
+          <h5 class="ion-no-margin">{{ requesterName | shortenString }}</h5>
         </ion-col>
         <ion-col class="ion-text-right" size="4" push="4">
           <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
@@ -42,7 +42,7 @@
     </div>
 
     <ng-container *ngIf="request.type === 'permission_request'">
-      <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: request.name }"></h2>
+      <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
       <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
       <ion-row class="ion-no-padding">
         <ion-col class="ion-no-padding">
