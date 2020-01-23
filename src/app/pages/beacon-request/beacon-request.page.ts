@@ -85,14 +85,16 @@ export class BeaconRequestPage implements OnInit {
         type: 'checkbox',
         label: 'Read Address',
         value: 'read_address',
+        icon: 'eye',
         checked: request.scope.indexOf('read_address') >= 0
       },
 
       {
         name: 'sign',
         type: 'checkbox',
-        label: 'Sign',
+        label: 'Sign transactions',
         value: 'sign',
+        icon: 'create',
         checked: request.scope.indexOf('sign') >= 0
       },
 
@@ -101,6 +103,7 @@ export class BeaconRequestPage implements OnInit {
         type: 'checkbox',
         label: 'Operation request',
         value: 'operation_request',
+        icon: 'color-wand',
         checked: request.scope.indexOf('operation_request') >= 0
       },
 
@@ -109,6 +112,7 @@ export class BeaconRequestPage implements OnInit {
         type: 'checkbox',
         label: 'Threshold',
         value: 'threshold',
+        icon: 'code-working',
         checked: request.scope.indexOf('threshold') >= 0
       }
     ]

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header no-border no-shadow>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -11,7 +11,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
+  <ion-list lines="none">
     <ion-item-sliding *ngFor="let peer of connectedPeers">
       <ion-item>
         {{ peer.name }}
