@@ -44,14 +44,11 @@ export class BeaconRequestPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService
-  ) {
-    if (request && request.name) {
-      this.requesterName = request.name
-    }
-  }
+  ) {}
 
   ngOnInit() {
     if (isUnknownObject(this.request) && this.request.type === MessageTypes.PermissionRequest) {
+      this.requesterName = ((this.request as any) as PermissionRequest).name
       this.permissionRequest((this.request as any) as PermissionRequest)
     }
 
