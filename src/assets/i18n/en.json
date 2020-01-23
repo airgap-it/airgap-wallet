@@ -135,7 +135,8 @@
       "enable-new-serializer_label": "Enable new serializer",
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
-    }
+    },
+    "beacon-settings_label": "Beacon Settings"
   },
 
   "select-wallet": {
@@ -497,5 +498,8 @@
     "connect_label": "Connect",
     "prepare-data_label": "Prepare Data",
     "dismiss_label": "Dismiss"
+  },
+  "settings-beacon": {
+    "title": "Beacon Settings"
   }
 }

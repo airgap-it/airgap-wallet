@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
 @Component({
-  selector: 'app-settings-beacon',
+  selector: 'settings-beacon',
   templateUrl: './settings-beacon.page.html',
   styleUrls: ['./settings-beacon.page.scss']
 })
