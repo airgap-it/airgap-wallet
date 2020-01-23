@@ -30,6 +30,7 @@ export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknow
 })
 export class BeaconRequestPage implements OnInit {
   request: BaseMessage
+  requesterName: string = ''
   address: string
   dappInfo: { name: string; pubKey: string }
   client: WalletCommunicationClient
@@ -43,7 +44,11 @@ export class BeaconRequestPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService
-  ) {}
+  ) {
+    if (request && request.name) {
+      this.requesterName = request.name
+    }
+  }
 
   ngOnInit() {
     if (isUnknownObject(this.request) && this.request.type === MessageTypes.PermissionRequest) {
