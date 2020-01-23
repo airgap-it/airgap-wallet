@@ -26,8 +26,8 @@ export class BeaconService {
     })
   }
 
-  public async addPeer(pubKey: string, relayServer: string) {
-    this.client.addPeer({ pubKey, relayServer } as any)
+  public async addPeer(pubKey: string, relayServer: string, name: string) {
+    this.client.addPeer({ pubKey, relayServer, name } as any)
   }
 
   async presentModal(request: BaseMessage, dappInfo: { pubKey: string }) {

@@ -104,7 +104,7 @@ export class SchemeRoutingProvider {
       const json = JSON.parse(typeof data === 'string' ? data : data[0])
       if (json.pubKey && json.relayServer) {
         console.log('WALLET COMMUNICATION')
-        await this.beaconService.addPeer(json.pubKey, json.relayServer)
+        await this.beaconService.addPeer(json.pubKey, json.relayServer, json.name)
       }
     } catch (e) {
       console.log('wallet communication interpretation failed', e)
