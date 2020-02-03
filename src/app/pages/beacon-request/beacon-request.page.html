@@ -78,6 +78,12 @@
       <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
         {{ 'beacon-request.connect_label' | translate }}
       </ion-button>
+      <ion-button *ngIf="request.type === 'operation_request'" shape="round" color="primary" (click)="done()">
+        {{ 'beacon-request.prepare-data_label' | translate }}
+      </ion-button>
+      <ion-button *ngIf="request.type === 'sign_payload_request'" shape="round" color="primary" (click)="done()">
+        {{ 'beacon-request.prepare-data_label' | translate }}
+      </ion-button>
       <ion-button *ngIf="request.type === 'broadcast_request'" shape="round" color="primary" (click)="done()">
         {{ 'beacon-request.prepare-data_label' | translate }}
       </ion-button>

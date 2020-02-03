@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { WalletClient } from '@airgap/beacon-sdk/dist/client/clients/WalletClient'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
-import { BaseMessage } from '@airgap/beacon-sdk/dist/client/Messages'
+import { BaseMessage } from '@airgap/beacon-sdk/dist/messages/Messages'
 
 @Injectable({
   providedIn: 'root'

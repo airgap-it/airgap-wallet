@@ -11,13 +11,15 @@ import {
   PermissionResponse,
   PermissionRequest,
   BroadcastRequest
-} from '@airgap/beacon-sdk/dist/client/Messages'
+} from '@airgap/beacon-sdk/dist/messages/Messages'
+import { NotGrantedBeaconError, BeaconErrors } from '@airgap/beacon-sdk/dist/messages/Errors'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
 import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { IACMessageDefinitionObject, IACMessageType } from 'airgap-coin-lib'
+import { IACMessageDefinitionObject, IACMessageType, TezosProtocol } from 'airgap-coin-lib'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
+import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -43,7 +45,8 @@ export class BeaconRequestPage implements OnInit {
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
-    private readonly beaconService: BeaconService
+    private readonly beaconService: BeaconService,
+    private readonly serializerService: SerializerService
   ) {}
 
   ngOnInit() {
@@ -120,30 +123,101 @@ export class BeaconRequestPage implements OnInit {
     ]
 
     this.responseHandler = async () => {
-      const response: PermissionResponse = {
-        id: request.id,
-        type: MessageTypes.PermissionResponse,
-        permissions: {
-          pubkey: wallet.publicKey,
-          networks: ['mainnet'],
-          scopes: this.inputs.filter(input => input.checked).map(input => input.value)
+      const scopes = this.inputs.filter(input => input.checked).map(input => input.value)
+      if (scopes.length > 0) {
+        const response: PermissionResponse = {
+          id: request.id,
+          type: MessageTypes.PermissionResponse,
+          permissions: {
+            pubkey: wallet.publicKey,
+            networks: ['mainnet'],
+            scopes: scopes
+          }
         }
-      }
-      const serialized = new Serializer().serialize(response)
 
-      this.beaconService.respond(request.id, serialized)
+        const serialized = new Serializer().serialize(response)
+        this.beaconService.respond(request.id, serialized)
+      } else {
+        const response: NotGrantedBeaconError = {
+          id: request.id,
+          type: MessageTypes.PermissionResponse,
+          error: BeaconErrors.NOT_GRANTED_ERROR
+        }
+        const serialized = new Serializer().serialize(response)
+        this.beaconService.respond(request.id, serialized)
+      }
     }
   }
 
   private async signRequest(request: SignPayloadRequest): Promise<void> {
-    console.log(request)
+    const tezosProtocol = new TezosProtocol()
+
+    const wallet = this.accountService.getWalletList().find(wallet => wallet.coinProtocol.identifier === 'xtz')
+    if (!wallet) {
+      throw new Error('no wallet found!')
+    }
+
+    this.responseHandler = async () => {
+      const transaction = { binaryTransaction: request.payload[0] as any }
+      const serializedChunks = await this.serializerService.serialize([
+        {
+          protocol: wallet.coinProtocol.identifier,
+          type: IACMessageType.TransactionSignRequest,
+          payload: {
+            publicKey: wallet.publicKey,
+            transaction: transaction, // TODO: Type
+            callback: 'airgap-wallet://?d='
+          }
+        }
+      ])
+      const info = {
+        wallet,
+        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: wallet.publicKey, transaction }),
+        data: serializedChunks
+      }
+
+      console.log('info', info)
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
   private async operationRequest(request: OperationRequest): Promise<void> {
-    console.log(request)
+    const tezosProtocol = new TezosProtocol()
+
+    const wallet = this.accountService.getWalletList().find(wallet => wallet.coinProtocol.identifier === 'xtz')
+    if (!wallet) {
+      throw new Error('no wallet found!')
+    }
+
+    this.responseHandler = async () => {
+      const transaction = await tezosProtocol.prepareOperations(wallet.publicKey, request.operationDetails as any)
+      const serializedChunks = await this.serializerService.serialize([
+        {
+          protocol: wallet.coinProtocol.identifier,
+          type: IACMessageType.TransactionSignRequest,
+          payload: {
+            publicKey: wallet.publicKey,
+            transaction: transaction as any, // TODO: Type
+            callback: 'airgap-wallet://?d='
+          }
+        }
+      ])
+      const info = {
+        wallet,
+        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: wallet.publicKey, transaction }),
+        data: serializedChunks
+      }
+
+      console.log('info', info)
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
-  private async broadcastRequest(_request: BroadcastRequest): Promise<void> {
+  private async broadcastRequest(request: BroadcastRequest): Promise<void> {
     // const signedTx = request.signedTransaction[0]
     let signedTransactionSync: IACMessageDefinitionObject = {
       type: IACMessageType.MessageSignResponse,
@@ -151,8 +225,7 @@ export class BeaconRequestPage implements OnInit {
       payload: {
         accountIdentifier: '',
         // transaction: signedTx // wait for SDK to correctly serialize
-        transaction:
-          '1ef017b560494ae7b102be63f4d64e64d70114ff4652df23f34ae4460645b3266b00641b67c32672f0b11263b89b05b51e42faa64a3f940ad8d79101904e0000c64ac48e550c2c289af4c5ce5fe52ca7ba7a91d1a411745313e154eff8d118f16c00641b67c32672f0b11263b89b05b51e42faa64a3fdc0bd9d79101bc5000000000641b67c32672f0b11263b89b05b51e42faa64a3f0085dcfbba4a00c5b4f89914c1819ccd8466f6328b74073d50406394e59fe32d89e62112fec2d5a9bc1e6787206fe50e26f90999ae3061ca76247b57e08b6e490a'
+        transaction: request.signedTransactions[0] as any
       }
     }
 
