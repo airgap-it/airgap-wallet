@@ -1,5 +1,3 @@
-import { BigNumber } from 'bignumber.js'
-import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
@@ -9,16 +7,12 @@ import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider, ProtocolSymbols } from '../../services/protocols/protocols'
+import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 export interface IAccountWrapper {
   selected: boolean
   wallet: AirGapMarketWallet
-}
-
-export enum Addresses {
-  XTZBTC_SOURCE = 'tz1Mj7RzPmMAqDUNFBn5t5VbXmWW4cSUAdtT'
 }
 
 @Component({
@@ -71,12 +65,7 @@ export class SubAccountAddPage {
             wallet.addresses = this.wallet.addresses
             wallet
               .synchronize()
-              .then(async () => {
-                if (wallet.protocolIdentifier === ProtocolSymbols.TZBTC) {
-                  const protocol = new TezosBTC()
-                  const balance = new BigNumber(await protocol.getBalance(wallet.addresses[0], Addresses.XTZBTC_SOURCE))
-                  wallet.currentBalance = balance
-                }
+              .then(() => {
                 this.subAccounts.push({ selected: false, wallet })
               })
               .catch(handleErrorSentry(ErrorCategory.COINLIB))
