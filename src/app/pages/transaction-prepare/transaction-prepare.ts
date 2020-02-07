@@ -91,7 +91,6 @@ export class TransactionPreparePage {
         'm/44h/1729h/0h/0h'
       )
       await newWallet.synchronize()
-      console.log(newWallet)
       this.feeCurrentMarketPrice = newWallet.currentMarketPrice.toNumber()
     } else {
       this.feeCurrentMarketPrice = wallet.currentMarketPrice.toNumber()
@@ -183,6 +182,7 @@ export class TransactionPreparePage {
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
+    console.log('FEE', fee.toNumber())
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {

@@ -117,7 +117,7 @@ export class OperationsProvider {
           wallet.addresses[0],
           address,
           amount.toString(10),
-          fee.times(20).toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
+          fee.toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
           wallet.publicKey
         )
       } else {
