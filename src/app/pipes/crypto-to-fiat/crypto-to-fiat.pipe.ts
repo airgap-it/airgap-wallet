@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
-import { BigNumber } from 'airgap-coin-lib/node_modules/bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 @Pipe({
   name: 'cryptoToFiat'

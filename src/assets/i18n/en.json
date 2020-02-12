@@ -368,7 +368,7 @@
     "sell_label": "From",
     "sell-amount_label": "Amount",
     "fee_label": "Fee",
-    "changellgy-address_label": "Changelly Address",
+    "exchange-address_label": "Exchange Address",
     "buy-amount_label": "Buy Amount",
     "receiving-to_label": "Receiving to",
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."

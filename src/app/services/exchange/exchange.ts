@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
 import { Exchange } from './exchange.interface'
-import { ChangellyExchange, CreateTransactionResponse } from './exchange.changelly'
+import { CreateTransactionResponse } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 
 @Injectable({

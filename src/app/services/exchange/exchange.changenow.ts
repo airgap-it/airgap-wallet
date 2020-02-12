@@ -1,34 +1,51 @@
 import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
 
-const BASE_URL = 'https://external.cryptowolf.eu/wallet/'
+const BASE_URL = 'https://changenow.io/api/v1'
 const ORIGIN = '' // TODO
 const CAPTCHA = '6Lcatm8UAAAAABbCBiTLWV3lRlk2hq6vUYoPvmGW'
 
-export interface CreateTransactionResponse {
-  amountExpectedFrom: string
-  amountExpectedTo: string
-  amountTo: number
-  apiExtraFee: string
-  changellyFee: string
-  createdAt: string
-  currencyFrom: string
-  currencyTo: string
-  id: string
-  kycRequired: boolean
+export interface CurrencyDetailResponse {
+  ticker: string
+  name: string
+  image: string
+  hasExternalId: boolean
+  isFiat: boolean
+  featured: boolean
+  isStable: boolean
+  supportsFixedRate: boolean
+  isAvailable?: boolean
+}
+
+export interface MinAmountResponse {
+  minAmount: number
+}
+
+export interface EstimatedAmountResponse {
+  estimatedAmount: number
+  transactionSpeedForecast: string
+  warningMessage?: any
+}
+
+export interface TransactionChangeNowResponse {
   payinAddress: string
-  payinExtraId: null
   payoutAddress: string
-  status: string
+  payoutExtraId: string
+  fromCurrency: string
+  toCurrency: string
+  refundAddress: string
+  refundExtraId: string
+  id: string
+  amount: number
 }
 
 const identifierExchangeToAirGapMap = new Map<string, string>()
-identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
-identifierExchangeToAirGapMap.set('aem', 'ae')
+// identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
+// identifierExchangeToAirGapMap.set('aem', 'ae')
 
 const identifierAirGapToExchangeMap = new Map<string, string>()
-identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
-identifierAirGapToExchangeMap.set('ae', 'aem')
+// identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
+// identifierAirGapToExchangeMap.set('ae', 'aem')
 
 class ChangeNowApi {
   constructor(public http: HttpClient) {}
@@ -50,9 +67,10 @@ class ChangeNowApi {
   }
 
   async getAvailableFromCurrencies(): Promise<string[]> {
-    const result: any = await this.http.get(`${BASE_URL}get-pairs.php`).toPromise()
-    const fromCurrencies = Object.keys(result)
-    console.log('from', fromCurrencies)
+    const result: CurrencyDetailResponse[] = (await this.http
+      .get(`${BASE_URL}/currencies?active=true`)
+      .toPromise()) as CurrencyDetailResponse[]
+    const fromCurrencies = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
     return this.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
   }
 
@@ -60,51 +78,52 @@ class ChangeNowApi {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    return '0'
+    let result: MinAmountResponse = (await this.http
+      .get(`${BASE_URL}/min-amount/${fromCurrency}_${toCurrency}`)
+      .toPromise()) as MinAmountResponse
+
+    return result.minAmount.toString()
   }
 
   async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const params = {
-      from: fromCurrency,
-      to: toCurrency,
-      amount,
-      origin: ORIGIN
-    }
+    const response: EstimatedAmountResponse = (await this.http
+      .get(`${BASE_URL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
+      .toPromise()) as EstimatedAmountResponse
 
-    let queryParams = []
-
-    Object.keys(params).forEach(key => {
-      queryParams.push(`${key}=${params[key]}`)
-    })
-
-    const response: any = await this.http.get(`${BASE_URL}send-amount.php?${queryParams.join('&')}`).toPromise()
-
-    return response
+    console.log('EXCHANGE AMOUNT', response.estimatedAmount.toFixed())
+    return response.estimatedAmount.toFixed()
   }
 
-  async validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
+  async validateAddress(): Promise<{ result: false; message: string }> {
     return { result: false, message: '' }
   }
 
-  async createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  async createTransaction(
+    fromCurrency: string,
+    toCurrency: string,
+    address: string,
+    amount: string
+  ): Promise<TransactionChangeNowResponse> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const formData = new FormData()
-    formData.append('from', fromCurrency)
-    formData.append('to', toCurrency)
-    formData.append('amount', amount)
-    formData.append('receivingid', address)
-    formData.append('receivingamount', '10')
-    formData.append('usd', '1')
-    formData.append('refundid', address)
-    formData.append('origin', ORIGIN)
-    formData.append('captcha', CAPTCHA)
+    const apiKey = 'changenow'
+    const body = {
+      from: fromCurrency,
+      to: toCurrency,
+      address: address,
+      amount: amount,
+      extraId: '',
+      userId: '',
+      contactEmail: '',
+      refundAddress: '',
+      refundExtraId: ''
+    }
 
-    const response: any = await this.http.post(`${BASE_URL}mail.php`, formData).toPromise()
+    const response: any = await this.http.post(`${BASE_URL}/transactions/${apiKey}`, body).toPromise()
 
     return response
   }
@@ -122,11 +141,9 @@ export class ChangeNowExchange extends ChangeNowApi implements Exchange {
   }
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
-    const result: any = await this.http.get(`${BASE_URL}get-pairs.php`).toPromise()
-
-    console.log('asdf', this.convertExchangeIdentifierToAirGapIdentifier(result[selectedFrom.toUpperCase()]))
-    return this.convertExchangeIdentifierToAirGapIdentifier(result[selectedFrom.toUpperCase()]).filter(
-      availableCurrency => availableCurrency !== selectedFrom
-    )
+    const result: any = await this.http.get(`${BASE_URL}/currencies-to/${selectedFrom}`).toPromise()
+    console.log('HARIBOL', result)
+    const identifiers = result.map((currency: CurrencyDetailResponse) => currency.ticker)
+    return this.convertExchangeIdentifierToAirGapIdentifier(identifiers)
   }
 }

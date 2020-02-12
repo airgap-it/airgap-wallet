@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { TransactionChangeNowResponse } from 'src/app/services/exchange/exchange.changenow'
 declare let cordova
 
 @Component({
@@ -19,11 +20,12 @@ export class ExchangeConfirmPage {
   public toWallet: AirGapMarketWallet
   public fee: BigNumber
 
+  public amountExpectedFrom: number
   public fromFiatAmount: number
   public feeFiatAmount: number
   public toFiatAmount: number
 
-  public exchangeResult: CreateTransactionResponse
+  public exchangeResult: any // | CreateTransactionResponse
 
   constructor(
     private readonly router: Router,
@@ -37,28 +39,34 @@ export class ExchangeConfirmPage {
       this.fromWallet = info.fromWallet
       this.toWallet = info.toWallet
       this.exchangeResult = info.exchangeResult
+      this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
     }
 
-    const fromAmount = new BigNumber(this.exchangeResult.amountExpectedFrom)
-    const changellyFee = new BigNumber(this.exchangeResult.changellyFee)
-    const apiExtraFee = new BigNumber(this.exchangeResult.apiExtraFee)
+    // const fromAmount = new BigNumber(this.exchangeResult.amountExpectedFrom)
+    // const changellyFee = new BigNumber(this.exchangeResult.changellyFee)
+    // const apiExtraFee = new BigNumber(this.exchangeResult.apiExtraFee)
+
+    const fromAmount = new BigNumber(this.exchangeResult.amount)
+    const changellyFee = new BigNumber(0)
+    const apiExtraFee = new BigNumber(0)
+
     const totalFeeInPercent = changellyFee.plus(apiExtraFee)
     const txFee = this.fromWallet.coinProtocol.feeDefaults.medium
     const exchangeTotalFee = fromAmount.multipliedBy(totalFeeInPercent.dividedBy(100))
     this.fee = exchangeTotalFee.plus(txFee)
 
-    this.fromFiatAmount = new BigNumber(this.exchangeResult.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
+    this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
     this.feeFiatAmount = this.fee.multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
-    this.toFiatAmount = new BigNumber(this.exchangeResult.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
+    this.toFiatAmount = new BigNumber(this.exchangeResult.amount).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
   }
 
   public async prepareTransaction() {
     const wallet = this.fromWallet
-    const amount = new BigNumber(new BigNumber(this.exchangeResult.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
+    const amount = new BigNumber(new BigNumber(this.exchangeResult.amount)).shiftedBy(wallet.coinProtocol.decimals)
     const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
+      const { airGapTx, serializedTx } = await this.operationsProvider.prepareTransaction(
         wallet,
         this.exchangeResult.payinAddress,
         amount,
@@ -67,8 +75,8 @@ export class ExchangeConfirmPage {
 
       const info = {
         wallet,
-        airGapTxs,
-        data: serializedTxChunks
+        airGapTx,
+        data: serializedTx
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)

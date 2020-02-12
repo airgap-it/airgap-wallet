@@ -13,8 +13,10 @@
     [address]="fromWallet.receivingPublicAddress"
     label="{{ 'exchange-confirm.sell_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="exchangeResult.currencyFrom"
+    [symbol]="exchangeResult.fromCurrency"
   ></address-row>
+
+  <!-- TODO currencyFrom vs fromCurrency -->
 
   <ion-row class="ion-align-items-center">
     <ion-col size="3" class="ion-no-padding">
@@ -25,6 +27,7 @@
       <div class="typography--mono" item-content>
         <span class="typography--mono">{{ exchangeResult.amountExpectedFrom }} (~${{ fromFiatAmount | number: '1.2-2' }})</span>
       </div>
+      <!-- TODO amountExpectedFrom / amountExpectedTO a vs amount -->
 
       <ng-container>
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'exchange-confirm.fee_label' | translate }}</ion-label>
@@ -37,9 +40,9 @@
 
   <address-row
     [address]="exchangeResult.payinAddress"
-    label="{{ 'exchange-confirm.changellgy-address_label' | translate }}"
+    label="{{ 'exchange-confirm.exchange-address_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="exchangeResult.currencyFrom"
+    [symbol]="exchangeResult.fromCurrency"
   ></address-row>
 
   <ion-row class="ion-align-items-center">
@@ -58,7 +61,7 @@
     [address]="toWallet.receivingPublicAddress"
     label="{{ 'exchange-confirm.receiving-to_label' | translate }}"
     [hasSymbol]="true"
-    [symbol]="exchangeResult.currencyTo"
+    [symbol]="exchangeResult.toCurrency"
   ></address-row>
 
   <ion-row class="ion-padding ion-margin-vertical" (click)="changellyUrl()">
