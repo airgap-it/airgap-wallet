@@ -1,11 +1,10 @@
+import { CreateTransactionResponse } from './../../services/exchange/exchange.changelly'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { CreateTransactionResponse } from '../../services/exchange/exchange'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 declare let cordova
