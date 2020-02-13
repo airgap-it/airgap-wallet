@@ -49,7 +49,7 @@
     <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
     <ion-row>
       <h5>
-        {{ selectedProtocol?.identifier | uppercase }}
+        {{ selectedProtocol?.symbol | uppercase }}
         <ion-icon name="md-arrow-dropdown"></ion-icon>
       </h5>
     </ion-row>
