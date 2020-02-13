@@ -40,12 +40,10 @@ export interface TransactionChangeNowResponse {
 }
 
 const identifierExchangeToAirGapMap = new Map<string, string>()
-// identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
-// identifierExchangeToAirGapMap.set('aem', 'ae')
+identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
 
 const identifierAirGapToExchangeMap = new Map<string, string>()
-// identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
-// identifierAirGapToExchangeMap.set('ae', 'aem')
+identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
 
 class ChangeNowApi {
   constructor(public http: HttpClient) {}
@@ -93,8 +91,8 @@ class ChangeNowApi {
       .get(`${BASE_URL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
       .toPromise()) as EstimatedAmountResponse
 
-    console.log('EXCHANGE AMOUNT', response.estimatedAmount.toFixed())
-    return response.estimatedAmount.toFixed()
+    console.log('EXCHANGE AMOUNT', response.estimatedAmount.toString())
+    return response.estimatedAmount.toString()
   }
 
   async validateAddress(): Promise<{ result: false; message: string }> {
