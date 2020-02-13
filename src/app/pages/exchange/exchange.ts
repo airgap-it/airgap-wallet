@@ -77,6 +77,7 @@ export class ExchangePage {
   public async initExchangePage(): Promise<void> {
     const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
     this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
+
     if (this.supportedProtocolsFrom.length === 0) {
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
 
@@ -202,14 +203,20 @@ export class ExchangePage {
         this.toWallet.receivingPublicAddress,
         this.amount.toFixed()
       )
-
+      const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
+        this.fromWallet.protocolIdentifier,
+        this.toWallet.protocolIdentifier,
+        this.amount.toString()
+      )
       const info = {
         fromWallet: this.fromWallet,
+        fromCurrency: this.fromWallet.protocolIdentifier,
         toWallet: this.toWallet,
+        toCurrency: this.toWallet.protocolIdentifier,
         exchangeResult: result,
-        amountExpectedFrom: this.amount
+        amountExpectedFrom: this.amount,
+        amountExpectedTo: amountExpectedTo
       }
-      console.log('startExchange INFO', this.amount.toNumber())
 
       this.dataService.setData(DataServiceKey.EXCHANGE, info)
       this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
