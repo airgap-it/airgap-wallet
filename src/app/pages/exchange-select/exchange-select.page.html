@@ -1,0 +1,28 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'protocol-select.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear" color="secondary">
+        <ion-icon name="md-close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="none">
+    <ion-radio-group [(ngModel)]="selectedExchange" (ngModelChange)="onModelChange()" lines="none" name="selectedExchange" required>
+      <ion-item>
+        <ion-label>Changelly</ion-label>
+        <ion-radio slot="start" value="Changelly"></ion-radio>
+      </ion-item>
+      <ion-item>
+        <ion-label>ChangeNow</ion-label>
+        <ion-radio slot="start" value="ChangeNow"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-content>

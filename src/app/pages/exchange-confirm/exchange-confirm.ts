@@ -1,4 +1,3 @@
-import { CreateTransactionResponse } from './../../services/exchange/exchange.changelly'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
@@ -7,7 +6,6 @@ import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { TransactionChangeNowResponse } from 'src/app/services/exchange/exchange.changenow'
 declare let cordova
 
 @Component({
@@ -71,13 +69,6 @@ export class ExchangeConfirmPage {
     const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
     const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
 
-    console.log('prepareTransaction()')
-    console.log('amount', amount)
-    console.log('wallet', wallet)
-    console.log('fee', fee)
-    console.log('this.exchangeResult.payinAddress', this.exchangeResult.payinAddress)
-    console.log('####################')
-
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
         wallet,
@@ -85,8 +76,6 @@ export class ExchangeConfirmPage {
         amount,
         fee
       )
-
-      // console.log('serializedTx', serializedTx)
 
       const info = {
         wallet,

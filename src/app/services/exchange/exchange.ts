@@ -1,17 +1,28 @@
+import { Subject, BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-
 import { Exchange } from './exchange.interface'
-import { CreateTransactionResponse } from './exchange.changelly'
+import { CreateTransactionResponse, ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExchangeProvider implements Exchange {
-  private readonly exchange: Exchange
+  private exchange: Exchange
+  private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
+
   constructor(public http: HttpClient) {
-    this.exchange = new ChangeNowExchange(http)
+    this.exchangeSubject.subscribe(exchange => {
+      switch (exchange) {
+        case 'Changelly':
+          this.exchange = new ChangellyExchange(this.http)
+          break
+        case 'ChangeNow':
+          this.exchange = new ChangeNowExchange(this.http)
+          break
+      }
+    })
   }
 
   public getAvailableFromCurrencies(): Promise<string[]> {
@@ -27,6 +38,7 @@ export class ExchangeProvider implements Exchange {
   }
 
   public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
+    console.log('getExchangeAmount', this.exchange)
     return this.exchange.getExchangeAmount(fromCurrency, toCurrency, amount)
   }
 
@@ -40,5 +52,13 @@ export class ExchangeProvider implements Exchange {
 
   public getStatus(transactionId: string): Promise<any> {
     return this.exchange.getStatus(transactionId)
+  }
+
+  public setActiveExchange(exchange: string) {
+    this.exchangeSubject.next(exchange)
+  }
+
+  public getActiveExchange() {
+    return this.exchangeSubject.asObservable()
   }
 }

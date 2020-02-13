@@ -2,8 +2,6 @@ import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
 
 const BASE_URL = 'https://changenow.io/api/v1'
-const ORIGIN = '' // TODO
-const CAPTCHA = '6Lcatm8UAAAAABbCBiTLWV3lRlk2hq6vUYoPvmGW'
 
 export interface CurrencyDetailResponse {
   ticker: string
@@ -90,8 +88,6 @@ class ChangeNowApi {
     const response: EstimatedAmountResponse = (await this.http
       .get(`${BASE_URL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
       .toPromise()) as EstimatedAmountResponse
-
-    console.log('EXCHANGE AMOUNT', response.estimatedAmount.toString())
     return response.estimatedAmount.toString()
   }
 
@@ -140,7 +136,6 @@ export class ChangeNowExchange extends ChangeNowApi implements Exchange {
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
     const result: any = await this.http.get(`${BASE_URL}/currencies-to/${selectedFrom}`).toPromise()
-    console.log('HARIBOL', result)
     const identifiers = result.map((currency: CurrencyDetailResponse) => currency.ticker)
     return this.convertExchangeIdentifierToAirGapIdentifier(identifiers)
   }

@@ -1,3 +1,5 @@
+import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
+import { ModalController } from '@ionic/angular'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
@@ -36,6 +38,7 @@ export class ExchangePage {
   public amount: BigNumber = new BigNumber(0)
   public minExchangeAmount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
+  public activeExchange: string
 
   public exchangePageStates = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
@@ -45,8 +48,14 @@ export class ExchangePage {
     private readonly exchangeProvider: ExchangeProvider,
     private readonly storageProvider: StorageProvider,
     private readonly accountProvider: AccountProvider,
-    private readonly dataService: DataService
-  ) {}
+    private readonly dataService: DataService,
+
+    private readonly modalController: ModalController
+  ) {
+    this.exchangeProvider.getActiveExchange().subscribe(exchange => {
+      this.activeExchange = exchange
+    })
+  }
 
   public async ionViewWillEnter() {
     if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
@@ -223,6 +232,22 @@ export class ExchangePage {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  public async doRadio(): Promise<void> {
+    const modal: HTMLIonModalElement = await this.modalController.create({
+      component: ExchangeSelectPage,
+      componentProps: {
+        activeExchange: this.activeExchange
+      }
+    })
+
+    modal
+      .onDidDismiss()
+      .then()
+      .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+
+    modal.present().catch(err => console.error(err))
   }
 
   public dismissExchangeOnboarding() {

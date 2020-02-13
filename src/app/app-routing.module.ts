@@ -139,6 +139,10 @@ const routes: Routes = [
     },
     loadChildren: () =>
       import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
+  },
+  {
+    path: 'exchange-select',
+    loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
   }
 ]
 @NgModule({
