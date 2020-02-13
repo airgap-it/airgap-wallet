@@ -139,7 +139,7 @@ export class TransactionConfirmPage {
 
         loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        this.showTransactionSuccessfulAlert(txId)
+        await this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
         const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
@@ -164,20 +164,22 @@ export class TransactionConfirmPage {
 
         // TODO: Remove this special error case once we remove web3 from the coin-lib
         if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
-          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(signed => {
-            if (signed.hash) {
-              this.showTransactionSuccessfulAlert(signed.hash)
-              // POST TX TO BACKEND
-              // necessary for the transaction backend
-              signed.amount = signed.amount.toString()
-              signed.fee = signed.fee.toString()
-              signed.signedTx = this.signedTx
-              this.pushBackendProvider.postPendingTx(signed) // Don't await
-              // END POST TX TO BACKEND
-            } else {
-              handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(
+            async signed => {
+              if (signed.hash) {
+                await this.showTransactionSuccessfulAlert(signed.hash)
+                // POST TX TO BACKEND
+                // necessary for the transaction backend
+                signed.amount = signed.amount.toString()
+                signed.fee = signed.fee.toString()
+                signed.signedTx = this.signedTx
+                this.pushBackendProvider.postPendingTx(signed) // Don't await
+                // END POST TX TO BACKEND
+              } else {
+                handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+              }
             }
-          })
+          )
         } else {
           this.toastCtrl
             .create({
@@ -195,7 +197,8 @@ export class TransactionConfirmPage {
       })
   }
 
-  private showTransactionSuccessfulAlert(transactionHash: string): void {
+  private async showTransactionSuccessfulAlert(transactionHash: string): Promise<void> {
+    const blockexplorer: string = await this.protocol.getBlockExplorerLinkForTxId(transactionHash)
     this.alertCtrl
       .create({
         header: 'Transaction broadcasted!',
@@ -204,7 +207,6 @@ export class TransactionConfirmPage {
           {
             text: 'Open Blockexplorer',
             handler: (): void => {
-              const blockexplorer: string = this.protocol.getBlockExplorerLinkForTxId(transactionHash)
               this.openUrl(blockexplorer)
 
               this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))

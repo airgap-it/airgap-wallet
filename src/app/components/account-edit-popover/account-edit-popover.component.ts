@@ -44,11 +44,11 @@ export class AccountEditPopoverComponent implements OnInit {
     await this.dismissPopover()
   }
 
-  public openBlockExplorer(): void {
+  public async openBlockExplorer(): Promise<void> {
     const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocolIdentifier)
 
     let blockexplorer: string = protocol.blockExplorer
-    blockexplorer = protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    blockexplorer = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
     this.openUrl(blockexplorer)
   }
   private openUrl(url: string): void {
