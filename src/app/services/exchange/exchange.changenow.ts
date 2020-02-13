@@ -134,8 +134,9 @@ export class ChangeNowExchange extends ChangeNowApi implements Exchange {
     super(http)
   }
 
-  public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
-    const result: any = await this.http.get(`${BASE_URL}/currencies-to/${selectedFrom}`).toPromise()
+  public async getAvailableToCurrenciesForCurrency(fromCurrency: string): Promise<string[]> {
+    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const result: any = await this.http.get(`${BASE_URL}/currencies-to/${fromCurrency}`).toPromise()
     const identifiers = result.map((currency: CurrencyDetailResponse) => currency.ticker)
     return this.convertExchangeIdentifierToAirGapIdentifier(identifiers)
   }
