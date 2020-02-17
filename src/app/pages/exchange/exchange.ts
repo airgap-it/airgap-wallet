@@ -73,7 +73,7 @@ export class ExchangePage {
 
   public async filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
-
+    protocols.push('xtz-btc') // custom exchange flow for TZBTC
     return protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
@@ -228,7 +228,7 @@ export class ExchangePage {
       }
 
       this.dataService.setData(DataServiceKey.EXCHANGE, info)
-      this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(err => console.error(err))
     } catch (error) {
       console.error(error)
     }
@@ -242,10 +242,7 @@ export class ExchangePage {
       }
     })
 
-    modal
-      .onDidDismiss()
-      .then(() => this.ionViewWillEnter())
-      .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+    modal.onDidDismiss().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
 
     modal.present().catch(err => console.error(err))
   }
