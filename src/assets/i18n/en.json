@@ -381,6 +381,22 @@
     "receiving-to_label": "Receiving to",
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
   },
+    "custom-exchange": {
+    "title": "Select a Gatekeeper",
+    "confirm-exchange_label": "Confirm Exchange",
+    "heading": "Select one of the following gatekeepers",
+    "bitcoin-suisse": {
+      "text": "Founded in 2013, Bitcoin Suisse has been a pioneer in providing crypto-financial services. Bitcoin Suisse has helped to shape the crypto-and blockchain-ecosystem in Switzerland and has been a driving force in the development of the ‘Crypto Valley’ and ‘Crypto Nation Switzerland’. As a regulated Swiss financial intermediary (SRO – VQF member), Bitcoin Suisse offers prime brokerage, storage, lending and other crypto-financial services."
+    },
+     "woorton": {
+      "text": "Woorton provides 24/7 cryptocurrency liquidity to professional traders via secure chats or API connectivity. They offer seamless access to digital assets against 30 fiat currencies and provide brokerage desks or payments providers around the world including emerging markets such as Sub-Saharan Africa, Argentina, Mexico, Russia or Ukraine. Their bank-grade trading infrastructure allows them to deploy capital on exchanges with proprietary trading algorithms and enhance the liquidity of all types of assets."
+    },
+     "taurus": {
+      "text": "Taurus Group SA is a leading Swiss company in digital assets and blockchain. It was founded by senior executives with a background in banking, IT, cybersecurity and regulation. Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
+    },
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "get-tzbtc": "Get TZBTC From {{Gatekeeper}}"
+  },
   "delegation-baker-detail": {
     "title": "Baker Detail",
     "accepts-delegation": "Accepts Delegation",

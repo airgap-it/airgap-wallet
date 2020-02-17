@@ -209,32 +209,36 @@ export class ExchangePage {
   }
 
   public async startExchange() {
-    try {
-      const result = await this.exchangeProvider.createTransaction(
-        this.fromWallet.protocolIdentifier,
-        this.toWallet.protocolIdentifier,
-        this.toWallet.receivingPublicAddress,
-        this.amount.toFixed()
-      )
-      const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
-        this.fromWallet.protocolIdentifier,
-        this.toWallet.protocolIdentifier,
-        this.amount.toString()
-      )
-      const info = {
-        fromWallet: this.fromWallet,
-        fromCurrency: this.fromWallet.protocolIdentifier,
-        toWallet: this.toWallet,
-        toCurrency: this.toWallet.protocolIdentifier,
-        exchangeResult: result,
-        amountExpectedFrom: this.amount,
-        amountExpectedTo: amountExpectedTo
-      }
+    if (this.toWallet.protocolIdentifier === 'xtz-btc') {
+      this.router.navigateByUrl('/custom-exchange').catch(handleErrorSentry(ErrorCategory.STORAGE))
+    } else {
+      try {
+        const result = await this.exchangeProvider.createTransaction(
+          this.fromWallet.protocolIdentifier,
+          this.toWallet.protocolIdentifier,
+          this.toWallet.receivingPublicAddress,
+          this.amount.toFixed()
+        )
+        const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
+          this.fromWallet.protocolIdentifier,
+          this.toWallet.protocolIdentifier,
+          this.amount.toString()
+        )
+        const info = {
+          fromWallet: this.fromWallet,
+          fromCurrency: this.fromWallet.protocolIdentifier,
+          toWallet: this.toWallet,
+          toCurrency: this.toWallet.protocolIdentifier,
+          exchangeResult: result,
+          amountExpectedFrom: this.amount,
+          amountExpectedTo: amountExpectedTo
+        }
 
-      this.dataService.setData(DataServiceKey.EXCHANGE, info)
-      this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(err => console.error(err))
-    } catch (error) {
-      console.error(error)
+        this.dataService.setData(DataServiceKey.EXCHANGE, info)
+        this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 

@@ -143,6 +143,10 @@ const routes: Routes = [
   {
     path: 'exchange-select',
     loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
+  },
+  {
+    path: 'custom-exchange',
+    loadChildren: () => import('./pages/custom-exchange/custom-exchange.module').then(m => m.CustomExchangePageModule)
   }
 ]
 @NgModule({
