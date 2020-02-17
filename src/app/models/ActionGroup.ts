@@ -44,26 +44,6 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any>[] {
-    const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
-      { name: 'account-transaction-list.import-accounts_label', icon: 'add', identifier: 'import-accounts' },
-      () => {
-        const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
-        importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
-          if (ktAddresses.length === 0) {
-            this.callerContext.showToast('No accounts to import.')
-          } else {
-            for (const [index] of ktAddresses.entries()) {
-              await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, index, ktAddresses)
-            }
-
-            this.callerContext.router.navigateByUrl('/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            this.callerContext.showToast('Accounts imported')
-          }
-        }
-
-        return importAccountAction
-      }
-    )
     const delegateButtonAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
@@ -88,8 +68,55 @@ export class ActionGroup {
         return delegateAction
       }
     )
+    const addTokenButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
+      () => {
+        const prepareAddTokenActionContext = new SimpleAction(() => {
+          return new Promise<AddTokenActionContext>(async resolve => {
+            const info = {
+              subProtocolType: SubProtocolType.TOKEN,
+              wallet: this.callerContext.wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+        addTokenAction.onComplete = async (): Promise<void> => {
+          addTokenAction.getLinkedAction().context.location.back()
+        }
 
-    return [delegateButtonAction, importButtonAction]
+        return addTokenAction
+      }
+    )
+
+    return [delegateButtonAction, addTokenButtonAction]
+  }
+
+  public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
+    const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
+      { name: 'account-transaction-list.import-accounts_label', icon: 'add', identifier: 'import-accounts' },
+      () => {
+        const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
+        importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
+          if (ktAddresses.length === 0) {
+            this.callerContext.showToast('No accounts to import.')
+          } else {
+            for (const [index] of ktAddresses.entries()) {
+              await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, index, ktAddresses)
+            }
+
+            this.callerContext.router.navigateByUrl('/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.callerContext.showToast('Accounts imported')
+          }
+        }
+        return importAccountAction
+      }
+    )
+    return importButtonAction
   }
 
   private getTezosKTActions(): Action<any, any>[] {

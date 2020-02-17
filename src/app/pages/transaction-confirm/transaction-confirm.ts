@@ -150,6 +150,7 @@ export class TransactionConfirmPage {
         signed.signedTx = this.signedTx
         signed.hash = txId
 
+        console.log('SIGNED TX', signed)
         this.pushBackendProvider.postPendingTx(signed) // Don't await
         // END POST TX TO BACKEND
       })
