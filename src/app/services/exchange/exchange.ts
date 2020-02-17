@@ -1,4 +1,4 @@
-import { Subject, BehaviorSubject } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Exchange } from './exchange.interface'
