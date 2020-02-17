@@ -361,6 +361,9 @@
   "protocol-select": {
     "title": "Select Coin"
   },
+  "exchange-select": {
+    "title": "Select Exchange"
+  },
   "exchange-confirm": {
     "title": "Confirm Exchange",
     "confirm-exchange_label": "Confirm Exchange",
