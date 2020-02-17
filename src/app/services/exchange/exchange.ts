@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
 import { Exchange } from './exchange.interface'
 import { CreateTransactionResponse, ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { MarketDataService } from '../market-data/market-data.service'
+import { CustomExchangeService } from '../custom-exchange/custom-exchange.service'
 
 @Injectable({
   providedIn: 'root'
@@ -13,14 +13,14 @@ export class ExchangeProvider implements Exchange {
   private exchange: Exchange
   private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
 
-  constructor(public http: HttpClient, private readonly marketDataService: MarketDataService) {
+  constructor(public http: HttpClient, private readonly customExchangeService: CustomExchangeService) {
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
         case 'Changelly':
-          this.exchange = new ChangellyExchange(this.http)
+          this.exchange = new ChangellyExchange(this.http, this.customExchangeService)
           break
         case 'ChangeNow':
-          this.exchange = new ChangeNowExchange(this.http, this.marketDataService)
+          this.exchange = new ChangeNowExchange(this.http, this.customExchangeService)
           break
       }
     })
@@ -39,7 +39,6 @@ export class ExchangeProvider implements Exchange {
   }
 
   public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    console.log('getExchangeAmount', this.exchange)
     return this.exchange.getExchangeAmount(fromCurrency, toCurrency, amount)
   }
 
