@@ -246,9 +246,15 @@ export class ExchangePage {
       }
     })
 
-    modal.onDidDismiss().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
-
     modal.present().catch(err => console.error(err))
+
+    modal
+      .onDidDismiss()
+      .then(() => {
+        this.ionViewWillEnter()
+        this.loadDataFromExchange()
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }
 
   public dismissExchangeOnboarding() {
