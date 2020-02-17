@@ -68,12 +68,12 @@ export class ExchangePage {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
       await this.loadWalletsForSelectedProtocol(TO)
+      this.protocolSet('from', getProtocolByIdentifier(supportedProtocolsFrom[0]))
     }
   }
 
   public async filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
-    protocols.push('xtz-btc') // custom exchange flow for TZBTC
     return protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
@@ -122,6 +122,10 @@ export class ExchangePage {
     if (fromOrTo === FROM) {
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
+
+      if (this.selectedFromProtocol && this.selectedFromProtocol.identifier === 'btc') {
+        this.supportedProtocolsTo.push('xtz-btc')
+      }
 
       if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
         if (this.supportedProtocolsTo.length > 0) {
