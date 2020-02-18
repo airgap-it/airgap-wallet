@@ -90,8 +90,8 @@
       </ion-text>
     </ion-row>
 
-    <ion-list lines="none" class="ion-padding-bottom">
-      <ion-item *ngFor="let tx of pendingExchangeTransactions">
+    <ion-list lines="none" class="ion-padding-bottom" *ngFor="let tx of pendingExchangeTransactions">
+      <ion-item>
         <ion-row class="ion-padding-horizontal">
           <ion-text color="primary">
             <p>
@@ -99,26 +99,41 @@
             </p>
           </ion-text>
         </ion-row>
+      </ion-item>
+
+      <ion-item>
         <ion-avatar slot="start">
-          <identicon [address]="tx.fromCurrency === wallet.protocolIdentifier ? tx.sendingAddress : tx.receivingAddress"></identicon>
+          <identicon [address]="tx.sendingAddress "></identicon>
         </ion-avatar>
         <ion-label>
           <h2>
-            <ion-icon
-              *ngIf="tx.toCurrency === wallet.protocolIdentifier"
-              src="../../assets/custom-ion-icons/md-call_received.svg"
-            ></ion-icon>
-            <ion-icon *ngIf="tx.fromCurrency === wallet.protocolIdentifier" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
-            <span class="font--weight__bold" color="black" *ngIf="tx.toCurrency === wallet.protocolIdentifier">
-              {{ tx.amountExpectedTo }} {{ wallet.protocolIdentifier.toUpperCase() }}
-            </span>
-            <span class="font--weight__bold" color="black" *ngIf="tx.fromCurrency === wallet.protocolIdentifier">
-              {{ tx.amountExpectedFrom }} {{ wallet.protocolIdentifier.toUpperCase() }}
+            <ion-icon src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+            <span class="font--weight__bold" color="black">
+              {{ tx.amountExpectedFrom }} {{ tx.fromCurrency.toUpperCase() }}
             </span>
           </h2>
           <ion-text color="blackLight">
             <h3 class="typography--mono">
-              {{ tx.fromCurrency === wallet.protocolIdentifier ? tx.sendingAddress : tx.receivingAddress }}
+              {{ tx.sendingAddress | shortenString}}
+            </h3>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-avatar slot="start">
+          <identicon [address]="tx.receivingAddress"></identicon>
+        </ion-avatar>
+        <ion-label>
+          <h2>
+            <ion-icon src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
+            <span class="font--weight__bold" color="black">
+              {{ tx.amountExpectedTo }} {{ tx.toCurrency.toUpperCase() }}
+            </span>
+          </h2>
+          <ion-text color="blackLight">
+            <h3 class="typography--mono">
+              {{ tx.receivingAddress | shortenString}}
             </h3>
           </ion-text>
         </ion-label>
