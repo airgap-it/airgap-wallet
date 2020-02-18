@@ -14,7 +14,7 @@ export enum CustomEnum {
 export class CustomExchangeService {
   constructor(public marketDataService: MarketDataService) {}
 
-  public customLogicTZBTC(methodName: CustomEnum, amount?: string): string | string[] {
+  public customLogicTZBTC(methodName: CustomEnum, amount?: string): any {
     switch (methodName) {
       case CustomEnum.MIN_AMOUNT:
         return '0'
