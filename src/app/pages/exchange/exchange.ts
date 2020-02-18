@@ -258,7 +258,8 @@ export class ExchangePage {
           amountExpectedTo: amountExpectedTo,
           status: txStatus,
           exchange: this.activeExchange,
-          id: txId
+          id: txId,
+          timestamp: Date.now()
         } as PendingExchangeTransaction
 
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)

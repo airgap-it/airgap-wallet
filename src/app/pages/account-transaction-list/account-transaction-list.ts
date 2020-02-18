@@ -98,7 +98,7 @@ export class AccountTransactionListPage {
               tx.status = txStatusResponse.status
               break
           }
-          if (tx.status === TransactionStatus.FINISHED) {
+          if (tx.status === TransactionStatus.FINISHED || tx.timestamp < Date.now() - 3600 * 1000) {
             this.exchangeProvider.transactionCompleted(tx)
             this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(this.wallet.protocolIdentifier)
           }

@@ -33,6 +33,7 @@ export interface PendingExchangeTransaction {
   status: string
   exchange: ExchangeEnum
   id: string
+  timestamp: number
 }
 
 @Injectable({
