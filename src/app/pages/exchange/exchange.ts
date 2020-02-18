@@ -64,11 +64,10 @@ export class ExchangePage {
       const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
       this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
       await this.loadWalletsForSelectedProtocol(FROM)
-
       const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
       this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
       await this.loadWalletsForSelectedProtocol(TO)
-      this.protocolSet('from', getProtocolByIdentifier(supportedProtocolsFrom[0]))
+      this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
     }
   }
 
@@ -219,6 +218,7 @@ export class ExchangePage {
           this.toWallet.receivingPublicAddress,
           this.amount.toFixed()
         )
+
         const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
           this.fromWallet.protocolIdentifier,
           this.toWallet.protocolIdentifier,
@@ -236,6 +236,8 @@ export class ExchangePage {
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
         this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
+        const txId = result.id
+        this.exchangeProvider.getStatus(txId)
       } catch (error) {
         console.error(error)
       }
@@ -254,7 +256,13 @@ export class ExchangePage {
 
     modal
       .onDidDismiss()
-      .then(() => {
+      .then(async () => {
+        this.selectedFromProtocol = getProtocolByIdentifier(this.supportedProtocolsFrom[0])
+        this.selectedToProtocol = getProtocolByIdentifier(this.supportedProtocolsTo.slice(-1).pop())
+
+        await this.loadWalletsForSelectedProtocol('from')
+        await this.loadWalletsForSelectedProtocol('to')
+
         this.ionViewWillEnter()
         this.loadDataFromExchange()
       })
