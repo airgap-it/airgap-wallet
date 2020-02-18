@@ -7,7 +7,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeProvider } from '../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeEnum, PendingExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
@@ -216,7 +216,7 @@ export class ExchangePage {
           this.fromWallet.protocolIdentifier,
           this.toWallet.protocolIdentifier,
           this.toWallet.receivingPublicAddress,
-          this.amount.toFixed()
+          this.amount.toString()
         )
 
         const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
@@ -230,14 +230,38 @@ export class ExchangePage {
           toWallet: this.toWallet,
           toCurrency: this.toWallet.protocolIdentifier,
           exchangeResult: result,
-          amountExpectedFrom: this.amount,
+          amountExpectedFrom: this.amount.toString(),
           amountExpectedTo: amountExpectedTo
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
         this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
+
         const txId = result.id
-        this.exchangeProvider.getStatus(txId)
+        let txStatus: string
+        const txStatusResponse = await this.exchangeProvider.getStatus(txId)
+        switch (this.activeExchange) {
+          case ExchangeEnum.CHANGELLY:
+            txStatus = txStatusResponse
+            break
+          case ExchangeEnum.CHANGENOW:
+            txStatus = txStatusResponse.status
+            break
+        }
+
+        const exchangeTxInfo = {
+          receivingAddress: this.toWallet.addresses[0],
+          sendingAddress: this.fromWallet.addresses[0],
+          fromCurrency: this.fromWallet.protocolIdentifier,
+          toCurrency: this.toWallet.protocolIdentifier,
+          amountExpectedFrom: this.amount,
+          amountExpectedTo: amountExpectedTo,
+          status: txStatus,
+          exchange: this.activeExchange,
+          id: txId
+        } as PendingExchangeTransaction
+
+        this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
       } catch (error) {
         console.error(error)
       }
@@ -257,13 +281,20 @@ export class ExchangePage {
     modal
       .onDidDismiss()
       .then(async () => {
-        this.selectedFromProtocol = getProtocolByIdentifier(this.supportedProtocolsFrom[0])
-        this.selectedToProtocol = getProtocolByIdentifier(this.supportedProtocolsTo.slice(-1).pop())
-
-        await this.loadWalletsForSelectedProtocol('from')
-        await this.loadWalletsForSelectedProtocol('to')
-
-        this.ionViewWillEnter()
+        let fromCurrencies = await this.exchangeProvider.getAvailableFromCurrencies()
+        fromCurrencies = this.exchangeProvider.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
+        if (!fromCurrencies.includes(this.selectedFromProtocol.identifier)) {
+          this.selectedFromProtocol = getProtocolByIdentifier(this.supportedProtocolsFrom[0])
+          await this.loadWalletsForSelectedProtocol('from')
+        }
+        let toCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
+        toCurrencies = this.exchangeProvider.convertExchangeIdentifierToAirGapIdentifier(toCurrencies)
+        if (!toCurrencies.includes(this.selectedToProtocol.identifier)) {
+          const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
+          const filteredSupportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
+          this.selectedToProtocol = getProtocolByIdentifier(filteredSupportedProtocolsTo.slice(-1).pop())
+          await this.loadWalletsForSelectedProtocol('to')
+        }
         this.loadDataFromExchange()
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

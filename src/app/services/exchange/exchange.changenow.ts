@@ -37,6 +37,20 @@ export interface TransactionChangeNowResponse {
   amount: number
 }
 
+export interface TransactionStatus {
+  status: string
+  payinAddress: string
+  payoutAddress: string
+  fromCurrency: string
+  toCurrency: string
+  id: string
+  updatedAt: Date
+  expectedSendAmount: number
+  expectedReceiveAmount: number
+  createdAt: Date
+  isPartner: boolean
+}
+
 const identifierExchangeToAirGapMap = new Map<string, string>()
 identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
 
@@ -46,7 +60,7 @@ identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
 class ChangeNowApi {
   constructor(public http: HttpClient, public customExchangeService: CustomExchangeService) {}
 
-  protected convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
     return identifiers
       .map(identifier => identifier.toLowerCase())
       .map(identifier => {
@@ -54,7 +68,7 @@ class ChangeNowApi {
       })
   }
 
-  protected convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
     return identifiers
       .map(identifier => {
         return identifierAirGapToExchangeMap.has(identifier) ? identifierAirGapToExchangeMap.get(identifier) : identifier
@@ -85,6 +99,7 @@ class ChangeNowApi {
   }
 
   async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
+    console.log('getExchangeAmount', fromCurrency, toCurrency, amount)
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -92,7 +107,7 @@ class ChangeNowApi {
       return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
     }
     if (toCurrency.toLowerCase() === 'xtz-btc') {
-      return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
+      return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_TO, amount)
     }
     const response: EstimatedAmountResponse = (await this.http
       .get(`${BASE_URL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
@@ -131,9 +146,8 @@ class ChangeNowApi {
     return response
   }
 
-  async getStatus(transactionId: string): Promise<any> {
-    const response = await this.http.get(`${BASE_URL}rtxid.php?daddr=${transactionId}`).toPromise()
-    console.log('res', response)
+  async getStatus(transactionId: string): Promise<TransactionStatus> {
+    const response = (await this.http.get(`${BASE_URL}/transactions/${transactionId}/changenow`).toPromise()) as TransactionStatus
     return response
   }
 }

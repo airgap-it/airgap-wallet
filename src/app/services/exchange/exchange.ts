@@ -1,10 +1,39 @@
+import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
 import { Exchange } from './exchange.interface'
-import { CreateTransactionResponse, ChangellyExchange } from './exchange.changelly'
+import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 import { CustomExchangeService } from '../custom-exchange/custom-exchange.service'
+import { Injectable } from '@angular/core'
+import { StorageProvider, SettingsKey } from '../storage/storage'
+
+export enum ExchangeEnum {
+  CHANGELLY = 'Changelly',
+  CHANGENOW = 'ChangeNow'
+}
+
+export enum TransactionStatus {
+  NEW = 'NEW',
+  WAITING = 'WAITING',
+  CONFORMING = 'CONFORMING',
+  EXCHANGING = 'EXCHANGING',
+  SENDING = 'SENDING',
+  FINISHED = 'FINISHED',
+  FAILED = 'FAILED'
+}
+
+export interface PendingExchangeTransaction {
+  receivingAddress: string
+  sendingAddress: string
+  fromCurrency: string
+  toCurrency: string
+  amountExpectedFrom: BigNumber
+  amountExpectedTo: string
+  status: string
+  exchange: ExchangeEnum
+  id: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +42,20 @@ export class ExchangeProvider implements Exchange {
   private exchange: Exchange
   private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
 
-  constructor(public http: HttpClient, private readonly customExchangeService: CustomExchangeService) {
+  private pendingTransactions: PendingExchangeTransaction[] = []
+
+  constructor(
+    public http: HttpClient,
+    private readonly customExchangeService: CustomExchangeService,
+    private readonly storageProvider: StorageProvider
+  ) {
+    this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
-        case 'Changelly':
+        case ExchangeEnum.CHANGELLY:
           this.exchange = new ChangellyExchange(this.http, this.customExchangeService)
           break
-        case 'ChangeNow':
+        case ExchangeEnum.CHANGENOW:
           this.exchange = new ChangeNowExchange(this.http, this.customExchangeService)
           break
       }
@@ -46,12 +82,20 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.validateAddress(currency, address)
   }
 
-  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<any> {
     return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
   }
 
   public getStatus(transactionId: string): Promise<any> {
     return this.exchange.getStatus(transactionId)
+  }
+
+  public convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+    return this.exchange.convertExchangeIdentifierToAirGapIdentifier(identifiers)
+  }
+
+  public convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+    return this.exchange.convertAirGapIdentifierToExchangeIdentifier(identifiers)
   }
 
   public setActiveExchange(exchange: string) {
@@ -60,5 +104,33 @@ export class ExchangeProvider implements Exchange {
 
   public getActiveExchange() {
     return this.exchangeSubject.asObservable()
+  }
+
+  public pushExchangeTransaction(tx: PendingExchangeTransaction) {
+    this.pendingTransactions.push(tx)
+    this.persist()
+  }
+
+  public transactionCompleted(tx: PendingExchangeTransaction) {
+    const index = this.pendingTransactions.indexOf(tx)
+    if (index > -1) {
+      this.pendingTransactions.splice(index, 1)
+    }
+    this.persist()
+  }
+
+  private async persist(): Promise<void> {
+    return this.storageProvider.set(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
+  }
+
+  private async loadPendingTranscationsFromStorage() {
+    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as PendingExchangeTransaction[]
+    this.pendingTransactions = pendingTransactions ? pendingTransactions : []
+    return
+  }
+
+  public getExchangeTransactionsByProtocol(protocolidentifier: string) {
+    const filtered = this.pendingTransactions.filter(tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier)
+    return filtered
   }
 }

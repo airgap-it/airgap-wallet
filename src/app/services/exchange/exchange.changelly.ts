@@ -67,13 +67,13 @@ class ChangellyApi {
     }
   }
 
-  private convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
     return identifiers.map(identifier => {
       return identifierExchangeToAirGapMap.has(identifier) ? identifierExchangeToAirGapMap.get(identifier) : identifier
     })
   }
 
-  protected convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
     return identifiers.map(identifier => {
       return identifierAirGapToExchangeMap.has(identifier) ? identifierAirGapToExchangeMap.get(identifier) : identifier
     })

@@ -81,6 +81,51 @@
     </ion-list>
   </ng-container>
 
+  <ng-container *ngIf="pendingExchangeTransactions.length > 0">
+    <ion-row class="ion-padding-horizontal">
+      <ion-text color="primary">
+        <p class="font--weight__bold">
+          {{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}
+        </p>
+      </ion-text>
+    </ion-row>
+
+    <ion-list lines="none" class="ion-padding-bottom">
+      <ion-item *ngFor="let tx of pendingExchangeTransactions">
+        <ion-row class="ion-padding-horizontal">
+          <ion-text color="primary">
+            <p>
+              {{ tx.status }}
+            </p>
+          </ion-text>
+        </ion-row>
+        <ion-avatar slot="start">
+          <identicon [address]="tx.fromCurrency === wallet.protocolIdentifier ? tx.sendingAddress : tx.receivingAddress"></identicon>
+        </ion-avatar>
+        <ion-label>
+          <h2>
+            <ion-icon
+              *ngIf="tx.toCurrency === wallet.protocolIdentifier"
+              src="../../assets/custom-ion-icons/md-call_received.svg"
+            ></ion-icon>
+            <ion-icon *ngIf="tx.fromCurrency === wallet.protocolIdentifier" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+            <span class="font--weight__bold" color="black" *ngIf="tx.toCurrency === wallet.protocolIdentifier">
+              {{ tx.amountExpectedTo }} {{ wallet.protocolIdentifier.toUpperCase() }}
+            </span>
+            <span class="font--weight__bold" color="black" *ngIf="tx.fromCurrency === wallet.protocolIdentifier">
+              {{ tx.amountExpectedFrom }} {{ wallet.protocolIdentifier.toUpperCase() }}
+            </span>
+          </h2>
+          <ion-text color="blackLight">
+            <h3 class="typography--mono">
+              {{ tx.fromCurrency === wallet.protocolIdentifier ? tx.sendingAddress : tx.receivingAddress }}
+            </h3>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
   <ion-row class="ion-align-items-center">
     <ion-col size="10" class="ion-padding">
       <ion-text class="font--weight__bold" color="primary">

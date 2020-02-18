@@ -6,4 +6,6 @@ export interface Exchange {
   validateAddress(currency: string, address: string): Promise<{ result: false; message: string }>
   createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<any>
   getStatus(transactionId: string): Promise<any>
+  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[]
+  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[]
 }
