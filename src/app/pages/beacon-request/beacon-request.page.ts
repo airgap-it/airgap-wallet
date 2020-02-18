@@ -14,7 +14,7 @@ import {
 } from '@airgap/beacon-sdk/dist/messages/Messages'
 import { NotGrantedBeaconError, BeaconErrors } from '@airgap/beacon-sdk/dist/messages/Errors'
 import { WalletCommunicationClient } from '@airgap/beacon-sdk'
-import { Serializer } from '@airgap/beacon-sdk/dist/client/Serializer'
+import { Serializer } from '@airgap/beacon-sdk/dist/Serializer'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { IACMessageDefinitionObject, IACMessageType, TezosProtocol } from 'airgap-coin-lib'
