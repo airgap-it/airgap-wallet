@@ -51,7 +51,6 @@ class ChangellyApi {
   constructor(public http: HttpClient, public customExchangeService: CustomExchangeService) {}
 
   async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
-    console.log(method, params)
     const wrapper: JsonRpcWrapper<T> = {
       id: Math.random()
         .toString(36)
@@ -105,6 +104,7 @@ class ChangellyApi {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
+    console.log('getExchangeAmount', amount)
     if (fromCurrency.toLowerCase() === 'xtz-btc') {
       return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
     }
