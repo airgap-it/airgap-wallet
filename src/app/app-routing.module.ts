@@ -139,6 +139,16 @@ const routes: Routes = [
     },
     loadChildren: () =>
       import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
+  },
+  {
+    path: 'delegation-polkadot-validator-detail/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/delegation-polkadot-validator-detail/delegation-polkadot-validator-detail.module').then(
+        m => m.DelegationPolkadotValidatorDetailPageModule
+      )
   }
 ]
 @NgModule({

@@ -22,7 +22,7 @@ export class SchemeRoutingProvider {
   private router: Router
 
   private readonly syncSchemeHandlers: {
-    [key in IACMessageType]: (deserializedSync: IACMessageDefinitionObject, scanAgainCallback: Function) => Promise<boolean>
+    [key in IACMessageType]: (deserializedSync: IACMessageDefinitionObject[], scanAgainCallback: Function) => Promise<boolean>
   }
 
   constructor(
@@ -107,23 +107,30 @@ export class SchemeRoutingProvider {
 
       return IACResult.SUCCESS
     }
-    const firstMessage: IACMessageDefinitionObject = deserializedSync[0]
 
-    if (firstMessage.type in IACMessageType) {
-      this.syncSchemeHandlers[firstMessage.type](firstMessage, scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+    const groupedByType = deserializedSync.reduce(
+      (grouped, message) => Object.assign(grouped, { [message.type]: (grouped[message.type] || []).concat(message) }),
+      {}
+    )
 
-      return IACResult.SUCCESS
-    } else {
-      this.syncTypeNotSupportedAlert(firstMessage, scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+    for (let type in groupedByType) {
+      if (type in IACMessageType) {
+        this.syncSchemeHandlers[type](groupedByType[type], scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+      } else {
+        this.syncTypeNotSupportedAlert(groupedByType[type], scanAgainCallback).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
 
-      return IACResult.ERROR
+        return IACResult.ERROR
+      }
     }
+
+    return IACResult.SUCCESS
   }
 
-  public async handleWalletSync(deserializedSync: IACMessageDefinitionObject): Promise<boolean> {
-    const walletSync: AccountShareResponse = deserializedSync.payload as AccountShareResponse
+  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
+    // TODO: handle multiple messages
+    const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      deserializedSync.protocol,
+      deserializedSyncs[0].protocol,
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath
@@ -138,10 +145,10 @@ export class SchemeRoutingProvider {
     return false
   }
 
-  public async handleSignedTransaction(deserializedSync: IACMessageDefinitionObject): Promise<boolean> {
+  public async handleSignedTransaction(deserializedSyncTransactions: IACMessageDefinitionObject[]): Promise<boolean> {
     if (this.router) {
       const info = {
-        signedTransactionSync: deserializedSync
+        signedTransactionsSync: deserializedSyncTransactions
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -153,7 +160,7 @@ export class SchemeRoutingProvider {
   }
 
   private async syncTypeNotSupportedAlert(
-    _deserializedSyncProtocol: IACMessageDefinitionObject,
+    _deserializedSyncProtocols: IACMessageDefinitionObject[],
     scanAgainCallback: Function
   ): Promise<boolean> {
     const cancelButton = {

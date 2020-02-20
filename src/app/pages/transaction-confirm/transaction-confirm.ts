@@ -33,9 +33,9 @@ const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  public signedTransactionSync: IACMessageDefinitionObject
-  private signedTx: string
-  public protocol: ICoinProtocol
+  public signedTransactionsSync: IACMessageDefinitionObject[]
+  private signedTxs: string[]
+  public protocols: ICoinProtocol[]
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -57,13 +57,13 @@ export class TransactionConfirmPage {
     await this.platform.ready()
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      this.signedTransactionSync = info.signedTransactionSync
+      this.signedTransactionsSync = info.signedTransactionsSync
     }
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTx = (this.signedTransactionSync.payload as SignedTransaction).transaction
-    this.protocol = getProtocolByIdentifier(this.signedTransactionSync.protocol)
+    this.signedTxs = this.signedTransactionsSync.map(signedTx => (signedTx.payload as SignedTransaction).transaction)
+    this.protocols = this.signedTransactionsSync.map(signedTx => getProtocolByIdentifier(signedTx.protocol))
   }
 
   public async broadcastTransaction() {
@@ -86,119 +86,124 @@ export class TransactionConfirmPage {
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
 
-    this.protocol
-      .broadcastTransaction(this.signedTx)
-      .then(async txId => {
-        if (interval) {
-          clearInterval(interval)
-        }
-        // TODO: Remove once tezos allows delegation from tz1 addresses
-        if (this.protocol.identifier === ProtocolSymbols.XTZ) {
-          // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
-          const ktInterval = setInterval(async () => {
-            const ktProtocol = new TezosKtProtocol()
-            const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === ProtocolSymbols.XTZ)
-            xtzWallets.forEach(async xtzWallet => {
-              const ktAccounts = await ktProtocol.getAddressesFromPublicKey(xtzWallet.publicKey)
-              ktAccounts.forEach((_ktAccount, index) => {
-                const ktWallet = new AirGapMarketWallet(
-                  ProtocolSymbols.XTZ_KT,
-                  xtzWallet.publicKey,
-                  xtzWallet.isExtendedPublicKey,
-                  xtzWallet.derivationPath,
-                  index
-                )
-                const exists = this.accountProvider.walletExists(ktWallet)
-                if (!exists) {
-                  ktWallet.addresses = ktAccounts
-                  ktWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-                  this.accountProvider.addWallet(ktWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-                }
+    this.protocols.forEach((protocol, index) => {
+      protocol
+        .broadcastTransaction(this.signedTxs[index])
+        .then(async txId => {
+          console.log('transaction hash', txId)
+          if (interval) {
+            clearInterval(interval)
+          }
+          // TODO: Remove once tezos allows delegation from tz1 addresses
+          if (protocol.identifier === ProtocolSymbols.XTZ) {
+            // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
+            const ktInterval = setInterval(async () => {
+              const ktProtocol = new TezosKtProtocol()
+              const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === ProtocolSymbols.XTZ)
+              xtzWallets.forEach(async xtzWallet => {
+                const ktAccounts = await ktProtocol.getAddressesFromPublicKey(xtzWallet.publicKey)
+                ktAccounts.forEach((_ktAccount, index) => {
+                  const ktWallet = new AirGapMarketWallet(
+                    ProtocolSymbols.XTZ_KT,
+                    xtzWallet.publicKey,
+                    xtzWallet.isExtendedPublicKey,
+                    xtzWallet.derivationPath,
+                    index
+                  )
+                  const exists = this.accountProvider.walletExists(ktWallet)
+                  if (!exists) {
+                    ktWallet.addresses = ktAccounts
+                    ktWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+                    this.accountProvider.addWallet(ktWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+                  }
+                })
               })
-            })
-          }, INTERVAL_KT_REFRESH)
-          setTimeout(() => {
-            clearInterval(ktInterval)
-          }, TIMEOUT_KT_REFRESH_CLEAR)
-        }
+            }, INTERVAL_KT_REFRESH)
+            setTimeout(() => {
+              clearInterval(ktInterval)
+            }, TIMEOUT_KT_REFRESH_CLEAR)
+          }
 
-        // TODO: Remove once we introduce pending transaction handling
-        // TODO: Multi messages
-        // tslint:disable-next-line:no-unnecessary-type-assertion
-        const signedTxWrapper = this.signedTransactionSync.payload as SignedTransaction
-        const lastTx: {
-          protocol: string
-          accountIdentifier: string
-          date: number
-        } = {
-          protocol: this.signedTransactionSync.protocol,
-          accountIdentifier: signedTxWrapper.accountIdentifier,
-          date: new Date().getTime()
-        }
-        this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
+          // TODO: Remove once we introduce pending transaction handling
+          // TODO: Multi messages
+          // tslint:disable-next-line:no-unnecessary-type-assertion
+          const signedTxWrapper = this.signedTransactionsSync[index].payload as SignedTransaction
+          const lastTx: {
+            protocol: string
+            accountIdentifier: string
+            date: number
+          } = {
+            protocol: this.signedTransactionsSync[index].protocol,
+            accountIdentifier: signedTxWrapper.accountIdentifier,
+            date: new Date().getTime()
+          }
+          this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
-        loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        await this.showTransactionSuccessfulAlert(txId)
+          // TODO: multiple transactions
+          await this.showTransactionSuccessfulAlert(protocol, txId)
 
-        // POST TX TO BACKEND
-        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
-          .payload as SignedTransaction))[0] as any
-        // necessary for the transaction backend
-        signed.amount = signed.amount.toString()
-        signed.fee = signed.fee.toString()
-        signed.signedTx = this.signedTx
-        signed.hash = txId
+          // POST TX TO BACKEND
+          const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
+            .payload as SignedTransaction))[0] as any
+          // necessary for the transaction backend
+          signed.amount = signed.amount.toString()
+          signed.fee = signed.fee.toString()
+          signed.signedTx = this.signedTxs[index]
+          signed.hash = txId
 
-        this.pushBackendProvider.postPendingTx(signed) // Don't await
-        // END POST TX TO BACKEND
-      })
-      .catch(error => {
-        if (interval) {
-          clearInterval(interval)
-        }
+          this.pushBackendProvider.postPendingTx(signed) // Don't await
+          // END POST TX TO BACKEND
+        })
+        .catch(error => {
+          if (interval) {
+            clearInterval(interval)
+          }
 
-        handleErrorSentry(ErrorCategory.COINLIB)(error)
+          handleErrorSentry(ErrorCategory.COINLIB)(error)
 
-        loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        // TODO: Remove this special error case once we remove web3 from the coin-lib
-        if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
-          ;(this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction) as any).then(
-            async signed => {
-              if (signed.hash) {
-                await this.showTransactionSuccessfulAlert(signed.hash)
-                // POST TX TO BACKEND
-                // necessary for the transaction backend
-                signed.amount = signed.amount.toString()
-                signed.fee = signed.fee.toString()
-                signed.signedTx = this.signedTx
-                this.pushBackendProvider.postPendingTx(signed) // Don't await
-                // END POST TX TO BACKEND
-              } else {
-                handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+          // TODO: Remove this special error case once we remove web3 from the coin-lib
+          if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
+            ;(protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index].payload as SignedTransaction) as any).then(
+              async signed => {
+                if (signed.hash) {
+                  // TODO: multiple transactions
+                  await this.showTransactionSuccessfulAlert(protocol, signed.hash)
+                  // POST TX TO BACKEND
+                  // necessary for the transaction backend
+                  signed.amount = signed.amount.toString()
+                  signed.fee = signed.fee.toString()
+                  signed.signedTx = this.signedTxs[index]
+                  this.pushBackendProvider.postPendingTx(signed) // Don't await
+                  // END POST TX TO BACKEND
+                } else {
+                  handleErrorSentry(ErrorCategory.COINLIB)('No transaction hash present in signed ETH transaction')
+                }
               }
-            }
-          )
-        } else {
-          this.toastCtrl
-            .create({
-              duration: TOAST_ERROR_DURATION,
-              message: 'Transaction broadcasting failed: ' + error,
-              showCloseButton: true,
-              position: 'bottom'
-            })
-            .then(toast => {
-              toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            })
-            .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
-        }
-        this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      })
+            )
+          } else {
+            this.toastCtrl
+              .create({
+                duration: TOAST_ERROR_DURATION,
+                message: 'Transaction broadcasting failed: ' + error,
+                showCloseButton: true,
+                position: 'bottom'
+              })
+              .then(toast => {
+                toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+              })
+              .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+          }
+          this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        })
+    })
   }
 
-  private async showTransactionSuccessfulAlert(transactionHash: string): Promise<void> {
-    const blockexplorer: string = await this.protocol.getBlockExplorerLinkForTxId(transactionHash)
+  private async showTransactionSuccessfulAlert(protocol: ICoinProtocol, transactionHash: string): Promise<void> {
+    const blockexplorer: string = await protocol.getBlockExplorerLinkForTxId(transactionHash)
     this.alertCtrl
       .create({
         header: 'Transaction broadcasted!',

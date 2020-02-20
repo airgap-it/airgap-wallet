@@ -390,6 +390,12 @@
     "done": "Done", 
     "unknown": "Unknown"
   },
+  "delegation-polkadot-validator-detail": {
+    "title": "Validator Detail",
+    "accepts-delegation": "Accepts Delegation",
+    "your-balance": "Your Balance",
+    "delegate": "Delegate"
+  },
   "delegation-cosmos": {
     "title": "Validator Detail",
     "status-active_label": "active",

@@ -1,0 +1,74 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'delegation-polkadot-validator-detail.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="secondary">
+        <ion-icon slot="icon-only" name="more"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12">
+      <ion-item lines="none" class="ion-no-padding" *ngIf="validatorConfig; else validatorAvatarSkeleton">
+        <ion-avatar slot="start">
+          <identicon [address]="validatorConfig?.address"></identicon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font--weight__bold" ion-text color="black">
+            {{ validatorConfig?.name }}
+          </h2>
+          <p>{{ validatorConfig?.address }}</p>
+          <ion-text color="danger" *ngIf="bakerConfigError">
+            <p>{{ validatorConfigError | translate }}</p>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+      <ng-template #validatorAvatarSkeleton>
+        <div>
+          <ion-item lines="none" class="ion-no-padding">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 40%; height: 19px;"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ng-template>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal ion-padding-bottom">
+    <ion-col size="12">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start" class="content--align__center-center border--container">
+            <ion-icon name="wallet"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2 class="font--weight__bold ion-ion-text" color="black">
+              {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+            </h2>
+            <h3>{{ 'delegation-polkadot-validator-detail.your-balance' | translate }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="delegate()">
+      {{ 'delegation-polkadot-validator-detail.delegate' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

@@ -15,6 +15,9 @@ import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
 
+import { PolkadotDelegateActionResult } from 'airgap-coin-lib/dist/actions/PolkadotDelegateAction'
+import { AirGapPolkadotDelegateActionContext, AirGapPolkadotDelegateAction } from './actions/PolkadotDelegateAction'
+
 export interface WalletActionInfo {
   name: string
   icon: string
@@ -36,6 +39,9 @@ export class ActionGroup {
     })
     actionMap.set(ProtocolSymbols.COSMOS, () => {
       return this.getCosmosActions()
+    })
+    actionMap.set(ProtocolSymbols.POLKADOT, () => {
+      return this.getPolkadotActions()
     })
 
     const actionFunction: () => Action<any, any>[] | undefined = actionMap.get(this.callerContext.protocolIdentifier)
@@ -171,5 +177,28 @@ export class ActionGroup {
     )
 
     return [addTokenButtonAction]
+  }
+
+  private getPolkadotActions(): Action<any, any>[] {
+    const delegateButtonAction: ButtonAction<PolkadotDelegateActionResult, void> = new ButtonAction(
+      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
+      () => {
+        const prepareDelegateActionContext: SimpleAction<AirGapPolkadotDelegateActionContext> = new SimpleAction(() => {
+          return new Promise<AirGapPolkadotDelegateActionContext>(async resolve => {
+            const info = {
+              wallet: this.callerContext.wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl('/delegation-polkadot-validator-detail/' + DataServiceKey.DETAIL)
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        return new LinkedAction(prepareDelegateActionContext, AirGapPolkadotDelegateAction)
+      }
+    )
+
+    return [delegateButtonAction]
   }
 }
