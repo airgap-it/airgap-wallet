@@ -7,42 +7,63 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-end">
-  <h3 class="ion-padding-start ion-padding-bottom" [innerHTML]="'custom-exchange.heading' | translate"></h3>
+<ion-content class="ion-padding-vertical">
+  <ion-row class="ion-padding-horizontal">
+    <h3 class="ion-no-margin" [innerHTML]="'custom-exchange.heading' | translate"></h3>
 
-  <ion-row class="ion-align-items-center">
-    {{ 'custom-exchange.bitcoin-suisse.text' | translate }}
-
-    <ion-button
-      shape="round"
-      size="small"
-      color="primary"
-      (click)="getTZBTC('bitcoin-suisse')"
-      [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Bitcoin Suisse' }"
-    ></ion-button>
+    <p class="ion-no-margin ion-padding-vertical">
+      {{ 'custom-exchange.text' | translate }}
+    </p>
   </ion-row>
 
-  <ion-row class="ion-align-items-center">
-    {{ 'custom-exchange.woorton.text' | translate }}
+  <ion-card>
+    <ion-card-header>
+      <img src="assets/img/bitcoin-suisse-left.png" class="gatekeeper--logo" />
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ 'custom-exchange.bitcoin-suisse.text' | translate }}</p>
+      <ion-button
+        shape="round"
+        size="small"
+        color="primary"
+        class="ion-margin-top"
+        (click)="getTZBTC('bitcoin-suisse')"
+        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Bitcoin Suisse' }"
+      ></ion-button>
+    </ion-card-content>
+  </ion-card>
 
-    <ion-button
-      shape="round"
-      size="small"
-      color="primary"
-      (click)="getTZBTC('woorton')"
-      [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Woorton' }"
-    ></ion-button>
-  </ion-row>
+  <ion-card>
+    <ion-card-header>
+      <img src="assets/img/taurus-left.png" class="gatekeeper--logo" />
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ 'custom-exchange.taurus.text' | translate }}</p>
+      <ion-button
+        shape="round"
+        size="small"
+        color="primary"
+        class="ion-margin-top"
+        (click)="getTZBTC('taurus')"
+        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Taurus' }"
+      ></ion-button>
+    </ion-card-content>
+  </ion-card>
 
-  <ion-row class="ion-align-items-center">
-    {{ 'custom-exchange.taurus.text' | translate }}
-
-    <ion-button
-      shape="round"
-      size="small"
-      color="primary"
-      (click)="getTZBTC('taurus')"
-      [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Taurus' }"
-    ></ion-button>
-  </ion-row>
+  <ion-card>
+    <ion-card-header>
+      <img src="assets/img/woorton-left.png" class="gatekeeper--logo" />
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ 'custom-exchange.woorton.text' | translate }}</p>
+      <ion-button
+        shape="round"
+        size="small"
+        color="primary"
+        class="ion-margin-top"
+        (click)="getTZBTC('woorton')"
+        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Woorton' }"
+      ></ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
