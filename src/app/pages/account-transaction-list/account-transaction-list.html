@@ -82,7 +82,7 @@
   </ng-container>
 
   <ng-container *ngIf="pendingExchangeTransactions.length > 0">
-    <ion-row class="ion-padding-horizontal">
+    <ion-row class="ion-padding">
       <ion-text color="primary">
         <p class="font--weight__bold">
           {{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}
@@ -91,16 +91,6 @@
     </ion-row>
 
     <ion-list lines="none" class="ion-padding-bottom" *ngFor="let tx of pendingExchangeTransactions">
-      <ion-item>
-        <ion-row class="ion-padding-horizontal">
-          <ion-text color="primary">
-            <p>
-              {{ tx.status }}
-            </p>
-          </ion-text>
-        </ion-row>
-      </ion-item>
-
       <ion-item>
         <ion-avatar slot="start">
           <identicon [address]="tx.sendingAddress "></identicon>
@@ -118,6 +108,9 @@
             </h3>
           </ion-text>
         </ion-label>
+        <p slot="end">
+          {{ tx.status }}
+        </p>
       </ion-item>
 
       <ion-item>
@@ -137,6 +130,9 @@
             </h3>
           </ion-text>
         </ion-label>
+        <p slot="end">
+          {{ tx.status }}
+        </p>
       </ion-item>
     </ion-list>
   </ng-container>
