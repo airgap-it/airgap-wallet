@@ -58,13 +58,19 @@
       [swapSell]="false"
     ></swap>
     <div class="divider--line"></div>
-    <ion-row class="powered__container ion-padding ion-align-items-center ">
+    <ion-row class="powered__container ion-padding-horizontal ion-padding-top ion-align-items-center">
       <ion-text color="blackLight">
         <small>
           {{ 'exchange.powered-by_label' | translate }}
         </small>
       </ion-text>
       <img src="assets/img/changelly_logo.svg" />
+    </ion-row>
+    <ion-row class="ion-padding-horizontal">
+      <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
+        {{ 'exchange.switch-exchange_label' | translate }}
+        <ion-icon name="md-arrow-dropdown"></ion-icon>
+      </ion-button>
     </ion-row>
     <ion-fab vertical="bottom" horizontal="end">
       <ion-button
@@ -81,7 +87,5 @@
         {{ 'exchange.exchange_label' | translate }}
       </ion-button>
     </ion-fab>
-
-    <ion-button (click)="doRadio()">{{activeExchange}}</ion-button>
   </ng-container>
 </ion-content>
