@@ -348,7 +348,7 @@
     "title": "Exchange",
     "exchange_label": "Exchange",
     "powered-by_label": "powered by",
-    "switch-exchange_label": "Switch Exchange",
+    "switch-exchange_label": "Exchange",
     "onboarding": {
       "heading": "You can exchange your <span class=\"style__strong color__primary\">Ethereum</span> to <span class=\"style__strong color__primary\">Bitcoin</span> and do other exchanges.",
       "description": "Easily swap all supported crypto currencies directly inside AirGap.",

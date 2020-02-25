@@ -58,20 +58,26 @@
       [swapSell]="false"
     ></swap>
     <div class="divider--line"></div>
-    <ion-row class="powered__container ion-padding-horizontal ion-padding-top ion-align-items-center">
-      <ion-text color="blackLight">
-        <small>
-          {{ 'exchange.powered-by_label' | translate }}
-        </small>
-      </ion-text>
-      <img src="assets/img/changelly_logo.svg" />
+    <ion-row class="ion-padding">
+      <ion-col class="ion-no-padding">
+        <ion-row class="powered__container ion-align-items-center">
+          <ion-text color="blackLight">
+            <small>
+              {{ 'exchange.powered-by_label' | translate }}
+            </small>
+          </ion-text>
+          <!-- TODO: set active logo changelly_logo.svg or changenow_logo.svg -->
+          <img src="assets/img/changenow_logo.svg" />
+        </ion-row>
+      </ion-col>
+      <ion-col class="ion-no-padding justify--content__end">
+        <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
+          {{ 'exchange.switch-exchange_label' | translate }}
+          <ion-icon name="md-arrow-dropdown"></ion-icon>
+        </ion-button>
+      </ion-col>
     </ion-row>
-    <ion-row class="ion-padding-horizontal">
-      <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
-        {{ 'exchange.switch-exchange_label' | translate }}
-        <ion-icon name="md-arrow-dropdown"></ion-icon>
-      </ion-button>
-    </ion-row>
+
     <ion-fab vertical="bottom" horizontal="end">
       <ion-button
         color="primary"
