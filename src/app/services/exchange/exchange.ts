@@ -113,12 +113,9 @@ export class ExchangeProvider implements Exchange {
   }
 
   public transactionCompleted(tx: PendingExchangeTransaction) {
-    console.log('this.pendingTransactions', this.pendingTransactions)
     const index = this.pendingTransactions.indexOf(tx)
-    console.log('index', index)
     if (index > -1) {
       this.pendingTransactions.splice(index, 1)
-      console.log('this.pendingTransactions after splice', this.pendingTransactions)
     }
     this.persist()
   }
@@ -133,8 +130,11 @@ export class ExchangeProvider implements Exchange {
     return
   }
 
-  public getExchangeTransactionsByProtocol(protocolidentifier: string) {
-    const filtered = this.pendingTransactions.filter(tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier)
-    return filtered
+  public getExchangeTransactionsByProtocol(protocolidentifier: string, address: string) {
+    const filteredByProtocol = this.pendingTransactions.filter(
+      tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier
+    )
+    const filteredByAddress = filteredByProtocol.filter(tx => tx.receivingAddress === address || tx.sendingAddress === address)
+    return filteredByAddress
   }
 }

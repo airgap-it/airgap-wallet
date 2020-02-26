@@ -86,6 +86,11 @@ export class AccountTransactionListPage {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider
   ) {
+    const info = this.route.snapshot.data.special
+    if (this.route.snapshot.data.special) {
+      this.wallet = info.wallet
+    }
+
     this.subscription = this.timer$.subscribe(() => {
       if (this.pendingExchangeTransactions.length > 0) {
         this.pendingExchangeTransactions.forEach(async tx => {
@@ -104,16 +109,14 @@ export class AccountTransactionListPage {
             (tx.status === TransactionStatus.WAITING && tx.timestamp < Date.now() - 8 * 3600 * 1000)
           ) {
             this.exchangeProvider.transactionCompleted(tx)
-            this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(this.wallet.protocolIdentifier)
+            this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
+              this.wallet.protocolIdentifier,
+              this.wallet.addresses[0]
+            )
           }
         })
       }
     })
-
-    const info = this.route.snapshot.data.special
-    if (this.route.snapshot.data.special) {
-      this.wallet = info.wallet
-    }
 
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
 
@@ -267,7 +270,10 @@ export class AccountTransactionListPage {
 
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
-    this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(this.wallet.protocolIdentifier)
+    this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
+      this.wallet.protocolIdentifier,
+      this.wallet.addresses[0]
+    )
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map(value => value.hash)
