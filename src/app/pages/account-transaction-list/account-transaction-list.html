@@ -38,16 +38,12 @@
     (click)="openPreparePage()"
   ></card-actionable>
 
-  <ng-container *ngIf="hasPendingTransactions">
-    <transaction-item
-      [pendingTransactions]="pendingTransactions"
-      [wallet]="wallet"
-      [isRefreshing]="isRefreshing"
-      [initialTransactionsLoaded]="initialTransactionsLoaded"
-    ></transaction-item>
-  </ng-container>
-
   <transaction-item
+    [hasPendingTransactions]="hasPendingTransactions"
+    [pendingTransactions]="pendingTransactions"
+    [wallet]="wallet"
+    [isRefreshing]="isRefreshing"
+    [initialTransactionsLoaded]="initialTransactionsLoaded"
     [pendingExchangeTransactions]="pendingExchangeTransactions"
     [protocolIdentifier]="protocolIdentifier"
   ></transaction-item>

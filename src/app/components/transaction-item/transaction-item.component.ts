@@ -25,6 +25,9 @@ export class TransactionItemComponent {
   public isRefreshing: boolean = false
 
   @Input()
+  public hasPendingTransactions: boolean = false
+
+  @Input()
   public initialTransactionsLoaded: boolean = false
 
   @Input()
