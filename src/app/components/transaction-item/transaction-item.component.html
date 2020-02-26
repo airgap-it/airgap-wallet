@@ -1,0 +1,96 @@
+<ng-container *ngIf="hasPendingTransactions">
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding ion-padding-top">
+      <ion-text color="primary">
+        <p class="font--weight__bold">
+          {{ 'account-transaction-list.pending-transactions.label' | translate }}
+        </p>
+      </ion-text>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
+        <ion-icon slot="start" name="open"></ion-icon>
+        {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
+      </ion-button>
+    </ion-col>
+  </ion-row>
+
+  <ion-list lines="none" class="ion-padding-bottom">
+    <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
+      <ion-avatar slot="start">
+        <identicon [address]="tx.isInbound ? tx.from[0] : tx.to[0]"></identicon>
+      </ion-avatar>
+      <ion-label>
+        <h2>
+          <ion-icon *ngIf="tx.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
+          <ion-icon *ngIf="!tx.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+          <span class="font--weight__bold" color="black">
+            {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+          </span>
+        </h2>
+        <ion-text color="blackLight">
+          <h3 class="typography--mono">
+            {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
+          </h3>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+    <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+      <ion-spinner color="black"></ion-spinner>
+    </div>
+  </ion-list>
+</ng-container>
+
+<ng-container *ngIf="pendingExchangeTransactions.length > 0">
+  <ion-row class="ion-padding">
+    <ion-text color="primary">
+      <p class="font--weight__bold">
+        {{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}
+      </p>
+    </ion-text>
+  </ion-row>
+
+  <ion-list lines="none" class="ion-padding-bottom" *ngFor="let tx of pendingExchangeTransactions">
+    <ion-item>
+      <ion-avatar *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase()" slot="start">
+        <identicon [address]="tx.sendingAddress"></identicon>
+      </ion-avatar>
+
+      <ion-avatar *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency.toLowerCase()" slot="start">
+        <identicon [address]="tx.receivingAddress"></identicon>
+      </ion-avatar>
+      <ion-label>
+        <h2>
+          <ion-icon
+            *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase()"
+            src="../../assets/custom-ion-icons/md-call_made.svg"
+          ></ion-icon>
+          <ion-icon
+            *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency.toLowerCase()"
+            src="../../assets/custom-ion-icons/md-call_received.svg"
+          ></ion-icon>
+
+          <span class="font--weight__bold" color="black">
+            {{ protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.amountExpectedFrom : tx.amountExpectedTo }}
+            {{
+              protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase()
+                ? tx.fromCurrency.toUpperCase()
+                : tx.toCurrency.toUpperCase()
+            }}
+          </span>
+        </h2>
+        <ion-text color="blackLight">
+          <h3 class="typography--mono" *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency">
+            {{ tx.sendingAddress | shortenString }}
+          </h3>
+          <h3 class="typography--mono" *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency">
+            {{ tx.receivingAddress | shortenString }}
+          </h3>
+        </ion-text>
+      </ion-label>
+      <p slot="end">
+        {{ tx.status }}
+      </p>
+    </ion-item>
+  </ion-list>
+</ng-container>

@@ -28,6 +28,7 @@ import { SignedTransactionComponent } from './signed-transaction/signed-transact
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
+import { TransactionItemComponent } from './transaction-item/transaction-item.component'
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+    TransactionItemComponent
   ],
   imports: [
     IonicModule,
@@ -65,7 +67,6 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
   exports: [
     PortfolioItemComponent,
     ChartComponent,
-
     IdenticonComponent,
     HexagonIconComponent,
     AddressRowComponent,
@@ -81,7 +82,8 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+    TransactionItemComponent
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })
