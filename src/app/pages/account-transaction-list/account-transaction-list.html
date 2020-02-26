@@ -101,10 +101,18 @@
         </ion-avatar>
         <ion-label>
           <h2>
-            <ion-icon src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+            <ion-icon
+              *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase()"
+              src="../../assets/custom-ion-icons/md-call_made.svg"
+            ></ion-icon>
+            <ion-icon
+              *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency.toLowerCase()"
+              src="../../assets/custom-ion-icons/md-call_received.svg"
+            ></ion-icon>
             <span class="font--weight__bold" color="black">
-              {{ protocolIdentifier === fromCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom }} {{protocolIdentifier === fromCurrency
-              ? tx.toCurrency.toUpperCase() : tx.fromCurrency.toUpperCase() }}
+              {{ protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.amountExpectedFrom : tx.amountExpectedTo}}
+              {{protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.fromCurrency.toLowerCase() :
+              tx.toCurrency.toUpperCase() }}
             </span>
           </h2>
           <ion-text color="blackLight">

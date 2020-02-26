@@ -113,9 +113,12 @@ export class ExchangeProvider implements Exchange {
   }
 
   public transactionCompleted(tx: PendingExchangeTransaction) {
+    console.log('this.pendingTransactions', this.pendingTransactions)
     const index = this.pendingTransactions.indexOf(tx)
+    console.log('index', index)
     if (index > -1) {
       this.pendingTransactions.splice(index, 1)
+      console.log('this.pendingTransactions after splice', this.pendingTransactions)
     }
     this.persist()
   }
