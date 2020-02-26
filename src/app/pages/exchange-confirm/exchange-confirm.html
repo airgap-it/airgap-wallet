@@ -63,8 +63,12 @@
     [symbol]="toCurrency"
   ></address-row>
 
-  <ion-row class="ion-padding ion-margin-vertical" (click)="changellyUrl()">
-    <small [innerHTML]="'exchange-confirm.disclaimer' | translate"></small>
+  <ion-row *ngIf="activeExchange === 'Changelly'" class="ion-padding ion-margin-vertical" (click)="changellyUrl()">
+    <small [innerHTML]="'exchange-confirm.changelly_d' | translate"></small>
+  </ion-row>
+
+  <ion-row *ngIf="activeExchange === 'ChangeNow'" class="ion-padding ion-margin-vertical" (click)="changeNowUrl()">
+    <small [innerHTML]="'exchange-confirm.changenow_disclaimer' | translate"></small>
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

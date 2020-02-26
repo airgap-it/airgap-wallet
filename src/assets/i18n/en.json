@@ -383,7 +383,9 @@
     "exchange-address_label": "Exchange Address",
     "buy-amount_label": "Buy Amount",
     "receiving-to_label": "Receiving to",
-    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "changelly_disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "changenow_disclaimer": "Exchange services provided by ChangeNow. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">ChangeNow AML/KYC</span>."
   },
     "custom-exchange": {
     "title": "Select a Gatekeeper",

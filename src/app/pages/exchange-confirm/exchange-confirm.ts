@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ExchangeProvider } from 'src/app/services/exchange/exchange'
 declare let cordova
 
 @Component({
@@ -14,6 +15,8 @@ declare let cordova
   styleUrls: ['./exchange-confirm.scss']
 })
 export class ExchangeConfirmPage {
+  public activeExchange: string
+
   public fromWallet: AirGapMarketWallet
   public toWallet: AirGapMarketWallet
 
@@ -33,6 +36,7 @@ export class ExchangeConfirmPage {
 
   constructor(
     private readonly router: Router,
+    private readonly exchangeProvider: ExchangeProvider,
     private readonly route: ActivatedRoute,
     public platform: Platform,
     private readonly operationsProvider: OperationsProvider,
@@ -54,6 +58,10 @@ export class ExchangeConfirmPage {
     this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
     this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
     this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
+
+    this.exchangeProvider.getActiveExchange().subscribe(exchange => {
+      this.activeExchange = exchange
+    })
   }
 
   public async prepareTransaction() {
@@ -92,5 +100,9 @@ export class ExchangeConfirmPage {
 
   public changellyUrl() {
     this.openUrl('https://old.changelly.com/aml-kyc')
+  }
+
+  public changeNowUrl() {
+    this.openUrl('https://support.changenow.io/hc/en-us/articles/360011609979')
   }
 }
