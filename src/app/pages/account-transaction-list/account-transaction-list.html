@@ -117,8 +117,11 @@
             </span>
           </h2>
           <ion-text color="blackLight">
-            <h3 class="typography--mono">
-              {{ protocolIdentifier === tx.fromCurrency ? tx.receivingAddress : tx.sendingAddress | shortenString}}
+            <h3 class="typography--mono" *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency">
+              {{ tx.sendingAddress | shortenString}}
+            </h3>
+            <h3 class="typography--mono" *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency">
+              {{ tx.receivingAddress | shortenString}}
             </h3>
           </ion-text>
         </ion-label>
