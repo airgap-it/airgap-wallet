@@ -323,7 +323,7 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        importAccountAction: this.actionGroup.getImportAccountsAction(),
+        importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.back()
         },
