@@ -109,15 +109,16 @@
               *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency.toLowerCase()"
               src="../../assets/custom-ion-icons/md-call_received.svg"
             ></ion-icon>
+
             <span class="font--weight__bold" color="black">
               {{ protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.amountExpectedFrom : tx.amountExpectedTo}}
-              {{protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.fromCurrency.toLowerCase() :
+              {{protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase() ? tx.fromCurrency.toUpperCase() :
               tx.toCurrency.toUpperCase() }}
             </span>
           </h2>
           <ion-text color="blackLight">
             <h3 class="typography--mono">
-              {{ protocolIdentifier === fromCurrency ? tx.receivingAddress : tx.sendingAddress | shortenString}}
+              {{ protocolIdentifier === tx.fromCurrency ? tx.receivingAddress : tx.sendingAddress | shortenString}}
             </h3>
           </ion-text>
         </ion-label>
