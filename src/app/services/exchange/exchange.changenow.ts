@@ -99,7 +99,6 @@ class ChangeNowApi {
   }
 
   async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    console.log('getExchangeAmount', fromCurrency, toCurrency, amount)
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
