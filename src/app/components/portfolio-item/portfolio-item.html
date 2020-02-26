@@ -24,7 +24,7 @@
       </ion-text>
     </ng-container>
 
-    <ion-badge *ngIf="(isDelegated | async) !== null" color="secondary">
+    <ion-badge *ngIf="(isDelegated | async) !== null && !hideDelegationBadge" color="secondary">
       {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
     </ion-badge>
 

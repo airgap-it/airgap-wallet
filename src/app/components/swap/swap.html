@@ -59,6 +59,7 @@
   <portfolio-item
     [wallet]="selectedWallet"
     tappable
+    [hideDelegationBadge]="true"
     [isExpendable]="supportedWallets?.length > 1"
     [hideFiatAmounts]="true"
     (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
