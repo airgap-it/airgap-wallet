@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { CustomExchangePage } from './custom-exchange.page'
+import { ExchangeCustomPage } from './exchange-custom.page'
 import { ComponentsModule } from 'src/app/components/components.module'
 import { TranslateModule } from '@ngx-translate/core'
 import { PipesModule } from 'src/app/pipes/pipes.module'
@@ -20,8 +20,8 @@ import { RouterModule } from '@angular/router'
     TranslateModule,
     PipesModule,
     MomentModule,
-    RouterModule.forChild([{ path: '', component: CustomExchangePage }])
+    RouterModule.forChild([{ path: '', component: ExchangeCustomPage }])
   ],
-  declarations: [CustomExchangePage]
+  declarations: [ExchangeCustomPage]
 })
-export class CustomExchangePageModule {}
+export class ExchangeCustomPageModule {}

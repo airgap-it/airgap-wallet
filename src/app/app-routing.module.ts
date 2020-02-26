@@ -146,7 +146,7 @@ const routes: Routes = [
   },
   {
     path: 'custom-exchange',
-    loadChildren: () => import('./pages/custom-exchange/custom-exchange.module').then(m => m.CustomExchangePageModule)
+    loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
   }
 ]
 @NgModule({

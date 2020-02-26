@@ -4,10 +4,10 @@ var cordova: any
 
 @Component({
   selector: 'app-custom-exchange',
-  templateUrl: './custom-exchange.page.html',
-  styleUrls: ['./custom-exchange.page.scss']
+  templateUrl: './exchange-custom.page.html',
+  styleUrls: ['./exchange-custom.page.scss']
 })
-export class CustomExchangePage {
+export class ExchangeCustomPage {
   constructor(public readonly platform: Platform) {}
 
   getTZBTC(gatekeeper: string) {
