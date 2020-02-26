@@ -39,6 +39,7 @@ export class ExchangePage {
   public minExchangeAmount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
   public activeExchange: string
+  public customExchange: boolean
 
   public exchangePageStates = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
@@ -116,6 +117,7 @@ export class ExchangePage {
       this.selectedFromProtocol = protocol
     } else {
       this.selectedToProtocol = protocol
+      this.customExchange = protocol.identifier === 'xtz-btc' ? true : false
     }
 
     if (fromOrTo === FROM) {
