@@ -92,41 +92,24 @@
 
     <ion-list lines="none" class="ion-padding-bottom" *ngFor="let tx of pendingExchangeTransactions">
       <ion-item>
-        <ion-avatar slot="start">
+        <ion-avatar *ngIf="protocolIdentifier.toLowerCase() === tx.fromCurrency.toLowerCase()" slot="start">
           <identicon [address]="tx.sendingAddress "></identicon>
+        </ion-avatar>
+
+        <ion-avatar *ngIf="protocolIdentifier.toLowerCase() === tx.toCurrency.toLowerCase()" slot="start">
+          <identicon [address]="tx.receivingAddress "></identicon>
         </ion-avatar>
         <ion-label>
           <h2>
             <ion-icon src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
             <span class="font--weight__bold" color="black">
-              {{ tx.amountExpectedFrom }} {{ tx.fromCurrency.toUpperCase() }}
+              {{ protocolIdentifier === fromCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom }} {{protocolIdentifier === fromCurrency
+              ? tx.toCurrency.toUpperCase() : tx.fromCurrency.toUpperCase() }}
             </span>
           </h2>
           <ion-text color="blackLight">
             <h3 class="typography--mono">
-              {{ tx.sendingAddress | shortenString}}
-            </h3>
-          </ion-text>
-        </ion-label>
-        <p slot="end">
-          {{ tx.status }}
-        </p>
-      </ion-item>
-
-      <ion-item>
-        <ion-avatar slot="start">
-          <identicon [address]="tx.receivingAddress"></identicon>
-        </ion-avatar>
-        <ion-label>
-          <h2>
-            <ion-icon src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
-            <span class="font--weight__bold" color="black">
-              {{ tx.amountExpectedTo }} {{ tx.toCurrency.toUpperCase() }}
-            </span>
-          </h2>
-          <ion-text color="blackLight">
-            <h3 class="typography--mono">
-              {{ tx.receivingAddress | shortenString}}
+              {{ protocolIdentifier === fromCurrency ? tx.receivingAddress : tx.sendingAddress | shortenString}}
             </h3>
           </ion-text>
         </ion-label>
