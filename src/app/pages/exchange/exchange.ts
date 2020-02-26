@@ -234,7 +234,7 @@ export class ExchangePage {
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocolIdentifier,
           toWallet: this.toWallet,
-          toCurrency: this.toWallet.protocolIdentifier,
+          toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocolIdentifier])[0],
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
           amountExpectedTo: amountExpectedTo
