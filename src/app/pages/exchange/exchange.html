@@ -67,7 +67,8 @@
             </small>
           </ion-text>
           <!-- TODO: set active logo changelly_logo.svg or changenow_logo.svg -->
-          <img src="assets/img/changenow_logo.svg" />
+          <img *ngIf="activeExchange === 'ChangeNow'" src="assets/img/changenow_logo.svg" />
+          <img *ngIf="activeExchange === 'Changelly'" src="assets/img/changelly_logo.svg" />
         </ion-row>
       </ion-col>
       <ion-col class="ion-no-padding justify--content__end">
