@@ -128,7 +128,11 @@ export class ExchangePage {
         this.supportedProtocolsTo.push('xtz-btc')
       }
 
-      if (!this.selectedToProtocol || this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier) {
+      if (
+        !this.selectedToProtocol ||
+        this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
+        !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
+      ) {
         if (this.supportedProtocolsTo.length > 0) {
           this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
         } else {
