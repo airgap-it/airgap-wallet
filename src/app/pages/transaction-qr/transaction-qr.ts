@@ -47,7 +47,6 @@ export class TransactionQrPage {
           totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
           totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
         }
-        console.log('TOTAL FEES', this.aggregatedInfo.totalFees)
       }
     }
     this.isBrowser = !this.platform.is('cordova')

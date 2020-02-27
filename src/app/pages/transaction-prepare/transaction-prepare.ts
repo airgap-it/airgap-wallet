@@ -182,7 +182,6 @@ export class TransactionPreparePage {
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
-    console.log('FEE', fee.toNumber())
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
