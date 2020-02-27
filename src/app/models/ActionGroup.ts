@@ -1,3 +1,4 @@
+import { AirGapTezosMigrateActionContext, AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
@@ -93,27 +94,19 @@ export class ActionGroup {
   }
 
   private getTezosKTActions(): Action<any, any>[] {
-    const migrateAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
+    const migrateAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
       () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
-            const info = {
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
+        const action = new AirGapTezosMigrateAction({
+          wallet: this.callerContext.wallet,
+          mainWallet: this.callerContext.mainWallet,
+          alertCtrl: this.callerContext.alertCtrl,
+          translateService: this.callerContext.translateService,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
         })
-        const viewDelegationAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapTezosDelegateAction
-        )
 
-        return viewDelegationAction
+        return action
       }
     )
 
