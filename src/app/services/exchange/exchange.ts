@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
@@ -125,7 +125,7 @@ export class ExchangeProvider implements Exchange {
     this.persist()
   }
 
-  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): FormattedExchangeTransaction[] {
+  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): IAirGapTransaction[] {
     const protocol = getProtocolByIdentifier(protocolIdentifier)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
@@ -135,11 +135,10 @@ export class ExchangeProvider implements Exchange {
         to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
-        status: tx.status,
-        exchange: tx.exchange,
-        id: tx.id,
+        fee: '0',
         timestamp: tx.timestamp,
-        protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency
+        protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
+        status: tx.status
       }
     })
   }

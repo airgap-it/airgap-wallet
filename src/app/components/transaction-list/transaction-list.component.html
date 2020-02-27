@@ -1,0 +1,32 @@
+<ion-row class="ion-padding-horizontal" *ngIf="transactionType === 'pendingTransaction' && hasPendingTransactions">
+  <ion-col size="12" class="ion-no-padding ion-padding-top">
+    <ion-text color="primary">
+      <p class="font--weight__bold">
+        {{ 'account-transaction-list.pending-transactions.label' | translate }}
+      </p>
+    </ion-text>
+  </ion-col>
+  <ion-col size="12" class="ion-no-padding">
+    <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
+      <ion-icon slot="start" name="open"></ion-icon>
+      {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
+    </ion-button>
+  </ion-col>
+</ion-row>
+
+<ion-row class="ion-padding-horizontal" *ngIf="transactionType === 'exchangeTransaction' && hasExchangeTransactions">
+  <ion-text color="primary">
+    <p class="font--weight__bold">
+      {{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}
+    </p>
+  </ion-text>
+</ion-row>
+
+<ion-list lines="none" class="ion-padding-bottom">
+  <ng-container *ngFor="let tx of transactions" (click)="openTransactionDetailPage(tx)">
+    <transaction-item [tx]="tx" [transactionType]="transactionType"></transaction-item>
+  </ng-container>
+  <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+    <ion-spinner color="black"></ion-spinner>
+  </div>
+</ion-list>

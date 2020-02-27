@@ -38,23 +38,23 @@
     (click)="openPreparePage()"
   ></card-actionable>
 
-  <transaction-item
+  <transaction-list
     [transactionType]="'pendingTransaction'"
     [hasPendingTransactions]="hasPendingTransactions"
     [transactions]="pendingTransactions"
     [isRefreshing]="isRefreshing"
     [initialTransactionsLoaded]="initialTransactionsLoaded"
     [wallet]="wallet"
-  ></transaction-item>
+  ></transaction-list>
 
-  <transaction-item
+  <transaction-list
     [transactionType]="'exchangeTransaction'"
     [hasExchangeTransactions]="hasExchangeTransactions"
     [transactions]="formattedExchangeTransactions"
     [isRefreshing]="isRefreshing"
     [initialTransactionsLoaded]="initialTransactionsLoaded"
     [wallet]="wallet"
-  ></transaction-item>
+  ></transaction-list>
 
   <ion-row class="ion-align-items-center">
     <ion-col size="10" class="ion-padding">
@@ -89,13 +89,13 @@
     </p>
   </div>
 
-  <transaction-item
+  <transaction-list
     [transactionType]="'normalTransaction'"
     [transactions]="transactions"
     [isRefreshing]="isRefreshing"
     [initialTransactionsLoaded]="initialTransactionsLoaded"
     [wallet]="wallet"
-  ></transaction-item>
+  ></transaction-list>
 
   <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
