@@ -123,7 +123,7 @@ export class ExchangeProvider implements Exchange {
         to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
-        fee: protocol.feeDefaults.medium,
+        fee: new BigNumber(protocol.feeDefaults.medium).times(10 ** protocol.decimals).toString(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
         status: tx.status
