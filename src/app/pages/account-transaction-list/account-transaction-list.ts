@@ -193,6 +193,11 @@ export class AccountTransactionListPage {
     this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  public openTransactionDetailPage(transaction: IAirGapTransaction): void {
+    this.dataService.setData(DataServiceKey.DETAIL, transaction)
+    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
   public openBlockexplorer(): void {
     const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
