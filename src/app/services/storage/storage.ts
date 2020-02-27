@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { PendingExchangeTransaction } from '../exchange/exchange'
+import { ExchangeTransaction } from '../exchange/exchange'
 
 export enum SettingsKey {
   INTRODUCTION = 'introduction',
@@ -47,7 +47,7 @@ interface SettingsKeyReturnType {
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: boolean
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: number
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: number
-  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: PendingExchangeTransaction[]
+  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
 }
 
 type SettingsKeyReturnDefaults = { [key in SettingsKey]: SettingsKeyReturnType[key] }

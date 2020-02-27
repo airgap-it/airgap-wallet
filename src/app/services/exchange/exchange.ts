@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js'
+import { getProtocolByIdentifier } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
@@ -23,13 +24,24 @@ export enum TransactionStatus {
   FAILED = 'FAILED'
 }
 
-export interface PendingExchangeTransaction {
+export interface ExchangeTransaction {
   receivingAddress: string
   sendingAddress: string
   fromCurrency: string
   toCurrency: string
   amountExpectedFrom: BigNumber
   amountExpectedTo: string
+  status: string
+  exchange: ExchangeEnum
+  id: string
+  timestamp: number
+}
+
+export interface FormattedExchangeTransaction {
+  from: string[]
+  to: string[]
+  isInbound: boolean
+  amount: string
   status: string
   exchange: ExchangeEnum
   id: string
@@ -43,7 +55,7 @@ export class ExchangeProvider implements Exchange {
   private exchange: Exchange
   private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
 
-  private pendingTransactions: PendingExchangeTransaction[] = []
+  private pendingTransactions: ExchangeTransaction[] = []
 
   constructor(
     public http: HttpClient,
@@ -107,12 +119,30 @@ export class ExchangeProvider implements Exchange {
     return this.exchangeSubject.asObservable()
   }
 
-  public pushExchangeTransaction(tx: PendingExchangeTransaction) {
+  public pushExchangeTransaction(tx: ExchangeTransaction) {
     this.pendingTransactions.push(tx)
     this.persist()
   }
 
-  public transactionCompleted(tx: PendingExchangeTransaction) {
+  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): FormattedExchangeTransaction[] {
+    const protocol = getProtocolByIdentifier(protocolIdentifier)
+    return pendingExchangeTxs.map(tx => {
+      const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
+      const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()
+      return {
+        from: [tx.receivingAddress],
+        to: [tx.sendingAddress],
+        isInbound: protocolIdentifier === tx.toCurrency ? true : false,
+        amount: formattedAmount,
+        status: tx.status,
+        exchange: tx.exchange,
+        id: tx.id,
+        timestamp: tx.timestamp
+      }
+    })
+  }
+
+  public transactionCompleted(tx: ExchangeTransaction) {
     const index = this.pendingTransactions.indexOf(tx)
     if (index > -1) {
       this.pendingTransactions.splice(index, 1)
@@ -125,7 +155,7 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as PendingExchangeTransaction[]
+    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }

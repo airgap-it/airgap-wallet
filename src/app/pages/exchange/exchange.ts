@@ -7,7 +7,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeProvider, ExchangeEnum, PendingExchangeTransaction } from '../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeEnum, ExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
@@ -261,12 +261,12 @@ export class ExchangePage {
           fromCurrency: this.fromWallet.protocolIdentifier,
           toCurrency: this.toWallet.protocolIdentifier,
           amountExpectedFrom: this.amount,
-          amountExpectedTo: amountExpectedTo,
+          amountExpectedTo: amountExpectedTo.toString(),
           status: txStatus,
           exchange: this.activeExchange,
           id: txId,
           timestamp: Date.now()
-        } as PendingExchangeTransaction
+        } as ExchangeTransaction
 
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
       } catch (error) {

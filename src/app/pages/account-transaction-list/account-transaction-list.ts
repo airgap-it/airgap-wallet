@@ -1,5 +1,11 @@
 import { Component } from '@angular/core'
-import { ExchangeProvider, PendingExchangeTransaction, ExchangeEnum, TransactionStatus } from './../../services/exchange/exchange'
+import {
+  ExchangeProvider,
+  ExchangeEnum,
+  TransactionStatus,
+  FormattedExchangeTransaction,
+  ExchangeTransaction
+} from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
@@ -51,10 +57,11 @@ export class AccountTransactionListPage {
   public protocolIdentifier: string
 
   public hasPendingTransactions: boolean = false
-  public hasPendingExchangeTransactions: boolean = false
+  public hasExchangeTransactions: boolean = false
 
   public pendingTransactions: IAirGapTransaction[] = []
-  public pendingExchangeTransactions: PendingExchangeTransaction[] = []
+  public exchangeTransactions: ExchangeTransaction[] = []
+  public formattedExchangeTransactions: FormattedExchangeTransaction[] = []
 
   // XTZ
   public isKtDelegated: boolean = false
@@ -92,8 +99,9 @@ export class AccountTransactionListPage {
     }
 
     this.subscription = this.timer$.subscribe(() => {
-      if (this.pendingExchangeTransactions.length > 0) {
-        this.pendingExchangeTransactions.forEach(async tx => {
+      if (this.exchangeTransactions.length > 0) {
+        this.hasExchangeTransactions = true
+        this.exchangeTransactions.forEach(async tx => {
           const txStatusResponse = await this.exchangeProvider.getStatus(tx.id)
           switch (tx.exchange) {
             case ExchangeEnum.CHANGELLY:
@@ -108,8 +116,9 @@ export class AccountTransactionListPage {
             (tx.status === TransactionStatus.NEW && tx.timestamp < Date.now() - 8 * 3600 * 1000) ||
             (tx.status === TransactionStatus.WAITING && tx.timestamp < Date.now() - 8 * 3600 * 1000)
           ) {
+            this.hasExchangeTransactions = false
             this.exchangeProvider.transactionCompleted(tx)
-            this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
+            this.exchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
               this.wallet.protocolIdentifier,
               this.wallet.addresses[0]
             )
@@ -270,10 +279,15 @@ export class AccountTransactionListPage {
 
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
-    this.pendingExchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
+    this.exchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
       this.wallet.protocolIdentifier,
       this.wallet.addresses[0]
     )
+    if (this.exchangeTransactions.length > 0) {
+      this.hasExchangeTransactions = true
+    }
+
+    this.formattedExchangeTransactions = this.exchangeProvider.formatExchangeTxs(this.exchangeTransactions, this.protocolIdentifier)
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map(value => value.hash)

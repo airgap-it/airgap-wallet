@@ -1,6 +1,6 @@
+import { FormattedExchangeTransaction } from './../../services/exchange/exchange'
 import { Component, Input } from '@angular/core'
 import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
-import { PendingExchangeTransaction } from 'src/app/services/exchange/exchange'
 import { Platform } from '@ionic/angular'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
@@ -16,19 +16,19 @@ export class TransactionItemComponent {
   constructor(private readonly platform: Platform, public readonly dataService: DataService, public readonly router: Router) {}
 
   @Input()
-  public pendingTransactions: IAirGapTransaction[] = []
-
-  @Input()
-  public pendingExchangeTransactions: PendingExchangeTransaction[] = []
-
-  @Input()
-  public protocolIdentifier: string
+  public transactions: IAirGapTransaction[] | FormattedExchangeTransaction[] = []
 
   @Input()
   public isRefreshing: boolean = false
 
   @Input()
+  public transactionType: any
+
+  @Input()
   public hasPendingTransactions: boolean = false
+
+  @Input()
+  public hasExchangeTransactions: boolean = false
 
   @Input()
   public initialTransactionsLoaded: boolean = false
