@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core'
 import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
 import { PendingExchangeTransaction } from 'src/app/services/exchange/exchange'
 import { Platform } from '@ionic/angular'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { Router } from '@angular/router'
 declare let cordova
 
 @Component({
@@ -10,7 +12,7 @@ declare let cordova
   styleUrls: ['./transaction-item.component.scss']
 })
 export class TransactionItemComponent {
-  constructor(private readonly platform: Platform) {}
+  constructor(private readonly platform: Platform, public readonly dataService: DataService, public readonly router: Router) {}
 
   @Input()
   public pendingTransactions: IAirGapTransaction[] = []
@@ -45,5 +47,9 @@ export class TransactionItemComponent {
     } else {
       window.open(url, '_blank')
     }
+  }
+  public openTransactionDetailPage(transaction: IAirGapTransaction): void {
+    this.dataService.setData(DataServiceKey.DETAIL, transaction)
+    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }
