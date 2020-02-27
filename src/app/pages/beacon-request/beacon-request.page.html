@@ -7,8 +7,24 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-horizontal ion-padding-bottom">
   <ng-container *ngIf="request">
+    <ng-container *ngIf="request.type != 'permission_request'">
+      <ion-card>
+        <ion-item lines="none">
+          <ion-avatar slot="start">
+            <identicon [address]="requesterName"></identicon>
+          </ion-avatar>
+          <ion-label class="ion-margin-start">
+            <p>
+              Beacon request by dApp
+            </p>
+            <h3>Beacon Example dApp{{requesterName}}</h3>
+          </ion-label>
+          <img src="assets/img/beacon_logo.svg" slot="end" class="by-beacon__img" />
+        </ion-item>
+      </ion-card>
+    </ng-container>
     <div *ngIf="request.type === 'permission_request'" class="request--container">
       <ion-row>
         <ion-col class="ion-text-center" size="3">
@@ -58,34 +74,37 @@
     </ng-container>
 
     <ion-row *ngIf="request.type === 'broadcast_request'">
-      <p class="ion-padding-top">{{ 'beacon-request.sign-data_label' | translate }}</p>
+      <ng-container *ngFor="let transaction of transactions">
+        <from-to [transaction]="transaction"></from-to>
+      </ng-container>
     </ion-row>
 
     <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
-      Not implemented
+      <ng-container *ngFor="let transaction of transactions">
+        <from-to [transaction]="transaction"></from-to>
+      </ng-container>
     </div>
 
     <div *ngIf="request.type === 'operation_request'" class="request--container">
-      Not implemented
+      <ng-container *ngFor="let transaction of transactions">
+        <from-to [transaction]="transaction"></from-to>
+      </ng-container>
     </div>
-
-    <pre *ngIf="request.type !== 'permission_request'">{{ request | json }}</pre>
 
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
       <ion-button shape="round" color="secondary" (click)="dismiss()">
-        {{ 'beacon-request.dismiss_label' | translate }}
+        {{ 'beacon-request.done_label' | translate }}
       </ion-button>
       <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
         {{ 'beacon-request.connect_label' | translate }}
       </ion-button>
-      <ion-button *ngIf="request.type === 'operation_request'" shape="round" color="primary" (click)="done()">
-        {{ 'beacon-request.prepare-data_label' | translate }}
-      </ion-button>
-      <ion-button *ngIf="request.type === 'sign_payload_request'" shape="round" color="primary" (click)="done()">
-        {{ 'beacon-request.prepare-data_label' | translate }}
-      </ion-button>
-      <ion-button *ngIf="request.type === 'broadcast_request'" shape="round" color="primary" (click)="done()">
-        {{ 'beacon-request.prepare-data_label' | translate }}
+      <ion-button
+        *ngIf="request.type === 'operation_request' || 'sign_payload_request' || 'broadcast_request'"
+        shape="round"
+        color="primary"
+        (click)="done()"
+      >
+        {{ 'beacon-request.continue_label' | translate }}
       </ion-button>
     </ion-fab>
   </ng-container>

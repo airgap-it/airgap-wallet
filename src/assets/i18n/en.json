@@ -496,8 +496,8 @@
       "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."
     },
     "connect_label": "Connect",
-    "prepare-data_label": "Prepare Data",
-    "dismiss_label": "Dismiss"
+    "continue_label": "Continue",
+    "done_label": "Done"
   },
   "settings-beacon": {
     "title": "Beacon Settings"
