@@ -26,7 +26,7 @@ export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknow
 }
 
 @Component({
-  selector: 'app-beacon-request',
+  selector: 'page-beacon-request',
   templateUrl: './beacon-request.page.html',
   styleUrls: ['./beacon-request.page.scss']
 })
