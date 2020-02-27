@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import { ModalController, NavParams } from '@ionic/angular'
 
 @Component({
-  selector: 'exchange-select',
+  selector: 'page-exchange-select',
   templateUrl: 'exchange-select.page.html'
 })
 export class ExchangeSelectPage {

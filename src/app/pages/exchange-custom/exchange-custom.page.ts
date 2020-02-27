@@ -3,7 +3,7 @@ import { Platform } from '@ionic/angular'
 var cordova: any
 
 @Component({
-  selector: 'app-custom-exchange',
+  selector: 'page-exchange-custom',
   templateUrl: './exchange-custom.page.html',
   styleUrls: ['./exchange-custom.page.scss']
 })
