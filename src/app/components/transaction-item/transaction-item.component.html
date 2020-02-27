@@ -1,4 +1,4 @@
-<ion-item>
+<ion-item class="ion-no-padding">
   <ion-avatar slot="start" *ngIf="transactionType !== 'exchangeTransaction'">
     <identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></identicon>
     <identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></identicon>
