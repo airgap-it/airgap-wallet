@@ -11,17 +11,18 @@
   <ng-container *ngIf="request">
     <ng-container *ngIf="request.type != 'permission_request'">
       <ion-card>
-        <ion-card-content>
-          <ion-item lines="none" class="ion-no-padding">
-            <ion-avatar slot="start">
-              <identicon [address]="requesterName"></identicon>
-            </ion-avatar>
-            <ion-label class="ion-margin-start">
-              <p>Requested by dApp</p>
-              <h3>{{requesterName}}</h3>
-            </ion-label>
-          </ion-item>
-        </ion-card-content>
+        <ion-item lines="none">
+          <ion-avatar slot="start">
+            <identicon [address]="requesterName"></identicon>
+          </ion-avatar>
+          <ion-label class="ion-margin-start">
+            <p>
+              Beacon request by dApp
+            </p>
+            <h3>Beacon Example dApp{{requesterName}}</h3>
+          </ion-label>
+          <img src="assets/img/beacon_logo.svg" slot="end" class="by-beacon__img" />
+        </ion-item>
       </ion-card>
     </ng-container>
     <div *ngIf="request.type === 'permission_request'" class="request--container">
@@ -91,11 +92,17 @@
     </div>
 
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-button fill="outline" color="primary" (click)="dismiss()">
-        Close
+      <ion-button shape="round" color="secondary" (click)="dismiss()">
+        {{ 'beacon-request.done_label' | translate }}
       </ion-button>
-      <ion-button color="primary" (click)="done()">
-        Confirm
+
+      <ion-button shape="round" color="primary" (click)="done()">
+        <ng-container *ngIf="request.type === '!permission_request'">
+          {{ 'beacon-request.continue_label' | translate }}
+        </ng-container>
+        <ng-container *ngIf="request.type === 'permission_request'">
+          {{ 'beacon-request.connect_label' | translate }}
+        </ng-container>
       </ion-button>
     </ion-fab>
   </ng-container>
