@@ -23,8 +23,8 @@
 </ion-row>
 
 <ion-list lines="none" class="ion-padding-bottom">
-  <ng-container *ngFor="let tx of transactions" (click)="openTransactionDetailPage(tx)">
-    <transaction-item [tx]="tx" [transactionType]="transactionType"></transaction-item>
+  <ng-container *ngFor="let tx of transactions">
+    <transaction-item [tx]="tx" [transactionType]="transactionType" (click)="openTransactionDetailPage(tx)"></transaction-item>
   </ng-container>
   <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
     <ion-spinner color="black"></ion-spinner>
