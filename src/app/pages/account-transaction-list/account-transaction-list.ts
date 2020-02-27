@@ -96,14 +96,19 @@ export class AccountTransactionListPage {
       if (this.exchangeTransactions.length > 0) {
         this.hasExchangeTransactions = true
         this.exchangeTransactions.forEach(async tx => {
-          const txStatusResponse = await this.exchangeProvider.getStatus(tx.id)
-          switch (tx.exchange) {
-            case ExchangeEnum.CHANGELLY:
-              tx.status = txStatusResponse
-              break
-            case ExchangeEnum.CHANGENOW:
-              tx.status = txStatusResponse.status
-              break
+          try {
+            const txStatusResponse = await this.exchangeProvider.getStatus(tx.id)
+            switch (tx.exchange) {
+              case ExchangeEnum.CHANGELLY:
+                tx.status = txStatusResponse
+                break
+              case ExchangeEnum.CHANGENOW:
+                tx.status = txStatusResponse.status
+                break
+            }
+          } catch (err) {
+            // most likely we created a transaction, but never sent it to the network.
+            // ChangeNow removes txs having the status 'waiting' after some time (not specified in their documentation)
           }
           if (
             tx.status === TransactionStatus.FINISHED ||
