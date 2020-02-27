@@ -1,11 +1,5 @@
 import { Component } from '@angular/core'
-import {
-  ExchangeProvider,
-  ExchangeEnum,
-  TransactionStatus,
-  FormattedExchangeTransaction,
-  ExchangeTransaction
-} from './../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeEnum, TransactionStatus, ExchangeTransaction } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
@@ -61,7 +55,7 @@ export class AccountTransactionListPage {
 
   public pendingTransactions: IAirGapTransaction[] = []
   public exchangeTransactions: ExchangeTransaction[] = []
-  public formattedExchangeTransactions: FormattedExchangeTransaction[] = []
+  public formattedExchangeTransactions: IAirGapTransaction[] = []
 
   // XTZ
   public isKtDelegated: boolean = false

@@ -37,18 +37,6 @@ export interface ExchangeTransaction {
   timestamp: number
 }
 
-export interface FormattedExchangeTransaction {
-  from: string[]
-  to: string[]
-  isInbound: boolean
-  amount: string
-  status: string
-  exchange: ExchangeEnum
-  id: string
-  timestamp: number
-  protocolIdentifier: string
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -135,7 +123,7 @@ export class ExchangeProvider implements Exchange {
         to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
-        fee: '0',
+        fee: protocol.feeDefaults.medium,
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
         status: tx.status

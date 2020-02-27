@@ -1,4 +1,3 @@
-import { FormattedExchangeTransaction } from '../../services/exchange/exchange'
 import { Component, Input } from '@angular/core'
 import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
 import { Platform } from '@ionic/angular'
@@ -16,7 +15,7 @@ export class TransactionListComponent {
   constructor(private readonly platform: Platform, public readonly dataService: DataService, public readonly router: Router) {}
 
   @Input()
-  public transactions: IAirGapTransaction[] | FormattedExchangeTransaction[] = []
+  public transactions: IAirGapTransaction[] = []
 
   @Input()
   public isRefreshing: boolean = false
