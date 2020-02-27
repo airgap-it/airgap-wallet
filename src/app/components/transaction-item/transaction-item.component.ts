@@ -4,6 +4,7 @@ import { PendingExchangeTransaction } from 'src/app/services/exchange/exchange'
 import { Platform } from '@ionic/angular'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
+import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 declare let cordova
 
 @Component({
