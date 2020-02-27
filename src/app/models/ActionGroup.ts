@@ -1,4 +1,4 @@
-import { AirGapTezosMigrateActionContext, AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
