@@ -97,7 +97,7 @@
       </ion-button>
 
       <ion-button shape="round" color="primary" (click)="done()">
-        <ng-container *ngIf="request.type === '!permission_request'">
+        <ng-container *ngIf="request.type !== 'permission_request'">
           {{ 'beacon-request.continue_label' | translate }}
         </ng-container>
         <ng-container *ngIf="request.type === 'permission_request'">
