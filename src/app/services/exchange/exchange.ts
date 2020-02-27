@@ -126,7 +126,7 @@ export class ExchangeProvider implements Exchange {
         fee: new BigNumber(protocol.feeDefaults.medium).times(10 ** protocol.decimals).toString(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
-        status: tx.status
+        extra: tx.status
       }
     })
   }

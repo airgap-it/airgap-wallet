@@ -28,7 +28,8 @@
     </ion-text>
   </ion-label>
   <p slot="end" *ngIf="transactionType === 'exchangeTransaction'">
-    {{ tx.status }}
+    {{ tx.extra }}
+    <!-- status of tx-->
   </p>
   <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
     <ion-col class="ion-no-padding">
