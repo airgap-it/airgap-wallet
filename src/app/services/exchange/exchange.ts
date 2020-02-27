@@ -46,6 +46,7 @@ export interface FormattedExchangeTransaction {
   exchange: ExchangeEnum
   id: string
   timestamp: number
+  protocolIdentifier: string
 }
 
 @Injectable({
@@ -130,14 +131,15 @@ export class ExchangeProvider implements Exchange {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
       const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()
       return {
-        from: [tx.receivingAddress],
-        to: [tx.sendingAddress],
+        from: [tx.sendingAddress],
+        to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
         status: tx.status,
         exchange: tx.exchange,
         id: tx.id,
-        timestamp: tx.timestamp
+        timestamp: tx.timestamp,
+        protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency
       }
     })
   }

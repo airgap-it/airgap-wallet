@@ -265,7 +265,7 @@ export class ExchangePage {
           status: txStatus,
           exchange: this.activeExchange,
           id: txId,
-          timestamp: Date.now()
+          timestamp: new BigNumber(Date.now()).div(1000).toNumber()
         } as ExchangeTransaction
 
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
