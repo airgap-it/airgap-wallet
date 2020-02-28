@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { CustomExchangeService } from '../custom-exchange/custom-exchange.service'
+import { ExchangeCustomService } from '../exchange-custom/exchange-custom.service'
 import { Injectable } from '@angular/core'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 
@@ -48,17 +48,17 @@ export class ExchangeProvider implements Exchange {
 
   constructor(
     public http: HttpClient,
-    private readonly customExchangeService: CustomExchangeService,
+    private readonly ExchangeCustomService: ExchangeCustomService,
     private readonly storageProvider: StorageProvider
   ) {
     this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
         case ExchangeEnum.CHANGELLY:
-          this.exchange = new ChangellyExchange(this.http, this.customExchangeService)
+          this.exchange = new ChangellyExchange(this.http, this.ExchangeCustomService)
           break
         case ExchangeEnum.CHANGENOW:
-          this.exchange = new ChangeNowExchange(this.http, this.customExchangeService)
+          this.exchange = new ChangeNowExchange(this.http, this.ExchangeCustomService)
           break
       }
     })

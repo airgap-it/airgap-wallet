@@ -11,7 +11,7 @@ export enum CustomEnum {
 @Injectable({
   providedIn: 'root'
 })
-export class CustomExchangeService {
+export class ExchangeCustomService {
   constructor(public marketDataService: MarketDataService) {}
 
   public customLogicTZBTC(methodName: CustomEnum, amount?: string): any {

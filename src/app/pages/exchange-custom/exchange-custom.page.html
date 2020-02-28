@@ -3,16 +3,16 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ 'custom-exchange.title' | translate }}</ion-title>
+    <ion-title>{{ 'exchange-custom.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-vertical">
   <ion-row class="ion-padding-horizontal">
-    <h3 class="ion-no-margin" [innerHTML]="'custom-exchange.heading' | translate"></h3>
+    <h3 class="ion-no-margin" [innerHTML]="'exchange-custom.heading' | translate"></h3>
 
     <p class="ion-no-margin ion-padding-vertical">
-      {{ 'custom-exchange.text' | translate }}
+      {{ 'exchange-custom.text' | translate }}
     </p>
   </ion-row>
 
@@ -21,14 +21,14 @@
       <img src="assets/img/bitcoin-suisse-left.png" class="gatekeeper--logo" />
     </ion-card-header>
     <ion-card-content>
-      <p>{{ 'custom-exchange.bitcoin-suisse.text' | translate }}</p>
+      <p>{{ 'exchange-custom.bitcoin-suisse.text' | translate }}</p>
       <ion-button
         shape="round"
         size="small"
         color="primary"
         class="ion-margin-top"
         (click)="getTZBTC('bitcoin-suisse')"
-        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Bitcoin Suisse' }"
+        [innerHTML]="'exchange-custom.get-tzbtc' | translate: { Gatekeeper: 'Bitcoin Suisse' }"
       ></ion-button>
     </ion-card-content>
   </ion-card>
@@ -38,14 +38,14 @@
       <img src="assets/img/taurus-left.png" class="gatekeeper--logo" />
     </ion-card-header>
     <ion-card-content>
-      <p>{{ 'custom-exchange.taurus.text' | translate }}</p>
+      <p>{{ 'exchange-custom.taurus.text' | translate }}</p>
       <ion-button
         shape="round"
         size="small"
         color="primary"
         class="ion-margin-top"
         (click)="getTZBTC('taurus')"
-        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Taurus' }"
+        [innerHTML]="'exchange-custom.get-tzbtc' | translate: { Gatekeeper: 'Taurus' }"
       ></ion-button>
     </ion-card-content>
   </ion-card>
@@ -55,14 +55,14 @@
       <img src="assets/img/woorton-left.png" class="gatekeeper--logo" />
     </ion-card-header>
     <ion-card-content>
-      <p>{{ 'custom-exchange.woorton.text' | translate }}</p>
+      <p>{{ 'exchange-custom.woorton.text' | translate }}</p>
       <ion-button
         shape="round"
         size="small"
         color="primary"
         class="ion-margin-top"
         (click)="getTZBTC('woorton')"
-        [innerHTML]="'custom-exchange.get-tzbtc' | translate: { Gatekeeper: 'Woorton' }"
+        [innerHTML]="'exchange-custom.get-tzbtc' | translate: { Gatekeeper: 'Woorton' }"
       ></ion-button>
     </ion-card-content>
   </ion-card>

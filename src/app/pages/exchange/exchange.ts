@@ -215,7 +215,7 @@ export class ExchangePage {
 
   public async startExchange() {
     if (this.toWallet.protocolIdentifier === 'xtz-btc') {
-      this.router.navigateByUrl('/custom-exchange').catch(handleErrorSentry(ErrorCategory.STORAGE))
+      this.router.navigateByUrl('/exchange-custom').catch(handleErrorSentry(ErrorCategory.STORAGE))
     } else {
       try {
         const result = await this.exchangeProvider.createTransaction(

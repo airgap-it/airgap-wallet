@@ -26,7 +26,7 @@
   <ng-container *ngFor="let tx of transactions">
     <transaction-item [tx]="tx" [transactionType]="transactionType" (click)="openTransactionDetailPage(tx)"></transaction-item>
   </ng-container>
-  <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
+  <ion-row *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content ion-justify-content-center">
     <ion-spinner color="black"></ion-spinner>
-  </div>
+  </ion-row>
 </ion-list>

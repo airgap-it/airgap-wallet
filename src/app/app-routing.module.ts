@@ -145,7 +145,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
   },
   {
-    path: 'custom-exchange',
+    path: 'exchange-custom',
     loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
   }
 ]

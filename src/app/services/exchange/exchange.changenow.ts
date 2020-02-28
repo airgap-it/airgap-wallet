@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Exchange } from './exchange.interface'
-import { CustomExchangeService, CustomEnum } from '../custom-exchange/custom-exchange.service'
+import { ExchangeCustomService, CustomEnum } from '../exchange-custom/exchange-custom.service'
 const BASE_URL = 'https://changenow.io/api/v1'
 
 export interface CurrencyDetailResponse {
@@ -58,7 +58,7 @@ const identifierAirGapToExchangeMap = new Map<string, string>()
 identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
 
 class ChangeNowApi {
-  constructor(public http: HttpClient, public customExchangeService: CustomExchangeService) {}
+  constructor(public http: HttpClient, public ExchangeCustomService: ExchangeCustomService) {}
 
   convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
     return identifiers
@@ -87,7 +87,7 @@ class ChangeNowApi {
   async getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     if (fromCurrency.toLowerCase() === 'xtz-btc' || toCurrency.toLowerCase() === 'xtz-btc') {
-      return this.customExchangeService.customLogicTZBTC(CustomEnum.MIN_AMOUNT)
+      return this.ExchangeCustomService.customLogicTZBTC(CustomEnum.MIN_AMOUNT)
     }
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -103,10 +103,10 @@ class ChangeNowApi {
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
     if (fromCurrency.toLowerCase() === 'xtz-btc') {
-      return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
+      return this.ExchangeCustomService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
     }
     if (toCurrency.toLowerCase() === 'xtz-btc') {
-      return this.customExchangeService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_TO, amount)
+      return this.ExchangeCustomService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_TO, amount)
     }
     const response: EstimatedAmountResponse = (await this.http
       .get(`${BASE_URL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
@@ -152,14 +152,14 @@ class ChangeNowApi {
 }
 
 export class ChangeNowExchange extends ChangeNowApi implements Exchange {
-  constructor(public http: HttpClient, public customExchangeService: CustomExchangeService) {
-    super(http, customExchangeService)
+  constructor(public http: HttpClient, public ExchangeCustomService: ExchangeCustomService) {
+    super(http, ExchangeCustomService)
   }
 
   public async getAvailableToCurrenciesForCurrency(fromCurrency: string): Promise<string[]> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     if (fromCurrency.toLowerCase() === 'xtz-btc') {
-      return this.customExchangeService.customLogicTZBTC(CustomEnum.AVAILABLE_TO_CURRENCY)
+      return this.ExchangeCustomService.customLogicTZBTC(CustomEnum.AVAILABLE_TO_CURRENCY)
     }
     const result: any = await this.http.get(`${BASE_URL}/currencies-to/${fromCurrency}`).toPromise()
     const identifiers = result.map((currency: CurrencyDetailResponse) => currency.ticker)

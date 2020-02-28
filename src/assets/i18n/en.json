@@ -387,7 +387,7 @@
     "changelly_disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "changenow_disclaimer": "Exchange services provided by ChangeNow. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">ChangeNow AML/KYC</span>."
   },
-    "custom-exchange": {
+    "exchange-custom": {
     "title": "Select a Gatekeeper",
     "text": "Exchange to TZBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
     "confirm-exchange_label": "Confirm Exchange",
