@@ -24,9 +24,6 @@
             {{ validatorInfo?.name }}
           </h2>
           <p>{{ validatorInfo?.address }}</p>
-          <ion-text color="danger" *ngIf="validatorInfoError">
-            <p>{{ validatorInfoError | translate }}</p>
-          </ion-text>
         </ion-label>
       </ion-item>
       <ng-template #validatorAvatarSkeleton>
