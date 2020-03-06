@@ -104,7 +104,7 @@ export class AccountImportPage {
   }
 
   public async dismiss(): Promise<void> {
-    await this.navController.pop()
+    this.navController.back()
   }
 
   public async import(): Promise<void> {
