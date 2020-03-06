@@ -31,13 +31,13 @@ export class AccountImportPage {
     private readonly webExtensionProvider: WebExtensionProvider,
     private readonly alertCtrl: AlertController,
     private readonly ngZone: NgZone
-  ) {
+  ) {}
+
+  public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {
       this.wallet = this.route.snapshot.data.special
     }
-  }
 
-  public async ionViewWillEnter(): Promise<void> {
     await this.platform.ready()
 
     this.loading = await this.loadingCtrl.create({
