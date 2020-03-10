@@ -48,17 +48,17 @@ export class ExchangeProvider implements Exchange {
 
   constructor(
     public http: HttpClient,
-    private readonly ExchangeCustomService: ExchangeCustomService,
+    private readonly exchangeCustomService: ExchangeCustomService,
     private readonly storageProvider: StorageProvider
   ) {
     this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
         case ExchangeEnum.CHANGELLY:
-          this.exchange = new ChangellyExchange(this.http, this.ExchangeCustomService)
+          this.exchange = new ChangellyExchange(this.http, this.exchangeCustomService)
           break
         case ExchangeEnum.CHANGENOW:
-          this.exchange = new ChangeNowExchange(this.http, this.ExchangeCustomService)
+          this.exchange = new ChangeNowExchange(this.http, this.exchangeCustomService)
           break
       }
     })
