@@ -1,4 +1,4 @@
-<ion-header no-border no-shadow>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -49,7 +49,7 @@
     </ion-slide>
   </ion-slides>
 </ion-content>
-<ion-footer no-border no-shadow>
+<ion-footer class="ion-no-border">
   <ion-toolbar class="ion-no-padding">
     <ion-buttons *ngIf="!isBegin" slot="end">
       <ion-button fill="clear" color="primary" (click)="slides.slidePrev()">
