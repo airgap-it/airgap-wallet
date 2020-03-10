@@ -6,7 +6,7 @@
     <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'account-transaction-list.title' | translate }}</ion-title>
     <ion-buttons slot="end">
       <ion-button id="edit-popover" (click)="presentEditPopover($event)" color="secondary">
-        <ion-icon slot="icon-only" size="small" name="ellipsis-vertical-outline"></ion-icon>
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -185,7 +185,7 @@
           [disabled]="wallet.currentBalance.toNumber() === 0"
           shape="round"
         >
-          <ion-icon slot="start" name="send"></ion-icon>
+          <ion-icon slot="start" name="send-outline"></ion-icon>
           {{ 'account-transaction-list.send_label' | translate }}
         </ion-button>
       </ion-col>
