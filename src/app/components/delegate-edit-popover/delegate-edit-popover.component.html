@@ -3,11 +3,11 @@
     <ion-label>{{ 'delegate-edit-popover.delegation-settings_label' | translate }}</ion-label>
   </ion-list-header>
   <ion-item *ngIf="!hideAirGap" button detail="false" (click)="changeBakerToAirGap()">
-    <ion-icon name="md-swap" color="dark" slot="end"></ion-icon>
+    <ion-icon name="swap-vertical-outline" color="dark" slot="end"></ion-icon>
     {{ 'delegate-edit-popover.change-baker-to-airgap_label' | translate }}
   </ion-item>
   <ion-item button detail="false" (click)="changeBaker()">
-    <ion-icon name="md-create" color="dark" slot="end"></ion-icon>
+    <ion-icon name="create" color="dark" slot="end"></ion-icon>
     {{ 'delegate-edit-popover.change-baker_label' | translate }}
   </ion-item>
 </ion-list>
