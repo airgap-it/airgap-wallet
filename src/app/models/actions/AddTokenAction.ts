@@ -18,7 +18,7 @@ export class AddTokenAction extends Action<void, AddTokenActionContext> {
 
   public info: WalletActionInfo = {
     name: 'account-transaction-list.add-tokens_label',
-    icon: 'add'
+    icon: 'add-outline'
   }
 
   protected async perform(): Promise<void> {

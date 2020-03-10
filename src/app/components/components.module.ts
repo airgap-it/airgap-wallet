@@ -63,9 +63,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
   exports: [
     PortfolioItemComponent,
     ChartComponent,
-
     IdenticonComponent,
-    HexagonIconComponent,
     AddressRowComponent,
     AmountComponent,
     FromToComponent,
