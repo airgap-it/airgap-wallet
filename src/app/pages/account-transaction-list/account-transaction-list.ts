@@ -273,7 +273,11 @@ export class AccountTransactionListPage {
       transactionMap.set(tx.hash, tx)
     })
 
-    return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
+    return Array.from(transactionMap.values()).sort((a, b) =>
+      a.timestamp !== undefined && b.timestamp !== undefined
+        ? b.timestamp - a.timestamp
+        : new BigNumber(b.blockHeight).minus(new BigNumber(a.blockHeight)).toNumber()
+    )
   }
 
   public async presentEditPopover(event): Promise<void> {
