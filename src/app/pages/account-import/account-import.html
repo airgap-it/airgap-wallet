@@ -17,12 +17,16 @@
 
     <portfolio-item [wallet]="wallet" [maxDigits]="8"></portfolio-item>
 
-    <ion-item *ngIf="walletAlreadyExists" color="danger" margin-top text-wrap>{{ 'account-import.warning' | translate }}</ion-item>
+    <ion-item *ngIf="walletAlreadyExists" color="danger" class="ion-margin-top ion-text-wrap">
+      {{ 'account-import.warning' | translate }}
+    </ion-item>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button id="dismiss" shape="round" color="white" (click)="dismiss()">{{ 'account-import.cancel_label' | translate }}</ion-button>
-    <ion-button id="import" shape="round" color="secondary" *ngIf="!walletAlreadyExists && walletImportable" (click)="import()">
+    <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
+      {{ 'account-import.cancel_label' | translate }}
+    </ion-button>
+    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists && walletImportable" (click)="import()">
       {{ 'account-import.import_label' | translate }}
     </ion-button>
   </ion-fab>
