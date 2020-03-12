@@ -1,44 +1,48 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'add-sub-account.title' | translate: { typeLabel: typeLabel | translate } }}</ion-title>
-  </ion-toolbar>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'add-sub-account.title' | translate: { typeLabel: typeLabel | translate } }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 <ion-content>
-  <ion-row class="ion-padding">
-    <ion-text class="font--weight__bold" color="primary">
-      <span>{{ typeLabel | translate }}</span>
-    </ion-text>
-  </ion-row>
+  <ion-grid fixed="true">
+    <ion-row class="ion-padding">
+      <ion-text class="font--weight__bold" color="primary">
+        <span>{{ typeLabel | translate }}</span>
+      </ion-text>
+    </ion-row>
 
-  <empty-state
-    *ngIf="!subAccounts.length"
-    [text]="'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate }"
-    [imageName]="wallet.protocolIdentifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
-    [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
-  ></empty-state>
+    <empty-state
+      *ngIf="!subAccounts.length"
+      [text]="'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate }"
+      [imageName]="wallet.protocolIdentifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
+      [fullHeight]="wallet.protocolIdentifier === 'xtz' ? false : true"
+    ></empty-state>
 
-  <ion-row class="ion-no-padding" *ngFor="let subAccount of subAccounts; let i = index">
-    <ion-col size="10" class="ion-no-padding">
-      <portfolio-item
-        [isToken]="subProtocolType === subProtocolTypes.TOKEN"
-        [wallet]="subAccount.wallet"
-        [maxDigits]="8"
-        tappable
-        (click)="toggleAccount(subAccount)"
-      ></portfolio-item>
-    </ion-col>
-    <ion-col size="2" class="content--align__center-center ion-no-padding">
-      <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
-    </ion-col>
-  </ion-row>
+    <ion-row class="ion-no-padding" *ngFor="let subAccount of subAccounts; let i = index">
+      <ion-col size="10" class="ion-no-padding">
+        <portfolio-item
+          [isToken]="subProtocolType === subProtocolTypes.TOKEN"
+          [wallet]="subAccount.wallet"
+          [maxDigits]="8"
+          tappable
+          (click)="toggleAccount(subAccount)"
+        ></portfolio-item>
+      </ion-col>
+      <ion-col size="2" class="content--align__center-center ion-no-padding">
+        <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
+      </ion-col>
+    </ion-row>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">
-      <ion-icon slot="start" name="add"></ion-icon>
-      {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
-    </ion-button>
-  </ion-fab>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">
+        <ion-icon slot="start" name="add"></ion-icon>
+        {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
+      </ion-button>
+    </ion-fab>
+  </ion-grid>
 </ion-content>

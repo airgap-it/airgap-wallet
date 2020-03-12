@@ -126,6 +126,10 @@
   ion-alert {
     --max-width: calc(100% - 32px);
   }
+
+  ion-split-pane {
+    --side-max-width: 10vw;
+  }
 }
 
 .ion-color-white {

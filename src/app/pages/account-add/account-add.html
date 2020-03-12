@@ -1,26 +1,30 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'add-account.title' | translate }}</ion-title>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
-  </ion-toolbar>
+  <ion-grid fixed="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'add-account.title' | translate }}</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list lines="none">
-    <currency-item
-      (click)="addAccount(protocol.identifier)"
-      *ngFor="let protocol of filteredAccountProtocols"
-      [protocol]="protocol"
-    ></currency-item>
-    <currency-item
-      (click)="addSubAccount(subProtocol.identifier)"
-      *ngFor="let subProtocol of filteredSubAccountProtocols"
-      [protocol]="subProtocol"
-    ></currency-item>
-  </ion-list>
+  <ion-grid fixed="true">
+    <ion-list lines="none">
+      <currency-item
+        (click)="addAccount(protocol.identifier)"
+        *ngFor="let protocol of filteredAccountProtocols"
+        [protocol]="protocol"
+      ></currency-item>
+      <currency-item
+        (click)="addSubAccount(subProtocol.identifier)"
+        *ngFor="let subProtocol of filteredSubAccountProtocols"
+        [protocol]="subProtocol"
+      ></currency-item>
+    </ion-list>
+  </ion-grid>
 </ion-content>
