@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { ModalController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
@@ -22,12 +22,16 @@ export class TabsPage {
   public tab3Root = ExchangePage
   public tab4Root = SettingsPage
 
+  public isMobile = false
+
   constructor(
     public modalController: ModalController,
     private readonly storageProvider: StorageProvider,
-    private readonly webExtensionProvider: WebExtensionProvider
+    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly plaftorm: Platform
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
+    this.isMobile = this.plaftorm.is('mobile')
   }
 
   private async showIntroductions() {

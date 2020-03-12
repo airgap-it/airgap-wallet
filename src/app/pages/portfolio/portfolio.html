@@ -1,5 +1,9 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="translucent"></ion-toolbar>
+  <ion-toolbar color="translucent">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 <ion-content fullscreen="true">
   <chart [total]="total"></chart>

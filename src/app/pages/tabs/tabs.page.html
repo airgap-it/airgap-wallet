@@ -1,5 +1,5 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom">
+  <ion-tab-bar slot="bottom" *ngIf="isMobile">
     <ion-tab-button tab="portfolio">
       <ion-icon name="list-outline"></ion-icon>
       <ion-label>{{ 'tabs.wallets' | translate }}</ion-label>
