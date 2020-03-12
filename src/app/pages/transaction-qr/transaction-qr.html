@@ -40,11 +40,10 @@
     </ng-container>
 
     <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>
-
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">
-        {{ 'transaction-qr.done_label' | translate }}
-      </ion-button>
-    </ion-fab>
   </ion-grid>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">
+      {{ 'transaction-qr.done_label' | translate }}
+    </ion-button>
+  </ion-fab>
 </ion-content>
