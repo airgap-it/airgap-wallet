@@ -8,14 +8,14 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-row class="ion-padding">
-    <ion-col>
+  <ion-row class="ion-padding-vertical">
+    <ion-col size="12">
       <ion-avatar>
         <identicon [address]="wallet.receivingPublicAddress"></identicon>
       </ion-avatar>
       <currency-symbol class="symbol--icon" [symbol]="wallet.coinProtocol.symbol"></currency-symbol>
     </ion-col>
-    <ion-col>
+    <ion-col size="12">
       <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol | uppercase }}</h2>
       <p>
         {{ 'wallet-address.address_label' | translate }}:
