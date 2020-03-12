@@ -12,7 +12,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid fixed="true">
+  <ion-grid fixed="true" class="ion-no-padding">
     <p [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }" class="ion-padding-horizontal"></p>
 
     <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
@@ -54,7 +54,7 @@
   </ion-grid>
 </ion-content>
 <ion-footer class="ion-no-border">
-  <ion-grid fixed="true">
+  <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar class="ion-no-padding">
       <ion-buttons *ngIf="!isBegin" slot="end">
         <ion-button fill="clear" color="primary" (click)="slides.slidePrev()">
