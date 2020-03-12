@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content class="ion-padding" forceOverflow="false">
-  <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isBrowser">
+  <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isBrowser" value="highest">
     <ion-segment-button value="highest">
       <ion-label>{{ 'introduction.highest.label' | translate }}</ion-label>
     </ion-segment-button>
@@ -63,7 +63,7 @@
     </ion-row>
 
     <ion-row class="ion-padding-vertical ion-align-items-center">
-      <ion-col size="5" text-center><img class="connector--img" src="assets/img/clone.svg" /></ion-col>
+      <ion-col size="5" class="ion-text-center"><img class="connector--img" src="assets/img/clone.svg" /></ion-col>
       <ion-col size="7">
         <strong>{{ 'introduction.communication.medium_text' | translate }}</strong>
       </ion-col>
