@@ -23,8 +23,6 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { timer, Subscription } from 'rxjs'
 
-// import 'core-js/es7/object'
-
 declare let cordova
 export const refreshRate = 3000
 
