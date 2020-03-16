@@ -7,11 +7,11 @@ import { Component, Input } from '@angular/core'
 })
 export class WidgetIconText {
   @Input()
-  public iconName: string = 'logo-usd'
+  public iconName: string
 
   @Input()
-  public text: string = 'test'
+  public text: string
 
   @Input()
-  public description?: string = 'test'
+  public description?: string
 }
