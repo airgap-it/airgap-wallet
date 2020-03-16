@@ -8,6 +8,7 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -32,15 +33,17 @@ export class PortfolioPage {
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly extensionsService: ExtensionsService
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
       this.calculateTotal(wallets)
-      
       this.refreshWalletGroups(wallets)
+
+      this.extensionsService.loadDelegationExtensions()
     })
     this.walletsProvider.walledChangedObservable.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList())
