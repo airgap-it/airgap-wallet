@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Observable } from 'rxjs'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
+import { supportsDelegation } from 'src/app/helpers/delegation'
 
 @Component({
   selector: 'portfolio-item',
@@ -57,12 +58,16 @@ export class PortfolioItemComponent {
 
   public async ngOnChanges() {
     if (
-      this.wallet &&
-      (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
-        this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT ||
-        this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS)
+      (this.wallet &&
+        (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
+          this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT ||
+          this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS)) ||
+      supportsDelegation(this.wallet.coinProtocol)
     ) {
-      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(this.wallet.receivingPublicAddress)
+      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
+        this.wallet.coinProtocol as ICoinDelegateProtocol,
+        this.wallet.receivingPublicAddress
+      )
     }
   }
 }

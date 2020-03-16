@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, CosmosProtocol, DelegationInfo, IACMessageType, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, CosmosProtocol, DelegationInfo, IACMessageType, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import {
   RawAeternityTransaction,
@@ -16,6 +16,7 @@ import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
+import { supportsDelegation } from 'src/app/helpers/delegation'
 
 @Injectable({
   providedIn: 'root'
@@ -34,10 +35,10 @@ export class OperationsProvider {
     this.delegationStatuses.next(this.delegationStatuses.getValue().set(address, delegated))
   }
 
-  public async getDelegationStatusOfAddress(address: string, refresh: boolean = false) {
+  public async getDelegationStatusOfAddress(protocol: ICoinDelegateProtocol, address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(address, false)
+      const { isDelegated } = await this.checkDelegated(protocol, address, false)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -46,15 +47,20 @@ export class OperationsProvider {
     }
   }
 
-  public async getDelegationStatusObservableOfAddress(address) {
-    await this.getDelegationStatusOfAddress(address)
+  public async getDelegationStatusObservableOfAddress(protocol: ICoinDelegateProtocol, address: string) {
+    await this.getDelegationStatusOfAddress(protocol, address)
 
     return this.delegationStatuses.pipe(map(delegationStatuses => delegationStatuses.get(address)))
   }
 
-  public refreshAllDelegationStatuses() {
+  public refreshAllDelegationStatuses(wallets: AirGapMarketWallet[]) {
     Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
-      this.getDelegationStatusOfAddress(entry[0], true).catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
+      const address = entry[0]
+      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.coinProtocol))
+      if (wallet) {
+        this.getDelegationStatusOfAddress(wallet.coinProtocol as ICoinDelegateProtocol, address, true)
+          .catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
+      }
     })
   }
 
@@ -75,17 +81,25 @@ export class OperationsProvider {
     ])
   }
 
-  public async checkDelegated(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
-    if (address && address.startsWith('cosmos')) {
-      // TODO: this is ugly and needs to be re-implemented properly
-      const protocol = new CosmosProtocol()
-      const delegations = await protocol.fetchDelegations(address)
-
+  // TODO: change returned type when generic protocol is done
+  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
+    if (!!protocol.getDelegatorDetailsFromAddress) {
+      const delegatorDetails = await protocol.getDelegatorDetailsFromAddress(address)
       return {
-        isDelegated: delegations.length > 0 ? true : false
+        isDelegated: delegatorDetails.isDelegating
       }
-    } else {
-      return this.fetchDelegationInfo(address, fetchExtraInfo)
+
+    } else { // TODO: remove if/else when generic protocol is done and implemented by the protocols
+      if (address && address.startsWith('cosmos')) {
+        const protocol = new CosmosProtocol()
+        const delegations = await protocol.fetchDelegations(address)
+
+        return {
+          isDelegated: delegations.length > 0 ? true : false
+        }
+      } else {
+        return this.fetchDelegationInfo(address, fetchExtraInfo)
+      }
     }
   }
   public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {

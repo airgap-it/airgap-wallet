@@ -2,7 +2,14 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
-import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  BakerInfo,
+  DelegationInfo,
+  DelegationRewardInfo,
+  TezosKtProtocol,
+  ICoinDelegateProtocol
+} from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
 
@@ -67,7 +74,11 @@ export class DelegationBakerDetailPage {
 
     this.airGapBaker = airGapBakerConfig
 
-    this.delegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, true)
+    this.delegationInfo = await this.operationsProvider.checkDelegated(
+      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      this.wallet.receivingPublicAddress,
+      true
+    )
 
     this.isDelegated = this.delegationInfo.isDelegated
 

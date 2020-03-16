@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { BigNumber } from 'bignumber.js'
@@ -20,6 +20,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { supportsDelegation } from 'src/app/helpers/delegation'
 
 // import 'core-js/es7/object'
 
@@ -170,8 +171,12 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null): void {
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
-      this.operationsProvider.refreshAllDelegationStatuses()
+    if (
+      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
+      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT ||
+      supportsDelegation(this.wallet.coinProtocol)
+    ) {
+      this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
 
     this.isRefreshing = true
@@ -311,7 +316,11 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, false)
+    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(
+      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      this.wallet.receivingPublicAddress,
+      false
+    )
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
