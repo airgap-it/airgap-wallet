@@ -141,14 +141,11 @@ const routes: Routes = [
       import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
   },
   {
-    path: 'delegation-polkadot-validator-detail/:id',
+    path: 'delegation-detail/:id',
     resolve: {
       special: DataResolverService
     },
-    loadChildren: () =>
-      import('./pages/delegation-polkadot-validator-detail/delegation-polkadot-validator-detail.module').then(
-        m => m.DelegationPolkadotValidatorDetailPageModule
-      )
+    loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   }
 ]
 @NgModule({

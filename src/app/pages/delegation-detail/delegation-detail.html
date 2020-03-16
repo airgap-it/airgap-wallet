@@ -1,0 +1,160 @@
+<ion-header no-border no-shadow>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ delegateeLabel }} Detail</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentEditPopover($event)" color="secondary">
+        <ion-icon slot="icon-only" name="more"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12">
+      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeDetails; else delegateeAvatarSkeleton">
+        <ion-avatar slot="start">
+          <identicon [address]="delegateeDetails?.address"></identicon>
+        </ion-avatar>
+        <ion-label>
+          <h2 class="font--weight__bold" ion-text color="black">
+            {{ delegateeDetails.name }}
+          </h2>
+          <p>{{ delegateeDetails.address }}</p>
+        </ion-label>
+      </ion-item>
+      <ng-template #delegateeAvatarSkeleton>
+        <div>
+          <ion-item lines="none" class="ion-no-padding">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 40%; height: 19px;"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ng-template>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-padding-horizontal ion-padding-bottom">
+    <ion-col size="12" class="ion-no-padding">
+      <p>{{ delegateeDetails?.status }}</p>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <div class="progress--container">
+        <div class="progress--current" [style.width]="delegateeDetails?.usageDetails.usage.toFixed(2) * 100 + '%'"></div>
+      </div>
+    </ion-col>
+    <ion-col size="12" class="ion-no-padding">
+      <ion-row>
+        <ion-col size="6" class="ion-no-padding">
+          <small *ngIf="delegateeDetails; else delegateeUsageSkeleton">
+            {{ delegateeDetails.usageDetails.usage.toNumber() * 100 | number }}%
+          </small>
+          <ng-template #delegateeUsageSkeleton>
+            <div>
+              <p class="ion-no-margin">
+                <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+              </p>
+            </div>
+          </ng-template>
+        </ion-col>
+        <ion-col size="6" class="ion-no-padding ion-text-right">
+          <small *ngIf="delegateeDetails; else delegateeUsageDetailsSkeleton">
+            {{ delegateeDetails.usageDetails.current.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier,
+            maxDigits: 3 } }} / {{ delegateeDetails.usageDetails.total.toFixed() | amountConverter: { protocolIdentifier:
+            wallet.protocolIdentifier, maxDigits: 3 } }}
+          </small>
+          <ng-template #delegateeUsageDetailsSkeleton>
+            <div class="justify--content__end">
+              <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+            </div>
+          </ng-template>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-card>
+        <ng-container *ngIf="delegateeDetails; else delegateeExtraSkeleton">
+          <ng-container *ngFor="let extra of delegateeDetails.extraDetails || []">
+            <widget-selector [widget]="extra"></widget-selector>
+          </ng-container>
+        </ng-container>
+        <ng-template #delegateeExtraSkeleton>
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%; height:19px;"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+              </h3>
+            </ion-label>
+          </ion-item>
+        </ng-template>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-padding-bottom" *ngIf="delegatorDetails?.availableActions && delegatorDetails?.availableActions.length > 0"></ion-row>
+
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-card>
+        <ng-container *ngIf="delegatorDetails; else delegatorDetailsSkeleton">
+          <ion-item lines="none">
+            <ion-avatar slot="start" class="content--align__center-center border--container">
+              <ion-icon name="wallet"></ion-icon>
+            </ion-avatar>
+            <ion-label>
+              <h2 class="font--weight__bold ion-ion-text" color="black">
+                {{ delegatorDetails.balance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+              </h2>
+              <h3>Your Balance</h3>
+            </ion-label>
+          </ion-item>
+          <ng-container *ngFor="let extra of delegatorDetails.extraDetails || []">
+            <widget-selector [widget]="extra"></widget-selector>
+          </ng-container>
+        </ng-container>
+        <ng-template #delegatorDetailsSkeleton>
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 80%; height:19px;"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+              </h3>
+            </ion-label>
+          </ion-item>
+        </ng-template>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="delegate()">
+      Delegate
+    </ion-button>
+  </ion-fab>
+</ion-content>

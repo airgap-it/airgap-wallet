@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, CosmosProtocol, DelegationInfo, IACMessageType, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  CosmosProtocol,
+  DelegationInfo,
+  IACMessageType,
+  IAirGapTransaction,
+  TezosKtProtocol,
+  ICoinDelegateProtocol
+} from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import {
   RawAeternityTransaction,
@@ -16,7 +24,10 @@ import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
-import { supportsDelegation } from 'src/app/helpers/delegation'
+import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIInputText } from 'src/app/models/widgets/UIInputText'
+import { isString } from 'util'
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +41,64 @@ export class OperationsProvider {
     private readonly toastController: ToastController,
     private readonly serializerService: SerializerService
   ) {}
+
+  public async getCurrentDelegatee(protocol: ICoinDelegateProtocol, address: string): Promise<string> {
+    const current = await protocol.getCurrentDelegateesForAddress(address)
+    if (current.length === 0) {
+      return protocol.getDefaultDelegatee()
+    }
+    return current[0] // TODO: handle multiple cases better
+  }
+
+  public async getDelegateeDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegateeDetails> {
+    const promises = []
+    promises.push(protocol.getDelegateeDetails(address))
+    if (supportsAirGapDelegation(protocol)) {
+      promises.push(protocol.getExtraDelegateeDetails(address))
+    }
+
+    const allDetails = await Promise.all(promises)
+
+    const basicDetails = allDetails[0]
+    const extraDetails = allDetails[1]
+
+    const details = {
+      ...basicDetails,
+      status: '-',
+      usageDetails: {
+        usage: new BigNumber(0),
+        current: new BigNumber(0),
+        total: new BigNumber(0)
+      },
+      ...(extraDetails ? extraDetails : {})
+    }
+
+    return details
+  }
+
+  public async getDelegatorDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegatorDetails> {
+    const promises = []
+    promises.push(protocol.getDelegatorDetailsFromAddress(address))
+    if (supportsAirGapDelegation(protocol)) {
+      promises.push(protocol.getExtraDelegatorDetailsFromAddress(address))
+    }
+
+    const allDetails = await Promise.all(promises)
+
+    const basicDetails = allDetails[0]
+    const extraDetails = allDetails[1]
+
+    const details = {
+      balance: basicDetails.balance,
+      isDelegating: basicDetails.isDelegating,
+      availableActions: basicDetails.availableActions
+        .map(action => (isString(action) ? new UIInputText(action, action) : null))
+        .filter(widget => widget !== null),
+      ...(extraDetails ? extraDetails : {})
+    }
+
+    return details
+  }
 
   public setDelegationStatusOfAddress(address: string, delegated: boolean) {
     this.delegationStatuses.next(this.delegationStatuses.getValue().set(address, delegated))
@@ -58,8 +127,9 @@ export class OperationsProvider {
       const address = entry[0]
       const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.coinProtocol))
       if (wallet) {
-        this.getDelegationStatusOfAddress(wallet.coinProtocol as ICoinDelegateProtocol, address, true)
-          .catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
+        this.getDelegationStatusOfAddress(wallet.coinProtocol as ICoinDelegateProtocol, address, true).catch(
+          handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)
+        )
       }
     })
   }
@@ -88,8 +158,8 @@ export class OperationsProvider {
       return {
         isDelegated: delegatorDetails.isDelegating
       }
-
-    } else { // TODO: remove if/else when generic protocol is done and implemented by the protocols
+    } else {
+      // TODO: remove if/else when generic protocol is done and implemented by the protocols
       if (address && address.startsWith('cosmos')) {
         const protocol = new CosmosProtocol()
         const delegations = await protocol.fetchDelegations(address)

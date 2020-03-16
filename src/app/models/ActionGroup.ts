@@ -191,7 +191,7 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/delegation-polkadot-validator-detail/' + DataServiceKey.DETAIL)
+              .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })

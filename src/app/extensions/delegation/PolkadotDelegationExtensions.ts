@@ -50,7 +50,7 @@ export class PolkadotDelegationExtensions {
       }
     })
     return {
-      availableActions: widgetActions
+      extraActions: widgetActions
     }
   }
 }

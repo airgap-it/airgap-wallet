@@ -29,6 +29,9 @@ import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
 
+import { WidgetSelector } from './widget-selector/widget-selector'
+import { WidgetIconText } from './widget-icon-text/widget-icon-text'
+
 @NgModule({
   declarations: [
     PortfolioItemComponent,
@@ -48,7 +51,9 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+    WidgetSelector,
+    WidgetIconText
   ],
   imports: [
     IonicModule,
@@ -81,7 +86,10 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+
+    WidgetSelector,
+    WidgetIconText
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })

@@ -1,0 +1,13 @@
+.progress--container {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 232, 204, 0.12);
+}
+.progress--current {
+  height: inherit;
+  background-color: var(--ion-color-primary);
+}
+.border--container {
+  border: 1px solid var(--ion-color-secondary);
+  border-radius: 50%;
+}
