@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { FormGroup } from '@angular/forms'
 
 @Component({
   selector: 'widget-selector',
@@ -9,4 +10,7 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 export class WidgetSelector {
   @Input()
   public widget: UIWidget
+
+  @Input()
+  public widgetForm?: FormGroup = null
 }

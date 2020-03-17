@@ -1,0 +1,4 @@
+<ion-item lines="none" [id]="'checkbox-' + id">
+  <ion-checkbox slot="start" [(ngModel)]="isChecked" (ionChange)="onCheckedChanged()"></ion-checkbox>
+  <ion-label>{{ label }}</ion-label>
+</ion-item>

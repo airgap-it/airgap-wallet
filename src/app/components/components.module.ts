@@ -30,7 +30,10 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
 
 import { WidgetSelector } from './widget-selector/widget-selector'
+import { WidgetCheckbox } from './widget-checkbox/widget-checkbox'
 import { WidgetIconText } from './widget-icon-text/widget-icon-text'
+import { WidgetInputText } from './widget-input-text/widget-input-text'
+import { WidgetSelect } from './widget-select/widget-select'
 
 @NgModule({
   declarations: [
@@ -53,7 +56,10 @@ import { WidgetIconText } from './widget-icon-text/widget-icon-text'
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
     WidgetSelector,
-    WidgetIconText
+    WidgetCheckbox,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetSelect
   ],
   imports: [
     IonicModule,
@@ -89,7 +95,10 @@ import { WidgetIconText } from './widget-icon-text/widget-icon-text'
     DelegateEditPopoverComponent,
 
     WidgetSelector,
-    WidgetIconText
+    WidgetCheckbox,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetSelect
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })

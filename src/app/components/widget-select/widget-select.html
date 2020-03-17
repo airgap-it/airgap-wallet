@@ -1,0 +1,8 @@
+<ion-item lines="none" [id]="'select-' + id">
+  <ion-label>{{ label }}</ion-label>
+  <ion-select [value]="defaultOption" (ionChange)="onOptionSelected($event.target.value)">
+    <ng-container *ngFor="let option of optionTuples">
+      <ion-select-option [value]="option[0]">{{ option[1] }}</ion-select-option>
+    </ng-container>
+  </ion-select>
+</ion-item>

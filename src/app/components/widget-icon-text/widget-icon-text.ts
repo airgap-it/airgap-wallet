@@ -7,6 +7,9 @@ import { Component, Input } from '@angular/core'
 })
 export class WidgetIconText {
   @Input()
+  public id: string
+
+  @Input()
   public iconName: string
 
   @Input()
