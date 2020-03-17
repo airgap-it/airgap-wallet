@@ -1,20 +1,16 @@
 import { Component } from '@angular/core'
-// import BigNumber from 'bignumber.js'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-// import { AirGapPolkadotDelegateActionContext } from 'src/app/models/actions/PolkadotDelegateAction'
 import { ActivatedRoute } from '@angular/router'
-// import { ActivatedRoute, Router } from '@angular/router'
-import { PopoverController } from '@ionic/angular'
-// import { ToastController, LoadingController, PopoverController } from '@ionic/angular'
-// import { PolkadotRewardDestination } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotRewardDestination'
-// import { DataService } from 'src/app/services/data/data.service'
-import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
-import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { BehaviorSubject } from 'rxjs'
-import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegatorDetails,
+  AirGapMainDelegatorAction,
+  AirGapExtraDelegatorAction
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { FormGroup, FormBuilder } from '@angular/forms'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -22,30 +18,34 @@ import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/de
   styleUrls: ['./delegation-detail.scss']
 })
 export class DelegationDetailPage {
-  public delegateeLabel: string
+  public delegateActionId: string = 'delegate'
+  public delegateButton: string = 'Delegate'
+
+  public undelegateActionId: string = 'undelegate'
+  public undelegateButton: string = 'Undelegate'
 
   public wallet: AirGapMarketWallet
 
-  public delegateeDetails: AirGapDelegateeDetails | null = null
-  public delegatorDetails: AirGapDelegatorDetails | null = null
+  public delegationForms: Map<string, FormGroup> = new Map()
+
+  public delegateeLabel: string
+
+  public activeDelegatorAction: string | null = null
+  public activeDelegatorActionConfirmButton: string | null = null
+
+  public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails> = new BehaviorSubject(null)
+  public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails> = new BehaviorSubject(null)
 
   private readonly delegateeAddress$: BehaviorSubject<string> = new BehaviorSubject(null)
 
-  // private readonly actionCallback: (context: AirGapPolkadotDelegateActionContext) => void
-
   constructor(
     private readonly operations: OperationsProvider,
-    // private readonly toastController: ToastController,
-    // private readonly loadingController: LoadingController,
-    private readonly popoverCtrl: PopoverController,
-    // private readonly router: Router,
-    // private readonly dataService: DataService,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly formBuilder: FormBuilder
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      // this.actionCallback = info.actionCallback
     }
 
     this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
@@ -59,65 +59,120 @@ export class DelegationDetailPage {
 
       this.operations
         .getDelegatorDetails(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(details => (this.delegatorDetails = details))
+        .then(details => this.delegatorDetails$.next(details))
     }
-  }
-
-  public async delegate(): Promise<void> {
-    // this.actionCallback({
-    //   wallet: this.wallet,
-    //   controller: this.wallet.publicKey,
-    //   value: this.wallet.currentBalance.multipliedBy(0.1),
-    //   fee: this.wallet.currentBalance.multipliedBy(0.001),
-    //   targets: [this.validatorInfo.address],
-    //   payee: PolkadotRewardDestination.Staked,
-    //   toastController: this.toastController,
-    //   loadingController: this.loadingController,
-    //   dataService: this.dataService,
-    //   router: this.router
-    // })
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
-    const popover: HTMLIonPopoverElement = await this.popoverCtrl.create({
-      component: DelegateEditPopoverComponent,
-      componentProps: {
-        hideAirGap: true
-      },
-      event,
-      translucent: true
-    })
+    console.log(event)
+    // TODO: select new delegatee
+  }
 
-    function isBakerAddressObject(value: unknown): value is { bakerAddress: string } {
-      return value instanceof Object && 'bakerAddress' in value
+  public async callAction(): Promise<void> {
+    const delegatorDetails = this.delegatorDetails$.value
+    if (!delegatorDetails) {
+      return
     }
 
-    popover
-      .onDidDismiss()
-      .then(async ({ data }: OverlayEventDetail<unknown>) => {
-        if (isBakerAddressObject(data)) {
-          // const validatorDetails = await (this.wallet.coinProtocol as PolkadotProtocol).getValidatorDetails(data.bakerAddress)
-          // this.validatorInfo = {
-          //   name: validatorDetails.name,
-          //   address: data.bakerAddress,
-          //   commission: validatorDetails.commission,
-          //   status: validatorDetails.status,
-          //   usage: validatorDetails.ownStash.dividedBy(validatorDetails.totalStakingBalance),
-          //   ownStash: validatorDetails.ownStash,
-          //   stakingBalance: validatorDetails.totalStakingBalance
-          // }
-        }
-      })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    let actionType: any
+    switch (this.activeDelegatorAction) {
+      case this.delegateActionId:
+        actionType = delegatorDetails.delegateAction.type
+        break
+      case this.undelegateActionId:
+        actionType = delegatorDetails.undelegateAction.type
+        break
+      default:
+        actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
+    }
+    const data = this.delegationForms[actionType].value
+    console.log(data)
+    const delegatorAction = this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+    console.log(delegatorAction)
+  }
 
-    return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public onActiveActionChange() {
+    switch (this.activeDelegatorAction) {
+      case this.delegateActionId:
+        this.activeDelegatorActionConfirmButton = this.delegateButton
+        break
+      case this.undelegateActionId:
+        this.activeDelegatorActionConfirmButton = this.undelegateButton
+        break
+      default:
+        const activeAction = this.delegatorDetails$.value.extraActions
+          ? this.delegatorDetails$.value.extraActions.find(action => action.type.toString() === this.activeDelegatorAction)
+          : null
+
+        this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
+    }
   }
 
   private subscribeObservables() {
     this.delegateeAddress$.subscribe(address => {
       if (address && supportsDelegation(this.wallet.coinProtocol)) {
-        this.operations.getDelegateeDetails(this.wallet.coinProtocol, address).then(details => (this.delegateeDetails = details))
+        this.operations.getDelegateeDetails(this.wallet.coinProtocol, address).then(details => this.delegateeDetails$.next(details))
+        this.setupMainActionsForms(this.delegatorDetails$.value)
       }
     })
+
+    this.delegatorDetails$.subscribe(details => {
+      if (!details) {
+        return
+      }
+      this.setupForms(details)
+      this.setActiveDelegatorAction(details)
+    })
+  }
+
+  private setupForms(details: AirGapDelegatorDetails) {
+    this.setupMainActionsForms(details)
+    this.setupExtraActionsForms(details)
+  }
+
+  private setupMainActionsForms(details: AirGapDelegatorDetails) {
+    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction]
+
+    mainActions.forEach(action => {
+      if (action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs)) {
+        const args = {}
+        if (action.paramName) {
+          args[action.paramName] = this.delegateeAddress$.value
+        }
+        if (action.extraArgs) {
+          action.extraArgs.forEach(arg => (args[arg.id] = ''))
+        }
+
+        this.delegationForms[action.type] = this.formBuilder.group(args)
+      }
+    })
+  }
+
+  private setupExtraActionsForms(details: AirGapDelegatorDetails) {
+    const extraActions: AirGapExtraDelegatorAction[] = details.extraActions
+
+    extraActions.forEach(action => {
+      if (action.args) {
+        const args = {}
+        action.args.forEach(arg => (args[arg.id] = ''))
+
+        this.delegationForms[action.type] = this.formBuilder.group(args)
+      }
+    })
+  }
+
+  private setActiveDelegatorAction(details: AirGapDelegatorDetails) {
+    if (details.delegateAction.isAvailable) {
+      this.activeDelegatorAction = this.delegateActionId
+      this.activeDelegatorActionConfirmButton = this.delegateButton
+    } else if (details.undelegateAction.isAvailable) {
+      this.activeDelegatorAction = this.undelegateActionId
+      this.activeDelegatorActionConfirmButton = this.undelegateButton
+    } else {
+      const activeAction = details.extraActions ? details.extraActions[0] : null
+
+      this.activeDelegatorAction = activeAction.type
+      this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
+    }
   }
 }

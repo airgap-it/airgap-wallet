@@ -3,22 +3,25 @@ import { UIWidget } from '../models/widgets/UIWidget'
 import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 
-interface AirGapDelegateeUsageDetails {
+export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
   current: BigNumber
   total: BigNumber
 }
 
-interface AirGapMainDelegatorAction {
+export interface AirGapMainDelegatorAction {
+  type?: any
   isAvailable: boolean
+  description: string
   paramName?: string
   extraArgs?: UIWidget[]
 }
 
-interface AirGapExtraDelegatorAction {
+export interface AirGapExtraDelegatorAction {
   type: any
   label: string
-  action: string
+  confirmLabel: string
+  description: string
   args?: UIWidget[]
 }
 
@@ -31,7 +34,7 @@ export interface AirGapDelegateeDetails extends DelegateeDetails {
 export interface AirGapDelegatorDetails extends DelegatorDetails {
   delegateAction: AirGapMainDelegatorAction
   undelegateAction: AirGapMainDelegatorAction
-  extraActions: AirGapExtraDelegatorAction[]
+  extraActions?: AirGapExtraDelegatorAction[]
   extraDetails?: UIWidget[]
 }
 

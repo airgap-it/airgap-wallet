@@ -15,15 +15,15 @@
 <ion-content>
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12">
-      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeDetails; else delegateeAvatarSkeleton">
+      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeDetails$ | async; else delegateeAvatarSkeleton">
         <ion-avatar slot="start">
-          <identicon [address]="delegateeDetails?.address"></identicon>
+          <identicon [address]="(delegateeDetails$ | async).address"></identicon>
         </ion-avatar>
         <ion-label>
           <h2 class="font--weight__bold" ion-text color="black">
-            {{ delegateeDetails.name }}
+            {{ (delegateeDetails$ | async).name }}
           </h2>
-          <p>{{ delegateeDetails.address }}</p>
+          <p>{{ (delegateeDetails$ | async).address }}</p>
         </ion-label>
       </ion-item>
       <ng-template #delegateeAvatarSkeleton>
@@ -48,18 +48,18 @@
 
   <ion-row class="ion-padding-horizontal ion-padding-bottom">
     <ion-col size="12" class="ion-no-padding">
-      <p>{{ delegateeDetails?.status }}</p>
+      <p>{{ (delegateeDetails$ | async)?.status }}</p>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <div class="progress--container">
-        <div class="progress--current" [style.width]="delegateeDetails?.usageDetails.usage.toFixed(2) * 100 + '%'"></div>
+        <div class="progress--current" [style.width]="(delegateeDetails$ | async)?.usageDetails.usage.toFixed(2) * 100 + '%'"></div>
       </div>
     </ion-col>
     <ion-col size="12" class="ion-no-padding">
       <ion-row>
         <ion-col size="6" class="ion-no-padding">
-          <small *ngIf="delegateeDetails; else delegateeUsageSkeleton">
-            {{ delegateeDetails.usageDetails.usage.toNumber() * 100 | number }}%
+          <small *ngIf="(delegateeDetails$ | async); else delegateeUsageSkeleton">
+            {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number }}%
           </small>
           <ng-template #delegateeUsageSkeleton>
             <div>
@@ -70,10 +70,10 @@
           </ng-template>
         </ion-col>
         <ion-col size="6" class="ion-no-padding ion-text-right">
-          <small *ngIf="delegateeDetails; else delegateeUsageDetailsSkeleton">
-            {{ delegateeDetails.usageDetails.current.toFixed() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier,
-            maxDigits: 3 } }} / {{ delegateeDetails.usageDetails.total.toFixed() | amountConverter: { protocolIdentifier:
-            wallet.protocolIdentifier, maxDigits: 3 } }}
+          <small *ngIf="(delegateeDetails$ | async); else delegateeUsageDetailsSkeleton">
+            {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocolIdentifier:
+            wallet.protocolIdentifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() | amountConverter: {
+            protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }}
           </small>
           <ng-template #delegateeUsageDetailsSkeleton>
             <div class="justify--content__end">
@@ -88,8 +88,8 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-card>
-        <ng-container *ngIf="delegateeDetails; else delegateeExtraSkeleton">
-          <ng-container *ngFor="let extra of delegateeDetails.extraDetails || []">
+        <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
+          <ng-container *ngFor="let extra of (delegateeDetails$ | async).extraDetails || []">
             <widget-selector [widget]="extra"></widget-selector>
           </ng-container>
         </ng-container>
@@ -112,24 +112,96 @@
     </ion-col>
   </ion-row>
 
-  <ion-row class="ion-padding-bottom" *ngIf="delegatorDetails?.availableActions && delegatorDetails?.availableActions.length > 0"></ion-row>
+  <ion-row class="ion-padding-bottom" *ngIf="(delegatorDetails$ | async)">
+    <ion-row>
+      <ion-segment scrollable [(ngModel)]="activeDelegatorAction" class="ion-padding-horizontal" (ionChange)="onActiveActionChange()">
+        <ion-segment-button [value]="delegateActionId" *ngIf="(delegatorDetails$ | async).delegateAction.isAvailable">
+          <ion-label>Delegate</ion-label>
+        </ion-segment-button>
+        <ion-segment-button [value]="undelegateActionId" *ngIf="(delegatorDetails$ | async).undelegateAction.isAvailable">
+          <ion-label>Undelegate</ion-label>
+        </ion-segment-button>
+        <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
+          <ion-segment-button [value]="extra.type">
+            <ion-label>{{ extra.label }}</ion-label>
+          </ion-segment-button>
+        </ng-container>
+      </ion-segment>
+    </ion-row>
+
+    <ion-row class="segment-container">
+      <ng-container *ngIf="activeDelegatorAction === delegateActionId">
+        <ion-row class="ion-padding-horizontal">
+          <ion-col size="12">
+            <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngFor="let extra of (delegatorDetails$ | async).delegateAction.extraArgs || []">
+          <ion-col size="12">
+            <widget-selector
+              [widget]="extra"
+              [widgetForm]="delegationForms[(delegatorDetails$ | async).delegateAction.type.toString()]"
+            ></widget-selector>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+      <ng-container *ngIf="activeDelegatorAction === undelegateActionId">
+        <ion-row class="ion-padding-horizontal">
+          <ion-col size="12">
+            <p>{{ (delegatorDetails$ | async).undelegateAction.description }}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngFor="let extra of (delegatorDetails$ | async).undelegateAction.extraArgs || []">
+          <ion-col size="12">
+            <widget-selector
+              [widget]="extra"
+              [widgetForm]="delegationForms[(delegatorDetails$ | async).undelegateAction.type.toString()]"
+            ></widget-selector>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
+        <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
+          <ion-row class="ion-padding-horizontal">
+            <p>{{ extra.description }}</p>
+          </ion-row>
+          <ion-row *ngFor="let arg of extra.args || []">
+            <ion-col size="12">
+              <widget-selector [widget]="arg" [widgetForm]="delegationForms[extra.type.toString()]"></widget-selector>
+            </ion-col>
+          </ion-row>
+        </ng-container>
+      </ng-container>
+    </ion-row>
+  </ion-row>
+
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-no-margin ion-ion-text">
+          Your account
+        </p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
 
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-card>
-        <ng-container *ngIf="delegatorDetails; else delegatorDetailsSkeleton">
+        <ng-container *ngIf="(delegatorDetails$ | async); else delegatorDetailsSkeleton">
           <ion-item lines="none">
             <ion-avatar slot="start" class="content--align__center-center border--container">
               <ion-icon name="wallet"></ion-icon>
             </ion-avatar>
             <ion-label>
               <h2 class="font--weight__bold ion-ion-text" color="black">
-                {{ delegatorDetails.balance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
+                {{ (delegatorDetails$ | async).balance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
+                }}
               </h2>
               <h3>Your Balance</h3>
             </ion-label>
           </ion-item>
-          <ng-container *ngFor="let extra of delegatorDetails.extraDetails || []">
+          <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraDetails || []">
             <widget-selector [widget]="extra"></widget-selector>
           </ng-container>
         </ng-container>
@@ -153,8 +225,8 @@
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="delegate()">
-      Delegate
+    <ion-button shape="round" color="primary" (click)="callAction()">
+      {{ activeDelegatorActionConfirmButton || 'Confirm' }}
     </ion-button>
   </ion-fab>
 </ion-content>

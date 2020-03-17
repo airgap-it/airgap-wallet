@@ -91,13 +91,36 @@ export class OperationsProvider {
     const details = {
       balance: basicDetails.balance,
       isDelegating: basicDetails.isDelegating,
-      availableActions: basicDetails.availableActions
+      delegateAction: { isAvailable: false },
+      undelegateAction: { isAvailable: false },
+      extraActions: basicDetails.availableActions
         .map(action => (isString(action) ? new UIInputText(action, action) : null))
         .filter(widget => widget !== null),
       ...(extraDetails ? extraDetails : {})
     }
 
     return details
+  }
+
+  public async prepareDelegatorAction(
+    wallet: AirGapMarketWallet,
+    type: any,
+    data?: any
+  ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTxChunks: string[] }> {
+    let airGapTxs = []
+    let serializedTxChunks = []
+    if (supportsDelegation(wallet.coinProtocol)) {
+      const rawUnsignedTx = await wallet.coinProtocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data)
+
+      airGapTxs = await wallet.coinProtocol.getTransactionDetails({
+        publicKey: wallet.publicKey,
+        transaction: rawUnsignedTx
+      })
+
+      serializedTxChunks = await this.serializeTx(wallet, rawUnsignedTx)
+    }
+
+    return { airGapTxs, serializedTxChunks }
   }
 
   public setDelegationStatusOfAddress(address: string, delegated: boolean) {
