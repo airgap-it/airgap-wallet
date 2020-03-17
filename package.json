@@ -91,7 +91,6 @@
     "cordova-plugin-ionic-webview": "^2.4.1",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-plugin-splashscreen": "^5.0.2",
-    "cordova-plugin-statusbar": "^2.4.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-socialsharing": "^5.4.4",
     "cordova-sqlite-storage": "^2.6.0",
@@ -178,7 +177,6 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-device": {},
-      "cordova-plugin-statusbar": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-x-socialsharing": {
         "ANDROID_SUPPORT_V4_VERSION": "28.+"
@@ -225,8 +223,8 @@
       }
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   }
 }
