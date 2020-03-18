@@ -1,9 +1,18 @@
-import { UIWidget, UIWidgetType } from './UIWidget'
+import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
 
-export class UICheckbox extends UIWidget {
-  readonly type: UIWidgetType = UIWidgetType.CHECKBOX
+interface UICheckboxConfig extends UIInputWidgetConfig {
+  label: string
+  defaultValue?: boolean
+}
 
-  constructor(id: string, readonly label: string, readonly defaultValue?: boolean) {
-    super(id)
+export class UICheckbox extends UIInputWidget<boolean> {
+  public readonly type: UIWidgetType = UIWidgetType.CHECKBOX
+  public readonly label: string
+
+  constructor(config: UICheckboxConfig) {
+    super(config)
+
+    this.label = config.label
+    this.value = config.defaultValue || false
   }
 }

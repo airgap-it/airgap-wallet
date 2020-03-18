@@ -1,11 +1,22 @@
-import { UIWidget, UIWidgetType } from './UIWidget'
+import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
 
-export class UISelect extends UIWidget {
-  readonly type = UIWidgetType.SELECT
-  readonly options: Map<any, string>
+interface UISelectConfig extends UIInputWidgetConfig {
+  label: string
 
-  constructor(id: string, readonly label: string, options: [any, string][], readonly defaultOption?: any) {
-    super(id)
-    this.options = new Map(options)
+  options: [any, string][]
+  defaultOption?: any
+}
+
+export class UISelect extends UIInputWidget<any> {
+  public readonly type = UIWidgetType.SELECT
+  public readonly label: string
+  public readonly options: Map<any, string>
+
+  constructor(config: UISelectConfig) {
+    super(config)
+
+    this.label = config.label
+    this.options = new Map(config.options)
+    this.value = config.defaultOption
   }
 }

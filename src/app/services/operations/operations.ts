@@ -97,7 +97,15 @@ export class OperationsProvider {
       delegateAction: { isAvailable: false },
       undelegateAction: { isAvailable: false },
       extraActions: basicDetails.availableActions
-        .map(action => (isString(action) ? new UIInputText(action, action) : null))
+        .map(action =>
+          isString(action)
+            ? new UIInputText({
+                id: action,
+                inputType: 'string',
+                label: action
+              })
+            : null
+        )
         .filter(widget => widget !== null),
       ...(extraDetails ? extraDetails : {})
     }

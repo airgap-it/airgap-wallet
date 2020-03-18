@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
+import { UICheckbox } from 'src/app/models/widgets/UICheckbox'
 
 @Component({
   selector: 'widget-checkbox',
@@ -8,32 +9,8 @@ import { FormGroup } from '@angular/forms'
 })
 export class WidgetCheckbox {
   @Input()
-  public id: string
+  public widget: UICheckbox
 
   @Input()
-  public label: string
-
-  @Input()
-  public isChecked?: boolean
-
-  @Input()
-  public widgetForm?: FormGroup
-
-  constructor() {
-    if (this.isChecked !== undefined) {
-      this.setFormValue(this.isChecked)
-    }
-  }
-
-  public onCheckedChanged() {
-    this.setFormValue(this.isChecked)
-  }
-
-  private setFormValue(isChecked: boolean) {
-    if (this.widgetForm) {
-      this.widgetForm.setValue({
-        [this.id]: isChecked || false
-      })
-    }
-  }
+  public widgetForm: FormGroup
 }

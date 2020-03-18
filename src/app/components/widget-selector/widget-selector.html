@@ -1,34 +1,9 @@
 <ng-container>
-  <widget-checkbox
-    *ngIf="widget.type === 'checkbox'"
-    [id]="widget.id"
-    [label]="widget['label']"
-    [isChecked]="widget['defaultValue']"
-    [widgetForm]="widgetForm"
-  ></widget-checkbox>
+  <widget-checkbox *ngIf="widget.type === 'checkbox' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-checkbox>
 
-  <widget-icon-text
-    *ngIf="widget.type === 'icon_text'"
-    [id]="widget.id"
-    [iconName]="widget['iconName']"
-    [text]="widget['text']"
-    [description]="widget['description']"
-  ></widget-icon-text>
+  <widget-icon-text *ngIf="widget.type === 'icon_text'" [widget]="widget"></widget-icon-text>
 
-  <widget-input-text
-    *ngIf="widget.type === 'input_text'"
-    [id]="widget.id"
-    [label]="widget['label']"
-    [defaultValue]="widget['defaultValue']"
-    [widgetForm]="widgetForm"
-  ></widget-input-text>
+  <widget-input-text *ngIf="widget.type === 'input_text' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-input-text>
 
-  <widget-select
-    *ngIf="widget.type === 'select'"
-    [id]="widget.id"
-    [label]="widget['label']"
-    [options]="widget['options']"
-    [defaultOption]="widget['defaultOption']"
-    [widgetForm]="widgetForm"
-  ></widget-select>
+  <widget-select *ngIf="widget.type === 'select' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-select>
 </ng-container>

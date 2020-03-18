@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core'
+import { UIIconText } from 'src/app/models/widgets/UIIconText'
 
 @Component({
   selector: 'widget-icon-text',
@@ -7,14 +8,5 @@ import { Component, Input } from '@angular/core'
 })
 export class WidgetIconText {
   @Input()
-  public id: string
-
-  @Input()
-  public iconName: string
-
-  @Input()
-  public text: string
-
-  @Input()
-  public description?: string
+  public widget: UIIconText
 }

@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
+import { UIInputText } from 'src/app/models/widgets/UIInputText'
 
 @Component({
   selector: 'widget-input-text',
@@ -8,22 +9,8 @@ import { FormGroup } from '@angular/forms'
 })
 export class WidgetInputText {
   @Input()
-  public id: string
+  public widget: UIInputText
 
   @Input()
-  public label: string
-
-  @Input()
-  public defaultValue?: string
-
-  @Input()
-  public widgetForm?: FormGroup
-
-  public onValueChanged() {
-    if (this.widgetForm) {
-      this.widgetForm.setValue({
-        [this.id]: ''
-      })
-    }
-  }
+  public widgetForm: FormGroup
 }

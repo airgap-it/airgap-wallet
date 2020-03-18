@@ -9,7 +9,7 @@ import { extensionProperty, extensionFunction } from '../decorators'
 import { PolkadotAddress } from 'airgap-coin-lib/dist/protocols/polkadot/account/PolkadotAddress'
 import BigNumber from 'bignumber.js'
 import { UIIconText } from 'src/app/models/widgets/UIIconText'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIInputWidget } from 'src/app/models/widgets/UIWidget'
 import { PolkadotStakingActionType } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingActionType'
 import { UIInputText } from 'src/app/models/widgets/UIInputText'
 import { UISelect } from 'src/app/models/widgets/UISelect'
@@ -38,7 +38,11 @@ export class PolkadotDelegationExtensions {
           },
           extraDetails: [
             // TODO: Add translations
-            new UIIconText('commission', 'logo-usd', validatorDetails.commission + '%' || '-', 'Comission')
+            new UIIconText({
+              iconName: 'logo-usd',
+              text: validatorDetails.commission + '%' || '-',
+              description: 'Comission'
+            })
           ]
         }
       })
@@ -51,9 +55,9 @@ export class PolkadotDelegationExtensions {
     const availableActions = await protocol.accountController.getAvailableDelegatorActions(publicKey)
 
     // TODO: add translations
-    const delegateAction = PolkadotDelegationExtensions.createDelegateAction(availableActions)
-    const undelegateAction = PolkadotDelegationExtensions.createUndelegateAction(availableActions)
-    const extraActions = PolkadotDelegationExtensions.createExtraActions(availableActions)
+    const delegateAction = PolkadotDelegationExtensions.createDelegateAction(protocol, availableActions)
+    const undelegateAction = PolkadotDelegationExtensions.createUndelegateAction(protocol, availableActions)
+    const extraActions = PolkadotDelegationExtensions.createExtraActions(protocol, availableActions)
 
     return {
       delegateAction,
@@ -62,7 +66,7 @@ export class PolkadotDelegationExtensions {
     }
   }
 
-  private static createDelegateAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
+  private static createDelegateAction(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
     const action = availableActions.find(
       action => action.type === PolkadotStakingActionType.BOND_NOMINATE || action.type === PolkadotStakingActionType.NOMINATE
     )
@@ -75,21 +79,9 @@ export class PolkadotDelegationExtensions {
         paramName: 'targets',
         extraArgs: [
           ...(action.type === PolkadotStakingActionType.BOND_NOMINATE
-            ? [
-                new UIInputText('value', 'Amount', '0'),
-                new UISelect(
-                  'payee',
-                  'Reward destination',
-                  [
-                    [PolkadotRewardDestination.Staked, 'Staked'], // probably needs better labels
-                    [PolkadotRewardDestination.Stash, 'Stash'],
-                    [PolkadotRewardDestination.Controller, 'Controller']
-                  ],
-                  PolkadotRewardDestination.Staked
-                )
-              ]
+            ? [PolkadotDelegationExtensions.createValueWidget(protocol.decimals), PolkadotDelegationExtensions.createPayeeWidget()]
             : []),
-          new UIInputText('tip', 'Tip', '0')
+          PolkadotDelegationExtensions.createTipWidget(protocol.decimals)
         ]
       }
     }
@@ -100,7 +92,7 @@ export class PolkadotDelegationExtensions {
     }
   }
 
-  private static createUndelegateAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
+  private static createUndelegateAction(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
     const action = availableActions.find(action => action.type === PolkadotStakingActionType.CANCEL_NOMINATION)
 
     if (action) {
@@ -108,7 +100,10 @@ export class PolkadotDelegationExtensions {
         type: action.type,
         isAvailable: true,
         description: 'Undelegate description',
-        extraArgs: [new UICheckbox('keepController', 'Keep Controller', true), new UIInputText('value', 'Amount', '0')]
+        extraArgs: [
+          PolkadotDelegationExtensions.createKeepControllerWidget(),
+          PolkadotDelegationExtensions.createValueWidget(protocol.decimals)
+        ]
       }
     }
 
@@ -118,7 +113,7 @@ export class PolkadotDelegationExtensions {
     }
   }
 
-  private static createExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
+  private static createExtraActions(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
     return availableActions
       .filter(
         action =>
@@ -130,20 +125,20 @@ export class PolkadotDelegationExtensions {
         let label: string
         let confirmLabel: string
         let description: string
-        let args: UIWidget[]
+        let args: UIInputWidget<any>[]
 
         switch (action.type) {
           case PolkadotStakingActionType.UNBOND:
             label = 'Unbond'
             confirmLabel = 'Unbond'
             description = 'Unbond description'
-            args = [new UIInputText('value', 'Amount', '0')]
+            args = [PolkadotDelegationExtensions.createValueWidget(protocol.decimals)]
             break
           case PolkadotStakingActionType.BOND_EXTRA:
             label = 'Bond Extra'
             confirmLabel = 'Bond'
             description = 'Bond extra description'
-            args = [new UIInputText('value', 'Amount', '0')]
+            args = [PolkadotDelegationExtensions.createValueWidget(protocol.decimals)]
             break
           case PolkadotStakingActionType.WITHDRAW_UNBONDED:
             label = 'Withdraw Unbonded'
@@ -154,24 +149,13 @@ export class PolkadotDelegationExtensions {
             label = 'Change Reward Destination'
             confirmLabel = 'Change'
             description = 'Change reward destination description'
-            args = [
-              new UISelect(
-                'payee',
-                'Reward destination',
-                [
-                  [PolkadotRewardDestination.Staked, 'Staked'], // probably needs better labels
-                  [PolkadotRewardDestination.Stash, 'Stash'],
-                  [PolkadotRewardDestination.Controller, 'Controller']
-                ],
-                PolkadotRewardDestination.Staked
-              )
-            ]
+            args = [PolkadotDelegationExtensions.createPayeeWidget()]
             break
           case PolkadotStakingActionType.CHANGE_CONTROLLER:
             label = 'Change Controller'
             confirmLabel = 'Change'
             description = 'Change controller description'
-            args = [new UIInputText('controller', 'Controller')]
+            args = [PolkadotDelegationExtensions.createControllerWidget()]
             break
         }
 
@@ -183,5 +167,56 @@ export class PolkadotDelegationExtensions {
           args
         }
       })
+  }
+
+  private static createValueWidget(decimals: number): UIInputText {
+    return new UIInputText({
+      id: 'value',
+      inputType: 'number',
+      label: 'Amount',
+      placeholder: '0.0',
+      defaultValue: '0.0',
+      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString()
+    })
+  }
+
+  private static createTipWidget(decimals: number): UIInputText {
+    return new UIInputText({
+      id: 'tip',
+      inputType: 'number',
+      label: 'Tip',
+      placeholder: '0.0',
+      defaultValue: '0.0',
+      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString()
+    })
+  }
+
+  private static createPayeeWidget(defaultOption?: PolkadotRewardDestination): UISelect {
+    return new UISelect({
+      id: 'payee',
+      label: 'Reward destination',
+      options: [
+        [PolkadotRewardDestination.Staked, 'Staked'], // probably needs better labels
+        [PolkadotRewardDestination.Stash, 'Stash'],
+        [PolkadotRewardDestination.Controller, 'Controller']
+      ],
+      defaultOption: defaultOption || PolkadotRewardDestination.Staked
+    })
+  }
+
+  private static createKeepControllerWidget(): UICheckbox {
+    return new UICheckbox({
+      id: 'keepController',
+      label: 'Keep Controller',
+      defaultValue: true
+    })
+  }
+
+  private static createControllerWidget(): UIInputText {
+    return new UIInputText({
+      id: 'controller',
+      inputType: 'string',
+      label: 'Controller'
+    })
   }
 }

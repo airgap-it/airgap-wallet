@@ -26,7 +26,7 @@ export class DelegationDetailPage {
 
   public wallet: AirGapMarketWallet
 
-  public delegationForms: Map<string, FormGroup> = new Map()
+  public delegationForms: Map<any, FormGroup> = new Map()
 
   public delegateeLabel: string
 
@@ -86,8 +86,7 @@ export class DelegationDetailPage {
         actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
     }
     const data = this.delegationForms[actionType].value
-    console.log(data)
-    const delegatorAction = this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+    const delegatorAction = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
     console.log(delegatorAction)
   }
 
@@ -139,15 +138,20 @@ export class DelegationDetailPage {
 
     mainActions.forEach(action => {
       if (action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs)) {
+        const form = this.delegationForms[action.type]
         const args = {}
         if (action.paramName) {
           args[action.paramName] = this.delegateeAddresses$.value
         }
         if (action.extraArgs) {
-          action.extraArgs.forEach(arg => (args[arg.id] = ''))
+          action.extraArgs.forEach(arg => (args[arg.id] = form ? form.value[arg.id] : null))
         }
 
-        this.delegationForms[action.type] = this.formBuilder.group(args)
+        if (form) {
+          form.setValue(args)
+        } else {
+          this.delegationForms[action.type] = this.formBuilder.group(args)
+        }
       }
     })
   }
@@ -157,10 +161,15 @@ export class DelegationDetailPage {
 
     extraActions.forEach(action => {
       if (action.args) {
+        const form = this.delegationForms[action.type]
         const args = {}
-        action.args.forEach(arg => (args[arg.id] = ''))
+        action.args.forEach(arg => (args[arg.id] = form ? form.value[arg.id] : null))
 
-        this.delegationForms[action.type] = this.formBuilder.group(args)
+        if (form) {
+          form.setValue(args)
+        } else {
+          this.delegationForms[action.type] = this.formBuilder.group(args)
+        }
       }
     })
   }

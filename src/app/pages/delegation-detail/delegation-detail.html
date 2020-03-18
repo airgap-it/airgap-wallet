@@ -140,7 +140,7 @@
           <ion-col size="12">
             <widget-selector
               [widget]="extra"
-              [widgetForm]="delegationForms[(delegatorDetails$ | async).delegateAction.type.toString()]"
+              [widgetForm]="delegationForms[(delegatorDetails$ | async).delegateAction.type]"
             ></widget-selector>
           </ion-col>
         </ion-row>
@@ -155,7 +155,7 @@
           <ion-col size="12">
             <widget-selector
               [widget]="extra"
-              [widgetForm]="delegationForms[(delegatorDetails$ | async).undelegateAction.type.toString()]"
+              [widgetForm]="delegationForms[(delegatorDetails$ | async).undelegateAction.type]"
             ></widget-selector>
           </ion-col>
         </ion-row>
@@ -167,7 +167,7 @@
           </ion-row>
           <ion-row *ngFor="let arg of extra.args || []">
             <ion-col size="12">
-              <widget-selector [widget]="arg" [widgetForm]="delegationForms[extra.type.toString()]"></widget-selector>
+              <widget-selector [widget]="arg" [widgetForm]="delegationForms[extra.type]"></widget-selector>
             </ion-col>
           </ion-row>
         </ng-container>
