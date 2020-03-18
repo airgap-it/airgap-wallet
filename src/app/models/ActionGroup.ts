@@ -15,9 +15,6 @@ import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
 
-import { PolkadotDelegateActionResult } from 'airgap-coin-lib/dist/actions/PolkadotDelegateAction'
-import { AirGapPolkadotDelegateActionContext, AirGapPolkadotDelegateAction } from './actions/PolkadotDelegateAction'
-
 export interface WalletActionInfo {
   name: string
   icon: string
@@ -179,12 +176,13 @@ export class ActionGroup {
     return [addTokenButtonAction]
   }
 
+  // TODO:
   private getPolkadotActions(): Action<any, any>[] {
-    const delegateButtonAction: ButtonAction<PolkadotDelegateActionResult, void> = new ButtonAction(
+    const delegateButtonAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapPolkadotDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapPolkadotDelegateActionContext>(async resolve => {
+        return new SimpleAction(() => {
+          return new Promise<void>(async resolve => {
             const info = {
               wallet: this.callerContext.wallet,
               actionCallback: resolve
@@ -195,7 +193,6 @@ export class ActionGroup {
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
-        return new LinkedAction(prepareDelegateActionContext, AirGapPolkadotDelegateAction)
       }
     )
 
