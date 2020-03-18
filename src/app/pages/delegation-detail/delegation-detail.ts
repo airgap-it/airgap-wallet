@@ -36,7 +36,7 @@ export class DelegationDetailPage {
   public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails> = new BehaviorSubject(null)
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails> = new BehaviorSubject(null)
 
-  private readonly delegateeAddress$: BehaviorSubject<string> = new BehaviorSubject(null)
+  private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
   constructor(
     private readonly operations: OperationsProvider,
@@ -54,8 +54,8 @@ export class DelegationDetailPage {
       this.subscribeObservables()
 
       this.operations
-        .getCurrentDelegatee(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(address => this.delegateeAddress$.next(address))
+        .getCurrentDelegatees(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
+        .then(addresses => this.delegateeAddresses$.next(addresses))
 
       this.operations
         .getDelegatorDetails(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
@@ -109,19 +109,23 @@ export class DelegationDetailPage {
   }
 
   private subscribeObservables() {
-    this.delegateeAddress$.subscribe(address => {
-      if (address && supportsDelegation(this.wallet.coinProtocol)) {
-        this.operations.getDelegateeDetails(this.wallet.coinProtocol, address).then(details => this.delegateeDetails$.next(details))
-        this.setupMainActionsForms(this.delegatorDetails$.value)
+    this.delegateeAddresses$.subscribe(addresses => {
+      if (addresses && supportsDelegation(this.wallet.coinProtocol)) {
+        // TODO: support multiple cases
+        this.operations.getDelegateeDetails(this.wallet.coinProtocol, addresses).then(details => this.delegateeDetails$.next(details[0]))
+
+        const details = this.delegatorDetails$.value
+        if (details) {
+          this.setupMainActionsForms(details)
+        }
       }
     })
 
     this.delegatorDetails$.subscribe(details => {
-      if (!details) {
-        return
+      if (details) {
+        this.setupForms(details)
+        this.setActiveDelegatorAction(details)
       }
-      this.setupForms(details)
-      this.setActiveDelegatorAction(details)
     })
   }
 
@@ -137,7 +141,7 @@ export class DelegationDetailPage {
       if (action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs)) {
         const args = {}
         if (action.paramName) {
-          args[action.paramName] = this.delegateeAddress$.value
+          args[action.paramName] = this.delegateeAddresses$.value
         }
         if (action.extraArgs) {
           action.extraArgs.forEach(arg => (args[arg.id] = ''))

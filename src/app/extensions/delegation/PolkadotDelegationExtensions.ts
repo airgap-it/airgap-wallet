@@ -21,24 +21,28 @@ export class PolkadotDelegationExtensions {
   static delegateeLabel: string = 'Validator'
 
   @extensionFunction(PolkadotProtocol)
-  static async getExtraDelegateeDetails(protocol: PolkadotProtocol, address: string): Promise<Partial<AirGapDelegateeDetails>> {
-    const validatorDetails = await protocol.nodeClient.getValidatorDetails(PolkadotAddress.fromEncoded(address))
+  static async getExtraDelegateesDetails(protocol: PolkadotProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
+    return Promise.all(
+      addresses.map(async address => {
+        const validatorDetails = await protocol.nodeClient.getValidatorDetails(PolkadotAddress.fromEncoded(address))
 
-    const ownStash = validatorDetails.ownStash ? validatorDetails.ownStash : new BigNumber(0)
-    const totalStakingBalance = validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : new BigNumber(0)
+        const ownStash = validatorDetails.ownStash ? validatorDetails.ownStash : new BigNumber(0)
+        const totalStakingBalance = validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : new BigNumber(0)
 
-    return {
-      status: validatorDetails.status || 'unknown',
-      usageDetails: {
-        usage: ownStash.dividedBy(totalStakingBalance),
-        current: ownStash,
-        total: totalStakingBalance
-      },
-      extraDetails: [
-        // TODO: Add translations
-        new UIIconText('commission', 'logo-usd', validatorDetails.commission + '%' || '-', 'Comission')
-      ]
-    }
+        return {
+          status: validatorDetails.status || 'unknown',
+          usageDetails: {
+            usage: ownStash.dividedBy(totalStakingBalance),
+            current: ownStash,
+            total: totalStakingBalance
+          },
+          extraDetails: [
+            // TODO: Add translations
+            new UIIconText('commission', 'logo-usd', validatorDetails.commission + '%' || '-', 'Comission')
+          ]
+        }
+      })
+    )
   }
 
   @extensionFunction(PolkadotProtocol)

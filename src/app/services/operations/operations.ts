@@ -28,6 +28,7 @@ import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/de
 import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIInputText } from 'src/app/models/widgets/UIInputText'
 import { isString } from 'util'
+import { DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 
 @Injectable({
   providedIn: 'root'
@@ -42,19 +43,19 @@ export class OperationsProvider {
     private readonly serializerService: SerializerService
   ) {}
 
-  public async getCurrentDelegatee(protocol: ICoinDelegateProtocol, address: string): Promise<string> {
+  public async getCurrentDelegatees(protocol: ICoinDelegateProtocol, address: string): Promise<string[]> {
     const current = await protocol.getCurrentDelegateesForAddress(address)
     if (current.length === 0) {
-      return protocol.getDefaultDelegatee()
+      return [await protocol.getDefaultDelegatee()]
     }
-    return current[0] // TODO: handle multiple cases better
+    return current
   }
 
-  public async getDelegateeDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegateeDetails> {
+  public async getDelegateeDetails(protocol: ICoinDelegateProtocol, addresses: string[]): Promise<AirGapDelegateeDetails> {
     const promises = []
-    promises.push(protocol.getDelegateeDetails(address))
+    promises.push(protocol.getDelegateesDetails(addresses))
     if (supportsAirGapDelegation(protocol)) {
-      promises.push(protocol.getExtraDelegateeDetails(address))
+      promises.push(protocol.getExtraDelegateesDetails(addresses))
     }
 
     const allDetails = await Promise.all(promises)
@@ -62,18 +63,20 @@ export class OperationsProvider {
     const basicDetails = allDetails[0]
     const extraDetails = allDetails[1]
 
-    const details = {
-      ...basicDetails,
+    const zippedDetails = basicDetails.map(
+      (basic, index) => [basic, extraDetails[index]] as [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]
+    )
+
+    return zippedDetails.map(([basic, extra]: [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]) => ({
+      ...basic,
       status: '-',
       usageDetails: {
         usage: new BigNumber(0),
         current: new BigNumber(0),
         total: new BigNumber(0)
       },
-      ...(extraDetails ? extraDetails : {})
-    }
-
-    return details
+      ...(extra ? extra : {})
+    }))
   }
 
   public async getDelegatorDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegatorDetails> {
@@ -110,7 +113,7 @@ export class OperationsProvider {
     let airGapTxs = []
     let serializedTxChunks = []
     if (supportsDelegation(wallet.coinProtocol)) {
-      const rawUnsignedTx = await wallet.coinProtocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data)
+      const rawUnsignedTx = (await wallet.coinProtocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data))[0]
 
       airGapTxs = await wallet.coinProtocol.getTransactionDetails({
         publicKey: wallet.publicKey,
