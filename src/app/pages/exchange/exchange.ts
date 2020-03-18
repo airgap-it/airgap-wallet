@@ -7,7 +7,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeProvider, ExchangeEnum, ExchangeTransaction } from '../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
@@ -244,16 +244,7 @@ export class ExchangePage {
         this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
         const txId = result.id
-        let txStatus: string
-        const txStatusResponse = await this.exchangeProvider.getStatus(txId)
-        switch (this.activeExchange) {
-          case ExchangeEnum.CHANGELLY:
-            txStatus = txStatusResponse
-            break
-          case ExchangeEnum.CHANGENOW:
-            txStatus = txStatusResponse.status
-            break
-        }
+        let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
 
         const exchangeTxInfo = {
           receivingAddress: this.toWallet.addresses[0],

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ExchangeProvider, ExchangeEnum, TransactionStatus, ExchangeTransaction } from './../../services/exchange/exchange'
+import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
@@ -52,7 +52,6 @@ export class AccountTransactionListPage {
   public hasExchangeTransactions: boolean = false
 
   public pendingTransactions: IAirGapTransaction[] = []
-  public exchangeTransactions: ExchangeTransaction[] = []
   public formattedExchangeTransactions: IAirGapTransaction[] = []
 
   // XTZ
@@ -90,37 +89,13 @@ export class AccountTransactionListPage {
       this.wallet = info.wallet
     }
 
-    this.subscription = this.timer$.subscribe(() => {
-      if (this.exchangeTransactions.length > 0) {
-        this.hasExchangeTransactions = true
-        this.exchangeTransactions.forEach(async tx => {
-          try {
-            const txStatusResponse = await this.exchangeProvider.getStatus(tx.id)
-            switch (tx.exchange) {
-              case ExchangeEnum.CHANGELLY:
-                tx.status = txStatusResponse
-                break
-              case ExchangeEnum.CHANGENOW:
-                tx.status = txStatusResponse.status
-                break
-            }
-          } catch (err) {
-            // most likely we created a transaction, but never sent it to the network.
-            // ChangeNow removes txs having the status 'waiting' after some time (not specified in their documentation)
-          }
-          if (
-            tx.status === TransactionStatus.FINISHED ||
-            (tx.status === TransactionStatus.NEW && tx.timestamp < Date.now() - 8 * 3600 * 1000) ||
-            (tx.status === TransactionStatus.WAITING && tx.timestamp < Date.now() - 8 * 3600 * 1000)
-          ) {
-            this.hasExchangeTransactions = false
-            this.exchangeProvider.transactionCompleted(tx)
-            this.exchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
-              this.wallet.protocolIdentifier,
-              this.wallet.addresses[0]
-            )
-          }
-        })
+    this.subscription = this.timer$.subscribe(async () => {
+      if (this.formattedExchangeTransactions.length > 0) {
+        this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
+          this.wallet.protocolIdentifier,
+          this.wallet.addresses[0]
+        )
+        this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
       }
     })
 
@@ -260,12 +235,11 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    await promiseTimeout(3000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(3000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
+      return []
     })
-
-    const transactions: IAirGapTransaction[] = await transactionPromise
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
@@ -276,15 +250,10 @@ export class AccountTransactionListPage {
 
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
-    this.exchangeTransactions = this.exchangeProvider.getExchangeTransactionsByProtocol(
+    this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
       this.wallet.protocolIdentifier,
       this.wallet.addresses[0]
     )
-    if (this.exchangeTransactions.length > 0) {
-      this.hasExchangeTransactions = true
-    }
-
-    this.formattedExchangeTransactions = this.exchangeProvider.formatExchangeTxs(this.exchangeTransactions, this.protocolIdentifier)
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map(value => value.hash)
@@ -314,7 +283,9 @@ export class AccountTransactionListPage {
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
     const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
       this.wallet.fetchTransactions(limit, offset),
-      this.wallet.synchronize()
+      this.wallet.synchronize().catch(error => {
+        console.error(error)
+      })
     ])
 
     return transactions

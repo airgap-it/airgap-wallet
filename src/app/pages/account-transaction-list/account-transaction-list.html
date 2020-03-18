@@ -82,12 +82,6 @@
   </ion-row>
 
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
-  <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showNoTransactionScreen()">
-    <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
-    <p>
-      {{ 'account-transaction-list.no-transactions_text' | translate }}
-    </p>
-  </div>
 
   <transaction-list
     [transactionType]="'normalTransaction'"

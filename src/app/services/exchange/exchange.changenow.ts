@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Exchange } from './exchange.interface'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 import { ExchangeCustomService, CustomEnum } from '../exchange-custom/exchange-custom.service'
 
 export interface CurrencyDetailResponse {
@@ -36,7 +36,7 @@ export interface TransactionChangeNowResponse {
   amount: number
 }
 
-export interface TransactionStatus {
+export interface ChangeNowTransactionStatus {
   status: string
   payinAddress: string
   payoutAddress: string
@@ -48,6 +48,26 @@ export interface TransactionStatus {
   expectedReceiveAmount: number
   createdAt: Date
   isPartner: boolean
+}
+
+export class ChangeNowTransactionStatusResponse implements ExchangeTransactionStatusResponse {
+  status: string
+
+  constructor(json: ChangeNowTransactionStatus) {
+    this.status = json.status
+  }
+
+  isPending(): boolean {
+    switch (this.status) {
+      case 'finished':
+      case 'failed':
+      case 'refunded':
+      case 'expired':
+        return false
+      default:
+        return true
+    }
+  }
 }
 
 class ChangeNowApi {
@@ -148,9 +168,11 @@ class ChangeNowApi {
     return response
   }
 
-  async getStatus(transactionId: string): Promise<TransactionStatus> {
-    const response = (await this.http.get(`${this.baseURL}/transactions/${transactionId}/changenow`).toPromise()) as TransactionStatus
-    return response
+  async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
+    const response = (await this.http
+      .get(`${this.baseURL}/transactions/${transactionId}/changenow`)
+      .toPromise()) as ChangeNowTransactionStatus
+    return new ChangeNowTransactionStatusResponse(response)
   }
 }
 

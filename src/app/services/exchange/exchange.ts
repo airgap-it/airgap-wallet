@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js'
 import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
-import { Exchange } from './exchange.interface'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 import { ExchangeCustomService } from '../exchange-custom/exchange-custom.service'
@@ -88,8 +88,17 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
   }
 
-  public getStatus(transactionId: string): Promise<any> {
+  public getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
     return this.exchange.getStatus(transactionId)
+  }
+
+  public getStatusForTransaction(transaction: ExchangeTransaction): Promise<ExchangeTransactionStatusResponse> {
+    switch (transaction.exchange) {
+      case ExchangeEnum.CHANGELLY:
+        return new ChangellyExchange(this.http, this.exchangeCustomService).getStatus(transaction.id)
+      case ExchangeEnum.CHANGENOW:
+        return new ChangeNowExchange(this.http, this.exchangeCustomService).getStatus(transaction.id)
+    }
   }
 
   public convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
@@ -149,11 +158,45 @@ export class ExchangeProvider implements Exchange {
     return
   }
 
-  public getExchangeTransactionsByProtocol(protocolidentifier: string, address: string) {
+  public async getExchangeTransactionsByProtocol(protocolidentifier: string, address: string): Promise<IAirGapTransaction[]> {
     const filteredByProtocol = this.pendingTransactions.filter(
       tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier
     )
     const filteredByAddress = filteredByProtocol.filter(tx => tx.receivingAddress === address || tx.sendingAddress === address)
-    return filteredByAddress
+    const statusPromises: Promise<{
+      transaction: ExchangeTransaction
+      statusResponse?: ExchangeTransactionStatusResponse
+    }>[] = filteredByAddress.map(tx => {
+      return this.getStatusForTransaction(tx)
+        .then(result => {
+          return { transaction: tx, statusResponse: result }
+        })
+        .catch(() => {
+          return { transaction: tx }
+        })
+    })
+    const transactions = (await Promise.all(statusPromises))
+      .filter(result => {
+        if (result.statusResponse !== undefined) {
+          result.transaction.status = result.statusResponse.status
+          const eightHours = 8 * 3600 * 1000
+          if (
+            !result.statusResponse.isPending() ||
+            result.transaction.timestamp < Date.now() - eightHours ||
+            result.transaction.timestamp < Date.now() - eightHours
+          ) {
+            this.transactionCompleted(result.transaction)
+            return false
+          } else {
+            return true
+          }
+        } else {
+          this.transactionCompleted(result.transaction)
+          return false
+        }
+      })
+      .map(result => result.transaction)
+
+    return this.formatExchangeTxs(transactions, protocolidentifier)
   }
 }

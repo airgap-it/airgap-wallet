@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Exchange } from './exchange.interface'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 import { CustomEnum, ExchangeCustomService } from '../exchange-custom/exchange-custom.service'
 
 export interface CreateTransactionResponse {
@@ -37,6 +37,26 @@ interface JsonRpcReturnWrapper<T> {
   method: string
   result?: T
   error?: JsonRpcResponseError
+}
+
+export class ChangellyTransactionStatusResponse implements ExchangeTransactionStatusResponse {
+  status: string
+
+  constructor(status: string) {
+    this.status = status
+  }
+
+  isPending(): boolean {
+    switch (this.status) {
+      case 'finished':
+      case 'failed':
+      case 'refunded':
+      case 'expired':
+        return false
+      default:
+        return true
+    }
+  }
 }
 
 class ChangellyApi {
@@ -146,12 +166,13 @@ class ChangellyApi {
     return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
   }
 
-  getStatus(transactionId: string): Promise<any> {
+  async getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
     const method = 'getStatus'
     const params = {
       id: transactionId
     }
-    return this.makeJsonRpcCall<Object, any>(method, params)
+    const statusString: string = await this.makeJsonRpcCall<Object, any>(method, params)
+    return new ChangellyTransactionStatusResponse(statusString)
   }
 }
 
