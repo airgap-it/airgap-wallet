@@ -254,6 +254,7 @@ export class AccountTransactionListPage {
       this.wallet.protocolIdentifier,
       this.wallet.addresses[0]
     )
+    this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map(value => value.hash)
