@@ -8,9 +8,6 @@
       <ion-text class="ion-no-margin" color="blackLight" *ngIf="widget.extraLabel || widget.createExtraLabel">
         <p class="ion-no-margin">{{ widget.extraLabel || widget.createExtraLabel(widget.value) }}</p>
       </ion-text>
-      <ion-text class="ion-no-margin" color="blackLight" *ngIf="widget.extraLabelHtml || widget.createExtraLabelHtml">
-        <p class="ion-no-margin" [innerHtml]="widget.extraLabelHtml || widget.createExtraLabelHtml(widget.value)"></p>
-      </ion-text>
     </ion-col>
     <ion-col size="3" class="ion-no-padding" *ngIf="widget.fixedValue || widget.getFixedValue">
       <ion-toolbar>
@@ -31,7 +28,7 @@
   <ion-row class="ion-padding-horizontal ion-padding-bottom" *ngIf="widgetForm">
     <ion-col size="12" *ngIf="!widgetForm.controls[widget.id].valid">
       <ion-text class="ion-no-margin" color="danger">
-        <p class="ion-no-margin">{{ widget.error }}</p>
+        <p class="ion-no-margin">{{ widget.errorLabel }}</p>
       </ion-text>
     </ion-col>
   </ion-row>
