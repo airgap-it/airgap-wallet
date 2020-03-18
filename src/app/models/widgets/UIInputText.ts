@@ -41,10 +41,10 @@ export class UIInputText extends UIInputWidget<string> {
   constructor(config: UIInputTextConfig) {
     super(config)
 
+    this.controlName = this.id + '-control'
+
     this.inputType = config.inputType
-
     this.label = config.label
-
     this.placeholder = config.placeholder || ''
 
     this.value = config.defaultValue || ''
@@ -63,17 +63,15 @@ export class UIInputText extends UIInputWidget<string> {
     if (this.isValueFixed) {
       this.isValueFixed = false
     }
+    if (this.widgetForm) {
+      this.widgetForm.patchValue({ [this.id]: this.customizeInput ? this.customizeInput(this.value) : this.value }, { emitEvent: false })
+    }
   }
 
   public toggleValue() {
     this.isValueFixed = !this.isValueFixed
     if (this.isValueFixed && this.widgetForm) {
-      this.widgetForm.patchValue(
-        {
-          [this.id]: this.fixedValue || this.getFixedValue()
-        },
-        { emitEvent: false }
-      )
+      this.widgetForm.patchValue({ [this.id]: this.fixedValue || this.getFixedValue() }, { emitEvent: false })
     }
   }
 }

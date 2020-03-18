@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { BehaviorSubject } from 'rxjs'
 import {
   AirGapDelegateeDetails,
@@ -11,6 +11,9 @@ import {
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import { FormGroup, FormBuilder } from '@angular/forms'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { LoadingController } from '@ionic/angular'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -38,8 +41,12 @@ export class DelegationDetailPage {
 
   private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
+  private loader: HTMLIonLoadingElement | undefined
   constructor(
+    private readonly router: Router,
+    private readonly dataService: DataService,
     private readonly operations: OperationsProvider,
+    private readonly loadingController: LoadingController,
     private readonly route: ActivatedRoute,
     private readonly formBuilder: FormBuilder
   ) {
@@ -69,25 +76,47 @@ export class DelegationDetailPage {
   }
 
   public async callAction(): Promise<void> {
-    const delegatorDetails = this.delegatorDetails$.value
-    if (!delegatorDetails) {
-      return
-    }
+    this.loader = await this.loadingController.create({
+      message: 'Preparing transaction...'
+    })
 
-    let actionType: any
-    switch (this.activeDelegatorAction) {
-      case this.delegateActionId:
-        actionType = delegatorDetails.delegateAction.type
-        break
-      case this.undelegateActionId:
-        actionType = delegatorDetails.undelegateAction.type
-        break
-      default:
-        actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
+    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+
+    try {
+      const delegatorDetails = this.delegatorDetails$.value
+      if (!delegatorDetails) {
+        return
+      }
+
+      let actionType: any
+      switch (this.activeDelegatorAction) {
+        case this.delegateActionId:
+          actionType = delegatorDetails.delegateAction.type
+          break
+        case this.undelegateActionId:
+          actionType = delegatorDetails.undelegateAction.type
+          break
+        default:
+          actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
+      }
+
+      const data = this.delegationForms[actionType].value
+      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+
+      const info = {
+        wallet: this.wallet,
+        airGapTxs,
+        data: serializedTxChunks
+      }
+
+      this.dismissLoader()
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      this.dismissLoader()
+      console.log(error)
     }
-    const data = this.delegationForms[actionType].value
-    const delegatorAction = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
-    console.log(delegatorAction)
   }
 
   public onActiveActionChange() {
@@ -144,7 +173,10 @@ export class DelegationDetailPage {
           args[action.paramName] = this.delegateeAddresses$.value
         }
         if (action.extraArgs) {
-          action.extraArgs.forEach(arg => (args[arg.id] = form ? form.value[arg.id] : null))
+          action.extraArgs.forEach(arg => {
+            args[arg.id] = form ? form.value[arg.id] : null
+            args[arg.controlName] = form ? form.value[arg.controlName] : null
+          })
         }
 
         if (form) {
@@ -163,7 +195,10 @@ export class DelegationDetailPage {
       if (action.args) {
         const form = this.delegationForms[action.type]
         const args = {}
-        action.args.forEach(arg => (args[arg.id] = form ? form.value[arg.id] : null))
+        action.args.forEach(arg => {
+          args[arg.id] = form ? form.value[arg.id] : null
+          args[arg.controlName] = form ? form.value[arg.controlName] : null
+        })
 
         if (form) {
           form.setValue(args)
@@ -186,6 +221,12 @@ export class DelegationDetailPage {
 
       this.activeDelegatorAction = activeAction.type
       this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
+    }
+  }
+
+  private dismissLoader() {
+    if (this.loader) {
+      this.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     }
   }
 }

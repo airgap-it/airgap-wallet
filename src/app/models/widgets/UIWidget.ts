@@ -18,6 +18,8 @@ export abstract class UIWidget {
 
 export abstract class UIInputWidget<T> extends UIWidget {
   public readonly id: string
+  public controlName: string
+
   public readonly validator?: Validator
 
   public value: T
@@ -28,6 +30,8 @@ export abstract class UIInputWidget<T> extends UIWidget {
 
     this.id = config.id
     this.validator = config.validator
+
+    this.controlName = this.id
   }
 
   public setWidgetForm(widgetForm: FormGroup) {
@@ -35,13 +39,13 @@ export abstract class UIInputWidget<T> extends UIWidget {
 
     if (this.value !== undefined || this.value !== null) {
       this.widgetForm.patchValue({
-        [this.id]: this.value
+        [this.controlName]: this.value
       })
     }
 
     this.widgetForm.valueChanges.subscribe(value => {
-      if (value && value[this.id]) {
-        this.value = value[this.id]
+      if (value && value[this.controlName]) {
+        this.value = value[this.controlName]
         this.onValueChanged()
       }
     })

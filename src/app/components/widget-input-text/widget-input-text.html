@@ -3,7 +3,7 @@
     <ion-col size="9" class="value--container__input ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
         <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ widget.label }}</ion-label>
-        <ion-input [type]="widget.inputType" [placeholder]="widget.placeholder" [formControlName]="widget.id"></ion-input>
+        <ion-input [type]="widget.inputType" [placeholder]="widget.placeholder" [formControlName]="widget.controlName"></ion-input>
       </ion-item>
       <ion-text class="ion-no-margin" color="blackLight" *ngIf="widget.extraLabel || widget.createExtraLabel">
         <p class="ion-no-margin">{{ widget.extraLabel || widget.createExtraLabel(widget.value) }}</p>
