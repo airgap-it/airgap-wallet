@@ -313,7 +313,7 @@ export class AccountTransactionListPage {
         wallet: this.wallet,
         importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
-          this.navController.back()
+          this.navController.pop()
         },
         onUndelegate: async (): Promise<void> => {
           // TODO: Should we move this to it's own file?
