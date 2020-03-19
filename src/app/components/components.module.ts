@@ -34,6 +34,7 @@ import { WidgetCheckbox } from './widget-checkbox/widget-checkbox'
 import { WidgetIconText } from './widget-icon-text/widget-icon-text'
 import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetSelect } from './widget-select/widget-select'
+import { WidgetAccount } from './widget-account/widget-account'
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { WidgetSelect } from './widget-select/widget-select'
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
     WidgetSelector,
+    WidgetAccount,
     WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,
@@ -95,6 +97,7 @@ import { WidgetSelect } from './widget-select/widget-select'
     DelegateEditPopoverComponent,
 
     WidgetSelector,
+    WidgetAccount,
     WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,

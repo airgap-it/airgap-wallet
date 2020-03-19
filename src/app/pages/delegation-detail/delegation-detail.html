@@ -15,17 +15,7 @@
 <ion-content>
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12">
-      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeDetails$ | async; else delegateeAvatarSkeleton">
-        <ion-avatar slot="start">
-          <identicon [address]="(delegateeDetails$ | async).address"></identicon>
-        </ion-avatar>
-        <ion-label>
-          <h2 class="font--weight__bold" ion-text color="black">
-            {{ (delegateeDetails$ | async).name }}
-          </h2>
-          <p>{{ (delegateeDetails$ | async).address }}</p>
-        </ion-label>
-      </ion-item>
+      <widget-account *ngIf="delegateeWidget; else delegateeAvatarSkeleton" [widget]="delegateeWidget"></widget-account>
       <ng-template #delegateeAvatarSkeleton>
         <div>
           <ion-item lines="none" class="ion-no-padding">

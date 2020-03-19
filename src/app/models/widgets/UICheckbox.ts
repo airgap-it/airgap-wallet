@@ -6,7 +6,7 @@ interface UICheckboxConfig extends UIInputWidgetConfig {
 }
 
 export class UICheckbox extends UIInputWidget<boolean> {
-  public readonly type: UIWidgetType = UIWidgetType.CHECKBOX
+  public readonly type = UIWidgetType.CHECKBOX
   public readonly label: string
 
   constructor(config: UICheckboxConfig) {

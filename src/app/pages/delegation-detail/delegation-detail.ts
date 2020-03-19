@@ -14,6 +14,7 @@ import { FormGroup, FormBuilder } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LoadingController } from '@ionic/angular'
+import { UIAccount } from 'src/app/models/widgets/UIAccount'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -32,6 +33,7 @@ export class DelegationDetailPage {
   public delegationForms: Map<any, FormGroup> = new Map()
 
   public delegateeLabel: string
+  public delegateeWidget: UIAccount
 
   public activeDelegatorAction: string | null = null
   public activeDelegatorActionConfirmButton: string | null = null
@@ -146,6 +148,15 @@ export class DelegationDetailPage {
         if (details) {
           this.setupMainActionsForms(details)
         }
+      }
+    })
+
+    this.delegateeDetails$.subscribe(details => {
+      if (details) {
+        this.delegateeWidget = new UIAccount({
+          name: details.name || '',
+          address: details.address
+        })
       }
     })
 

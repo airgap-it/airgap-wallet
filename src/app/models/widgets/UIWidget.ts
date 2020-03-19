@@ -1,10 +1,11 @@
 import { Validator, FormGroup } from '@angular/forms'
 
 export enum UIWidgetType {
+  ACCOUNT = 'account',
+  CHECKBOX = 'checkbox',
   ICON_TEXT = 'icon_text',
   INPUT_TEXT = 'input_text',
-  SELECT = 'select',
-  CHECKBOX = 'checkbox'
+  SELECT = 'select'
 }
 
 export interface UIInputWidgetConfig {
