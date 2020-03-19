@@ -59,7 +59,7 @@
   <ion-row class="ion-align-items-center">
     <ion-col size="10" class="ion-padding">
       <ion-text class="font--weight__bold" color="primary">
-        <p>{{ 'account-transaction-list.transactions_label' | translate }}</p>
+        <p class="ion-no-margin">{{ 'account-transaction-list.transactions_label' | translate }}</p>
       </ion-text>
     </ion-col>
 
@@ -69,8 +69,8 @@
     <ion-col size="1"></ion-col>
   </ion-row>
 
-  <ion-row>
-    <ion-col class="ion-padding" *ngIf="showLinkToBlockExplorer">
+  <ion-row *ngIf="showLinkToBlockExplorer">
+    <ion-col class="ion-padding">
       <ion-text class="font--weight__bold" color="secondary">
         <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
       </ion-text>
