@@ -15,6 +15,8 @@ import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LoadingController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/UIAccount'
+import { UIIconText } from 'src/app/models/widgets/UIIconText'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -33,7 +35,9 @@ export class DelegationDetailPage {
   public delegationForms: Map<any, FormGroup> = new Map()
 
   public delegateeLabel: string
-  public delegateeWidget: UIAccount
+  public delegateeAccountWidget: UIAccount
+
+  public delegatorBalanceWidget: UIIconText
 
   public activeDelegatorAction: string | null = null
   public activeDelegatorActionConfirmButton: string | null = null
@@ -50,7 +54,8 @@ export class DelegationDetailPage {
     private readonly operations: OperationsProvider,
     private readonly loadingController: LoadingController,
     private readonly route: ActivatedRoute,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: FormBuilder,
+    private readonly amountConverter: AmountConverterPipe
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -153,8 +158,8 @@ export class DelegationDetailPage {
 
     this.delegateeDetails$.subscribe(details => {
       if (details) {
-        this.delegateeWidget = new UIAccount({
-          name: details.name || '',
+        this.delegateeAccountWidget = new UIAccount({
+          name: details.name,
           address: details.address
         })
       }
@@ -162,6 +167,16 @@ export class DelegationDetailPage {
 
     this.delegatorDetails$.subscribe(details => {
       if (details) {
+        // TODO: add translations
+        this.delegatorBalanceWidget = new UIIconText({
+          iconName: 'wallet',
+          text: this.amountConverter.transform(details.balance, {
+            protocolIdentifier: this.wallet.protocolIdentifier,
+            maxDigits: 10
+          }),
+          description: 'Your Balance'
+        })
+
         this.setupForms(details)
         this.setActiveDelegatorAction(details)
       }

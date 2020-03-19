@@ -8,5 +8,5 @@ import { UIAccount } from 'src/app/models/widgets/UIAccount'
 })
 export class WidgetAccount {
   @Input()
-  public widget: UIAccount
+  public readonly widget: UIAccount
 }

@@ -15,7 +15,9 @@
 <ion-content>
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12">
-      <widget-account *ngIf="delegateeWidget; else delegateeAvatarSkeleton" [widget]="delegateeWidget"></widget-account>
+      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton">
+        <widget-account [widget]="delegateeAccountWidget"></widget-account>
+      </ion-item>
       <ng-template #delegateeAvatarSkeleton>
         <div>
           <ion-item lines="none" class="ion-no-padding">
@@ -80,7 +82,9 @@
       <ion-card>
         <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
           <ng-container *ngFor="let extra of (delegateeDetails$ | async).extraDetails || []">
-            <widget-selector [widget]="extra"></widget-selector>
+            <ion-item lines="none">
+              <widget-selector [widget]="extra"></widget-selector>
+            </ion-item>
           </ng-container>
         </ng-container>
         <ng-template #delegateeExtraSkeleton>
@@ -153,7 +157,9 @@
       <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
         <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
           <ion-row class="ion-padding-horizontal">
-            <p>{{ extra.description }}</p>
+            <ion-col size="12">
+              <p>{{ extra.description }}</p>
+            </ion-col>
           </ion-row>
           <ion-row *ngFor="let arg of extra.args || []">
             <ion-col size="12">
@@ -180,19 +186,12 @@
       <ion-card>
         <ng-container *ngIf="(delegatorDetails$ | async); else delegatorDetailsSkeleton">
           <ion-item lines="none">
-            <ion-avatar slot="start" class="content--align__center-center border--container">
-              <ion-icon name="wallet"></ion-icon>
-            </ion-avatar>
-            <ion-label>
-              <h2 class="font--weight__bold ion-ion-text" color="black">
-                {{ (delegatorDetails$ | async).balance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
-                }}
-              </h2>
-              <h3>Your Balance</h3>
-            </ion-label>
+            <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
           </ion-item>
           <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraDetails || []">
-            <widget-selector [widget]="extra"></widget-selector>
+            <ion-item lines="none">
+              <widget-selector [widget]="extra"></widget-selector>
+            </ion-item>
           </ng-container>
         </ng-container>
         <ng-template #delegatorDetailsSkeleton>
