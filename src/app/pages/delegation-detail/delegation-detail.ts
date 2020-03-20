@@ -17,6 +17,7 @@ import { LoadingController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -52,6 +53,7 @@ export class DelegationDetailPage {
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly operations: OperationsProvider,
+    private readonly extensionsService: ExtensionsService,
     private readonly loadingController: LoadingController,
     private readonly route: ActivatedRoute,
     private readonly formBuilder: FormBuilder,
@@ -62,19 +64,7 @@ export class DelegationDetailPage {
       this.wallet = info.wallet
     }
 
-    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
-
-    if (supportsDelegation(this.wallet.coinProtocol)) {
-      this.subscribeObservables()
-
-      this.operations
-        .getCurrentDelegatees(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(addresses => this.delegateeAddresses$.next(addresses))
-
-      this.operations
-        .getDelegatorDetails(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(details => this.delegatorDetails$.next(details))
-    }
+    this.extensionsService.loadDelegationExtensions(this.wallet).then(() => this.initView())
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
@@ -140,6 +130,22 @@ export class DelegationDetailPage {
           : null
 
         this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
+    }
+  }
+
+  private initView() {
+    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
+
+    if (supportsDelegation(this.wallet.coinProtocol)) {
+      this.subscribeObservables()
+
+      this.operations
+        .getCurrentDelegatees(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
+        .then(addresses => this.delegateeAddresses$.next(addresses))
+
+      this.operations
+        .getDelegatorDetails(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
+        .then(details => this.delegatorDetails$.next(details))
     }
   }
 

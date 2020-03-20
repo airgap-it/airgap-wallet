@@ -52,6 +52,7 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { ExtensionsService } from './services/extensions/extensions.service'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -114,6 +115,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
+    ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
     WebExtensionProvider,

@@ -6,6 +6,8 @@ export interface UIAccountConfig {
   description?: string
 
   abbreviateAddress?: boolean
+  abbreviationStart?: number
+  abbreviationEnd?: number
 }
 
 export class UIAccount extends UIWidget {
@@ -24,11 +26,14 @@ export class UIAccount extends UIWidget {
 
     this.name = config.name
     this.address = config.address
-    this.displayAddress = config.abbreviateAddress ? this.abbreviateAddress(this.address) : this.address
+    this.displayAddress = config.abbreviateAddress ? this.abbreviateAddress(this.address, config) : this.address
     this.description = config.description
   }
 
-  private abbreviateAddress(address: string): string {
-    return address.slice(0, 3) + '...' + address.substr(-3)
+  private abbreviateAddress(address: string, config: { abbreviationStart?: number; abbreviationEnd?: number } = {}): string {
+    const start = config.abbreviationStart || 3
+    const end = config.abbreviationEnd || 3
+
+    return address.length > start + end ? address.slice(0, start) + '...' + address.substr(-end) : address
   }
 }
