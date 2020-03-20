@@ -64,7 +64,7 @@ export class OperationsProvider {
     const extraDetails = allDetails[1]
 
     const zippedDetails = basicDetails.map(
-      (basic, index) => [basic, extraDetails[index]] as [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]
+      (basic, index) => [basic, extraDetails ? extraDetails[index] : null] as [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]
     )
 
     return zippedDetails.map(([basic, extra]: [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]) => ({

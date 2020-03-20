@@ -245,8 +245,8 @@ export class DelegationDetailPage {
     } else {
       const activeAction = details.extraActions ? details.extraActions[0] : null
 
-      this.activeDelegatorAction = activeAction.type
-      this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
+      this.activeDelegatorAction = activeAction ? activeAction.type : null
+      this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel : null
     }
   }
 
