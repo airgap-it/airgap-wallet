@@ -13,11 +13,13 @@ import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/de
 import { FormGroup, FormBuilder } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { LoadingController } from '@ionic/angular'
+import { LoadingController, PopoverController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
+import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -55,6 +57,7 @@ export class DelegationDetailPage {
     private readonly operations: OperationsProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly loadingController: LoadingController,
+    private readonly popoverController: PopoverController,
     private readonly route: ActivatedRoute,
     private readonly formBuilder: FormBuilder,
     private readonly amountConverter: AmountConverterPipe
@@ -68,8 +71,31 @@ export class DelegationDetailPage {
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
-    console.log(event)
-    // TODO: select new delegatee
+    const popover: HTMLIonPopoverElement = await this.popoverController.create({
+      component: DelegateEditPopoverComponent,
+      componentProps: {
+        delegateeLabel: this.delegateeLabel
+      },
+      event,
+      translucent: true
+    })
+
+    function isDelegateeAddressObject(value: unknown): value is { delegateeAddress: string } {
+      return value instanceof Object && 'delegateeAddress' in value
+    }
+
+    popover
+      .onDidDismiss()
+      .then(async ({ data }: OverlayEventDetail<unknown>) => {
+        if (isDelegateeAddressObject(data)) {
+          this.delegateeAddresses$.next([data.delegateeAddress]) // TODO: support multiple entries
+        } else {
+          console.log('Did not receive valid delegatee address object')
+        }
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+
+    return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async callAction(): Promise<void> {

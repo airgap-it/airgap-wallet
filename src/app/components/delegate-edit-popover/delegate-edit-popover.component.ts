@@ -9,7 +9,8 @@ import { LanguageService } from '../../services/language/language.service'
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
-  public hideAirGap: boolean
+  public readonly hideAirGap: boolean
+  public readonly delegateeLabel: string
 
   constructor(
     private readonly alertController: AlertController,
@@ -18,16 +19,17 @@ export class DelegateEditPopoverComponent {
     private readonly navParams: NavParams
   ) {
     this.hideAirGap = this.navParams.get('hideAirGap')
+    this.delegateeLabel = this.navParams.get('delegateeLabel')
   }
 
-  public async changeBaker(): Promise<void> {
+  public async changeDelegatee(): Promise<void> {
     const translatedAlert = await this.languageService.getTranslatedAlert(
       'delegate-edit-popover.heading',
       'delegate-edit-popover.text',
       [
         {
-          name: 'bakerAddress',
-          id: 'baker-address',
+          name: 'delegateeAddress',
+          id: 'delegatee-address',
           placeholder: 'delegate-edit-popover.baker-address_label'
         }
       ],
@@ -42,8 +44,8 @@ export class DelegateEditPopoverComponent {
         },
         {
           text: 'delegate-edit-popover.set-baker_label',
-          handler: ({ bakerAddress }: { bakerAddress: string }): boolean => {
-            this.popoverController.dismiss({ bakerAddress })
+          handler: ({ delegateeAddress }: { delegateeAddress: string }): boolean => {
+            this.popoverController.dismiss({ delegateeAddress })
 
             return true
           }
@@ -55,7 +57,7 @@ export class DelegateEditPopoverComponent {
     await alert.present()
   }
 
-  public async changeBakerToAirGap() {
+  public async changeDelegateeToAirGap() {
     this.popoverController.dismiss({ changeToAirGap: true })
   }
 }
