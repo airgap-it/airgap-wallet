@@ -10,7 +10,7 @@ export class ExtensionsService {
     switch (wallet.protocolIdentifier) {
       case ProtocolSymbols.POLKADOT:
         const { PolkadotDelegationExtensions } = await import('../../extensions/delegation/polkadot/PolkadotDelegationExtensions')
-        PolkadotDelegationExtensions.load(wallet)
+        PolkadotDelegationExtensions.load()
         break
     }
   }

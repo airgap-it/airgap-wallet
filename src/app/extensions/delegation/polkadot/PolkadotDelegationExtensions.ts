@@ -1,4 +1,4 @@
-import { PolkadotProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
+import { PolkadotProtocol } from 'airgap-coin-lib'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { extensionProperty, extensionFunction } from '../../decorators'
 import { PolkadotDelegationExtensionFunctionsProvider } from './PolkadotDelegationExtensionFunctionsProvider'
@@ -6,8 +6,8 @@ import { PolkadotDelegationExtensionFunctionsProvider } from './PolkadotDelegati
 export class PolkadotDelegationExtensions {
   private static functionsProvider: PolkadotDelegationExtensionFunctionsProvider
 
-  public static load(wallet: AirGapMarketWallet) {
-    PolkadotDelegationExtensions.functionsProvider = new PolkadotDelegationExtensionFunctionsProvider(wallet)
+  public static load() {
+    PolkadotDelegationExtensions.functionsProvider = new PolkadotDelegationExtensionFunctionsProvider()
   }
 
   @extensionProperty(PolkadotProtocol)

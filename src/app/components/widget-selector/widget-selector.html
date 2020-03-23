@@ -1,4 +1,4 @@
-<ng-container>
+<ng-container *ngIf="widget.isVisible">
   <widget-account *ngIf="widget.type === 'account'" [widget]="widget"></widget-account>
   <widget-checkbox *ngIf="widget.type === 'checkbox' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-checkbox>
   <widget-icon-text *ngIf="widget.type === 'icon_text'" [widget]="widget"></widget-icon-text>

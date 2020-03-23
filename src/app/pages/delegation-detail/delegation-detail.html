@@ -111,10 +111,10 @@
   <ion-row class="ion-padding-bottom" *ngIf="(delegatorDetails$ | async)">
     <ion-row>
       <ion-segment scrollable [(ngModel)]="activeDelegatorAction" class="ion-padding-horizontal" (ionChange)="onActiveActionChange()">
-        <ion-segment-button [value]="delegateActionId" *ngIf="(delegatorDetails$ | async).delegateAction.isAvailable">
+        <ion-segment-button [value]="delegateActionId" [disabled]="!(delegatorDetails$ | async).delegateAction.isAvailable">
           <ion-label>Delegate</ion-label>
         </ion-segment-button>
-        <ion-segment-button [value]="undelegateActionId" *ngIf="(delegatorDetails$ | async).undelegateAction.isAvailable">
+        <ion-segment-button [value]="undelegateActionId" [disabled]="!(delegatorDetails$ | async).undelegateAction.isAvailable">
           <ion-label>Undelegate</ion-label>
         </ion-segment-button>
         <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
@@ -187,7 +187,7 @@
     <ion-col size="12">
       <ion-card>
         <ng-container *ngIf="(delegatorDetails$ | async); else delegatorDetailsSkeleton">
-          <ion-item lines="none">
+          <ion-item lines="none" *ngIf="delegatorBalanceWidget">
             <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
           </ion-item>
           <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraDetails || []">
@@ -217,7 +217,7 @@
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="callAction()">
-      {{ activeDelegatorActionConfirmButton || 'Confirm' }}
+      {{ activeDelegatorActionConfirmButton || 'OK' }}
     </ion-button>
   </ion-fab>
 </ion-content>

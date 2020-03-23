@@ -1,6 +1,7 @@
 import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-interface UIInputTextConfig extends UIInputWidgetConfig {
+export interface UIInputTextConfig extends UIInputWidgetConfig {
   inputType: string
 
   label: string
@@ -8,14 +9,14 @@ interface UIInputTextConfig extends UIInputWidgetConfig {
   placeholder?: string
   defaultValue?: string
 
-  customizeInput?: (value: string) => string
+  customizeInput?: (value: string, wallet?: AirGapMarketWallet) => string
 
   extraLabel?: string
-  createExtraLabel?: (value: string) => string
+  createExtraLabel?: (value: string, wallet?: AirGapMarketWallet) => string
   errorLabel?: string
 
   fixedValue?: string
-  getFixedValue?: () => string
+  getFixedValue?: (wallet?: AirGapMarketWallet) => string
   toggleFixedValueButton?: string
 }
 
@@ -48,21 +49,20 @@ export class UIInputText extends UIInputWidget<string> {
     this.placeholder = config.placeholder || ''
 
     this.value = config.defaultValue || ''
-    this.customizeInput = config.customizeInput
+    this.customizeInput = config.customizeInput ? (value: string) => config.customizeInput(value, this.wallet) : undefined
 
     this.extraLabel = config.extraLabel
-    this.createExtraLabel = config.createExtraLabel
+    this.createExtraLabel = config.createExtraLabel ? (value: string) => config.createExtraLabel(value, this.wallet) : undefined
     this.errorLabel = config.errorLabel
 
     this.fixedValue = config.fixedValue
-    this.getFixedValue = config.getFixedValue
+    this.getFixedValue = config.getFixedValue ? () => config.getFixedValue(this.wallet) : undefined
     this.toggleFixedValueButton = config.toggleFixedValueButton
   }
 
   public onValueChanged() {
-    if (this.isValueFixed) {
-      this.isValueFixed = false
-    }
+    this.isValueFixed = this.fixedValue === this.value
+
     if (this.widgetForm) {
       this.widgetForm.patchValue({ [this.id]: this.customizeInput ? this.customizeInput(this.value) : this.value }, { emitEvent: false })
     }
@@ -71,7 +71,7 @@ export class UIInputText extends UIInputWidget<string> {
   public toggleValue() {
     this.isValueFixed = !this.isValueFixed
     if (this.isValueFixed && this.widgetForm) {
-      this.widgetForm.patchValue({ [this.id]: this.fixedValue || this.getFixedValue() }, { emitEvent: false })
+      this.widgetForm.patchValue({ [this.controlName]: this.fixedValue || this.getFixedValue() })
     }
   }
 }

@@ -1,6 +1,6 @@
-import { UIWidget, UIWidgetType } from './UIWidget'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from './UIWidget'
 
-interface UIIconTextConfig {
+export interface UIIconTextConfig extends UIWidgetConfig {
   iconName: string
   text: string
   description?: string
@@ -13,7 +13,7 @@ export class UIIconText extends UIWidget {
   public readonly description?: string
 
   constructor(config: UIIconTextConfig) {
-    super()
+    super(config)
 
     this.iconName = config.iconName
     this.text = config.text

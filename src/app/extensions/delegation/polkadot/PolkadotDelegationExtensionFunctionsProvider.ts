@@ -1,4 +1,4 @@
-import { PolkadotProtocol, PolkadotRewardDestination, AirGapMarketWallet } from 'airgap-coin-lib'
+import { PolkadotProtocol, AirGapMarketWallet, PolkadotRewardDestination } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
@@ -10,15 +10,19 @@ import BigNumber from 'bignumber.js'
 import { UIIconText } from 'src/app/models/widgets/UIIconText'
 import { UIInputWidget, UIWidget } from 'src/app/models/widgets/UIWidget'
 import { PolkadotStakingActionType } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingActionType'
-import { UIInputText } from 'src/app/models/widgets/UIInputText'
-import { UISelect } from 'src/app/models/widgets/UISelect'
+import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/UIInputText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { UICheckbox } from 'src/app/models/widgets/UICheckbox'
-import { UIAccount } from 'src/app/models/widgets/UIAccount'
-import { PolkadotStakingLedger } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingLedger'
+import { PolkadotStakingInfo } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingLedger'
+import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
 
 export class PolkadotDelegationExtensionFunctionsProvider {
-  constructor(private readonly wallet: AirGapMarketWallet) {}
+  private readonly supportedActions = [
+    PolkadotStakingActionType.BOND_NOMINATE,
+    PolkadotStakingActionType.BOND_EXTRA,
+    PolkadotStakingActionType.CANCEL_NOMINATION,
+    PolkadotStakingActionType.CHANGE_NOMINATION,
+    PolkadotStakingActionType.WITHDRAW_UNBONDED
+  ]
 
   public async getExtraDelegateesDetails(protocol: PolkadotProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
     return Promise.all(
@@ -56,37 +60,55 @@ export class PolkadotDelegationExtensionFunctionsProvider {
       this.createExtraDetails(protocol, polkadotAddress)
     ])
 
-    const availableActions = results[0]
+    const availableActions = results[0].filter(action => this.supportedActions.includes(action.type))
     const extraDetails = results[1]
 
     // TODO: add translations
-    const delegateAction = this.createDelegateAction(protocol, availableActions)
-    const undelegateAction = this.createUndelegateAction(protocol, availableActions)
-    const extraActions = this.createExtraActions(protocol, availableActions)
+    const actionResults = await Promise.all([
+      this.createDelegateAction(protocol, polkadotAddress, availableActions),
+      this.createUndelegateAction(protocol, polkadotAddress, availableActions),
+      this.createChangeDelegateeAction(availableActions),
+      this.createExtraActions(availableActions)
+    ])
+
+    const delegateAction = actionResults[0]
+    const undelegateAction = actionResults[1]
+    const changeDelegateeAction = actionResults[2]
+    const extraActions = actionResults[3]
 
     return {
       delegateAction,
       undelegateAction,
+      changeDelegateeAction,
       extraActions,
       extraDetails
     }
   }
 
-  private createDelegateAction(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
+  private async createDelegateAction(
+    protocol: PolkadotProtocol,
+    address: PolkadotAddress,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapMainDelegatorAction> {
     const action = availableActions.find(
-      action => action.type === PolkadotStakingActionType.BOND_NOMINATE || action.type === PolkadotStakingActionType.NOMINATE
+      action => action.type === PolkadotStakingActionType.BOND_NOMINATE || action.type === PolkadotStakingActionType.BOND_EXTRA
     )
 
     if (action) {
+      const maxValue = await protocol.accountController.calculateMaxDelegationValue(address)
+
       return {
         type: action.type,
         isAvailable: true,
         description: 'Delegate description',
         paramName: 'targets',
         extraArgs: [
-          ...(action.type === PolkadotStakingActionType.BOND_NOMINATE
-            ? [this.createValueWidget(protocol.decimals), this.createPayeeWidget()]
-            : []),
+          this.createValueWidget(protocol.decimals, {
+            defaultValue: maxValue.shiftedBy(-protocol.decimals).toFixed(2),
+            toggleFixedValueButton: 'Max',
+            fixedValue: maxValue.shiftedBy(-protocol.decimals).toFixed(2)
+          }),
+          ...(action.type === PolkadotStakingActionType.BOND_NOMINATE ? [this.createPayeeWidget({ isVisible: false })] : []),
           this.createTipWidget(protocol.decimals)
         ]
       }
@@ -98,15 +120,30 @@ export class PolkadotDelegationExtensionFunctionsProvider {
     }
   }
 
-  private createUndelegateAction(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
+  private async createUndelegateAction(
+    protocol: PolkadotProtocol,
+    address: PolkadotAddress,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapMainDelegatorAction> {
     const action = availableActions.find(action => action.type === PolkadotStakingActionType.CANCEL_NOMINATION)
 
     if (action) {
-      return {
-        type: action.type,
-        isAvailable: true,
-        description: 'Undelegate description',
-        extraArgs: [this.createKeepControllerWidget(), this.createValueWidget(protocol.decimals)]
+      const stakingInfo = await protocol.accountController.getStakingInfo(address)
+
+      if (stakingInfo) {
+        return {
+          type: action.type,
+          isAvailable: true,
+          description: 'Undelegate description',
+          extraArgs: [
+            this.createValueWidget(protocol.decimals, {
+              isVisible: false,
+              toggleFixedValueButton: 'Max',
+              fixedValue: stakingInfo.active.shiftedBy(-protocol.decimals).toFixed(2),
+              defaultValue: stakingInfo.active.shiftedBy(-protocol.decimals).toFixed(2)
+            })
+          ]
+        }
       }
     }
 
@@ -116,13 +153,33 @@ export class PolkadotDelegationExtensionFunctionsProvider {
     }
   }
 
-  private createExtraActions(protocol: PolkadotProtocol, availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
+  private async createChangeDelegateeAction(availableActions: DelegatorAction[]): Promise<AirGapMainDelegatorAction> {
+    const description = 'Change Validator'
+    const action = availableActions.find(action => action.type === PolkadotStakingActionType.CHANGE_NOMINATION)
+
+    if (action) {
+      return {
+        type: action.type,
+        isAvailable: true,
+        description,
+        paramName: 'targets'
+      }
+    }
+
+    return {
+      description,
+      isAvailable: true
+    }
+  }
+
+  private createExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
     return availableActions
       .filter(
         action =>
           action.type !== PolkadotStakingActionType.BOND_NOMINATE &&
-          action.type !== PolkadotStakingActionType.NOMINATE &&
-          action.type !== PolkadotStakingActionType.CANCEL_NOMINATION
+          action.type !== PolkadotStakingActionType.BOND_EXTRA &&
+          action.type !== PolkadotStakingActionType.CANCEL_NOMINATION &&
+          action.type !== PolkadotStakingActionType.CHANGE_NOMINATION
       )
       .map(action => {
         let label: string
@@ -131,34 +188,10 @@ export class PolkadotDelegationExtensionFunctionsProvider {
         let args: UIInputWidget<any>[]
 
         switch (action.type) {
-          case PolkadotStakingActionType.UNBOND:
-            label = 'Unbond'
-            confirmLabel = 'Unbond'
-            description = 'Unbond description'
-            args = [this.createValueWidget(protocol.decimals)]
-            break
-          case PolkadotStakingActionType.BOND_EXTRA:
-            label = 'Bond Extra'
-            confirmLabel = 'Bond'
-            description = 'Bond extra description'
-            args = [this.createValueWidget(protocol.decimals)]
-            break
           case PolkadotStakingActionType.WITHDRAW_UNBONDED:
             label = 'Withdraw Unbonded'
             confirmLabel = 'Withdraw'
             description = 'Withdraw unbonded description'
-            break
-          case PolkadotStakingActionType.CHANGE_REWARD_DESTINATION:
-            label = 'Change Reward Destination'
-            confirmLabel = 'Change'
-            description = 'Change reward destination description'
-            args = [this.createPayeeWidget()]
-            break
-          case PolkadotStakingActionType.CHANGE_CONTROLLER:
-            label = 'Change Controller'
-            confirmLabel = 'Change'
-            description = 'Change controller description'
-            args = [this.createControllerWidget()]
             break
         }
 
@@ -172,31 +205,35 @@ export class PolkadotDelegationExtensionFunctionsProvider {
       })
   }
 
-  private createValueWidget(decimals: number): UIInputText {
+  private createValueWidget(decimals: number, config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
       id: 'value',
       inputType: 'number',
       label: 'Amount',
       placeholder: '0.0',
       defaultValue: '0.0',
-      createExtraLabel: (value: string) => `$${new BigNumber(value || 0).multipliedBy(this.wallet.currentMarketPrice).toFixed(2)}`,
-      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString()
+      createExtraLabel: (value: string, wallet?: AirGapMarketWallet) =>
+        wallet ? `$${new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice).toFixed(2)}` : '',
+      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString(),
+      ...config
     })
   }
 
-  private createTipWidget(decimals: number): UIInputText {
+  private createTipWidget(decimals: number, config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
       id: 'tip',
       inputType: 'number',
       label: 'Tip',
       placeholder: '0.0',
       defaultValue: '0.0',
-      createExtraLabel: (value: string) => `$${new BigNumber(value || 0).multipliedBy(this.wallet.currentMarketPrice).toFixed(2)}`,
-      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString()
+      createExtraLabel: (value: string, wallet?: AirGapMarketWallet) =>
+        wallet ? `$${new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice).toFixed(2)}` : '',
+      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString(),
+      ...config
     })
   }
 
-  private createPayeeWidget(defaultOption?: PolkadotRewardDestination): UISelect {
+  private createPayeeWidget(config: Partial<UISelectConfig> = {}): UISelect {
     return new UISelect({
       id: 'payee',
       label: 'Reward destination',
@@ -205,134 +242,62 @@ export class PolkadotDelegationExtensionFunctionsProvider {
         [PolkadotRewardDestination.Stash, 'Stash'],
         [PolkadotRewardDestination.Controller, 'Controller']
       ],
-      defaultOption: defaultOption || PolkadotRewardDestination.Staked
-    })
-  }
-
-  private createKeepControllerWidget(): UICheckbox {
-    return new UICheckbox({
-      id: 'keepController',
-      label: 'Keep Controller',
-      defaultValue: true
-    })
-  }
-
-  private createControllerWidget(): UIInputText {
-    return new UIInputText({
-      id: 'controller',
-      inputType: 'string',
-      label: 'Controller'
+      defaultOption: PolkadotRewardDestination.Staked,
+      ...config
     })
   }
 
   private async createExtraDetails(protocol: PolkadotProtocol, address: PolkadotAddress): Promise<UIWidget[]> {
     const extraDetails = []
 
-    const results = await Promise.all([protocol.nodeClient.getRewardDestination(address), protocol.nodeClient.getBonded(address)])
+    const results = await Promise.all([
+      protocol.accountController.isNominating(address),
+      protocol.accountController.getStakingInfo(address)
+    ])
+    const isNominating = results[0]
+    const stakingInfo = results[1]
 
-    const payee = results[0]
-    if (payee !== null) {
-      extraDetails.push(...(await this.createRewardDetailsWidgets(payee)))
-    }
-
-    const controller = results[1]
-    if (controller) {
-      extraDetails.push(...(await this.createStakingDetails(protocol, address, controller)))
+    if (stakingInfo) {
+      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, isNominating, stakingInfo)))
     }
 
     return extraDetails
   }
 
-  private async createRewardDetailsWidgets(payee: PolkadotRewardDestination): Promise<UIWidget[]> {
-    let details = []
-
-    let rewardDestination = ''
-    switch (payee) {
-      case PolkadotRewardDestination.Staked:
-        rewardDestination = 'Staked'
-        break
-      case PolkadotRewardDestination.Stash:
-        rewardDestination = 'Stash'
-        break
-      case PolkadotRewardDestination.Controller:
-        rewardDestination = 'Controller'
-        break
-    }
-
-    details.push(
-      new UIIconText({
-        iconName: 'logo-usd',
-        text: rewardDestination,
-        description: 'Reward Destination'
-      })
-    )
-
-    return details
-  }
-
-  private async createStakingDetails(
-    protocol: PolkadotProtocol,
-    address: PolkadotAddress,
-    controller: PolkadotAddress
-  ): Promise<UIWidget[]> {
-    const details = []
-
-    const stakingResults = await Promise.all([
-      protocol.accountController.isNominating(address.toString()),
-      protocol.nodeClient.getLedger(controller)
-    ])
-    const isNominating = stakingResults[0]
-    const stakingLedger = stakingResults[1]
-
-    if (stakingLedger) {
-      details.push(...(await this.createStakingLedgerDetailsWidgets(protocol, isNominating, stakingLedger)))
-    }
-
-    details.push(
-      new UIAccount({
-        address: controller.toString(),
-        description: 'Controller',
-        abbreviateAddress: true,
-        abbreviationStart: 9,
-        abbreviationEnd: 9
-      })
-    )
-
-    return details
-  }
-
-  private async createStakingLedgerDetailsWidgets(
+  private async createStakingDetailsWidgets(
     protocol: PolkadotProtocol,
     isNominating: boolean,
-    stakingLedger: PolkadotStakingLedger
+    stakingInfo: PolkadotStakingInfo
   ): Promise<UIWidget[]> {
     const details = []
-
-    const totalBonded = stakingLedger.total.value
-    const activeBonded = stakingLedger.active.value
-
-    if (totalBonded.eq(activeBonded)) {
+    if (stakingInfo.total.eq(stakingInfo.active)) {
       details.push(
         new UIIconText({
-          iconName: 'wallet',
-          text: `${totalBonded.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          iconName: 'contacts',
+          text: `${stakingInfo.total.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
           description: isNominating ? 'Delegated' : 'Bonded'
         })
       )
-    } else {
+    } else if (stakingInfo.total.eq(stakingInfo.locked)) {
       details.push(
         new UIIconText({
-          iconName: 'wallet',
-          text: `${stakingLedger ? stakingLedger.active.value.shiftedBy(-protocol.decimals).toString() : '-'} ${protocol.marketSymbol}`,
-          description: isNominating ? 'Active Delegated' : 'Active Bonded'
+          iconName: 'contacts',
+          text: `${stakingInfo.locked.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          description: 'Locked'
+        }),
+        // TODO: get estimated time/blocks
+        new UIIconText({
+          iconName: 'alarm',
+          text: '-',
+          description: 'Until ready to withdraw'
         })
       )
-
+    } else if (stakingInfo.unlocked.gt(0)) {
       details.push(
         new UIIconText({
-          iconName: 'wallet',
-          text: `${stakingLedger ? stakingLedger.total.value.shiftedBy(-protocol.decimals).toString() : '-'} ${protocol.marketSymbol}`,
-          description: isNominating ? 'Total Delegated' : 'Total Bonded'
+          iconName: 'contacts',
+          text: `${stakingInfo.unlocked.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          description: 'Ready to withdraw'
         })
       )
     }

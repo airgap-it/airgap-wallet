@@ -13,13 +13,14 @@ import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/de
 import { FormGroup, FormBuilder } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { LoadingController, PopoverController } from '@ionic/angular'
+import { LoadingController, PopoverController, NavController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
+import { UIInputWidget } from 'src/app/models/widgets/UIWidget'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -53,6 +54,7 @@ export class DelegationDetailPage {
   private loader: HTMLIonLoadingElement | undefined
   constructor(
     private readonly router: Router,
+    private readonly navController: NavController,
     private readonly dataService: DataService,
     private readonly operations: OperationsProvider,
     private readonly extensionsService: ExtensionsService,
@@ -99,6 +101,11 @@ export class DelegationDetailPage {
   }
 
   public async callAction(): Promise<void> {
+    if (this.activeDelegatorAction === undefined || this.activeDelegatorAction === null) {
+      this.navController.back()
+      return
+    }
+
     this.loader = await this.loadingController.create({
       message: 'Preparing transaction...'
     })
@@ -230,12 +237,8 @@ export class DelegationDetailPage {
         if (action.paramName) {
           args[action.paramName] = this.delegateeAddresses$.value
         }
-        if (action.extraArgs) {
-          action.extraArgs.forEach(arg => {
-            args[arg.id] = form ? form.value[arg.id] : null
-            args[arg.controlName] = form ? form.value[arg.controlName] : null
-          })
-        }
+
+        Object.assign(args, this.setupArgsForms(action.extraArgs || [], form))
 
         if (form) {
           form.setValue(args)
@@ -252,12 +255,7 @@ export class DelegationDetailPage {
     extraActions.forEach(action => {
       if (action.args) {
         const form = this.delegationForms[action.type]
-        const args = {}
-        action.args.forEach(arg => {
-          args[arg.id] = form ? form.value[arg.id] : null
-          args[arg.controlName] = form ? form.value[arg.controlName] : null
-        })
-
+        const args = this.setupArgsForms(action.args || [], form)
         if (form) {
           form.setValue(args)
         } else {
@@ -265,6 +263,19 @@ export class DelegationDetailPage {
         }
       }
     })
+  }
+
+  private setupArgsForms(args: UIInputWidget<any>[], form: FormGroup): any {
+    const formArgs = {}
+
+    args.forEach(arg => {
+      formArgs[arg.id] = form ? form.value[arg.id] : null
+      formArgs[arg.controlName] = form ? form.value[arg.controlName] : null
+
+      arg.wallet = this.wallet
+    })
+
+    return formArgs
   }
 
   private setActiveDelegatorAction(details: AirGapDelegatorDetails) {

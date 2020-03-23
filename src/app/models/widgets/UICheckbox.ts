@@ -1,6 +1,6 @@
 import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
 
-interface UICheckboxConfig extends UIInputWidgetConfig {
+export interface UICheckboxConfig extends UIInputWidgetConfig {
   label: string
   defaultValue?: boolean
 }

@@ -1,6 +1,6 @@
-import { UIWidget, UIWidgetType } from './UIWidget'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from './UIWidget'
 
-export interface UIAccountConfig {
+export interface UIAccountConfig extends UIWidgetConfig {
   name?: string
   address: string
   description?: string
@@ -22,7 +22,7 @@ export class UIAccount extends UIWidget {
   }
 
   constructor(config: UIAccountConfig) {
-    super()
+    super(config)
 
     this.name = config.name
     this.address = config.address

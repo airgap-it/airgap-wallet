@@ -34,6 +34,7 @@ export interface AirGapDelegateeDetails extends DelegateeDetails {
 export interface AirGapDelegatorDetails extends DelegatorDetails {
   delegateAction: AirGapMainDelegatorAction
   undelegateAction: AirGapMainDelegatorAction
+  changeDelegateeAction: AirGapMainDelegatorAction
   extraActions?: AirGapExtraDelegatorAction[]
   extraDetails?: UIWidget[]
 }
