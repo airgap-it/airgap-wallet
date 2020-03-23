@@ -10,6 +10,7 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 enum ExchangePageState {
   LOADING,
@@ -39,8 +40,8 @@ export class ExchangePage {
 
   get isTZBTCExchange(): boolean {
     return (
-      (this.selectedFromProtocol !== undefined && this.selectedFromProtocol.identifier === 'xtz-btc') ||
-      (this.selectedToProtocol !== undefined && this.selectedToProtocol.identifier == 'xtz-btc')
+      (this.selectedFromProtocol !== undefined && this.selectedFromProtocol.identifier === ProtocolSymbols.TZBTC) ||
+      (this.selectedToProtocol !== undefined && this.selectedToProtocol.identifier === ProtocolSymbols.TZBTC)
     )
   }
 
@@ -75,8 +76,8 @@ export class ExchangePage {
           (!filterZeroBalance || (filterZeroBalance && wallet.currentBalance.isGreaterThan(0)))
       )
     )
-    const tzbtcIndex = result.indexOf('xtz-btc')
-    if (tzbtcIndex !== -1 && !walletList.some(wallet => wallet.protocolIdentifier === 'btc')) {
+    const tzbtcIndex = result.indexOf(ProtocolSymbols.TZBTC)
+    if (tzbtcIndex !== -1 && !walletList.some(wallet => wallet.protocolIdentifier === ProtocolSymbols.BTC)) {
       result.splice(tzbtcIndex, 1)
     }
     return result
@@ -116,17 +117,17 @@ export class ExchangePage {
 
   private async getSupportedFromProtocols(): Promise<string[]> {
     const fromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
-    fromProtocols.push('xtz-btc')
+    fromProtocols.push(ProtocolSymbols.TZBTC)
     return this.filterValidProtocols(fromProtocols)
   }
 
   private async getSupportedToProtocols(from: string): Promise<string[]> {
-    if (from === 'xtz-btc') {
-      return this.filterValidProtocols(['btc'])
+    if (from === ProtocolSymbols.TZBTC) {
+      return this.filterValidProtocols([ProtocolSymbols.BTC])
     }
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
-    if (from === 'btc') {
-      toProtocols.push('xtz-btc')
+    if (from === ProtocolSymbols.BTC) {
+      toProtocols.push(ProtocolSymbols.TZBTC)
     }
     return this.filterValidProtocols(toProtocols)
   }
