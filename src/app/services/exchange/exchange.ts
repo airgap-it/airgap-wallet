@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http'
 import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { ExchangeCustomService } from '../exchange-custom/exchange-custom.service'
 import { Injectable } from '@angular/core'
 import { StorageProvider, SettingsKey } from '../storage/storage'
 
@@ -46,19 +45,15 @@ export class ExchangeProvider implements Exchange {
 
   private pendingTransactions: ExchangeTransaction[] = []
 
-  constructor(
-    public http: HttpClient,
-    private readonly exchangeCustomService: ExchangeCustomService,
-    private readonly storageProvider: StorageProvider
-  ) {
+  constructor(public http: HttpClient, private readonly storageProvider: StorageProvider) {
     this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
         case ExchangeEnum.CHANGELLY:
-          this.exchange = new ChangellyExchange(this.http, this.exchangeCustomService)
+          this.exchange = new ChangellyExchange(this.http)
           break
         case ExchangeEnum.CHANGENOW:
-          this.exchange = new ChangeNowExchange(this.http, this.exchangeCustomService)
+          this.exchange = new ChangeNowExchange(this.http)
           break
       }
     })
@@ -95,9 +90,9 @@ export class ExchangeProvider implements Exchange {
   public getStatusForTransaction(transaction: ExchangeTransaction): Promise<ExchangeTransactionStatusResponse> {
     switch (transaction.exchange) {
       case ExchangeEnum.CHANGELLY:
-        return new ChangellyExchange(this.http, this.exchangeCustomService).getStatus(transaction.id)
+        return new ChangellyExchange(this.http).getStatus(transaction.id)
       case ExchangeEnum.CHANGENOW:
-        return new ChangeNowExchange(this.http, this.exchangeCustomService).getStatus(transaction.id)
+        return new ChangeNowExchange(this.http).getStatus(transaction.id)
     }
   }
 

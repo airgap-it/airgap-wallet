@@ -1,5 +1,5 @@
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
-import { ModalController } from '@ionic/angular'
+import { ModalController, LoadingController } from '@ionic/angular'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
@@ -17,9 +17,6 @@ enum ExchangePageState {
   NOT_ENOUGH_CURRENCIES,
   EXCHANGE
 }
-
-const FROM = 'from'
-const TO = 'to'
 
 @Component({
   selector: 'page-exchange',
@@ -39,7 +36,13 @@ export class ExchangePage {
   public minExchangeAmount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
   public activeExchange: string
-  public customExchange: boolean
+
+  get isTZBTCExchange(): boolean {
+    return (
+      (this.selectedFromProtocol !== undefined && this.selectedFromProtocol.identifier === 'xtz-btc') ||
+      (this.selectedToProtocol !== undefined && this.selectedToProtocol.identifier == 'xtz-btc')
+    )
+  }
 
   public exchangePageStates = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
@@ -50,6 +53,7 @@ export class ExchangePage {
     private readonly storageProvider: StorageProvider,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
+    private readonly loadingController: LoadingController,
 
     private readonly modalController: ModalController
   ) {
@@ -59,115 +63,127 @@ export class ExchangePage {
   }
 
   public async ionViewWillEnter() {
-    if (this.exchangePageState === ExchangePageState.LOADING || this.exchangePageState === ExchangePageState.NOT_ENOUGH_CURRENCIES) {
-      this.initExchangePage()
-    } else {
-      const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
-      this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
-      await this.loadWalletsForSelectedProtocol(FROM)
-      const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
-      this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
-      await this.loadWalletsForSelectedProtocol(TO)
-      this.protocolSet('from', getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
-    }
+    this.setup()
   }
 
-  public async filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
+  private filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): string[] {
     const walletList = this.accountProvider.getWalletList()
-    return protocols.filter(supportedProtocol =>
+    const result = protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
           wallet.protocolIdentifier === supportedProtocol &&
           (!filterZeroBalance || (filterZeroBalance && wallet.currentBalance.isGreaterThan(0)))
       )
     )
+    const tzbtcIndex = result.indexOf('xtz-btc')
+    if (tzbtcIndex !== -1 && !walletList.some(wallet => wallet.protocolIdentifier === 'btc')) {
+      result.splice(tzbtcIndex, 1)
+    }
+    return result
   }
 
-  public async initExchangePage(): Promise<void> {
-    const supportedProtocolsFrom = await this.exchangeProvider.getAvailableFromCurrencies()
-    this.supportedProtocolsFrom = await this.filterValidProtocols(supportedProtocolsFrom)
-
-    if (this.supportedProtocolsFrom.length === 0) {
+  async setup() {
+    const fromProtocols = await this.getSupportedFromProtocols()
+    if (fromProtocols.length === 0) {
+      this.supportedProtocolsFrom = []
+      this.supportedProtocolsTo = []
+      this.selectedFromProtocol = undefined
+      this.selectedToProtocol = undefined
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
-
       return
     }
+    this.supportedProtocolsFrom = fromProtocols
+    let currentFromProtocol: string
+    if (this.selectedFromProtocol !== undefined) {
+      currentFromProtocol = this.selectedFromProtocol.identifier
+    } else {
+      currentFromProtocol = fromProtocols[0]
+    }
+    await this.setFromProtocol(getProtocolByIdentifier(currentFromProtocol))
 
-    await this.protocolSet(FROM, getProtocolByIdentifier(this.supportedProtocolsFrom[0]))
+    if (this.exchangePageState === ExchangePageState.LOADING) {
+      const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
+      if (!hasShownOnboarding) {
+        this.exchangePageState = ExchangePageState.ONBOARDING
+        return
+      }
+    }
 
+    if (this.supportedProtocolsFrom.length > 0 && this.supportedProtocolsTo.length > 0) {
+      this.exchangePageState = ExchangePageState.EXCHANGE
+    }
+  }
+
+  private async getSupportedFromProtocols(): Promise<string[]> {
+    const fromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
+    fromProtocols.push('xtz-btc')
+    return this.filterValidProtocols(fromProtocols)
+  }
+
+  private async getSupportedToProtocols(from: string): Promise<string[]> {
+    if (from === 'xtz-btc') {
+      return this.filterValidProtocols(['btc'])
+    }
+    const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
+    if (from === 'btc') {
+      toProtocols.push('xtz-btc')
+    }
+    return this.filterValidProtocols(toProtocols)
+  }
+
+  async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
+    this.selectedFromProtocol = protocol
+    this.supportedProtocolsTo = await this.getSupportedToProtocols(protocol.identifier)
     if (this.supportedProtocolsTo.length === 0) {
+      this.supportedProtocolsFrom = []
+      this.supportedProtocolsTo = []
+      this.selectedFromProtocol = undefined
+      this.selectedToProtocol = undefined
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
-
       return
     }
 
-    const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
-
-    if (!hasShownOnboarding) {
-      this.exchangePageState = ExchangePageState.ONBOARDING
-
-      return
+    if (
+      this.selectedToProtocol === undefined ||
+      this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
+      !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
+    ) {
+      const toProtocol = getProtocolByIdentifier(this.supportedProtocolsTo[0])
+      this.selectedToProtocol = toProtocol
+      this.loadWalletsForSelectedToProtocol()
     }
 
-    this.exchangePageState = ExchangePageState.EXCHANGE
+    this.loadWalletsForSelectedFromProtocol()
+    this.loadDataFromExchange()
   }
 
-  public async protocolSet(fromOrTo: string, protocol: ICoinProtocol): Promise<void> {
-    if (fromOrTo === FROM) {
-      this.selectedFromProtocol = protocol
-    } else {
-      this.selectedToProtocol = protocol
-      this.customExchange = protocol.identifier === 'xtz-btc' ? true : false
-    }
-
-    if (fromOrTo === FROM) {
-      const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
-      this.supportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
-
-      if (this.selectedFromProtocol && this.selectedFromProtocol.identifier === 'btc') {
-        this.supportedProtocolsTo.push('xtz-btc')
-      }
-
-      if (
-        !this.selectedToProtocol ||
-        this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
-        !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
-      ) {
-        if (this.supportedProtocolsTo.length > 0) {
-          this.protocolSet(TO, getProtocolByIdentifier(this.supportedProtocolsTo[0]))
-        } else {
-          this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
-
-          return
-        }
-      }
-    }
-
-    await this.loadWalletsForSelectedProtocol(fromOrTo)
-
-    return this.loadDataFromExchange()
+  async setToProtocol(protocol: ICoinProtocol): Promise<void> {
+    this.selectedToProtocol = protocol
+    this.loadWalletsForSelectedToProtocol()
+    this.loadDataFromExchange()
   }
 
-  public async loadWalletsForSelectedProtocol(fromOrTo: string) {
-    if (fromOrTo === FROM) {
-      this.supportedFromWallets = this.accountProvider
-        .getWalletList()
-        .filter(wallet => wallet.protocolIdentifier === this.selectedFromProtocol.identifier && wallet.currentBalance.isGreaterThan(0))
+  loadWalletsForSelectedFromProtocol() {
+    this.supportedFromWallets = this.walletsForProtocol(this.selectedFromProtocol.identifier, true)
+    // Only set wallet if it's another protocol or not available
+    if (this.shouldReplaceActiveWallet(this.fromWallet, this.supportedFromWallets)) {
+      this.fromWallet = this.supportedFromWallets[0]
+    }
+  }
 
-      // Only set wallet if it's another protocol or not available
-      if (this.shouldReplaceActiveWallet(this.fromWallet, this.supportedFromWallets)) {
-        this.fromWallet = this.supportedFromWallets[0]
-      }
-    } else {
-      this.supportedToWallets = this.accountProvider
-        .getWalletList()
-        .filter(wallet => wallet.protocolIdentifier === this.selectedToProtocol.identifier)
+  loadWalletsForSelectedToProtocol() {
+    this.supportedToWallets = this.walletsForProtocol(this.selectedToProtocol.identifier, false)
+    this.toWallet = this.supportedToWallets[0]
+    // Only set wallet if it's another protocol or not available
+    if (this.shouldReplaceActiveWallet(this.toWallet, this.supportedToWallets)) {
       this.toWallet = this.supportedToWallets[0]
-      // Only set wallet if it's another protocol or not available
-      if (this.shouldReplaceActiveWallet(this.toWallet, this.supportedToWallets)) {
-        this.toWallet = this.supportedToWallets[0]
-      }
     }
+  }
+
+  private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
+    return this.accountProvider
+      .getWalletList()
+      .filter(wallet => wallet.protocolIdentifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
@@ -178,13 +194,13 @@ export class ExchangePage {
     )
   }
 
-  public async walletSet(fromOrTo: string, wallet: AirGapMarketWallet) {
-    if (fromOrTo === FROM) {
-      this.fromWallet = wallet
-    } else {
-      this.toWallet = wallet
-    }
+  async setFromWallet(wallet: AirGapMarketWallet) {
+    this.fromWallet = wallet
+    this.loadDataFromExchange()
+  }
 
+  async setToWallet(wallet: AirGapMarketWallet) {
+    this.toWallet = wallet
     this.loadDataFromExchange()
   }
 
@@ -196,27 +212,40 @@ export class ExchangePage {
 
   public async loadDataFromExchange() {
     if (this.fromWallet && this.toWallet) {
-      this.minExchangeAmount = new BigNumber(
-        await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocolIdentifier, this.toWallet.protocolIdentifier)
-      )
+      this.minExchangeAmount = await this.getMinAmountForCurrency()
     }
     if (this.fromWallet && this.toWallet && this.amount.isGreaterThan(0)) {
-      this.exchangeAmount = new BigNumber(
-        await this.exchangeProvider.getExchangeAmount(
-          this.fromWallet.protocolIdentifier,
-          this.toWallet.protocolIdentifier,
-          this.amount.toString()
-        )
-      )
+      this.exchangeAmount = new BigNumber(await this.getExchangeAmount())
     } else {
       this.exchangeAmount = new BigNumber(0)
     }
   }
 
+  private async getMinAmountForCurrency(): Promise<BigNumber> {
+    if (this.isTZBTCExchange) {
+      return new BigNumber(0)
+    }
+    return new BigNumber(
+      await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocolIdentifier, this.toWallet.protocolIdentifier)
+    )
+  }
+
+  private async getExchangeAmount(): Promise<string> {
+    if (this.isTZBTCExchange) {
+      return this.amount.toFixed()
+    }
+    return await this.exchangeProvider.getExchangeAmount(
+      this.fromWallet.protocolIdentifier,
+      this.toWallet.protocolIdentifier,
+      this.amount.toString()
+    )
+  }
+
   public async startExchange() {
-    if (this.toWallet.protocolIdentifier === 'xtz-btc') {
+    if (this.isTZBTCExchange) {
       this.router.navigateByUrl('/exchange-custom').catch(handleErrorSentry(ErrorCategory.STORAGE))
     } else {
+      const loader = await this.getAndShowLoader()
       try {
         const result = await this.exchangeProvider.createTransaction(
           this.fromWallet.protocolIdentifier,
@@ -225,11 +254,7 @@ export class ExchangePage {
           this.amount.toString()
         )
 
-        const amountExpectedTo = await this.exchangeProvider.getExchangeAmount(
-          this.fromWallet.protocolIdentifier,
-          this.toWallet.protocolIdentifier,
-          this.amount.toString()
-        )
+        const amountExpectedTo = await this.getExchangeAmount()
         const info = {
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocolIdentifier,
@@ -262,6 +287,8 @@ export class ExchangePage {
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
       } catch (error) {
         console.error(error)
+      } finally {
+        this.hideLoader(loader)
       }
     }
   }
@@ -283,15 +310,15 @@ export class ExchangePage {
         fromCurrencies = this.exchangeProvider.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
         if (!fromCurrencies.includes(this.selectedFromProtocol.identifier)) {
           this.selectedFromProtocol = getProtocolByIdentifier(this.supportedProtocolsFrom[0])
-          await this.loadWalletsForSelectedProtocol('from')
+          this.loadWalletsForSelectedFromProtocol()
         }
         let toCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
         toCurrencies = this.exchangeProvider.convertExchangeIdentifierToAirGapIdentifier(toCurrencies)
         if (!toCurrencies.includes(this.selectedToProtocol.identifier)) {
           const supportedProtocolsTo = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(this.selectedFromProtocol.identifier)
-          const filteredSupportedProtocolsTo = await this.filterValidProtocols(supportedProtocolsTo, false)
+          const filteredSupportedProtocolsTo = this.filterValidProtocols(supportedProtocolsTo, false)
           this.selectedToProtocol = getProtocolByIdentifier(filteredSupportedProtocolsTo.slice(-1).pop())
-          await this.loadWalletsForSelectedProtocol('to')
+          this.loadWalletsForSelectedToProtocol()
         }
         this.loadDataFromExchange()
       })
@@ -299,11 +326,25 @@ export class ExchangePage {
   }
 
   public dismissExchangeOnboarding() {
-    this.initExchangePage()
+    this.setup()
     this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
   public goToAddCoinPage() {
     this.router.navigateByUrl('/account-add')
+  }
+
+  private async getAndShowLoader() {
+    const loader = await this.loadingController.create({
+      message: 'Preparing transaction...'
+    })
+
+    await loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+
+    return loader
+  }
+
+  private hideLoader(loader: HTMLIonLoadingElement) {
+    loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
   }
 }

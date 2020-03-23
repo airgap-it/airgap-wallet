@@ -64,7 +64,7 @@
   ></address-row>
 
   <ion-row *ngIf="activeExchange === 'Changelly'" class="ion-padding ion-margin-vertical" (click)="changellyUrl()">
-    <small [innerHTML]="'exchange-confirm.changelly_d' | translate"></small>
+    <small [innerHTML]="'exchange-confirm.changelly_disclaimer' | translate"></small>
   </ion-row>
 
   <ion-row *ngIf="activeExchange === 'ChangeNow'" class="ion-padding ion-margin-vertical" (click)="changeNowUrl()">

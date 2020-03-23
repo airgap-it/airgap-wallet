@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
-import { CustomEnum, ExchangeCustomService } from '../exchange-custom/exchange-custom.service'
 
 export interface CreateTransactionResponse {
   amountExpectedFrom: string
@@ -63,11 +62,7 @@ class ChangellyApi {
   private identifierExchangeToAirGapMap = new Map<string, string>()
   private identifierAirGapToExchangeMap = new Map<string, string>()
 
-  constructor(
-    public http: HttpClient,
-    public exchangeCustomService: ExchangeCustomService,
-    private baseURL = 'https://swap.airgap.prod.gke.papers.tech/'
-  ) {
+  constructor(public http: HttpClient, private baseURL = 'https://swap.airgap.prod.gke.papers.tech/') {
     this.identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
     this.identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
   }
@@ -111,9 +106,6 @@ class ChangellyApi {
   getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-    if (fromCurrency.toLowerCase() === 'xtz-btc' || toCurrency.toLowerCase() === 'xtz-btc') {
-      return this.exchangeCustomService.customLogicTZBTC(CustomEnum.MIN_AMOUNT)
-    }
     const method = 'getMinAmount'
     const params = {
       from: fromCurrency,
@@ -125,13 +117,6 @@ class ChangellyApi {
   getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-
-    if (fromCurrency.toLowerCase() === 'xtz-btc') {
-      return this.exchangeCustomService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_FROM, amount)
-    }
-    if (toCurrency.toLowerCase() === 'xtz-btc') {
-      return this.exchangeCustomService.customLogicTZBTC(CustomEnum.EXCHANGE_AMOUNT_TO, amount)
-    }
     const method = 'getExchangeAmount'
     const params = {
       from: fromCurrency,
@@ -177,17 +162,12 @@ class ChangellyApi {
 }
 
 export class ChangellyExchange extends ChangellyApi implements Exchange {
-  constructor(public http: HttpClient, public exchangeCustomService: ExchangeCustomService) {
-    super(http, exchangeCustomService)
+  constructor(public http: HttpClient) {
+    super(http)
   }
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
-    const fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([selectedFrom])[0]
     const availableCurrencies = await this.getAvailableFromCurrencies()
-
-    if (fromCurrency.toLowerCase() === 'xtz-btc') {
-      return this.exchangeCustomService.customLogicTZBTC(CustomEnum.AVAILABLE_TO_CURRENCY)
-    }
     return availableCurrencies.filter(availableCurrency => availableCurrency !== selectedFrom)
   }
 }

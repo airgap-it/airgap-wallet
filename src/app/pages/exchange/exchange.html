@@ -43,8 +43,8 @@
       [supportedProtocols]="supportedProtocolsFrom"
       [exchangeAmount]="amount"
       [minExchangeAmount]="minExchangeAmount"
-      (protocolSetEmitter)="protocolSet('from', $event)"
-      (walletSetEmitter)="walletSet('from', $event)"
+      (protocolSetEmitter)="setFromProtocol($event)"
+      (walletSetEmitter)="setFromWallet($event)"
       (amountSetEmitter)="amountSet($event)"
     ></swap>
     <swap
@@ -53,12 +53,12 @@
       [selectedProtocol]="selectedToProtocol"
       [supportedProtocols]="supportedProtocolsTo"
       [exchangeAmount]="exchangeAmount"
-      (protocolSetEmitter)="protocolSet('to', $event)"
-      (walletSetEmitter)="walletSet('to', $event)"
+      (protocolSetEmitter)="setToProtocol($event)"
+      (walletSetEmitter)="setToWallet($event)"
       [swapSell]="false"
     ></swap>
     <div class="divider--line"></div>
-    <ion-row class="ion-padding" *ngIf="!customExchange">
+    <ion-row class="ion-padding" *ngIf="!isTZBTCExchange">
       <ion-col class="ion-no-padding">
         <ion-row class="powered__container ion-align-items-center">
           <ion-text color="blackLight">
