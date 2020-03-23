@@ -40,6 +40,7 @@ export interface AirGapDelegatorDetails extends DelegatorDetails {
 }
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
+  airGapDelegatee: string
   delegateeLabel: string
   getExtraDelegateesDetails(addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
   getExtraDelegatorDetailsFromAddress(address: string): Promise<Partial<AirGapDelegatorDetails>>

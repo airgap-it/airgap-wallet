@@ -46,7 +46,11 @@ export class OperationsProvider {
   public async getCurrentDelegatees(protocol: ICoinDelegateProtocol, address: string): Promise<string[]> {
     const current = await protocol.getCurrentDelegateesForAddress(address)
     if (current.length === 0) {
-      return [await protocol.getDefaultDelegatee()]
+      let defaultDelegatee: string
+      if (supportsAirGapDelegation(protocol)) {
+        defaultDelegatee = protocol.airGapDelegatee
+      }
+      return [defaultDelegatee || (await protocol.getDefaultDelegatee())]
     }
     return current
   }

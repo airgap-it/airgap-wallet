@@ -76,6 +76,9 @@ export class DelegationDetailPage {
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
       component: DelegateEditPopoverComponent,
       componentProps: {
+        hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
+          ? this.delegateeAddresses$.value.includes(this.wallet.coinProtocol.airGapDelegatee)
+          : true,
         delegateeLabel: this.delegateeLabel
       },
       event,
@@ -86,11 +89,17 @@ export class DelegationDetailPage {
       return value instanceof Object && 'delegateeAddress' in value
     }
 
+    function isChangeToAirGapObject(value: unknown): value is { changeToAirGap: boolean } {
+      return value instanceof Object && 'changeToAirGap' in value
+    }
+
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
         if (isDelegateeAddressObject(data)) {
-          this.delegateeAddresses$.next([data.delegateeAddress]) // TODO: support multiple entries
+          this.changeDelegatees([data.delegateeAddress]) // TODO: support multiple entries
+        } else if (isChangeToAirGapObject(data) && supportsAirGapDelegation(this.wallet.coinProtocol)) {
+          this.changeDelegatees([this.wallet.coinProtocol.airGapDelegatee])
         } else {
           console.log('Did not receive valid delegatee address object')
         }
@@ -106,47 +115,24 @@ export class DelegationDetailPage {
       return
     }
 
-    this.loader = await this.loadingController.create({
-      message: 'Preparing transaction...'
-    })
-
-    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
-
-    try {
-      const delegatorDetails = this.delegatorDetails$.value
-      if (!delegatorDetails) {
-        return
-      }
-
-      let actionType: any
-      switch (this.activeDelegatorAction) {
-        case this.delegateActionId:
-          actionType = delegatorDetails.delegateAction.type
-          break
-        case this.undelegateActionId:
-          actionType = delegatorDetails.undelegateAction.type
-          break
-        default:
-          actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
-      }
-
-      const data = this.delegationForms[actionType].value
-      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
-
-      const info = {
-        wallet: this.wallet,
-        airGapTxs,
-        data: serializedTxChunks
-      }
-
-      this.dismissLoader()
-
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } catch (error) {
-      this.dismissLoader()
-      console.log(error)
+    const delegatorDetails = this.delegatorDetails$.value
+    if (!delegatorDetails) {
+      return
     }
+
+    let actionType: any
+    switch (this.activeDelegatorAction) {
+      case this.delegateActionId:
+        actionType = delegatorDetails.delegateAction.type
+        break
+      case this.undelegateActionId:
+        actionType = delegatorDetails.undelegateAction.type
+        break
+      default:
+        actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
+    }
+
+    this.prepareDelegationAction(actionType)
   }
 
   public onActiveActionChange() {
@@ -228,7 +214,7 @@ export class DelegationDetailPage {
   }
 
   private setupMainActionsForms(details: AirGapDelegatorDetails) {
-    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction]
+    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction, details.changeDelegateeAction]
 
     mainActions.forEach(action => {
       if (action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs)) {
@@ -290,6 +276,50 @@ export class DelegationDetailPage {
 
       this.activeDelegatorAction = activeAction ? activeAction.type : null
       this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel : null
+    }
+  }
+
+  private changeDelegatees(addresses: string[]) {
+    const delegatorDetails = this.delegatorDetails$.value
+    if (!delegatorDetails.isDelegating) {
+      this.delegateeAddresses$.next(addresses)
+    } else if (delegatorDetails.changeDelegateeAction.isAvailable) {
+      const action = delegatorDetails.changeDelegateeAction
+      if (action.paramName) {
+        this.delegationForms[action.type].patchValue({
+          [action.paramName]: addresses
+        })
+      }
+      this.prepareDelegationAction(action.type)
+    } else {
+      // TODO: show error
+    }
+  }
+
+  private async prepareDelegationAction(actionType: any): Promise<void> {
+    this.loader = await this.loadingController.create({
+      message: 'Preparing transaction...'
+    })
+
+    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+
+    try {
+      const data = this.delegationForms[actionType].value
+      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+
+      const info = {
+        wallet: this.wallet,
+        airGapTxs,
+        data: serializedTxChunks
+      }
+
+      this.dismissLoader()
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    } catch (error) {
+      this.dismissLoader()
+      console.log(error)
     }
   }
 

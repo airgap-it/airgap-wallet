@@ -11,6 +11,9 @@ export class PolkadotDelegationExtensions {
   }
 
   @extensionProperty(PolkadotProtocol)
+  static airGapDelegatee: string = ''
+
+  @extensionProperty(PolkadotProtocol)
   static delegateeLabel: string = 'Validator'
 
   @extensionFunction(PolkadotProtocol)

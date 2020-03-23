@@ -197,8 +197,8 @@ export class DelegationBakerDetailPage {
       translucent: true
     })
 
-    function isBakerAddressObject(value: unknown): value is { delegateeAddress: string } {
-      return value instanceof Object && 'delegateeAddress' in value
+    function isBakerAddressObject(value: unknown): value is { bakerAddress: string } {
+      return value instanceof Object && 'bakerAddress' in value
     }
 
     function isChangeToAirGapObject(value: unknown): value is { changeToAirGap: boolean } {
@@ -209,8 +209,8 @@ export class DelegationBakerDetailPage {
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
         if (isBakerAddressObject(data)) {
-          console.log(data.delegateeAddress)
-          await this.setBaker({ address: data.delegateeAddress })
+          console.log(data.bakerAddress)
+          await this.setBaker({ address: data.bakerAddress })
         } else if (isChangeToAirGapObject(data) && data.changeToAirGap) {
           await this.setBaker(this.airGapBaker)
         } else {
