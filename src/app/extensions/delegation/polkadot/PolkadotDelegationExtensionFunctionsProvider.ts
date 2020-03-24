@@ -14,6 +14,7 @@ import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/UIInputTe
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { PolkadotStakingInfo } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingLedger'
 import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
+import * as moment from 'moment'
 
 export class PolkadotDelegationExtensionFunctionsProvider {
   private readonly supportedActions = [
@@ -270,6 +271,7 @@ export class PolkadotDelegationExtensionFunctionsProvider {
     stakingInfo: PolkadotStakingInfo
   ): Promise<UIWidget[]> {
     const details = []
+
     if (stakingInfo.total.eq(stakingInfo.active)) {
       details.push(
         new UIIconText({
@@ -278,18 +280,19 @@ export class PolkadotDelegationExtensionFunctionsProvider {
           description: isNominating ? 'Delegated' : 'Bonded'
         })
       )
-    } else if (stakingInfo.total.eq(stakingInfo.locked)) {
+    } else if (stakingInfo.locked.length > 0) {
+      const nextUnlocking = stakingInfo.locked.sort((a, b) => a.expectedUnlock.minus(b.expectedUnlock))[0]
+      const unlockingDate = new Date(nextUnlocking.expectedUnlock.toNumber())
       details.push(
         new UIIconText({
           iconName: 'contacts',
-          text: `${stakingInfo.locked.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          text: `${nextUnlocking.value.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
           description: 'Locked'
         }),
-        // TODO: get estimated time/blocks
         new UIIconText({
           iconName: 'alarm',
-          text: '-',
-          description: 'Until ready to withdraw'
+          text: `${moment(unlockingDate).fromNow()} (${moment(unlockingDate).format('LLL')})`,
+          description: 'Ready to withdraw'
         })
       )
     } else if (stakingInfo.unlocked.gt(0)) {
