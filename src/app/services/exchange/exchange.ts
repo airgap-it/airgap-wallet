@@ -191,7 +191,6 @@ export class ExchangeProvider implements Exchange {
         }
       })
       .map(result => result.transaction)
-
     return this.formatExchangeTxs(transactions, protocolidentifier)
   }
 }
