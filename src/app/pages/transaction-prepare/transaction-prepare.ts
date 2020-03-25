@@ -242,11 +242,11 @@ export class TransactionPreparePage {
     }
   }
 
-  private setMaxAmount(fee: string) {
+  private async setMaxAmount(formFee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
-    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.toNumber() > 0 ? amount.minus(new BigNumber(fee)) : 0
-    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
+    const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = await this.wallet.getMaxTransferValue(fee.toFixed())
+    this.transactionForm.controls.amount.setValue(amount.shiftedBy(-this.wallet.coinProtocol.decimals).toFixed(), {
       emitEvent: false
     })
   }
