@@ -44,7 +44,7 @@ export class PolkadotDelegationExtensionFunctionsProvider {
             // TODO: Add translations
             new UIIconText({
               iconName: 'logo-usd',
-              text: validatorDetails.commission ? validatorDetails.commission + '%' : '-',
+              text: validatorDetails.commission ? validatorDetails.commission.multipliedBy(100).toFixed() + '%' : '-',
               description: 'Comission'
             })
           ]
