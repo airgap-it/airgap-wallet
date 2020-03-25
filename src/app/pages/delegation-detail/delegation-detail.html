@@ -108,24 +108,22 @@
     </ion-col>
   </ion-row>
 
-  <ion-row class="ion-padding-bottom" *ngIf="(delegatorDetails$ | async)">
-    <ion-row>
-      <ion-segment scrollable [(ngModel)]="activeDelegatorAction" class="ion-padding-horizontal" (ionChange)="onActiveActionChange()">
-        <ion-segment-button [value]="delegateActionId" [disabled]="!(delegatorDetails$ | async).delegateAction.isAvailable">
-          <ion-label>Delegate</ion-label>
+  <ng-container *ngIf="(delegatorDetails$ | async)">
+    <ion-segment scrollable [(ngModel)]="activeDelegatorAction" class="ion-padding-horizontal" (ionChange)="onActiveActionChange()">
+      <ion-segment-button [value]="delegateActionId" [disabled]="!(delegatorDetails$ | async).delegateAction.isAvailable">
+        <ion-label>Delegate</ion-label>
+      </ion-segment-button>
+      <ion-segment-button [value]="undelegateActionId" [disabled]="!(delegatorDetails$ | async).undelegateAction.isAvailable">
+        <ion-label>Undelegate</ion-label>
+      </ion-segment-button>
+      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
+        <ion-segment-button [value]="extra.type">
+          <ion-label>{{ extra.label }}</ion-label>
         </ion-segment-button>
-        <ion-segment-button [value]="undelegateActionId" [disabled]="!(delegatorDetails$ | async).undelegateAction.isAvailable">
-          <ion-label>Undelegate</ion-label>
-        </ion-segment-button>
-        <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
-          <ion-segment-button [value]="extra.type">
-            <ion-label>{{ extra.label }}</ion-label>
-          </ion-segment-button>
-        </ng-container>
-      </ion-segment>
-    </ion-row>
+      </ng-container>
+    </ion-segment>
 
-    <ion-row class="segment-container">
+    <div class="segment--container">
       <ng-container *ngIf="activeDelegatorAction === delegateActionId">
         <ion-row class="ion-padding-horizontal">
           <ion-col size="12">
@@ -170,8 +168,15 @@
           </ion-row>
         </ng-container>
       </ng-container>
-    </ion-row>
-  </ion-row>
+      <ng-container *ngIf="activeDelegatorAction === null && !(delegatorDetails$ | async).isDelegating">
+        <ion-row class="ion-padding-horizontal">
+          <ion-col size="12">
+            <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+    </div>
+  </ng-container>
 
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12" class="ion-no-padding">

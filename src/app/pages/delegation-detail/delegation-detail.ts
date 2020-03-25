@@ -77,7 +77,7 @@ export class DelegationDetailPage {
       component: DelegateEditPopoverComponent,
       componentProps: {
         hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
-          ? this.delegateeAddresses$.value.includes(this.wallet.coinProtocol.airGapDelegatee)
+          ? !this.wallet.coinProtocol.airGapDelegatee || this.delegateeAddresses$.value.includes(this.wallet.coinProtocol.airGapDelegatee)
           : true,
         delegateeLabel: this.delegateeLabel
       },

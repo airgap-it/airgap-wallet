@@ -109,14 +109,13 @@ export class PolkadotDelegationExtensionFunctionsProvider {
             toggleFixedValueButton: 'Max',
             fixedValue: maxValue.shiftedBy(-protocol.decimals).toFixed(2)
           }),
-          ...(action.type === PolkadotStakingActionType.BOND_NOMINATE ? [this.createPayeeWidget({ isVisible: false })] : []),
-          this.createTipWidget(protocol.decimals)
+          ...(action.type === PolkadotStakingActionType.BOND_NOMINATE ? [this.createPayeeWidget({ isVisible: false })] : [])
         ]
       }
     }
 
     return {
-      description: "Can't delegate",
+      description: availableActions.length === 0 ? 'Insufficient funds' : "Can't delegate",
       isAvailable: false
     }
   }
@@ -211,20 +210,6 @@ export class PolkadotDelegationExtensionFunctionsProvider {
       id: 'value',
       inputType: 'number',
       label: 'Amount',
-      placeholder: '0.0',
-      defaultValue: '0.0',
-      createExtraLabel: (value: string, wallet?: AirGapMarketWallet) =>
-        wallet ? `$${new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice).toFixed(2)}` : '',
-      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toString(),
-      ...config
-    })
-  }
-
-  private createTipWidget(decimals: number, config: Partial<UIInputTextConfig> = {}): UIInputText {
-    return new UIInputText({
-      id: 'tip',
-      inputType: 'number',
-      label: 'Tip',
       placeholder: '0.0',
       defaultValue: '0.0',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) =>
