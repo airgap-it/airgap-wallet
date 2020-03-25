@@ -173,7 +173,7 @@ export class TransactionPreparePage {
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
                   -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
