@@ -199,7 +199,7 @@ export class DelegationDetailPage {
             protocolIdentifier: this.wallet.protocolIdentifier,
             maxDigits: 10
           }),
-          description: 'Your Balance'
+          description: 'Your balance'
         })
 
         this.setupForms(details)

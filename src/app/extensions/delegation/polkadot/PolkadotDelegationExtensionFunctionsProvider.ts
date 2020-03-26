@@ -15,6 +15,7 @@ import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegatePro
 import { PolkadotStakingInfo } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingLedger'
 import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
 import * as moment from 'moment'
+import { PolkadotNominations } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotNominations'
 
 export class PolkadotDelegationExtensionFunctionsProvider {
   private readonly supportedActions = [
@@ -236,15 +237,12 @@ export class PolkadotDelegationExtensionFunctionsProvider {
   private async createExtraDetails(protocol: PolkadotProtocol, address: PolkadotAddress): Promise<UIWidget[]> {
     const extraDetails = []
 
-    const results = await Promise.all([
-      protocol.accountController.isNominating(address),
-      protocol.accountController.getStakingInfo(address)
-    ])
-    const isNominating = results[0]
+    const results = await Promise.all([protocol.nodeClient.getNominations(address), protocol.accountController.getStakingInfo(address)])
+    const nominations = results[0]
     const stakingInfo = results[1]
 
     if (stakingInfo) {
-      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, isNominating, stakingInfo)))
+      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, nominations, stakingInfo)))
     }
 
     return extraDetails
@@ -252,10 +250,18 @@ export class PolkadotDelegationExtensionFunctionsProvider {
 
   private async createStakingDetailsWidgets(
     protocol: PolkadotProtocol,
-    isNominating: boolean,
+    nominations: PolkadotNominations | null,
     stakingInfo: PolkadotStakingInfo
   ): Promise<UIWidget[]> {
     const details = []
+
+    const results = await Promise.all([protocol.nodeClient.getActiveEraInfo(), protocol.nodeClient.getExpectedEraDuration()])
+
+    const activeEra = results[0]
+    const eraDuration = results[1]
+
+    const isNominating = nominations !== null
+    const isNominationActive = activeEra && nominations ? nominations.submittedIn.value.lt(activeEra.index.value) : false
 
     if (stakingInfo.total.eq(stakingInfo.active)) {
       details.push(
@@ -286,6 +292,17 @@ export class PolkadotDelegationExtensionFunctionsProvider {
           iconName: 'contacts',
           text: `${stakingInfo.unlocked.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
           description: 'Ready to withdraw'
+        })
+      )
+    }
+
+    if (isNominating && activeEra && activeEra.start.hasValue && eraDuration) {
+      const nextEraDate = new Date(activeEra.start.value.value.plus(eraDuration).toNumber())
+      details.push(
+        new UIIconText({
+          iconName: 'sync',
+          text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
+          description: isNominationActive ? 'Next payout' : 'Becomes active'
         })
       )
     }
