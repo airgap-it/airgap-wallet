@@ -69,7 +69,7 @@ export class DelegationDetailPage {
       this.wallet = info.wallet
     }
 
-    this.extensionsService.loadDelegationExtensions(this.wallet).then(() => this.initView())
+    this.extensionsService.loadDelegationExtensions().then(() => this.initView())
   }
 
   public async presentEditPopover(event: Event): Promise<void> {

@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { ProtocolSymbols } from '../protocols/protocols'
+import { ICoinDelegateProtocol, PolkadotProtocol } from 'airgap-coin-lib'
+import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/ProtocolDelegationExtensions'
+import { PolkadotDelegationExtensions } from 'src/app/extensions/delegation/PolkadotDelegationExtensions'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
-  public async loadDelegationExtensions(wallet: AirGapMarketWallet): Promise<void> {
-    switch (wallet.protocolIdentifier) {
-      case ProtocolSymbols.POLKADOT:
-        const { PolkadotDelegationExtensions } = await import('../../extensions/delegation/polkadot/PolkadotDelegationExtensions')
-        PolkadotDelegationExtensions.load()
-        break
+  private extensions: [new () => ICoinDelegateProtocol, () => ProtocolDelegationExtensions<any>][] = [
+    [PolkadotProtocol, PolkadotDelegationExtensions.create]
+  ]
+  public async loadDelegationExtensions(): Promise<void> {
+    for (let [protocol, extensionFactory] of this.extensions) {
+      ProtocolDelegationExtensions.load(protocol, extensionFactory())
     }
   }
 }

@@ -1,4 +1,4 @@
-import { PolkadotProtocol, AirGapMarketWallet, PolkadotRewardDestination } from 'airgap-coin-lib'
+import { PolkadotProtocol, PolkadotRewardDestination, AirGapMarketWallet } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
@@ -16,8 +16,11 @@ import { PolkadotStakingInfo } from 'airgap-coin-lib/dist/protocols/polkadot/sta
 import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
 import * as moment from 'moment'
 import { PolkadotNominations } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotNominations'
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
-export class PolkadotDelegationExtensionFunctionsProvider {
+export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<PolkadotProtocol> {
+  private static instance: PolkadotDelegationExtensions
+
   private readonly supportedActions = [
     PolkadotStakingActionType.BOND_NOMINATE,
     PolkadotStakingActionType.BOND_EXTRA,
@@ -26,7 +29,18 @@ export class PolkadotDelegationExtensionFunctionsProvider {
     PolkadotStakingActionType.WITHDRAW_UNBONDED
   ]
 
-  public async getExtraDelegateesDetails(protocol: PolkadotProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
+  public static create(): PolkadotDelegationExtensions {
+    if (!PolkadotDelegationExtensions.instance) {
+      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions()
+    }
+
+    return PolkadotDelegationExtensions.instance
+  }
+
+  public airGapDelegatee?: string = undefined
+  public delegateeLabel: string = 'Validator'
+
+  public async getExtraDelegateesDetails(protocol?: PolkadotProtocol, addresses?: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
     return Promise.all(
       addresses.map(async address => {
         const validatorDetails = await protocol.nodeClient.getValidatorDetails(PolkadotAddress.fromEncoded(address))
@@ -54,7 +68,10 @@ export class PolkadotDelegationExtensionFunctionsProvider {
     )
   }
 
-  public async getExtraDelegatorDetailsFromAddress(protocol: PolkadotProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
+  public async getExtraDelegatorDetailsFromAddress(
+    protocol?: PolkadotProtocol,
+    address?: string
+  ): Promise<Partial<AirGapDelegatorDetails>> {
     const polkadotAddress = PolkadotAddress.fromEncoded(address)
 
     const results = await Promise.all([
