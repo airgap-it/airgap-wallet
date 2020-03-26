@@ -246,7 +246,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         [PolkadotRewardDestination.Stash, 'Stash'],
         [PolkadotRewardDestination.Controller, 'Controller']
       ],
-      defaultOption: PolkadotRewardDestination.Staked,
+      defaultOption: PolkadotRewardDestination.Stash,
       ...config
     })
   }
