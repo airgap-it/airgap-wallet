@@ -15,7 +15,6 @@ import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegatePro
 import { PolkadotStakingInfo } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotStakingLedger'
 import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
 import * as moment from 'moment'
-import { PolkadotNominations } from 'airgap-coin-lib/dist/protocols/polkadot/staking/PolkadotNominations'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<PolkadotProtocol> {
@@ -26,7 +25,8 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     PolkadotStakingActionType.BOND_EXTRA,
     PolkadotStakingActionType.CANCEL_NOMINATION,
     PolkadotStakingActionType.CHANGE_NOMINATION,
-    PolkadotStakingActionType.WITHDRAW_UNBONDED
+    PolkadotStakingActionType.WITHDRAW_UNBONDED,
+    PolkadotStakingActionType.COLLECT_REWARDS
   ]
 
   public static create(): PolkadotDelegationExtensions {
@@ -211,6 +211,11 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             confirmLabel = 'Withdraw'
             description = 'Withdraw unbonded description'
             break
+          case PolkadotStakingActionType.COLLECT_REWARDS:
+            label = 'Collect Rewards'
+            confirmLabel = 'Collect'
+            description = 'Collect rewards description'
+            break
         }
 
         return {
@@ -254,37 +259,28 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   private async createExtraDetails(protocol: PolkadotProtocol, address: PolkadotAddress): Promise<UIWidget[]> {
     const extraDetails = []
 
-    const results = await Promise.all([protocol.nodeClient.getNominations(address), protocol.accountController.getStakingInfo(address)])
-    const nominations = results[0]
-    const stakingInfo = results[1]
+    const results = await Promise.all([protocol.accountController.getStakingInfo(address)])
+
+    const stakingInfo = results[0]
 
     if (stakingInfo) {
-      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, nominations, stakingInfo)))
+      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, stakingInfo)))
     }
 
     return extraDetails
   }
 
-  private async createStakingDetailsWidgets(
-    protocol: PolkadotProtocol,
-    nominations: PolkadotNominations | null,
-    stakingInfo: PolkadotStakingInfo
-  ): Promise<UIWidget[]> {
+  private async createStakingDetailsWidgets(protocol: PolkadotProtocol, stakingInfo: PolkadotStakingInfo): Promise<UIWidget[]> {
     const details = []
 
-    const results = await Promise.all([protocol.nodeClient.getActiveEraInfo(), protocol.nodeClient.getExpectedEraDuration()])
-
-    const activeEra = results[0]
-    const eraDuration = results[1]
-
-    const isNominating = nominations !== null
-    const isNominationActive = activeEra && nominations ? nominations.submittedIn.value.lt(activeEra.index.value) : false
+    const isNominating = stakingInfo.status === 'nominating'
+    const isNominationInactive = stakingInfo.status === 'nominating_inactive'
 
     if (stakingInfo.total.eq(stakingInfo.active)) {
       details.push(
         new UIIconText({
           iconName: 'contacts',
-          text: `${stakingInfo.total.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          text: `${stakingInfo.total.shiftedBy(-protocol.decimals).toFixed(2)} ${protocol.marketSymbol}`,
           description: isNominating ? 'Delegated' : 'Bonded'
         })
       )
@@ -294,7 +290,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       details.push(
         new UIIconText({
           iconName: 'contacts',
-          text: `${nextUnlocking.value.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          text: `${nextUnlocking.value.shiftedBy(-protocol.decimals).toFixed(2)} ${protocol.marketSymbol}`,
           description: 'Locked'
         }),
         new UIIconText({
@@ -307,21 +303,33 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       details.push(
         new UIIconText({
           iconName: 'contacts',
-          text: `${stakingInfo.unlocked.shiftedBy(-protocol.decimals).toString()} ${protocol.marketSymbol}`,
+          text: `${stakingInfo.unlocked.shiftedBy(-protocol.decimals).toFixed(2)} ${protocol.marketSymbol}`,
           description: 'Ready to withdraw'
         })
       )
     }
 
-    if (isNominating && activeEra && activeEra.start.hasValue && eraDuration) {
-      const nextEraDate = new Date(activeEra.start.value.value.plus(eraDuration).toNumber())
+    if (isNominating) {
+      const nextEraDate = new Date(stakingInfo.nextEra)
       details.push(
         new UIIconText({
           iconName: 'sync',
           text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
-          description: isNominationActive ? 'Next payout' : 'Becomes active'
+          description: isNominationInactive ? 'Becomes active' : 'Next payout'
         })
       )
+
+      const notCollected = stakingInfo.previousRewards.filter(reward => !reward.collected)
+      if (notCollected.length > 0) {
+        const totalNotCollected = notCollected.reduce((sum, next) => sum.plus(next.amount), new BigNumber(0))
+        details.push(
+          new UIIconText({
+            iconName: 'logo-usd',
+            text: `${totalNotCollected.shiftedBy(-protocol.decimals).toFixed(2)} ${protocol.marketSymbol}`,
+            description: 'To collect'
+          })
+        )
+      }
     }
 
     return details
