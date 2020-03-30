@@ -304,7 +304,8 @@ export class DelegationDetailPage {
     await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
 
     try {
-      const data = this.delegationForms[actionType].value
+      const form = this.delegationForms[actionType]
+      const data = form ? form.value : undefined
       const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 
       const info = {
