@@ -2,14 +2,19 @@ import { Injectable } from '@angular/core'
 import { ICoinDelegateProtocol, PolkadotProtocol } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/ProtocolDelegationExtensions'
 import { PolkadotDelegationExtensions } from 'src/app/extensions/delegation/PolkadotDelegationExtensions'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { DecimalPipe } from '@angular/common'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => ProtocolDelegationExtensions<any>][] = [
-    [PolkadotProtocol, PolkadotDelegationExtensions.create]
+    [PolkadotProtocol, () => PolkadotDelegationExtensions.create(this.decimalPipe, this.amountConverted)]
   ]
+
+  public constructor(private readonly decimalPipe: DecimalPipe, private readonly amountConverted: AmountConverterPipe) {}
+
   public async loadDelegationExtensions(): Promise<void> {
     for (let [protocol, extensionFactory] of this.extensions) {
       ProtocolDelegationExtensions.load(protocol, extensionFactory())

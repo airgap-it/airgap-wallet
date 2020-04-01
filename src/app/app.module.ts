@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common'
+import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -99,6 +99,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     QRScanner,
     Keyboard,
     AmountConverterPipe,
+    DecimalPipe,
     MarketDataService,
     DrawChartService,
     Deeplinks,
