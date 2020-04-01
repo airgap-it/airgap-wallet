@@ -10,7 +10,7 @@ import {
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import { FormGroup, FormBuilder } from '@angular/forms'
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LoadingController, PopoverController, NavController } from '@ionic/angular'
@@ -28,10 +28,10 @@ import { UIInputWidget } from 'src/app/models/widgets/UIWidget'
   styleUrls: ['./delegation-detail.scss']
 })
 export class DelegationDetailPage {
-  public delegateActionId: string = 'delegate'
+  public delegateActionId: string
   public delegateButton: string = 'Delegate'
 
-  public undelegateActionId: string = 'undelegate'
+  public undelegateActionId: string
   public undelegateButton: string = 'Undelegate'
 
   public wallet: AirGapMarketWallet
@@ -48,6 +48,8 @@ export class DelegationDetailPage {
 
   public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails> = new BehaviorSubject(null)
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails> = new BehaviorSubject(null)
+
+  public canProceed: boolean = true
 
   private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
@@ -122,10 +124,10 @@ export class DelegationDetailPage {
 
     let actionType: any
     switch (this.activeDelegatorAction) {
-      case this.delegateActionId:
+      case this.delegateActionId.toString():
         actionType = delegatorDetails.delegateAction.type
         break
-      case this.undelegateActionId:
+      case this.undelegateActionId.toString():
         actionType = delegatorDetails.undelegateAction.type
         break
       default:
@@ -203,6 +205,8 @@ export class DelegationDetailPage {
         })
 
         this.setupForms(details)
+        this.delegateActionId = details.delegateAction.type ? details.delegateAction.type.toString() : 'delegate'
+        this.undelegateActionId = details.undelegateAction.type ? details.undelegateAction.type.toString() : 'undelegate'
         this.setActiveDelegatorAction(details)
       }
     })
@@ -211,42 +215,68 @@ export class DelegationDetailPage {
   private setupForms(details: AirGapDelegatorDetails) {
     this.setupMainActionsForms(details)
     this.setupExtraActionsForms(details)
+
+    Array.from(this.delegationForms.entries()).forEach(([type, formGroup]) => {
+      formGroup.valueChanges.subscribe(() => {
+        if (this.activeDelegatorAction === type.toString()) {
+          this.canProceed = formGroup.valid
+        }
+      })
+    })
   }
 
   private setupMainActionsForms(details: AirGapDelegatorDetails) {
     const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction, details.changeDelegateeAction]
 
-    mainActions.forEach(action => {
-      if (action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs)) {
-        const form = this.delegationForms[action.type]
-        const args = {}
-        if (action.paramName) {
-          args[action.paramName] = this.delegateeAddresses$.value
-        }
-
-        Object.assign(args, this.setupArgsForms(action.extraArgs || [], form))
-
-        if (form) {
-          form.setValue(args)
+    mainActions
+      .filter(action => action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs))
+      .forEach(action => {
+        if (action.form) {
+          this.delegationForms.set(action.type, action.form)
         } else {
-          this.delegationForms[action.type] = this.formBuilder.group(args)
+          const form = this.delegationForms.get(action.type)
+          const args = this.setupArgsForms(action.extraArgs || [], form)
+
+          if (form) {
+            form.setValue(args)
+          } else {
+            this.delegationForms.set(action.type, this.formBuilder.group(args))
+          }
         }
-      }
-    })
+
+        const form = this.delegationForms.get(action.type)
+        if (action.paramName && !form.get(action.paramName)) {
+          this.delegationForms.get(action.type).addControl(action.paramName, new FormControl(this.delegateeAddresses$.value))
+        }
+
+        if (action.extraArgs) {
+          action.extraArgs.forEach(arg => {
+            arg.wallet = this.wallet
+          })
+        }
+      })
   }
 
   private setupExtraActionsForms(details: AirGapDelegatorDetails) {
     const extraActions: AirGapExtraDelegatorAction[] = details.extraActions
 
     extraActions.forEach(action => {
-      if (action.args) {
-        const form = this.delegationForms[action.type]
+      if (action.form) {
+        this.delegationForms.set(action.type, action.form)
+      } else if (action.args) {
+        const form = this.delegationForms.get(action.type)
         const args = this.setupArgsForms(action.args || [], form)
         if (form) {
           form.setValue(args)
         } else {
-          this.delegationForms[action.type] = this.formBuilder.group(args)
+          this.delegationForms.set(action.type, this.formBuilder.group(args))
         }
+      }
+
+      if (action.args) {
+        action.args.forEach(arg => {
+          arg.wallet = this.wallet
+        })
       }
     })
   }
@@ -256,9 +286,6 @@ export class DelegationDetailPage {
 
     args.forEach(arg => {
       formArgs[arg.id] = form ? form.value[arg.id] : null
-      formArgs[arg.controlName] = form ? form.value[arg.controlName] : null
-
-      arg.wallet = this.wallet
     })
 
     return formArgs
@@ -274,7 +301,7 @@ export class DelegationDetailPage {
     } else {
       const activeAction = details.extraActions ? details.extraActions[0] : null
 
-      this.activeDelegatorAction = activeAction ? activeAction.type : null
+      this.activeDelegatorAction = activeAction && activeAction ? activeAction.type.toString() : null
       this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel : null
     }
   }
@@ -304,7 +331,7 @@ export class DelegationDetailPage {
     await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
 
     try {
-      const form = this.delegationForms[actionType]
+      const form = this.delegationForms.get(actionType)
       const data = form ? form.value : undefined
       const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 

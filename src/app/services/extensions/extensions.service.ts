@@ -4,16 +4,21 @@ import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/Prot
 import { PolkadotDelegationExtensions } from 'src/app/extensions/delegation/PolkadotDelegationExtensions'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
+import { FormBuilder } from '@angular/forms'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => ProtocolDelegationExtensions<any>][] = [
-    [PolkadotProtocol, () => PolkadotDelegationExtensions.create(this.decimalPipe, this.amountConverted)]
+    [PolkadotProtocol, () => PolkadotDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverted)]
   ]
 
-  public constructor(private readonly decimalPipe: DecimalPipe, private readonly amountConverted: AmountConverterPipe) {}
+  public constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly decimalPipe: DecimalPipe,
+    private readonly amountConverted: AmountConverterPipe
+  ) {}
 
   public async loadDelegationExtensions(): Promise<void> {
     for (let [protocol, extensionFactory] of this.extensions) {

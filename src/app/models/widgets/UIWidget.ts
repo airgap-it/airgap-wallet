@@ -1,4 +1,4 @@
-import { Validator, FormGroup } from '@angular/forms'
+import { ValidatorFn, AbstractControl } from '@angular/forms'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 export enum UIWidgetType {
@@ -13,9 +13,12 @@ export interface UIWidgetConfig {
   isVisible?: boolean
 }
 
-export interface UIInputWidgetConfig extends UIWidgetConfig {
+export interface UIInputWidgetConfig<T> extends UIWidgetConfig {
   id: string
-  validator?: Validator
+  formControl?: AbstractControl
+  validators?: ValidatorFn | ValidatorFn[]
+
+  onValueChanged?: (value: T) => void
 }
 
 export abstract class UIWidget {
@@ -30,40 +33,48 @@ export abstract class UIWidget {
 
 export abstract class UIInputWidget<T> extends UIWidget {
   public readonly id: string
-  public controlName: string
 
-  public readonly validator?: Validator
+  public widgetControl?: AbstractControl
+  public readonly validators?: ValidatorFn | ValidatorFn[]
+
+  public readonly onValueChangedCallback?: (value: T) => void
 
   public value: T
-  public widgetForm?: FormGroup
 
   public wallet?: AirGapMarketWallet
 
-  constructor(config: UIInputWidgetConfig) {
+  constructor(config: UIInputWidgetConfig<T>) {
     super(config)
 
     this.id = config.id
-    this.validator = config.validator
+    this.validators = config.validators
+    this.widgetControl = config.formControl
 
-    this.controlName = this.id
+    this.onValueChangedCallback = config.onValueChanged
   }
 
-  public setWidgetForm(widgetForm: FormGroup) {
-    this.widgetForm = widgetForm
+  public setWidgetForm(widgetControl: AbstractControl) {
+    this.widgetControl = widgetControl
 
-    this.widgetForm.valueChanges.subscribe(value => {
-      if (value && value[this.controlName]) {
-        this.value = value[this.controlName]
+    if (this.validators) {
+      this.widgetControl.setValidators(this.validators)
+    }
+
+    this.widgetControl.valueChanges.subscribe(value => {
+      if (value) {
+        this.value = value
         this.onValueChanged()
       }
     })
 
     if (this.value !== undefined || this.value !== null) {
-      this.widgetForm.patchValue({
-        [this.controlName]: this.value
-      })
+      this.widgetControl.patchValue(this.value)
     }
   }
 
-  protected onValueChanged() {}
+  protected onValueChanged() {
+    if (this.onValueChangedCallback) {
+      this.onValueChangedCallback(this.value)
+    }
+  }
 }

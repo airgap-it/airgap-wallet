@@ -16,7 +16,7 @@ export class WidgetSelector {
 
   ngOnInit() {
     if (this.widget instanceof UIInputWidget) {
-      this.widget.setWidgetForm(this.widgetForm)
+      this.widget.setWidgetForm(this.widgetForm.get(this.widget.id))
     }
   }
 }

@@ -1,15 +1,13 @@
 import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-export interface UIInputTextConfig extends UIInputWidgetConfig {
+export interface UIInputTextConfig extends UIInputWidgetConfig<string> {
   inputType: string
 
   label: string
 
   placeholder?: string
   defaultValue?: string
-
-  customizeInput?: (value: string, wallet?: AirGapMarketWallet) => string
 
   extraLabel?: string
   createExtraLabel?: (value: string, wallet?: AirGapMarketWallet) => string
@@ -27,9 +25,8 @@ export class UIInputText extends UIInputWidget<string> {
   public readonly label: string
 
   public readonly placeholder: string
-  public readonly customizeInput?: (value: string) => string
 
-  public readonly extraLabel?: string
+  public extraLabel?: string
   public readonly createExtraLabel?: (value: string) => string
   public readonly errorLabel?: string
 
@@ -42,17 +39,14 @@ export class UIInputText extends UIInputWidget<string> {
   constructor(config: UIInputTextConfig) {
     super(config)
 
-    this.controlName = this.id + '-control'
-
     this.inputType = config.inputType
     this.label = config.label
     this.placeholder = config.placeholder || ''
 
     this.value = config.defaultValue || ''
-    this.customizeInput = config.customizeInput ? (value: string) => config.customizeInput(value, this.wallet) : undefined
 
-    this.extraLabel = config.extraLabel
     this.createExtraLabel = config.createExtraLabel ? (value: string) => config.createExtraLabel(value, this.wallet) : undefined
+    this.extraLabel = config.extraLabel || this.createExtraLabel ? this.createExtraLabel(this.value) : undefined
     this.errorLabel = config.errorLabel
 
     this.fixedValue = config.fixedValue
@@ -63,15 +57,19 @@ export class UIInputText extends UIInputWidget<string> {
   public onValueChanged() {
     this.isValueFixed = this.fixedValue === this.value
 
-    if (this.widgetForm) {
-      this.widgetForm.patchValue({ [this.id]: this.customizeInput ? this.customizeInput(this.value) : this.value }, { emitEvent: false })
+    if (this.createExtraLabel) {
+      this.extraLabel = this.createExtraLabel(this.value)
+    }
+
+    if (this.onValueChangedCallback) {
+      this.onValueChangedCallback(this.value)
     }
   }
 
   public toggleValue() {
     this.isValueFixed = !this.isValueFixed
-    if (this.isValueFixed && this.widgetForm) {
-      this.widgetForm.patchValue({ [this.controlName]: this.fixedValue || this.getFixedValue() })
+    if (this.isValueFixed && this.widgetControl) {
+      this.widgetControl.patchValue(this.fixedValue || this.getFixedValue())
     }
   }
 }

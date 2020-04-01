@@ -2,6 +2,7 @@ import { ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { UIWidget, UIInputWidget } from '../models/widgets/UIWidget'
 import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { FormGroup } from '@angular/forms'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -14,6 +15,7 @@ export interface AirGapMainDelegatorAction {
   isAvailable: boolean
   description: string
   paramName?: string
+  form?: FormGroup
   extraArgs?: UIInputWidget<any>[]
 }
 
@@ -22,6 +24,7 @@ export interface AirGapExtraDelegatorAction {
   label: string
   confirmLabel: string
   description: string
+  form?: FormGroup
   args?: UIInputWidget<any>[]
 }
 

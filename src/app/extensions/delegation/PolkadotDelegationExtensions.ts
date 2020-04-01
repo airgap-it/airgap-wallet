@@ -21,22 +21,35 @@ import {
 } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotNominatorDetails'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
+import { FormBuilder, Validators } from '@angular/forms'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+
+const supportedActions = [
+  PolkadotStakingActionType.BOND_NOMINATE,
+  PolkadotStakingActionType.BOND_EXTRA,
+  PolkadotStakingActionType.CANCEL_NOMINATION,
+  PolkadotStakingActionType.CHANGE_NOMINATION,
+  PolkadotStakingActionType.WITHDRAW_UNBONDED,
+  PolkadotStakingActionType.COLLECT_REWARDS
+]
+
+const controlIds = {
+  targets: 'targets',
+  value: 'value',
+  valueControl: 'valueControl',
+  payee: 'payee'
+}
 
 export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<PolkadotProtocol> {
   private static instance: PolkadotDelegationExtensions
 
-  private readonly supportedActions = [
-    PolkadotStakingActionType.BOND_NOMINATE,
-    PolkadotStakingActionType.BOND_EXTRA,
-    PolkadotStakingActionType.CANCEL_NOMINATION,
-    PolkadotStakingActionType.CHANGE_NOMINATION,
-    PolkadotStakingActionType.WITHDRAW_UNBONDED,
-    PolkadotStakingActionType.COLLECT_REWARDS
-  ]
-
-  public static create(decimalPipe: DecimalPipe, amountConverter: AmountConverterPipe): PolkadotDelegationExtensions {
+  public static create(
+    formBuilder: FormBuilder,
+    decimalPipe: DecimalPipe,
+    amountConverter: AmountConverterPipe
+  ): PolkadotDelegationExtensions {
     if (!PolkadotDelegationExtensions.instance) {
-      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(decimalPipe, amountConverter)
+      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(formBuilder, decimalPipe, amountConverter)
     }
 
     return PolkadotDelegationExtensions.instance
@@ -45,7 +58,11 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   public airGapDelegatee?: string = undefined
   public delegateeLabel: string = 'Validator'
 
-  private constructor(private readonly decimalPipe: DecimalPipe, private readonly amountConverterPipe: AmountConverterPipe) {
+  private constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly decimalPipe: DecimalPipe,
+    private readonly amountConverterPipe: AmountConverterPipe
+  ) {
     super()
   }
 
@@ -84,7 +101,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   // TODO: add translations
   public async getExtraDelegatorDetailsFromAddress(protocol: PolkadotProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
     const nominatorDetails = await protocol.accountController.getNominatorDetails(address)
-    const availableActions = nominatorDetails.availableActions.filter(action => this.supportedActions.includes(action.type))
+    const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
     const results = await Promise.all([
       this.createDelegateAction(protocol, address, availableActions),
@@ -120,20 +137,48 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
     let partial: Partial<AirGapMainDelegatorAction>
     if (action) {
-      const maxValue = new BigNumber(await protocol.estimateMaxDelegationValueFromAddress(address))
+      const results = await Promise.all([
+        protocol.estimateMaxDelegationValueFromAddress(address),
+        protocol.nodeClient.getExistentialDeposit()
+      ])
+
+      const maxValue = new BigNumber(results[0])
+      const minValue = new BigNumber(results[1])
+
       const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
+
+      const form = this.formBuilder.group({
+        [controlIds.value]: [],
+        [controlIds.valueControl]: [
+          maxValueFormatted,
+          Validators.compose([
+            Validators.required,
+            Validators.min(minValue.shiftedBy(-protocol.decimals).toNumber()),
+            Validators.max(new BigNumber(maxValueFormatted).toNumber()),
+            DecimalValidator.validate(protocol.decimals)
+          ])
+        ],
+        [controlIds.payee]: []
+      })
 
       if (maxValue.gt(0)) {
         partial = {
           type: action.type,
           isAvailable: true,
           description: 'Delegate description',
-          paramName: 'targets',
+          paramName: controlIds.targets,
+          form,
           extraArgs: [
-            this.createValueWidget(protocol.decimals, {
+            this.createValueWidget({
+              id: controlIds.valueControl,
               defaultValue: maxValueFormatted,
               toggleFixedValueButton: 'Max',
-              fixedValue: maxValueFormatted
+              fixedValue: maxValueFormatted,
+              onValueChanged: (value: string) => {
+                form.patchValue({
+                  [controlIds.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+                })
+              }
             }),
             ...(action.type === PolkadotStakingActionType.BOND_NOMINATE ? [this.createPayeeWidget({ isVisible: false })] : [])
           ]
@@ -164,16 +209,35 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           10
         )
 
+        const form = this.formBuilder.group({
+          [controlIds.value]: [],
+          [controlIds.valueControl]: [
+            valueFormatted,
+            Validators.compose([
+              Validators.required,
+              Validators.max(new BigNumber(valueFormatted).toNumber()),
+              DecimalValidator.validate(protocol.decimals)
+            ])
+          ]
+        })
+
         return {
           type: action.type,
           isAvailable: true,
           description: 'Undelegate description',
+          form,
           extraArgs: [
-            this.createValueWidget(protocol.decimals, {
+            this.createValueWidget({
+              id: controlIds.valueControl,
               isVisible: false,
               toggleFixedValueButton: 'Max',
               fixedValue: valueFormatted,
-              defaultValue: valueFormatted
+              defaultValue: valueFormatted,
+              onValueChanged: (value: string) => {
+                form.patchValue({
+                  [controlIds.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+                })
+              }
             })
           ]
         }
@@ -195,7 +259,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         type: action.type,
         isAvailable: true,
         description,
-        paramName: 'targets'
+        paramName: controlIds.targets
       }
     }
 
@@ -243,29 +307,29 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       })
   }
 
-  private createValueWidget(decimals: number, config: Partial<UIInputTextConfig> = {}): UIInputText {
+  private createValueWidget(config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
-      id: 'value',
+      id: controlIds.value,
       inputType: 'number',
       label: 'Amount',
-      placeholder: '0.0',
-      defaultValue: '0.0',
+      placeholder: '0.00',
+      defaultValue: '0.00',
+      errorLabel: 'Invalid value',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
           const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
-          return `$${this.decimalPipe.transform(marketPrice.toString(), '1.1-2')}`
+          return `$${this.decimalPipe.transform(marketPrice.toString(), '1.2-2')}`
         } else {
           return ''
         }
       },
-      customizeInput: (value: string) => new BigNumber(value).shiftedBy(decimals).toFixed(),
       ...config
     })
   }
 
   private createPayeeWidget(config: Partial<UISelectConfig> = {}): UISelect {
     return new UISelect({
-      id: 'payee',
+      id: controlIds.payee,
       label: 'Reward destination',
       options: [
         [PolkadotRewardDestination.STAKED, 'Staked'], // probably needs better labels

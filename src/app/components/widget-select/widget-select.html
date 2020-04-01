@@ -3,7 +3,7 @@
     <ion-col size="12" class="ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
         <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ widget.label }}</ion-label>
-        <ion-select [formControlName]="widget.controlName">
+        <ion-select [formControlName]="widget.id">
           <ng-container *ngFor="let option of optionTuples">
             <ion-select-option [value]="option[0]">{{ option[1] }}</ion-select-option>
           </ng-container>

@@ -1,6 +1,6 @@
 import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
 
-export interface UISelectConfig extends UIInputWidgetConfig {
+export interface UISelectConfig extends UIInputWidgetConfig<any> {
   label: string
 
   options: [any, string][]

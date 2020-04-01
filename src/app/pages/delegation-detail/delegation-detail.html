@@ -132,9 +132,18 @@
         </ion-row>
         <ion-row *ngFor="let extra of (delegatorDetails$ | async).delegateAction.extraArgs || []">
           <ion-col size="12">
+            <form
+              *ngIf="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
+              [formGroup]="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
+            >
+              <widget-selector
+                [widget]="extra"
+                [widgetForm]="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
+              ></widget-selector>
+            </form>
             <widget-selector
               [widget]="extra"
-              [widgetForm]="delegationForms[(delegatorDetails$ | async).delegateAction.type]"
+              *ngIf="!delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
             ></widget-selector>
           </ion-col>
         </ion-row>
@@ -147,9 +156,18 @@
         </ion-row>
         <ion-row *ngFor="let extra of (delegatorDetails$ | async).undelegateAction.extraArgs || []">
           <ion-col size="12">
+            <form
+              *ngIf="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
+              [formGroup]="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
+            >
+              <widget-selector
+                [widget]="extra"
+                [widgetForm]="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
+              ></widget-selector>
+            </form>
             <widget-selector
               [widget]="extra"
-              [widgetForm]="delegationForms[(delegatorDetails$ | async).undelegateAction.type]"
+              *ngIf="!delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
             ></widget-selector>
           </ion-col>
         </ion-row>
@@ -163,7 +181,10 @@
           </ion-row>
           <ion-row *ngFor="let arg of extra.args || []">
             <ion-col size="12">
-              <widget-selector [widget]="arg" [widgetForm]="delegationForms[extra.type]"></widget-selector>
+              <form *ngIf="delegationForms.get(extra.type)" [formGroup]="delegationForms.get(extra.type)">
+                <widget-selector [widget]="arg" [widgetForm]="delegationForms.get(extra.type)"></widget-selector>
+              </form>
+              <widget-selector [widget]="arg" *ngIf="!delegationForms.get(extra.type)"></widget-selector>
             </ion-col>
           </ion-row>
         </ng-container>
@@ -221,7 +242,7 @@
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="primary" (click)="callAction()">
+    <ion-button shape="round" color="primary" (click)="callAction()" [disabled]="!canProceed">
       {{ activeDelegatorActionConfirmButton || 'OK' }}
     </ion-button>
   </ion-fab>
