@@ -191,10 +191,9 @@ export class OperationsProvider {
 
   // TODO: change returned type when generic protocol is done
   public async checkDelegated(protocol: ICoinDelegateProtocol, address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
-    if (!!protocol.getDelegatorDetailsFromAddress) {
-      const delegatorDetails = await protocol.getDelegatorDetailsFromAddress(address)
+    if (supportsDelegation(protocol)) {
       return {
-        isDelegated: delegatorDetails.isDelegating
+        isDelegated: await protocol.isAddressDelegating(address)
       }
     } else {
       // TODO: remove if/else when generic protocol is done and implemented by the protocols
