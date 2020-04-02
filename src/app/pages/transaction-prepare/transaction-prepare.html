@@ -4,7 +4,7 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>
-      {{ 'transaction-prepare.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}
+      {{ 'transaction-prepare.title' | translate: { title: wallet.coinProtocol.symbol | uppercase } }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -188,7 +188,7 @@
               {{ 'transaction-prepare.amount_label' | translate }}
             </ng-container>
             <ng-container *ngIf="transactionForm.controls['fee'].valid" color="primary">
-              ${{ transactionForm.get('fee').value * wallet.currentMarketPrice.toNumber() | number: '1.2-4' }}
+              ${{ transactionForm.get('fee').value * feeCurrentMarketPrice | number: '1.2-4' }}
             </ng-container>
           </span>
           <span id="fee-amount-advanced" *ngIf="!transactionForm.get('isAdvancedMode').value">

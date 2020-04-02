@@ -116,6 +116,7 @@ export class MarketDataService {
         const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.coinProtocol.marketSymbol))
         const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
         const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
+
         const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
         const allWalletValues = [0, 0]
         for (const [index, wallet] of wallets.entries()) {
