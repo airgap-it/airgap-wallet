@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { UIAccount } from 'src/app/models/widgets/UIAccount'
+import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 
 @Component({
   selector: 'widget-account',

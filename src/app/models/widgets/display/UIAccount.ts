@@ -1,4 +1,4 @@
-import { UIWidget, UIWidgetType, UIWidgetConfig } from './UIWidget'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 
 export interface UIAccountConfig extends UIWidgetConfig {
   name?: string
@@ -8,14 +8,17 @@ export interface UIAccountConfig extends UIWidgetConfig {
   abbreviateAddress?: boolean
   abbreviationStart?: number
   abbreviationEnd?: number
+
+  onConnectedFormChanged?: (value?: any, widget?: UIAccount) => void
 }
 
 export class UIAccount extends UIWidget {
   public readonly type = UIWidgetType.ACCOUNT
-  public readonly name?: string
-  public readonly address: string
-  public readonly displayAddress: string
-  public readonly description?: string
+
+  public name?: string
+  public address: string
+  public displayAddress: string
+  public description?: string
 
   public get hasName(): boolean {
     return this.name !== undefined && this.name !== null

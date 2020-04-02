@@ -7,12 +7,13 @@ import {
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { PolkadotAddress } from 'airgap-coin-lib/dist/protocols/polkadot/data/account/PolkadotAddress'
 import BigNumber from 'bignumber.js'
-import { UIIconText } from 'src/app/models/widgets/UIIconText'
-import { UIInputWidget, UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 import { PolkadotStakingActionType } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotStakingActionType'
-import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/UIInputText'
+import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { UISelect, UISelectConfig } from 'src/app/models/widgets/UISelect'
+import { UISelect, UISelectConfig } from 'src/app/models/widgets/input/UISelect'
 import * as moment from 'moment'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
@@ -21,8 +22,9 @@ import {
 } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotNominatorDetails'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { FormBuilder, Validators, FormGroup } from '@angular/forms'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { PolkadotValidatorDetails } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotValidatorDetails'
 
 const supportedActions = [
   PolkadotStakingActionType.BOND_NOMINATE,
@@ -33,7 +35,9 @@ const supportedActions = [
   PolkadotStakingActionType.COLLECT_REWARDS
 ]
 
-const controlIds = {
+const widgetId = {
+  commission: 'commission',
+  expectedReward: 'expectedReward',
   targets: 'targets',
   value: 'value',
   valueControl: 'valueControl',
@@ -75,9 +79,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
 
-        const commission = validatorDetails.commission
-          ? this.decimalPipe.transform(new BigNumber(validatorDetails.commission).multipliedBy(100).toString())
-          : null
+        const extraDetails = await this.createDelegateeExtraDetails(protocol, validatorDetails)
 
         return {
           status: validatorDetails.status || 'unknown',
@@ -86,16 +88,59 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             current: ownStash,
             total: totalStakingBalance
           },
-          extraDetails: [
-            new UIIconText({
-              iconName: 'logo-usd',
-              text: commission ? commission + '%' : '-',
-              description: 'Comission'
-            })
-          ]
+          extraDetails
         }
       })
     )
+  }
+
+  private async createDelegateeExtraDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): Promise<UIWidget[]> {
+    const details = []
+
+    const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
+    const totalPreviousReward = validatorDetails.lastEraReward ? new BigNumber(validatorDetails.lastEraReward.amount) : null
+
+    const calculateExpectedReward = (userStake: BigNumber) => {
+      const totalStake = new BigNumber(validatorDetails.totalStakingBalance).plus(userStake)
+      const userShare = userStake.dividedBy(totalStake)
+      const expectedReward = new BigNumber(1)
+        .minus(commission)
+        .multipliedBy(totalPreviousReward)
+        .multipliedBy(userShare)
+
+      return expectedReward
+    }
+
+    details.push(
+      new UIIconText({
+        id: widgetId.commission,
+        iconName: 'logo-usd',
+        text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
+        description: 'Commission'
+      })
+    )
+
+    if (totalPreviousReward && commission && validatorDetails.status === 'Active') {
+      details.push(
+        new UIIconText({
+          id: widgetId.expectedReward,
+          iconName: 'logo-usd',
+          text: '-',
+          description: 'Expected reward',
+          isVisible: false,
+          onConnectedFormChanged: (value: any, widget: UIIconText) => {
+            if (value[widgetId.value]) {
+              const expectedReward = calculateExpectedReward(new BigNumber(value[widgetId.value]))
+              widget.text = this.amountConverterPipe.transform(expectedReward, {
+                protocolIdentifier: protocol.identifier,
+                maxDigits: 10
+              })
+            }
+          }
+        })
+      )
+    }
+    return details
   }
 
   // TODO: add translations
@@ -107,8 +152,8 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       this.createDelegateAction(protocol, address, availableActions),
       this.createUndelegateAction(protocol, nominatorDetails.stakingDetails, availableActions),
       this.createChangeDelegateeAction(availableActions),
-      this.createExtraActions(availableActions),
-      this.createExtraDetails(protocol, nominatorDetails)
+      this.createDelegatorExtraActions(availableActions),
+      this.createDelegatorExtraDetails(protocol, nominatorDetails)
     ])
 
     const delegateAction = results[0]
@@ -123,6 +168,16 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       changeDelegateeAction,
       extraActions,
       extraDetails
+    }
+  }
+
+  public async onDetailsChange(
+    _: PolkadotProtocol,
+    delegateesDetails: AirGapDelegateeDetails[],
+    delegatorDetails: AirGapDelegatorDetails
+  ): Promise<void> {
+    if (!delegatorDetails.isDelegating && delegatorDetails.delegateAction.isAvailable && delegatorDetails.delegateAction.form) {
+      this.showExpectedRewardWidget(delegateesDetails, delegatorDetails.delegateAction.form)
     }
   }
 
@@ -148,8 +203,8 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
 
       const form = this.formBuilder.group({
-        [controlIds.value]: [],
-        [controlIds.valueControl]: [
+        [widgetId.value]: [],
+        [widgetId.valueControl]: [
           maxValueFormatted,
           Validators.compose([
             Validators.required,
@@ -158,7 +213,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             DecimalValidator.validate(protocol.decimals)
           ])
         ],
-        [controlIds.payee]: []
+        [widgetId.payee]: []
       })
 
       if (maxValue.gt(0)) {
@@ -166,17 +221,17 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           type: action.type,
           isAvailable: true,
           description: 'Delegate description',
-          paramName: controlIds.targets,
+          paramName: widgetId.targets,
           form,
           extraArgs: [
             this.createValueWidget({
-              id: controlIds.valueControl,
+              id: widgetId.valueControl,
               defaultValue: maxValueFormatted,
               toggleFixedValueButton: 'Max',
               fixedValue: maxValueFormatted,
               onValueChanged: (value: string) => {
                 form.patchValue({
-                  [controlIds.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+                  [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
                 })
               }
             }),
@@ -210,8 +265,8 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         )
 
         const form = this.formBuilder.group({
-          [controlIds.value]: [],
-          [controlIds.valueControl]: [
+          [widgetId.value]: [],
+          [widgetId.valueControl]: [
             valueFormatted,
             Validators.compose([
               Validators.required,
@@ -228,14 +283,14 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           form,
           extraArgs: [
             this.createValueWidget({
-              id: controlIds.valueControl,
+              id: widgetId.valueControl,
               isVisible: false,
               toggleFixedValueButton: 'Max',
               fixedValue: valueFormatted,
               defaultValue: valueFormatted,
               onValueChanged: (value: string) => {
                 form.patchValue({
-                  [controlIds.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+                  [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
                 })
               }
             })
@@ -259,7 +314,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         type: action.type,
         isAvailable: true,
         description,
-        paramName: controlIds.targets
+        paramName: widgetId.targets
       }
     }
 
@@ -269,7 +324,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     }
   }
 
-  private createExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
+  private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
     return availableActions
       .filter(
         action =>
@@ -309,7 +364,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
   private createValueWidget(config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
-      id: controlIds.value,
+      id: widgetId.value,
       inputType: 'number',
       label: 'Amount',
       placeholder: '0.00',
@@ -329,7 +384,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
   private createPayeeWidget(config: Partial<UISelectConfig> = {}): UISelect {
     return new UISelect({
-      id: controlIds.payee,
+      id: widgetId.payee,
       label: 'Reward destination',
       options: [
         [PolkadotRewardDestination.STAKED, 'Staked'], // probably needs better labels
@@ -341,7 +396,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     })
   }
 
-  private async createExtraDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): Promise<UIWidget[]> {
+  private async createDelegatorExtraDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): Promise<UIWidget[]> {
     const extraDetails = []
 
     if (nominatorDetails.stakingDetails) {
@@ -460,6 +515,18 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     }
 
     return details
+  }
+
+  private showExpectedRewardWidget(delegateesDetails: AirGapDelegateeDetails[], delegationActionForm: FormGroup) {
+    delegateesDetails.forEach(details => {
+      if (details.extraDetails) {
+        const expectedRewardWidget = details.extraDetails.find(extra => extra.id === widgetId.expectedReward)
+        if (expectedRewardWidget) {
+          expectedRewardWidget.setConnectedForms(delegationActionForm)
+          expectedRewardWidget.isVisible = true
+        }
+      }
+    })
   }
 
   private partitionArray<T>(array: T[], predicate: (value: T) => boolean): [T[], T[]] {

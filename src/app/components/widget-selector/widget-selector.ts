@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
-import { UIWidget, UIInputWidget } from 'src/app/models/widgets/UIWidget'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { FormGroup } from '@angular/forms'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 
 @Component({
   selector: 'widget-selector',
@@ -15,8 +16,8 @@ export class WidgetSelector {
   public widgetForm?: FormGroup = null
 
   ngOnInit() {
-    if (this.widget instanceof UIInputWidget) {
-      this.widget.setWidgetForm(this.widgetForm.get(this.widget.id))
+    if (this.widgetForm && this.widget instanceof UIInputWidget) {
+      this.widget.setFormControl(this.widgetForm.get(this.widget.id))
     }
   }
 }

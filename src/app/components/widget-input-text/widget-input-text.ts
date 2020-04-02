@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
-import { UIInputText } from 'src/app/models/widgets/UIInputText'
+import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 @Component({
   selector: 'widget-input-text',

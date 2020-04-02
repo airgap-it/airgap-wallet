@@ -81,7 +81,7 @@
     <ion-col size="12">
       <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
         <ion-card *ngIf="(delegateeDetails$ | async).extraDetails">
-          <ng-container *ngFor="let extra of (delegateeDetails$ | async).extraDetails || []">
+          <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).extraDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>
@@ -116,7 +116,7 @@
       <ion-segment-button [value]="undelegateActionId" [disabled]="!(delegatorDetails$ | async).undelegateAction.isAvailable">
         <ion-label>Undelegate</ion-label>
       </ion-segment-button>
-      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
+      <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraActions)">
         <ion-segment-button [value]="extra.type">
           <ion-label>{{ extra.label }}</ion-label>
         </ion-segment-button>
@@ -130,7 +130,7 @@
             <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
           </ion-col>
         </ion-row>
-        <ion-row *ngFor="let extra of (delegatorDetails$ | async).delegateAction.extraArgs || []">
+        <ion-row *ngFor="let extra of filterVisible((delegatorDetails$ | async).delegateAction.extraArgs)">
           <ion-col size="12">
             <form
               *ngIf="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
@@ -154,7 +154,7 @@
             <p>{{ (delegatorDetails$ | async).undelegateAction.description }}</p>
           </ion-col>
         </ion-row>
-        <ion-row *ngFor="let extra of (delegatorDetails$ | async).undelegateAction.extraArgs || []">
+        <ion-row *ngFor="let extra of filterVisible((delegatorDetails$ | async).undelegateAction.extraArgs)">
           <ion-col size="12">
             <form
               *ngIf="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
@@ -172,14 +172,14 @@
           </ion-col>
         </ion-row>
       </ng-container>
-      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions || []">
+      <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraActions)">
         <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
           <ion-row class="ion-padding-horizontal">
             <ion-col size="12">
               <p>{{ extra.description }}</p>
             </ion-col>
           </ion-row>
-          <ion-row *ngFor="let arg of extra.args || []">
+          <ion-row *ngFor="let arg of filterVisible(extra.args)">
             <ion-col size="12">
               <form *ngIf="delegationForms.get(extra.type)" [formGroup]="delegationForms.get(extra.type)">
                 <widget-selector [widget]="arg" [widgetForm]="delegationForms.get(extra.type)"></widget-selector>
@@ -216,7 +216,7 @@
           <ion-item lines="none" *ngIf="delegatorBalanceWidget">
             <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
           </ion-item>
-          <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraDetails || []">
+          <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>

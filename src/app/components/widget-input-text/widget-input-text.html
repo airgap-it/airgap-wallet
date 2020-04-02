@@ -25,8 +25,8 @@
       </ion-toolbar>
     </ion-col>
   </ion-row>
-  <ion-row class="ion-padding-horizontal ion-padding-bottom" *ngIf="widget.widgetControl && widget">
-    <ion-col size="12" *ngIf="widget.widgetControl.invalid">
+  <ion-row class="ion-padding-horizontal ion-padding-bottom" *ngIf="widget.formControl && widget.errorLabel">
+    <ion-col size="12" *ngIf="widget.formControl.invalid">
       <ion-text class="ion-no-margin" color="danger">
         <p class="ion-no-margin">{{ widget.errorLabel }}</p>
       </ion-text>

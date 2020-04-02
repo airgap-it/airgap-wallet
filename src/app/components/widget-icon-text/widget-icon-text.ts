@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { UIIconText } from 'src/app/models/widgets/UIIconText'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 
 @Component({
   selector: 'widget-icon-text',

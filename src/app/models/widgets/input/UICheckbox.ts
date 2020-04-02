@@ -1,13 +1,18 @@
-import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
+import { UIWidgetType } from '../UIWidget'
+import { UIInputWidgetConfig, UIInputWidget } from '../UIInputWidget'
 
 export interface UICheckboxConfig extends UIInputWidgetConfig {
   label: string
   defaultValue?: boolean
+
+  onValueChanged?: (value?: boolean, widget?: UICheckbox) => void
+  onConnectedFormChanged?: (value?: any, widget?: UICheckbox) => void
 }
 
 export class UICheckbox extends UIInputWidget<boolean> {
   public readonly type = UIWidgetType.CHECKBOX
-  public readonly label: string
+
+  public label: string
 
   constructor(config: UICheckboxConfig) {
     super(config)

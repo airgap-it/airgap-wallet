@@ -26,7 +26,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIInputText } from 'src/app/models/widgets/UIInputText'
+import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { isString } from 'util'
 import { DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 
@@ -115,6 +115,16 @@ export class OperationsProvider {
     }
 
     return details
+  }
+
+  public async onDelegationDetailsChange(
+    wallet: AirGapMarketWallet,
+    delegateesDetails: AirGapDelegateeDetails[] | null,
+    delegatorDetails: AirGapDelegatorDetails | null
+  ): Promise<void> {
+    if (supportsAirGapDelegation(wallet.coinProtocol) && delegateesDetails && delegatorDetails) {
+      wallet.coinProtocol.onDetailsChange(delegateesDetails.filter(details => !!details), delegatorDetails)
+    }
   }
 
   public async prepareDelegatorAction(

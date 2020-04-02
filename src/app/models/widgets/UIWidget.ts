@@ -1,5 +1,5 @@
-import { ValidatorFn, AbstractControl } from '@angular/forms'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { FormGroup } from '@angular/forms'
+import { isArray } from 'util'
 
 export enum UIWidgetType {
   ACCOUNT = 'account',
@@ -10,71 +10,50 @@ export enum UIWidgetType {
 }
 
 export interface UIWidgetConfig {
+  id?: string
   isVisible?: boolean
-}
 
-export interface UIInputWidgetConfig<T> extends UIWidgetConfig {
-  id: string
-  formControl?: AbstractControl
-  validators?: ValidatorFn | ValidatorFn[]
-
-  onValueChanged?: (value: T) => void
+  connectedForms?: FormGroup | FormGroup[]
+  onConnectedFormChanged?: (value?: any, widget?: any) => void
 }
 
 export abstract class UIWidget {
   public abstract readonly type: UIWidgetType
 
+  public readonly id?: string
   public isVisible: boolean
 
+  public connectedForms?: FormGroup[]
+  public onConnectedFormChangedCallback?: (value?: any, widget?: UIWidget) => void
+
   constructor(config: UIWidgetConfig) {
-    this.isVisible = config.isVisible !== undefined ? config.isVisible : true
-  }
-}
-
-export abstract class UIInputWidget<T> extends UIWidget {
-  public readonly id: string
-
-  public widgetControl?: AbstractControl
-  public readonly validators?: ValidatorFn | ValidatorFn[]
-
-  public readonly onValueChangedCallback?: (value: T) => void
-
-  public value: T
-
-  public wallet?: AirGapMarketWallet
-
-  constructor(config: UIInputWidgetConfig<T>) {
-    super(config)
-
     this.id = config.id
-    this.validators = config.validators
-    this.widgetControl = config.formControl
+    this.isVisible = config.isVisible !== undefined ? config.isVisible : true
+    this.onConnectedFormChangedCallback = config.onConnectedFormChanged
 
-    this.onValueChangedCallback = config.onValueChanged
+    this.setConnectedForms(config.connectedForms)
   }
 
-  public setWidgetForm(widgetControl: AbstractControl) {
-    this.widgetControl = widgetControl
-
-    if (this.validators) {
-      this.widgetControl.setValidators(this.validators)
+  public setConnectedForms(connectedForms?: FormGroup | FormGroup[]) {
+    if (!connectedForms) {
+      return
     }
 
-    this.widgetControl.valueChanges.subscribe(value => {
-      if (value) {
-        this.value = value
-        this.onValueChanged()
-      }
+    this.connectedForms = isArray(connectedForms) ? connectedForms : [connectedForms]
+
+    this.connectedForms.forEach(form => {
+      form.valueChanges.subscribe(value => {
+        if (value) {
+          this.onConnectedFormChanged(value)
+        }
+      })
+      this.onConnectedFormChanged(form.value)
     })
-
-    if (this.value !== undefined || this.value !== null) {
-      this.widgetControl.patchValue(this.value)
-    }
   }
 
-  protected onValueChanged() {
-    if (this.onValueChangedCallback) {
-      this.onValueChangedCallback(this.value)
+  protected onConnectedFormChanged(value: any) {
+    if (this.onConnectedFormChangedCallback) {
+      this.onConnectedFormChangedCallback(value, this)
     }
   }
 }

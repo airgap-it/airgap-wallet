@@ -6,6 +6,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
   private static readonly GET_EXTRA_DELEGATEES_DETAILS_KEY = 'getExtraDelegateesDetails'
   private static readonly GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegatorDetailsFromAddress'
+  private static readonly ON_DETAILS_CHANGE_KEY = 'onDetailsChange'
 
   public static load<T extends ICoinDelegateProtocol>(protocol: new () => T, extensions: ProtocolDelegationExtensions<T>) {
     const alreadyLoaded =
@@ -20,7 +21,8 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
         [ProtocolDelegationExtensions.GET_EXTRA_DELEGATEES_DETAILS_KEY, 'function'],
-        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY, 'function']
+        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY, 'function'],
+        [ProtocolDelegationExtensions.ON_DETAILS_CHANGE_KEY, 'function']
       )
     }
   }
@@ -63,6 +65,13 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
 
   public abstract airGapDelegatee?: string
   public abstract delegateeLabel: string
+
   public abstract getExtraDelegateesDetails(protocol: T, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
   public abstract getExtraDelegatorDetailsFromAddress(protocol: T, address: string): Promise<Partial<AirGapDelegatorDetails>>
+
+  public abstract onDetailsChange(
+    protocol: T,
+    delegateesDetails: AirGapDelegateeDetails[],
+    delegatorDetails: AirGapDelegatorDetails
+  ): Promise<void>
 }

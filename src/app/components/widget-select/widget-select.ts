@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
-import { UISelect } from 'src/app/models/widgets/UISelect'
+import { UISelect } from 'src/app/models/widgets/input/UISelect'
 
 @Component({
   selector: 'widget-select',

@@ -1,7 +1,8 @@
-import { UIInputWidget, UIWidgetType, UIInputWidgetConfig } from './UIWidget'
+import { UIWidgetType } from '../UIWidget'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { UIInputWidgetConfig, UIInputWidget } from '../UIInputWidget'
 
-export interface UIInputTextConfig extends UIInputWidgetConfig<string> {
+export interface UIInputTextConfig extends UIInputWidgetConfig {
   inputType: string
 
   label: string
@@ -16,23 +17,25 @@ export interface UIInputTextConfig extends UIInputWidgetConfig<string> {
   fixedValue?: string
   getFixedValue?: (wallet?: AirGapMarketWallet) => string
   toggleFixedValueButton?: string
+
+  onValueChanged?: (value?: string, widget?: UIInputText) => void
+  onConnectedFormChanged?: (value?: any, widget?: UIInputText) => void
 }
 
 export class UIInputText extends UIInputWidget<string> {
   public readonly type = UIWidgetType.INPUT_TEXT
   public readonly inputType: string
 
-  public readonly label: string
-
-  public readonly placeholder: string
+  public label: string
+  public placeholder: string
 
   public extraLabel?: string
-  public readonly createExtraLabel?: (value: string) => string
-  public readonly errorLabel?: string
+  public createExtraLabel?: (value: string) => string
+  public errorLabel?: string
 
-  public readonly fixedValue?: string
-  public readonly getFixedValue?: () => string
-  public readonly toggleFixedValueButton?: string
+  public fixedValue?: string
+  public getFixedValue?: () => string
+  public toggleFixedValueButton?: string
 
   public isValueFixed: boolean = false
 
@@ -62,14 +65,14 @@ export class UIInputText extends UIInputWidget<string> {
     }
 
     if (this.onValueChangedCallback) {
-      this.onValueChangedCallback(this.value)
+      this.onValueChangedCallback(this.value, this)
     }
   }
 
   public toggleValue() {
     this.isValueFixed = !this.isValueFixed
-    if (this.isValueFixed && this.widgetControl) {
-      this.widgetControl.patchValue(this.fixedValue || this.getFixedValue())
+    if (this.isValueFixed && this.formControl) {
+      this.formControl.patchValue(this.fixedValue || this.getFixedValue())
     }
   }
 }

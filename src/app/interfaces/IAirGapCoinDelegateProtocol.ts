@@ -1,5 +1,6 @@
 import { ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { UIWidget, UIInputWidget } from '../models/widgets/UIWidget'
+import { UIWidget } from '../models/widgets/UIWidget'
+import { UIInputWidget } from '../models/widgets/UIInputWidget'
 import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
@@ -47,4 +48,6 @@ export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   delegateeLabel: string
   getExtraDelegateesDetails(addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
   getExtraDelegatorDetailsFromAddress(address: string): Promise<Partial<AirGapDelegatorDetails>>
+
+  onDetailsChange(delegateesDetails: AirGapDelegateeDetails[], delegatorDetails: AirGapDelegatorDetails): Promise<void>
 }

@@ -14,13 +14,14 @@ import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LoadingController, PopoverController, NavController } from '@ionic/angular'
-import { UIAccount } from 'src/app/models/widgets/UIAccount'
-import { UIIconText } from 'src/app/models/widgets/UIIconText'
+import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
-import { UIInputWidget } from 'src/app/models/widgets/UIWidget'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -36,7 +37,7 @@ export class DelegationDetailPage {
 
   public wallet: AirGapMarketWallet
 
-  public delegationForms: Map<any, FormGroup> = new Map()
+  public delegationForms: Map<string, FormGroup> = new Map()
 
   public delegateeLabel: string
   public delegateeAccountWidget: UIAccount
@@ -72,6 +73,10 @@ export class DelegationDetailPage {
     }
 
     this.extensionsService.loadDelegationExtensions().then(() => this.initView())
+  }
+
+  public filterVisible(widgets?: UIWidget[]): UIWidget[] {
+    return widgets ? widgets.filter(widget => widget.isVisible) : []
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
@@ -189,6 +194,8 @@ export class DelegationDetailPage {
           name: details.name,
           address: details.address
         })
+
+        this.operations.onDelegationDetailsChange(this.wallet, [details], this.delegatorDetails$.value)
       }
     })
 
@@ -208,6 +215,8 @@ export class DelegationDetailPage {
         this.delegateActionId = details.delegateAction.type ? details.delegateAction.type.toString() : 'delegate'
         this.undelegateActionId = details.undelegateAction.type ? details.undelegateAction.type.toString() : 'undelegate'
         this.setActiveDelegatorAction(details)
+
+        this.operations.onDelegationDetailsChange(this.wallet, [this.delegateeDetails$.value], details)
       }
     })
   }
@@ -242,6 +251,8 @@ export class DelegationDetailPage {
           } else {
             this.delegationForms.set(action.type, this.formBuilder.group(args))
           }
+
+          action.form = this.delegationForms.get(action.type)
         }
 
         const form = this.delegationForms.get(action.type)
@@ -266,11 +277,14 @@ export class DelegationDetailPage {
       } else if (action.args) {
         const form = this.delegationForms.get(action.type)
         const args = this.setupArgsForms(action.args || [], form)
+
         if (form) {
           form.setValue(args)
         } else {
           this.delegationForms.set(action.type, this.formBuilder.group(args))
         }
+
+        action.form = this.delegationForms.get(action.type)
       }
 
       if (action.args) {

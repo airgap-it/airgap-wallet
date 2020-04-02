@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
-import { UICheckbox } from 'src/app/models/widgets/UICheckbox'
+import { UICheckbox } from 'src/app/models/widgets/input/UICheckbox'
 
 @Component({
   selector: 'widget-checkbox',
