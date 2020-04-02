@@ -41,6 +41,7 @@ export class SubAccountAddPage {
       this.actionCallback = info.actionCallback
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
+      console.log('info', info)
     }
 
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
@@ -50,7 +51,6 @@ export class SubAccountAddPage {
     } else {
       assertNever(this.subProtocolType)
     }
-
     if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
@@ -63,8 +63,12 @@ export class SubAccountAddPage {
           const exists: boolean = this.accountProvider.walletExists(wallet)
           if (!exists) {
             wallet.addresses = this.wallet.addresses
-            wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-            this.subAccounts.push({ selected: false, wallet })
+            wallet
+              .synchronize()
+              .then(() => {
+                this.subAccounts.push({ selected: false, wallet })
+              })
+              .catch(handleErrorSentry(ErrorCategory.COINLIB))
           }
         }
       })

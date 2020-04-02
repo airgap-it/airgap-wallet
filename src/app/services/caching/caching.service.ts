@@ -76,8 +76,10 @@ export class CachingService {
     return new Promise<MarketDataSample[]>(async resolve => {
       const cachedData: StorageObject = await this.storage.get(uniqueId)
       if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
+        console.log('there is cached market data for', coinProtocol)
         resolve(cachedData.value)
       } else {
+        console.log('there NO cached market data for', coinProtocol)
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
           promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {

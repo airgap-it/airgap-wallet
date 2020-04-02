@@ -294,10 +294,15 @@
     "accounts_label": "Accounts"
   },
 
-  "account-import-onboarding": {
+ "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
+    "sub-protocol_text": "<strong>{{subProtocol}}</strong> can not be added without a <strong>{{protocol}}</strong> account.",
     "slides": {
+      "slide-0": {
+        "text": "<strong>{{protocol}}</strong> has many tokens. To use any of them, you need to first first add a <strong>{{protocol}}</strong> account from AirGap Vault",
+        "description": "Follow the instructions on the next few steps to add a <strong>{{protocol}}</strong> account before you can continue"
+      },
       "slide-1": {
         "text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
         "description": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>."

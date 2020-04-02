@@ -142,14 +142,16 @@ export class TransactionConfirmPage {
         this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
-        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
-          .payload as SignedTransaction))[0] as any
+        const signed = (
+          await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)
+        )[0] as any
         // necessary for the transaction backend
         signed.amount = signed.amount.toString()
         signed.fee = signed.fee.toString()
         signed.signedTx = this.signedTx
         signed.hash = txId
 
+        console.log('SIGNED TX', signed)
         this.pushBackendProvider.postPendingTx(signed) // Don't await
         // END POST TX TO BACKEND
       })
