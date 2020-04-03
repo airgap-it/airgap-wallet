@@ -238,7 +238,7 @@ export class DelegationDetailPage {
     const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction, details.changeDelegateeAction]
 
     mainActions
-      .filter(action => action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs))
+      .filter(action => action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs || action.form))
       .forEach(action => {
         if (action.form) {
           this.delegationForms.set(action.type, action.form)
@@ -361,7 +361,8 @@ export class DelegationDetailPage {
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
       this.dismissLoader()
-      console.log(error)
+      console.warn(error)
+      // TODO: show error prompt
     }
   }
 

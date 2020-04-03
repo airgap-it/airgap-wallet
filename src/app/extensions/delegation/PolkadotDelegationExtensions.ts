@@ -13,7 +13,6 @@ import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 import { PolkadotStakingActionType } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotStakingActionType'
 import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { UISelect, UISelectConfig } from 'src/app/models/widgets/input/UISelect'
 import * as moment from 'moment'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
@@ -150,7 +149,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
     const results = await Promise.all([
       this.createDelegateAction(protocol, address, availableActions),
-      this.createUndelegateAction(protocol, nominatorDetails.stakingDetails, availableActions),
+      this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions),
       this.createChangeDelegateeAction(availableActions),
       this.createDelegatorExtraActions(availableActions),
       this.createDelegatorExtraDetails(protocol, nominatorDetails)
@@ -213,7 +212,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             DecimalValidator.validate(protocol.decimals)
           ])
         ],
-        [widgetId.payee]: []
+        [widgetId.payee]: [PolkadotRewardDestination.STASH]
       })
 
       if (maxValue.gt(0)) {
@@ -234,8 +233,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
                   [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
                 })
               }
-            }),
-            ...(action.type === PolkadotStakingActionType.BOND_NOMINATE ? [this.createPayeeWidget({ isVisible: false })] : [])
+            })
           ]
         }
       } else {
@@ -251,7 +249,6 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   private async createUndelegateAction(
-    protocol: PolkadotProtocol,
     stakingDetails: PolkadotStakingDetails | null,
     availableActions: DelegatorAction[]
   ): Promise<AirGapMainDelegatorAction> {
@@ -259,42 +256,15 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
     if (action) {
       if (stakingDetails) {
-        const valueFormatted = this.amountConverterPipe.formatBigNumber(
-          new BigNumber(stakingDetails.active).shiftedBy(-protocol.decimals),
-          10
-        )
-
         const form = this.formBuilder.group({
-          [widgetId.value]: [],
-          [widgetId.valueControl]: [
-            valueFormatted,
-            Validators.compose([
-              Validators.required,
-              Validators.max(new BigNumber(valueFormatted).toNumber()),
-              DecimalValidator.validate(protocol.decimals)
-            ])
-          ]
+          [widgetId.value]: [stakingDetails.active]
         })
 
         return {
           type: action.type,
           isAvailable: true,
           description: 'Undelegate description',
-          form,
-          extraArgs: [
-            this.createValueWidget({
-              id: widgetId.valueControl,
-              isVisible: false,
-              toggleFixedValueButton: 'Max',
-              fixedValue: valueFormatted,
-              defaultValue: valueFormatted,
-              onValueChanged: (value: string) => {
-                form.patchValue({
-                  [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
-                })
-              }
-            })
-          ]
+          form
         }
       }
     }
@@ -378,20 +348,6 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           return ''
         }
       },
-      ...config
-    })
-  }
-
-  private createPayeeWidget(config: Partial<UISelectConfig> = {}): UISelect {
-    return new UISelect({
-      id: widgetId.payee,
-      label: 'Reward destination',
-      options: [
-        [PolkadotRewardDestination.STAKED, 'Staked'], // probably needs better labels
-        [PolkadotRewardDestination.STASH, 'Stash'],
-        [PolkadotRewardDestination.CONTROLLER, 'Controller']
-      ],
-      defaultOption: PolkadotRewardDestination.STASH,
       ...config
     })
   }

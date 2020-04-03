@@ -14,7 +14,7 @@ export class WidgetSelect {
   @Input()
   public widgetForm: FormGroup
 
-  public get optionTuples(): [any, string][] {
+  public get optionTuples(): [string, string][] {
     return Array.from(this.widget.options.entries())
   }
 }

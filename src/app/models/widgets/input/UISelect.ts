@@ -15,13 +15,13 @@ export class UISelect extends UIInputWidget<any> {
   public readonly type = UIWidgetType.SELECT
 
   public label: string
-  public options: Map<any, string>
+  public options: Map<string, string>
 
   constructor(config: UISelectConfig) {
     super(config)
 
     this.label = config.label
-    this.options = new Map(config.options)
-    this.value = config.defaultOption
+    this.options = new Map(config.options.map(([key, value]) => [key.toString(), value]))
+    this.value = config.defaultOption.toString()
   }
 }

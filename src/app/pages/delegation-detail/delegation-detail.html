@@ -116,7 +116,7 @@
       <ion-segment-button [value]="undelegateActionId" [disabled]="!(delegatorDetails$ | async).undelegateAction.isAvailable">
         <ion-label>Undelegate</ion-label>
       </ion-segment-button>
-      <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraActions)">
+      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions">
         <ion-segment-button [value]="extra.type">
           <ion-label>{{ extra.label }}</ion-label>
         </ion-segment-button>
@@ -172,7 +172,7 @@
           </ion-col>
         </ion-row>
       </ng-container>
-      <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraActions)">
+      <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions">
         <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
           <ion-row class="ion-padding-horizontal">
             <ion-col size="12">

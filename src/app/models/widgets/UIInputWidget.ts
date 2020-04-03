@@ -49,6 +49,7 @@ export abstract class UIInputWidget<T> extends UIWidget {
       }
     })
 
+    console.log(this.id, this.value)
     if (this.value !== undefined || this.value !== null) {
       this.formControl.patchValue(this.value)
     }
