@@ -49,10 +49,10 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
-    amountConverter: AmountConverterPipe
+    amountConverterPipe: AmountConverterPipe
   ): PolkadotDelegationExtensions {
     if (!PolkadotDelegationExtensions.instance) {
-      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(formBuilder, decimalPipe, amountConverter)
+      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe)
     }
 
     return PolkadotDelegationExtensions.instance
@@ -78,7 +78,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
 
-        const extraDetails = await this.createDelegateeExtraDetails(protocol, validatorDetails)
+        const extraDetails = this.createDelegateeExtraDetails(protocol, validatorDetails)
 
         return {
           status: validatorDetails.status || 'unknown',
@@ -93,7 +93,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     )
   }
 
-  private async createDelegateeExtraDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): Promise<UIWidget[]> {
+  private createDelegateeExtraDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): UIWidget[] {
     const details = []
 
     const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
@@ -147,19 +147,11 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     const nominatorDetails = await protocol.accountController.getNominatorDetails(address)
     const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
-    const results = await Promise.all([
-      this.createDelegateAction(protocol, address, availableActions),
-      this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions),
-      this.createChangeDelegateeAction(availableActions),
-      this.createDelegatorExtraActions(availableActions),
-      this.createDelegatorExtraDetails(protocol, nominatorDetails)
-    ])
-
-    const delegateAction = results[0]
-    const undelegateAction = results[1]
-    const changeDelegateeAction = results[2]
-    const extraActions = results[3]
-    const extraDetails = results[4]
+    const delegateAction = await this.createDelegateAction(protocol, address, availableActions)
+    const undelegateAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
+    const changeDelegateeAction = this.createChangeDelegateeAction(availableActions)
+    const extraActions = this.createDelegatorExtraActions(availableActions)
+    const extraDetails = this.createDelegatorExtraDetails(protocol, nominatorDetails)
 
     return {
       delegateAction,
@@ -248,10 +240,10 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     }
   }
 
-  private async createUndelegateAction(
+  private createUndelegateAction(
     stakingDetails: PolkadotStakingDetails | null,
     availableActions: DelegatorAction[]
-  ): Promise<AirGapMainDelegatorAction> {
+  ): AirGapMainDelegatorAction {
     const action = availableActions.find(action => action.type === PolkadotStakingActionType.CANCEL_NOMINATION)
 
     if (action) {
@@ -275,7 +267,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     }
   }
 
-  private async createChangeDelegateeAction(availableActions: DelegatorAction[]): Promise<AirGapMainDelegatorAction> {
+  private createChangeDelegateeAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
     const description = 'Change Validator'
     const action = availableActions.find(action => action.type === PolkadotStakingActionType.CHANGE_NOMINATION)
 
@@ -352,29 +344,29 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     })
   }
 
-  private async createDelegatorExtraDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): Promise<UIWidget[]> {
+  private createDelegatorExtraDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIWidget[] {
     const extraDetails = []
 
     if (nominatorDetails.stakingDetails) {
-      extraDetails.push(...(await this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails)))
+      extraDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails))
     }
 
     return extraDetails
   }
 
-  private async createStakingDetailsWidgets(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): Promise<UIWidget[]> {
+  private createStakingDetailsWidgets(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
     const details = []
 
-    details.push(...(await this.createBondedDetails(protocol, stakingDetails)))
+    details.push(...this.createBondedDetails(protocol, stakingDetails))
 
     if (stakingDetails.status === 'nominating') {
-      details.push(...(await this.createNominationDetails(protocol, stakingDetails)))
+      details.push(...this.createNominationDetails(protocol, stakingDetails))
     }
 
     return details
   }
 
-  private async createBondedDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): Promise<UIWidget[]> {
+  private createBondedDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
     const details = []
 
     const totalStaking = new BigNumber(stakingDetails.total)
@@ -428,7 +420,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     return details
   }
 
-  private async createNominationDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): Promise<UIWidget[]> {
+  private createNominationDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
     const details = []
 
     const nextEraDate = new Date(stakingDetails.nextEra)

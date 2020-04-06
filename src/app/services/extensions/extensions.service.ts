@@ -11,13 +11,13 @@ import { FormBuilder } from '@angular/forms'
 })
 export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => ProtocolDelegationExtensions<any>][] = [
-    [PolkadotProtocol, () => PolkadotDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverted)]
+    [PolkadotProtocol, () => PolkadotDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)]
   ]
 
   public constructor(
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverted: AmountConverterPipe
+    private readonly amountConverterPipe: AmountConverterPipe
   ) {}
 
   public async loadDelegationExtensions(): Promise<void> {
