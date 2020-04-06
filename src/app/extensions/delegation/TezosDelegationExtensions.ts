@@ -1,4 +1,4 @@
-import { TezosProtocol, TezosDelegationAction, TezosKtProtocol, DelegationRewardInfo } from 'airgap-coin-lib'
+import { TezosProtocol, TezosDelegationAction, TezosKtProtocol, DelegationRewardInfo, DelegationInfo } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
@@ -10,6 +10,7 @@ import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { Moment } from 'moment'
 import * as moment from 'moment'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 const hoursPerCycle: number = 68
 
@@ -91,13 +92,15 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const delegatorDetails = results[0]
     const delegatorExtraInfo = results[1]
 
-    const delegateAction = this.createDelegateAction(delegatorDetails.availableActions)
-    const undelegateAction = this.createUndelegateAction(delegatorDetails.availableActions)
+    const delegateAction: AirGapMainDelegatorAction = this.createDelegateAction(delegatorDetails.availableActions)
+    const undelegateAction: AirGapMainDelegatorAction = this.createUndelegateAction(delegatorDetails.availableActions)
+    const displayRewards: UIRewardList | undefined = await this.createDelegatorDisplayRewards(protocol, address, delegatorExtraInfo)
 
     return {
       delegateAction,
       undelegateAction,
-      extraDetails: delegatorExtraInfo
+      extraDetails: delegatorExtraInfo,
+      displayRewards: displayRewards
     }
   }
 
@@ -164,6 +167,33 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     )
 
     return details
+  }
+
+  private async createDelegatorDisplayRewards(
+    protocol: TezosProtocol,
+    address: string,
+    delegatorExtraInfo: DelegationInfo
+  ): Promise<UIRewardList | undefined> {
+    if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
+      return undefined
+    }
+
+    const rewardInfo = await this.ktProtocol.delegationRewards(delegatorExtraInfo.value, address)
+
+    return new UIRewardList({
+      rewards: rewardInfo.slice(0, 5).map(reward => ({
+        index: reward.cycle,
+        amount: `~${this.amountConverter.transform(reward.reward, {
+          protocolIdentifier: protocol.identifier,
+          maxDigits: 10
+        })}`,
+        collected: reward.payout < new Date(),
+        timestamp: reward.payout.getTime()
+      })),
+      indexColLabel: 'Cycle',
+      amountColLabel: 'Expected Reward',
+      payoutColLabel: 'Earliest Payout'
+    })
   }
 
   private async showFuturePayoutDetails(

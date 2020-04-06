@@ -26,9 +26,8 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
-import { isString } from 'util'
-import { DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +42,13 @@ export class OperationsProvider {
     private readonly serializerService: SerializerService
   ) {}
 
-  public async getCurrentDelegatees(protocol: ICoinDelegateProtocol, address: string): Promise<string[]> {
-    const current = await protocol.getCurrentDelegateesForAddress(address)
+  public async getCurrentDelegatees(wallet: AirGapMarketWallet): Promise<string[]> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    const current = await protocol.getCurrentDelegateesForAddress(wallet.receivingPublicAddress)
     if (current.length === 0) {
       let defaultDelegatee: string
       if (supportsAirGapDelegation(protocol)) {
@@ -55,7 +59,12 @@ export class OperationsProvider {
     return current
   }
 
-  public async getDelegateeDetails(protocol: ICoinDelegateProtocol, addresses: string[]): Promise<AirGapDelegateeDetails> {
+  public async getDelegateeDetails(wallet: AirGapMarketWallet, addresses: string[]): Promise<AirGapDelegateeDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
     const promises = []
     promises.push(protocol.getDelegateesDetails(addresses))
     if (supportsAirGapDelegation(protocol)) {
@@ -83,34 +92,37 @@ export class OperationsProvider {
     }))
   }
 
-  public async getDelegatorDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegatorDetails> {
+  public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<AirGapDelegatorDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
     const promises = []
-    promises.push(protocol.getDelegatorDetailsFromAddress(address))
+    promises.push(protocol.getDelegatorDetailsFromAddress(wallet.receivingPublicAddress))
     if (supportsAirGapDelegation(protocol)) {
-      promises.push(protocol.getExtraDelegatorDetailsFromAddress(address))
+      promises.push(protocol.getExtraDelegatorDetailsFromAddress(wallet.receivingPublicAddress))
     }
 
     const allDetails = await Promise.all(promises)
 
-    const basicDetails = allDetails[0]
-    const extraDetails = allDetails[1]
+    const basicDetails: DelegatorDetails = allDetails[0]
+    const extraDetails: Partial<AirGapDelegatorDetails> = allDetails[1]
 
     const details = {
       balance: basicDetails.balance,
       isDelegating: basicDetails.isDelegating,
-      delegateAction: { isAvailable: false },
-      undelegateAction: { isAvailable: false },
-      extraActions: basicDetails.availableActions
-        .map(action =>
-          isString(action)
-            ? new UIInputText({
-                id: action,
-                inputType: 'string',
-                label: action
-              })
-            : null
-        )
-        .filter(widget => widget !== null),
+      delegateAction: { isAvailable: false, description: '' },
+      undelegateAction: { isAvailable: false, description: '' },
+      changeDelegateeAction: { isAvailable: true, description: '' },
+      displayRewards: basicDetails.rewards
+        ? new UIRewardList({
+            rewards: basicDetails.rewards.slice(0, 5),
+            indexColLabel: 'Index',
+            amountColLabel: 'Reward',
+            payoutColLabel: 'Payout'
+          })
+        : undefined,
       ...(extraDetails ? extraDetails : {})
     }
 

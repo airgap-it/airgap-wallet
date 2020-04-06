@@ -35,6 +35,7 @@ import { WidgetIconText } from './widget-icon-text/widget-icon-text'
 import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetSelect } from './widget-select/widget-select'
 import { WidgetAccount } from './widget-account/widget-account'
+import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import { WidgetAccount } from './widget-account/widget-account'
     WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,
+    WidgetRewardList,
     WidgetSelect
   ],
   imports: [
@@ -101,6 +103,7 @@ import { WidgetAccount } from './widget-account/widget-account'
     WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,
+    WidgetRewardList,
     WidgetSelect
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]

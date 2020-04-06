@@ -6,6 +6,7 @@ export enum UIWidgetType {
   CHECKBOX = 'checkbox',
   ICON_TEXT = 'icon_text',
   INPUT_TEXT = 'input_text',
+  REWARD_LIST = 'reward_list',
   SELECT = 'select'
 }
 

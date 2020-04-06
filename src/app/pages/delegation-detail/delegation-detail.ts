@@ -9,7 +9,7 @@ import {
   AirGapExtraDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
@@ -162,24 +162,18 @@ export class DelegationDetailPage {
   private initView() {
     this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
 
-    if (supportsDelegation(this.wallet.coinProtocol)) {
-      this.subscribeObservables()
+    this.subscribeObservables()
 
-      this.operations
-        .getCurrentDelegatees(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(addresses => this.delegateeAddresses$.next(addresses))
+    this.operations.getCurrentDelegatees(this.wallet).then(addresses => this.delegateeAddresses$.next(addresses))
 
-      this.operations
-        .getDelegatorDetails(this.wallet.coinProtocol, this.wallet.receivingPublicAddress)
-        .then(details => this.delegatorDetails$.next(details))
-    }
+    this.operations.getDelegatorDetails(this.wallet).then(details => this.delegatorDetails$.next(details))
   }
 
   private subscribeObservables() {
     this.delegateeAddresses$.subscribe(addresses => {
-      if (addresses && supportsDelegation(this.wallet.coinProtocol)) {
+      if (addresses) {
         // TODO: support multiple cases
-        this.operations.getDelegateeDetails(this.wallet.coinProtocol, addresses).then(details => this.delegateeDetails$.next(details[0]))
+        this.operations.getDelegateeDetails(this.wallet, addresses).then(details => this.delegateeDetails$.next(details[0]))
 
         const details = this.delegatorDetails$.value
         if (details) {
@@ -199,7 +193,7 @@ export class DelegationDetailPage {
       }
     })
 
-    this.delegatorDetails$.subscribe(details => {
+    this.delegatorDetails$.subscribe(async details => {
       if (details) {
         // TODO: add translations
         this.delegatorBalanceWidget = new UIIconText({
@@ -271,28 +265,30 @@ export class DelegationDetailPage {
   private setupExtraActionsForms(details: AirGapDelegatorDetails) {
     const extraActions: AirGapExtraDelegatorAction[] = details.extraActions
 
-    extraActions.forEach(action => {
-      if (action.form) {
-        this.delegationForms.set(action.type, action.form)
-      } else if (action.args) {
-        const form = this.delegationForms.get(action.type)
-        const args = this.setupArgsForms(action.args || [], form)
+    if (extraActions) {
+      extraActions.forEach(action => {
+        if (action.form) {
+          this.delegationForms.set(action.type, action.form)
+        } else if (action.args) {
+          const form = this.delegationForms.get(action.type)
+          const args = this.setupArgsForms(action.args || [], form)
 
-        if (form) {
-          form.setValue(args)
-        } else {
-          this.delegationForms.set(action.type, this.formBuilder.group(args))
+          if (form) {
+            form.setValue(args)
+          } else {
+            this.delegationForms.set(action.type, this.formBuilder.group(args))
+          }
+
+          action.form = this.delegationForms.get(action.type)
         }
 
-        action.form = this.delegationForms.get(action.type)
-      }
-
-      if (action.args) {
-        action.args.forEach(arg => {
-          arg.wallet = this.wallet
-        })
-      }
-    })
+        if (action.args) {
+          action.args.forEach(arg => {
+            arg.wallet = this.wallet
+          })
+        }
+      })
+    }
   }
 
   private setupArgsForms(args: UIInputWidget<any>[], form: FormGroup): any {
