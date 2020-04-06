@@ -1,5 +1,6 @@
 import { ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
@@ -74,4 +75,19 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     delegateesDetails: AirGapDelegateeDetails[],
     delegatorDetails: AirGapDelegatorDetails
   ): Promise<void>
+
+  protected updateWidget(details: AirGapDelegateeDetails | AirGapDelegatorDetails, widgetId: string, widget: UIWidget | undefined) {
+    if (!details.displayDetails) {
+      details.displayDetails = []
+    }
+
+    const index = details.displayDetails.findIndex(widget => widget.id === widgetId)
+    if (index !== -1 && widget) {
+      details.displayDetails[index] = widget
+    } else if (index !== -1 && !widget) {
+      details.displayDetails.splice(index, 1)
+    } else if (index === -1 && widget) {
+      details.displayDetails.push(widget)
+    }
+  }
 }

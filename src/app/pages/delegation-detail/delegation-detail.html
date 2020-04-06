@@ -80,8 +80,8 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
-        <ion-card *ngIf="(delegateeDetails$ | async).extraDetails">
-          <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).extraDetails)">
+        <ion-card *ngIf="(delegateeDetails$ | async).displayDetails">
+          <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).displayDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>
@@ -216,7 +216,7 @@
           <ion-item lines="none" *ngIf="delegatorBalanceWidget">
             <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
           </ion-item>
-          <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraDetails)">
+          <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).displayDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>
