@@ -318,8 +318,7 @@ export class AccountTransactionListPage {
   public async isDelegated(): Promise<void> {
     const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(
       this.wallet.coinProtocol as ICoinDelegateProtocol,
-      this.wallet.receivingPublicAddress,
-      false
+      this.wallet.receivingPublicAddress
     )
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()

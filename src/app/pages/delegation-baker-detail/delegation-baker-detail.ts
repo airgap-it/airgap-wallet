@@ -76,8 +76,7 @@ export class DelegationBakerDetailPage {
 
     this.delegationInfo = await this.operationsProvider.checkDelegated(
       this.wallet.coinProtocol as ICoinDelegateProtocol,
-      this.wallet.receivingPublicAddress,
-      true
+      this.wallet.receivingPublicAddress
     )
 
     this.isDelegated = this.delegationInfo.isDelegated
@@ -191,6 +190,7 @@ export class DelegationBakerDetailPage {
     const popover: HTMLIonPopoverElement = await this.popoverCtrl.create({
       component: DelegateEditPopoverComponent,
       componentProps: {
+        isTezos: true,
         hideAirGap: this.bakerConfig.address === this.airGapBaker.address
       },
       event,

@@ -73,7 +73,7 @@ export class OperationsProvider {
 
     return zippedDetails.map(([basic, extra]: [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]) => ({
       ...basic,
-      status: '-',
+      name: '',
       usageDetails: {
         usage: new BigNumber(0),
         current: new BigNumber(0),
@@ -155,7 +155,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(protocol: ICoinDelegateProtocol, address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(protocol, address, false)
+      const { isDelegated } = await this.checkDelegated(protocol, address)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -200,7 +200,7 @@ export class OperationsProvider {
   }
 
   // TODO: change returned type when generic protocol is done
-  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
+  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<DelegationInfo> {
     if (supportsDelegation(protocol)) {
       return {
         isDelegated: await protocol.isAddressDelegating(address)
@@ -215,14 +215,11 @@ export class OperationsProvider {
           isDelegated: delegations.length > 0 ? true : false
         }
       } else {
-        return this.fetchDelegationInfo(address, fetchExtraInfo)
+        return {
+          isDelegated: false
+        }
       }
     }
-  }
-  public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
-    const protocol = new TezosKtProtocol()
-
-    return protocol.isAddressDelegated(address, fetchExtraInfo)
   }
 
   public async prepareTransaction(
