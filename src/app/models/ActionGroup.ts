@@ -67,30 +67,7 @@ export class ActionGroup {
         return importAccountAction
       }
     )
-    const delegateButtonAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
-      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
-      () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
-            const wallet: AirGapMarketWallet = this.callerContext.wallet
-            const info = {
-              wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-        const delegateAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapTezosDelegateAction
-        )
-
-        return delegateAction
-      }
-    )
+    const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction, importButtonAction]
   }
@@ -178,24 +155,25 @@ export class ActionGroup {
 
   // TODO:
   private getPolkadotActions(): Action<any, any>[] {
-    const delegateButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
-      () => {
-        return new SimpleAction(() => {
-          return new Promise<void>(async resolve => {
-            const info = {
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-      }
-    )
+    const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]
+  }
+
+  private createDelegateButtonAction(): ButtonAction<void, void> {
+    return new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' }, () => {
+      return new SimpleAction(() => {
+        return new Promise<void>(async resolve => {
+          const info = {
+            wallet: this.callerContext.wallet,
+            actionCallback: resolve
+          }
+          this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+          this.callerContext.router
+            .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
+            .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        })
+      })
+    })
   }
 }

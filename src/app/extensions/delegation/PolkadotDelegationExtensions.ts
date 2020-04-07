@@ -1,4 +1,4 @@
-import { PolkadotProtocol, PolkadotRewardDestination, AirGapMarketWallet } from 'airgap-coin-lib'
+import { PolkadotProtocol, PolkadotPayee, AirGapMarketWallet } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
@@ -24,6 +24,7 @@ import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators, FormGroup } from '@angular/forms'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 import { PolkadotValidatorDetails } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotValidatorDetails'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 const supportedActions = [
   PolkadotStakingActionType.BOND_NOMINATE,
@@ -78,7 +79,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
 
-        const extraDetails = this.createDelegateeExtraDetails(protocol, validatorDetails)
+        const displayDetails = this.createDelegateeDisplayDetails(protocol, validatorDetails)
 
         return {
           status: validatorDetails.status || 'unknown',
@@ -87,13 +88,13 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             current: ownStash,
             total: totalStakingBalance
           },
-          extraDetails
+          displayDetails
         }
       })
     )
   }
 
-  private createDelegateeExtraDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): UIWidget[] {
+  private createDelegateeDisplayDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): UIWidget[] {
     const details = []
 
     const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
@@ -147,18 +148,20 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     const nominatorDetails = await protocol.accountController.getNominatorDetails(address)
     const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
-    const delegateAction = await this.createDelegateAction(protocol, address, availableActions)
-    const undelegateAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const changeDelegateeAction = this.createChangeDelegateeAction(availableActions)
-    const extraActions = this.createDelegatorExtraActions(availableActions)
-    const extraDetails = this.createDelegatorExtraDetails(protocol, nominatorDetails)
+    const delegateAction: AirGapMainDelegatorAction = await this.createDelegateAction(protocol, address, availableActions)
+    const undelegateAction: AirGapMainDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
+    const changeDelegateeAction: AirGapMainDelegatorAction = this.createChangeDelegateeAction(availableActions)
+    const extraActions: AirGapExtraDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
+    const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
+    const displayRewards: UIRewardList | undefined = this.createDelegatorDisplayRewards(protocol, nominatorDetails)
 
     return {
       delegateAction,
       undelegateAction,
       changeDelegateeAction,
       extraActions,
-      extraDetails
+      displayDetails,
+      displayRewards: displayRewards
     }
   }
 
@@ -204,7 +207,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             DecimalValidator.validate(protocol.decimals)
           ])
         ],
-        [widgetId.payee]: [PolkadotRewardDestination.STASH]
+        [widgetId.payee]: [PolkadotPayee.STASH]
       })
 
       if (maxValue.gt(0)) {
@@ -344,14 +347,14 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     })
   }
 
-  private createDelegatorExtraDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIWidget[] {
-    const extraDetails = []
+  private createDelegatorDisplayDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIWidget[] {
+    const displayDetails = []
 
     if (nominatorDetails.stakingDetails) {
-      extraDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails))
+      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails))
     }
 
-    return extraDetails
+    return displayDetails
   }
 
   private createStakingDetailsWidgets(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
@@ -364,6 +367,27 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     }
 
     return details
+  }
+
+  private createDelegatorDisplayRewards(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIRewardList | undefined {
+    if (!nominatorDetails.isDelegating) {
+      return undefined
+    }
+
+    return new UIRewardList({
+      rewards: nominatorDetails.stakingDetails.rewards.slice(0, 5).map(reward => ({
+        index: reward.eraIndex,
+        amount: this.amountConverterPipe.transform(reward.amount, {
+          protocolIdentifier: protocol.identifier,
+          maxDigits: 10
+        }),
+        collected: reward.collected,
+        timestamp: reward.timestamp
+      })),
+      indexColLabel: 'Era',
+      amountColLabel: 'Reward',
+      payoutColLabel: 'Payout'
+    })
   }
 
   private createBondedDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
@@ -424,7 +448,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     const details = []
 
     const nextEraDate = new Date(stakingDetails.nextEra)
-    const [collected, notCollected] = this.partitionArray(stakingDetails.previousRewards, reward => reward.collected)
+    const unclaimed = stakingDetails.rewards.filter(reward => !reward.collected)
 
     details.push(
       new UIIconText({
@@ -434,8 +458,8 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       })
     )
 
-    if (notCollected.length > 0) {
-      const totalNotCollected = notCollected.reduce((sum, next) => sum.plus(next.amount), new BigNumber(0))
+    if (unclaimed.length > 0) {
+      const totalNotCollected = unclaimed.reduce((sum, next) => sum.plus(next.amount), new BigNumber(0))
       details.push(
         new UIIconText({
           iconName: 'logo-usd',
@@ -446,20 +470,6 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           description: 'To collect'
         })
       )
-    } else if (collected.length > 0) {
-      const lastCollected = collected[0]
-      const lastCollectedAmount = new BigNumber(lastCollected.amount)
-      const lastCollectedDate = new Date(lastCollected.timestamp)
-      details.push(
-        new UIIconText({
-          iconName: 'logo-usd',
-          text: this.amountConverterPipe.transform(lastCollectedAmount, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
-          }),
-          description: `Last reward: ${moment(lastCollectedDate).format('LLL')}`
-        })
-      )
     }
 
     return details
@@ -467,23 +477,13 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
   private showExpectedRewardWidget(delegateesDetails: AirGapDelegateeDetails[], delegationActionForm: FormGroup) {
     delegateesDetails.forEach(details => {
-      if (details.extraDetails) {
-        const expectedRewardWidget = details.extraDetails.find(extra => extra.id === widgetId.expectedReward)
+      if (details.displayDetails) {
+        const expectedRewardWidget = details.displayDetails.find(extra => extra.id === widgetId.expectedReward)
         if (expectedRewardWidget) {
           expectedRewardWidget.setConnectedForms(delegationActionForm)
           expectedRewardWidget.isVisible = true
         }
       }
     })
-  }
-
-  private partitionArray<T>(array: T[], predicate: (value: T) => boolean): [T[], T[]] {
-    const partitioned: [T[], T[]] = [[], []]
-    for (let item of array) {
-      const index = predicate(item) ? 0 : 1
-      partitioned[index].push(item)
-    }
-
-    return partitioned
   }
 }

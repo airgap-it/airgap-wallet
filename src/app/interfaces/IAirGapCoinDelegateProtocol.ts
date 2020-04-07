@@ -4,6 +4,7 @@ import { UIInputWidget } from '../models/widgets/UIInputWidget'
 import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
+import { UIRewardList } from '../models/widgets/display/UIRewardList'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -30,9 +31,9 @@ export interface AirGapExtraDelegatorAction {
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {
-  status: string
   usageDetails: AirGapDelegateeUsageDetails
-  extraDetails?: UIWidget[]
+  displayDetails?: UIWidget[]
+  extraDetails?: any
 }
 
 export interface AirGapDelegatorDetails extends DelegatorDetails {
@@ -40,12 +41,15 @@ export interface AirGapDelegatorDetails extends DelegatorDetails {
   undelegateAction: AirGapMainDelegatorAction
   changeDelegateeAction: AirGapMainDelegatorAction
   extraActions?: AirGapExtraDelegatorAction[]
-  extraDetails?: UIWidget[]
+  displayDetails?: UIWidget[]
+  displayRewards?: UIRewardList
+  extraDetails?: any
 }
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   airGapDelegatee?: string
   delegateeLabel: string
+
   getExtraDelegateesDetails(addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
   getExtraDelegatorDetailsFromAddress(address: string): Promise<Partial<AirGapDelegatorDetails>>
 

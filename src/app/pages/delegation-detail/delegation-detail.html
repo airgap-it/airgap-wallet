@@ -15,9 +15,7 @@
 <ion-content>
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12">
-      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton">
-        <widget-account [widget]="delegateeAccountWidget"></widget-account>
-      </ion-item>
+      <widget-account *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton" [widget]="delegateeAccountWidget"></widget-account>
       <ng-template #delegateeAvatarSkeleton>
         <div>
           <ion-item lines="none" class="ion-no-padding">
@@ -80,8 +78,8 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
-        <ion-card *ngIf="(delegateeDetails$ | async).extraDetails">
-          <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).extraDetails)">
+        <ion-card *ngIf="(delegateeDetails$ | async).displayDetails">
+          <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).displayDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>
@@ -216,7 +214,7 @@
           <ion-item lines="none" *ngIf="delegatorBalanceWidget">
             <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
           </ion-item>
-          <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).extraDetails)">
+          <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).displayDetails)">
             <ion-item lines="none">
               <widget-selector [widget]="extra"></widget-selector>
             </ion-item>
@@ -240,6 +238,22 @@
       </ion-card>
     </ion-col>
   </ion-row>
+
+  <ng-container *ngIf="(delegatorDetails$ | async) && (delegatorDetails$ | async).displayRewards">
+    <ion-row class="ion-padding-horizontal">
+      <ion-text color="primary">
+        <p ion-text class="font--weight__bold ion-no-margin">
+          Your rewards
+        </p>
+      </ion-text>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="12">
+        <widget-reward-list [widget]="(delegatorDetails$ | async).displayRewards"></widget-reward-list>
+      </ion-col>
+    </ion-row>
+  </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="callAction()" [disabled]="!canProceed">

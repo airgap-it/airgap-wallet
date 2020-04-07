@@ -1,17 +1,15 @@
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
+import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise-timeout'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapTezosDelegateAction } from '../../models/actions/TezosDelegateAction'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -74,7 +72,6 @@ export class AccountTransactionListPage {
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
-    private readonly loadingController: LoadingController,
     private readonly pushBackendProvider: PushBackendProvider
   ) {
     const info = this.route.snapshot.data.special
@@ -292,19 +289,6 @@ export class AccountTransactionListPage {
         wallet: this.wallet,
         onDelete: (): void => {
           this.navController.pop()
-        },
-        onUndelegate: async (): Promise<void> => {
-          // TODO: Should we move this to it's own file?
-          const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction({
-            wallet: this.wallet,
-            delegate: undefined,
-            toastController: this.toastController,
-            loadingController: this.loadingController,
-            dataService: this.dataService,
-            router: this.router
-          })
-
-          await delegateAction.start()
         }
       },
       event,
@@ -318,8 +302,7 @@ export class AccountTransactionListPage {
   public async isDelegated(): Promise<void> {
     const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(
       this.wallet.coinProtocol as ICoinDelegateProtocol,
-      this.wallet.receivingPublicAddress,
-      false
+      this.wallet.receivingPublicAddress
     )
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
@@ -335,10 +318,8 @@ export class AccountTransactionListPage {
     return ktAddresses
   }
 
-  public async openDelegateSelection(): Promise<void> {
-    const delegateAction: TezosDelegateAction<any> | undefined = this.actions.find(
-      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation'
-    ) as TezosDelegateAction<any>
+  public async openDelegationDetails(): Promise<void> {
+    const delegateAction = this.actions.find(action => action.identifier === 'delegate-action')
     if (delegateAction) {
       await delegateAction.start()
     }

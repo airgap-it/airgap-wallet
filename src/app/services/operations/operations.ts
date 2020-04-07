@@ -25,10 +25,10 @@ import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { DelegateeDetails, DelegatorDetails, DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
-import { isString } from 'util'
-import { DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 
 @Injectable({
   providedIn: 'root'
@@ -43,8 +43,13 @@ export class OperationsProvider {
     private readonly serializerService: SerializerService
   ) {}
 
-  public async getCurrentDelegatees(protocol: ICoinDelegateProtocol, address: string): Promise<string[]> {
-    const current = await protocol.getCurrentDelegateesForAddress(address)
+  public async getCurrentDelegatees(wallet: AirGapMarketWallet): Promise<string[]> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    const current = await protocol.getCurrentDelegateesForAddress(wallet.receivingPublicAddress)
     if (current.length === 0) {
       let defaultDelegatee: string
       if (supportsAirGapDelegation(protocol)) {
@@ -55,7 +60,12 @@ export class OperationsProvider {
     return current
   }
 
-  public async getDelegateeDetails(protocol: ICoinDelegateProtocol, addresses: string[]): Promise<AirGapDelegateeDetails> {
+  public async getDelegateeDetails(wallet: AirGapMarketWallet, addresses: string[]): Promise<AirGapDelegateeDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
     const promises = []
     promises.push(protocol.getDelegateesDetails(addresses))
     if (supportsAirGapDelegation(protocol)) {
@@ -72,8 +82,8 @@ export class OperationsProvider {
     )
 
     return zippedDetails.map(([basic, extra]: [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]) => ({
+      name: '',
       ...basic,
-      status: '-',
       usageDetails: {
         usage: new BigNumber(0),
         current: new BigNumber(0),
@@ -83,38 +93,78 @@ export class OperationsProvider {
     }))
   }
 
-  public async getDelegatorDetails(protocol: ICoinDelegateProtocol, address: string): Promise<AirGapDelegatorDetails> {
+  public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<AirGapDelegatorDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
     const promises = []
-    promises.push(protocol.getDelegatorDetailsFromAddress(address))
+    promises.push(protocol.getDelegatorDetailsFromAddress(wallet.receivingPublicAddress))
     if (supportsAirGapDelegation(protocol)) {
-      promises.push(protocol.getExtraDelegatorDetailsFromAddress(address))
+      promises.push(protocol.getExtraDelegatorDetailsFromAddress(wallet.receivingPublicAddress))
     }
 
     const allDetails = await Promise.all(promises)
 
-    const basicDetails = allDetails[0]
-    const extraDetails = allDetails[1]
+    const basicDetails: DelegatorDetails = allDetails[0]
+    const extraDetails: Partial<AirGapDelegatorDetails> = allDetails[1]
 
     const details = {
       balance: basicDetails.balance,
       isDelegating: basicDetails.isDelegating,
-      delegateAction: { isAvailable: false },
-      undelegateAction: { isAvailable: false },
-      extraActions: basicDetails.availableActions
-        .map(action =>
-          isString(action)
-            ? new UIInputText({
-                id: action,
-                inputType: 'string',
-                label: action
-              })
-            : null
-        )
-        .filter(widget => widget !== null),
+      delegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['delegate'], ['delegate', 'delegatee']),
+      undelegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['undelegate'], ['delegate', 'delegatee']),
+      changeDelegateeAction: this.createDefaultMainDelegatorAction(
+        basicDetails.availableActions,
+        ['change', 'change_baker', 'change_validator'],
+        ['delegate', 'delegatee'],
+        { availableByDefault: true }
+      ),
+      displayRewards: basicDetails.rewards
+        ? new UIRewardList({
+            rewards: basicDetails.rewards.slice(0, 5),
+            indexColLabel: 'Index',
+            amountColLabel: 'Reward',
+            payoutColLabel: 'Payout'
+          })
+        : undefined,
       ...(extraDetails ? extraDetails : {})
     }
 
     return details
+  }
+
+  private createDefaultMainDelegatorAction(
+    availableActions: DelegatorAction[],
+    typeKeywords: any[],
+    argsKeywords: string[] = [],
+    options: { availableByDefault: boolean } = { availableByDefault: false }
+  ): AirGapMainDelegatorAction {
+    const action = availableActions.find(action => typeKeywords.includes(action.type))
+    if (action) {
+      const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
+      return {
+        type: action.type,
+        isAvailable: true,
+        paramName: paramName,
+        description: '',
+        extraArgs: action.args
+          ? action.args.map(
+              arg =>
+                new UIInputText({
+                  id: arg,
+                  label: arg
+                })
+            )
+          : undefined
+      }
+    }
+
+    return {
+      isAvailable: options.availableByDefault,
+      description: ''
+    }
   }
 
   public async onDelegationDetailsChange(
@@ -155,7 +205,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(protocol: ICoinDelegateProtocol, address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(protocol, address, false)
+      const { isDelegated } = await this.checkDelegated(protocol, address)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -200,7 +250,7 @@ export class OperationsProvider {
   }
 
   // TODO: change returned type when generic protocol is done
-  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
+  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<DelegationInfo> {
     if (supportsDelegation(protocol)) {
       return {
         isDelegated: await protocol.isAddressDelegating(address)
@@ -215,14 +265,11 @@ export class OperationsProvider {
           isDelegated: delegations.length > 0 ? true : false
         }
       } else {
-        return this.fetchDelegationInfo(address, fetchExtraInfo)
+        return {
+          isDelegated: false
+        }
       }
     }
-  }
-  public async fetchDelegationInfo(address: string, fetchExtraInfo: boolean): Promise<DelegationInfo> {
-    const protocol = new TezosKtProtocol()
-
-    return protocol.isAddressDelegated(address, fetchExtraInfo)
   }
 
   public async prepareTransaction(
