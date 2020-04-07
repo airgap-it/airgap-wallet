@@ -44,6 +44,59 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any>[] {
+    const delegateButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
+      () => {
+        const prepareDelegateAction: SimpleAction<void> = new SimpleAction(() => {
+          return new Promise<void>(async resolve => {
+            const wallet: AirGapMarketWallet = this.callerContext.wallet
+            const info = {
+              wallet,
+              actionCallback: async (context: AirGapTezosDelegateActionContext) => {
+                const action = new AirGapTezosDelegateAction(context)
+                await action.start()
+              }
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            resolve()
+          })
+        })
+
+        return prepareDelegateAction
+      }
+    )
+    const addTokenButtonAction = new ButtonAction(
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
+      () => {
+        const prepareAddTokenActionContext = new SimpleAction(() => {
+          return new Promise<AddTokenActionContext>(async resolve => {
+            const info = {
+              subProtocolType: SubProtocolType.TOKEN,
+              wallet: this.callerContext.wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+        addTokenAction.onComplete = async (): Promise<void> => {
+          addTokenAction.getLinkedAction().context.location.back()
+        }
+
+        return addTokenAction
+      }
+    )
+
+    return [delegateButtonAction, addTokenButtonAction]
+  }
+
+  public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
     const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
       { name: 'account-transaction-list.import-accounts_label', icon: 'add-outline', identifier: 'import-accounts' },
       () => {
@@ -60,36 +113,10 @@ export class ActionGroup {
             this.callerContext.showToast('Accounts imported')
           }
         }
-
         return importAccountAction
       }
     )
-    const delegateButtonAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
-      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
-      () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
-            const wallet: AirGapMarketWallet = this.callerContext.wallet
-            const info = {
-              wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-        const delegateAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapTezosDelegateAction
-        )
-
-        return delegateAction
-      }
-    )
-
-    return [delegateButtonAction, importButtonAction]
+    return importButtonAction
   }
 
   private getTezosKTActions(): Action<any, any>[] {

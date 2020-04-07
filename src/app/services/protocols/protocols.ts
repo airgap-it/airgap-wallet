@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtocol } from 'airgap-coin-lib'
+import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 
 import { tokens } from './tokens'
 
@@ -14,6 +15,7 @@ export enum ProtocolSymbols {
   ETH = 'eth',
   XTZ = 'xtz',
   XTZ_KT = 'xtz-kt',
+  TZBTC = 'xtz-btc',
   COSMOS = 'cosmos'
 }
 
@@ -42,12 +44,12 @@ export class ProtocolsProvider {
   }
 
   public getEnabledSubProtocols() {
-    return ['eth-erc20-ae']
+    return ['eth-erc20-ae', 'xtz-btc']
   }
 
   public addProtocols() {
     addSubProtocol('xtz', new TezosKtProtocol())
-
+    addSubProtocol('xtz', new TezosBTC())
     this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         addSubProtocol(
