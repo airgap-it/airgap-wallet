@@ -92,13 +92,39 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const delegatorDetails = results[0]
     const delegatorExtraInfo = results[1]
 
-    const delegateAction: AirGapMainDelegatorAction = this.createDelegateAction(delegatorDetails.availableActions)
-    const undelegateAction: AirGapMainDelegatorAction = this.createUndelegateAction(delegatorDetails.availableActions)
+    const delegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
+      delegatorDetails.availableActions,
+      TezosDelegationAction.DELEGATE,
+      {
+        paramName: 'delegate',
+        description: 'Delegate description',
+        descriptionInactive: "Can't delegate"
+      }
+    )
+
+    const undelegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
+      delegatorDetails.availableActions,
+      TezosDelegationAction.UNDELEGATE,
+      {
+        description: 'Undelegate description',
+        descriptionInactive: "Can't undelegate"
+      }
+    )
+
+    const changeDelegateeAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
+      delegatorDetails.availableActions,
+      TezosDelegationAction.CHANGE_BAKER,
+      {
+        description: 'Change Baker'
+      }
+    )
+
     const displayRewards: UIRewardList | undefined = await this.createDelegatorDisplayRewards(protocol, address, delegatorExtraInfo)
 
     return {
       delegateAction,
       undelegateAction,
+      changeDelegateeAction,
       extraDetails: delegatorExtraInfo,
       displayRewards: displayRewards
     }
@@ -117,35 +143,28 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     this.showFuturePayoutDetails(protocol, bakerDetails, delegatorDetails)
   }
 
-  private createDelegateAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
-    const delegateAction = availableActions.find(action => action.type === TezosDelegationAction.DELEGATE)
-    if (delegateAction) {
-      return {
-        type: TezosDelegationAction.DELEGATE,
-        isAvailable: true,
-        paramName: 'delegate',
-        description: 'Delegate description'
-      }
-    } else {
-      return {
-        isAvailable: false,
-        description: "Can't delegate"
-      }
+  private createTezosMainDelegatorAction(
+    availableActions: DelegatorAction[],
+    type: TezosDelegationAction,
+    config: {
+      paramName?: string
+      description: string
+      descriptionInactive?: string
+      availableByDefault?: boolean
     }
-  }
-
-  private createUndelegateAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
-    const undelegateAction = availableActions.find(action => action.type === TezosDelegationAction.UNDELEGATE)
-    if (undelegateAction) {
+  ): AirGapMainDelegatorAction {
+    const action = availableActions.find(action => action.type === type)
+    if (action) {
       return {
-        type: TezosDelegationAction.UNDELEGATE,
+        type: type,
         isAvailable: true,
-        description: 'Undelegate description'
+        paramName: config.paramName,
+        description: config.description
       }
     } else {
       return {
-        isAvailable: false,
-        description: "Can't undelegate"
+        isAvailable: config.availableByDefault || false,
+        description: config.descriptionInactive || ''
       }
     }
   }
