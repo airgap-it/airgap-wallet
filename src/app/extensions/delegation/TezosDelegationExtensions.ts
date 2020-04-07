@@ -181,7 +181,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       }),
       new UIIconText({
         iconName: 'sync',
-        text: bakerConfig ? `${bakerConfig.payout.cycles} Cycles ${bakerConfig.payout.time}` : 'Unknown',
+        textHTML: bakerConfig ? `${bakerConfig.payout.cycles} Cycles <small>${bakerConfig.payout.time}</small>` : 'Unknown',
         description: 'Payout Schedule'
       })
     )

@@ -3,7 +3,9 @@
     <ion-icon [name]="widget.iconName"></ion-icon>
   </ion-avatar>
   <ion-label>
-    <h2 class="font--weight__bold" ion-text color="black">{{ widget.text }}</h2>
+    <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.text">{{ widget.text }}</h2>
+    <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.textHTML" [innerHTML]="widget.textHTML"></h2>
     <h3 *ngIf="widget.description">{{ widget.description }}</h3>
+    <h3 *ngIf="widget.descriptionHTML" [innerHTML]="widget.descriptionHTML"></h3>
   </ion-label>
 </ion-item>
