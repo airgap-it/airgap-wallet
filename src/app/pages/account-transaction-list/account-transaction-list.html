@@ -25,8 +25,8 @@
     [wallet]="wallet"
     [isDelegated]="isKtDelegated"
     [delegateAmount]="wallet.currentBalance"
-    (onDelegatedClick)="openDelegateSelection()"
-    (onUndelegatedClick)="openDelegateSelection()"
+    (onDelegatedClick)="openDelegationDetails()"
+    (onUndelegatedClick)="openDelegationDetails()"
   ></tezos-delegation-card>
   <card-actionable
     *ngIf="wallet.protocolIdentifier === 'xtz-kt'"

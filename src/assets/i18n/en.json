@@ -390,12 +390,6 @@
     "done": "Done", 
     "unknown": "Unknown"
   },
-  "delegation-polkadot-validator-detail": {
-    "title": "Validator Detail",
-    "accepts-delegation": "Accepts Delegation",
-    "your-balance": "Your Balance",
-    "delegate": "Delegate"
-  },
   "delegation-cosmos": {
     "title": "Validator Detail",
     "status-active_label": "active",
@@ -436,13 +430,6 @@
   "portfolio-item": {
     "active": "active"
   },
-  "tezos-delegation-stats": {
-    "cycle": "Cycle",  
-    "reward": "Expected Reward", 
-    "payout": "Earliest Payout"
-  },  
-
-  
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",

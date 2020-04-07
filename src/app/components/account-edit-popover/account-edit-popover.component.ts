@@ -19,7 +19,6 @@ declare let cordova
 export class AccountEditPopoverComponent implements OnInit {
   private readonly wallet: AirGapMarketWallet
   private readonly onDelete: Function
-  private readonly onUndelegate: Function
 
   // Tezos
   public isTezosKT: boolean = false
@@ -37,7 +36,6 @@ export class AccountEditPopoverComponent implements OnInit {
   ) {
     this.wallet = this.navParams.get('wallet')
     this.onDelete = this.navParams.get('onDelete')
-    this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
   public async copyAddressToClipboard(): Promise<void> {
@@ -76,15 +74,6 @@ export class AccountEditPopoverComponent implements OnInit {
       )
     }
     // tezos end
-  }
-
-  public async undelegate(): Promise<void> {
-    await this.dismissPopover()
-    if (this.onUndelegate) {
-      this.onUndelegate()
-    } else {
-      handleErrorSentry(ErrorCategory.OTHER)('onUndelegate not defined')
-    }
   }
 
   public async delete(): Promise<void> {

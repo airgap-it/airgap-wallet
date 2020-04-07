@@ -27,13 +27,10 @@ import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
-import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
 
 import { WidgetSelector } from './widget-selector/widget-selector'
-import { WidgetCheckbox } from './widget-checkbox/widget-checkbox'
 import { WidgetIconText } from './widget-icon-text/widget-icon-text'
 import { WidgetInputText } from './widget-input-text/widget-input-text'
-import { WidgetSelect } from './widget-select/widget-select'
 import { WidgetAccount } from './widget-account/widget-account'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
@@ -53,17 +50,14 @@ import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
     WidgetSelector,
     WidgetAccount,
-    WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,
-    WidgetRewardList,
-    WidgetSelect
+    WidgetRewardList
   ],
   imports: [
     IonicModule,
@@ -93,18 +87,15 @@ import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
 
     WidgetSelector,
     WidgetAccount,
-    WidgetCheckbox,
     WidgetIconText,
     WidgetInputText,
-    WidgetRewardList,
-    WidgetSelect
+    WidgetRewardList
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })
