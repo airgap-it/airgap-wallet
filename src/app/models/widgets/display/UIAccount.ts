@@ -17,7 +17,6 @@ export class UIAccount extends UIWidget {
 
   public name?: string
   public address: string
-  public displayAddress: string
   public description?: string
 
   public get hasName(): boolean {
@@ -29,14 +28,6 @@ export class UIAccount extends UIWidget {
 
     this.name = config.name
     this.address = config.address
-    this.displayAddress = config.abbreviateAddress ? this.abbreviateAddress(this.address, config) : this.address
     this.description = config.description
-  }
-
-  private abbreviateAddress(address: string, config: { abbreviationStart?: number; abbreviationEnd?: number } = {}): string {
-    const start = config.abbreviationStart || 3
-    const end = config.abbreviationEnd || 3
-
-    return address.length > start + end ? address.slice(0, start) + '...' + address.substr(-end) : address
   }
 }
