@@ -51,6 +51,7 @@ export class DelegationDetailPage {
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails> = new BehaviorSubject(null)
 
   public canProceed: boolean = true
+  public supportMultipleDelegatees: boolean = false
 
   private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
@@ -72,7 +73,10 @@ export class DelegationDetailPage {
       this.wallet = info.wallet
     }
 
-    this.extensionsService.loadDelegationExtensions().then(() => this.initView())
+    this.extensionsService.loadDelegationExtensions().then(() => {
+      this.supportMultipleDelegatees = supportsDelegation(this.wallet.coinProtocol) && this.wallet.coinProtocol.supportsMultipleDelegatees
+      this.initView()
+    })
   }
 
   public filterVisible(widgets?: UIWidget[]): UIWidget[] {
@@ -251,14 +255,11 @@ export class DelegationDetailPage {
 
         const form = this.delegationForms.get(action.type)
         if (action.paramName && !form.get(action.paramName)) {
-          const supportsMultipleDelegatees =
-            supportsDelegation(this.wallet.coinProtocol) && this.wallet.coinProtocol.supportsMultipleDelegatees
-
           this.delegationForms
             .get(action.type)
             .addControl(
               action.paramName,
-              new FormControl(supportsMultipleDelegatees ? this.delegateeAddresses$.value : this.delegateeAddresses$.value[0])
+              new FormControl(this.supportMultipleDelegatees ? this.delegateeAddresses$.value : this.delegateeAddresses$.value[0])
             )
         }
 
@@ -331,8 +332,8 @@ export class DelegationDetailPage {
     } else if (delegatorDetails.changeDelegateeAction.isAvailable) {
       const action = delegatorDetails.changeDelegateeAction
       if (action.paramName) {
-        this.delegationForms[action.type].patchValue({
-          [action.paramName]: addresses
+        this.delegationForms.get(action.type).patchValue({
+          [action.paramName]: this.supportMultipleDelegatees ? addresses : addresses[0]
         })
       }
       this.prepareDelegationAction(action.type)

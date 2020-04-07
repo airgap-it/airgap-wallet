@@ -1,4 +1,4 @@
-import { TezosProtocol, TezosDelegationAction, TezosKtProtocol, DelegationRewardInfo, DelegationInfo } from 'airgap-coin-lib'
+import { TezosProtocol, TezosDelegatorAction, TezosKtProtocol, DelegationRewardInfo, DelegationInfo } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
@@ -87,14 +87,14 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   public async getExtraDelegatorDetailsFromAddress(protocol: TezosProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
-    const results = await Promise.all([protocol.getDelegatorDetailsFromAddress(address), this.ktProtocol.isAddressDelegated(address)])
+    const results = await Promise.all([protocol.getDelegatorDetailsFromAddress(address), this.ktProtocol.getDelegationInfo(address)])
 
     const delegatorDetails = results[0]
     const delegatorExtraInfo = results[1]
 
     const delegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
       delegatorDetails.availableActions,
-      TezosDelegationAction.DELEGATE,
+      TezosDelegatorAction.DELEGATE,
       {
         paramName: 'delegate',
         description: 'Delegate description',
@@ -104,7 +104,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     const undelegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
       delegatorDetails.availableActions,
-      TezosDelegationAction.UNDELEGATE,
+      TezosDelegatorAction.UNDELEGATE,
       {
         description: 'Undelegate description',
         descriptionInactive: "Can't undelegate"
@@ -113,8 +113,9 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     const changeDelegateeAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
       delegatorDetails.availableActions,
-      TezosDelegationAction.CHANGE_BAKER,
+      TezosDelegatorAction.CHANGE_BAKER,
       {
+        paramName: 'delegate',
         description: 'Change Baker'
       }
     )
@@ -145,7 +146,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   private createTezosMainDelegatorAction(
     availableActions: DelegatorAction[],
-    type: TezosDelegationAction,
+    type: TezosDelegatorAction,
     config: {
       paramName?: string
       description: string
@@ -197,7 +198,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       return undefined
     }
 
-    const rewardInfo = await this.ktProtocol.delegationRewards(delegatorExtraInfo.value, address)
+    const rewardInfo = await this.ktProtocol.getDelegationRewards(delegatorExtraInfo.value, address)
 
     return new UIRewardList({
       rewards: rewardInfo.slice(0, 5).map(reward => ({
@@ -225,7 +226,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     let nextPayout: Moment | null = null
     let avgRoIPerCycle: BigNumber | null = null
     try {
-      const bakerRewards = await this.ktProtocol.delegationRewards(bakerDetails.address)
+      const bakerRewards = await this.ktProtocol.getDelegationRewards(bakerDetails.address)
       nextPayout = this.getNextPayoutMoment(delegatorDetails, bakerRewards, bakerConfig.payout ? bakerConfig.payout.cycles : undefined)
 
       const avgRoIPerCyclePercentage = bakerRewards
