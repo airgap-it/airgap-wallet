@@ -2,8 +2,10 @@ import { UIWidgetType } from '../UIWidget'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { UIInputWidgetConfig, UIInputWidget } from '../UIInputWidget'
 
+type InputType = 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url'
+
 export interface UIInputTextConfig extends UIInputWidgetConfig {
-  inputType: string
+  inputType?: InputType
 
   label: string
 
@@ -24,7 +26,7 @@ export interface UIInputTextConfig extends UIInputWidgetConfig {
 
 export class UIInputText extends UIInputWidget<string> {
   public readonly type = UIWidgetType.INPUT_TEXT
-  public readonly inputType: string
+  public readonly inputType: InputType
 
   public label: string
   public placeholder: string
@@ -42,7 +44,7 @@ export class UIInputText extends UIInputWidget<string> {
   constructor(config: UIInputTextConfig) {
     super(config)
 
-    this.inputType = config.inputType
+    this.inputType = config.inputType || 'text'
     this.label = config.label
     this.placeholder = config.placeholder || ''
 

@@ -25,9 +25,10 @@ import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { DelegateeDetails, DelegatorDetails, DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 @Injectable({
   providedIn: 'root'
@@ -112,9 +113,14 @@ export class OperationsProvider {
     const details = {
       balance: basicDetails.balance,
       isDelegating: basicDetails.isDelegating,
-      delegateAction: { isAvailable: false, description: '' },
-      undelegateAction: { isAvailable: false, description: '' },
-      changeDelegateeAction: { isAvailable: true, description: '' },
+      delegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['delegate'], ['delegate', 'delegatee']),
+      undelegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['undelegate'], ['delegate', 'delegatee']),
+      changeDelegateeAction: this.createDefaultMainDelegatorAction(
+        basicDetails.availableActions,
+        ['change', 'change_baker', 'change_validator'],
+        ['delegate', 'delegatee'],
+        { availableByDefault: true }
+      ),
       displayRewards: basicDetails.rewards
         ? new UIRewardList({
             rewards: basicDetails.rewards.slice(0, 5),
@@ -127,6 +133,38 @@ export class OperationsProvider {
     }
 
     return details
+  }
+
+  private createDefaultMainDelegatorAction(
+    availableActions: DelegatorAction[],
+    typeKeywords: any[],
+    argsKeywords: string[] = [],
+    options: { availableByDefault: boolean } = { availableByDefault: false }
+  ): AirGapMainDelegatorAction {
+    const action = availableActions.find(action => typeKeywords.includes(action.type))
+    if (action) {
+      const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
+      return {
+        type: action.type,
+        isAvailable: true,
+        paramName: paramName,
+        description: '',
+        extraArgs: action.args
+          ? action.args.map(
+              arg =>
+                new UIInputText({
+                  id: arg,
+                  label: arg
+                })
+            )
+          : undefined
+      }
+    }
+
+    return {
+      isAvailable: options.availableByDefault,
+      description: ''
+    }
   }
 
   public async onDelegationDetailsChange(
