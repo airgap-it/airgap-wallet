@@ -4,6 +4,7 @@ import { IAirGapCoinDelegateProtocol } from '../interfaces/IAirGapCoinDelegatePr
 export function supportsDelegation(protocol: ICoinProtocol): protocol is ICoinDelegateProtocol {
   const delegateProtocol = protocol as ICoinDelegateProtocol
   return (
+    delegateProtocol.supportsMultipleDelegatees !== undefined &&
     !!delegateProtocol.getDefaultDelegatee &&
     !!delegateProtocol.getCurrentDelegateesForPublicKey &&
     !!delegateProtocol.getCurrentDelegateesForAddress &&

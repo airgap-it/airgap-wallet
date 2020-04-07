@@ -9,7 +9,7 @@ import {
   AirGapExtraDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { supportsAirGapDelegation, supportsDelegation } from 'src/app/helpers/delegation'
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
@@ -251,7 +251,15 @@ export class DelegationDetailPage {
 
         const form = this.delegationForms.get(action.type)
         if (action.paramName && !form.get(action.paramName)) {
-          this.delegationForms.get(action.type).addControl(action.paramName, new FormControl(this.delegateeAddresses$.value))
+          const supportsMultipleDelegatees =
+            supportsDelegation(this.wallet.coinProtocol) && this.wallet.coinProtocol.supportsMultipleDelegatees
+
+          this.delegationForms
+            .get(action.type)
+            .addControl(
+              action.paramName,
+              new FormControl(supportsMultipleDelegatees ? this.delegateeAddresses$.value : this.delegateeAddresses$.value[0])
+            )
         }
 
         if (action.extraArgs) {
