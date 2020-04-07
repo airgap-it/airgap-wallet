@@ -15,9 +15,7 @@
 <ion-content>
   <ion-row class="ion-padding-horizontal">
     <ion-col size="12">
-      <ion-item lines="none" class="ion-no-padding" *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton">
-        <widget-account [widget]="delegateeAccountWidget"></widget-account>
-      </ion-item>
+      <widget-account *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton" [widget]="delegateeAccountWidget"></widget-account>
       <ng-template #delegateeAvatarSkeleton>
         <div>
           <ion-item lines="none" class="ion-no-padding">

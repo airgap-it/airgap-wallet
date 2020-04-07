@@ -82,8 +82,8 @@ export class OperationsProvider {
     )
 
     return zippedDetails.map(([basic, extra]: [DelegateeDetails, Partial<AirGapDelegatorDetails> | null]) => ({
-      ...basic,
       name: '',
+      ...basic,
       usageDetails: {
         usage: new BigNumber(0),
         current: new BigNumber(0),
