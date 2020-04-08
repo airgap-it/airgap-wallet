@@ -3,7 +3,6 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
 import { SimpleAction } from 'airgap-coin-lib/dist/actions/SimpleAction'
-import { TezosDelegateActionResult } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
@@ -14,6 +13,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
 import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './actions/TezosDelegateAction'
+import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
 
 export interface WalletActionInfo {
   name: string
@@ -44,28 +44,28 @@ export class ActionGroup {
   }
 
   private getTezosActions(): Action<any, any>[] {
-    const delegateButtonAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
+    const delegateButtonAction = new ButtonAction(
       { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
       () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
+        const prepareDelegateAction: SimpleAction<void> = new SimpleAction(() => {
+          return new Promise<void>(async resolve => {
             const wallet: AirGapMarketWallet = this.callerContext.wallet
             const info = {
               wallet,
-              actionCallback: resolve
+              actionCallback: async (context: AirGapTezosDelegateActionContext) => {
+                const action = new AirGapTezosDelegateAction(context)
+                await action.start()
+              }
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            resolve()
           })
         })
-        const delegateAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapTezosDelegateAction
-        )
 
-        return delegateAction
+        return prepareDelegateAction
       }
     )
     const addTokenButtonAction = new ButtonAction(
@@ -98,7 +98,7 @@ export class ActionGroup {
 
   public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
     const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
-      { name: 'account-transaction-list.import-accounts_label', icon: 'add', identifier: 'import-accounts' },
+      { name: 'account-transaction-list.import-accounts_label', icon: 'add-outline', identifier: 'import-accounts' },
       () => {
         const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
@@ -120,30 +120,19 @@ export class ActionGroup {
   }
 
   private getTezosKTActions(): Action<any, any>[] {
-    const migrateAction: ButtonAction<TezosDelegateActionResult, void> = new ButtonAction(
-      { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
+    const migrateAction = new ButtonAction<void, AirGapTezosMigrateActionContext>(
+      { name: 'account-transaction-list.migrate_label', icon: 'return-down-back-outline', identifier: 'migrate-action' },
       () => {
-        const prepareDelegateActionContext: SimpleAction<AirGapTezosDelegateActionContext> = new SimpleAction(() => {
-          return new Promise<AirGapTezosDelegateActionContext>(async resolve => {
-            const info = {
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
+        return new AirGapTezosMigrateAction({
+          wallet: this.callerContext.wallet,
+          mainWallet: this.callerContext.mainWallet,
+          alertCtrl: this.callerContext.alertCtrl,
+          translateService: this.callerContext.translateService,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
         })
-        const viewDelegationAction: LinkedAction<TezosDelegateActionResult, AirGapTezosDelegateActionContext> = new LinkedAction(
-          prepareDelegateActionContext,
-          AirGapTezosDelegateAction
-        )
-
-        return viewDelegationAction
       }
     )
-
     return [migrateAction]
   }
 
@@ -173,7 +162,7 @@ export class ActionGroup {
 
   private getEthereumActions(): Action<any, any>[] {
     const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
       () => {
         const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
           return new Promise<AddTokenActionContext>(async resolve => {

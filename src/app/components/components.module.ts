@@ -18,7 +18,6 @@ import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FromToComponent } from './from-to/from-to'
-import { HexagonIconComponent } from './hexagon-icon/hexagon-icon'
 import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
@@ -34,7 +33,6 @@ import { TransactionItemComponent } from './transaction-item/transaction-item.co
     PortfolioItemComponent,
     IdenticonComponent,
     ChartComponent,
-    HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
     SwapComponent,
@@ -68,7 +66,6 @@ import { TransactionItemComponent } from './transaction-item/transaction-item.co
     PortfolioItemComponent,
     ChartComponent,
     IdenticonComponent,
-    HexagonIconComponent,
     AddressRowComponent,
     AmountComponent,
     FromToComponent,

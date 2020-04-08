@@ -135,6 +135,10 @@
       margin: 0;
     }
   }
+
+  ion-split-pane {
+    --side-max-width: 10vw;
+  }
 }
 
 .ion-color-white {

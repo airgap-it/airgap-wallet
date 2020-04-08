@@ -140,7 +140,12 @@ export class PushProvider {
       this.toastController
         .create({
           message: `${notification.title}: ${notification.message}`,
-          showCloseButton: true,
+          buttons: [
+            {
+              text: 'Ok',
+              role: 'cancel'
+            }
+          ],
           duration: 3000,
           position: 'top'
         })

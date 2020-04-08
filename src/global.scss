@@ -115,7 +115,7 @@ ion-card {
   padding: 8px 0;
 }
 page-account-transaction-list {
-  .sc-ion-card-ios-h {
+  ion-card {
     margin: 8px 16px;
   }
 }
@@ -125,9 +125,9 @@ page-portfolio,
 page-delegation-baker-detail,
 page-account-address,
 page-transaction-qr,
-page-exchange-custom {
-  .sc-ion-card-md-h,
-  .sc-ion-card-ios-h,
+page-exchange-custom,
+page-transaction-qr {
+  ion-card,
   qr-clipboard {
     box-shadow: 0 10px 20px 0 rgba(49, 27, 88, 0.12);
     border: 1px solid rgba(0, 232, 204, 0.08);
@@ -158,5 +158,15 @@ page-settings {
   ion-range {
     padding-left: 0;
     padding-right: 0;
+  }
+}
+page-scan {
+  zxing-scanner {
+    height: 100%;
+    width: 100%;
+    video {
+      object-fit: cover;
+      height: 100% !important;
+    }
   }
 }

@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol, ICoinSubProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -12,6 +12,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
+import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -56,9 +57,6 @@ export class TransactionPreparePage {
         fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
         isAdvancedMode: [false, []]
       })
-      // if (info.disableFees) {
-      //   this.disableFees = info.disableFees
-      // }
       if (info.forceMigration) {
         this.forceMigration = info.forceMigration
         this.setMaxAmount('0')
@@ -160,7 +158,7 @@ export class TransactionPreparePage {
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
                   -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
@@ -216,11 +214,23 @@ export class TransactionPreparePage {
 
   private setMaxAmount(fee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
-    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.minus(new BigNumber(fee)) > 0 ? amount.minus(new BigNumber(fee)) : 0
-    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
+    const feeBN = new BigNumber(fee)
+    let amount: BigNumber = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
+    if (!this.isToken) {
+      const amountMinusFees = amount.minus(feeBN)
+      amount = amountMinusFees.gt(0) ? amountMinusFees : new BigNumber(0)
+    }
+    this.transactionForm.controls.amount.setValue(amount.toFixed(), {
       emitEvent: false
     })
+  }
+
+  private get isToken(): boolean {
+    if ((this.wallet.coinProtocol as any).isSubProtocol !== undefined) {
+      return ((this.wallet.coinProtocol as unknown) as ICoinSubProtocol).subProtocolType === SubProtocolType.TOKEN
+    } else {
+      return false
+    }
   }
 
   public pasteClipboard() {

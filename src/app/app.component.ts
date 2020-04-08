@@ -23,6 +23,8 @@ import { generateGUID } from './utils/utils'
   templateUrl: 'app.component.html'
 })
 export class AppComponent {
+  public isMobile = false
+
   constructor(
     private readonly platform: Platform,
     private readonly statusBar: StatusBar,
@@ -42,6 +44,7 @@ export class AppComponent {
     private readonly config: Config
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
+    this.isMobile = this.platform.is('mobile')
   }
 
   public async initializeApp() {

@@ -47,13 +47,13 @@
     }
   },
   "dependencies": {
-    "@angular/animations": "^8.2.13",
-    "@angular/common": "^8.2.13",
-    "@angular/core": "^8.2.13",
-    "@angular/forms": "^8.2.13",
-    "@angular/platform-browser": "^8.2.13",
-    "@angular/platform-browser-dynamic": "^8.2.13",
-    "@angular/router": "^8.2.13",
+    "@angular/animations": "^8.2.14",
+    "@angular/common": "^8.2.14",
+    "@angular/core": "^8.2.14",
+    "@angular/forms": "^8.2.14",
+    "@angular/platform-browser": "^8.2.14",
+    "@angular/platform-browser-dynamic": "^8.2.14",
+    "@angular/router": "^8.2.14",
     "@download/blockies": "^1.0.3",
     "@ionic-native/app-version": "^5.5.0",
     "@ionic-native/barcode-scanner": "^5.5.0",
@@ -66,14 +66,14 @@
     "@ionic-native/qr-scanner": "^5.5.0",
     "@ionic-native/splash-screen": "^5.0.0",
     "@ionic-native/status-bar": "^5.0.0",
-    "@ionic/angular": "4.11.4",
-    "@ionic/core": "4.11.4",
+    "@ionic/angular": "5.0.0",
+    "@ionic/core": "5.0.4",
     "@ionic/storage": "^2.2.0",
     "@ngx-translate/core": "^11.0.1",
     "@ngx-translate/http-loader": "^4.0.0",
     "@sentry/browser": "5.1.3",
     "@zxing/ngx-scanner": "1.3.0",
-    "airgap-coin-lib": "0.7.4",
+    "airgap-coin-lib": "0.7.5",
     "angular2-template-loader": "^0.6.2",
     "angularx-qrcode": "^1.5.3",
     "bignumber.js": "8.0.1",
@@ -91,7 +91,7 @@
     "cordova-plugin-ionic-webview": "^2.4.1",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-plugin-splashscreen": "^5.0.2",
-    "cordova-plugin-statusbar": "^2.4.2",
+    "cordova-plugin-statusbar": "^2.4.3",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-socialsharing": "^5.4.4",
     "cordova-sqlite-storage": "^2.6.0",
@@ -106,7 +106,7 @@
     "husky": "^1.3.1",
     "ionic-plugin-deeplinks": "git+https://github.com/airgap-it/ionic-plugin-deeplinks.git#cordova-ios-v5.0.0-fix",
     "ionic2-material-icons": "^1.0.3",
-    "ionicons": "^4.5.6",
+    "ionicons": "^5.0.0",
     "moment": "^2.24.0",
     "myetherwallet-blockies": "^0.1.1",
     "ng-lottie": "^0.3.2",
@@ -126,13 +126,13 @@
   },
   "devDependencies": {
     "@angular-devkit/architect": "^0.803.18",
-    "@angular-devkit/build-angular": "^0.803.18",
+    "@angular-devkit/build-angular": "^0.803.25",
     "@angular-devkit/core": "^8.3.18",
     "@angular-devkit/schematics": "^8.3.18",
-    "@angular/cli": "~8.3.18",
-    "@angular/compiler": "~8.2.13",
-    "@angular/compiler-cli": "~8.2.13",
-    "@angular/language-service": "~8.2.13",
+    "@angular/cli": "~8.3.25",
+    "@angular/compiler": "~8.2.14",
+    "@angular/compiler-cli": "~8.2.14",
+    "@angular/language-service": "~8.2.14",
     "@ionic/angular-toolkit": "2.1.1",
     "@types/chrome": "0.0.83",
     "@types/jasmine": "~2.8.8",
@@ -178,7 +178,6 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-device": {},
-      "cordova-plugin-statusbar": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-x-socialsharing": {
         "ANDROID_SUPPORT_V4_VERSION": "28.+"
@@ -222,11 +221,12 @@
         "DEEPLINK_4_HOST": " ",
         "DEEPLINK_5_SCHEME": " ",
         "DEEPLINK_5_HOST": " "
-      }
+      },
+      "cordova-plugin-statusbar": {}
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   }
 }

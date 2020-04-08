@@ -3,15 +3,15 @@
     <ion-label>{{ 'wallet-edit-popover-component.settings_label' | translate }}</ion-label>
   </ion-list-header>
   <ion-item button detail="false" (click)="copyAddressToClipboard()">
-    <ion-icon name="clipboard" color="dark" slot="end"></ion-icon>
+    <ion-icon name="clipboard-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.copy-address_label' | translate }}
   </ion-item>
   <ion-item id="blockexplorer" button detail="false" (click)="openBlockExplorer()">
-    <ion-icon name="open" color="dark" slot="end"></ion-icon>
+    <ion-icon name="open-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.block_explorer' | translate }}
   </ion-item>
   <ion-item id="delete" button detail="false" (click)="delete()">
-    <ion-icon name="trash" color="dark" slot="end"></ion-icon>
+    <ion-icon name="trash-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.delete_label' | translate }}
   </ion-item>
   <ion-item *ngIf="importAccountAction" button detail="false" (click)="importAccountAction.start()">
@@ -19,7 +19,7 @@
     {{ importAccountAction.context.name | translate }}
   </ion-item>
   <ion-item *ngIf="!isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
-    <ion-icon name="close" color="dark" slot="end"></ion-icon>
+    <ion-icon name="close-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.undelegate_label' | translate }}
   </ion-item>
 </ion-list>

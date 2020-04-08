@@ -78,7 +78,12 @@ export class TransactionConfirmPage {
       const toast: HTMLIonToastElement = await this.toastCtrl.create({
         duration: TOAST_DURATION,
         message: 'Transaction queued. It might take some time until your TX shows up!',
-        showCloseButton: true,
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel'
+          }
+        ],
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
@@ -184,7 +189,12 @@ export class TransactionConfirmPage {
             .create({
               duration: TOAST_ERROR_DURATION,
               message: 'Transaction broadcasting failed: ' + error,
-              showCloseButton: true,
+              buttons: [
+                {
+                  text: 'Ok',
+                  role: 'cancel'
+                }
+              ],
               position: 'bottom'
             })
             .then(toast => {

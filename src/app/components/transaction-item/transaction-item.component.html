@@ -31,11 +31,11 @@
     {{ tx.extra }}
     <!-- status of tx-->
   </p>
-  <ion-row slot="end" *ngIf="transactionType === 'normalTransaction'">
+  <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
     <ion-col class="ion-no-padding">
       <ion-row class="ion-justify-content-end">
         <ion-text color="blackLight">
-          <p class="ion-no-margin" *ngIf="tx.timestamp">
+          <p *ngIf="tx.timestamp">
             {{
               tx.timestamp
                 | amFromUnix
@@ -46,7 +46,7 @@
       </ion-row>
       <ion-row class="ion-justify-content-end">
         <ion-text color="blackLight">
-          <p class="ion-no-margin" *ngIf="tx.timestamp">
+          <p *ngIf="tx.timestamp">
             {{
               tx.timestamp
                 | amFromUnix
