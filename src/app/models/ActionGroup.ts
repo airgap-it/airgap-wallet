@@ -98,7 +98,7 @@ export class ActionGroup {
 
   public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
     const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
-      { name: 'account-transaction-list.import-accounts_label', icon: 'add', identifier: 'import-accounts' },
+      { name: 'account-transaction-list.import-accounts_label', icon: 'add-outline', identifier: 'import-accounts' },
       () => {
         const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
@@ -121,7 +121,7 @@ export class ActionGroup {
 
   private getTezosKTActions(): Action<any, any>[] {
     const migrateAction = new ButtonAction<void, AirGapTezosMigrateActionContext>(
-      { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
+      { name: 'account-transaction-list.migrate_label', icon: 'return-down-back-outline', identifier: 'migrate-action' },
       () => {
         return new AirGapTezosMigrateAction({
           wallet: this.callerContext.wallet,
@@ -162,7 +162,7 @@ export class ActionGroup {
 
   private getEthereumActions(): Action<any, any>[] {
     const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
       () => {
         const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
           return new Promise<AddTokenActionContext>(async resolve => {

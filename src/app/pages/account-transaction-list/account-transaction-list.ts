@@ -336,7 +336,12 @@ export class AccountTransactionListPage {
     const toast: HTMLIonToastElement = await this.toastController.create({
       duration: 3000,
       message,
-      showCloseButton: true,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel'
+        }
+      ],
       position: 'bottom'
     })
     toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))

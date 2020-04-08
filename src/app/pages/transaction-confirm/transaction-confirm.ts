@@ -78,7 +78,12 @@ export class TransactionConfirmPage {
       const toast: HTMLIonToastElement = await this.toastCtrl.create({
         duration: TOAST_DURATION,
         message: 'Transaction queued. It might take some time until your TX shows up!',
-        showCloseButton: true,
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel'
+          }
+        ],
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
@@ -142,9 +147,8 @@ export class TransactionConfirmPage {
         this.showTransactionSuccessfulAlert(txId)
 
         // POST TX TO BACKEND
-        const signed = (
-          await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync.payload as SignedTransaction)
-        )[0] as any
+        const signed = (await this.protocol.getTransactionDetailsFromSigned(this.signedTransactionSync
+          .payload as SignedTransaction))[0] as any
         // necessary for the transaction backend
         signed.amount = signed.amount.toString()
         signed.fee = signed.fee.toString()
@@ -185,7 +189,12 @@ export class TransactionConfirmPage {
             .create({
               duration: TOAST_ERROR_DURATION,
               message: 'Transaction broadcasting failed: ' + error,
-              showCloseButton: true,
+              buttons: [
+                {
+                  text: 'Ok',
+                  role: 'cancel'
+                }
+              ],
               position: 'bottom'
             })
             .then(toast => {
