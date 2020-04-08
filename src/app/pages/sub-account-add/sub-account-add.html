@@ -8,9 +8,9 @@
     </ion-toolbar>
   </ion-grid>
 </ion-header>
-<ion-content>
+<ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
-    <ion-row class="ion-padding">
+    <ion-row>
       <ion-text class="font--weight__bold" color="primary">
         <span>{{ typeLabel | translate }}</span>
       </ion-text>
@@ -37,12 +37,12 @@
         <ion-checkbox [(ngModel)]="subAccount.selected" color="primary"></ion-checkbox>
       </ion-col>
     </ion-row>
-
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">
-        <ion-icon slot="start" name="add"></ion-icon>
-        {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
-      </ion-button>
-    </ion-fab>
   </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">
+      <ion-icon slot="start" name="add"></ion-icon>
+      {{ 'add-sub-account.add-accounts_label' | translate: { typeLabel: typeLabel | translate } }}
+    </ion-button>
+  </ion-fab>
 </ion-content>
