@@ -41,49 +41,6 @@
       (click)="openPreparePage()"
     ></card-actionable>
 
-    <ng-container *ngIf="hasPendingTransactions">
-      <ion-row class="ion-padding-horizontal">
-        <ion-col size="12" class="ion-no-padding ion-padding-top">
-          <ion-text color="primary">
-            <p class="font--weight__bold">
-              {{ 'account-transaction-list.pending-transactions.label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="12" class="ion-no-padding">
-          <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
-            <ion-icon slot="start" name="open"></ion-icon>
-            {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
-          </ion-button>
-        </ion-col>
-      </ion-row>
-
-      <ion-list lines="none" class="ion-padding-bottom">
-        <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
-          <ion-avatar slot="start">
-            <identicon [address]="tx.isInbound ? tx.from[0] : tx.to[0]"></identicon>
-          </ion-avatar>
-          <ion-label>
-            <h2>
-              <ion-icon *ngIf="tx.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
-              <ion-icon *ngIf="!tx.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
-              <span class="font--weight__bold" color="black">
-                {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
-              </span>
-            </h2>
-            <ion-text color="blackLight">
-              <h3 class="typography--mono">
-                {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
-              </h3>
-            </ion-text>
-          </ion-label>
-        </ion-item>
-        <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
-          <ion-spinner color="black"></ion-spinner>
-        </div>
-      </ion-list>
-    </ng-container>
-
     <transaction-list
       [transactionType]="'pendingTransaction'"
       [hasPendingTransactions]="hasPendingTransactions"
@@ -115,8 +72,8 @@
       <ion-col size="1"></ion-col>
     </ion-row>
 
-    <ion-row>
-      <ion-col class="ion-padding" *ngIf="showLinkToBlockExplorer">
+    <ion-row *ngIf="showLinkToBlockExplorer">
+      <ion-col class="ion-padding">
         <ion-text class="font--weight__bold" color="secondary">
           <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
         </ion-text>
