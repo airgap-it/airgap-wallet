@@ -389,9 +389,9 @@
   },
     "exchange-custom": {
     "title": "Select a Gatekeeper",
-    "text": "Exchange to TZBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
+    "text": "Exchange to tzBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
     "confirm-exchange_label": "Confirm Exchange",
-    "heading": "In-App TZBTC swap not yet supported",
+    "heading": "In-App tzBTC swap not yet supported",
     "bitcoin-suisse": {
       "title": "Bitcoin Suisse",
       "text": "As a regulated Swiss financial intermediary (SRO – VQF member), Bitcoin Suisse offers prime brokerage, storage, lending and other crypto-financial services."
@@ -405,7 +405,7 @@
       "text": "Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
     },
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-    "get-tzbtc": "Get TZBTC From {{Gatekeeper}}"
+    "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
   },
   "delegation-baker-detail": {
     "title": "Baker Detail",
