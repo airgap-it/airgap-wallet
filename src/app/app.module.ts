@@ -1,3 +1,5 @@
+import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
+import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
 import { CommonModule } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -59,7 +61,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage, IntroductionPushPage],
+  entryComponents: [ProtocolSelectPage, IntroductionPushPage, ExchangeSelectPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -89,6 +91,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     PipesModule,
     ComponentsModule,
     ProtocolSelectPageModule,
+    ExchangeSelectPageModule,
     IntroductionPushPageModule
   ],
   providers: [

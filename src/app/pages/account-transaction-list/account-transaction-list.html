@@ -41,48 +41,23 @@
       (click)="openPreparePage()"
     ></card-actionable>
 
-    <ng-container *ngIf="hasPendingTransactions">
-      <ion-row class="ion-padding-horizontal">
-        <ion-col size="12" class="ion-no-padding ion-padding-top">
-          <ion-text color="primary">
-            <p class="font--weight__bold">
-              {{ 'account-transaction-list.pending-transactions.label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="12" class="ion-no-padding">
-          <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
-            <ion-icon slot="start" name="open"></ion-icon>
-            {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
-          </ion-button>
-        </ion-col>
-      </ion-row>
+    <transaction-list
+      [transactionType]="'pendingTransaction'"
+      [hasPendingTransactions]="hasPendingTransactions"
+      [transactions]="pendingTransactions"
+      [isRefreshing]="isRefreshing"
+      [initialTransactionsLoaded]="initialTransactionsLoaded"
+      [wallet]="wallet"
+    ></transaction-list>
 
-      <ion-list lines="none" class="ion-padding-bottom">
-        <ion-item *ngFor="let tx of pendingTransactions" (click)="openTransactionDetailPage(tx)">
-          <ion-avatar slot="start">
-            <identicon [address]="tx.isInbound ? tx.from[0] : tx.to[0]"></identicon>
-          </ion-avatar>
-          <ion-label>
-            <h2>
-              <ion-icon *ngIf="tx.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
-              <ion-icon *ngIf="!tx.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
-              <span class="font--weight__bold" color="black">
-                {{ tx.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
-              </span>
-            </h2>
-            <ion-text color="blackLight">
-              <h3 class="typography--mono">
-                {{ tx.isInbound ? tx.from[0] : (tx.to[0] | shortenString) }}
-              </h3>
-            </ion-text>
-          </ion-label>
-        </ion-item>
-        <div *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content">
-          <ion-spinner color="black"></ion-spinner>
-        </div>
-      </ion-list>
-    </ng-container>
+    <transaction-list
+      [transactionType]="'exchangeTransaction'"
+      [hasExchangeTransactions]="hasExchangeTransactions"
+      [transactions]="formattedExchangeTransactions"
+      [isRefreshing]="isRefreshing"
+      [initialTransactionsLoaded]="initialTransactionsLoaded"
+      [wallet]="wallet"
+    ></transaction-list>
 
     <ion-row class="ion-align-items-center">
       <ion-col size="10" class="ion-padding">
@@ -97,8 +72,8 @@
       <ion-col size="1"></ion-col>
     </ion-row>
 
-    <ion-row>
-      <ion-col class="ion-padding" *ngIf="showLinkToBlockExplorer">
+    <ion-row *ngIf="showLinkToBlockExplorer">
+      <ion-col class="ion-padding">
         <ion-text class="font--weight__bold" color="secondary">
           <p>{{ 'account-transaction-list.tx_not_loading' | translate }}</p>
         </ion-text>
@@ -110,61 +85,18 @@
     </ion-row>
 
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
-    <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && showNoTransactionScreen()">
-      <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
-      <p>
-        {{ 'account-transaction-list.no-transactions_text' | translate }}
-      </p>
-    </div>
 
-    <ion-list lines="none" class="ion-padding-bottom">
-      <ion-item *ngFor="let t of transactions" (click)="openTransactionDetailPage(t)">
-        <ion-avatar slot="start">
-          <identicon *ngIf="t.isInbound" [address]="t.from[0]"></identicon>
-          <identicon *ngIf="!t.isInbound" [address]="t.to[0]"></identicon>
-        </ion-avatar>
-        <ion-label>
-          <h2>
-            <ion-icon *ngIf="t.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
-            <ion-icon *ngIf="!t.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
-            <ion-text class="font--weight__bold" color="black">
-              <span>
-                {{ t.amount | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 } }}
-              </span>
-            </ion-text>
-          </h2>
-          <ion-text color="blackLight">
-            <h3 class="typography--mono">
-              <ng-container *ngIf="t.isInbound">{{ t.from[0] | shortenString }}</ng-container>
-              <ng-container *ngIf="!t.isInbound">{{ t.to[0] | shortenString }}</ng-container>
-            </h3>
-          </ion-text>
-        </ion-label>
-        <ion-row class="items--right" slot="end">
-          <ion-col class="ion-no-padding">
-            <ion-row class="ion-justify-content-end">
-              <ion-text color="blackLight">
-                <p *ngIf="t.timestamp">
-                  {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse:
-                  'HH:mm' } }}
-                </p>
-              </ion-text>
-            </ion-row>
-            <ion-row class="ion-justify-content-end">
-              <ion-text color="blackLight">
-                <p *ngIf="t.timestamp">
-                  {{ t.timestamp | amFromUnix | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm',
-                  sameElse: 'L' } }}
-                </p>
-              </ion-text>
-            </ion-row>
-          </ion-col>
-        </ion-row>
-      </ion-item>
-      <div *ngIf="isRefreshing && !initialTransactionsLoaded && !showLinkToBlockExplorer" class="loading-content">
-        <ion-spinner color="black"></ion-spinner>
-      </div>
-    </ion-list>
+    <transaction-list
+      [transactionType]="'normalTransaction'"
+      [transactions]="transactions"
+      [isRefreshing]="isRefreshing"
+      [initialTransactionsLoaded]="initialTransactionsLoaded"
+      [wallet]="wallet"
+    ></transaction-list>
+
+    <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 
     <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>

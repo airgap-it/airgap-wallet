@@ -7,9 +7,7 @@ import { QRCodeModule } from 'angularx-qrcode'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
-
 import { PipesModule } from '../pipes/pipes.module'
-
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { AddressRowComponent } from './address-row/address-row'
 import { AmountComponent } from './amount/amount.component'
@@ -27,6 +25,8 @@ import { SignedTransactionComponent } from './signed-transaction/signed-transact
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
+import { TransactionListComponent } from './transaction-list/transaction-list.component'
+import { TransactionItemComponent } from './transaction-item/transaction-item.component'
 
 @NgModule({
   declarations: [
@@ -46,7 +46,9 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+    TransactionListComponent,
+    TransactionItemComponent
   ],
   imports: [
     IonicModule,
@@ -77,7 +79,9 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+    TransactionListComponent,
+    TransactionItemComponent
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })

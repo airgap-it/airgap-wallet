@@ -177,7 +177,7 @@
           <ion-item class="advanced-item" class="ion-no-padding">
             <ion-label position="stacked"></ion-label>
             <ion-input
-              [attr.disabled]="forceMigration"
+              [attr.disabled]="forceMigration || disableFees"
               id="fee-input"
               formControlName="fee"
               type="string"
@@ -189,7 +189,7 @@
           </ion-item>
         </ion-col>
       </ion-row>
-      <ion-row class="fee-amount__help ion-padding-horizontal">
+      <ion-row class="fee-amount__help ion-padding-horizontal" *ngIf="!disableFees">
         <ion-text color="blackLight">
           <p class="ion-no-margin">
             <span id="fee-amount">
@@ -197,7 +197,7 @@
                 {{ 'transaction-prepare.amount_label' | translate }}
               </ng-container>
               <ng-container *ngIf="transactionForm.controls['fee'].valid" color="primary">
-                ${{ transactionForm.get('fee').value * wallet.currentMarketPrice.toNumber() | number: '1.2-4' }}
+                ${{ transactionForm.get('fee').value * feeCurrentMarketPrice | number: '1.2-4' }}
               </ng-container>
             </span>
             <span id="fee-amount-advanced" *ngIf="!transactionForm.get('isAdvancedMode').value">

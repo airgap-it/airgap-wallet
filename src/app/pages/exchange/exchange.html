@@ -49,8 +49,8 @@
         [supportedProtocols]="supportedProtocolsFrom"
         [exchangeAmount]="amount"
         [minExchangeAmount]="minExchangeAmount"
-        (protocolSetEmitter)="protocolSet('from', $event)"
-        (walletSetEmitter)="walletSet('from', $event)"
+        (protocolSetEmitter)="setFromProtocol($event)"
+        (walletSetEmitter)="setFromWallet($event)"
         (amountSetEmitter)="amountSet($event)"
       ></swap>
       <swap
@@ -59,19 +59,31 @@
         [selectedProtocol]="selectedToProtocol"
         [supportedProtocols]="supportedProtocolsTo"
         [exchangeAmount]="exchangeAmount"
-        (protocolSetEmitter)="protocolSet('to', $event)"
-        (walletSetEmitter)="walletSet('to', $event)"
+        (protocolSetEmitter)="setToProtocol($event)"
+        (walletSetEmitter)="setToWallet($event)"
         [swapSell]="false"
       ></swap>
       <div class="divider--line"></div>
-      <ion-row class="powered__container ion-padding ion-align-items-center ">
-        <ion-text color="blackLight">
-          <small>
-            {{ 'exchange.powered-by_label' | translate }}
-          </small>
-        </ion-text>
-        <img src="assets/img/changelly_logo.svg" />
+      <ion-row class="powered__container ion-padding ion-align-items-center " *ngIf="!isTZBTCExchange">
+        <ion-col class="ion-no-padding">
+          <ion-row class="powered__container ion-align-items-center">
+            <ion-text color="blackLight">
+              <small>
+                {{ 'exchange.powered-by_label' | translate }}
+              </small>
+            </ion-text>
+            <img *ngIf="activeExchange === 'ChangeNow'" src="assets/img/changenow_logo.svg" />
+            <img *ngIf="activeExchange === 'Changelly'" src="assets/img/changelly_logo.svg" />
+          </ion-row>
+        </ion-col>
+        <ion-col class="ion-no-padding justify--content__end">
+          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
+            {{ 'exchange.switch-exchange_label' | translate }}
+            <ion-icon name="chevron-down-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
       </ion-row>
+
       <ion-fab vertical="bottom" horizontal="end">
         <ion-button
           color="primary"

@@ -26,6 +26,7 @@ export class TransactionPreparePage {
   public feeCurrentMarketPrice: number
   public sendMaxAmount = false
   public forceMigration = false
+  public disableFees = false
 
   constructor(
     public loadingCtrl: LoadingController,

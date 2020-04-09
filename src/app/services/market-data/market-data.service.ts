@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
 import { MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
+import * as cryptocompare from './../../../../node_modules/cryptocompare'
 
 import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
@@ -140,6 +141,15 @@ export class MarketDataService {
           })
         }
         resolve(allWalletValues)
+      })
+    })
+  }
+
+  public fetchCurrentMarketPrice(marketSymbol: string, baseSymbol = 'USD'): Promise<BigNumber> {
+    return new Promise(resolve => {
+      cryptocompare.price(marketSymbol.toUpperCase(), baseSymbol).then(prices => {
+        const currentMarketPrice = new BigNumber(prices.USD)
+        resolve(currentMarketPrice)
       })
     })
   }

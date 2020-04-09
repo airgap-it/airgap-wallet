@@ -44,7 +44,7 @@ export class ProtocolsProvider {
   }
 
   public getEnabledSubProtocols() {
-    return ['eth-erc20-ae', 'xtz-btc']
+    return ['eth-erc20-ae', 'xtz-btc', 'eth-erc20-xchf']
   }
 
   public addProtocols() {
