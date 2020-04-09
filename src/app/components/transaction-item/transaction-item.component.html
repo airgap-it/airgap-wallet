@@ -35,7 +35,7 @@
     <ion-col class="ion-no-padding">
       <ion-row class="ion-justify-content-end">
         <ion-text color="blackLight">
-          <p *ngIf="tx.timestamp">
+          <p class="ion-no-margin" *ngIf="tx.timestamp">
             {{
               tx.timestamp
                 | amFromUnix
@@ -46,7 +46,7 @@
       </ion-row>
       <ion-row class="ion-justify-content-end">
         <ion-text color="blackLight">
-          <p *ngIf="tx.timestamp">
+          <p class="ion-no-margin" *ngIf="tx.timestamp">
             {{
               tx.timestamp
                 | amFromUnix
