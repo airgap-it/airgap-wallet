@@ -58,22 +58,27 @@ export class AccountAddPage {
   }
 
   public addAccount(protocolIdentifier: string) {
-    this.dataService.setData(DataServiceKey.PROTOCOL, protocolIdentifier)
+    const info = {
+      mainProtocolIdentifier: protocolIdentifier
+    }
+    this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public addSubAccount(subProtocolIdentifier: string) {
     const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
     if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
-      console.log(subProtocolIdentifier)
       const info = {
         subProtocolIdentifier
       }
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
-      console.log(mainProtocolIdentifier)
-      this.dataService.setData(DataServiceKey.PROTOCOL, mainProtocolIdentifier)
+      const info = {
+        mainProtocolIdentifier: mainProtocolIdentifier,
+        subProtocolIdentifier: subProtocolIdentifier
+      }
+      this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }

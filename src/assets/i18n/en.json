@@ -14,6 +14,9 @@
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
       "open-blockexplorer_label": "Open Blockexplorer"
     },
+    "pending-exchange-transactions": {
+      "label": "Pending Exchange Transactions"
+    },
     "receive_label": "Receive",
     "send_label": "Send",
     "tx_not_loading": "The transactions can currently not be loaded, please refer to the block explorer to view the latest transactions",
@@ -294,10 +297,15 @@
     "accounts_label": "Accounts"
   },
 
-  "account-import-onboarding": {
+ "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
+    "sub-protocol_text": "<strong>{{subProtocol}}</strong> can not be added without a <strong>{{protocol}}</strong> account.",
     "slides": {
+      "slide-0": {
+        "text": "<strong>{{protocol}}</strong> has many tokens. To use any of them, you need to first first add a <strong>{{protocol}}</strong> account from AirGap Vault",
+        "description": "Follow the instructions on the next few steps to add a <strong>{{protocol}}</strong> account before you can continue"
+      },
       "slide-1": {
         "text": "Open your  <strong>AirGap Vault</strong> application, on the same device or on your offline device.",
         "description": "Go to the <strong>“Accounts”</strong> tab and select <strong>“Add Account”</strong>."
@@ -340,6 +348,7 @@
     "title": "Exchange",
     "exchange_label": "Exchange",
     "powered-by_label": "powered by",
+    "switch-exchange_label": "Exchange",
     "onboarding": {
       "heading": "You can exchange your <span class=\"style__strong color__primary\">Ethereum</span> to <span class=\"style__strong color__primary\">Bitcoin</span> and do other exchanges.",
       "description": "Easily swap all supported crypto currencies directly inside AirGap.",
@@ -361,6 +370,9 @@
   "protocol-select": {
     "title": "Select Coin"
   },
+  "exchange-select": {
+    "title": "Select Exchange"
+  },
   "exchange-confirm": {
     "title": "Confirm Exchange",
     "confirm-exchange_label": "Confirm Exchange",
@@ -368,10 +380,32 @@
     "sell_label": "From",
     "sell-amount_label": "Amount",
     "fee_label": "Fee",
-    "changellgy-address_label": "Changelly Address",
+    "exchange-address_label": "Exchange Address",
     "buy-amount_label": "Buy Amount",
     "receiving-to_label": "Receiving to",
-    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "changelly_disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "changenow_disclaimer": "Exchange services provided by ChangeNow. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">ChangeNow AML/KYC</span>."
+  },
+    "exchange-custom": {
+    "title": "Select a Gatekeeper",
+    "text": "Exchange to tzBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
+    "confirm-exchange_label": "Confirm Exchange",
+    "heading": "In-App tzBTC swap not yet supported",
+    "bitcoin-suisse": {
+      "title": "Bitcoin Suisse",
+      "text": "As a regulated Swiss financial intermediary (SRO – VQF member), Bitcoin Suisse offers prime brokerage, storage, lending and other crypto-financial services."
+    },
+     "woorton": {
+       "title": "Woorton",
+      "text": "Woorton provides 24/7 cryptocurrency liquidity to professional traders via secure chats or API connectivity."
+    },
+     "taurus": {
+       "title": "Taurus",
+      "text": "Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
+    },
+    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
+    "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
   },
   "delegation-baker-detail": {
     "title": "Baker Detail",

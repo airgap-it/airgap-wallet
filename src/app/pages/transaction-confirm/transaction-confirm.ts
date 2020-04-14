@@ -78,7 +78,12 @@ export class TransactionConfirmPage {
       const toast: HTMLIonToastElement = await this.toastCtrl.create({
         duration: TOAST_DURATION,
         message: 'Transaction queued. It might take some time until your TX shows up!',
-        showCloseButton: true,
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel'
+          }
+        ],
         position: 'bottom'
       })
       toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
@@ -141,8 +146,7 @@ export class TransactionConfirmPage {
 
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-          // TODO: multiple transactions
-          await this.showTransactionSuccessfulAlert(protocol, txId)
+          this.showTransactionSuccessfulAlert(protocol, txId)
 
           // POST TX TO BACKEND
           const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
@@ -153,6 +157,7 @@ export class TransactionConfirmPage {
           signed.signedTx = this.signedTxs[index]
           signed.hash = txId
 
+          console.log('SIGNED TX', signed)
           this.pushBackendProvider.postPendingTx(signed) // Don't await
           // END POST TX TO BACKEND
         })
@@ -168,10 +173,9 @@ export class TransactionConfirmPage {
           // TODO: Remove this special error case once we remove web3 from the coin-lib
           if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
             ;(protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index].payload as SignedTransaction) as any).then(
-              async signed => {
+              signed => {
                 if (signed.hash) {
-                  // TODO: multiple transactions
-                  await this.showTransactionSuccessfulAlert(protocol, signed.hash)
+                  this.showTransactionSuccessfulAlert(protocol, signed.hash)
                   // POST TX TO BACKEND
                   // necessary for the transaction backend
                   signed.amount = signed.amount.toString()
@@ -189,7 +193,12 @@ export class TransactionConfirmPage {
               .create({
                 duration: TOAST_ERROR_DURATION,
                 message: 'Transaction broadcasting failed: ' + error,
-                showCloseButton: true,
+                buttons: [
+                  {
+                    text: 'Ok',
+                    role: 'cancel'
+                  }
+                ],
                 position: 'bottom'
               })
               .then(toast => {

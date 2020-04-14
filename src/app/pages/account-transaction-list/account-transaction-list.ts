@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
+import { ExchangeProvider } from './../../services/exchange/exchange'
+import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
@@ -19,10 +20,10 @@ import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
-
-// import 'core-js/es7/object'
+import { timer, Subscription } from 'rxjs'
 
 declare let cordova
+export const refreshRate = 3000
 
 @Component({
   selector: 'page-account-transaction-list',
@@ -30,6 +31,9 @@ declare let cordova
   styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
+  private timer$ = timer(0, refreshRate)
+  private subscription: Subscription = new Subscription()
+
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
   public infiniteEnabled: boolean = false
@@ -44,7 +48,10 @@ export class AccountTransactionListPage {
   public protocolIdentifier: string
 
   public hasPendingTransactions: boolean = false
+  public hasExchangeTransactions: boolean = false
+
   public pendingTransactions: IAirGapTransaction[] = []
+  public formattedExchangeTransactions: IAirGapTransaction[] = []
 
   // XTZ
   public isKtDelegated: boolean = false
@@ -72,12 +79,23 @@ export class AccountTransactionListPage {
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
-    private readonly pushBackendProvider: PushBackendProvider
+    private readonly pushBackendProvider: PushBackendProvider,
+    private readonly exchangeProvider: ExchangeProvider
   ) {
     const info = this.route.snapshot.data.special
     if (this.route.snapshot.data.special) {
       this.wallet = info.wallet
     }
+
+    this.subscription = this.timer$.subscribe(async () => {
+      if (this.formattedExchangeTransactions.length > 0) {
+        this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
+          this.wallet.protocolIdentifier,
+          this.wallet.addresses[0]
+        )
+        this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
+      }
+    })
 
     this.protocolIdentifier = this.wallet.coinProtocol.identifier
 
@@ -121,7 +139,8 @@ export class AccountTransactionListPage {
     this.doRefresh()
   }
 
-  public openPreparePage(): void {
+  public openPreparePage() {
+    let info
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
@@ -132,15 +151,20 @@ export class AccountTransactionListPage {
         router: this.router
       })
       action.start()
+    } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
+      info = {
+        wallet: this.wallet,
+        address: '',
+        disableFees: true
+      }
     } else {
-      const info = {
+      info = {
         wallet: this.wallet,
         address: ''
       }
-      this.dataService.setData(DataServiceKey.DETAIL, info)
-
-      this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage(): void {
@@ -213,12 +237,11 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    await promiseTimeout(3000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(3000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
+      return []
     })
-
-    const transactions: IAirGapTransaction[] = await transactionPromise
 
     this.transactions = this.mergeTransactions(this.transactions, transactions)
 
@@ -228,6 +251,12 @@ export class AccountTransactionListPage {
     const addr: string = this.wallet.receivingPublicAddress
 
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+
+    this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
+      this.wallet.protocolIdentifier,
+      this.wallet.addresses[0]
+    )
+    this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map(value => value.hash)
@@ -257,7 +286,9 @@ export class AccountTransactionListPage {
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
     const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
       this.wallet.fetchTransactions(limit, offset),
-      this.wallet.synchronize()
+      this.wallet.synchronize().catch(error => {
+        console.error(error)
+      })
     ])
 
     return transactions
@@ -287,6 +318,7 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
+        importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }
@@ -329,9 +361,18 @@ export class AccountTransactionListPage {
     const toast: HTMLIonToastElement = await this.toastController.create({
       duration: 3000,
       message,
-      showCloseButton: true,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel'
+        }
+      ],
       position: 'bottom'
     })
     toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }

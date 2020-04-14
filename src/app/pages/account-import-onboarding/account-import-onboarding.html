@@ -1,73 +1,120 @@
-<ion-header no-border no-shadow>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>
-      <span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: protocol.name }"></span>
-    </ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title *ngIf="protocol && !subProtocol">
+        <span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: protocol.name }"></span>
+      </ion-title>
+      <ion-title *ngIf="subProtocol">
+        <span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: subProtocol.name }"></span>
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
 <ion-content>
-  <p [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }" class="ion-padding-horizontal"></p>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <p
+      [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }"
+      class="ion-padding-horizontal"
+      *ngIf="!subProtocol"
+    ></p>
+    <p
+      [innerHTML]="'account-import-onboarding.sub-protocol_text' | translate: { subProtocol: subProtocol.name !== protocol.name ? subProtocol.name : subProtocol.identifier, protocol: protocol.name }"
+      class="ion-padding-horizontal"
+      *ngIf="subProtocol"
+    ></p>
 
-  <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
-    <ion-slide class="ion-padding-horizontal">
-      <div class="slide-zoom">
-        <img [src]="'/assets/img/' + slide1" />
-        <ion-text>
-          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.text' | translate"></p>
-        </ion-text>
-        <ion-text>
-          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.description' | translate"></p>
-        </ion-text>
-      </div>
-    </ion-slide>
-    <ion-slide class="ion-padding-horizontal">
-      <div class="slide-zoom">
-        <img [src]="'/assets/img/' + slide2" />
-        <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
-      </div>
-    </ion-slide>
-    <ion-slide class="ion-padding-horizontal">
-      <div class="slide-zoom">
-        <img [src]="'/assets/img/' + slide3" />
-        <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
-        <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
-      </div>
-    </ion-slide>
-    <ion-slide class="ion-padding-horizontal">
-      <div class="slide-zoom">
-        <img [src]="'/assets/img/' + slide4" />
-        <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
-        <p
-          class="ion-text-left"
-          [innerHTML]="'account-import-onboarding.slides.slide-4.description' | translate: { protocolName: protocol.name }"
-        ></p>
-      </div>
-    </ion-slide>
-  </ion-slides>
+    <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
+      <ion-slide class="ion-padding-horizontal" *ngIf="subProtocol">
+        <div class="slide-zoom">
+          <ion-row class="ion-align-items-center on-padding-bottom ion-margin-bottom sub-protocol__container">
+            <ion-col size="5">
+              <img src="assets/symbols/{{protocol.symbol.toLowerCase()}}.svg" />
+              <h5>{{protocol.name}}</h5>
+            </ion-col>
+            <ion-col size="2" class="ion-justify-content-center">
+              <ion-icon name="md-link" color="dark" size="large"></ion-icon>
+            </ion-col>
+            <ion-col size="5">
+              <img src="assets/symbols/{{subProtocol.symbol.toLowerCase()}}.svg" />
+              <h5>{{subProtocol.name}}</h5>
+            </ion-col>
+          </ion-row>
+          <ion-text>
+            <p
+              [innerHTML]="'account-import-onboarding.slides.slide-0.text' | translate: { subProtocol: subProtocol.name !== protocol.name ? subProtocol.name : subProtocol.identifier, protocol: protocol.name }"
+              class="ion-text-left"
+            ></p>
+          </ion-text>
+          <ion-text>
+            <p
+              [innerHTML]="'account-import-onboarding.slides.slide-0.description' | translate: { protocol: protocol.name }"
+              class="ion-text-left"
+            ></p>
+          </ion-text>
+        </div>
+      </ion-slide>
+      <ion-slide class="ion-padding-horizontal">
+        <div class="slide-zoom">
+          <img [src]="'/assets/img/' + slide1" />
+          <ion-text>
+            <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.text' | translate"></p>
+          </ion-text>
+          <ion-text>
+            <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.description' | translate"></p>
+          </ion-text>
+        </div>
+      </ion-slide>
+      <ion-slide class="ion-padding-horizontal">
+        <div class="slide-zoom">
+          <img [src]="'/assets/img/' + slide2" />
+          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
+        </div>
+      </ion-slide>
+      <ion-slide class="ion-padding-horizontal">
+        <div class="slide-zoom">
+          <img [src]="'/assets/img/' + slide3" />
+          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
+          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
+        </div>
+      </ion-slide>
+      <ion-slide class="ion-padding-horizontal">
+        <div class="slide-zoom">
+          <img [src]="'/assets/img/' + slide4" />
+          <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
+          <p
+            class="ion-text-left"
+            [innerHTML]="'account-import-onboarding.slides.slide-4.description' | translate: { protocolName: protocol.name }"
+          ></p>
+        </div>
+      </ion-slide>
+    </ion-slides>
+  </ion-grid>
 </ion-content>
-<ion-footer no-border no-shadow>
-  <ion-toolbar class="ion-no-padding">
-    <ion-buttons *ngIf="!isBegin" slot="end">
-      <ion-button fill="clear" color="primary" (click)="slides.slidePrev()">
-        <ion-icon name="arrow-back"></ion-icon>
-        {{ 'account-import-onboarding.back' | translate }}
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons *ngIf="!isEnd" slot="end">
-      <ion-button fill="clear" color="primary" (click)="slides.slideNext()">
-        {{ 'account-import-onboarding.next' | translate }}
-        <ion-icon name="arrow-forward"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-buttons *ngIf="isEnd" slot="end">
-      <ion-button fill="clear" color="primary" (click)="openVault()">
-        {{ 'account-import-onboarding.open_vault' | translate }}
-        <ion-icon name="arrow-forward"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+<ion-footer class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar class="ion-no-padding">
+      <ion-buttons *ngIf="!isBegin" slot="end">
+        <ion-button fill="clear" color="primary" (click)="slides.slidePrev()">
+          <ion-icon name="arrow-back"></ion-icon>
+          {{ 'account-import-onboarding.back' | translate }}
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons *ngIf="!isEnd" slot="end">
+        <ion-button fill="clear" color="primary" (click)="slides.slideNext()">
+          {{ 'account-import-onboarding.next' | translate }}
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons *ngIf="isEnd" slot="end">
+        <ion-button fill="clear" color="primary" (click)="openVault()">
+          {{ 'account-import-onboarding.open_vault' | translate }}
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-grid>
 </ion-footer>

@@ -24,9 +24,10 @@ export class TransactionPreparePage {
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
   public amountForm: FormGroup
-
+  public feeCurrentMarketPrice: number
   public sendMaxAmount = false
   public forceMigration = false
+  public disableFees = false
 
   // temporary fields until we figure out how to handle Polkadot fee/tip model
   public isPolkadot = false
@@ -62,7 +63,6 @@ export class TransactionPreparePage {
         fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
         isAdvancedMode: [false, []]
       })
-
       if (info.forceMigration) {
         this.forceMigration = info.forceMigration
         this.setMaxAmount('0')
@@ -106,8 +106,20 @@ export class TransactionPreparePage {
       this.calculatePolkadotFee()
     }
   }
-  public setWallet(wallet: AirGapMarketWallet) {
+  public async setWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
+    if (wallet.protocolIdentifier === 'xtz-btc') {
+      const newWallet = new AirGapMarketWallet(
+        'xtz',
+        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
+        false,
+        'm/44h/1729h/0h/0h'
+      )
+      await newWallet.synchronize()
+      this.feeCurrentMarketPrice = newWallet.currentMarketPrice.toNumber()
+    } else {
+      this.feeCurrentMarketPrice = wallet.currentMarketPrice.toNumber()
+    }
   }
 
   public useWallet() {

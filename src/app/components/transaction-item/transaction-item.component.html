@@ -1,0 +1,60 @@
+<ion-item>
+  <ion-avatar slot="start" *ngIf="transactionType !== 'exchangeTransaction'">
+    <identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></identicon>
+    <identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></identicon>
+  </ion-avatar>
+
+  <ion-avatar slot="start" *ngIf="transactionType === 'exchangeTransaction'">
+    <identicon *ngIf="tx.isInbound" [address]="tx.to[0]"></identicon>
+    <identicon *ngIf="!tx.isInbound" [address]="tx.from[0]"></identicon>
+  </ion-avatar>
+  <ion-label>
+    <h2>
+      <ion-icon *ngIf="tx.isInbound" src="../../assets/custom-ion-icons/md-call_received.svg"></ion-icon>
+      <ion-icon *ngIf="!tx.isInbound" src="../../assets/custom-ion-icons/md-call_made.svg"></ion-icon>
+      <span class="font--weight__bold" color="black">
+        {{ tx.amount | amountConverter: { protocolIdentifier: tx.protocolIdentifier, maxDigits: 10 } }}
+      </span>
+    </h2>
+    <ion-text color="blackLight">
+      <h3 class="typography--mono" *ngIf="transactionType !== 'exchangeTransaction'">
+        <ng-container *ngIf="tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
+        <ng-container *ngIf="!tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
+      </h3>
+      <h3 class="typography--mono" *ngIf="transactionType === 'exchangeTransaction'">
+        <ng-container *ngIf="tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
+        <ng-container *ngIf="!tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
+      </h3>
+    </ion-text>
+  </ion-label>
+  <p slot="end" *ngIf="transactionType === 'exchangeTransaction'">
+    {{ tx.extra }}
+    <!-- status of tx-->
+  </p>
+  <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
+    <ion-col class="ion-no-padding">
+      <ion-row class="ion-justify-content-end">
+        <ion-text color="blackLight">
+          <p class="ion-no-margin" *ngIf="tx.timestamp">
+            {{
+              tx.timestamp
+                | amFromUnix
+                | amCalendar: { sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: '[Last] dddd', sameElse: 'HH:mm' }
+            }}
+          </p>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-end">
+        <ion-text color="blackLight">
+          <p class="ion-no-margin" *ngIf="tx.timestamp">
+            {{
+              tx.timestamp
+                | amFromUnix
+                | amCalendar: { sameDay: '[at] HH:mm', lastDay: '[at] HH:mm', lastWeek: '[at] HH:mm', sameElse: 'L' }
+            }}
+          </p>
+        </ion-text>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+</ion-item>

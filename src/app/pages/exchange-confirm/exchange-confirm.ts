@@ -3,11 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { CreateTransactionResponse } from '../../services/exchange/exchange'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ExchangeProvider } from 'src/app/services/exchange/exchange'
 declare let cordova
 
 @Component({
@@ -16,18 +15,28 @@ declare let cordova
   styleUrls: ['./exchange-confirm.scss']
 })
 export class ExchangeConfirmPage {
+  public activeExchange: string
+
   public fromWallet: AirGapMarketWallet
   public toWallet: AirGapMarketWallet
-  public fee: BigNumber
+
+  public fee: string
+  public feeFiatAmount: string
+
+  public amountExpectedFrom: number
+  public amountExpectedTo: number
+
+  public fromCurrency: string
+  public toCurrency: string
 
   public fromFiatAmount: number
-  public feeFiatAmount: number
   public toFiatAmount: number
 
-  public exchangeResult: CreateTransactionResponse
+  public exchangeResult: any // | CreateTransactionResponse
 
   constructor(
     private readonly router: Router,
+    private readonly exchangeProvider: ExchangeProvider,
     private readonly route: ActivatedRoute,
     public platform: Platform,
     private readonly operationsProvider: OperationsProvider,
@@ -37,25 +46,27 @@ export class ExchangeConfirmPage {
       const info = this.route.snapshot.data.special
       this.fromWallet = info.fromWallet
       this.toWallet = info.toWallet
+      this.fromCurrency = info.fromCurrency
+      this.toCurrency = info.toCurrency
+      this.toWallet
       this.exchangeResult = info.exchangeResult
+
+      this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
+      this.amountExpectedTo = this.exchangeResult.amountExpectedTo ? this.exchangeResult.amountExpectedTo : info.amountExpectedTo
     }
+    this.fee = this.fromWallet.coinProtocol.feeDefaults.medium
+    this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
+    this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
+    this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
 
-    const fromAmount = new BigNumber(this.exchangeResult.amountExpectedFrom)
-    const changellyFee = new BigNumber(this.exchangeResult.changellyFee)
-    const apiExtraFee = new BigNumber(this.exchangeResult.apiExtraFee)
-    const totalFeeInPercent = changellyFee.plus(apiExtraFee)
-    const txFee = this.fromWallet.coinProtocol.feeDefaults.medium
-    const exchangeTotalFee = fromAmount.multipliedBy(totalFeeInPercent.dividedBy(100))
-    this.fee = exchangeTotalFee.plus(txFee)
-
-    this.fromFiatAmount = new BigNumber(this.exchangeResult.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
-    this.feeFiatAmount = this.fee.multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
-    this.toFiatAmount = new BigNumber(this.exchangeResult.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
+    this.exchangeProvider.getActiveExchange().subscribe(exchange => {
+      this.activeExchange = exchange
+    })
   }
 
   public async prepareTransaction() {
     const wallet = this.fromWallet
-    const amount = new BigNumber(new BigNumber(this.exchangeResult.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
+    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
     const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
 
     try {
@@ -89,5 +100,9 @@ export class ExchangeConfirmPage {
 
   public changellyUrl() {
     this.openUrl('https://old.changelly.com/aml-kyc')
+  }
+
+  public changeNowUrl() {
+    this.openUrl('https://support.changenow.io/hc/en-us/articles/360011609979')
   }
 }

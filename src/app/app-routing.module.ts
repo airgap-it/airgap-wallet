@@ -138,6 +138,14 @@ const routes: Routes = [
       special: DataResolverService
     },
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
+  },
+  {
+    path: 'exchange-select',
+    loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
+  },
+  {
+    path: 'exchange-custom',
+    loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
   }
 ]
 @NgModule({

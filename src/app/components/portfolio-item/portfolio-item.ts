@@ -35,6 +35,9 @@ export class PortfolioItemComponent {
   public hideFiatAmounts: boolean = false
 
   @Input()
+  public hideDelegationBadge: boolean = false
+
+  @Input()
   public isToken: boolean = false
 
   @Input()

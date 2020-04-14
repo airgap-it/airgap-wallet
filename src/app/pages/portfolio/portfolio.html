@@ -1,56 +1,61 @@
-<ion-header no-border no-shadow>
-  <ion-toolbar color="translucent"></ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="translucent">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 <ion-content fullscreen="true">
-  <chart [total]="total"></chart>
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <chart [total]="total"></chart>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-  <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
-    <ng-container *ngIf="walletGroupsArray.length; else noItems">
-      <ion-list class="walletGroups ion-no-padding" lines="none" *ngFor="let walletGroup of walletGroupsArray">
+    <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
+      <ng-container *ngIf="walletGroupsArray.length; else noItems">
+        <ion-list class="walletGroups ion-no-padding" lines="none" *ngFor="let walletGroup of walletGroupsArray">
+          <ion-card>
+            <portfolio-item
+              *ngIf="walletGroup.mainWallet"
+              class="mainWallet"
+              [wallet]="walletGroup.mainWallet"
+              [maxDigits]="walletGroup.mainWallet.coinProtocol.decimals + 1"
+              tappable
+              (click)="openDetail(walletGroup.mainWallet)"
+            ></portfolio-item>
+            <portfolio-item
+              *ngFor="let subWallet of walletGroup.subWallets"
+              [wallet]="subWallet"
+              [maxDigits]="subWallet.coinProtocol.decimals + 1"
+              tappable
+              (click)="openDetail(walletGroup.mainWallet, subWallet)"
+            ></portfolio-item>
+          </ion-card>
+        </ion-list>
+      </ng-container>
+      <ng-template #noItems>
+        <ion-row class="container__empty" class="ion-padding ion-justify-content-center">
+          <img width="50%" height="50%" src="assets/img/sync_wallet_onboarding_1.svg" />
+          <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
+        </ion-row>
+      </ng-template>
+    </ng-container>
+    <ng-template #loading>
+      <ion-list lines="none" class="ion-margin-top">
         <ion-card>
-          <portfolio-item
-            *ngIf="walletGroup.mainWallet"
-            class="mainWallet"
-            [wallet]="walletGroup.mainWallet"
-            [maxDigits]="8"
-            tappable
-            (click)="openDetail(walletGroup.mainWallet)"
-          ></portfolio-item>
-          <portfolio-item
-            *ngFor="let subWallet of walletGroup.subWallets"
-            [wallet]="subWallet"
-            [maxDigits]="8"
-            tappable
-            (click)="openDetail(walletGroup.mainWallet, subWallet)"
-          ></portfolio-item>
+          <portfolio-item></portfolio-item>
+        </ion-card>
+        <ion-card>
+          <portfolio-item></portfolio-item>
+        </ion-card>
+        <ion-card>
+          <portfolio-item></portfolio-item>
+        </ion-card>
+        <ion-card>
+          <portfolio-item></portfolio-item>
         </ion-card>
       </ion-list>
-    </ng-container>
-    <ng-template #noItems>
-      <ion-row class="container__empty" class="ion-padding ion-justify-content-center">
-        <img width="50%" height="50%" src="assets/img/sync_wallet_onboarding_1.svg" />
-        <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
-      </ion-row>
     </ng-template>
-  </ng-container>
-  <ng-template #loading>
-    <ion-list lines="none" class="ion-margin-top">
-      <ion-card>
-        <portfolio-item></portfolio-item>
-      </ion-card>
-      <ion-card>
-        <portfolio-item></portfolio-item>
-      </ion-card>
-      <ion-card>
-        <portfolio-item></portfolio-item>
-      </ion-card>
-      <ion-card>
-        <portfolio-item></portfolio-item>
-      </ion-card>
-    </ion-list>
-  </ng-template>
-
+  </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ng-container *ngIf="wallets | async as walletsArray">
       <ion-fab-button *ngIf="walletsArray.length > 0" id="add-more-coins-button" color="secondary" (click)="openAccountAddPage()">

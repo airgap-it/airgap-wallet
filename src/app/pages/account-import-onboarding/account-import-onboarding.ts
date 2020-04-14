@@ -33,8 +33,11 @@ export class AccountImportOnboardingPage implements OnInit {
     }
   }
   public protocol: ICoinProtocol
+  public subProtocol: ICoinProtocol | undefined
+
   public isBegin: boolean = true
   public isEnd: boolean = false
+  private indexEndingSlide: number
 
   constructor(private readonly route: ActivatedRoute, public platform: Platform, private readonly deeplinkProvider: DeepLinkProvider) {
     if (this.platform.is('ios')) {
@@ -47,8 +50,13 @@ export class AccountImportOnboardingPage implements OnInit {
 
   public ngOnInit(): void {
     if (this.route.snapshot.data.special) {
-      this.protocol = getProtocolByIdentifier(this.route.snapshot.data.special)
-      console.log(this.protocol)
+      const info = this.route.snapshot.data.special
+      this.protocol = getProtocolByIdentifier(info.mainProtocolIdentifier)
+      this.indexEndingSlide = 3
+      if (info.subProtocolIdentifier) {
+        this.subProtocol = getProtocolByIdentifier(info.subProtocolIdentifier)
+        this.indexEndingSlide = 4
+      }
     }
   }
 
@@ -57,7 +65,7 @@ export class AccountImportOnboardingPage implements OnInit {
       .getActiveIndex()
       .then((val: number) => {
         this.isBegin = val === 0
-        this.isEnd = val === 3
+        this.isEnd = val === this.indexEndingSlide
       })
       .catch(handleErrorSentry(ErrorCategory.OTHER))
   }

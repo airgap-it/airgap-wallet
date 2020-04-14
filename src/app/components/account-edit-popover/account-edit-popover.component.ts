@@ -1,3 +1,4 @@
+import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
@@ -9,6 +10,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { supportsDelegation } from 'src/app/helpers/delegation'
+import { ButtonAction } from 'src/app/models/actions/ButtonAction'
 
 declare let cordova
 
@@ -21,6 +23,7 @@ export class AccountEditPopoverComponent implements OnInit {
   private readonly onDelete: Function
 
   // Tezos
+  public importAccountAction: ButtonAction<string[], ImportAccoutActionContext>
   public isTezosKT: boolean = false
   public isDelegated: boolean = false
 
@@ -35,6 +38,7 @@ export class AccountEditPopoverComponent implements OnInit {
     private readonly operationsProvider: OperationsProvider
   ) {
     this.wallet = this.navParams.get('wallet')
+    this.importAccountAction = this.navParams.get('importAccountAction')
     this.onDelete = this.navParams.get('onDelete')
   }
 
