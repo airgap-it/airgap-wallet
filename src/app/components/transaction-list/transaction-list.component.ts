@@ -35,8 +35,8 @@ export class TransactionListComponent {
   @Input()
   public wallet: AirGapMarketWallet
 
-  public openBlockexplorer(): void {
-    const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+  public async openBlockexplorer(): Promise<void> {
+    const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.openUrl(blockexplorer)
   }
