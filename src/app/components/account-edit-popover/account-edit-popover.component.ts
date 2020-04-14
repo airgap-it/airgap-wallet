@@ -2,7 +2,7 @@ import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAcc
 import { Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -67,13 +67,9 @@ export class AccountEditPopoverComponent implements OnInit {
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
     }
-    if (
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT ||
-      supportsDelegation(this.wallet.coinProtocol)
-    ) {
+    if (supportsDelegation(this.wallet.coinProtocol)) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(
-        this.wallet.coinProtocol as ICoinDelegateProtocol,
+        this.wallet.coinProtocol,
         this.wallet.receivingPublicAddress
       )
     }

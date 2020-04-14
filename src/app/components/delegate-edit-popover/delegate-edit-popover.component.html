@@ -2,17 +2,12 @@
   <ion-list-header>
     <ion-label>{{ 'delegate-edit-popover.delegation-settings_label' | translate }}</ion-label>
   </ion-list-header>
-  <ion-item *ngIf="!hideAirGap && !isTezos" button detail="false" (click)="changeDelegateeToAirGap()">
+  <ion-item *ngIf="!hideAirGap" button detail="false" (click)="changeDelegateeToAirGap()">
     <ion-icon name="swap-vertical-outline" color="dark" slot="end"></ion-icon>
     Change to AirGap {{ delegateeLabel }}
-  </ion-item>
-  <ion-item *ngIf="!hideAirGap && isTezos" button detail="false" (click)="changeDelegateeToAirGap()">
-    <ion-icon name="swap-vertical-outline" color="dark" slot="end"></ion-icon>
-    {{ 'delegate-edit-popover.change-baker-to-airgap_label' | translate }}
   </ion-item>
   <ion-item button detail="false" (click)="changeDelegatee()">
     <ion-icon name="create-outline" color="dark" slot="end"></ion-icon>
     <span *ngIf="delegateeLabel">Change {{ delegateeLabel }}</span>
-    <span *ngIf="!delegateeLabel">{{ 'delegate-edit-popover.change-baker_label' | translate }}</span>
   </ion-item>
 </ion-list>
