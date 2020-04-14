@@ -117,6 +117,22 @@ build_web_extension:
   tags:
     - docker
 
+build_mac:
+  stage: native_build
+  when: manual
+  script:
+    - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" package.json'
+    - npm install
+    - npm run electron:build:mac
+  artifacts:
+    name: 'electron_macos'
+    paths:
+      - electron/build/airgap-wallet-$VERSION.dmg
+      - electron/build/airgap-wallet-$VERSION.dmg.blockmap
+      - electron/build/airgap-wallet-$VERSION-mac.zip
+  tags:
+    - ios
+
 build_linux:
   stage: native_build
   when: manual
@@ -131,6 +147,7 @@ build_linux:
   after_script:
     - docker rm -f $CI_PIPELINE_ID || true
   artifacts:
+    name: 'electron_linux'
     paths:
       - electron/airgap-wallet-$VERSION.AppImage
 
@@ -149,6 +166,7 @@ build_windows:
   after_script:
     - docker rm -f $CI_PIPELINE_ID || true
   artifacts:
+    name: 'electron_windows'
     paths:
       - electron/airgap-wallet-$VERSION.exe
       - electron/airgap-wallet-$VERSION.exe.blockmap
