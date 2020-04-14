@@ -184,7 +184,6 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
       action => action.type === PolkadotStakingActionType.BOND_NOMINATE || action.type === PolkadotStakingActionType.BOND_EXTRA
     )
 
-    let partial: Partial<AirGapMainDelegatorAction>
     if (action) {
       const results = await Promise.all([
         protocol.estimateMaxDelegationValueFromAddress(address),
@@ -210,36 +209,31 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         [widgetId.payee]: [PolkadotPayee.STASH]
       })
 
-      if (maxValue.gt(0)) {
-        partial = {
-          type: action.type,
-          isAvailable: true,
-          description: 'Delegate description',
-          paramName: widgetId.targets,
-          form,
-          extraArgs: [
-            this.createValueWidget({
-              id: widgetId.valueControl,
-              defaultValue: maxValueFormatted,
-              toggleFixedValueButton: 'Max',
-              fixedValue: maxValueFormatted,
-              onValueChanged: (value: string) => {
-                form.patchValue({
-                  [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
-                })
-              }
-            })
-          ]
-        }
-      } else {
-        partial = { description: 'Insufficient funds' }
+      return {
+        type: action.type,
+        isAvailable: true,
+        description: 'Delegate description',
+        paramName: widgetId.targets,
+        form,
+        extraArgs: [
+          this.createValueWidget({
+            id: widgetId.valueControl,
+            defaultValue: maxValueFormatted,
+            toggleFixedValueButton: 'Max',
+            fixedValue: maxValueFormatted,
+            onValueChanged: (value: string) => {
+              form.patchValue({
+                [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+              })
+            }
+          })
+        ]
       }
     }
 
     return {
       description: "Can't delegate",
-      isAvailable: false,
-      ...partial
+      isAvailable: false
     }
   }
 

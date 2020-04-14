@@ -107,7 +107,13 @@
   </ion-row>
 
   <ng-container *ngIf="(delegatorDetails$ | async)">
-    <ion-segment scrollable [(ngModel)]="activeDelegatorAction" class="ion-padding-horizontal" (ionChange)="onActiveActionChange()">
+    <ion-segment
+      scrollable
+      [(ngModel)]="activeDelegatorAction"
+      class="ion-padding-horizontal"
+      (ionChange)="onActiveActionChange()"
+      *ngIf="multipleActionsAvailable"
+    >
       <ion-segment-button [value]="delegateActionId" [disabled]="!(delegatorDetails$ | async).delegateAction.isAvailable">
         <ion-label>Delegate</ion-label>
       </ion-segment-button>
@@ -121,9 +127,9 @@
       </ng-container>
     </ion-segment>
 
-    <div class="segment--container">
+    <div [ngClass]="{'segment--container': multipleActionsAvailable}">
       <ng-container *ngIf="activeDelegatorAction === delegateActionId">
-        <ion-row class="ion-padding-horizontal">
+        <ion-row class="ion-padding-horizontal" *ngIf="(delegatorDetails$ | async).delegateAction.description">
           <ion-col size="12">
             <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
           </ion-col>
@@ -147,7 +153,7 @@
         </ion-row>
       </ng-container>
       <ng-container *ngIf="activeDelegatorAction === undelegateActionId">
-        <ion-row class="ion-padding-horizontal">
+        <ion-row class="ion-padding-horizontal" *ngIf="(delegatorDetails$ | async).undelegateAction.description">
           <ion-col size="12">
             <p>{{ (delegatorDetails$ | async).undelegateAction.description }}</p>
           </ion-col>
@@ -172,7 +178,7 @@
       </ng-container>
       <ng-container *ngFor="let extra of (delegatorDetails$ | async).extraActions">
         <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
-          <ion-row class="ion-padding-horizontal">
+          <ion-row class="ion-padding-horizontal" *ngIf="extra.description">
             <ion-col size="12">
               <p>{{ extra.description }}</p>
             </ion-col>

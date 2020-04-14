@@ -26,7 +26,12 @@ import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegatorDetails,
+  AirGapMainDelegatorAction,
+  AirGapExtraDelegatorAction
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { DelegateeDetails, DelegatorDetails, DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
@@ -111,15 +116,29 @@ export class OperationsProvider {
     const basicDetails: DelegatorDetails = allDetails[0]
     const extraDetails: Partial<AirGapDelegatorDetails> = allDetails[1]
 
+    const defaultDelegateActionTypeKeywords = ['delegate']
+    const defaultUndelegateActionTypeKeywords = ['undelegate']
+    const defaultChangeDelegateeActionTypeKeywords = ['change', 'change_baker', 'change_validator']
+
+    const defaultMainParamNameKeywords = ['delegate', 'delegatee']
+
     const details = {
       balance: basicDetails.balance,
       isDelegating: basicDetails.isDelegating,
-      delegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['delegate'], ['delegate', 'delegatee']),
-      undelegateAction: this.createDefaultMainDelegatorAction(basicDetails.availableActions, ['undelegate'], ['delegate', 'delegatee']),
+      delegateAction: this.createDefaultMainDelegatorAction(
+        basicDetails.availableActions,
+        defaultDelegateActionTypeKeywords,
+        defaultMainParamNameKeywords
+      ),
+      undelegateAction: this.createDefaultMainDelegatorAction(
+        basicDetails.availableActions,
+        defaultUndelegateActionTypeKeywords,
+        defaultMainParamNameKeywords
+      ),
       changeDelegateeAction: this.createDefaultMainDelegatorAction(
         basicDetails.availableActions,
-        ['change', 'change_baker', 'change_validator'],
-        ['delegate', 'delegatee'],
+        defaultChangeDelegateeActionTypeKeywords,
+        defaultMainParamNameKeywords,
         { availableByDefault: true }
       ),
       displayRewards: basicDetails.rewards
@@ -130,6 +149,11 @@ export class OperationsProvider {
             payoutColLabel: 'Payout'
           })
         : undefined,
+      extraActions: this.createDefaultExtraDelegatorActions(basicDetails.availableActions, [
+        ...defaultDelegateActionTypeKeywords,
+        ...defaultUndelegateActionTypeKeywords,
+        ...defaultChangeDelegateeActionTypeKeywords
+      ]),
       ...(extraDetails ? extraDetails : {})
     }
 
@@ -145,13 +169,13 @@ export class OperationsProvider {
     const action = availableActions.find(action => typeKeywords.includes(action.type))
     if (action) {
       const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
+      const extraArgs = action.args ? action.args.filter(arg => arg !== paramName) : undefined
       return {
         type: action.type,
         isAvailable: true,
         paramName: paramName,
-        description: '',
-        extraArgs: action.args
-          ? action.args.map(
+        extraArgs: extraArgs
+          ? extraArgs.map(
               arg =>
                 new UIInputText({
                   id: arg,
@@ -166,6 +190,30 @@ export class OperationsProvider {
       isAvailable: options.availableByDefault,
       description: ''
     }
+  }
+
+  private createDefaultExtraDelegatorActions(
+    availableActions: DelegatorAction[] | undefined,
+    ignoreTypeKeywords: any[]
+  ): AirGapExtraDelegatorAction[] | undefined {
+    const extraActions = availableActions ? availableActions.filter(action => !ignoreTypeKeywords.includes(action.type)) : []
+
+    return extraActions.length > 0
+      ? extraActions.map(action => ({
+          type: action.type,
+          label: action.type.toString(),
+          confirmLabel: action.type.toString(),
+          args: action.args
+            ? action.args.map(
+                arg =>
+                  new UIInputText({
+                    id: arg,
+                    label: arg
+                  })
+              )
+            : undefined
+        }))
+      : undefined
   }
 
   public async onDelegationDetailsChange(

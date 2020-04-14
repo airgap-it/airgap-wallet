@@ -92,25 +92,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const delegatorDetails = results[0]
     const delegatorExtraInfo = results[1]
 
-    const delegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
-      delegatorDetails.availableActions,
-      TezosDelegatorAction.DELEGATE,
-      {
-        paramName: 'delegate',
-        description: 'Delegate description',
-        descriptionInactive: "Can't delegate"
-      }
-    )
-
-    const undelegateAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
-      delegatorDetails.availableActions,
-      TezosDelegatorAction.UNDELEGATE,
-      {
-        description: 'Undelegate description',
-        descriptionInactive: "Can't undelegate"
-      }
-    )
-
     const changeDelegateeAction: AirGapMainDelegatorAction = this.createTezosMainDelegatorAction(
       delegatorDetails.availableActions,
       TezosDelegatorAction.CHANGE_BAKER,
@@ -123,8 +104,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const displayRewards: UIRewardList | undefined = await this.createDelegatorDisplayRewards(protocol, address, delegatorExtraInfo)
 
     return {
-      delegateAction,
-      undelegateAction,
       changeDelegateeAction,
       extraDetails: delegatorExtraInfo,
       displayRewards: displayRewards

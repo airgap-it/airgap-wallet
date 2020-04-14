@@ -53,6 +53,16 @@ export class DelegationDetailPage {
   public canProceed: boolean = true
   public supportMultipleDelegatees: boolean = false
 
+  public get multipleActionsAvailable(): boolean {
+    const details = this.delegatorDetails$.value
+    const mainActions = [details.delegateAction, details.undelegateAction]
+
+    const availableActions =
+      mainActions.filter(action => action.isAvailable).length + (details.extraActions ? details.extraActions.length : 0)
+
+    return availableActions > 1
+  }
+
   private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
   private loader: HTMLIonLoadingElement | undefined

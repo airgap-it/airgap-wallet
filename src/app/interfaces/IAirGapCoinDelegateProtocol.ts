@@ -15,7 +15,7 @@ export interface AirGapDelegateeUsageDetails {
 export interface AirGapMainDelegatorAction {
   type?: any
   isAvailable: boolean
-  description: string
+  description?: string
   paramName?: string
   form?: FormGroup
   extraArgs?: UIInputWidget<any>[]
@@ -25,7 +25,7 @@ export interface AirGapExtraDelegatorAction {
   type: any
   label: string
   confirmLabel: string
-  description: string
+  description?: string
   form?: FormGroup
   args?: UIInputWidget<any>[]
 }
