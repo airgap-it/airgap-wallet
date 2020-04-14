@@ -180,7 +180,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
         description: 'Fee'
       }),
       new UIIconText({
-        iconName: 'sync',
+        iconName: 'sync-outline',
         textHTML: bakerConfig ? `${bakerConfig.payout.cycles} Cycles <small>${bakerConfig.payout.time}</small>` : 'Unknown',
         description: 'Payout Schedule'
       })
@@ -281,7 +281,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const nextPayoutWidget = nextPayout
       ? new UIIconText({
           id: widgetId.nextPayout,
-          iconName: 'sync',
+          iconName: 'sync-outline',
           text: nextPayout.fromNow(),
           description: delegatorDetails.isDelegating ? 'Next Payout' : 'First Payout'
         })
@@ -290,7 +290,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const estimatedReturnWidget = returnPerCycle
       ? new UIIconText({
           id: widgetId.estimatedReturn,
-          iconName: 'alarm',
+          iconName: 'alarm-outline',
           text: this.amountConverter.transform(returnPerCycle.toFixed(), {
             protocolIdentifier: protocol.identifier,
             maxDigits: 10

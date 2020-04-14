@@ -192,11 +192,7 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null): void {
-    if (
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ ||
-      this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT ||
-      supportsDelegation(this.wallet.coinProtocol)
-    ) {
+    if (supportsDelegation(this.wallet.coinProtocol)) {
       this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
 

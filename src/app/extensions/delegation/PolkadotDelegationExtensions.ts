@@ -400,7 +400,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     if (totalStaking.eq(activeStaking)) {
       details.push(
         new UIIconText({
-          iconName: 'contacts',
+          iconName: 'people-outline',
           text: this.amountConverterPipe.transform(totalStaking, {
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
@@ -416,7 +416,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
       details.push(
         new UIIconText({
-          iconName: 'contacts',
+          iconName: 'people-outline',
           text: this.amountConverterPipe.transform(nextUnlockingValue, {
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
@@ -424,7 +424,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
           description: 'Locked'
         }),
         new UIIconText({
-          iconName: 'alarm',
+          iconName: 'alarm-outline',
           text: `${moment(unlockingDate).fromNow()} (${moment(unlockingDate).format('LLL')})`,
           description: 'Ready to withdraw'
         })
@@ -432,7 +432,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     } else if (totalUnlocked.gt(0)) {
       details.push(
         new UIIconText({
-          iconName: 'contacts',
+          iconName: 'people-outline',
           text: this.amountConverterPipe.transform(totalUnlocked, {
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
@@ -452,7 +452,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
     details.push(
       new UIIconText({
-        iconName: 'sync',
+        iconName: 'sync-outline',
         text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
         description: stakingDetails.status === 'nominating_inactive' ? 'Becomes active' : 'Next payout'
       })

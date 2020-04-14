@@ -14,6 +14,7 @@ import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -69,7 +70,7 @@ export class TransactionPreparePage {
       }
     }
 
-    this.isPolkadot = this.wallet.coinProtocol.identifier === 'polkadot'
+    this.isPolkadot = this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT
 
     this.useWallet()
 

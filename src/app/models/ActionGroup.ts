@@ -179,15 +179,16 @@ export class ActionGroup {
   private createDelegateButtonAction(): ButtonAction<void, void> {
     return new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' }, () => {
       return new SimpleAction(() => {
-        return new Promise<void>(async resolve => {
+        return new Promise<void>(resolve => {
           const info = {
-            wallet: this.callerContext.wallet,
-            actionCallback: resolve
+            wallet: this.callerContext.wallet
           }
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
             .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+          resolve()
         })
       })
     })

@@ -201,7 +201,7 @@ export class DelegationDetailPage {
       if (details) {
         // TODO: add translations
         this.delegatorBalanceWidget = new UIIconText({
-          iconName: 'wallet',
+          iconName: 'wallet-outline',
           text: this.amountConverter.transform(details.balance, {
             protocolIdentifier: this.wallet.protocolIdentifier,
             maxDigits: 10
