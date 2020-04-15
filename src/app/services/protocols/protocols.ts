@@ -15,8 +15,9 @@ export enum ProtocolSymbols {
   ETH = 'eth',
   XTZ = 'xtz',
   XTZ_KT = 'xtz-kt',
-  TZBTC = 'xtz-btc',
-  COSMOS = 'cosmos'
+  COSMOS = 'cosmos',
+  POLKADOT = 'polkadot',
+  TZBTC = 'xtz-btc'
 }
 
 @Injectable({

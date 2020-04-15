@@ -24,9 +24,13 @@ import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
-import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
 import { TransactionListComponent } from './transaction-list/transaction-list.component'
 import { TransactionItemComponent } from './transaction-item/transaction-item.component'
+import { WidgetSelector } from './widget-selector/widget-selector'
+import { WidgetIconText } from './widget-icon-text/widget-icon-text'
+import { WidgetInputText } from './widget-input-text/widget-input-text'
+import { WidgetAccount } from './widget-account/widget-account'
+import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
 @NgModule({
   declarations: [
@@ -43,12 +47,18 @@ import { TransactionItemComponent } from './transaction-item/transaction-item.co
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
+
     TransactionListComponent,
-    TransactionItemComponent
+    TransactionItemComponent,
+
+    WidgetSelector,
+    WidgetAccount,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetRewardList
   ],
   imports: [
     IonicModule,
@@ -76,12 +86,18 @@ import { TransactionItemComponent } from './transaction-item/transaction-item.co
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
+
     TransactionListComponent,
-    TransactionItemComponent
+    TransactionItemComponent,
+
+    WidgetSelector,
+    WidgetAccount,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetRewardList
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })
