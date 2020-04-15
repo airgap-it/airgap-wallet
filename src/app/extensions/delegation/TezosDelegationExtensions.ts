@@ -1,4 +1,4 @@
-import { TezosProtocol, TezosDelegatorAction, TezosKtProtocol, DelegationRewardInfo, DelegationInfo } from 'airgap-coin-lib'
+import { TezosProtocol, TezosDelegatorAction, DelegationRewardInfo, DelegationInfo } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import { AirGapDelegateeDetails, AirGapDelegatorDetails, AirGapMainDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
@@ -26,14 +26,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     amountConverter: AmountConverterPipe
   ): Promise<TezosDelegationExtensions> {
     const bakersConfig = await remoteConfigProvider.tezosBakers()
-    return new TezosDelegationExtensions(new TezosKtProtocol(), bakersConfig[0], decimalPipe, amountConverter)
+    return new TezosDelegationExtensions(bakersConfig[0], decimalPipe, amountConverter)
   }
 
   public airGapDelegatee?: string = this.airGapBakerConfig.address
   public delegateeLabel: string = 'Baker'
 
   private constructor(
-    private readonly ktProtocol: TezosKtProtocol,
     private readonly airGapBakerConfig: BakerConfig,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverter: AmountConverterPipe
@@ -42,7 +41,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   // TODO: add translations
-  public async getExtraDelegateesDetails(_: TezosProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
+  public async getExtraDelegateesDetails(protocol: TezosProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
     if (addresses.length > 1) {
       return Promise.reject('Multiple bakers are not supported.')
     }
@@ -53,7 +52,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     if (address) {
       const isAirGapBaker = address === this.airGapBakerConfig.address
 
-      const bakerInfo = await this.ktProtocol.bakerInfo(address)
+      const bakerInfo = await protocol.bakerInfo(address)
 
       const bakerTotalUsage = new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
       const bakerCurrentUsage = new BigNumber(bakerInfo.stakingBalance)
@@ -87,7 +86,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   public async getExtraDelegatorDetailsFromAddress(protocol: TezosProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
-    const results = await Promise.all([protocol.getDelegatorDetailsFromAddress(address), this.ktProtocol.getDelegationInfo(address)])
+    const results = await Promise.all([protocol.getDelegatorDetailsFromAddress(address), protocol.getDelegationInfo(address)])
 
     const delegatorDetails = results[0]
     const delegatorExtraInfo = results[1]
@@ -177,7 +176,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       return undefined
     }
 
-    const rewardInfo = await this.ktProtocol.getDelegationRewards(delegatorExtraInfo.value, address)
+    const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
 
     return new UIRewardList({
       rewards: rewardInfo.slice(0, 5).map(reward => ({
@@ -205,7 +204,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     let nextPayout: Moment | null = null
     let avgRoIPerCycle: BigNumber | null = null
     try {
-      const bakerRewards = await this.ktProtocol.getDelegationRewards(bakerDetails.address)
+      const bakerRewards = await protocol.getDelegationRewards(bakerDetails.address)
       nextPayout = this.getNextPayoutMoment(delegatorDetails, bakerRewards, bakerConfig.payout ? bakerConfig.payout.cycles : undefined)
 
       const avgRoIPerCyclePercentage = bakerRewards
