@@ -184,15 +184,15 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       action => action.type === SubstrateStakingActionType.BOND_NOMINATE || action.type === SubstrateStakingActionType.BOND_EXTRA
     )
 
-    if (action) {
-      const results = await Promise.all([
-        protocol.estimateMaxDelegationValueFromAddress(address),
-        protocol.nodeClient.getExistentialDeposit()
-      ])
+    const results = await Promise.all([
+      protocol.estimateMaxDelegationValueFromAddress(address),
+      protocol.nodeClient.getExistentialDeposit()
+    ])
 
-      const maxValue = new BigNumber(results[0])
-      const minValue = new BigNumber(results[1])
+    const maxValue = new BigNumber(results[0])
+    const minValue = new BigNumber(results[1])
 
+    if (action && maxValue.gt(minValue)) {
       const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
 
       const form = this.formBuilder.group({
@@ -345,18 +345,22 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const displayDetails = []
 
     if (nominatorDetails.stakingDetails) {
-      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails))
+      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.isDelegating, nominatorDetails.stakingDetails))
     }
 
     return displayDetails
   }
 
-  private createStakingDetailsWidgets(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): UIWidget[] {
+  private createStakingDetailsWidgets(
+    protocol: SubstrateProtocol,
+    isNominating: boolean,
+    stakingDetails: SubstrateStakingDetails
+  ): UIWidget[] {
     const details = []
 
     details.push(...this.createBondedDetails(protocol, stakingDetails))
 
-    if (stakingDetails.status === 'nominating') {
+    if (isNominating) {
       details.push(...this.createNominationDetails(protocol, stakingDetails))
     }
 
@@ -367,7 +371,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     protocol: SubstrateProtocol,
     nominatorDetails: SubstrateNominatorDetails
   ): UIRewardList | undefined {
-    if (!nominatorDetails.isDelegating) {
+    if (!nominatorDetails.isDelegating || nominatorDetails.stakingDetails.rewards.length === 0) {
       return undefined
     }
 
