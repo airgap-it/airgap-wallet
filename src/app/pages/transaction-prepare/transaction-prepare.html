@@ -135,8 +135,8 @@
         </ion-col>
       </ion-row>
       <div class="divider--line"></div>
-      <!-- TODO: remove `ng-container` when we properly support Polkadot fee/tip model -->
-      <ng-container *ngIf="!isPolkadot">
+      <!-- TODO: remove `ng-container` when we properly support Substrate fee/tip model -->
+      <ng-container *ngIf="!isSubstrate">
         <ion-row class="fee--amount__label ion-padding-horizontal">
           <ion-col size="12" class="ion-no-padding">
             <ion-item lines="none" class="ion-no-padding">
@@ -209,8 +209,8 @@
           </ion-text>
         </ion-row>
       </ng-container>
-      <!-- TODO: remove it when we properly support Polkadot fee/tip model -->
-      <ng-container *ngIf="isPolkadot">
+      <!-- TODO: remove it when we properly support Substrate fee/tip model -->
+      <ng-container *ngIf="isSubstrate">
         <ion-row class="fee--amount__label ion-padding-horizontal">
           <ion-col size="12" class="ion-no-padding">
             <ion-item lines="none" class="ion-no-padding">
@@ -269,15 +269,15 @@
           <ion-text color="blackLight">
             <p class="ion-no-margin">
               <span id="fee-amount">
-                <ng-container *ngIf="polkadotFee.isNaN()" color="primary">
+                <ng-container *ngIf="substrateFee.isNaN()" color="primary">
                   <ion-skeleton-text animated style="width: 15%;"></ion-skeleton-text>
                 </ng-container>
-                <ng-container *ngIf="!polkadotFee.isNaN()" color="primary">
-                  ${{ polkadotFee.multipliedBy(wallet.currentMarketPrice).toString() | number: '1.2-4' }}
+                <ng-container *ngIf="!substrateFee.isNaN()" color="primary">
+                  ${{ substrateFee.multipliedBy(wallet.currentMarketPrice).toString() | number: '1.2-4' }}
                 </ng-container>
               </span>
-              <span id="fee-amount-advanced" *ngIf="!polkadotFee.isNaN()">
-                ({{ polkadotFee.toString() | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+              <span id="fee-amount-advanced" *ngIf="!substrateFee.isNaN()">
+                ({{ substrateFee.toString() | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
               </span>
             </p>
           </ion-text>

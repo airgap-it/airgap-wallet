@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { ICoinDelegateProtocol, PolkadotProtocol, TezosProtocol } from 'airgap-coin-lib'
+import { ICoinDelegateProtocol, KusamaProtocol, PolkadotProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/ProtocolDelegationExtensions'
-import { PolkadotDelegationExtensions } from 'src/app/extensions/delegation/PolkadotDelegationExtensions'
+import { SubstrateDelegationExtensions } from 'src/app/extensions/delegation/SubstrateDelegationExtensions'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder } from '@angular/forms'
@@ -13,7 +13,8 @@ import { TezosDelegationExtensions } from 'src/app/extensions/delegation/TezosDe
 })
 export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => Promise<ProtocolDelegationExtensions<any>>][] = [
-    [PolkadotProtocol, async () => PolkadotDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
+    [KusamaProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
+    [PolkadotProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
     [TezosProtocol, () => TezosDelegationExtensions.create(this.remoteConfigProvider, this.decimalPipe, this.amountConverterPipe)]
   ]
 
