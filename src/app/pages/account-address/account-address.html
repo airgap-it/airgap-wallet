@@ -29,7 +29,7 @@
   </ion-row>
 
   <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [size]="240"></qr-clipboard>
+    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [shouldPrefixSingleQrWithUrl]="false" [size]="240"></qr-clipboard>
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
