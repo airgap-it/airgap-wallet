@@ -17,6 +17,7 @@ export enum ProtocolSymbols {
   XTZ_KT = 'xtz-kt',
   COSMOS = 'cosmos',
   POLKADOT = 'polkadot',
+  KUSAMA = 'kusama',
   TZBTC = 'xtz-btc'
 }
 
