@@ -464,13 +464,6 @@
   "portfolio-item": {
     "active": "active"
   },
-  "tezos-delegation-stats": {
-    "cycle": "Cycle",  
-    "reward": "Expected Reward", 
-    "payout": "Earliest Payout"
-  },  
-
-  
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",

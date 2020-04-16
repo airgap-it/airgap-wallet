@@ -2,17 +2,15 @@ import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
+import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { TezosDelegateAction } from 'airgap-coin-lib/dist/actions/TezosDelegateAction'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise-timeout'
 import { ActionGroup } from '../../models/ActionGroup'
-import { AirGapTezosDelegateAction } from '../../models/actions/TezosDelegateAction'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -21,6 +19,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 
 declare let cordova
@@ -80,7 +79,6 @@ export class AccountTransactionListPage {
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
-    private readonly loadingController: LoadingController,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider
   ) {
@@ -179,8 +177,8 @@ export class AccountTransactionListPage {
     this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public openBlockexplorer(): void {
-    const blockexplorer = this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+  public async openBlockexplorer(): Promise<void> {
+    const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.openUrl(blockexplorer)
   }
@@ -194,8 +192,8 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null): void {
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
-      this.operationsProvider.refreshAllDelegationStatuses()
+    if (supportsDelegation(this.wallet.coinProtocol)) {
+      this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
 
     this.isRefreshing = true
@@ -304,7 +302,11 @@ export class AccountTransactionListPage {
       transactionMap.set(tx.hash, tx)
     })
 
-    return Array.from(transactionMap.values()).sort((a, b) => b.timestamp - a.timestamp)
+    return Array.from(transactionMap.values()).sort((a, b) =>
+      a.timestamp !== undefined && b.timestamp !== undefined
+        ? b.timestamp - a.timestamp
+        : new BigNumber(b.blockHeight).minus(new BigNumber(a.blockHeight)).toNumber()
+    )
   }
 
   public async presentEditPopover(event): Promise<void> {
@@ -315,19 +317,6 @@ export class AccountTransactionListPage {
         importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
-        },
-        onUndelegate: async (): Promise<void> => {
-          // TODO: Should we move this to it's own file?
-          const delegateAction: AirGapTezosDelegateAction = new AirGapTezosDelegateAction({
-            wallet: this.wallet,
-            delegate: undefined,
-            toastController: this.toastController,
-            loadingController: this.loadingController,
-            dataService: this.dataService,
-            router: this.router
-          })
-
-          await delegateAction.start()
         }
       },
       event,
@@ -339,7 +328,10 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(this.wallet.receivingPublicAddress, false)
+    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(
+      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      this.wallet.receivingPublicAddress
+    )
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
@@ -354,10 +346,8 @@ export class AccountTransactionListPage {
     return ktAddresses
   }
 
-  public async openDelegateSelection(): Promise<void> {
-    const delegateAction: TezosDelegateAction<any> | undefined = this.actions.find(
-      (action: Action<any, any>) => action.identifier === 'delegate-action' || action.identifier === 'view-delegation'
-    ) as TezosDelegateAction<any>
+  public async openDelegationDetails(): Promise<void> {
+    const delegateAction = this.actions.find(action => action.identifier === 'delegate-action')
     if (delegateAction) {
       await delegateAction.start()
     }

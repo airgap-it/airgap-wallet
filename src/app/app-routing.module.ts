@@ -118,14 +118,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/transaction-confirm/transaction-confirm.module').then(m => m.TransactionConfirmPageModule)
   },
   {
-    path: 'delegation-baker-detail/:id',
-    resolve: {
-      special: DataResolverService
-    },
-    loadChildren: () =>
-      import('./pages/delegation-baker-detail/delegation-baker-detail.module').then(m => m.DelegationBakerDetailPageModule)
-  },
-  {
     path: 'delegation-cosmos/:id',
     resolve: {
       special: DataResolverService
@@ -139,6 +131,13 @@ const routes: Routes = [
     },
     loadChildren: () =>
       import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
+  },
+  {
+    path: 'delegation-detail/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   },
   {
     path: 'exchange-select',

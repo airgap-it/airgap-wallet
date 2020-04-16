@@ -18,8 +18,4 @@
     <ion-icon [name]="importAccountAction.context.icon" color="dark" slot="end"></ion-icon>
     {{ importAccountAction.context.name | translate }}
   </ion-item>
-  <ion-item *ngIf="!isTezosKT && isDelegated" button detail="false" (click)="undelegate()">
-    <ion-icon name="close-outline" color="dark" slot="end"></ion-icon>
-    {{ 'wallet-edit-popover-component.undelegate_label' | translate }}
-  </ion-item>
 </ion-list>

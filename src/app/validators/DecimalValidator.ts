@@ -1,12 +1,12 @@
-import { FormControl } from '@angular/forms'
+import { AbstractControl } from '@angular/forms'
 import { BigNumber } from 'bignumber.js'
 
 export class DecimalValidator {
-  public static validate(decimals: number): (control: FormControl) => { pattern: string } | null {
+  public static validate(decimals: number): (control: AbstractControl) => { pattern: string } | null {
     const regExpString: string = `^[0-9]+((\\.|,){1}[0-9]\\d{0,${decimals - 1}})?$`
     const regExp: RegExp = new RegExp(regExpString)
 
-    return (control: FormControl): { pattern: string } | null => {
+    return (control: AbstractControl): { pattern: string } | null => {
       const stringAmount: string = new BigNumber(control.value).toFixed()
       if (stringAmount.match(regExp) === null) {
         return { pattern: 'Pattern does not match.' }

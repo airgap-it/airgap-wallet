@@ -1,6 +1,6 @@
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
 import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
-import { CommonModule } from '@angular/common'
+import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -54,6 +54,7 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { ExtensionsService } from './services/extensions/extensions.service'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -101,6 +102,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     QRScanner,
     Keyboard,
     AmountConverterPipe,
+    DecimalPipe,
     MarketDataService,
     DrawChartService,
     Deeplinks,
@@ -117,6 +119,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
+    ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
     WebExtensionProvider,

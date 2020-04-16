@@ -12,7 +12,7 @@ import { SerializerService } from '../../services/serializer/serializer.service'
 })
 export class SignedTransactionComponent implements OnChanges {
   @Input()
-  public signedTx: IACMessageDefinitionObject | undefined // TODO: Type
+  public signedTxs: IACMessageDefinitionObject[] | undefined // TODO: Type
 
   @Input()
   public syncProtocolString: string
@@ -37,7 +37,7 @@ export class SignedTransactionComponent implements OnChanges {
   public async ngOnChanges(): Promise<void> {
     if (this.syncProtocolString) {
       try {
-        this.signedTx = await this.serializerService.deserialize(this.syncProtocolString)[0]
+        this.signedTxs = await this.serializerService.deserialize(this.syncProtocolString)[0]
       } catch (e) {
         this.fallbackActivated = true
         handleErrorSentry(ErrorCategory.COINLIB)(e)
@@ -45,10 +45,13 @@ export class SignedTransactionComponent implements OnChanges {
     }
 
     // TODO: Handle multiple messages
-    if (this.signedTx) {
-      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTx.protocol)
+    if (this.signedTxs) {
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTxs[0].protocol)
       try {
-        this.airGapTxs = await protocol.getTransactionDetailsFromSigned(this.signedTx.payload as SignedTransaction)
+        this.airGapTxs = (await Promise.all(
+          this.signedTxs.map(signedTx => protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction))
+        )).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+
         if (
           this.airGapTxs.length > 1 &&
           this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
@@ -63,7 +66,7 @@ export class SignedTransactionComponent implements OnChanges {
       } catch (e) {
         console.error(e)
         this.fallbackActivated = true
-        this.rawTxData = this.signedTx.payload as SignedTransaction
+        this.rawTxData = this.signedTxs[0].payload as SignedTransaction
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
