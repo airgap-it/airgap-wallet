@@ -1,4 +1,3 @@
-import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
@@ -120,25 +119,7 @@ export class ActionGroup {
   }
 
   private getCosmosActions(): Action<any, any>[] {
-    const delegateButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' },
-      () => {
-        const prepareDelegateAction: SimpleAction<void> = new SimpleAction(() => {
-          return new Promise<void>(async resolve => {
-            const wallet: AirGapMarketWallet = this.callerContext.wallet
-            const info = {
-              wallet
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl('/delegation-validator-list/' + DataServiceKey.DETAIL)
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            resolve()
-          })
-        })
-        return prepareDelegateAction
-      }
-    )
+    const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]
   }

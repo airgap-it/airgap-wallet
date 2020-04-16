@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, DelegationInfo, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
@@ -328,7 +328,7 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const { isDelegated }: DelegationInfo = await this.operationsProvider.checkDelegated(
+    const isDelegated = await this.operationsProvider.checkDelegated(
       this.wallet.coinProtocol as ICoinDelegateProtocol,
       this.wallet.receivingPublicAddress
     )

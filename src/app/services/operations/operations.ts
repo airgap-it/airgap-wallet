@@ -1,15 +1,7 @@
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
-import {
-  AirGapMarketWallet,
-  CosmosProtocol,
-  DelegationInfo,
-  IACMessageType,
-  IAirGapTransaction,
-  TezosKtProtocol,
-  ICoinDelegateProtocol
-} from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import {
   RawAeternityTransaction,
@@ -254,7 +246,7 @@ export class OperationsProvider {
   public async getDelegationStatusOfAddress(protocol: ICoinDelegateProtocol, address: string, refresh: boolean = false) {
     const delegationStatus = this.delegationStatuses.getValue().get(address)
     if (refresh || delegationStatus === undefined) {
-      const { isDelegated } = await this.checkDelegated(protocol, address)
+      const isDelegated = await this.checkDelegated(protocol, address)
       this.setDelegationStatusOfAddress(address, isDelegated)
 
       return isDelegated
@@ -298,27 +290,8 @@ export class OperationsProvider {
     ])
   }
 
-  // TODO: change returned type when generic protocol is done
-  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<DelegationInfo> {
-    if (supportsDelegation(protocol)) {
-      return {
-        isDelegated: await protocol.isAddressDelegating(address)
-      }
-    } else {
-      // TODO: remove if/else when generic protocol is done and implemented by the protocols
-      if (address && address.startsWith('cosmos')) {
-        const protocol = new CosmosProtocol()
-        const delegations = await protocol.fetchDelegations(address)
-
-        return {
-          isDelegated: delegations.length > 0 ? true : false
-        }
-      } else {
-        return {
-          isDelegated: false
-        }
-      }
-    }
+  public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<boolean> {
+    return supportsDelegation(protocol) ? protocol.isAddressDelegating(address) : false
   }
 
   public async prepareTransaction(
