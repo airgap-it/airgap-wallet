@@ -13,7 +13,7 @@ import { supportsAirGapDelegation, supportsDelegation } from 'src/app/helpers/de
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { LoadingController, PopoverController, NavController } from '@ionic/angular'
+import { LoadingController, PopoverController, NavController, ToastController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -74,6 +74,7 @@ export class DelegationDetailPage {
     private readonly extensionsService: ExtensionsService,
     private readonly loadingController: LoadingController,
     private readonly popoverController: PopoverController,
+    private readonly toastController: ToastController,
     private readonly route: ActivatedRoute,
     private readonly formBuilder: FormBuilder,
     private readonly amountConverter: AmountConverterPipe
@@ -348,7 +349,7 @@ export class DelegationDetailPage {
       }
       this.prepareDelegationAction(action.type)
     } else {
-      // TODO: show error
+      this.showToast(`Can't change ${this.delegateeLabel}`)
     }
   }
 
@@ -376,8 +377,9 @@ export class DelegationDetailPage {
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
       this.dismissLoader()
+
       console.warn(error)
-      // TODO: show error prompt
+      this.showToast(error.message)
     }
   }
 
@@ -385,5 +387,14 @@ export class DelegationDetailPage {
     if (this.loader) {
       this.loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
     }
+  }
+
+  private async showToast(message: string): Promise<void> {
+    const toast: HTMLIonToastElement = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'bottom'
+    })
+    toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
   }
 }
