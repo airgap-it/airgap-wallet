@@ -1,38 +1,38 @@
-import { PolkadotProtocol, PolkadotPayee, AirGapMarketWallet } from 'airgap-coin-lib'
+import { SubstrateProtocol, SubstratePayee, AirGapMarketWallet } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapMainDelegatorAction,
   AirGapExtraDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { PolkadotAddress } from 'airgap-coin-lib/dist/protocols/polkadot/data/account/PolkadotAddress'
+import { SubstrateAddress } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/account/SubstrateAddress'
 import BigNumber from 'bignumber.js'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
-import { PolkadotStakingActionType } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotStakingActionType'
+import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import * as moment from 'moment'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
-  PolkadotNominatorDetails,
-  PolkadotStakingDetails
-} from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotNominatorDetails'
+  SubstrateNominatorDetails,
+  SubstrateStakingDetails
+} from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators, FormGroup } from '@angular/forms'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
-import { PolkadotValidatorDetails } from 'airgap-coin-lib/dist/protocols/polkadot/data/staking/PolkadotValidatorDetails'
+import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 const supportedActions = [
-  PolkadotStakingActionType.BOND_NOMINATE,
-  PolkadotStakingActionType.BOND_EXTRA,
-  PolkadotStakingActionType.CANCEL_NOMINATION,
-  PolkadotStakingActionType.CHANGE_NOMINATION,
-  PolkadotStakingActionType.WITHDRAW_UNBONDED,
-  PolkadotStakingActionType.COLLECT_REWARDS
+  SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.BOND_EXTRA,
+  SubstrateStakingActionType.CANCEL_NOMINATION,
+  SubstrateStakingActionType.CHANGE_NOMINATION,
+  SubstrateStakingActionType.WITHDRAW_UNBONDED,
+  SubstrateStakingActionType.COLLECT_REWARDS
 ]
 
 const widgetId = {
@@ -44,19 +44,19 @@ const widgetId = {
   payee: 'payee'
 }
 
-export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<PolkadotProtocol> {
-  private static instance: PolkadotDelegationExtensions
+export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<SubstrateProtocol> {
+  private static instance: SubstrateDelegationExtensions
 
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe
-  ): PolkadotDelegationExtensions {
-    if (!PolkadotDelegationExtensions.instance) {
-      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe)
+  ): SubstrateDelegationExtensions {
+    if (!SubstrateDelegationExtensions.instance) {
+      SubstrateDelegationExtensions.instance = new SubstrateDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe)
     }
 
-    return PolkadotDelegationExtensions.instance
+    return SubstrateDelegationExtensions.instance
   }
 
   public airGapDelegatee?: string = undefined
@@ -71,10 +71,10 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   // TODO: add translations
-  public async getExtraDelegateesDetails(protocol: PolkadotProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
+  public async getExtraDelegateesDetails(protocol: SubstrateProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
     return Promise.all(
       addresses.map(async address => {
-        const validatorDetails = await protocol.accountController.getValidatorDetails(PolkadotAddress.fromEncoded(address))
+        const validatorDetails = await protocol.accountController.getValidatorDetails(SubstrateAddress.fromEncoded(address))
 
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
@@ -94,7 +94,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     )
   }
 
-  private createDelegateeDisplayDetails(protocol: PolkadotProtocol, validatorDetails: PolkadotValidatorDetails): UIWidget[] {
+  private createDelegateeDisplayDetails(protocol: SubstrateProtocol, validatorDetails: SubstrateValidatorDetails): UIWidget[] {
     const details = []
 
     const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
@@ -144,7 +144,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   // TODO: add translations
-  public async getExtraDelegatorDetailsFromAddress(protocol: PolkadotProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
+  public async getExtraDelegatorDetailsFromAddress(protocol: SubstrateProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
     const nominatorDetails = await protocol.accountController.getNominatorDetails(address)
     const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
@@ -166,7 +166,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   public async onDetailsChange(
-    _: PolkadotProtocol,
+    _: SubstrateProtocol,
     delegateesDetails: AirGapDelegateeDetails[],
     delegatorDetails: AirGapDelegatorDetails
   ): Promise<void> {
@@ -176,23 +176,23 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   private async createDelegateAction(
-    protocol: PolkadotProtocol,
+    protocol: SubstrateProtocol,
     address: string,
     availableActions: DelegatorAction[]
   ): Promise<AirGapMainDelegatorAction> {
     const action = availableActions.find(
-      action => action.type === PolkadotStakingActionType.BOND_NOMINATE || action.type === PolkadotStakingActionType.BOND_EXTRA
+      action => action.type === SubstrateStakingActionType.BOND_NOMINATE || action.type === SubstrateStakingActionType.BOND_EXTRA
     )
 
-    if (action) {
-      const results = await Promise.all([
-        protocol.estimateMaxDelegationValueFromAddress(address),
-        protocol.nodeClient.getExistentialDeposit()
-      ])
+    const results = await Promise.all([
+      protocol.estimateMaxDelegationValueFromAddress(address),
+      protocol.nodeClient.getExistentialDeposit()
+    ])
 
-      const maxValue = new BigNumber(results[0])
-      const minValue = new BigNumber(results[1])
+    const maxValue = new BigNumber(results[0])
+    const minValue = new BigNumber(results[1])
 
+    if (action && maxValue.gt(minValue)) {
       const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
 
       const form = this.formBuilder.group({
@@ -206,7 +206,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
             DecimalValidator.validate(protocol.decimals)
           ])
         ],
-        [widgetId.payee]: [PolkadotPayee.STASH]
+        [widgetId.payee]: [SubstratePayee.STASH]
       })
 
       return {
@@ -238,10 +238,10 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
   }
 
   private createUndelegateAction(
-    stakingDetails: PolkadotStakingDetails | null,
+    stakingDetails: SubstrateStakingDetails | null,
     availableActions: DelegatorAction[]
   ): AirGapMainDelegatorAction {
-    const action = availableActions.find(action => action.type === PolkadotStakingActionType.CANCEL_NOMINATION)
+    const action = availableActions.find(action => action.type === SubstrateStakingActionType.CANCEL_NOMINATION)
 
     if (action) {
       if (stakingDetails) {
@@ -266,7 +266,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
 
   private createChangeDelegateeAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
     const description = 'Change Validator'
-    const action = availableActions.find(action => action.type === PolkadotStakingActionType.CHANGE_NOMINATION)
+    const action = availableActions.find(action => action.type === SubstrateStakingActionType.CHANGE_NOMINATION)
 
     if (action) {
       return {
@@ -287,10 +287,10 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     return availableActions
       .filter(
         action =>
-          action.type !== PolkadotStakingActionType.BOND_NOMINATE &&
-          action.type !== PolkadotStakingActionType.BOND_EXTRA &&
-          action.type !== PolkadotStakingActionType.CANCEL_NOMINATION &&
-          action.type !== PolkadotStakingActionType.CHANGE_NOMINATION
+          action.type !== SubstrateStakingActionType.BOND_NOMINATE &&
+          action.type !== SubstrateStakingActionType.BOND_EXTRA &&
+          action.type !== SubstrateStakingActionType.CANCEL_NOMINATION &&
+          action.type !== SubstrateStakingActionType.CHANGE_NOMINATION
       )
       .map(action => {
         let label: string
@@ -299,12 +299,12 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
         let args: UIInputWidget<any>[]
 
         switch (action.type) {
-          case PolkadotStakingActionType.WITHDRAW_UNBONDED:
+          case SubstrateStakingActionType.WITHDRAW_UNBONDED:
             label = 'Withdraw Unbonded'
             confirmLabel = 'Withdraw'
             description = 'Withdraw unbonded description'
             break
-          case PolkadotStakingActionType.COLLECT_REWARDS:
+          case SubstrateStakingActionType.COLLECT_REWARDS:
             label = 'Collect Rewards'
             confirmLabel = 'Collect'
             description = 'Collect rewards description'
@@ -341,30 +341,37 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     })
   }
 
-  private createDelegatorDisplayDetails(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIWidget[] {
+  private createDelegatorDisplayDetails(protocol: SubstrateProtocol, nominatorDetails: SubstrateNominatorDetails): UIWidget[] {
     const displayDetails = []
 
     if (nominatorDetails.stakingDetails) {
-      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.stakingDetails))
+      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.isDelegating, nominatorDetails.stakingDetails))
     }
 
     return displayDetails
   }
 
-  private createStakingDetailsWidgets(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
+  private createStakingDetailsWidgets(
+    protocol: SubstrateProtocol,
+    isNominating: boolean,
+    stakingDetails: SubstrateStakingDetails
+  ): UIWidget[] {
     const details = []
 
     details.push(...this.createBondedDetails(protocol, stakingDetails))
 
-    if (stakingDetails.status === 'nominating') {
+    if (isNominating) {
       details.push(...this.createNominationDetails(protocol, stakingDetails))
     }
 
     return details
   }
 
-  private createDelegatorDisplayRewards(protocol: PolkadotProtocol, nominatorDetails: PolkadotNominatorDetails): UIRewardList | undefined {
-    if (!nominatorDetails.isDelegating) {
+  private createDelegatorDisplayRewards(
+    protocol: SubstrateProtocol,
+    nominatorDetails: SubstrateNominatorDetails
+  ): UIRewardList | undefined {
+    if (!nominatorDetails.isDelegating || nominatorDetails.stakingDetails.rewards.length === 0) {
       return undefined
     }
 
@@ -384,7 +391,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     })
   }
 
-  private createBondedDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
+  private createBondedDetails(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): UIWidget[] {
     const details = []
 
     const totalStaking = new BigNumber(stakingDetails.total)
@@ -438,7 +445,7 @@ export class PolkadotDelegationExtensions extends ProtocolDelegationExtensions<P
     return details
   }
 
-  private createNominationDetails(protocol: PolkadotProtocol, stakingDetails: PolkadotStakingDetails): UIWidget[] {
+  private createNominationDetails(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): UIWidget[] {
     const details = []
 
     const nextEraDate = new Date(stakingDetails.nextEra)
