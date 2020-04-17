@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { Observable } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -43,11 +43,17 @@ export class PortfolioItemComponent {
   @Input()
   public isDelegated: Observable<boolean>
 
+  private readonly walletChanged: Subscription
+
   constructor(
     private readonly operationsProvider: OperationsProvider,
     public webExtensionProvider: WebExtensionProvider,
     public accountProvider: AccountProvider
-  ) {}
+  ) {
+    this.walletChanged = this.accountProvider.walledChangedObservable.subscribe(async () => {
+      this.updateDelegationStatus()
+    })
+  }
 
   public ngOnInit(): void {
     if (this.webExtensionProvider.isWebExtension()) {
@@ -59,22 +65,20 @@ export class PortfolioItemComponent {
     }
   }
 
-  public async ngOnChanges() {
-    if (this.wallet && (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))) {
-      if (this.wallet.receivingPublicAddress !== undefined) {
-        this.updateDelegationStatus(this.wallet.receivingPublicAddress)
-      } else {
-        this.accountProvider.walledChangedObservable.subscribe(async () => {
-          this.updateDelegationStatus(this.wallet.receivingPublicAddress)
-        })
-      }
+  private async updateDelegationStatus() {
+    if (
+      this.wallet !== undefined &&
+      this.wallet.receivingPublicAddress !== undefined &&
+      (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))
+    ) {
+      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
+        this.wallet.coinProtocol as ICoinDelegateProtocol,
+        this.wallet.receivingPublicAddress
+      )
     }
   }
 
-  private async updateDelegationStatus(address: string) {
-    this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-      this.wallet.coinProtocol as ICoinDelegateProtocol,
-      address
-    )
+  public ngOnDestroy(): void {
+    this.walletChanged.unsubscribe()
   }
 }
