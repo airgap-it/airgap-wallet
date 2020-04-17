@@ -39,6 +39,9 @@ export class ActionGroup {
     actionMap.set(ProtocolSymbols.POLKADOT, () => {
       return this.getPolkadotActions()
     })
+    actionMap.set(ProtocolSymbols.KUSAMA, () => {
+      return this.getKusamaActions()
+    })
 
     const actionFunction: () => Action<any, any>[] | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
@@ -169,8 +172,13 @@ export class ActionGroup {
     return [addTokenButtonAction]
   }
 
-  // TODO:
   private getPolkadotActions(): Action<any, any>[] {
+    const delegateButtonAction = this.createDelegateButtonAction()
+
+    return [delegateButtonAction]
+  }
+
+  private getKusamaActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]

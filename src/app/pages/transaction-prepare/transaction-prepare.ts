@@ -30,10 +30,10 @@ export class TransactionPreparePage {
   public forceMigration = false
   public disableFees = false
 
-  // temporary fields until we figure out how to handle Polkadot fee/tip model
-  public isPolkadot = false
-  public polkadotFee: BigNumber = new BigNumber(NaN)
-  private polkadotFee$: BehaviorSubject<string> = new BehaviorSubject('')
+  // temporary fields until we figure out how to handle Substrate fee/tip model
+  public isSubstrate = false
+  public substrateFee: BigNumber = new BigNumber(NaN)
+  private substrateFee$: BehaviorSubject<string> = new BehaviorSubject('')
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -70,7 +70,8 @@ export class TransactionPreparePage {
       }
     }
 
-    this.isPolkadot = this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT
+    this.isSubstrate =
+      this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT || this.wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA
 
     this.useWallet()
 
@@ -80,7 +81,7 @@ export class TransactionPreparePage {
   public onChanges(): void {
     this.transactionForm.get('amount').valueChanges.subscribe(() => {
       this.sendMaxAmount = false
-      if (this.isPolkadot) {
+      if (this.isSubstrate) {
         this.calculatePolkadotFee()
       }
     })
@@ -92,16 +93,16 @@ export class TransactionPreparePage {
     })
 
     // TODO: remove it when we properly support Polkadot fee/tip model
-    if (this.isPolkadot) {
-      this.polkadotFee$
+    if (this.isSubstrate) {
+      this.substrateFee$
         .pipe(
           debounceTime(300),
           distinctUntilChanged()
         )
         .subscribe(value => {
-          this.polkadotFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
+          this.substrateFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
           this.transactionForm.controls.fee.setValue(
-            this.polkadotFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+            this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
           )
         })
       this.calculatePolkadotFee()
@@ -207,14 +208,14 @@ export class TransactionPreparePage {
     const { address: formAddress, amount: formAmount } = this.transactionForm.value
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
 
-    if (this.isPolkadot && !amount.isNaN() && amount.isInteger()) {
+    if (this.isSubstrate && !amount.isNaN() && amount.isInteger()) {
       const fee = await (this.wallet.coinProtocol as PolkadotProtocol).getTransferFeeEstimate(
         this.wallet.publicKey,
         formAddress,
         amount.toString(10)
       )
 
-      this.polkadotFee$.next(fee)
+      this.substrateFee$.next(fee)
     }
   }
 

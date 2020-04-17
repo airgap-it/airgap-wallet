@@ -61,10 +61,20 @@ export class PortfolioItemComponent {
 
   public async ngOnChanges() {
     if (this.wallet && (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))) {
-      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-        this.wallet.coinProtocol as ICoinDelegateProtocol,
-        this.wallet.receivingPublicAddress
-      )
+      if (this.wallet.receivingPublicAddress !== undefined) {
+        this.updateDelegationStatus(this.wallet.receivingPublicAddress)
+      } else {
+        this.accountProvider.walledChangedObservable.subscribe(async () => {
+          this.updateDelegationStatus(this.wallet.receivingPublicAddress)
+        })
+      }
     }
+  }
+
+  private async updateDelegationStatus(address: string) {
+    this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
+      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      address
+    )
   }
 }
