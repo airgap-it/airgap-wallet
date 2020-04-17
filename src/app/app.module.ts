@@ -1,4 +1,6 @@
-import { CommonModule } from '@angular/common'
+import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
+import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
+import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -54,6 +56,7 @@ import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
+import { ExtensionsService } from './services/extensions/extensions.service'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -61,7 +64,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage],
+  entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage, ExchangeSelectPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -91,8 +94,9 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     PipesModule,
     ComponentsModule,
     ProtocolSelectPageModule,
-    IntroductionPushPageModule,
-    BeaconRequestPageModule
+    BeaconRequestPageModule,
+    ExchangeSelectPageModule,
+    IntroductionPushPageModule
   ],
   providers: [
     StatusBar,
@@ -101,6 +105,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     QRScanner,
     Keyboard,
     AmountConverterPipe,
+    DecimalPipe,
     MarketDataService,
     DrawChartService,
     Deeplinks,
@@ -117,6 +122,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
+    ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
     WebExtensionProvider,

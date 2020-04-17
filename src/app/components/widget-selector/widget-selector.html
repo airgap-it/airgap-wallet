@@ -1,0 +1,5 @@
+<ng-container *ngIf="widget.isVisible">
+  <widget-account *ngIf="widget.type === 'account'" [widget]="widget"></widget-account>
+  <widget-icon-text *ngIf="widget.type === 'icon_text'" [widget]="widget"></widget-icon-text>
+  <widget-input-text *ngIf="widget.type === 'input_text' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-input-text>
+</ng-container>

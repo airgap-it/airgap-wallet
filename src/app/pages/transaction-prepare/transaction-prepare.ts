@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, TezosKtProtocol, PolkadotProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -12,6 +12,9 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
+import { BehaviorSubject } from 'rxjs'
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -22,9 +25,15 @@ export class TransactionPreparePage {
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
   public amountForm: FormGroup
-
+  public feeCurrentMarketPrice: number
   public sendMaxAmount = false
   public forceMigration = false
+  public disableFees = false
+
+  // temporary fields until we figure out how to handle Substrate fee/tip model
+  public isSubstrate = false
+  public substrateFee: BigNumber = new BigNumber(NaN)
+  private substrateFee$: BehaviorSubject<string> = new BehaviorSubject('')
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -55,12 +64,14 @@ export class TransactionPreparePage {
         fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
         isAdvancedMode: [false, []]
       })
-
       if (info.forceMigration) {
         this.forceMigration = info.forceMigration
         this.setMaxAmount('0')
       }
     }
+
+    this.isSubstrate =
+      this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT || this.wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA
 
     this.useWallet()
 
@@ -70,6 +81,9 @@ export class TransactionPreparePage {
   public onChanges(): void {
     this.transactionForm.get('amount').valueChanges.subscribe(() => {
       this.sendMaxAmount = false
+      if (this.isSubstrate) {
+        this.calculatePolkadotFee()
+      }
     })
 
     this.transactionForm.get('fee').valueChanges.subscribe((val: string) => {
@@ -77,15 +91,43 @@ export class TransactionPreparePage {
         this.setMaxAmount(val)
       }
     })
+
+    // TODO: remove it when we properly support Polkadot fee/tip model
+    if (this.isSubstrate) {
+      this.substrateFee$
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.substrateFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
+          this.transactionForm.controls.fee.setValue(
+            this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+          )
+        })
+      this.calculatePolkadotFee()
+    }
   }
-  public setWallet(wallet: AirGapMarketWallet) {
+  public async setWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
+    if (wallet.protocolIdentifier === 'xtz-btc') {
+      const newWallet = new AirGapMarketWallet(
+        'xtz',
+        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
+        false,
+        'm/44h/1729h/0h/0h'
+      )
+      await newWallet.synchronize()
+      this.feeCurrentMarketPrice = newWallet.currentMarketPrice.toNumber()
+    } else {
+      this.feeCurrentMarketPrice = wallet.currentMarketPrice.toNumber()
+    }
   }
 
   public useWallet() {
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
-      new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+      new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
     )
     // TODO: Remove this code after we implement a fee system
     if (this.wallet.protocolIdentifier === 'ae') {
@@ -145,7 +187,7 @@ export class TransactionPreparePage {
               break
             case 2:
               this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
                   -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
                 )
               )
@@ -159,6 +201,21 @@ export class TransactionPreparePage {
           }
         })
       })
+    }
+  }
+
+  public async calculatePolkadotFee() {
+    const { address: formAddress, amount: formAmount } = this.transactionForm.value
+    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+
+    if (this.isSubstrate && !amount.isNaN() && amount.isInteger()) {
+      const fee = await (this.wallet.coinProtocol as PolkadotProtocol).getTransferFeeEstimate(
+        this.wallet.publicKey,
+        formAddress,
+        amount.toString(10)
+      )
+
+      this.substrateFee$.next(fee)
     }
   }
 
@@ -199,11 +256,11 @@ export class TransactionPreparePage {
     }
   }
 
-  private setMaxAmount(fee: string) {
+  private async setMaxAmount(formFee: string) {
     // We need to pass the fee here because during the "valueChanges" call the form is not updated
-    const amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals)
-    const amountWithoutFees = amount.toNumber() > 0 ? amount.minus(new BigNumber(fee)) : 0
-    this.transactionForm.controls.amount.setValue(amountWithoutFees.toFixed(), {
+    const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = await this.wallet.getMaxTransferValue(fee.toFixed())
+    this.transactionForm.controls.amount.setValue(amount.shiftedBy(-this.wallet.coinProtocol.decimals).toFixed(), {
       emitEvent: false
     })
   }

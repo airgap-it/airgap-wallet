@@ -51,8 +51,12 @@ export class ClipboardService {
         message,
         duration: 1000,
         position: 'top',
-        showCloseButton: true,
-        closeButtonText: 'Ok'
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel'
+          }
+        ]
       })
       .then(toast => {
         toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))

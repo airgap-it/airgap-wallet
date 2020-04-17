@@ -7,9 +7,7 @@ import { QRCodeModule } from 'angularx-qrcode'
 import { MaterialIconsModule } from 'ionic2-material-icons'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
-
 import { PipesModule } from '../pipes/pipes.module'
-
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { AddressRowComponent } from './address-row/address-row'
 import { AmountComponent } from './amount/amount.component'
@@ -20,21 +18,25 @@ import { CurrencySymbolComponent } from './currency-symbol/currency-symbol'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FromToComponent } from './from-to/from-to'
-import { HexagonIconComponent } from './hexagon-icon/hexagon-icon'
 import { IdenticonComponent } from './identicon/identicon'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { QrClipboardComponent } from './qr-clipboard/qr-clipboard'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
-import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-stats'
+import { TransactionListComponent } from './transaction-list/transaction-list.component'
+import { TransactionItemComponent } from './transaction-item/transaction-item.component'
+import { WidgetSelector } from './widget-selector/widget-selector'
+import { WidgetIconText } from './widget-icon-text/widget-icon-text'
+import { WidgetInputText } from './widget-input-text/widget-input-text'
+import { WidgetAccount } from './widget-account/widget-account'
+import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
 @NgModule({
   declarations: [
     PortfolioItemComponent,
     IdenticonComponent,
     ChartComponent,
-    HexagonIconComponent,
     AddressRowComponent,
     FromToComponent,
     SwapComponent,
@@ -45,10 +47,18 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+
+    TransactionListComponent,
+    TransactionItemComponent,
+
+    WidgetSelector,
+    WidgetAccount,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetRewardList
   ],
   imports: [
     IonicModule,
@@ -65,9 +75,7 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
   exports: [
     PortfolioItemComponent,
     ChartComponent,
-
     IdenticonComponent,
-    HexagonIconComponent,
     AddressRowComponent,
     AmountComponent,
     FromToComponent,
@@ -78,10 +86,18 @@ import { TezosDelegationStats } from './tezos-delegation-stats/tezos-delegation-
     CurrencySymbolComponent,
     QrClipboardComponent,
     SignedTransactionComponent,
-    TezosDelegationStats,
     TezosDelegationCard,
     CurrencyItemComponent,
-    DelegateEditPopoverComponent
+    DelegateEditPopoverComponent,
+
+    TransactionListComponent,
+    TransactionItemComponent,
+
+    WidgetSelector,
+    WidgetAccount,
+    WidgetIconText,
+    WidgetInputText,
+    WidgetRewardList
   ],
   entryComponents: [AccountEditPopoverComponent, DelegateEditPopoverComponent]
 })

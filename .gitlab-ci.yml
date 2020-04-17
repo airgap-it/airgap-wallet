@@ -6,6 +6,8 @@ variables:
   IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
   IMAGE_TAG_ANDROID_CURRENT: $CI_REGISTRY_IMAGE:android-$CI_COMMIT_SHA
   IMAGE_TAG_ANDROID_LATEST: $CI_REGISTRY_IMAGE:android-latest
+  IMAGE_TAG_ELECTRON_LINUX_CURRENT: $CI_REGISTRY_IMAGE:electron-linux-$CI_COMMIT_SHA
+  IMAGE_TAG_ELECTRON_WINDOWS_CURRENT: $CI_REGISTRY_IMAGE:electron-windows-$CI_COMMIT_SHA
 
 stages:
   - build
@@ -114,6 +116,60 @@ build_web_extension:
       - extension/
   tags:
     - docker
+
+build_mac:
+  stage: native_build
+  when: manual
+  script:
+    - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" package.json'
+    - npm install
+    - npm run electron:build:mac
+  artifacts:
+    name: 'electron_macos'
+    paths:
+      - electron/build/airgap-wallet-$VERSION.dmg
+      - electron/build/airgap-wallet-$VERSION.dmg.blockmap
+      - electron/build/airgap-wallet-$VERSION-mac.zip
+  tags:
+    - ios
+
+build_linux:
+  stage: native_build
+  when: manual
+  tags:
+    - docker
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build -f build/electron/linux/Dockerfile -t $IMAGE_TAG_ELECTRON_LINUX_CURRENT --build-arg VERSION="$VERSION" .
+    - docker run --name $CI_PIPELINE_ID $IMAGE_TAG_ELECTRON_LINUX_CURRENT echo "container ran."
+    - docker cp $CI_PIPELINE_ID:/app/electron/build/airgap-wallet-$VERSION.AppImage electron/airgap-wallet-$VERSION.AppImage
+  after_script:
+    - docker rm -f $CI_PIPELINE_ID || true
+  artifacts:
+    name: 'electron_linux'
+    paths:
+      - electron/airgap-wallet-$VERSION.AppImage
+
+build_windows:
+  stage: native_build
+  when: manual
+  tags:
+    - docker
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build -f build/electron/windows/Dockerfile -t $IMAGE_TAG_ELECTRON_WINDOWS_CURRENT --build-arg VERSION="$VERSION" .
+    - docker run --name $CI_PIPELINE_ID $IMAGE_TAG_ELECTRON_WINDOWS_CURRENT echo "container ran."
+    - docker cp $CI_PIPELINE_ID:/app/electron/build/airgap-wallet-$VERSION.exe electron/airgap-wallet-$VERSION.exe
+    - docker cp $CI_PIPELINE_ID:/app/electron/build/airgap-wallet-$VERSION.exe.blockmap electron/airgap-wallet-$VERSION.exe.blockmap
+  after_script:
+    - docker rm -f $CI_PIPELINE_ID || true
+  artifacts:
+    name: 'electron_windows'
+    paths:
+      - electron/airgap-wallet-$VERSION.exe
+      - electron/airgap-wallet-$VERSION.exe.blockmap
 
 qa:
   stage: qa

@@ -23,7 +23,7 @@ export class TransactionDetailPage {
     }
   }
 
-  public openBlockexplorer() {
+  public async openBlockexplorer() {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
@@ -32,9 +32,9 @@ export class TransactionDetailPage {
     let blockexplorer: string = protocol.blockExplorer
 
     if (hash) {
-      blockexplorer = protocol.getBlockExplorerLinkForTxId(hash)
+      blockexplorer = await protocol.getBlockExplorerLinkForTxId(hash)
     } else {
-      blockexplorer = protocol.getBlockExplorerLinkForAddress(
+      blockexplorer = await protocol.getBlockExplorerLinkForAddress(
         this.transaction.isInbound ? this.transaction.to[0] : this.transaction.from[0]
       )
     }

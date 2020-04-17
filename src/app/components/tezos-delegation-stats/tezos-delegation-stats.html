@@ -1,20 +1,26 @@
-<ion-card class="ion-padding">
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="2">
-      <strong>{{ 'tezos-delegation-stats.cycle' | translate }}</strong>
-    </ion-col>
-    <ion-col>
-      <strong>{{ 'tezos-delegation-stats.reward' | translate }}</strong>
-    </ion-col>
-    <ion-col>
-      <strong>{{ 'tezos-delegation-stats.payout' | translate }}</strong>
-    </ion-col>
-  </ion-row>
-  <ion-row class="ion-justify-content-center ion-padding-bottom" *ngFor="let reward of delegationRewards">
-    <ion-col size="2">#{{ reward.cycle }}</ion-col>
-    <ion-col>~{{ reward.reward?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 8 } }}</ion-col>
-    <ion-col>
-      {{ reward.payout | date: 'HH:mm dd.LL.yy' }}
-    </ion-col>
-  </ion-row>
-</ion-card>
+<ion-row class="ion-padding-bottom">
+  <ion-col size="12" size-md="6">
+    <ion-card class="ion-padding">
+      <ion-row class="ion-justify-content-center ion-padding-bottom">
+        <ion-col size="2">
+          <strong>{{ 'tezos-delegation-stats.cycle' | translate }}</strong>
+        </ion-col>
+        <ion-col>
+          <strong>{{ 'tezos-delegation-stats.reward' | translate }}</strong>
+        </ion-col>
+        <ion-col>
+          <strong>{{ 'tezos-delegation-stats.payout' | translate }}</strong>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-justify-content-center ion-padding-bottom" *ngFor="let reward of delegationRewards">
+        <ion-col size="2">#{{ reward.cycle }}</ion-col>
+        <ion-col>
+          ~{{ reward.reward?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 8 } }}
+        </ion-col>
+        <ion-col>
+          {{ reward.payout | date: 'HH:mm dd.LL.yy' }}
+        </ion-col>
+      </ion-row>
+    </ion-card>
+  </ion-col>
+</ion-row>

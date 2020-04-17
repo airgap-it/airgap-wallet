@@ -118,14 +118,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/transaction-confirm/transaction-confirm.module').then(m => m.TransactionConfirmPageModule)
   },
   {
-    path: 'delegation-baker-detail/:id',
-    resolve: {
-      special: DataResolverService
-    },
-    loadChildren: () =>
-      import('./pages/delegation-baker-detail/delegation-baker-detail.module').then(m => m.DelegationBakerDetailPageModule)
-  },
-  {
     path: 'delegation-cosmos/:id',
     resolve: {
       special: DataResolverService
@@ -147,6 +139,21 @@ const routes: Routes = [
   {
     path: 'settings-beacon',
     loadChildren: () => import('./pages/settings-beacon/settings-beacon.module').then(m => m.SettingsBeaconPageModule)
+  },
+  {
+    path: 'delegation-detail/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
+  },
+  {
+    path: 'exchange-select',
+    loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
+  },
+  {
+    path: 'exchange-custom',
+    loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
   }
 ]
 @NgModule({

@@ -1,12 +1,12 @@
-<ion-header no-border no-shadow>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ 'introduction-push.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()" fill="clear">
-        <ion-icon slot="icon-only" name="md-close"></ion-icon>
+      <ion-button (click)="dismiss()" color="secondary">
+        <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

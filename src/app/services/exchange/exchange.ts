@@ -1,176 +1,62 @@
+import { BigNumber } from 'bignumber.js'
+import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
+import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { ChangellyExchange } from './exchange.changelly'
+import { ChangeNowExchange } from './exchange.changenow'
 import { Injectable } from '@angular/core'
+import { StorageProvider, SettingsKey } from '../storage/storage'
 
-import { Exchange } from './exchange.interface'
+export enum ExchangeEnum {
+  CHANGELLY = 'Changelly',
+  CHANGENOW = 'ChangeNow'
+}
 
-const CHANGELLY_BASE_URL = 'https://swap.airgap.prod.gke.papers.tech/'
+export enum TransactionStatus {
+  NEW = 'NEW',
+  WAITING = 'WAITING',
+  CONFORMING = 'CONFORMING',
+  EXCHANGING = 'EXCHANGING',
+  SENDING = 'SENDING',
+  FINISHED = 'FINISHED',
+  FAILED = 'FAILED'
+}
 
-export interface CreateTransactionResponse {
-  amountExpectedFrom: string
+export interface ExchangeTransaction {
+  receivingAddress: string
+  sendingAddress: string
+  fromCurrency: string
+  toCurrency: string
+  amountExpectedFrom: BigNumber
   amountExpectedTo: string
-  amountTo: number
-  apiExtraFee: string
-  changellyFee: string
-  createdAt: string
-  currencyFrom: string
-  currencyTo: string
-  id: string
-  kycRequired: boolean
-  payinAddress: string
-  payinExtraId: null
-  payoutAddress: string
   status: string
-}
-
-interface JsonRpcWrapper<T> {
+  exchange: ExchangeEnum
   id: string
-  jsonrpc: string
-  method: string
-  params: T
-}
-
-interface JsonRpcResponseError {
-  code: number
-  message: string
-}
-
-interface JsonRpcReturnWrapper<T> {
-  id: string
-  jsonrpc: string
-  method: string
-  result?: T
-  error?: JsonRpcResponseError
-}
-
-const identifierExchangeToAirGapMap = new Map<string, string>()
-identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
-
-const identifierAirGapToExchangeMap = new Map<string, string>()
-identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
-
-class ChangellyApi {
-  constructor(public http: HttpClient) {}
-
-  public async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
-    const wrapper: JsonRpcWrapper<T> = {
-      id: Math.random()
-        .toString(36)
-        .substring(6),
-      jsonrpc: '2.0',
-      method,
-      params
-    }
-    const response = await this.http.post<JsonRpcReturnWrapper<R>>(CHANGELLY_BASE_URL, wrapper).toPromise()
-    if (response.result) {
-      return response.result
-    } else {
-      throw new Error(JSON.stringify(response.error))
-    }
-  }
-
-  private convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
-    return identifiers.map(identifier => {
-      return identifierExchangeToAirGapMap.has(identifier) ? identifierExchangeToAirGapMap.get(identifier) : identifier
-    })
-  }
-
-  private convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
-    return identifiers.map(identifier => {
-      return identifierAirGapToExchangeMap.has(identifier) ? identifierAirGapToExchangeMap.get(identifier) : identifier
-    })
-  }
-
-  public async getAvailableFromCurrencies(): Promise<string[]> {
-    const method = 'getCurrencies'
-    const params = {}
-    const result = await this.makeJsonRpcCall<Object, string[]>(method, params)
-
-    return this.convertExchangeIdentifierToAirGapIdentifier(result)
-  }
-
-  public getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-
-    const method = 'getMinAmount'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency
-    }
-
-    return this.makeJsonRpcCall<Object, string>(method, params)
-  }
-
-  public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-
-    const method = 'getExchangeAmount'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency,
-      amount
-    }
-
-    return this.makeJsonRpcCall<Object, string>(method, params)
-  }
-
-  public validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
-    currency = this.convertAirGapIdentifierToExchangeIdentifier([currency])[0]
-
-    const method = 'validateAddress'
-    const params = {
-      currency,
-      address
-    }
-
-    return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, params)
-  }
-
-  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-
-    const method = 'createTransaction'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency,
-      address,
-      amount
-    }
-
-    return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
-  }
-
-  public getStatus(transactionId: string): Promise<any> {
-    const method = 'getStatus'
-    const params = {
-      id: transactionId
-    }
-
-    return this.makeJsonRpcCall<Object, any>(method, params)
-  }
-}
-
-class ChangellyExchange extends ChangellyApi implements Exchange {
-  constructor(public http: HttpClient) {
-    super(http)
-  }
-
-  public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
-    const availableCurrencies = await this.getAvailableFromCurrencies()
-
-    return availableCurrencies.filter(availableCurrency => availableCurrency !== selectedFrom)
-  }
+  timestamp: number
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExchangeProvider implements Exchange {
-  private readonly exchange: Exchange
-  constructor(public http: HttpClient) {
-    this.exchange = new ChangellyExchange(http)
+  private exchange: Exchange
+  private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
+
+  private pendingTransactions: ExchangeTransaction[] = []
+
+  constructor(public http: HttpClient, private readonly storageProvider: StorageProvider) {
+    this.loadPendingTranscationsFromStorage()
+    this.exchangeSubject.subscribe(exchange => {
+      switch (exchange) {
+        case ExchangeEnum.CHANGELLY:
+          this.exchange = new ChangellyExchange(this.http)
+          break
+        case ExchangeEnum.CHANGENOW:
+          this.exchange = new ChangeNowExchange(this.http)
+          break
+      }
+    })
   }
 
   public getAvailableFromCurrencies(): Promise<string[]> {
@@ -193,11 +79,118 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.validateAddress(currency, address)
   }
 
-  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<any> {
     return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
   }
 
-  public getStatus(transactionId: string): Promise<any> {
+  public getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
     return this.exchange.getStatus(transactionId)
+  }
+
+  public getStatusForTransaction(transaction: ExchangeTransaction): Promise<ExchangeTransactionStatusResponse> {
+    switch (transaction.exchange) {
+      case ExchangeEnum.CHANGELLY:
+        return new ChangellyExchange(this.http).getStatus(transaction.id)
+      case ExchangeEnum.CHANGENOW:
+        return new ChangeNowExchange(this.http).getStatus(transaction.id)
+    }
+  }
+
+  public convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+    return this.exchange.convertExchangeIdentifierToAirGapIdentifier(identifiers)
+  }
+
+  public convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+    return this.exchange.convertAirGapIdentifierToExchangeIdentifier(identifiers)
+  }
+
+  public setActiveExchange(exchange: string) {
+    this.exchangeSubject.next(exchange)
+  }
+
+  public getActiveExchange() {
+    return this.exchangeSubject.asObservable()
+  }
+
+  public pushExchangeTransaction(tx: ExchangeTransaction) {
+    this.pendingTransactions.push(tx)
+    this.persist()
+  }
+
+  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): IAirGapTransaction[] {
+    const protocol = getProtocolByIdentifier(protocolIdentifier)
+    return pendingExchangeTxs.map(tx => {
+      const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
+      const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()
+      return {
+        from: [tx.sendingAddress],
+        to: [tx.receivingAddress],
+        isInbound: protocolIdentifier === tx.toCurrency ? true : false,
+        amount: formattedAmount,
+        fee: new BigNumber(protocol.feeDefaults.medium).times(10 ** protocol.decimals).toString(),
+        timestamp: tx.timestamp,
+        protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
+        extra: tx.status
+      }
+    })
+  }
+
+  public transactionCompleted(tx: ExchangeTransaction) {
+    const index = this.pendingTransactions.indexOf(tx)
+    if (index > -1) {
+      this.pendingTransactions.splice(index, 1)
+    }
+    this.persist()
+  }
+
+  private async persist(): Promise<void> {
+    return this.storageProvider.set(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
+  }
+
+  private async loadPendingTranscationsFromStorage() {
+    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
+    this.pendingTransactions = pendingTransactions ? pendingTransactions : []
+    return
+  }
+
+  public async getExchangeTransactionsByProtocol(protocolidentifier: string, address: string): Promise<IAirGapTransaction[]> {
+    const filteredByProtocol = this.pendingTransactions.filter(
+      tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier
+    )
+    const filteredByAddress = filteredByProtocol.filter(tx => tx.receivingAddress === address || tx.sendingAddress === address)
+    const statusPromises: Promise<{
+      transaction: ExchangeTransaction
+      statusResponse?: ExchangeTransactionStatusResponse
+    }>[] = filteredByAddress.map(tx => {
+      return this.getStatusForTransaction(tx)
+        .then(result => {
+          return { transaction: tx, statusResponse: result }
+        })
+        .catch(() => {
+          return { transaction: tx }
+        })
+    })
+    const transactions = (await Promise.all(statusPromises))
+      .filter(result => {
+        if (result.statusResponse !== undefined) {
+          result.transaction.status = result.statusResponse.status
+          const eightHours = 8 * 3600 * 1000
+          if (
+            !result.statusResponse.isPending() ||
+            result.transaction.timestamp < Date.now() - eightHours ||
+            result.transaction.timestamp < Date.now() - eightHours
+          ) {
+            this.transactionCompleted(result.transaction)
+            return false
+          } else {
+            return true
+          }
+        } else {
+          this.transactionCompleted(result.transaction)
+          return false
+        }
+      })
+      .map(result => result.transaction)
+    return this.formatExchangeTxs(transactions, protocolidentifier)
   }
 }
