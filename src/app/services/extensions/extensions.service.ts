@@ -15,7 +15,10 @@ export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => Promise<ProtocolDelegationExtensions<any>>][] = [
     [KusamaProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
     [PolkadotProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
-    [TezosProtocol, () => TezosDelegationExtensions.create(this.remoteConfigProvider, this.decimalPipe, this.amountConverterPipe)]
+    [
+      TezosProtocol,
+      () => TezosDelegationExtensions.create(this.remoteConfigProvider, this.decimalPipe, this.amountConverterPipe, this.formBuilder)
+    ]
   ]
 
   public constructor(

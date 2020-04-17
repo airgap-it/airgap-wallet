@@ -1,5 +1,4 @@
-import { FormGroup } from '@angular/forms'
-import { isArray } from 'util'
+import { BehaviorSubject } from 'rxjs'
 
 export enum UIWidgetType {
   ACCOUNT = 'account',
@@ -10,12 +9,16 @@ export enum UIWidgetType {
   SELECT = 'select'
 }
 
+export enum WidgetState {
+  UNKNOWN = 0,
+  INIT,
+  CONTENT_INIT,
+  VIEW_INIT
+}
+
 export interface UIWidgetConfig {
   id?: string
   isVisible?: boolean
-
-  connectedForms?: FormGroup | FormGroup[]
-  onConnectedFormChanged?: (value?: any, widget?: any) => void
 }
 
 export abstract class UIWidget {
@@ -24,37 +27,74 @@ export abstract class UIWidget {
   public readonly id?: string
   public isVisible: boolean
 
-  public connectedForms?: FormGroup[]
-  public onConnectedFormChangedCallback?: (value?: any, widget?: UIWidget) => void
+  protected get state(): WidgetState {
+    const state = this.state$.value
+    return state in WidgetState ? state : WidgetState.UNKNOWN
+  }
+
+  protected set state(value: WidgetState) {
+    this.state$.next(value)
+  }
+
+  protected scheduledActions: Map<WidgetState, Function[]> = new Map()
+
+  private readonly state$: BehaviorSubject<number> = new BehaviorSubject(WidgetState.UNKNOWN)
 
   constructor(config: UIWidgetConfig) {
     this.id = config.id
     this.isVisible = config.isVisible !== undefined ? config.isVisible : true
-    this.onConnectedFormChangedCallback = config.onConnectedFormChanged
 
-    this.setConnectedForms(config.connectedForms)
+    this.initObservers()
   }
 
-  public setConnectedForms(connectedForms?: FormGroup | FormGroup[]) {
-    if (!connectedForms) {
-      return
+  public onInit(): void {
+    this.state = WidgetState.INIT
+  }
+
+  public afterContentInit(): void {
+    this.state = WidgetState.CONTENT_INIT
+  }
+
+  public afterViewInit(): void {
+    this.state = WidgetState.VIEW_INIT
+  }
+
+  public reachedState(state: WidgetState): boolean {
+    return this.state >= state
+  }
+
+  public doAfterReached(state: WidgetState, action: () => void, async: boolean = false) {
+    if (this.reachedState(state)) {
+      !async ? action() : setTimeout(action)
+    } else {
+      const toSchedule = !async
+        ? action
+        : () => {
+            setTimeout(action)
+          }
+      this.scheduleAction(state, toSchedule)
     }
+  }
 
-    this.connectedForms = isArray(connectedForms) ? connectedForms : [connectedForms]
+  public scheduleAction(state: WidgetState, action: () => void) {
+    const actions = this.scheduledActions.get(state) || []
+    actions.push(action)
 
-    this.connectedForms.forEach(form => {
-      form.valueChanges.subscribe(value => {
-        if (value) {
-          this.onConnectedFormChanged(value)
-        }
-      })
-      this.onConnectedFormChanged(form.value)
+    this.scheduledActions.set(state, actions)
+  }
+
+  protected invokeScheduled(state: WidgetState) {
+    if (this.scheduledActions.has(state)) {
+      const actions = this.scheduledActions.get(state)
+      this.scheduledActions.delete(state)
+
+      actions.forEach(action => action())
+    }
+  }
+
+  private initObservers() {
+    this.state$.subscribe(state => {
+      this.invokeScheduled(state)
     })
-  }
-
-  protected onConnectedFormChanged(value: any) {
-    if (this.onConnectedFormChangedCallback) {
-      this.onConnectedFormChangedCallback(value, this)
-    }
   }
 }

@@ -9,8 +9,8 @@ import {
   AirGapExtraDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { supportsAirGapDelegation, supportsDelegation } from 'src/app/helpers/delegation'
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms'
+import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { FormGroup, FormBuilder } from '@angular/forms'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LoadingController, PopoverController, NavController, ToastController } from '@ionic/angular'
@@ -47,11 +47,10 @@ export class DelegationDetailPage {
   public activeDelegatorAction: string | null = null
   public activeDelegatorActionConfirmButton: string | null = null
 
-  public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails> = new BehaviorSubject(null)
-  public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails> = new BehaviorSubject(null)
+  public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails | null> = new BehaviorSubject(null)
+  public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails | null> = new BehaviorSubject(null)
 
   public canProceed: boolean = true
-  public supportMultipleDelegatees: boolean = false
 
   public get multipleActionsAvailable(): boolean {
     const details = this.delegatorDetails$.value
@@ -63,7 +62,9 @@ export class DelegationDetailPage {
     return availableActions > 1
   }
 
-  private readonly delegateeAddresses$: BehaviorSubject<string[]> = new BehaviorSubject([])
+  private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
+
+  private currentDelegatees: string[] = []
 
   private loader: HTMLIonLoadingElement | undefined
   constructor(
@@ -85,7 +86,6 @@ export class DelegationDetailPage {
     }
 
     this.extensionsService.loadDelegationExtensions().then(() => {
-      this.supportMultipleDelegatees = supportsDelegation(this.wallet.coinProtocol) && this.wallet.coinProtocol.supportsMultipleDelegatees
       this.initView()
     })
   }
@@ -99,7 +99,7 @@ export class DelegationDetailPage {
       component: DelegateEditPopoverComponent,
       componentProps: {
         hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
-          ? !this.wallet.coinProtocol.airGapDelegatee || this.delegateeAddresses$.value.includes(this.wallet.coinProtocol.airGapDelegatee)
+          ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
           : true,
         delegateeLabel: this.delegateeLabel
       },
@@ -119,9 +119,9 @@ export class DelegationDetailPage {
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
         if (isDelegateeAddressObject(data)) {
-          this.changeDelegatees([data.delegateeAddress]) // TODO: support multiple entries
+          this.changeDisplayedDetails(data.delegateeAddress)
         } else if (isChangeToAirGapObject(data) && supportsAirGapDelegation(this.wallet.coinProtocol)) {
-          this.changeDelegatees([this.wallet.coinProtocol.airGapDelegatee])
+          this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
         } else {
           console.log('Did not receive valid delegatee address object')
         }
@@ -179,20 +179,22 @@ export class DelegationDetailPage {
 
     this.subscribeObservables()
 
-    this.operations.getCurrentDelegatees(this.wallet).then(addresses => this.delegateeAddresses$.next(addresses))
-
-    this.operations.getDelegatorDetails(this.wallet).then(details => this.delegatorDetails$.next(details))
+    this.operations.getCurrentDelegatees(this.wallet).then(addresses => {
+      if (addresses) {
+        this.currentDelegatees = addresses
+        this.delegateeAddress$.next(addresses[0])
+      }
+    })
   }
 
   private subscribeObservables() {
-    this.delegateeAddresses$.subscribe(addresses => {
-      if (addresses) {
-        // TODO: support multiple cases
-        this.operations.getDelegateeDetails(this.wallet, addresses).then(details => this.delegateeDetails$.next(details[0]))
-
-        const details = this.delegatorDetails$.value
-        if (details) {
-          this.setupMainActionsForms(details)
+    this.delegateeAddress$.subscribe(async address => {
+      if (address) {
+        // TODO: support multiple addresses
+        const details = await this.operations.getDelegationDetails(this.wallet, [address])
+        if (details && details.length > 0) {
+          this.delegateeDetails$.next(details[0].delegatees[0])
+          this.delegatorDetails$.next(details[0].delegator)
         }
       }
     })
@@ -203,8 +205,6 @@ export class DelegationDetailPage {
           name: details.name,
           address: details.address
         })
-
-        this.operations.onDelegationDetailsChange(this.wallet, [details], this.delegatorDetails$.value)
       }
     })
 
@@ -224,8 +224,6 @@ export class DelegationDetailPage {
         this.delegateActionId = details.delegateAction.type ? details.delegateAction.type.toString() : 'delegate'
         this.undelegateActionId = details.undelegateAction.type ? details.undelegateAction.type.toString() : 'undelegate'
         this.setActiveDelegatorAction(details)
-
-        this.operations.onDelegationDetailsChange(this.wallet, [this.delegateeDetails$.value], details)
       }
     })
   }
@@ -244,35 +242,25 @@ export class DelegationDetailPage {
   }
 
   private setupMainActionsForms(details: AirGapDelegatorDetails) {
-    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction, details.changeDelegateeAction]
+    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction]
 
     mainActions
-      .filter(action => action && action.type !== undefined && action.isAvailable && (action.paramName || action.extraArgs || action.form))
+      .filter(action => action && action.type !== undefined && action.isAvailable && (action.extraArgs || action.form))
       .forEach(action => {
         if (action.form) {
           this.delegationForms.set(action.type, action.form)
-        } else {
-          const form = this.delegationForms.get(action.type)
-          const args = this.setupArgsForms(action.extraArgs || [], form)
-
-          if (form) {
-            form.setValue(args)
-          } else {
-            this.delegationForms.set(action.type, this.formBuilder.group(args))
-          }
-
-          action.form = this.delegationForms.get(action.type)
         }
 
         const form = this.delegationForms.get(action.type)
-        if (action.paramName && !form.get(action.paramName)) {
-          this.delegationForms
-            .get(action.type)
-            .addControl(
-              action.paramName,
-              new FormControl(this.supportMultipleDelegatees ? this.delegateeAddresses$.value : this.delegateeAddresses$.value[0])
-            )
+        const args = this.setupArgsForms(action.extraArgs || [], form)
+
+        if (form) {
+          form.patchValue(args)
+        } else {
+          this.delegationForms.set(action.type, this.formBuilder.group(args))
         }
+
+        action.form = this.delegationForms.get(action.type)
 
         if (action.extraArgs) {
           action.extraArgs.forEach(arg => {
@@ -289,20 +277,20 @@ export class DelegationDetailPage {
       extraActions.forEach(action => {
         if (action.form) {
           this.delegationForms.set(action.type, action.form)
-        } else if (action.args) {
+        }
+
+        if (action.args) {
           const form = this.delegationForms.get(action.type)
-          const args = this.setupArgsForms(action.args || [], form)
+          const args = this.setupArgsForms(action.args, form)
 
           if (form) {
-            form.setValue(args)
+            form.patchValue(args)
           } else {
             this.delegationForms.set(action.type, this.formBuilder.group(args))
           }
 
           action.form = this.delegationForms.get(action.type)
-        }
 
-        if (action.args) {
           action.args.forEach(arg => {
             arg.wallet = this.wallet
           })
@@ -336,21 +324,11 @@ export class DelegationDetailPage {
     }
   }
 
-  private changeDelegatees(addresses: string[]) {
-    const delegatorDetails = this.delegatorDetails$.value
-    if (!delegatorDetails.isDelegating) {
-      this.delegateeAddresses$.next(addresses)
-    } else if (delegatorDetails.changeDelegateeAction.isAvailable) {
-      const action = delegatorDetails.changeDelegateeAction
-      if (action.paramName) {
-        this.delegationForms.get(action.type).patchValue({
-          [action.paramName]: this.supportMultipleDelegatees ? addresses : addresses[0]
-        })
-      }
-      this.prepareDelegationAction(action.type)
-    } else {
-      this.showToast(`Can't change ${this.delegateeLabel}`)
-    }
+  private changeDisplayedDetails(address: string) {
+    this.delegateeDetails$.next(null)
+    this.delegatorDetails$.next(null)
+
+    this.delegateeAddress$.next(address)
   }
 
   private async prepareDelegationAction(actionType: any): Promise<void> {

@@ -1,19 +1,15 @@
 import { ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { AirGapDelegateeDetails, AirGapDelegatorDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { AirGapDelegationDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
-  private static readonly GET_EXTRA_DELEGATEES_DETAILS_KEY = 'getExtraDelegateesDetails'
-  private static readonly GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegatorDetailsFromAddress'
-  private static readonly ON_DETAILS_CHANGE_KEY = 'onDetailsChange'
+  private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
 
   public static load<T extends ICoinDelegateProtocol>(protocol: new () => T, extensions: ProtocolDelegationExtensions<T>) {
     const alreadyLoaded =
       this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY) &&
-      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATEES_DETAILS_KEY) &&
-      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY)
+      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY)
 
     if (!alreadyLoaded) {
       this.extend(
@@ -21,9 +17,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         extensions,
         [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
-        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATEES_DETAILS_KEY, 'function'],
-        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATOR_DETAILS_FROM_ADDRESS_KEY, 'function'],
-        [ProtocolDelegationExtensions.ON_DETAILS_CHANGE_KEY, 'function']
+        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function']
       )
     }
   }
@@ -67,27 +61,9 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   public abstract airGapDelegatee?: string
   public abstract delegateeLabel: string
 
-  public abstract getExtraDelegateesDetails(protocol: T, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
-  public abstract getExtraDelegatorDetailsFromAddress(protocol: T, address: string): Promise<Partial<AirGapDelegatorDetails>>
-
-  public abstract onDetailsChange(
+  public abstract getExtraDelegationDetailsFromAddress(
     protocol: T,
-    delegateesDetails: AirGapDelegateeDetails[],
-    delegatorDetails: AirGapDelegatorDetails
-  ): Promise<void>
-
-  protected updateWidget(details: AirGapDelegateeDetails | AirGapDelegatorDetails, widgetId: string, widget: UIWidget | undefined) {
-    if (!details.displayDetails) {
-      details.displayDetails = []
-    }
-
-    const index = details.displayDetails.findIndex(widget => widget.id === widgetId)
-    if (index !== -1 && widget) {
-      details.displayDetails[index] = widget
-    } else if (index !== -1 && !widget) {
-      details.displayDetails.splice(index, 1)
-    } else if (index === -1 && widget) {
-      details.displayDetails.push(widget)
-    }
-  }
+    delegator: string,
+    delegatees: string[]
+  ): Promise<AirGapDelegationDetails[]>
 }

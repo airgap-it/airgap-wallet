@@ -3,12 +3,12 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapMainDelegatorAction,
-  AirGapExtraDelegatorAction
+  AirGapExtraDelegatorAction,
+  AirGapDelegationDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { SubstrateAddress } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/account/SubstrateAddress'
 import BigNumber from 'bignumber.js'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
@@ -21,7 +21,7 @@ import {
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators, FormGroup } from '@angular/forms'
+import { FormBuilder, Validators } from '@angular/forms'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
@@ -35,13 +35,11 @@ const supportedActions = [
   SubstrateStakingActionType.COLLECT_REWARDS
 ]
 
-const widgetId = {
-  commission: 'commission',
-  expectedReward: 'expectedReward',
-  targets: 'targets',
-  value: 'value',
-  valueControl: 'valueControl',
-  payee: 'payee'
+enum ArgumentName {
+  TARGETS = 'targets',
+  VALUE = 'value',
+  VALUE_CONTROL = 'valueControl',
+  PAYEE = 'payee'
 }
 
 export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<SubstrateProtocol> {
@@ -71,17 +69,39 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   // TODO: add translations
-  public async getExtraDelegateesDetails(protocol: SubstrateProtocol, addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]> {
+  public async getExtraDelegationDetailsFromAddress(
+    protocol: SubstrateProtocol,
+    delegator: string,
+    delegatees: string[]
+  ): Promise<AirGapDelegationDetails[]> {
+    const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, delegator, delegatees)
+    const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, extraNominatorDetails)
+
+    return [
+      {
+        delegator: extraNominatorDetails,
+        delegatees: extraValidatorsDetails
+      }
+    ]
+  }
+
+  private async getExtraValidatorsDetails(
+    protocol: SubstrateProtocol,
+    validators: string[],
+    extraNominatorDetials: AirGapDelegatorDetails
+  ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
-      addresses.map(async address => {
-        const validatorDetails = await protocol.accountController.getValidatorDetails(SubstrateAddress.fromEncoded(address))
+      validators.map(async validator => {
+        const validatorDetails = await protocol.accountController.getValidatorDetails(validator)
 
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
 
-        const displayDetails = this.createDelegateeDisplayDetails(protocol, validatorDetails)
+        const displayDetails = this.createDelegateeDisplayDetails(protocol, validatorDetails, extraNominatorDetials)
 
         return {
+          ...validatorDetails,
+          name: validatorDetails.name || '',
           status: validatorDetails.status || 'unknown',
           usageDetails: {
             usage: ownStash.dividedBy(totalStakingBalance),
@@ -94,7 +114,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
   }
 
-  private createDelegateeDisplayDetails(protocol: SubstrateProtocol, validatorDetails: SubstrateValidatorDetails): UIWidget[] {
+  private createDelegateeDisplayDetails(
+    protocol: SubstrateProtocol,
+    validatorDetails: SubstrateValidatorDetails,
+    extraNominatorDetails: AirGapDelegatorDetails
+  ): UIWidget[] {
     const details = []
 
     const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
@@ -113,91 +137,114 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     details.push(
       new UIIconText({
-        id: widgetId.commission,
         iconName: 'logo-usd',
         text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
         description: 'Commission'
       })
     )
 
-    if (totalPreviousReward && commission && validatorDetails.status === 'Active') {
-      details.push(
-        new UIIconText({
-          id: widgetId.expectedReward,
-          iconName: 'logo-usd',
-          text: '-',
-          description: 'Expected reward',
-          isVisible: false,
-          onConnectedFormChanged: (value: any, widget: UIIconText) => {
-            if (value[widgetId.value]) {
-              const expectedReward = calculateExpectedReward(new BigNumber(value[widgetId.value]))
-              widget.text = this.amountConverterPipe.transform(expectedReward, {
+    const showExpectedRewardWidget =
+      totalPreviousReward &&
+      commission &&
+      validatorDetails.status === 'Active' &&
+      extraNominatorDetails.delegateAction.isAvailable &&
+      extraNominatorDetails.delegateAction.form
+
+    if (showExpectedRewardWidget) {
+      const expectedRewardWidget = new UIIconText({
+        iconName: 'logo-usd',
+        text: '-',
+        description: 'Expected reward'
+      })
+
+      extraNominatorDetails.delegateAction.form.valueChanges.subscribe(value => {
+        expectedRewardWidget.doAfterReached(
+          WidgetState.INIT,
+          () => {
+            if (value[ArgumentName.VALUE]) {
+              const expectedReward = calculateExpectedReward(new BigNumber(value[ArgumentName.VALUE]))
+              expectedRewardWidget.text = this.amountConverterPipe.transform(expectedReward, {
                 protocolIdentifier: protocol.identifier,
                 maxDigits: 10
               })
             }
-          }
-        })
-      )
+          },
+          true
+        )
+      })
+
+      details.push(expectedRewardWidget)
     }
     return details
   }
 
-  // TODO: add translations
-  public async getExtraDelegatorDetailsFromAddress(protocol: SubstrateProtocol, address: string): Promise<Partial<AirGapDelegatorDetails>> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(address)
+  private async getExtraNominatorDetails(
+    protocol: SubstrateProtocol,
+    address: string,
+    validators: string[]
+  ): Promise<AirGapDelegatorDetails> {
+    const nominatorDetails = await protocol.accountController.getNominatorDetails(address, validators)
     const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
-    const delegateAction: AirGapMainDelegatorAction = await this.createDelegateAction(protocol, address, availableActions)
+    const delegateAction: AirGapMainDelegatorAction = await this.createDelegateAction(
+      protocol,
+      nominatorDetails.stakingDetails,
+      availableActions,
+      nominatorDetails.address,
+      validators
+    )
+
     const undelegateAction: AirGapMainDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const changeDelegateeAction: AirGapMainDelegatorAction = this.createChangeDelegateeAction(availableActions)
     const extraActions: AirGapExtraDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
     const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
     const displayRewards: UIRewardList | undefined = this.createDelegatorDisplayRewards(protocol, nominatorDetails)
 
     return {
+      ...nominatorDetails,
       delegateAction,
       undelegateAction,
-      changeDelegateeAction,
       extraActions,
       displayDetails,
       displayRewards: displayRewards
     }
   }
 
-  public async onDetailsChange(
-    _: SubstrateProtocol,
-    delegateesDetails: AirGapDelegateeDetails[],
-    delegatorDetails: AirGapDelegatorDetails
-  ): Promise<void> {
-    if (!delegatorDetails.isDelegating && delegatorDetails.delegateAction.isAvailable && delegatorDetails.delegateAction.form) {
-      this.showExpectedRewardWidget(delegateesDetails, delegatorDetails.delegateAction.form)
-    }
-  }
-
   private async createDelegateAction(
     protocol: SubstrateProtocol,
-    address: string,
-    availableActions: DelegatorAction[]
+    stakingDetails: SubstrateStakingDetails,
+    availableActions: DelegatorAction[],
+    nominatorAddress: string,
+    validators: string[]
   ): Promise<AirGapMainDelegatorAction> {
-    const action = availableActions.find(
-      action => action.type === SubstrateStakingActionType.BOND_NOMINATE || action.type === SubstrateStakingActionType.BOND_EXTRA
-    )
+    // sorted by priority
+    const types = [
+      SubstrateStakingActionType.BOND_NOMINATE,
+      SubstrateStakingActionType.CHANGE_NOMINATION,
+      SubstrateStakingActionType.BOND_EXTRA
+    ]
+    const actions = availableActions
+      .filter(action => types.includes(action.type))
+      .sort((a1, a2) => types.indexOf(a1.type) - types.indexOf(a2.type))
+
+    const action = actions[0]
 
     const results = await Promise.all([
-      protocol.estimateMaxDelegationValueFromAddress(address),
+      protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
       protocol.nodeClient.getExistentialDeposit()
     ])
 
     const maxValue = new BigNumber(results[0])
     const minValue = new BigNumber(results[1])
 
-    if (action && maxValue.gt(minValue)) {
+    const hasSufficientFunds = maxValue.gt(minValue)
+
+    if (action && hasSufficientFunds) {
       const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
 
       const form = this.formBuilder.group({
-        [widgetId.value]: [],
-        [widgetId.valueControl]: [
+        [ArgumentName.TARGETS]: [validators],
+        [ArgumentName.VALUE]: [action.args.includes(ArgumentName.VALUE) ? maxValue.toString() : stakingDetails.active],
+        [ArgumentName.VALUE_CONTROL]: [
           maxValueFormatted,
           Validators.compose([
             Validators.required,
@@ -206,33 +253,37 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
             DecimalValidator.validate(protocol.decimals)
           ])
         ],
-        [widgetId.payee]: [SubstratePayee.STASH]
+        [ArgumentName.PAYEE]: [SubstratePayee.STASH]
       })
 
-      return {
-        type: action.type,
-        isAvailable: true,
-        description: 'Delegate description',
-        paramName: widgetId.targets,
-        form,
-        extraArgs: [
+      const argWidgets = []
+      if (action.args.includes(ArgumentName.VALUE)) {
+        argWidgets.push(
           this.createValueWidget({
-            id: widgetId.valueControl,
+            id: ArgumentName.VALUE_CONTROL,
             defaultValue: maxValueFormatted,
             toggleFixedValueButton: 'Max',
             fixedValue: maxValueFormatted,
             onValueChanged: (value: string) => {
               form.patchValue({
-                [widgetId.value]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
+                [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
               })
             }
           })
-        ]
+        )
+      }
+
+      return {
+        type: action.type,
+        isAvailable: true,
+        description: 'Delegate description',
+        form,
+        extraArgs: argWidgets
       }
     }
 
     return {
-      description: "Can't delegate",
+      description: !hasSufficientFunds ? 'Not enough balance' : undefined,
       isAvailable: false
     }
   }
@@ -246,7 +297,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     if (action) {
       if (stakingDetails) {
         const form = this.formBuilder.group({
-          [widgetId.value]: [stakingDetails.active]
+          [ArgumentName.VALUE]: [stakingDetails.active]
         })
 
         return {
@@ -258,29 +309,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       }
     }
 
-    return {
-      description: "Can't undelegate",
-      isAvailable: false
-    }
-  }
-
-  private createChangeDelegateeAction(availableActions: DelegatorAction[]): AirGapMainDelegatorAction {
-    const description = 'Change Validator'
-    const action = availableActions.find(action => action.type === SubstrateStakingActionType.CHANGE_NOMINATION)
-
-    if (action) {
-      return {
-        type: action.type,
-        isAvailable: true,
-        description,
-        paramName: widgetId.targets
-      }
-    }
-
-    return {
-      description,
-      isAvailable: true
-    }
+    return { isAvailable: false }
   }
 
   private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
@@ -323,7 +352,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private createValueWidget(config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
-      id: widgetId.value,
+      id: ArgumentName.VALUE,
       inputType: 'number',
       label: 'Amount',
       placeholder: '0.00',
@@ -343,9 +372,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private createDelegatorDisplayDetails(protocol: SubstrateProtocol, nominatorDetails: SubstrateNominatorDetails): UIWidget[] {
     const displayDetails = []
+    const isDelegating = nominatorDetails.delegatees.length > 0
 
     if (nominatorDetails.stakingDetails) {
-      displayDetails.push(...this.createStakingDetailsWidgets(protocol, nominatorDetails.isDelegating, nominatorDetails.stakingDetails))
+      displayDetails.push(...this.createStakingDetailsWidgets(protocol, isDelegating, nominatorDetails.stakingDetails))
     }
 
     return displayDetails
@@ -371,7 +401,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     protocol: SubstrateProtocol,
     nominatorDetails: SubstrateNominatorDetails
   ): UIRewardList | undefined {
-    if (!nominatorDetails.isDelegating || nominatorDetails.stakingDetails.rewards.length === 0) {
+    if (nominatorDetails.delegatees.length === 0 || nominatorDetails.stakingDetails.rewards.length === 0) {
       return undefined
     }
 
@@ -474,17 +504,5 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     }
 
     return details
-  }
-
-  private showExpectedRewardWidget(delegateesDetails: AirGapDelegateeDetails[], delegationActionForm: FormGroup) {
-    delegateesDetails.forEach(details => {
-      if (details.displayDetails) {
-        const expectedRewardWidget = details.displayDetails.find(extra => extra.id === widgetId.expectedReward)
-        if (expectedRewardWidget) {
-          expectedRewardWidget.setConnectedForms(delegationActionForm)
-          expectedRewardWidget.isVisible = true
-        }
-      }
-    })
   }
 }
