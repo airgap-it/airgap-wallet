@@ -1,4 +1,3 @@
-import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
@@ -13,7 +12,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction } from './actions/ButtonAction'
-import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 
 export interface WalletActionInfo {
   name: string
