@@ -76,10 +76,8 @@ export class CachingService {
     return new Promise<MarketDataSample[]>(async resolve => {
       const cachedData: StorageObject = await this.storage.get(uniqueId)
       if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
-        console.log('there is cached market data for', coinProtocol)
         resolve(cachedData.value)
       } else {
-        console.log('there NO cached market data for', coinProtocol)
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
           promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {
@@ -99,6 +97,16 @@ export class CachingService {
         promise
           .then((prices: MarketDataSample[]) => {
             let filteredPrices: MarketDataSample[] = prices
+            if (timeUnit === 'days') {
+              filteredPrices = prices.filter((_value, index) => {
+                return index % 5 === 0
+              })
+            }
+            if (timeUnit === 'hours') {
+              filteredPrices = prices.filter((_value, index) => {
+                return index % 2 === 0
+              })
+            }
             if (timeUnit === 'minutes') {
               filteredPrices = prices.filter((_value, index) => {
                 return index % 20 === 0
@@ -127,7 +135,6 @@ export class CachingService {
     return new Promise<CosmosValidator[]>(async resolve => {
       const validatorsObject: StorageObject = await this.storage.get(uniqueId)
       if (validatorsObject && validatorsObject.timestamp > Date.now() - 30 * 60 * 1000) {
-        console.log('FROM CACHE: validators')
         resolve(validatorsObject.value)
       } else {
         const protocol = new CosmosProtocol()

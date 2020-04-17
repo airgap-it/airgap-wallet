@@ -111,37 +111,36 @@ export class MarketDataService {
   }
 
   public async fetchAllValues(interval: TimeUnit | string): Promise<number[]> {
-    return new Promise<number[]>(resolve => {
-      this.walletsProvider.wallets.subscribe(async wallets => {
-        // TODO fetchMarketData() only once for each protocolIdentifier
-        const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.coinProtocol.marketSymbol))
-        const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
-        const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
+    return new Promise<number[]>(async resolve => {
+      const wallets = this.walletsProvider.getWalletList()
+      // TODO fetchMarketData() only once for each protocolIdentifier
+      const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.coinProtocol.marketSymbol))
+      const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
+      const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
 
-        const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
-        const allWalletValues = [0, 0]
-        for (const [index, wallet] of wallets.entries()) {
-          this.cachingService.setPriceData(
-            { timeUnit: interval, protocolIdentifier: wallet.coinProtocol.marketSymbol, key: CachingServiceKey.PRICESAMPLES },
-            priceSamples[index]
-          )
-          this.cachingService.setTransactionData(
-            { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
-            transactionsByWallet[index]
-          )
-          const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
-          walletValues.forEach(function(walletValue, idx) {
-            if (!Number.isNaN(walletValue)) {
-              if (allWalletValues[idx] > 0) {
-                allWalletValues[idx] += walletValue
-              } else {
-                allWalletValues[idx] = walletValue
-              }
+      const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
+      const allWalletValues = [0, 0]
+      for (const [index, wallet] of wallets.entries()) {
+        this.cachingService.setPriceData(
+          { timeUnit: interval, protocolIdentifier: wallet.coinProtocol.marketSymbol, key: CachingServiceKey.PRICESAMPLES },
+          priceSamples[index]
+        )
+        this.cachingService.setTransactionData(
+          { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
+          transactionsByWallet[index]
+        )
+        const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
+        walletValues.forEach(function(walletValue, idx) {
+          if (!Number.isNaN(walletValue)) {
+            if (allWalletValues[idx] > 0) {
+              allWalletValues[idx] += walletValue
+            } else {
+              allWalletValues[idx] = walletValue
             }
-          })
-        }
-        resolve(allWalletValues)
-      })
+          }
+        })
+      }
+      resolve(allWalletValues)
     })
   }
 
