@@ -57,7 +57,6 @@ export class MarketDataService {
       protocolIdentifier: wallet.protocolIdentifier,
       maxDigits: 10
     })
-
     // txHistory is sorted from most recent to oldest tx
     txHistory.forEach((transaction: TransactionHistoryObject) => {
       balancesByTimestamp.push({ timestamp: transaction.timestamp, balance: currentBalance })
@@ -130,7 +129,7 @@ export class MarketDataService {
           transactionsByWallet[index]
         )
         const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
-        walletValues.forEach(function(walletValue, idx) {
+        walletValues.forEach((walletValue, idx) => {
           if (!Number.isNaN(walletValue)) {
             if (allWalletValues[idx] > 0) {
               allWalletValues[idx] += walletValue

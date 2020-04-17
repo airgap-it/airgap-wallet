@@ -25,7 +25,7 @@ export interface PriceSampleIdentifier {
 }
 
 export interface StorageObject {
-  value: any[]
+  value: any
   timestamp: number
 }
 
