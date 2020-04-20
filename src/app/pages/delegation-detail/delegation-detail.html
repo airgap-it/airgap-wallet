@@ -135,19 +135,19 @@
                 <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
               </ion-col>
             </ion-row>
-            <ion-row *ngFor="let extra of filterVisible((delegatorDetails$ | async).delegateAction.extraArgs)">
+            <ion-row *ngFor="let arg of filterVisible((delegatorDetails$ | async).delegateAction.args)">
               <ion-col size="12">
                 <form
                   *ngIf="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
                   [formGroup]="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
                 >
                   <widget-selector
-                    [widget]="extra"
+                    [widget]="arg"
                     [widgetForm]="delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
                   ></widget-selector>
                 </form>
                 <widget-selector
-                  [widget]="extra"
+                  [widget]="arg"
                   *ngIf="!delegationForms.get((delegatorDetails$ | async).delegateAction.type)"
                 ></widget-selector>
               </ion-col>
@@ -159,19 +159,19 @@
                 <p>{{ (delegatorDetails$ | async).undelegateAction.description }}</p>
               </ion-col>
             </ion-row>
-            <ion-row *ngFor="let extra of filterVisible((delegatorDetails$ | async).undelegateAction.extraArgs)">
+            <ion-row *ngFor="let arg of filterVisible((delegatorDetails$ | async).undelegateAction.args)">
               <ion-col size="12">
                 <form
                   *ngIf="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
                   [formGroup]="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
                 >
                   <widget-selector
-                    [widget]="extra"
+                    [widget]="arg"
                     [widgetForm]="delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
                   ></widget-selector>
                 </form>
                 <widget-selector
-                  [widget]="extra"
+                  [widget]="arg"
                   *ngIf="!delegationForms.get((delegatorDetails$ | async).undelegateAction.type)"
                 ></widget-selector>
               </ion-col>

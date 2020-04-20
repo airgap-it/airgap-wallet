@@ -140,6 +140,13 @@ const routes: Routes = [
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   },
   {
+    path: 'delegation-list/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/delegation-list/delegation-list.module').then(m => m.DelegationListPageModule)
+  },
+  {
     path: 'exchange-select',
     loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
   },

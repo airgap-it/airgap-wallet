@@ -15,6 +15,7 @@ export function supportsDelegation(protocol: ICoinProtocol): protocol is ICoinDe
     !!delegateProtocol.getDefaultDelegatee &&
     !!delegateProtocol.getCurrentDelegateesForPublicKey &&
     !!delegateProtocol.getCurrentDelegateesForAddress &&
+    !!delegateProtocol.getDelegateeDetails &&
     !!delegateProtocol.isPublicKeyDelegating &&
     !!delegateProtocol.isAddressDelegating &&
     !!delegateProtocol.getDelegationDetailsFromPublicKey &&

@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ delegateeLabel }} List</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container *ngIf="filteredDelegatees && filteredDelegatees.length > 0; else loadingTemplate">
+      <ion-list lines="none">
+        <ion-item (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of filteredDelegatees">
+          <widget-account [widget]="delegatee"></widget-account>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
+    <ng-template #loadingTemplate>
+      <ion-list lines="none">
+        <ion-item>
+          <ion-avatar slot="start">
+            <identicon></identicon>
+          </ion-avatar>
+          <ion-label>
+            <ion-text>
+              <ion-row class="ion-no-padding">
+                <ion-col size="9" class="ion-no-padding">
+                  <h2>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h2>
+                </ion-col>
+                <ion-col size="3" class="ion-no-padding">
+                  <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                </ion-col>
+              </ion-row>
+            </ion-text>
+            <ion-row class="ion-no-padding">
+              <ion-col size="4" class="ion-no-padding">
+                <ion-text>
+                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </ion-text>
+              </ion-col>
+              <ion-col size="8" class="ion-no-padding">
+                <ion-text>
+                  <p class="ion-no-margin">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                  </p>
+                </ion-text>
+              </ion-col>
+            </ion-row>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-grid>
+</ion-content>

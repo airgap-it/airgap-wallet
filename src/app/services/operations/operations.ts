@@ -29,6 +29,7 @@ import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
+import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +44,27 @@ export class OperationsProvider {
     private readonly serializerService: SerializerService,
     private readonly formBuilder: FormBuilder
   ) {}
+
+  public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccount[]> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    if (supportsAirGapDelegation(protocol)) {
+      return []
+    } else {
+      const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
+      return delegateesDetails.map(
+        details =>
+          new UIAccount({
+            name: details.name,
+            address: details.address,
+            shortenAddress: true
+          })
+      )
+    }
+  }
 
   public async getCurrentDelegatees(wallet: AirGapMarketWallet): Promise<string[]> {
     const protocol = wallet.coinProtocol
@@ -106,7 +128,7 @@ export class OperationsProvider {
     const defaultDelegateActionTypeKeywords = ['delegate']
     const defaultUndelegateActionTypeKeywords = ['undelegate']
 
-    const defaultMainParamNameKeywords = ['delegate', 'delegatee']
+    const defaultMainParamNameKeywords = ['delegate', 'delegatee', 'baker', 'validator']
 
     return {
       ...delegatorDetails,
@@ -147,7 +169,7 @@ export class OperationsProvider {
     const action = availableActions.find(action => typeKeywords.includes(action.type))
     if (action) {
       const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
-      const extraArgs = action.args ? action.args.filter(arg => arg !== paramName) : undefined
+      const args = action.args ? action.args.filter(arg => arg !== paramName) : undefined
 
       const form = paramName ? this.formBuilder.group({ [paramName]: delegatees }) : undefined
 
@@ -155,8 +177,8 @@ export class OperationsProvider {
         type: action.type,
         isAvailable: true,
         form: form,
-        extraArgs: extraArgs
-          ? extraArgs.map(
+        args: args
+          ? args.map(
               arg =>
                 new UIInputText({
                   id: arg,
@@ -167,7 +189,10 @@ export class OperationsProvider {
       }
     }
 
-    return { isAvailable: false }
+    return {
+      type: null,
+      isAvailable: false
+    }
   }
 
   private createDefaultExtraDelegatorActions(

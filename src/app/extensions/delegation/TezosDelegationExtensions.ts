@@ -157,7 +157,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
           form: form,
           isAvailable: true
         }
-      : { isAvailable: false }
+      : {
+          type: null,
+          isAvailable: false
+        }
   }
 
   private async createDelegatorDisplayDetails(

@@ -12,21 +12,21 @@ export interface AirGapDelegateeUsageDetails {
   total: BigNumber
 }
 
-export interface AirGapMainDelegatorAction {
-  type?: any
-  isAvailable: boolean
-  description?: string
+export interface AirGapDelegatorAction {
+  type: any
   form?: FormGroup
-  extraArgs?: UIInputWidget<any>[]
+  args?: UIInputWidget<any>[]
 }
 
-export interface AirGapExtraDelegatorAction {
-  type: any
+export interface AirGapMainDelegatorAction extends AirGapDelegatorAction {
+  isAvailable: boolean
+  description?: string
+}
+
+export interface AirGapExtraDelegatorAction extends AirGapDelegatorAction {
   label: string
   confirmLabel: string
   description?: string
-  form?: FormGroup
-  args?: UIInputWidget<any>[]
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {

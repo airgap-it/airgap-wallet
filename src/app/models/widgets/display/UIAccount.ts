@@ -5,9 +5,7 @@ export interface UIAccountConfig extends UIWidgetConfig {
   address: string
   description?: string
 
-  abbreviateAddress?: boolean
-  abbreviationStart?: number
-  abbreviationEnd?: number
+  shortenAddress?: boolean
 
   onConnectedFormChanged?: (value?: any, widget?: UIAccount) => void
 }
@@ -19,6 +17,8 @@ export class UIAccount extends UIWidget {
   public address: string
   public description?: string
 
+  public shortenAddress: boolean
+
   public get hasName(): boolean {
     return this.name !== undefined && this.name !== null
   }
@@ -29,5 +29,7 @@ export class UIAccount extends UIWidget {
     this.name = config.name
     this.address = config.address
     this.description = config.description
+
+    this.shortenAddress = config.shortenAddress || false
   }
 }

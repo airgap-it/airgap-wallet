@@ -4,8 +4,11 @@
   </ion-avatar>
   <ion-label>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.hasName">{{ widget.name }}</h2>
-    <h2 class="font--weight__bold" ion-text color="black" *ngIf="!widget.hasName">{{ widget.address }}</h2>
-    <p *ngIf="widget.hasName">{{ widget.address }}</p>
+    <h2 class="font--weight__bold" ion-text color="black" *ngIf="!widget.hasName">{{ widget.address | shortenString }}</h2>
+
+    <p *ngIf="widget.hasName && !widget.shortenAddress">{{ widget.address }}</p>
+    <p *ngIf="widget.hasName && widget.shortenAddress">{{ widget.address | shortenString }}</p>
+
     <h3 *ngIf="widget.description">{{ widget.description }}</h3>
   </ion-label>
 </ion-item>

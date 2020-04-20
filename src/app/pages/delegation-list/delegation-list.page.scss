@@ -1,0 +1,10 @@
+.sc-ion-label-md-s h2,
+.sc-ion-label-ios-s h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list-ios {
+  ion-item {
+    margin-bottom: 8px;
+  }
+}

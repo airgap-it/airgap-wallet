@@ -278,11 +278,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         isAvailable: true,
         description: 'Delegate description',
         form,
-        extraArgs: argWidgets
+        args: argWidgets
       }
     }
 
     return {
+      type: null,
       description: !hasSufficientFunds ? 'Not enough balance' : undefined,
       isAvailable: false
     }
@@ -309,7 +310,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       }
     }
 
-    return { isAvailable: false }
+    return {
+      type: null,
+      isAvailable: false
+    }
   }
 
   private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
