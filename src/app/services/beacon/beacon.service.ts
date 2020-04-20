@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core'
-import { WalletClient } from '@airgap/beacon-sdk/dist/clients/WalletClient'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
-import { BaseMessage } from '@airgap/beacon-sdk/dist/messages/Messages'
+import {
+  WalletClient,
+  BeaconBaseMessage,
+  BeaconMessageType,
+  OperationResponse,
+  BroadcastResponse,
+  SignPayloadResponse
+} from '@airgap/beacon-sdk'
 
 @Injectable({
   providedIn: 'root'
 })
 export class BeaconService {
   private client: WalletClient | undefined
+  private messages: BeaconBaseMessage[] = []
+  private requests: [string, any][] = []
+
   constructor(private readonly modalController: ModalController) {
     this.init()
   }
@@ -22,6 +31,8 @@ export class BeaconService {
 
       console.log('typeof', typeof message)
 
+      this.messages.push(message)
+
       this.presentModal(message, { pubKey: 'not available yet' })
     })
   }
@@ -30,24 +41,71 @@ export class BeaconService {
     this.client.addPeer({ pubKey, relayServer, name } as any)
   }
 
-  async presentModal(request: BaseMessage, dappInfo: { pubKey: string }) {
+  async presentModal(request: BeaconBaseMessage, dappInfo: { pubKey: string }) {
     console.log('presentModal')
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
       componentProps: {
         request,
         dappInfo,
-        client: this.client
+        client: this.client,
+        beaconService: this
       }
     })
     return await modal.present()
   }
 
-  public async respond(requestId: string, message: string) {
+  public async addVaultRequest(messageId, unsignedTransaction) {
+    this.requests.push([messageId, unsignedTransaction])
+  }
+
+  public async getVaultRequest(signedMessage: string, hash: string) {
+    // TODO: Refactor this once we have IDs in the serializer between Wallet <=> Vault
+    this.requests = this.requests.filter(request => {
+      if (signedMessage === request[1]) {
+        const broadcastResponse: BroadcastResponse = {
+          id: request[0],
+          type: BeaconMessageType.BroadcastResponse,
+          beaconId: '',
+          transactionHash: hash
+        }
+        this.respond(broadcastResponse)
+
+        return false
+      } else if (signedMessage.startsWith(request[1])) {
+        const signPayloadResponse: SignPayloadResponse = {
+          id: request[0],
+          type: BeaconMessageType.SignPayloadResponse,
+          beaconId: '',
+          signature: signedMessage.substr(signedMessage.length - 128)
+        }
+        this.respond(signPayloadResponse)
+
+        return false
+      } else if (signedMessage.startsWith(request[1].binaryTransaction)) {
+        const operationResponse: OperationResponse = {
+          id: request[0],
+          type: BeaconMessageType.OperationResponse,
+          beaconId: '',
+          transactionHash: hash
+        }
+        this.respond(operationResponse)
+
+        return false
+      } else {
+        console.log('NO MATCH', signedMessage, request[1].binaryTransaction)
+
+        return true
+      }
+    })
+  }
+
+  public async respond(message: BeaconBaseMessage) {
     if (!this.client) {
       throw new Error('Client not ready')
     }
-    this.client.respond(requestId, message)
+    console.log('responding', message)
+    this.client.respond(message)
   }
 
   public async getPeers(): Promise<string[]> {

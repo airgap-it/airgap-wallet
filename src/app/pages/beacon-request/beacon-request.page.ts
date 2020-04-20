@@ -4,22 +4,23 @@ import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-
 import { ModalController } from '@ionic/angular'
 
 import {
-  BaseMessage,
-  MessageTypes,
+  BeaconBaseMessage,
+  BeaconMessageType,
   SignPayloadRequest,
   OperationRequest,
   PermissionResponse,
   PermissionRequest,
-  BroadcastRequest
-} from '@airgap/beacon-sdk/dist/messages/Messages'
-import { NotGrantedBeaconError, BeaconErrors } from '@airgap/beacon-sdk/dist/messages/Errors'
-import { WalletCommunicationClient } from '@airgap/beacon-sdk'
-import { Serializer } from '@airgap/beacon-sdk/dist/Serializer'
+  BroadcastRequest,
+  PermissionScope,
+  BeaconErrorMessage,
+  BeaconErrorType
+} from '@airgap/beacon-sdk'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { IACMessageDefinitionObject, IACMessageType, TezosProtocol, IAirGapTransaction } from 'airgap-coin-lib'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
+import { WalletClient } from '@airgap/beacon-sdk/dist/clients/WalletClient'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -32,13 +33,14 @@ export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknow
 })
 export class BeaconRequestPage implements OnInit {
   public title: string = ''
-  public request: BaseMessage | undefined
+  public request: BeaconBaseMessage | undefined
   public requesterName: string = ''
   public address: string = ''
 
   dappInfo: { name: string; pubKey: string }
-  client: WalletCommunicationClient
+  client: WalletClient
   inputs?: any
+  private beaconService: BeaconService | undefined
 
   responseHandler: (() => Promise<void>) | undefined
   public transactions: IAirGapTransaction[] | undefined
@@ -48,31 +50,30 @@ export class BeaconRequestPage implements OnInit {
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
-    private readonly beaconService: BeaconService,
     private readonly serializerService: SerializerService
   ) {}
 
   ngOnInit() {
     console.log('new request', this.request)
-    if (isUnknownObject(this.request) && this.request.type === MessageTypes.PermissionRequest) {
+    if (isUnknownObject(this.request) && this.request.type === BeaconMessageType.PermissionRequest) {
       this.title = 'Permission Request'
-      this.requesterName = ((this.request as any) as PermissionRequest).name
+      this.requesterName = ((this.request as any) as PermissionRequest).appMetadata.name
       this.permissionRequest((this.request as any) as PermissionRequest)
     }
 
-    if (isUnknownObject(this.request) && this.request.type === MessageTypes.SignPayloadRequest) {
+    if (isUnknownObject(this.request) && this.request.type === BeaconMessageType.SignPayloadRequest) {
       this.title = 'Sign Payload Request'
       this.requesterName = 'dApp Name (placeholder)'
       this.signRequest((this.request as any) as SignPayloadRequest)
     }
 
-    if (isUnknownObject(this.request) && this.request.type === MessageTypes.OperationRequest) {
+    if (isUnknownObject(this.request) && this.request.type === BeaconMessageType.OperationRequest) {
       this.title = 'Operation Request'
       this.requesterName = 'dApp Name (placeholder)'
       this.operationRequest((this.request as any) as OperationRequest)
     }
 
-    if (isUnknownObject(this.request) && this.request.type === MessageTypes.BroadcastRequest) {
+    if (isUnknownObject(this.request) && this.request.type === BeaconMessageType.BroadcastRequest) {
       this.title = 'Broadcast Request'
       this.requesterName = 'dApp Name (placeholder)'
       this.broadcastRequest((this.request as any) as BroadcastRequest)
@@ -104,7 +105,7 @@ export class BeaconRequestPage implements OnInit {
         label: 'Read Address',
         value: 'read_address',
         icon: 'eye',
-        checked: request.scope.indexOf('read_address') >= 0
+        checked: request.scopes.indexOf(PermissionScope.READ_ADDRESS) >= 0
       },
 
       {
@@ -113,7 +114,7 @@ export class BeaconRequestPage implements OnInit {
         label: 'Sign transactions',
         value: 'sign',
         icon: 'create',
-        checked: request.scope.indexOf('sign') >= 0
+        checked: request.scopes.indexOf(PermissionScope.SIGN) >= 0
       },
 
       {
@@ -122,7 +123,7 @@ export class BeaconRequestPage implements OnInit {
         label: 'Operation request',
         value: 'operation_request',
         icon: 'color-wand',
-        checked: request.scope.indexOf('operation_request') >= 0
+        checked: request.scopes.indexOf(PermissionScope.OPERATION_REQUEST) >= 0
       },
 
       {
@@ -131,7 +132,7 @@ export class BeaconRequestPage implements OnInit {
         label: 'Threshold',
         value: 'threshold',
         icon: 'code-working',
-        checked: request.scope.indexOf('threshold') >= 0
+        checked: request.scopes.indexOf(PermissionScope.THRESHOLD) >= 0
       }
     ]
 
@@ -140,24 +141,23 @@ export class BeaconRequestPage implements OnInit {
       if (scopes.length > 0) {
         const response: PermissionResponse = {
           id: request.id,
-          type: MessageTypes.PermissionResponse,
-          permissions: {
-            pubkey: wallet.publicKey,
-            networks: ['mainnet'],
-            scopes: scopes
-          }
+          beaconId: '',
+          type: BeaconMessageType.PermissionResponse,
+          accountIdentifier: `${wallet.publicKey}-${request.network.name}`,
+          pubkey: wallet.publicKey,
+          network: request.network,
+          scopes: scopes
         }
 
-        const serialized = new Serializer().serialize(response)
-        this.beaconService.respond(request.id, serialized)
+        this.beaconService.respond(response)
       } else {
-        const response: NotGrantedBeaconError = {
+        const response: BeaconErrorMessage = {
           id: request.id,
-          type: MessageTypes.PermissionResponse,
-          error: BeaconErrors.NOT_GRANTED_ERROR
+          beaconId: '',
+          type: BeaconMessageType.PermissionResponse,
+          errorType: BeaconErrorType.NOT_GRANTED_ERROR
         }
-        const serialized = new Serializer().serialize(response)
-        this.beaconService.respond(request.id, serialized)
+        this.beaconService.respond(response)
       }
     }
   }
@@ -166,7 +166,7 @@ export class BeaconRequestPage implements OnInit {
     const tezosProtocol = new TezosProtocol()
     this.transactions = await tezosProtocol.getTransactionDetails({
       publicKey: '',
-      transaction: { binaryTransaction: request.payload[0] as any }
+      transaction: { binaryTransaction: request.payload }
     })
 
     const wallet = this.accountService.getWalletList().find(wallet => wallet.coinProtocol.identifier === 'xtz')
@@ -174,15 +174,17 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
+    await this.beaconService.addVaultRequest(request.id, request.payload)
+
     this.responseHandler = async () => {
-      const transaction = { binaryTransaction: request.payload[0] as any }
+      const transaction = { binaryTransaction: request.payload }
       const serializedChunks = await this.serializerService.serialize([
         {
           protocol: wallet.coinProtocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: wallet.publicKey,
-            transaction: transaction, // TODO: Type
+            transaction,
             callback: 'airgap-wallet://?d='
           }
         }
@@ -210,6 +212,8 @@ export class BeaconRequestPage implements OnInit {
 
     const transaction = await tezosProtocol.prepareOperations(wallet.publicKey, request.operationDetails as any)
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
+
+    await this.beaconService.addVaultRequest(request.id, forgedTransaction)
 
     this.transactions = tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
@@ -243,7 +247,9 @@ export class BeaconRequestPage implements OnInit {
 
   private async broadcastRequest(request: BroadcastRequest): Promise<void> {
     const tezosProtocol = new TezosProtocol()
-    const signedTx = request.signedTransactions[0]
+    const signedTx: string = request.signedTransaction
+
+    await this.beaconService.addVaultRequest(request.id, signedTx)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',
@@ -261,7 +267,7 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       const info = {
-        signedTransactionSync: signedTransactionSync
+        signedTransactionsSync: [signedTransactionSync]
       }
 
       this.dataService.setData(DataServiceKey.TRANSACTION, info)

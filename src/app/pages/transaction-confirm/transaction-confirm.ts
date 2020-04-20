@@ -15,6 +15,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
 declare var cordova
 
@@ -46,7 +47,8 @@ export class TransactionConfirmPage {
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
     private readonly accountProvider: AccountProvider,
-    private readonly pushBackendProvider: PushBackendProvider
+    private readonly pushBackendProvider: PushBackendProvider,
+    private readonly beaconService: BeaconService
   ) {}
 
   public dismiss(): void {
@@ -96,6 +98,9 @@ export class TransactionConfirmPage {
         .broadcastTransaction(this.signedTxs[index])
         .then(async txId => {
           console.log('transaction hash', txId)
+
+          this.beaconService.getVaultRequest(this.signedTxs[index], txId)
+
           if (interval) {
             clearInterval(interval)
           }
