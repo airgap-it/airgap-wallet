@@ -101,7 +101,8 @@ export class DelegationDetailPage {
         hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
           ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
           : true,
-        delegateeLabel: this.delegateeLabel
+        delegateeLabel: this.delegateeLabel,
+        hasMultipleDelegatees: this.currentDelegatees.length > 1
       },
       event,
       translucent: true
@@ -115,6 +116,10 @@ export class DelegationDetailPage {
       return value instanceof Object && 'changeToAirGap' in value
     }
 
+    function isShowDelegateeListObject(value: unknown): value is { showDelegateeList: boolean } {
+      return value instanceof Object && 'showDelegateeList' in value
+    }
+
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
@@ -122,8 +127,10 @@ export class DelegationDetailPage {
           this.changeDisplayedDetails(data.delegateeAddress)
         } else if (isChangeToAirGapObject(data) && supportsAirGapDelegation(this.wallet.coinProtocol)) {
           this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
+        } else if (isShowDelegateeListObject(data)) {
+          // TODO: navigate to list
         } else {
-          console.log('Did not receive valid delegatee address object')
+          console.log('Unknown option selected.')
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))

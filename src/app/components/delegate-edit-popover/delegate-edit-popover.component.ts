@@ -10,6 +10,7 @@ import { AlertOptions } from '@ionic/angular/node_modules/@ionic/core'
 export class DelegateEditPopoverComponent {
   public readonly hideAirGap: boolean
   public readonly delegateeLabel: string
+  public readonly hasMultipleDelegatees: boolean
 
   constructor(
     private readonly alertController: AlertController,
@@ -18,6 +19,7 @@ export class DelegateEditPopoverComponent {
   ) {
     this.hideAirGap = this.navParams.get('hideAirGap')
     this.delegateeLabel = this.navParams.get('delegateeLabel')
+    this.hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
   }
 
   public async changeDelegatee(): Promise<void> {
@@ -62,5 +64,9 @@ export class DelegateEditPopoverComponent {
 
   public async changeDelegateeToAirGap() {
     this.popoverController.dismiss({ changeToAirGap: true })
+  }
+
+  public async showAllDelegatees() {
+    this.popoverController.dismiss({ showDelegateeList: true })
   }
 }

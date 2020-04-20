@@ -10,4 +10,8 @@
     <ion-icon name="create-outline" color="dark" slot="end"></ion-icon>
     <span *ngIf="delegateeLabel">Change {{ delegateeLabel }}</span>
   </ion-item>
+  <ion-item *ngIf="hasMultipleDelegatees" button detail="false" (click)="showAllDelegatees()">
+    <ion-icon name="list-outline" color="dark" slot="end"></ion-icon>
+    Show {{ delegateeLabel }} list
+  </ion-item>
 </ion-list>
