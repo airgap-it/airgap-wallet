@@ -252,5 +252,8 @@
       "android",
       "ios"
     ]
+  },
+  "browser": {
+    "fs": false
   }
 }
