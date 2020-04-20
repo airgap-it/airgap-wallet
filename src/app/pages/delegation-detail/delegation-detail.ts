@@ -294,7 +294,9 @@ export class DelegationDetailPage {
     Array.from(this.delegationForms.entries()).forEach(([type, formGroup]) => {
       formGroup.valueChanges.subscribe(() => {
         if (this.activeDelegatorAction === type.toString()) {
-          this.canProceed = formGroup.valid
+          setTimeout(() => {
+            this.canProceed = formGroup.valid
+          })
         }
       })
     })
