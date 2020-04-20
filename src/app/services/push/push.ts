@@ -71,8 +71,8 @@ export class PushProvider {
           component: IntroductionPushPage
         })
 
-        modal.dismiss(askForPermissions => {
-          if (askForPermissions) {
+        modal.onDidDismiss().then(result => {
+          if (result.data) {
             this.register()
           }
         })
