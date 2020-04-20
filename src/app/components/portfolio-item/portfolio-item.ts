@@ -43,17 +43,13 @@ export class PortfolioItemComponent {
   @Input()
   public isDelegated: Observable<boolean>
 
-  private readonly walletChanged: Subscription
+  private walletChanged: Subscription
 
   constructor(
     private readonly operationsProvider: OperationsProvider,
     public webExtensionProvider: WebExtensionProvider,
     public accountProvider: AccountProvider
-  ) {
-    this.walletChanged = this.accountProvider.walledChangedObservable.subscribe(async () => {
-      this.updateDelegationStatus()
-    })
-  }
+  ) {}
 
   public ngOnInit(): void {
     if (this.webExtensionProvider.isWebExtension()) {
@@ -63,6 +59,10 @@ export class PortfolioItemComponent {
         }
       })
     }
+    this.updateDelegationStatus()
+    this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
+      this.updateDelegationStatus()
+    })
   }
 
   private async updateDelegationStatus() {

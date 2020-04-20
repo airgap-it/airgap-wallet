@@ -42,7 +42,7 @@ export class PortfolioPage {
 
       this.refreshWalletGroups(wallets)
     })
-    this.walletsProvider.walledChangedObservable.subscribe(() => {
+    this.walletsProvider.walletChangedObservable.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList())
     })
   }
