@@ -18,7 +18,7 @@
       </p>
     </ion-text>
     <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of compatibleWallets">
-      <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
+      <portfolio-item [wallet]="wallet" tappable (click)="openPreparePage(wallet)"></portfolio-item>
     </ion-list>
 
     <ion-text color="primary">
@@ -27,7 +27,7 @@
       </p>
     </ion-text>
     <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of incompatibleWallets">
-      <portfolio-item [wallet]="wallet" [maxDigits]="8" tappable (click)="openPreparePage(wallet)"></portfolio-item>
+      <portfolio-item [wallet]="wallet" tappable (click)="openPreparePage(wallet)"></portfolio-item>
     </ion-list>
   </ion-grid>
 </ion-content>

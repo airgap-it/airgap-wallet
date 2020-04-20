@@ -7,6 +7,8 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 import { supportsDelegation } from 'src/app/helpers/delegation'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'portfolio-item',
@@ -18,9 +20,6 @@ export class PortfolioItemComponent {
 
   @Input()
   public wallet: AirGapMarketWallet
-
-  @Input()
-  public maxDigits: number = 0
 
   @Input()
   public showBalances: boolean = true
@@ -43,6 +42,14 @@ export class PortfolioItemComponent {
   @Input()
   public isDelegated: Observable<boolean>
 
+  @Input()
+  public maxDigits: number
+
+  public balance: string
+  public numberOfDecimalsInBalance: number = 0
+  public readonly smallFontDecimalThreshold = 16
+  private readonly defaultMaxDigits = 15
+
   private readonly walletChanged: Subscription
 
   constructor(
@@ -63,6 +70,20 @@ export class PortfolioItemComponent {
         }
       })
     }
+    if (this.wallet !== undefined && this.wallet.currentBalance !== undefined) {
+      const converter = new AmountConverterPipe()
+      const currentBalance: BigNumber = this.wallet.currentBalance
+      const balanceFormatted = converter.transformValueOnly(currentBalance, {
+        protocol: this.wallet.coinProtocol,
+        maxDigits: this.digits()
+      })
+      this.balance = `${balanceFormatted} ${this.wallet.coinProtocol.symbol}`
+      const balanceSplit = balanceFormatted.split('.')
+      if (balanceSplit.length == 2) {
+        const decimals = balanceSplit.pop()
+        this.numberOfDecimalsInBalance = decimals.length
+      }
+    }
   }
 
   private async updateDelegationStatus() {
@@ -75,6 +96,14 @@ export class PortfolioItemComponent {
         this.wallet.coinProtocol as ICoinDelegateProtocol,
         this.wallet.receivingPublicAddress
       )
+    }
+  }
+
+  public digits(): number {
+    if (this.maxDigits === undefined) {
+      return Math.min(this.wallet.coinProtocol.decimals + 1, this.defaultMaxDigits)
+    } else {
+      return this.maxDigits == 0 ? this.wallet.coinProtocol.decimals + 1 : this.maxDigits
     }
   }
 

@@ -11,7 +11,7 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-row style="display: block"><portfolio-item [wallet]="wallet"></portfolio-item></ion-row>
+    <ion-row style="display: block"><portfolio-item [wallet]="wallet" [maxDigits]="0"></portfolio-item></ion-row>
     <ion-row class="ion-padding-top ion-padding-horizontal">
       <ion-button *ngFor="let action of actions" color="secondary" (click)="action.start()" shape="round" size="small" fill="outline">
         <ion-icon slot="start" [name]="action.context.icon"></ion-icon>
