@@ -187,9 +187,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const canDelegate = maxDelegationAmount.gt(0)
 
     const baseDescription = hasDelegated
-      ? `You have currently ${delegatedFormatted} delegated to this validator.`
+      ? `You have currently <span class="style__strong color__primary">${delegatedFormatted}</span> delegated to this validator.`
       : 'Select the amount you want to delegate.'
-    const extraDescription = canDelegate ? ` You can ${hasDelegated ? 'additionally' : ''} delegate up to ${totalDelegatedFormatted}.` : ''
+    const extraDescription = canDelegate
+      ? ` You can ${
+          hasDelegated ? 'additionally' : ''
+        } delegate up to <span class="style__strong color__primary">${totalDelegatedFormatted}</span>.`
+      : ''
 
     return this.createMainDelegatorAction(
       protocol,
@@ -207,13 +211,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     delegatedAmount: BigNumber
   ): AirGapMainDelegatorAction {
-    const description = `You have currently delegated to this validator, you can undelegate up to ${this.amountConverterPipe.transform(
-      delegatedAmount,
-      {
-        protocolIdentifier: protocol.identifier,
-        maxDigits: 10
-      }
-    )}.`
+    const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
+      protocolIdentifier: protocol.identifier,
+      maxDigits: 10
+    })
+    const description = `You have currently delegated to this validator, you can undelegate up to <span class="style__strong color__primary">${delegatedAmountFormatted}</span>.`
 
     return this.createMainDelegatorAction(
       protocol,
@@ -310,7 +312,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return {
       label: 'Rewards',
       confirmLabel: 'Claim Rewards',
-      description: `You can claim up to ${rewardsFormatted} in rewards for this delegation.`
+      description: `You can claim up to <span class="style__strong color__primary">${rewardsFormatted}</span> in rewards for this delegation.`
     }
   }
 

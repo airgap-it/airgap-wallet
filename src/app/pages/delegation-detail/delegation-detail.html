@@ -132,7 +132,7 @@
           <ng-container *ngIf="activeDelegatorAction === delegateActionId">
             <ion-row class="ion-padding-horizontal" *ngIf="(delegatorDetails$ | async).delegateAction.description">
               <ion-col size="12">
-                <p>{{ (delegatorDetails$ | async).delegateAction.description }}</p>
+                <p [innerHtml]="(delegatorDetails$ | async).delegateAction.description"></p>
               </ion-col>
             </ion-row>
             <ion-row *ngFor="let arg of filterVisible((delegatorDetails$ | async).delegateAction.args)">
@@ -156,7 +156,7 @@
           <ng-container *ngIf="activeDelegatorAction === undelegateActionId">
             <ion-row class="ion-padding-horizontal" *ngIf="(delegatorDetails$ | async).undelegateAction.description">
               <ion-col size="12">
-                <p>{{ (delegatorDetails$ | async).undelegateAction.description }}</p>
+                <p [innerHtml]="(delegatorDetails$ | async).undelegateAction.description"></p>
               </ion-col>
             </ion-row>
             <ion-row *ngFor="let arg of filterVisible((delegatorDetails$ | async).undelegateAction.args)">
@@ -181,7 +181,7 @@
             <ng-container *ngIf="activeDelegatorAction === extra.type.toString()">
               <ion-row class="ion-padding-horizontal" *ngIf="extra.description">
                 <ion-col size="12">
-                  <p>{{ extra.description }}</p>
+                  <p [innerHtml]="extra.description"></p>
                 </ion-col>
               </ion-row>
               <ion-row *ngFor="let arg of filterVisible(extra.args)">
