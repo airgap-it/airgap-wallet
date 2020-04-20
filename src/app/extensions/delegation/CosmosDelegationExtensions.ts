@@ -16,7 +16,6 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { FormBuilder, Validators } from '@angular/forms'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -247,8 +246,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           Validators.compose([
             Validators.required,
             Validators.min(new BigNumber(1).shiftedBy(-protocol.decimals).toNumber()),
-            Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
-            DecimalValidator.validate(protocol.decimals)
+            Validators.max(new BigNumber(maxAmountFormatted).toNumber())
           ])
         ]
       })

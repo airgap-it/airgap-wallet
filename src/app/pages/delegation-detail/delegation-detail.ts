@@ -281,8 +281,13 @@ export class DelegationDetailPage {
       })
     }
 
-    const newForm = this.formBuilder.group(Object.assign(form ? form.value : {}, formArgs))
-    this.delegationForms.set(action.type, newForm)
+    if (!form) {
+      this.delegationForms.set(action.type, this.formBuilder.group(formArgs))
+    } else {
+      Object.keys(formArgs)
+        .map(key => [key, formArgs[key]] as [string, any])
+        .forEach(([key, value]) => form.addControl(key, value))
+    }
   }
 
   private setupFormObservers() {
