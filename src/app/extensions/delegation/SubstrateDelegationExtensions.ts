@@ -1,4 +1,4 @@
-import { SubstrateProtocol, SubstratePayee, AirGapMarketWallet } from 'airgap-coin-lib'
+import { SubstrateProtocol, SubstratePayee } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
@@ -11,7 +11,6 @@ import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
-import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import * as moment from 'moment'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
@@ -259,15 +258,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const argWidgets = []
       if (action.args.includes(ArgumentName.VALUE)) {
         argWidgets.push(
-          this.createValueWidget({
-            id: ArgumentName.VALUE_CONTROL,
-            defaultValue: maxValueFormatted,
-            toggleFixedValueButton: 'Max',
-            fixedValue: maxValueFormatted,
+          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, {
             onValueChanged: (value: string) => {
-              form.patchValue({
-                [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed()
-              })
+              form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             }
           })
         )
@@ -352,26 +345,6 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           args
         }
       })
-  }
-
-  private createValueWidget(config: Partial<UIInputTextConfig> = {}): UIInputText {
-    return new UIInputText({
-      id: ArgumentName.VALUE,
-      inputType: 'number',
-      label: 'Amount',
-      placeholder: '0.00',
-      defaultValue: '0.00',
-      errorLabel: 'Invalid value',
-      createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
-        if (wallet) {
-          const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
-          return `$${this.decimalPipe.transform(marketPrice.toString(), '1.2-2')}`
-        } else {
-          return ''
-        }
-      },
-      ...config
-    })
   }
 
   private createDelegatorDisplayDetails(protocol: SubstrateProtocol, nominatorDetails: SubstrateNominatorDetails): UIWidget[] {

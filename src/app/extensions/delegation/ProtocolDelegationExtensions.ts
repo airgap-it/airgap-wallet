@@ -1,5 +1,7 @@
-import { ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { ICoinDelegateProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { AirGapDelegationDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIInputTextConfig, UIInputText } from 'src/app/models/widgets/input/UIInputText'
+import BigNumber from 'bignumber.js'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
@@ -66,4 +68,26 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]>
+
+  protected createAmountWidget(id: string, maxValue: string, config: Partial<UIInputTextConfig> = {}): UIInputText {
+    return new UIInputText({
+      id,
+      inputType: 'number',
+      label: 'Amount',
+      placeholder: '0.00',
+      defaultValue: maxValue,
+      toggleFixedValueButton: 'Max',
+      fixedValue: maxValue,
+      errorLabel: 'Invalid value',
+      createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
+        if (wallet) {
+          const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
+          return `$${marketPrice.toFixed(2)}`
+        } else {
+          return ''
+        }
+      },
+      ...config
+    })
+  }
 }

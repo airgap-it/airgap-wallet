@@ -41,7 +41,7 @@
 
     <ion-row class="ion-padding-horizontal ion-padding-bottom">
       <ion-col size="12" class="ion-no-padding">
-        <p>{{ (delegateeDetails$ | async)?.status }}</p>
+        <p>{{ (delegateeDetails$ | async)?.status | titlecase }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
         <div class="progress--container">
@@ -52,7 +52,7 @@
         <ion-row>
           <ion-col size="6" class="ion-no-padding">
             <small *ngIf="(delegateeDetails$ | async); else delegateeUsageSkeleton">
-              {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number }}%
+              {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number: '1.2-2' }}%
             </small>
             <ng-template #delegateeUsageSkeleton>
               <div>
