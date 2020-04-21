@@ -4,6 +4,7 @@ import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-
 import { ModalController } from '@ionic/angular'
 
 import {
+  WalletClient,
   BeaconBaseMessage,
   BeaconMessageType,
   SignPayloadRequest,
@@ -20,7 +21,6 @@ import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { IACMessageDefinitionObject, IACMessageType, TezosProtocol, IAirGapTransaction } from 'airgap-coin-lib'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
-import { WalletClient } from '@airgap/beacon-sdk/dist/clients/WalletClient'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
