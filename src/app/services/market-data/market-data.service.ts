@@ -53,10 +53,12 @@ export class MarketDataService {
     const txHistory: TransactionHistoryObject[] = await this.getTransactionHistory(wallet, transactions)
     const balancesByTimestamp: BalanceAtTimestampObject[] = []
 
-    let currentBalance = this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
-      protocolIdentifier: wallet.protocolIdentifier,
-      maxDigits: 10
-    })
+    let currentBalance = parseFloat(
+      this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
+        protocol: wallet.coinProtocol,
+        maxDigits: 10
+      })
+    )
     // txHistory is sorted from most recent to oldest tx
     txHistory.forEach((transaction: TransactionHistoryObject) => {
       balancesByTimestamp.push({ timestamp: transaction.timestamp, balance: currentBalance })

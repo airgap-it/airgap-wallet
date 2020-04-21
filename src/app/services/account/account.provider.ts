@@ -47,7 +47,7 @@ export class AccountProvider {
 
   private readonly walletChangedBehaviour: Subject<void> = new Subject()
 
-  get walledChangedObservable() {
+  get walletChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
