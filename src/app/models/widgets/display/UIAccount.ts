@@ -6,8 +6,6 @@ export interface UIAccountConfig extends UIWidgetConfig {
   description?: string
 
   shortenAddress?: boolean
-
-  onConnectedFormChanged?: (value?: any, widget?: UIAccount) => void
 }
 
 export class UIAccount extends UIWidget {
