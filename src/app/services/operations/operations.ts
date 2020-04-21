@@ -29,7 +29,7 @@ import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
-import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 
 @Injectable({
   providedIn: 'root'
@@ -45,22 +45,22 @@ export class OperationsProvider {
     private readonly formBuilder: FormBuilder
   ) {}
 
-  public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccount[]> {
+  public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccountSummary[]> {
     const protocol = wallet.coinProtocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
 
     if (supportsAirGapDelegation(protocol)) {
-      return []
+      return protocol.createDelegateesSummary(delegatees)
     } else {
       const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
       return delegateesDetails.map(
         details =>
-          new UIAccount({
-            name: details.name,
+          new UIAccountSummary({
             address: details.address,
-            shortenAddress: true
+            header: [details.name, ''],
+            description: [details.address, '']
           })
       )
     }

@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
 import { UIRewardList } from '../models/widgets/display/UIRewardList'
+import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -52,4 +53,5 @@ export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   delegateeLabel: string
 
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
+  createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
 }

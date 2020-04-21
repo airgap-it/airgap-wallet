@@ -16,9 +16,9 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="filteredDelegatees && filteredDelegatees.length > 0; else loadingTemplate">
       <ion-list lines="none">
-        <ion-item (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of filteredDelegatees">
-          <widget-account [widget]="delegatee"></widget-account>
-        </ion-item>
+        <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of filteredDelegatees">
+          <widget-account-summary [widget]="delegatee"></widget-account-summary>
+        </div>
       </ion-list>
     </ng-container>
 

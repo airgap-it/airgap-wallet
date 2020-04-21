@@ -2,11 +2,13 @@ import { ICoinDelegateProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
 import { AirGapDelegationDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIInputTextConfig, UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import BigNumber from 'bignumber.js'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
   private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
+  private static readonly CREATE_DELEGATEES_SUMMARY_KEY = 'createDelegateesSummary'
 
   public static load<T extends ICoinDelegateProtocol>(protocol: new () => T, extensions: ProtocolDelegationExtensions<T>) {
     const alreadyLoaded =
@@ -19,7 +21,8 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         extensions,
         [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
-        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function']
+        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function'],
+        [ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY, 'function']
       )
     }
   }
@@ -68,6 +71,18 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]>
+
+  public async createDelegateesSummary(protocol: T, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
+    return delegateesDetails.map(
+      details =>
+        new UIAccountSummary({
+          address: details.address,
+          header: [details.name, ''],
+          description: [details.address, '']
+        })
+    )
+  }
 
   protected createAmountWidget(id: string, maxValue: string, config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({

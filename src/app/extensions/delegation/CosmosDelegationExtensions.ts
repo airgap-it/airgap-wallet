@@ -16,6 +16,8 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { FormBuilder, Validators } from '@angular/forms'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -29,10 +31,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
-    amountConverterPipe: AmountConverterPipe
+    amountConverterPipe: AmountConverterPipe,
+    shortenStringPipe: ShortenStringPipe
   ): CosmosDelegationExtensions {
     if (!CosmosDelegationExtensions.instance) {
-      CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe)
+      CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe, shortenStringPipe)
     }
 
     return CosmosDelegationExtensions.instance
@@ -44,7 +47,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private constructor(
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverterPipe: AmountConverterPipe
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly shortenStringPipe: ShortenStringPipe
   ) {
     super()
   }
@@ -70,6 +74,27 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           delegatees: [validator]
         }
       })
+    )
+  }
+
+  public async createDelegateesSummary(protocol: CosmosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const validatorsDetails = await Promise.all(delegatees.map(validator => protocol.fetchValidator(validator)))
+    return validatorsDetails.map(
+      details =>
+        new UIAccountSummary({
+          address: details.operator_address,
+          header: [
+            details.description.moniker,
+            this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString()) + '%'
+          ],
+          description: [
+            this.shortenStringPipe.transform(details.operator_address),
+            this.amountConverterPipe.transform(details.tokens, {
+              protocolIdentifier: protocol.identifier,
+              maxDigits: 10
+            })
+          ]
+        })
     )
   }
 

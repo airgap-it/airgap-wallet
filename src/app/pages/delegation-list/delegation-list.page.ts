@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 import { NavController } from '@ionic/angular'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 
 @Component({
   selector: 'delegation-list',
@@ -17,9 +17,9 @@ export class DelegationListPage {
   public delegateeLabel: string
 
   public searchTerm: string = ''
-  public filteredDelegatees: UIAccount[]
+  public filteredDelegatees: UIAccountSummary[]
 
-  private delegatees: UIAccount[]
+  private delegatees: UIAccountSummary[]
   private callback: (address: string) => void
 
   constructor(
@@ -47,7 +47,7 @@ export class DelegationListPage {
       this.filteredDelegatees = this.delegatees.filter(delegatee => {
         const searchTermLowerCase = searchTerm.toLowerCase()
         const hasMatchingAddress = delegatee.address.toLowerCase().includes(searchTermLowerCase)
-        const hasMatchingName = delegatee.name && delegatee.name.toLowerCase().includes(searchTermLowerCase)
+        const hasMatchingName = delegatee.header[0].toLowerCase().includes(searchTermLowerCase)
 
         return hasMatchingAddress || hasMatchingName
       })
