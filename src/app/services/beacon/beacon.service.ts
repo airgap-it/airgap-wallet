@@ -11,12 +11,13 @@ import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+
 @Injectable({
   providedIn: 'root'
 })
 export class BeaconService {
   private client: WalletClient | undefined
-  private messages: BeaconBaseMessage[] = []
   private requests: [string, any][] = []
 
   constructor(private readonly modalController: ModalController) {
@@ -32,14 +33,8 @@ export class BeaconService {
 
       console.log('typeof', typeof message)
 
-      this.messages.push(message)
-
       this.presentModal(message, { pubKey: 'not available yet' })
     })
-  }
-
-  public async addPeer(pubKey: string, relayServer: string, name: string) {
-    this.client.addPeer({ pubKey, relayServer, name } as any)
   }
 
   async presentModal(request: BeaconBaseMessage, dappInfo: { pubKey: string }) {
@@ -53,11 +48,12 @@ export class BeaconService {
         beaconService: this
       }
     })
-    return await modal.present()
+
+    return modal.present()
   }
 
-  public async addVaultRequest(messageId, unsignedTransaction) {
-    this.requests.push([messageId, unsignedTransaction])
+  public async addVaultRequest(messageId: string, requestPayload: any) {
+    this.requests.push([messageId, requestPayload])
   }
 
   public async getVaultRequest(signedMessage: string, hash: string) {
@@ -70,7 +66,7 @@ export class BeaconService {
           beaconId: '',
           transactionHash: hash
         }
-        this.respond(broadcastResponse)
+        this.respond(broadcastResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1])) {
@@ -80,7 +76,7 @@ export class BeaconService {
           beaconId: '',
           signature: signedMessage.substr(signedMessage.length - 128)
         }
-        this.respond(signPayloadResponse)
+        this.respond(signPayloadResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1].binaryTransaction)) {
@@ -90,7 +86,7 @@ export class BeaconService {
           beaconId: '',
           transactionHash: hash
         }
-        this.respond(operationResponse)
+        this.respond(operationResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else {
@@ -101,20 +97,24 @@ export class BeaconService {
     })
   }
 
-  public async respond(message: BeaconBaseMessage) {
+  public async respond(message: BeaconBaseMessage): Promise<void> {
     if (!this.client) {
       throw new Error('Client not ready')
     }
     console.log('responding', message)
-    this.client.respond(message)
+    await this.client.respond(message)
+  }
+
+  public async addPeer(pubKey: string, relayServer: string, name: string): Promise<void> {
+    this.client.addPeer({ pubKey, relayServer, name } as any)
   }
 
   public async getPeers(): Promise<P2PPairInfo[]> {
-    return this.client.getPeers()
+    return this.client.getPeers() as any
   }
 
   public async removePeer(peer: P2PPairInfo): Promise<void> {
-    await this.client.removePeer(peer)
+    await this.client.removePeer(peer as any)
   }
 
   public async removeAllPeers(): Promise<void> {
