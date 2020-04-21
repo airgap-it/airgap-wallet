@@ -99,15 +99,15 @@ export class SchemeRoutingProvider {
   ): Promise<IACResult> {
     this.router = router
 
-    // Check if it's a wallet communication request
+    // Check if it's a beacon request
     try {
       const json = JSON.parse(typeof data === 'string' ? data : data[0])
       if (json.pubKey && json.relayServer) {
-        console.log('WALLET COMMUNICATION')
+        console.log('Beacon Pairing QR scanned', json)
         await this.beaconService.addPeer(json.pubKey, json.relayServer, json.name)
       }
     } catch (e) {
-      console.log('wallet communication interpretation failed', e)
+      //
     }
 
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
