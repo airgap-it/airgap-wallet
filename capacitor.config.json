@@ -4,6 +4,9 @@
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
+  "ios": {
+    "cordovaSwiftVersion": "5.0"
+  },
   "cordova": {
     "preferences": {
       "webviewbounce": "false",
