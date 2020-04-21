@@ -1,17 +1,8 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
-import {
-  AirGapMarketWallet,
-  getProtocolByIdentifier,
-  IACMessageDefinitionObject,
-  ICoinProtocol,
-  SignedTransaction,
-  TezosKtProtocol
-} from 'airgap-coin-lib'
+import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
 
-import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
@@ -19,13 +10,10 @@ import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 declare var cordova
 
 const SECOND: number = 1000
-const MINUTE: number = SECOND * 60
 
 const TOAST_DURATION: number = SECOND * 3
 const TOAST_ERROR_DURATION: number = SECOND * 5
-const INTERVAL_KT_REFRESH: number = SECOND * 10
 const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
-const TIMEOUT_KT_REFRESH_CLEAR: number = MINUTE * 5
 
 @Component({
   selector: 'page-transaction-confirm',
@@ -45,7 +33,6 @@ export class TransactionConfirmPage {
     private readonly alertCtrl: AlertController,
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
-    private readonly accountProvider: AccountProvider,
     private readonly pushBackendProvider: PushBackendProvider
   ) {}
 
@@ -99,36 +86,6 @@ export class TransactionConfirmPage {
           if (interval) {
             clearInterval(interval)
           }
-          // TODO: Remove once tezos allows delegation from tz1 addresses
-          if (protocol.identifier === ProtocolSymbols.XTZ) {
-            // Add KT accounts after broadcasting an xtz address because it might have generated a new KT address
-            const ktInterval = setInterval(async () => {
-              const ktProtocol = new TezosKtProtocol()
-              const xtzWallets = this.accountProvider.getWalletList().filter(wallet => wallet.protocolIdentifier === ProtocolSymbols.XTZ)
-              xtzWallets.forEach(async xtzWallet => {
-                const ktAccounts = await ktProtocol.getAddressesFromPublicKey(xtzWallet.publicKey)
-                ktAccounts.forEach((_ktAccount, index) => {
-                  const ktWallet = new AirGapMarketWallet(
-                    ProtocolSymbols.XTZ_KT,
-                    xtzWallet.publicKey,
-                    xtzWallet.isExtendedPublicKey,
-                    xtzWallet.derivationPath,
-                    index
-                  )
-                  const exists = this.accountProvider.walletExists(ktWallet)
-                  if (!exists) {
-                    ktWallet.addresses = ktAccounts
-                    ktWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-                    this.accountProvider.addWallet(ktWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-                  }
-                })
-              })
-            }, INTERVAL_KT_REFRESH)
-            setTimeout(() => {
-              clearInterval(ktInterval)
-            }, TIMEOUT_KT_REFRESH_CLEAR)
-          }
-
           // TODO: Remove once we introduce pending transaction handling
           // TODO: Multi messages
           // tslint:disable-next-line:no-unnecessary-type-assertion

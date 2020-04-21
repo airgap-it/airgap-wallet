@@ -5,15 +5,17 @@
     <currency-symbol [symbol]="wallet.coinProtocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
   </ion-avatar>
   <ion-label>
-    <h2 class="font--weight__bold" ion-text color="black" *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading">
-      {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: maxDigits } }}
+    <h2
+      class="font--weight__bold"
+      [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__regular': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
+      *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading"
+    >
+      {{ balance }}
     </h2>
     <ng-template #syncingHeading>
-      <div>
-        <h2>
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </h2>
-      </div>
+      <h2>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </h2>
     </ng-template>
     <ng-container *ngIf="!isToken">
       <ion-text color="blackLight">
@@ -31,49 +33,43 @@
     <ng-template #syncingHeadingLow>
       <div>
         <h3>
-          <ion-skeleton-text animated></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
         </h3>
       </div>
     </ng-template>
   </ion-label>
 
-  <ion-row class="items--right" slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
-    <ion-col size="12" class="ion-no-padding ion-text-right">
-      <strong *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
-        <ion-text color="black">
-          <p>
-            ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
-            wallet.currentMarketPrice } | number: '1.2-2' }}
-          </p>
-        </ion-text>
-      </strong>
-      <ng-template #syncingBalance>
-        <div>
-          <p>
-            <ion-skeleton-text animated></ion-skeleton-text>
-          </p>
-        </div>
-      </ng-template>
-    </ion-col>
-    <ion-col size="12" class="ion-no-padding ion-text-right">
-      <p *ngIf="wallet.currentBalance; else syncingPrice">
-        <ion-text color="blackLight">
-          <span *ngIf="wallet.currentBalance?.toNumber() > 0">${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}</span>
-        </ion-text>
-        <!-- <span ion-text [ngClass]="wallet.change24hour >= 0 ? 'green' : 'red'">{{ wallet.change24hour }}%</span> -->
+  <div slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
+    <p
+      class="ion-text-right font--weight__bold porfolio-item__margin"
+      *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance"
+    >
+      ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+      wallet.currentMarketPrice } | number: '1.2-2' }}
+    </p>
+    <ng-template #syncingBalance>
+      <p>
+        <ion-skeleton-text animated style="width: 40px"></ion-skeleton-text>
       </p>
-      <ng-template #syncingPrice>
-        <div>
-          <p>
-            <ion-skeleton-text animated></ion-skeleton-text>
-          </p>
-        </div>
-      </ng-template>
-    </ion-col>
-  </ion-row>
-  <ion-row class="items--right" slot="end" *ngIf="isExpendable" class="expendable__container">
-    <ion-icon [ngClass]="{ 'icon--rotated': isExtended }" name="chevron-down-outline"></ion-icon>
-  </ion-row>
+    </ng-template>
+    <p *ngIf="wallet.currentBalance; else syncingPrice">
+      <ion-text color="blackLight">
+        <span *ngIf="wallet.currentBalance?.toNumber() > 0">${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}</span>
+      </ion-text>
+    </p>
+    <ng-template #syncingPrice>
+      <p>
+        <ion-skeleton-text animated style="width: 40px"></ion-skeleton-text>
+      </p>
+    </ng-template>
+  </div>
+  <ion-icon
+    slot="end"
+    *ngIf="isExpendable"
+    class="expendable__container"
+    [ngClass]="{ 'icon--rotated': isExtended }"
+    name="chevron-down-outline"
+  ></ion-icon>
 </ion-item>
 
 <ng-template #skeletonWallet>
@@ -92,17 +88,13 @@
         <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
       </h3>
     </ion-label>
-    <ion-row class="items--right" slot="end">
-      <ion-col size="12" class="ion-no-padding ion-text-right">
-        <p>
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding ion-text-right">
-        <p>
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </p>
-      </ion-col>
-    </ion-row>
+    <div slot="end">
+      <p>
+        <ion-skeleton-text animated style="width: 40px"></ion-skeleton-text>
+      </p>
+      <p>
+        <ion-skeleton-text animated style="width: 40px"></ion-skeleton-text>
+      </p>
+    </div>
   </ion-item>
 </ng-template>

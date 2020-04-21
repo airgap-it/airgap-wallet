@@ -15,7 +15,7 @@
       <p>{{ 'account-import.text' | translate }}</p>
     </ion-row>
 
-    <portfolio-item [wallet]="wallet" [maxDigits]="8"></portfolio-item>
+    <portfolio-item [wallet]="wallet"></portfolio-item>
 
     <ion-item *ngIf="walletAlreadyExists" color="danger" class="ion-margin-top ion-text-wrap">
       {{ 'account-import.warning' | translate }}

@@ -1,23 +1,27 @@
 .expendable__container {
-  ion-icon {
-    -webkit-transition-duration: 0.4s;
-    -moz-transition-duration: 0.4s;
-    -o-transition-duration: 0.4s;
-    transition-duration: 0.4s;
+  -webkit-transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  transition-duration: 0.4s;
 
-    -webkit-transition-property: -webkit-transform;
-    -moz-transition-property: -moz-transform;
-    -o-transition-property: -o-transform;
-    transition-property: transform;
-  }
-  .icon--rotated {
+  -webkit-transition-property: -webkit-transform;
+  -moz-transition-property: -moz-transform;
+  -o-transition-property: -o-transform;
+  transition-property: transform;
+  &.icon--rotated {
     transform: rotate(180deg);
   }
 }
 
-ion-badge,
+p,
 ion-label {
-  margin: 0 !important;
+  margin: 0;
+}
+ion-badge {
+  margin: 4px 0 0 0;
+}
+.porfolio-item__margin {
+  margin: 2px 0px 6px;
 }
 .symbol--icon {
   position: absolute;
@@ -26,20 +30,8 @@ ion-label {
   left: 40px;
   top: 40px;
 }
-.symbol--icon__isToken {
-  top: 18px;
-}
-h2,
-.items--right ion-col:first-of-type {
-  margin: 2px 0px 6px !important;
-}
-p {
-  margin: 0px;
-}
-ion-item {
-  ion-avatar {
-    margin: 8px 16px 8px 0;
-    min-height: 48px;
-    min-width: 48px;
-  }
+ion-avatar {
+  margin: 8px 16px 8px 0;
+  min-height: 48px;
+  min-width: 48px;
 }

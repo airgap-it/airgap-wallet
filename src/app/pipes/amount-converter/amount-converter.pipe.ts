@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 @Pipe({
@@ -7,19 +7,6 @@ import { BigNumber } from 'bignumber.js'
 })
 export class AmountConverterPipe implements PipeTransform {
   public transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
-    if (BigNumber.isBigNumber(value)) {
-      value = value.toNumber()
-    }
-    if (!args.protocolIdentifier || (!value && value !== 0) || isNaN(Number(value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
-      /* console.warn(
-        `AmountConverterPipe: necessary properties missing!\n` +
-          `Protocol: ${args.protocolIdentifier}\n` +
-          `Value: ${value}\n` +
-          `maxDigits: ${args.maxDigits}`
-      ) */
-      return ''
-    }
-
     let protocol
 
     try {
@@ -28,38 +15,20 @@ export class AmountConverterPipe implements PipeTransform {
       return ''
     }
 
-    const BN = BigNumber.clone({
-      FORMAT: {
-        decimalSeparator: `.`,
-        groupSeparator: `'`,
-        groupSize: 3
-      }
-    })
-    const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
-
-    const result = `${this.formatBigNumber(amount, args.maxDigits)} ${protocol.symbol.toUpperCase()}`
+    const amount = this.transformValueOnly(value, { protocol: protocol, maxDigits: args.maxDigits })
+    if (amount === undefined) {
+      return ''
+    }
+    const result = `${amount} ${protocol.symbol.toUpperCase()}`
     return result
   }
 
-  public transformValueOnly(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): number {
+  public transformValueOnly(value: BigNumber | string | number, args: { protocol: ICoinProtocol; maxDigits: number }): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()
     }
-    if (!args.protocolIdentifier || (!value && value !== 0) || isNaN(Number(value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
-      /* console.warn(
-        `AmountConverterPipe: necessary properties missing!\n` +
-          `Protocol: ${args.protocolIdentifier}\n` +
-          `Value: ${value}\n` +
-          `maxDigits: ${args.maxDigits}`
-      ) */
-      return undefined
-    }
 
-    let protocol
-
-    try {
-      protocol = getProtocolByIdentifier(args.protocolIdentifier)
-    } catch (e) {
+    if (!args.protocol || (!value && value !== 0) || isNaN(Number(value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
       return undefined
     }
 
@@ -70,9 +39,9 @@ export class AmountConverterPipe implements PipeTransform {
         groupSize: 3
       }
     })
-    const amount = new BN(value).shiftedBy(-1 * protocol.decimals)
+    const amount = new BN(value).shiftedBy(-1 * args.protocol.decimals)
 
-    return parseFloat(this.formatBigNumber(amount, args.maxDigits))
+    return this.formatBigNumber(amount, args.maxDigits)
   }
 
   public formatBigNumber(value: BigNumber, maxDigits?: number): string {

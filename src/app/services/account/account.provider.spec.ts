@@ -23,7 +23,7 @@ describe('AccountProvider', () => {
 
   beforeEach(async () => {
     accountProvider = TestBed.get(AccountProvider)
-    await accountProvider.walledChangedObservable.pipe(take(1)).toPromise() // Wait for initial load to be over
+    await accountProvider.walletChangedObservable.pipe(take(1)).toPromise() // Wait for initial load to be over
   })
 
   it('should be created', () => {
