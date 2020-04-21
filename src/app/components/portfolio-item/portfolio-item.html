@@ -7,7 +7,7 @@
   <ion-label>
     <h2
       class="font--weight__bold"
-      [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__small': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
+      [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__regular': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
       *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading"
     >
       {{ balance }}
