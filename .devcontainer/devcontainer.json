@@ -18,5 +18,5 @@
   // https://aka.ms/vscode-remote/containers/non-root for details on adding a non-root user if none exist.
   // "remoteUser": "node",
   // Add the IDs of extensions you want installed when the container is created in the array below.
-  "extensions": ["dbaeumer.vscode-eslint"]
+  "extensions": ["dbaeumer.vscode-eslint", "angular.ng-template", "esbenp.prettier-vscode", "ms-vscode.vscode-typescript-tslint-plugin"]
 }
