@@ -115,12 +115,7 @@ export class OperationsProvider {
   private async getDefaultDelegateesDetails(delegateesDetails: DelegateeDetails[]): Promise<AirGapDelegateeDetails[]> {
     return delegateesDetails.map(details => ({
       name: '',
-      ...details,
-      usageDetails: {
-        usage: new BigNumber(0),
-        current: new BigNumber(0),
-        total: new BigNumber(0)
-      }
+      ...details
     }))
   }
 

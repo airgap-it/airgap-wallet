@@ -45,14 +45,16 @@
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
         <div class="progress--container">
-          <div class="progress--current" [style.width]="(delegateeDetails$ | async)?.usageDetails.usage.toFixed(2) * 100 + '%'"></div>
+          <div class="progress--current" [style.width]="(delegateeDetails$ | async)?.usageDetails?.usage.toFixed(2) * 100 + '%'"></div>
         </div>
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
         <ion-row>
           <ion-col size="6" class="ion-no-padding">
             <small *ngIf="(delegateeDetails$ | async); else delegateeUsageSkeleton">
-              {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number: '1.2-2' }}%
+              <span *ngIf="(delegateeDetails$ | async).usageDetails">
+                {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number: '1.2-2' }}%
+              </span>
             </small>
             <ng-template #delegateeUsageSkeleton>
               <div>
@@ -64,9 +66,11 @@
           </ion-col>
           <ion-col size="6" class="ion-no-padding ion-text-right">
             <small *ngIf="(delegateeDetails$ | async); else delegateeUsageDetailsSkeleton">
-              {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocolIdentifier:
-              wallet.protocolIdentifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() | amountConverter:
-              { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }}
+              <span *ngIf="(delegateeDetails$ | async).usageDetails">
+                {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocolIdentifier:
+                wallet.protocolIdentifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() |
+                amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }}
+              </span>
             </small>
             <ng-template #delegateeUsageDetailsSkeleton>
               <div class="justify--content__end">
@@ -113,6 +117,7 @@
       <ion-col size="12">
         <ion-segment
           scrollable="true"
+          class="ion-padding-horizontal"
           [(ngModel)]="activeDelegatorAction"
           (ionChange)="onActiveActionChange()"
           *ngIf="multipleActionsAvailable"
