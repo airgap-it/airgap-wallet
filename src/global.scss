@@ -25,8 +25,11 @@ ion-card-title {
 }
 
 /* iOS font-size fix */
-sc-ion-label-ios-s h2 {
+.sc-ion-label-ios-s h2 {
   font-size: 16px;
+}
+.font-size__regular {
+  font-size: 14px !important;
 }
 
 identicon {
@@ -39,13 +42,6 @@ identicon {
 /* Styling of translated messages */
 .color__primary {
   color: var(--ion-color-primary);
-}
-
-.color__percentage_up {
-  color: green;
-}
-.color__percentage_down {
-  color: red;
 }
 
 .style__strong {
@@ -79,7 +75,6 @@ identicon {
 .font--weight__bold {
   font-weight: 700 !important;
 }
-
 .font--weight__med {
   font-weight: 500;
 }

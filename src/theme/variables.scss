@@ -200,6 +200,19 @@ page-account-address {
   }
 }
 
+portfolio-item {
+  div[slot='end'] {
+    margin-inline-start: 8px;
+  }
+}
+page-portfolio {
+  portfolio-item {
+    div[slot='end'] {
+      margin-inline-end: 0;
+    }
+  }
+}
+
 .item__image[slot='start'] {
   margin: 8px 16px 8px 0;
 }

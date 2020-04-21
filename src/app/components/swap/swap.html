@@ -64,7 +64,6 @@
     [hideFiatAmounts]="true"
     (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
-    [maxDigits]="8"
   ></portfolio-item>
   <ng-container *ngIf="expandWalletSelection">
     <ion-list lines="none" margin-top [@expandWalletAnimation]>
@@ -76,7 +75,6 @@
           tappable
           [hideFiatAmounts]="true"
           [isExpendable]="false"
-          [maxDigits]="8"
         ></portfolio-item>
       </ng-container>
     </ion-list>

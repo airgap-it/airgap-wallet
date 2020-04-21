@@ -18,14 +18,12 @@
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
               [wallet]="walletGroup.mainWallet"
-              [maxDigits]="walletGroup.mainWallet.coinProtocol.decimals + 1"
               tappable
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
             <portfolio-item
               *ngFor="let subWallet of walletGroup.subWallets"
               [wallet]="subWallet"
-              [maxDigits]="subWallet.coinProtocol.decimals + 1"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"
             ></portfolio-item>

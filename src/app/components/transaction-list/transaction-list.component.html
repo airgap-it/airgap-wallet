@@ -1,7 +1,7 @@
 <ion-row *ngIf="transactionType === 'pendingTransaction' && hasPendingTransactions">
-  <ion-col size="10" class="ion-padding">
+  <ion-col size="10" class="ion-padding-horizontal">
     <ion-text class="font--weight__bold" color="primary">
-      <p>{{ 'account-transaction-list.pending-transactions.label' | translate }}</p>
+      <p class="ion-no-margin">{{ 'account-transaction-list.pending-transactions.label' | translate }}</p>
     </ion-text>
   </ion-col>
   <ion-col size="12" class="ion-no-padding">
