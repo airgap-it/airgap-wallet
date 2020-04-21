@@ -69,11 +69,6 @@ describe('FeeConverter Pipe', () => {
       value: '1',
       protocolIdentifier: 'eth',
       expected: '0.000000000000000001 ETH'
-    },
-    {
-      value: '1',
-      protocolIdentifier: 'eth-erc20-ae',
-      expected: '0.000000000000000001 ETH'
     }
   ]
   makeTests(truthyProtocolIdentifiers)
