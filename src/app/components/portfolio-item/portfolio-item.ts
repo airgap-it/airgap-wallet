@@ -66,10 +66,28 @@ export class PortfolioItemComponent {
         }
       })
     }
+    this.updateBalance()
     this.updateDelegationStatus()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
+      this.updateBalance()
       this.updateDelegationStatus()
     })
+  }
+
+  private async updateDelegationStatus() {
+    if (
+      this.wallet !== undefined &&
+      this.wallet.receivingPublicAddress !== undefined &&
+      (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))
+    ) {
+      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
+        this.wallet.coinProtocol as ICoinDelegateProtocol,
+        this.wallet.receivingPublicAddress
+      )
+    }
+  }
+
+  private updateBalance() {
     if (this.wallet !== undefined && this.wallet.currentBalance !== undefined) {
       const converter = new AmountConverterPipe()
       const currentBalance: BigNumber = this.wallet.currentBalance
@@ -83,19 +101,6 @@ export class PortfolioItemComponent {
         const decimals = balanceSplit.pop()
         this.numberOfDecimalsInBalance = decimals.length
       }
-    }
-  }
-
-  private async updateDelegationStatus() {
-    if (
-      this.wallet !== undefined &&
-      this.wallet.receivingPublicAddress !== undefined &&
-      (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))
-    ) {
-      this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-        this.wallet.coinProtocol as ICoinDelegateProtocol,
-        this.wallet.receivingPublicAddress
-      )
     }
   }
 
