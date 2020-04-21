@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AirGap Wallet</string>
+    <string name="title_activity_main">AirGap Wallet</string>
+    <string name="package_name">it.airgap.wallet</string>
+    <string name="custom_url_scheme">it.airgap.wallet</string>
+</resources>
