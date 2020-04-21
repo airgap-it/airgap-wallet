@@ -509,20 +509,20 @@
     "sort_label": "Sort Validators",
     "no_validators_found_label": "No validators matching your search have been found"
   },
-	"action-alert-tip": {
-		"heading": "Thank you for using AirGap!",
-		"text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
-		"cancel_label": "No",
-		"ok_label": "Yes!"
-	},
+  "action-alert-tip": {
+    "heading": "Thank you for using AirGap!",
+    "text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
+    "cancel_label": "No",
+    "ok_label": "Yes!"
+  },
 
-	"action-alert-delegation": {
-		"heading": "Thank you for using AirGap!",
-		"text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
-		"cancel_label": "No",
-		"ok_label": "Yes!"
-	},
-	
+  "action-alert-delegation": {
+    "heading": "Thank you for using AirGap!",
+    "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
+    "cancel_label": "No",
+    "ok_label": "Yes!"
+  },
+  
   "beacon-request": {
     "title": "Connection Request",
     "sign-data_label": "Do you want to sign the following data?",
@@ -535,6 +535,9 @@
     "done_label": "Done"
   },
   "settings-beacon": {
-    "title": "Beacon Settings"
+    "title": "Beacon Settings",
+    "remove-all_label": "",
+    "delete_label": "",
+    "no-peers": "Not connected to any peers"
   }
 }

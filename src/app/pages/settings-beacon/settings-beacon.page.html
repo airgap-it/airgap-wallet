@@ -3,9 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Beacon Settings</ion-title>
+    <ion-title>{{ 'settings-beacon.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="removeAllPeers()">Remove all</ion-button>
+      <ion-button (click)="removeAllPeers()">{{ 'settings-beacon.remove-all_label' | translate }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -14,7 +14,7 @@
   <div *ngIf="connectedPeers.length === 0" class="empty-list ion-padding-horizontal">
     <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
     <p>
-      Not connected to any peers
+      {{ 'settings-beacon.no-peers' | translate }}
     </p>
   </div>
   <ion-list lines="none">
@@ -23,7 +23,7 @@
         {{ peer.name }}
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="removePeer(peer)">Delete</ion-item-option>
+        <ion-item-option color="danger" (click)="removePeer(peer)">{{ 'settings-beacon.delete_label' | translate }}</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>

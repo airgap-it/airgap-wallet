@@ -1,14 +1,15 @@
+import {
+  BeaconBaseMessage,
+  BeaconMessageType,
+  BroadcastResponse,
+  OperationResponse,
+  SignPayloadResponse,
+  WalletClient
+} from '@airgap/beacon-sdk'
+import { P2PPairInfo } from '@airgap/beacon-sdk/dist/types/P2PPairInfo'
 import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
-import {
-  WalletClient,
-  BeaconBaseMessage,
-  BeaconMessageType,
-  OperationResponse,
-  BroadcastResponse,
-  SignPayloadResponse
-} from '@airgap/beacon-sdk'
 
 @Injectable({
   providedIn: 'root'
@@ -108,12 +109,12 @@ export class BeaconService {
     this.client.respond(message)
   }
 
-  public async getPeers(): Promise<string[]> {
+  public async getPeers(): Promise<P2PPairInfo[]> {
     return this.client.getPeers()
   }
 
-  public async removePeer(id: string): Promise<void> {
-    await this.client.removePeer(id)
+  public async removePeer(peer: P2PPairInfo): Promise<void> {
+    await this.client.removePeer(peer)
   }
 
   public async removeAllPeers(): Promise<void> {
