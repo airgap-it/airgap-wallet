@@ -394,15 +394,23 @@
     "heading": "In-App tzBTC swap not yet supported",
     "bitcoin-suisse": {
       "title": "Bitcoin Suisse",
-      "text": "As a regulated Swiss financial intermediary (SRO – VQF member), Bitcoin Suisse offers prime brokerage, storage, lending and other crypto-financial services."
+      "text": "Founded in 2013, Bitcoin Suisse has been a pioneer in providing crypto-financial services. Bitcoin Suisse has helped to shape the crypto-and blockchain-ecosystem in Switzerland. To receive TZBTC, you need to be fully onboarded as customer incl. all KYC /AML documentation. The minimum amount for trading with Bitcoin Suisse is 1 BTC or 1 TZBTC. Trading fees apply for each transaction."
     },
-     "woorton": {
-       "title": "Woorton",
-      "text": "Woorton provides 24/7 cryptocurrency liquidity to professional traders via secure chats or API connectivity."
+    "bity": {
+      "title": "Bity",
+      "text": "Founded in 2014, Bity SA is a leading crypto-financial services provider. It was founded on the conviction that blockchains, and other technologies for decentralization, will have some of the most profound social implications in history. As a regulated Swiss financial intermediary, Bity offers crypto-financial services and products for individuals and businesses globally, empowering people to always be in complete control of their own funds."
+    },
+    "sygnum": {
+      "title": "Sygnum",
+      "text": "Sygnum is the world’s first digital asset bank, and a digital asset specialist with global reach. Sygnum offers a portfolio of regulated banking services which seamlessly integrates traditional and digital assets into one account, including major national currencies, Bitcoin, Ethereum, a Digital CHF and asset tokens. Founded on Swiss and Singapore heritage, Sygnum empowers institutional clients to invest in the digital asset economy with complete trust."
     },
      "taurus": {
        "title": "Taurus",
-      "text": "Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
+      "text": "Taurus Group SA is a leading Swiss company in digital assets and blockchain. It was founded by senior executives with a background in banking, IT, cybersecurity and regulation. Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
+    },
+     "woorton": {
+       "title": "Woorton",
+      "text": "Woorton provides 24/7 cryptocurrency liquidity via API or voice trading. Their bank-grade trading infrastructure allows them to deploy capital on exchanges with proprietary trading algorithms and enhance the liquidity of all types of assets. They offer seamless access to digital assets and provide investors, brokerage desks and payments providers around the world. Woorton provides liquidity in tzBTC against 20 currencies including BTC, ETH, USD, EUR, CHF, GBP, stablecoins and more."
     },
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"

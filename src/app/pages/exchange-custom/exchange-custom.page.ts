@@ -13,13 +13,19 @@ export class ExchangeCustomPage {
   getTZBTC(gatekeeper: string) {
     switch (gatekeeper) {
       case 'bitcoin-suisse':
-        this.openUrl('https://www.bitcoinsuisse.com/')
+        this.openUrl('https://login.bitcoinsuisse.com/Account/Register')
         break
-      case 'woorton':
-        this.openUrl('https://www.woorton.com/')
+      case 'bity':
+        this.openUrl('mailto:tzBTC@bity.com')
+        break
+      case 'sygnum':
+        this.openUrl('mailto:info@sygnum.com')
         break
       case 'taurus':
-        this.openUrl('https://www.taurusgroup.ch/en')
+        this.openUrl('mailto:tradingdesk@taurusgroup.ch')
+        break
+      case 'woorton':
+        this.openUrl('https://www.woorton.com/tzBTC.php')
         break
     }
   }
