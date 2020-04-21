@@ -18,6 +18,7 @@ import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmo
 import { FormBuilder, Validators } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -160,15 +161,15 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   ): Promise<AirGapDelegatorDetails> {
     const [delegations, rewards] = await Promise.all([
       protocol.fetchDelegations(delegatorDetails.address),
-      protocol.nodeClient.fetchRewardForDelegation(delegatorDetails.address, validator)
+      protocol.fetchRewardForDelegation(delegatorDetails.address, validator)
     ])
 
     const delegatedAmount = new BigNumber(
       delegatorDetails.delegatees.includes(validator)
-        ? delegations.find(delegation => delegation.validator_address === validator).shares
+        ? delegations.find(delegation => delegation.validator_address === validator).balance
         : 0
     )
-    const totalDelegatedAmount = new BigNumber(delegations.map(delegation => parseFloat(delegation.shares)).reduce((a, b) => a + b, 0))
+    const totalDelegatedAmount = new BigNumber(delegations.map(delegation => parseFloat(delegation.balance)).reduce((a, b) => a + b, 0))
 
     const unclaimedRewards = new BigNumber(rewards)
 
@@ -263,7 +264,10 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const action = availableActions.find(action => types.includes(action.type))
 
     if (action) {
-      const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(maxAmount.shiftedBy(-protocol.decimals), 10)
+      const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(
+        maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
+        10
+      )
 
       const form = this.formBuilder.group({
         [ArgumentName.VALIDATOR]: validator,
@@ -273,7 +277,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           Validators.compose([
             Validators.required,
             Validators.min(new BigNumber(1).shiftedBy(-protocol.decimals).toNumber()),
-            Validators.max(new BigNumber(maxAmountFormatted).toNumber())
+            Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
+            DecimalValidator.validate(protocol.decimals)
           ])
         ]
       })

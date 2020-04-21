@@ -39,7 +39,7 @@ export class AmountConverterPipe implements PipeTransform {
         groupSize: 3
       }
     })
-    const amount = new BN(value).shiftedBy(-1 * args.protocol.decimals)
+    const amount = new BN(value).shiftedBy(-1 * args.protocol.decimals).decimalPlaces(args.protocol.decimals, BigNumber.ROUND_FLOOR)
 
     return this.formatBigNumber(amount, args.maxDigits)
   }
