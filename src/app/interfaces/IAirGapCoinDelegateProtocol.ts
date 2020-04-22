@@ -5,6 +5,8 @@ import BigNumber from 'bignumber.js'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
 import { UIRewardList } from '../models/widgets/display/UIRewardList'
+import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
+import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -12,46 +14,46 @@ export interface AirGapDelegateeUsageDetails {
   total: BigNumber
 }
 
-export interface AirGapMainDelegatorAction {
-  type?: any
-  isAvailable: boolean
-  description?: string
-  paramName?: string
-  form?: FormGroup
-  extraArgs?: UIInputWidget<any>[]
-}
-
-export interface AirGapExtraDelegatorAction {
+export interface AirGapDelegatorAction {
   type: any
-  label: string
-  confirmLabel: string
-  description?: string
   form?: FormGroup
   args?: UIInputWidget<any>[]
 }
 
+export interface AirGapMainDelegatorAction extends AirGapDelegatorAction {
+  isAvailable: boolean
+  description?: string
+}
+
+export interface AirGapExtraDelegatorAction extends AirGapDelegatorAction {
+  label: string
+  confirmLabel: string
+  description?: string
+}
+
 export interface AirGapDelegateeDetails extends DelegateeDetails {
-  usageDetails: AirGapDelegateeUsageDetails
+  usageDetails?: AirGapDelegateeUsageDetails
   displayDetails?: UIWidget[]
-  extraDetails?: any
 }
 
 export interface AirGapDelegatorDetails extends DelegatorDetails {
   delegateAction: AirGapMainDelegatorAction
   undelegateAction: AirGapMainDelegatorAction
-  changeDelegateeAction: AirGapMainDelegatorAction
   extraActions?: AirGapExtraDelegatorAction[]
   displayDetails?: UIWidget[]
   displayRewards?: UIRewardList
-  extraDetails?: any
+}
+
+export interface AirGapDelegationDetails {
+  delegator: AirGapDelegatorDetails
+  delegatees: AirGapDelegateeDetails[]
 }
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   airGapDelegatee?: string
   delegateeLabel: string
 
-  getExtraDelegateesDetails(addresses: string[]): Promise<Partial<AirGapDelegateeDetails>[]>
-  getExtraDelegatorDetailsFromAddress(address: string): Promise<Partial<AirGapDelegatorDetails>>
-
-  onDetailsChange(delegateesDetails: AirGapDelegateeDetails[], delegatorDetails: AirGapDelegatorDetails): Promise<void>
+  getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
+  createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
+  createAccountExtendedDetails(address: string): Promise<UIAccountExtendedDetails>
 }

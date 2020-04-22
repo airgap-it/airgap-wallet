@@ -21,15 +21,15 @@
               <ion-row>
                 <p class="font--size__large ion-no-margin">
                   <strong>
-                    {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
-                    }}
+                    {{ availableBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits:
+                    wallet.coinProtocol.decimals + 1 } }}
                   </strong>
                 </p>
               </ion-row>
               <ion-row>
                 <ion-text color="blackLight">
                   <p class="ion-no-margin">
-                    ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+                    ${{ availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
                     wallet.currentMarketPrice } | number: '1.2-2' }}
                   </p>
                 </ion-text>

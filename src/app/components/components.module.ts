@@ -31,6 +31,8 @@ import { WidgetIconText } from './widget-icon-text/widget-icon-text'
 import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetAccount } from './widget-account/widget-account'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
+import { WidgetAccountSummary } from './widget-account-summary/widget-account-summary'
+import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
 
 @NgModule({
   declarations: [
@@ -56,6 +58,8 @@ import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
     WidgetSelector,
     WidgetAccount,
+    WidgetAccountSummary,
+    WidgetAccountExtendedDetails,
     WidgetIconText,
     WidgetInputText,
     WidgetRewardList
@@ -95,6 +99,8 @@ import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 
     WidgetSelector,
     WidgetAccount,
+    WidgetAccountSummary,
+    WidgetAccountExtendedDetails,
     WidgetIconText,
     WidgetInputText,
     WidgetRewardList

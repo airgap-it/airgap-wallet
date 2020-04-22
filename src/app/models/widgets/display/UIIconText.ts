@@ -7,8 +7,6 @@ export interface UIIconTextConfig extends UIWidgetConfig {
 
   description?: string
   descriptionHTML?: string
-
-  onConnectedFormChanged?: (value?: any, widget?: UIIconText) => void
 }
 
 export class UIIconText extends UIWidget {

@@ -62,10 +62,7 @@ class ChangellyApi {
   private identifierExchangeToAirGapMap = new Map<string, string>()
   private identifierAirGapToExchangeMap = new Map<string, string>()
 
-  constructor(public http: HttpClient, private baseURL = 'https://swap.airgap.prod.gke.papers.tech/') {
-    this.identifierExchangeToAirGapMap.set('ae', 'eth-erc20-ae')
-    this.identifierAirGapToExchangeMap.set('eth-erc20-ae', 'ae')
-  }
+  constructor(public http: HttpClient, private baseURL = 'https://swap.airgap.prod.gke.papers.tech/') {}
 
   async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
     const wrapper: JsonRpcWrapper<T> = {

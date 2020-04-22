@@ -19,5 +19,14 @@ export class WidgetSelector {
     if (this.widgetForm && this.widget instanceof UIInputWidget) {
       this.widget.setFormControl(this.widgetForm.get(this.widget.id))
     }
+    this.widget.onInit()
+  }
+
+  ngAfterContentInit(): void {
+    this.widget.afterContentInit()
+  }
+
+  ngAfterViewInit(): void {
+    this.widget.afterViewInit()
   }
 }

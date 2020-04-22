@@ -1,0 +1,37 @@
+<ion-item lines="none" class="ion-no-padding ion-no-margin">
+  <ion-avatar slot="start">
+    <identicon [address]="widget.address"></identicon>
+  </ion-avatar>
+  <ion-label>
+    <ion-text color="black">
+      <ion-row class="ion-no-padding">
+        <ion-col size="9" class="ion-no-padding">
+          <h2 class="font--weight__bold">
+            {{ widget.header[0] }}
+          </h2>
+        </ion-col>
+        <ion-col size="3" class="ion-text-end ion-no-padding">
+          <p class="ion-no-margin">
+            {{ widget.header[1] }}
+          </p>
+        </ion-col>
+      </ion-row>
+    </ion-text>
+    <ion-row class="ion-no-padding">
+      <ion-col size="4" class="ion-no-padding">
+        <ion-text color="blackLight">
+          <p class="ion-no-margin typography--mono">
+            {{ widget.description[0] }}
+          </p>
+        </ion-text>
+      </ion-col>
+      <ion-col size="8" class="ion-text-end ion-no-padding">
+        <ion-text color="blackLight">
+          <p class="ion-no-margin">
+            {{ widget.description[1] }}
+          </p>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-label>
+</ion-item>

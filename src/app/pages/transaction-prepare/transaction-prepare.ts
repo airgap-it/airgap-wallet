@@ -23,6 +23,7 @@ import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 })
 export class TransactionPreparePage {
   public wallet: AirGapMarketWallet
+  public availableBalance: BigNumber
   public transactionForm: FormGroup
   public amountForm: FormGroup
   public feeCurrentMarketPrice: number
@@ -47,7 +48,7 @@ export class TransactionPreparePage {
     private readonly dataService: DataService
   ) {
     let address = ''
-    let wallet
+    let wallet: AirGapMarketWallet
     let amount = 0
 
     if (this.route.snapshot.data.special) {
@@ -56,7 +57,6 @@ export class TransactionPreparePage {
       amount = info.amount || 0
       wallet = info.wallet
       this.setWallet(wallet)
-
       this.transactionForm = formBuilder.group({
         address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
         amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
@@ -108,9 +108,11 @@ export class TransactionPreparePage {
       this.calculatePolkadotFee()
     }
   }
+
   public async setWallet(wallet: AirGapMarketWallet) {
     this.wallet = wallet
-    if (wallet.protocolIdentifier === 'xtz-btc') {
+
+    if (wallet.protocolIdentifier === ProtocolSymbols.TZBTC) {
       const newWallet = new AirGapMarketWallet(
         'xtz',
         'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
@@ -121,6 +123,16 @@ export class TransactionPreparePage {
       this.feeCurrentMarketPrice = newWallet.currentMarketPrice.toNumber()
     } else {
       this.feeCurrentMarketPrice = wallet.currentMarketPrice.toNumber()
+    }
+    // TODO: refactor this so that we do not need to check for the protocols
+    if (
+      wallet.protocolIdentifier === ProtocolSymbols.COSMOS ||
+      wallet.protocolIdentifier === ProtocolSymbols.KUSAMA ||
+      wallet.protocolIdentifier === ProtocolSymbols.POLKADOT
+    ) {
+      this.availableBalance = new BigNumber(await wallet.coinProtocol.getAvailableBalanceOfAddresses([this.wallet.addresses[0]]))
+    } else {
+      this.availableBalance = this.wallet.currentBalance
     }
   }
 

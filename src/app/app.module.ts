@@ -57,6 +57,7 @@ import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
 import { ExtensionsService } from './services/extensions/extensions.service'
+import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -106,6 +107,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     Keyboard,
     AmountConverterPipe,
     DecimalPipe,
+    ShortenStringPipe,
     MarketDataService,
     DrawChartService,
     Deeplinks,
