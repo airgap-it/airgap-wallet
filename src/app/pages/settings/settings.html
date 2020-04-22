@@ -77,9 +77,18 @@
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
         {{ 'settings.about_label' | translate }}
       </ion-item>
+    </ion-list>
+    <ion-list lines="none">
+      <ion-list-header class="ion-no-margin" lines="none">
+        <ion-label>{{ 'settings.beacon.label' | translate }}</ion-label>
+      </ion-list-header>
       <ion-item (click)="beaconSettings()" detail>
+        <ion-icon src="/assets/img/beacon_logo_black.svg" slot="start"></ion-icon>
+        {{ 'settings.beacon.settings_label' | translate }}
+      </ion-item>
+      <ion-item (click)="aboutBeacon()" detail>
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
-        {{ 'settings.beacon-settings_label' | translate }}
+        {{ 'settings.beacon.about_label' | translate }}
       </ion-item>
     </ion-list>
     <ion-list lines="none">

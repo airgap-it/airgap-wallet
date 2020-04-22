@@ -139,7 +139,11 @@
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
     },
-    "beacon-settings_label": "Beacon Settings"
+    "beacon": {
+      "label": "Beacon",
+      "settings_label": "Beacon Settings",
+      "about_label": "About Beacon"
+    }
   },
 
   "select-wallet": {
