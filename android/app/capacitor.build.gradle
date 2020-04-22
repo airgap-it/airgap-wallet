@@ -19,7 +19,7 @@ dependencies {
 }
 apply from: "../../node_modules/cordova-android-support-gradle-release/cordova-android-support-gradle-release.gradle"
 apply from: "../../node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle"
-apply from: "../../node_modules/cordova-support-google-services/build.gradle"
+//apply from: "../../node_modules/cordova-support-google-services/build.gradle"
 apply from: "../../node_modules/phonegap-plugin-multidex/multidex.gradle"
 
 if (hasProperty('postBuildExtras')) {
