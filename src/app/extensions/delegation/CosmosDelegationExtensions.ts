@@ -159,9 +159,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatorDetails: DelegatorDetails,
     validator: string
   ): Promise<AirGapDelegatorDetails> {
-    const [delegations, rewards] = await Promise.all([
+    const [delegations, availableBalance, rewards] = await Promise.all([
       protocol.fetchDelegations(delegatorDetails.address),
-      protocol.fetchRewardForDelegation(delegatorDetails.address, validator)
+      protocol.fetchAvailableBalance(delegatorDetails.address).then(availableBalance => new BigNumber(availableBalance)),
+      protocol
+        .fetchRewardForDelegation(delegatorDetails.address, validator)
+        .then(rewards => new BigNumber(rewards))
+        .catch(() => new BigNumber(0))
     ])
 
     const delegatedAmount = new BigNumber(
@@ -171,13 +175,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
     const totalDelegatedAmount = new BigNumber(delegations.map(delegation => parseFloat(delegation.balance)).reduce((a, b) => a + b, 0))
 
-    const unclaimedRewards = new BigNumber(rewards)
-
-    const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, delegatedAmount, totalDelegatedAmount)
+    const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
-    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, unclaimedRewards)
+    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, rewards)
 
-    const displayDetails = this.createDisplayDetails(protocol, totalDelegatedAmount, unclaimedRewards)
+    const displayDetails = this.createDisplayDetails(protocol, totalDelegatedAmount, rewards)
 
     return {
       ...delegatorDetails,
@@ -192,19 +194,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
-    delegatedAmount: BigNumber,
-    totalDelegatedAmount: BigNumber
+    availableBalance: BigNumber,
+    delegatedAmount: BigNumber
   ): AirGapMainDelegatorAction {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
 
-    const maxDelegationAmount = new BigNumber(delegatorDetails.balance).minus(totalDelegatedAmount).minus(requiredFee)
+    const maxDelegationAmount = availableBalance.minus(requiredFee)
 
     const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
     })
 
-    const totalDelegatedFormatted = this.amountConverterPipe.transform(maxDelegationAmount, {
+    const maxDelegationFormatted = this.amountConverterPipe.transform(maxDelegationAmount, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
     })
@@ -218,7 +220,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const extraDescription = canDelegate
       ? ` You can ${
           hasDelegated ? 'additionally' : ''
-        } delegate up to <span class="style__strong color__primary">${totalDelegatedFormatted}</span>.`
+        } delegate up to <span class="style__strong color__primary">${maxDelegationFormatted}</span> (after transaction fees).`
       : ''
 
     return this.createMainDelegatorAction(
