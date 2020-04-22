@@ -4,6 +4,12 @@
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "cordovaSwiftVersion": "5.0"
+  },
   "cordova": {
     "preferences": {
       "webviewbounce": "false",
