@@ -146,6 +146,10 @@ export class SettingsPage {
     this.openUrl('https://airgap.it/#faq')
   }
 
+  public aboutBeacon(): void {
+    this.openUrl('https://walletbeacon.io')
+  }
+
   private openUrl(url: string): void {
     if (this.platform.is('ios') || this.platform.is('android')) {
       cordova.InAppBrowser.open(url, '_system', 'location=true')
