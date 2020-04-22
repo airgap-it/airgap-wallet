@@ -67,7 +67,7 @@
     }
   },
   "dependencies": {
-    "@airgap/beacon-sdk": "0.0.3-beta.6",
+    "@airgap/beacon-sdk": "0.0.3-beta.9",
     "@angular/animations": "^9.1.2",
     "@angular/common": "^9.1.2",
     "@angular/core": "^9.1.2",

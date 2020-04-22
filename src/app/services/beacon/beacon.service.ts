@@ -1,12 +1,13 @@
 import {
-  BeaconBaseMessage,
   BeaconMessageType,
-  BroadcastResponse,
-  OperationResponse,
-  SignPayloadResponse,
+  BeaconRequestOutputMessage,
+  BeaconResponseInputMessage,
+  BroadcastResponseInput,
+  OperationResponseInput,
+  P2PPairInfo,
+  SignPayloadResponseInput,
   WalletClient
 } from '@airgap/beacon-sdk'
-import { P2PPairInfo } from '@airgap/beacon-sdk/dist/types/P2PPairInfo'
 import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
@@ -25,25 +26,24 @@ export class BeaconService {
   }
 
   public async init(): Promise<boolean> {
-    this.client = new WalletClient('AirGapWallet')
+    this.client = new WalletClient({ name: 'AirGapWallet' })
     await this.client.init()
 
-    return this.client.connect(message => {
+    return this.client.connect(async message => {
       console.log('WALLET gotEncryptedMessage:', message)
 
       console.log('typeof', typeof message)
 
-      this.presentModal(message, { pubKey: 'not available yet' })
+      await this.presentModal(message)
     })
   }
 
-  async presentModal(request: BeaconBaseMessage, dappInfo: { pubKey: string }) {
+  async presentModal(request: BeaconRequestOutputMessage) {
     console.log('presentModal')
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
       componentProps: {
         request,
-        dappInfo,
         client: this.client,
         beaconService: this
       }
@@ -60,30 +60,27 @@ export class BeaconService {
     // TODO: Refactor this once we have IDs in the serializer between Wallet <=> Vault
     this.requests = this.requests.filter(request => {
       if (signedMessage === request[1]) {
-        const broadcastResponse: BroadcastResponse = {
+        const broadcastResponse: BroadcastResponseInput = {
           id: request[0],
           type: BeaconMessageType.BroadcastResponse,
-          beaconId: '',
           transactionHash: hash
         }
         this.respond(broadcastResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1])) {
-        const signPayloadResponse: SignPayloadResponse = {
+        const signPayloadResponse: SignPayloadResponseInput = {
           id: request[0],
           type: BeaconMessageType.SignPayloadResponse,
-          beaconId: '',
           signature: signedMessage.substr(signedMessage.length - 128)
         }
         this.respond(signPayloadResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1].binaryTransaction)) {
-        const operationResponse: OperationResponse = {
+        const operationResponse: OperationResponseInput = {
           id: request[0],
           type: BeaconMessageType.OperationResponse,
-          beaconId: '',
           transactionHash: hash
         }
         this.respond(operationResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
@@ -97,7 +94,7 @@ export class BeaconService {
     })
   }
 
-  public async respond(message: BeaconBaseMessage): Promise<void> {
+  public async respond(message: BeaconResponseInputMessage): Promise<void> {
     if (!this.client) {
       throw new Error('Client not ready')
     }
