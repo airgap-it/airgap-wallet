@@ -9,23 +9,5 @@
   },
   "ios": {
     "cordovaSwiftVersion": "5.0"
-  },
-  "cordova": {
-    "preferences": {
-      "webviewbounce": "false",
-      "UIWebViewBounce": "false",
-      "DisallowOverscroll": "true",
-      "android-minSdkVersion": "19",
-      "BackupWebStorage": "none",
-      "SplashMaintainAspectRatio": "true",
-      "FadeSplashScreenDuration": "300",
-      "SplashShowOnlyFirstTime": "false",
-      "SplashScreen": "screen",
-      "SplashScreenDelay": "10000",
-      "orientation": "portrait",
-      "cordova.plugins.diagnostic.modules": "CAMERA",
-      "UseScheme": "true",
-      "MixedContentMode": "1"
-    }
   }
 }

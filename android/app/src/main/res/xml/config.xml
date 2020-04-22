@@ -64,18 +64,4 @@
   </feature>
 
   
-  <preference name="webviewbounce" value="false" />
-  <preference name="UIWebViewBounce" value="false" />
-  <preference name="DisallowOverscroll" value="true" />
-  <preference name="android-minSdkVersion" value="19" />
-  <preference name="BackupWebStorage" value="none" />
-  <preference name="SplashMaintainAspectRatio" value="true" />
-  <preference name="FadeSplashScreenDuration" value="300" />
-  <preference name="SplashShowOnlyFirstTime" value="false" />
-  <preference name="SplashScreen" value="screen" />
-  <preference name="SplashScreenDelay" value="10000" />
-  <preference name="orientation" value="portrait" />
-  <preference name="cordova.plugins.diagnostic.modules" value="CAMERA" />
-  <preference name="UseScheme" value="true" />
-  <preference name="MixedContentMode" value="1" />
 </widget>
