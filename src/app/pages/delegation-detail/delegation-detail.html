@@ -120,7 +120,7 @@
           class="ion-padding-horizontal"
           [(ngModel)]="activeDelegatorAction"
           (ionChange)="onActiveActionChange()"
-          *ngIf="multipleActionsAvailable"
+          *ngIf="shouldDisplaySegmentButtons"
         >
           <ion-segment-button [value]="delegateActionId" *ngIf="(delegatorDetails$ | async).delegateAction.isAvailable">
             <ion-label>Delegate</ion-label>
@@ -133,7 +133,7 @@
           </ion-segment-button>
         </ion-segment>
 
-        <div [ngClass]="{'segment--container': multipleActionsAvailable}">
+        <div [ngClass]="{'segment--container': shouldDisplaySegmentButtons}">
           <ng-container *ngIf="activeDelegatorAction === delegateActionId">
             <ion-row class="ion-padding-horizontal" *ngIf="(delegatorDetails$ | async).delegateAction.description">
               <ion-col size="12">

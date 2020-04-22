@@ -52,14 +52,16 @@ export class DelegationDetailPage {
 
   public canProceed: boolean = true
 
-  public get multipleActionsAvailable(): boolean {
+  public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
     const mainActions = [details.delegateAction, details.undelegateAction]
 
-    const availableActions =
-      mainActions.filter(action => action.isAvailable).length + (details.extraActions ? details.extraActions.length : 0)
+    const availableActions = [
+      ...mainActions.filter(action => action.isAvailable),
+      ...(details.extraActions ? details.extraActions.length : [])
+    ]
 
-    return availableActions > 1
+    return availableActions.length > 1 || availableActions.some(action => !!action.description || !!action.args)
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
