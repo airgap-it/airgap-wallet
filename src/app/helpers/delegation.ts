@@ -29,6 +29,7 @@ export function supportsAirGapDelegation(protocol: ICoinProtocol): protocol is I
   return (
     delegateProtocol.delegateeLabel !== undefined &&
     !!delegateProtocol.getExtraDelegationDetailsFromAddress &&
-    !!delegateProtocol.createDelegateesSummary
+    !!delegateProtocol.createDelegateesSummary &&
+    !!delegateProtocol.createAccountExtendedDetails
   )
 }

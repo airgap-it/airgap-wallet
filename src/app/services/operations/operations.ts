@@ -30,6 +30,7 @@ import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +64,19 @@ export class OperationsProvider {
             description: [details.address, '']
           })
       )
+    }
+  }
+
+  public async getAccountExtendedDetails(wallet: AirGapMarketWallet): Promise<UIAccountExtendedDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    if (supportsAirGapDelegation(protocol)) {
+      return protocol.createAccountExtendedDetails(wallet.receivingPublicAddress)
+    } else {
+      return new UIAccountExtendedDetails({ items: [] })
     }
   }
 

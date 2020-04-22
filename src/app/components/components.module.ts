@@ -32,6 +32,7 @@ import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetAccount } from './widget-account/widget-account'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetAccountSummary } from './widget-account-summary/widget-account-summary'
+import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { WidgetAccountSummary } from './widget-account-summary/widget-account-su
     WidgetSelector,
     WidgetAccount,
     WidgetAccountSummary,
+    WidgetAccountExtendedDetails,
     WidgetIconText,
     WidgetInputText,
     WidgetRewardList
@@ -98,6 +100,7 @@ import { WidgetAccountSummary } from './widget-account-summary/widget-account-su
     WidgetSelector,
     WidgetAccount,
     WidgetAccountSummary,
+    WidgetAccountExtendedDetails,
     WidgetIconText,
     WidgetInputText,
     WidgetRewardList

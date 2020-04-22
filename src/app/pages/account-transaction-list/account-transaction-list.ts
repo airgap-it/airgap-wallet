@@ -21,6 +21,8 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
+import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
+import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 declare let cordova
 export const refreshRate = 3000
@@ -53,6 +55,8 @@ export class AccountTransactionListPage {
   public pendingTransactions: IAirGapTransaction[] = []
   public formattedExchangeTransactions: IAirGapTransaction[] = []
 
+  public accountExtendedDetails: UIAccountExtendedDetails
+
   // XTZ
   public isKtDelegated: boolean = false
 
@@ -64,6 +68,8 @@ export class AccountTransactionListPage {
 
   private readonly TRANSACTION_LIMIT: number = 10
   private readonly actionGroup: ActionGroup
+
+  private readonly walletChanged: Subscription
 
   constructor(
     public readonly alertCtrl: AlertController,
@@ -80,12 +86,18 @@ export class AccountTransactionListPage {
     private readonly storageProvider: StorageProvider,
     private readonly toastController: ToastController,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly exchangeProvider: ExchangeProvider
+    private readonly exchangeProvider: ExchangeProvider,
+    private readonly extensionsService: ExtensionsService
   ) {
     const info = this.route.snapshot.data.special
     if (this.route.snapshot.data.special) {
       this.wallet = info.wallet
     }
+
+    this.updateExtendedDetails()
+    this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
+      this.updateExtendedDetails()
+    })
 
     this.subscription = this.timer$.subscribe(async () => {
       if (this.formattedExchangeTransactions.length > 0) {
@@ -368,7 +380,16 @@ export class AccountTransactionListPage {
     toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  private updateExtendedDetails() {
+    if (supportsDelegation(this.wallet.coinProtocol) && this.wallet.receivingPublicAddress !== undefined) {
+      this.extensionsService.loadDelegationExtensions().then(async () => {
+        this.accountExtendedDetails = await this.operationsProvider.getAccountExtendedDetails(this.wallet)
+      })
+    }
+  }
+
   public ngOnDestroy(): void {
     this.subscription.unsubscribe()
+    this.walletChanged.unsubscribe()
   }
 }

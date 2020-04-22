@@ -19,6 +19,7 @@ import { FormBuilder, Validators } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -99,6 +100,36 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
+  public async createAccountExtendedDetails(protocol: CosmosProtocol, address: string): Promise<UIAccountExtendedDetails> {
+    const results = await Promise.all([
+      protocol.getAvailableBalanceOfAddresses([address]),
+      protocol.fetchTotalDelegatedAmount(address),
+      protocol.fetchTotalUnbondingAmount(address),
+      protocol.fetchTotalReward(address)
+    ])
+    const items: UIAccountExtendedDetailsItem[] = [
+      {
+        label: 'account-transaction-detail.available_label',
+        text: `${this.amountConverterPipe.transformValueOnly(results[0], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+      },
+      {
+        label: 'account-transaction-detail.delegated_label',
+        text: `${this.amountConverterPipe.transformValueOnly(results[1], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+      },
+      {
+        label: 'account-transaction-detail.unbonding_label',
+        text: `${this.amountConverterPipe.transformValueOnly(results[2], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+      },
+      {
+        label: 'account-transaction-detail.reward_label',
+        text: `${this.amountConverterPipe.transformValueOnly(results[3], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+      }
+    ]
+    return new UIAccountExtendedDetails({
+      items: items
+    })
+  }
+
   private async getExtraValidatorDetails(protocol: CosmosProtocol, validatorDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
     const results = await Promise.all([
       protocol.nodeClient.fetchValidator(validatorDetails.address),
@@ -161,7 +192,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   ): Promise<AirGapDelegatorDetails> {
     const [delegations, availableBalance, rewards] = await Promise.all([
       protocol.fetchDelegations(delegatorDetails.address),
-      protocol.fetchAvailableBalance(delegatorDetails.address).then(availableBalance => new BigNumber(availableBalance)),
+      protocol.getAvailableBalanceOfAddresses([delegatorDetails.address]).then(availableBalance => new BigNumber(availableBalance)),
       protocol
         .fetchRewardForDelegation(delegatorDetails.address, validator)
         .then(rewards => new BigNumber(rewards))

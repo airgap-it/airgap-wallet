@@ -6,6 +6,15 @@
       <ion-row class="ion-justify-content-center"><div class="line"></div></ion-row>
     </ion-col>
     <ion-col size="9" class="ion-padding-bottom">
+      <ng-container *ngIf="transaction.extra">
+        <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.type_label' | translate }}</ion-label>
+        <div class="ion-padding-bottom">
+          <span class="typography--mono">
+            {{ transaction.extra }}
+          </span>
+        </div>
+      </ng-container>
+
       <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="ion-padding-bottom">
         <span class="typography--mono ion-padding-bottom">
