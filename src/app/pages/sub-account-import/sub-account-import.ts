@@ -29,6 +29,7 @@ export class SubAccountImportPage {
     this.accountProvider.wallets
       .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocolIdentifier === this.subProtocolIdentifier.split('-')[0])))
       .subscribe(mainAccounts => {
+        const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
@@ -38,10 +39,13 @@ export class SubAccountImportPage {
               mainAccount.derivationPath
             )
             airGapMarketWallet.addresses = mainAccount.addresses
-            airGapMarketWallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+            promises.push(airGapMarketWallet.synchronize())
             this.subWallets.push(airGapMarketWallet)
           }
         })
+        Promise.all(promises)
+          .then(() => this.accountProvider.triggerWalletChanged())
+          .catch(handleErrorSentry(ErrorCategory.COINLIB))
       })
   }
 
