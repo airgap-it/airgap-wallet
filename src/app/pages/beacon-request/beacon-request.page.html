@@ -93,21 +93,21 @@
           <from-to [transaction]="transaction"></from-to>
         </ng-container>
       </div>
-
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-button shape="round" color="secondary" (click)="dismiss()">
-          {{ 'beacon-request.done_label' | translate }}
-        </ion-button>
-
-        <ion-button shape="round" color="primary" (click)="done()">
-          <ng-container *ngIf="request.type !== 'permission_request'">
-            {{ 'beacon-request.continue_label' | translate }}
-          </ng-container>
-          <ng-container *ngIf="request.type === 'permission_request'">
-            {{ 'beacon-request.connect_label' | translate }}
-          </ng-container>
-        </ion-button>
-      </ion-fab>
     </ng-container>
   </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="dismiss()">
+      test{{ 'beacon-request.done_label' | translate }}
+    </ion-button>
+
+    <ion-button shape="round" color="primary" (click)="done()">
+      <ng-container *ngIf="request.type !== 'permission_request'">
+        test{{ 'beacon-request.continue_label' | translate }}
+      </ng-container>
+      <ng-container *ngIf="request.type === 'permission_request'">
+        test{{ 'beacon-request.connect_label' | translate }}
+      </ng-container>
+    </ion-button>
+  </ion-fab>
 </ion-content>

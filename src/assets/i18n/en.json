@@ -540,8 +540,8 @@
   },
   "settings-beacon": {
     "title": "Beacon Settings",
-    "remove-all_label": "",
-    "delete_label": "",
+    "remove-all_label": "Remove All",
+    "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
   }
 }
