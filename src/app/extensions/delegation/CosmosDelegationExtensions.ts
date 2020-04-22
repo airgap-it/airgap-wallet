@@ -229,6 +229,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       validator,
       [CosmosDelegationActionType.DELEGATE],
       maxDelegationAmount,
+      new BigNumber(1),
       baseDescription + extraDescription
     )
   }
@@ -251,6 +252,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       validator,
       [CosmosDelegationActionType.UNDELEGATE],
       delegatedAmount,
+      new BigNumber(1),
       description
     )
   }
@@ -261,11 +263,12 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     types: CosmosDelegationActionType[],
     maxAmount: BigNumber,
+    minAmount: BigNumber,
     description: string
   ): AirGapMainDelegatorAction {
     const action = availableActions.find(action => types.includes(action.type))
 
-    if (action) {
+    if (action && maxAmount.gte(minAmount)) {
       const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(
         maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
         10
@@ -278,7 +281,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           maxAmountFormatted,
           Validators.compose([
             Validators.required,
-            Validators.min(new BigNumber(1).shiftedBy(-protocol.decimals).toNumber()),
+            Validators.min(new BigNumber(minAmount).shiftedBy(-protocol.decimals).toNumber()),
             Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
             DecimalValidator.validate(protocol.decimals)
           ])
