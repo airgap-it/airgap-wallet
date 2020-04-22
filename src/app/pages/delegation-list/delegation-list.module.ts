@@ -7,18 +7,18 @@ import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
 
-import { PipesModule } from './../../pipes/pipes.module'
-import { DelegationValidatorListPage } from './delegation-validator-list.page'
+import { PipesModule } from '../../pipes/pipes.module'
+import { DelegationListPage } from './delegation-list.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: DelegationValidatorListPage
+    component: DelegationListPage
   }
 ]
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, PipesModule, RouterModule.forChild(routes)],
-  declarations: [DelegationValidatorListPage]
+  declarations: [DelegationListPage]
 })
-export class DelegationValidatorListPageModule {}
+export class DelegationListPageModule {}

@@ -12,15 +12,14 @@ export function supportsDelegation(protocol: ICoinProtocol): protocol is ICoinDe
   }
 
   return (
-    delegateProtocol.supportsMultipleDelegatees !== undefined &&
     !!delegateProtocol.getDefaultDelegatee &&
     !!delegateProtocol.getCurrentDelegateesForPublicKey &&
     !!delegateProtocol.getCurrentDelegateesForAddress &&
-    !!delegateProtocol.getDelegateesDetails &&
+    !!delegateProtocol.getDelegateeDetails &&
     !!delegateProtocol.isPublicKeyDelegating &&
     !!delegateProtocol.isAddressDelegating &&
-    !!delegateProtocol.getDelegatorDetailsFromPublicKey &&
-    !!delegateProtocol.getDelegatorDetailsFromAddress &&
+    !!delegateProtocol.getDelegationDetailsFromPublicKey &&
+    !!delegateProtocol.getDelegationDetailsFromAddress &&
     !!delegateProtocol.prepareDelegatorActionFromPublicKey
   )
 }
@@ -29,8 +28,7 @@ export function supportsAirGapDelegation(protocol: ICoinProtocol): protocol is I
   const delegateProtocol = protocol as IAirGapCoinDelegateProtocol
   return (
     delegateProtocol.delegateeLabel !== undefined &&
-    !!delegateProtocol.getExtraDelegateesDetails &&
-    !!delegateProtocol.getExtraDelegatorDetailsFromAddress &&
-    !!delegateProtocol.onDetailsChange
+    !!delegateProtocol.getExtraDelegationDetailsFromAddress &&
+    !!delegateProtocol.createDelegateesSummary
   )
 }

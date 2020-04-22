@@ -4,7 +4,6 @@ import { Observable, Subscription } from 'rxjs'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -75,11 +74,7 @@ export class PortfolioItemComponent {
   }
 
   private async updateDelegationStatus() {
-    if (
-      this.wallet !== undefined &&
-      this.wallet.receivingPublicAddress !== undefined &&
-      (this.wallet.protocolIdentifier === ProtocolSymbols.COSMOS || supportsDelegation(this.wallet.coinProtocol))
-    ) {
+    if (this.wallet !== undefined && this.wallet.receivingPublicAddress !== undefined && supportsDelegation(this.wallet.coinProtocol)) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
         this.wallet.coinProtocol as ICoinDelegateProtocol,
         this.wallet.receivingPublicAddress

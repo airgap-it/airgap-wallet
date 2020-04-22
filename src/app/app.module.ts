@@ -55,6 +55,7 @@ import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { ExtensionsService } from './services/extensions/extensions.service'
+import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -103,6 +104,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     Keyboard,
     AmountConverterPipe,
     DecimalPipe,
+    ShortenStringPipe,
     MarketDataService,
     DrawChartService,
     Deeplinks,

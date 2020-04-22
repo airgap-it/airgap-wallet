@@ -21,7 +21,6 @@ export interface UIInputTextConfig extends UIInputWidgetConfig {
   toggleFixedValueButton?: string
 
   onValueChanged?: (value?: string, widget?: UIInputText) => void
-  onConnectedFormChanged?: (value?: any, widget?: UIInputText) => void
 }
 
 export class UIInputText extends UIInputWidget<string> {
