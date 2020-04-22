@@ -21,7 +21,7 @@ export class ExtensionsService {
     [PolkadotProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
     [
       TezosProtocol,
-      () => TezosDelegationExtensions.create(this.remoteConfigProvider, this.decimalPipe, this.amountConverterPipe, this.formBuilder)
+      async () => TezosDelegationExtensions.create(this.remoteConfigProvider, this.decimalPipe, this.amountConverterPipe, this.formBuilder)
     ],
     [
       CosmosProtocol,

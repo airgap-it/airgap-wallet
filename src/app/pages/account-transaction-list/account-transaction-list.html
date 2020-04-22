@@ -41,6 +41,11 @@
       (click)="openPreparePage()"
     ></card-actionable>
 
+    <widget-account-extended-details
+      *ngIf="accountExtendedDetails !== undefined"
+      [widget]="accountExtendedDetails"
+    ></widget-account-extended-details>
+
     <transaction-list
       [transactionType]="'pendingTransaction'"
       [hasPendingTransactions]="hasPendingTransactions"
@@ -93,10 +98,6 @@
       [initialTransactionsLoaded]="initialTransactionsLoaded"
       [wallet]="wallet"
     ></transaction-list>
-
-    <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
-      <ion-infinite-scroll-content></ion-infinite-scroll-content>
-    </ion-infinite-scroll>
 
     <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>

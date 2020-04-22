@@ -1,0 +1,18 @@
+<ng-container *ngFor="let item of widget.items">
+  <ion-row class="ion-padding-horizontal ion-padding-top">
+    <ion-col>
+      <ion-text color="blackLight">
+        <h3 class="typography--mono ion-no-margin">
+          {{ item.label | translate }}
+        </h3>
+      </ion-text>
+    </ion-col>
+    <ion-col>
+      <p class="ion-text-end ion-no-margin">
+        <strong>
+          {{ item.text }}
+        </strong>
+      </p>
+    </ion-col>
+  </ion-row>
+</ng-container>

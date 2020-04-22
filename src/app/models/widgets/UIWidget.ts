@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs'
 export enum UIWidgetType {
   ACCOUNT = 'account',
   ACCOUNT_SUMMARY = 'account_summary',
+  ACCOUNT_EXTENDED_DETAILS = 'account_extended_details',
   CHECKBOX = 'checkbox',
   ICON_TEXT = 'icon_text',
   INPUT_TEXT = 'input_text',

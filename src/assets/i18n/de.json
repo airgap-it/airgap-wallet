@@ -90,6 +90,7 @@
   "wallet-import.syncing_label": "Synchronisieren...",
   "wallet-import.cancel_label": "Abbrechen",
   "wallet-import.import_label": "Importieren",
+  "from-to.type": "Transaktionstyp",
   "from-to.amount_label": "Betrag",
   "from-to.fee_label": "Gebühr",
   "from-to.time_label": "ZEIT",
