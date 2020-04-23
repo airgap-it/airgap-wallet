@@ -156,12 +156,16 @@ export class ExchangePage {
 
     this.loadWalletsForSelectedFromProtocol()
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async setToProtocol(protocol: ICoinProtocol): Promise<void> {
     this.selectedToProtocol = protocol
     this.loadWalletsForSelectedToProtocol()
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   private loadWalletsForSelectedFromProtocol() {
@@ -198,11 +202,15 @@ export class ExchangePage {
   async setFromWallet(wallet: AirGapMarketWallet) {
     this.fromWallet = wallet
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async setToWallet(wallet: AirGapMarketWallet) {
     this.toWallet = wallet
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async amountSet(amount: string) {
