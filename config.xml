@@ -117,24 +117,16 @@
     </plugin>
     <plugin name="cordova-plugin-app-version" spec="0.1.9" />
     <plugin name="cordova-plugin-inappbrowser" spec="^1.7.2" />
-    <plugin name="cordova-plugin-add-swift-support" spec="^1.7.2" />
     <plugin name="com.lampa.startapp" spec="^6.1.6" />
     <plugin name="cordova-plugin-qrscanner" spec="3.0.1" />
     <plugin name="cordova-sqlite-storage" spec="2.6.0" />
-    <plugin name="cordova-plugin-ionic-keyboard" spec="2.1.3" />
     <plugin name="cordova-clipboard" spec="1.2.1" />
     <plugin name="cordova.plugins.diagnostic" spec="4.0.12">
         <variable name="ANDROID_SUPPORT_VERSION" value="28.+" />
     </plugin>
-    <plugin name="cordova-plugin-ionic-webview" spec="^2.3.1">
-        <variable name="ANDROID_SUPPORT_ANNOTATIONS_VERSION" value="28.+" />
-    </plugin>
     <plugin name="phonegap-plugin-push" spec="2.2.3">
         <variable name="ANDROID_SUPPORT_V13_VERSION" value="28.+" />
         <variable name="FCM_VERSION" value="11.6.2" />
-    </plugin>
-    <plugin name="cordova-android-support-gradle-release" spec="3.0.1">
-        <variable name="ANDROID_SUPPORT_VERSION" value="28.+" />
     </plugin>
     <plugin name="ionic-plugin-deeplinks" spec="https://github.com/airgap-it/ionic-plugin-deeplinks#cordova-ios-v5.0.0-fix">
         <variable name="URL_SCHEME" value="airgap-wallet" />
