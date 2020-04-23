@@ -10,7 +10,6 @@ import { RouteReuseStrategy } from '@angular/router'
 import { AppVersion } from '@ionic-native/app-version/ngx'
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Clipboard } from '@ionic-native/clipboard/ngx'
-import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { Keyboard } from '@ionic-native/keyboard/ngx'
 import { Push } from '@ionic-native/push/ngx'
@@ -112,7 +111,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ShortenStringPipe,
     MarketDataService,
     DrawChartService,
-    Deeplinks,
     Clipboard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     ScannerProvider,

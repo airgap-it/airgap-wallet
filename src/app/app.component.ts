@@ -1,9 +1,8 @@
-import { Component, Inject } from '@angular/core'
+import { Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
-import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
+import { AppPlugin, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle, AppUrlOpen } from '@capacitor/core'
 
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
@@ -16,7 +15,7 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'app-root',
@@ -28,7 +27,6 @@ export class AppComponent {
   constructor(
     private readonly platform: Platform,
     private readonly translate: TranslateService,
-    private readonly deeplinks: Deeplinks,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
     private readonly protocolsProvider: ProtocolsProvider,
     private readonly storageProvider: StorageProvider,
@@ -40,6 +38,8 @@ export class AppComponent {
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
+    private readonly ngZone: NgZone,
+    @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
     @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
   ) {
@@ -121,25 +121,16 @@ export class AppComponent {
       })
     }
     if (this.platform.is('cordova')) {
-      this.deeplinks
-        .route({
-          '/': null
-        })
-        .subscribe(
-          match => {
-            // match.$route - the route we matched, which is the matched entry from the arguments to route()
-            // match.$args - the args passed in the link
-            // match.$link - the full link data
-            console.log('Successfully matched route', JSON.stringify(match))
-            this.schemeRoutingProvider
-              .handleNewSyncRequest(this.router, match.$link.url)
-              .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-          },
-          nomatch => {
-            // nomatch.$link - the full link data
-            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)('route not matched: ' + JSON.stringify(nomatch))
+      this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
+        this.ngZone.run(() => {
+          if (data.url.startsWith('airgap-wallet://')) {
+            console.log('Successfully matched route', JSON.stringify(data.url))
+            this.schemeRoutingProvider.handleNewSyncRequest(this.router, data.url).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+          } else {
+            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)('route not matched: ' + JSON.stringify(data.url))
           }
-        )
+        })
+      })
     }
   }
 

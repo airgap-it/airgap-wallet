@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing'
 import { AppVersion } from '@ionic-native/app-version/ngx'
-import { Deeplinks } from '@ionic-native/deeplinks/ngx'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 import { AppComponent } from './app.component'
 
@@ -15,9 +14,9 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
+          { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen },
-          Deeplinks,
           { provide: AppVersion, useValue: unitHelper.mockRefs.appVersion }
         ],
         declarations: [AppComponent]

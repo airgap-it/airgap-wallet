@@ -125,24 +125,6 @@
         <variable name="ANDROID_SUPPORT_V13_VERSION" value="28.+" />
         <variable name="FCM_VERSION" value="11.6.2" />
     </plugin>
-    <plugin name="ionic-plugin-deeplinks" spec="https://github.com/airgap-it/ionic-plugin-deeplinks#cordova-ios-v5.0.0-fix">
-        <variable name="URL_SCHEME" value="airgap-wallet" />
-        <variable name="DEEPLINK_HOST" value="wallet.airgap.it" />
-        <variable name="DEEPLINK_SCHEME" value="https" />
-        <variable name="ANDROID_PATH_PREFIX" value="/" />
-        <variable name="ANDROID_2_PATH_PREFIX" value="/" />
-        <variable name="ANDROID_3_PATH_PREFIX" value="/" />
-        <variable name="ANDROID_4_PATH_PREFIX" value="/" />
-        <variable name="ANDROID_5_PATH_PREFIX" value="/" />
-        <variable name="DEEPLINK_2_SCHEME" value=" " />
-        <variable name="DEEPLINK_2_HOST" value=" " />
-        <variable name="DEEPLINK_3_SCHEME" value=" " />
-        <variable name="DEEPLINK_3_HOST" value=" " />
-        <variable name="DEEPLINK_4_SCHEME" value=" " />
-        <variable name="DEEPLINK_4_HOST" value=" " />
-        <variable name="DEEPLINK_5_SCHEME" value=" " />
-        <variable name="DEEPLINK_5_HOST" value=" " />
-    </plugin>
     <engine name="android" spec="8.1.0" />
     <engine name="ios" spec="5.0.1" />
 </widget>
