@@ -6,11 +6,11 @@
       <ion-row class="ion-justify-content-center"><div class="line"></div></ion-row>
     </ion-col>
     <ion-col size="9" class="ion-padding-bottom">
-      <ng-container *ngIf="transaction.extra">
+      <ng-container *ngIf="transaction.extra && transaction.extra.type">
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.type_label' | translate }}</ion-label>
         <div class="ion-padding-bottom">
           <span class="typography--mono">
-            {{ transaction.extra }}
+            {{ transaction.extra.type }}
           </span>
         </div>
       </ng-container>
