@@ -163,6 +163,7 @@ export class AccountTransactionListPage {
         router: this.router
       })
       action.start()
+      return
     } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
       info = {
         wallet: this.wallet,
