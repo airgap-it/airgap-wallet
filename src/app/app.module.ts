@@ -56,9 +56,9 @@ import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { APP_PLUGIN, BROWSER_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
-const { SplashScreen, StatusBar } = Plugins
+const { App, Browser, SplashScreen, StatusBar } = Plugins
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -100,6 +100,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     IntroductionPushPageModule
   ],
   providers: [
+    { provide: APP_PLUGIN, useValue: App },
+    { provide: BROWSER_PLUGIN, useValue: Browser },
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     BarcodeScanner,

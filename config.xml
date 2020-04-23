@@ -110,13 +110,10 @@
         <splash height="1125" src="resources/ios/splash/Default-Landscape-2436h.png" width="2436" />
     </platform>
     <icon src="resources/ios/icon/icon-small@3x.png" />
-    <plugin name="cordova-plugin-device" spec="^1.1.7" />
-    <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
     <plugin name="cordova-plugin-x-socialsharing" spec="^5.4.4">
         <variable name="ANDROID_SUPPORT_V4_VERSION" value="26.1.0" />
     </plugin>
     <plugin name="cordova-plugin-app-version" spec="0.1.9" />
-    <plugin name="cordova-plugin-inappbrowser" spec="^1.7.2" />
     <plugin name="com.lampa.startapp" spec="^6.1.6" />
     <plugin name="cordova-plugin-qrscanner" spec="3.0.1" />
     <plugin name="cordova-sqlite-storage" spec="2.6.0" />

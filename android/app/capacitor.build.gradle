@@ -11,11 +11,12 @@ apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
 
     implementation "com.android.support:support-v4:24.1.1+"
+    implementation "com.android.support:support-v4:28.+"
+    implementation "com.android.support:appcompat-v7:28.+"
     implementation "com.android.support:support-v13:27.+"
     implementation "me.leolin:ShortcutBadger:1.1.17@aar"
     implementation "com.google.firebase:firebase-messaging:11.6.2"
 }
-apply from: "../../node_modules/cordova-android-support-gradle-release/cordova-android-support-gradle-release.gradle"
 apply from: "../../node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle"
 //apply from: "../../node_modules/cordova-support-google-services/build.gradle"
 apply from: "../../node_modules/phonegap-plugin-multidex/multidex.gradle"

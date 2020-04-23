@@ -1,9 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Platform } from '@ionic/angular'
 import { getProtocolByIdentifier, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
-
-declare let cordova
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
   selector: 'page-transaction-detail',
@@ -13,7 +11,7 @@ export class TransactionDetailPage {
   public transaction: IAirGapTransaction
   public lottieConfig: any
 
-  constructor(private readonly platform: Platform, private readonly route: ActivatedRoute) {
+  constructor(private readonly route: ActivatedRoute, private readonly browserService: BrowserService) {
     if (this.route.snapshot.data.special) {
       this.transaction = this.route.snapshot.data.special
     }
@@ -38,14 +36,6 @@ export class TransactionDetailPage {
         this.transaction.isInbound ? this.transaction.to[0] : this.transaction.from[0]
       )
     }
-    this.openUrl(blockexplorer)
-  }
-
-  private openUrl(url: string) {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+    this.browserService.openUrl(blockexplorer)
   }
 }

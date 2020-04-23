@@ -1,6 +1,6 @@
 import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { Component, OnInit } from '@angular/core'
-import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
+import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
@@ -11,8 +11,7 @@ import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
-
-declare let cordova
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
   templateUrl: 'account-edit-popover.component.html',
@@ -32,10 +31,10 @@ export class AccountEditPopoverComponent implements OnInit {
     private readonly navParams: NavParams,
     private readonly walletsProvider: AccountProvider,
     private readonly viewCtrl: PopoverController,
-    private readonly platform: Platform,
     private readonly clipboardProvider: ClipboardService,
     private readonly translateService: TranslateService,
-    private readonly operationsProvider: OperationsProvider
+    private readonly operationsProvider: OperationsProvider,
+    private readonly browserService: BrowserService
   ) {
     this.wallet = this.navParams.get('wallet')
     this.importAccountAction = this.navParams.get('importAccountAction')
@@ -52,14 +51,7 @@ export class AccountEditPopoverComponent implements OnInit {
 
     let blockexplorer: string = protocol.blockExplorer
     blockexplorer = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
-    this.openUrl(blockexplorer)
-  }
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+    this.browserService.openUrl(blockexplorer)
   }
 
   public async ngOnInit(): Promise<void> {

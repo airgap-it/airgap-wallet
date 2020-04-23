@@ -8,9 +8,9 @@ import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-rout
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../../services/serializer/serializer.service'
 import { IntroductionPage } from '../introduction/introduction'
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 declare var window: any
-declare var cordova: any
 
 @Component({
   selector: 'page-settings',
@@ -25,7 +25,8 @@ export class SettingsPage {
     private readonly modalController: ModalController,
     private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider
+    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly browserService: BrowserService
   ) {}
 
   public about(): void {
@@ -68,7 +69,7 @@ export class SettingsPage {
   }
 
   public feedback(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-wallet/issues')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-wallet/issues')
   }
 
   public async telegram(): Promise<void> {
@@ -101,11 +102,11 @@ export class SettingsPage {
           handler: (data: string): void => {
             switch (data) {
               case 'Chinese':
-                this.openUrl('https://t.me/AirGap_cn')
+                this.browserService.openUrl('https://t.me/AirGap_cn')
                 break
               case 'International':
               default:
-                this.openUrl('https://t.me/AirGap')
+                this.browserService.openUrl('https://t.me/AirGap')
             }
           }
         }
@@ -116,7 +117,7 @@ export class SettingsPage {
   }
 
   public translate(): void {
-    this.openUrl('https://translate.sook.ch/')
+    this.browserService.openUrl('https://translate.sook.ch/')
   }
 
   /*
@@ -127,27 +128,19 @@ export class SettingsPage {
   */
 
   public githubDistro(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-distro')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-distro')
   }
 
   public githubWebSigner(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-web-signer')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-web-signer')
   }
 
   public githubWallet(): void {
-    this.openUrl('https://github.com/airgap-it')
+    this.browserService.openUrl('https://github.com/airgap-it')
   }
 
   public faq(): void {
-    this.openUrl('https://airgap.it/#faq')
-  }
-
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+    this.browserService.openUrl('https://airgap.it/#faq')
   }
 
   public pasteClipboard(): void {
