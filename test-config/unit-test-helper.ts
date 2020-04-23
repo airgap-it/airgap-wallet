@@ -21,11 +21,10 @@ import {
   ModalControllerMock,
   NavControllerMock,
   PlatformMock,
-  StatusBarMock,
   ToastControllerMock
 } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
-import { SplashScreenMock } from './plugins-mock'
+import { SplashScreenMock, StatusBarMock } from './plugins-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {

@@ -155,15 +155,19 @@ export class PlatformMock {
 
 export class NavControllerMock {
   public pop(): any {
-    return new Promise((resolve: Function): void => {
-      resolve()
-    })
+    return new Promise(
+      (resolve: Function): void => {
+        resolve()
+      }
+    )
   }
 
   public push(_ctrl: any, _args: any): any {
-    return new Promise((resolve: Function): void => {
-      resolve()
-    })
+    return new Promise(
+      (resolve: Function): void => {
+        resolve()
+      }
+    )
   }
 
   public getActive(): any {
@@ -181,11 +185,6 @@ export class NavControllerMock {
   public registerChildNav(_nav: any): void {
     return
   }
-}
-
-export class StatusBarMock {
-  public styleDefault: jasmine.Spy = newSpy('styleDefault', Promise.resolve())
-  public backgroundColorByHexString: jasmine.Spy = newSpy('backgroundColorByHexString', Promise.resolve())
 }
 
 export class DeeplinkMock {

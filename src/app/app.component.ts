@@ -1,10 +1,9 @@
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { Deeplinks } from '@ionic-native/deeplinks/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { SplashScreenPlugin } from '@capacitor/core'
+import { SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
 
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
@@ -17,7 +16,7 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
-import { SPLASH_SCREEN_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'app-root',
@@ -28,7 +27,6 @@ export class AppComponent {
 
   constructor(
     private readonly platform: Platform,
-    private readonly statusBar: StatusBar,
     private readonly translate: TranslateService,
     private readonly deeplinks: Deeplinks,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
@@ -42,7 +40,8 @@ export class AppComponent {
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
-    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
+    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
+    @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('mobile')
@@ -57,8 +56,8 @@ export class AppComponent {
     await this.platform.ready()
 
     if (this.platform.is('cordova')) {
-      this.statusBar.styleDefault()
-      this.statusBar.backgroundColorByHexString('#FFFFFF')
+      this.statusBar.setStyle({ style: StatusBarStyle.Light })
+      this.statusBar.setBackgroundColor({ color: '#FFFFFF' })
       this.splashScreen.hide()
 
       this.pushProvider.initPush()

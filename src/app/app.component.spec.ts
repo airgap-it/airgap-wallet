@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing'
 import { AppVersion } from '@ionic-native/app-version/ngx'
 import { Deeplinks } from '@ionic-native/deeplinks/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
+import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 import { AppComponent } from './app.component'
-import { SPLASH_SCREEN_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 describe('AppComponent', () => {
   let unitHelper: UnitHelper
@@ -16,7 +15,7 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          { provide: StatusBar, useValue: unitHelper.mockRefs.statusBar },
+          { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen },
           Deeplinks,
           { provide: AppVersion, useValue: unitHelper.mockRefs.appVersion }
@@ -39,7 +38,7 @@ describe('AppComponent', () => {
   it('should initialize the app', async () => {
     TestBed.createComponent(AppComponent)
     expect(unitHelper.mockRefs.platform.ready).toHaveBeenCalled()
-    expect(unitHelper.mockRefs.statusBar.styleDefault).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.statusBar.setStyle).toHaveBeenCalled()
     expect(unitHelper.mockRefs.splashScreen.hide).toHaveBeenCalled()
   })
 

@@ -1,13 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { Clipboard } from '@ionic-native/clipboard/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 
-import { NavParamsMock, PlatformMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
+import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
-import { SplashScreenMock } from 'test-config/plugins-mock'
+import { SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -15,7 +14,7 @@ import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
 
-import { SPLASH_SCREEN_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
@@ -51,7 +50,7 @@ describe('TransactionPrepare Page', () => {
           Clipboard,
           { provide: Storage, useClass: StorageMock },
           { provide: NavParams, useClass: NavParamsMock },
-          { provide: StatusBar, useClass: StatusBarMock },
+          { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
           { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },
           ClipboardService,

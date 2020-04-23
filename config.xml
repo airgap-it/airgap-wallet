@@ -154,7 +154,6 @@
         <variable name="DEEPLINK_5_SCHEME" value=" " />
         <variable name="DEEPLINK_5_HOST" value=" " />
     </plugin>
-    <plugin name="cordova-plugin-statusbar" spec="^2.4.3" />
     <engine name="android" spec="8.1.0" />
     <engine name="ios" spec="5.0.1" />
 </widget>
