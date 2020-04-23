@@ -1,7 +1,6 @@
 // tslint:disable:max-classes-per-file
 
-const newSpy: (name: string, returnValue: any) => jasmine.Spy = (name: string, returnValue: any): jasmine.Spy =>
-  jasmine.createSpy(name).and.returnValue(returnValue)
+import { newSpy } from './unit-test-helper'
 
 export type Spied<T> = { [Method in keyof T]: jasmine.Spy }
 
@@ -187,10 +186,6 @@ export class NavControllerMock {
 export class StatusBarMock {
   public styleDefault: jasmine.Spy = newSpy('styleDefault', Promise.resolve())
   public backgroundColorByHexString: jasmine.Spy = newSpy('backgroundColorByHexString', Promise.resolve())
-}
-
-export class SplashScreenMock {
-  public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }
 
 export class DeeplinkMock {

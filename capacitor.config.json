@@ -4,6 +4,12 @@
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "androidSplashResourceName": "screen"
+    }
+  },
   "android": {
     "allowMixedContent": true
   },

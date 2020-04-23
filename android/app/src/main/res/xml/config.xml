@@ -44,16 +44,6 @@
     <param name="android-package" value="io.sqlc.SQLitePlugin"/>
   </feature>
 
-  <feature name="Diagnostic">
-    <param name="android-package" value="cordova.plugins.Diagnostic"/>
-    <param name="onload" value="true"/>
-  </feature>
-
-  <feature name="Diagnostic_Camera">
-    <param name="android-package" value="cordova.plugins.Diagnostic_Camera"/>
-    <param name="onload" value="true"/>
-  </feature>
-
   <feature name="IonicDeeplinkPlugin">
     <param name="android-package" value="io.ionic.links.IonicDeeplink"/>
     <param name="onload" value="true"/>

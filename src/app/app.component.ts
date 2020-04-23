@@ -1,10 +1,10 @@
-import { Component } from '@angular/core'
+import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { Deeplinks } from '@ionic-native/deeplinks/ngx'
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { SplashScreenPlugin } from '@capacitor/core'
 
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
@@ -17,6 +17,7 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
+import { SPLASH_SCREEN_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,6 @@ export class AppComponent {
   constructor(
     private readonly platform: Platform,
     private readonly statusBar: StatusBar,
-    private readonly splashScreen: SplashScreen,
     private readonly translate: TranslateService,
     private readonly deeplinks: Deeplinks,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
@@ -41,7 +41,8 @@ export class AppComponent {
     private readonly pushProvider: PushProvider,
     private readonly router: Router,
     private readonly dataService: DataService,
-    private readonly config: Config
+    private readonly config: Config,
+    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('mobile')

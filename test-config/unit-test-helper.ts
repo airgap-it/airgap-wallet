@@ -21,11 +21,11 @@ import {
   ModalControllerMock,
   NavControllerMock,
   PlatformMock,
-  SplashScreenMock,
   StatusBarMock,
   ToastControllerMock
 } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
+import { SplashScreenMock } from './plugins-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {
@@ -83,3 +83,6 @@ export class UnitHelper {
     return testBed
   }
 }
+
+export const newSpy: (name: string, returnValue: any) => jasmine.Spy = (name: string, returnValue: any): jasmine.Spy =>
+  jasmine.createSpy(name).and.returnValue(returnValue)

@@ -35,16 +35,6 @@
     <param name="ios-package" value="SQLitePlugin"/>
   </feature>
 
-  <feature name="Diagnostic">
-    <param name="ios-package" value="Diagnostic"/>
-    <param name="onload" value="true"/>
-  </feature>
-
-  <feature name="Diagnostic_Camera">
-    <param name="ios-package" value="Diagnostic_Camera"/>
-    <param name="onload" value="true"/>
-  </feature>
-
   <feature name="IonicDeeplinkPlugin">
     <param name="ios-package" value="IonicDeeplinkPlugin" onload="true"/>
   </feature>

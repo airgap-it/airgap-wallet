@@ -15,7 +15,6 @@ import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { Keyboard } from '@ionic-native/keyboard/ngx'
 import { Push } from '@ionic-native/push/ngx'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
@@ -26,6 +25,7 @@ import { MaterialIconsModule } from 'ionic2-material-icons'
 import { LottieAnimationViewModule } from 'ng-lottie'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
+import { Plugins } from '@capacitor/core'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -56,6 +56,10 @@ import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
+
+import { SPLASH_SCREEN_PLUGIN } from './capacitor-plugins/injection-tokens'
+
+const { SplashScreen } = Plugins
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -97,8 +101,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     IntroductionPushPageModule
   ],
   providers: [
+    { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     StatusBar,
-    SplashScreen,
     BarcodeScanner,
     QRScanner,
     Keyboard,
