@@ -1,4 +1,4 @@
-import { P2PPairInfo } from '@airgap/beacon-sdk/dist/types/P2PPairInfo'
+import { P2PPairInfo } from '@airgap/beacon-sdk'
 import { Component, OnInit } from '@angular/core'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 

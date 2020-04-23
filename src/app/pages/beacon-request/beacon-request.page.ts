@@ -14,7 +14,7 @@ import {
   SignPayloadRequestOutput,
   BroadcastRequestOutput,
   PermissionResponseInput
-} from '@airgap/beacon-sdk/dist/clients/WalletClient'
+} from '@airgap/beacon-sdk'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
