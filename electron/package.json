@@ -1,22 +1,31 @@
 {
-  "name": "capacitor-app",
-  "version": "1.0.0",
-  "description": "An Amazing Capacitor App",
+  "name": "airgap-wallet",
+  "version": "0.0.1",
+  "author": "Papers GmbH <contact@papers.ch> (https://papers.ch)",
+  "homepage": "https://www.airgap.it",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "electron:start": "electron ./"
+    "electron:start": "electron ./",
+    "electron:build:mac": "electron-builder --mac --publish=never",
+    "electron:build:linux": "electron-builder --linux --publish=never",
+    "electron:build:windows": "electron-builder --win --publish=never"
+  },
+  "build": {
+    "appId": "it.airgap.wallet",
+    "directories": {
+      "output": "electron/build"
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}.${ext}"
+    }
   },
   "dependencies": {
     "@capacitor/electron": "^2.0.1",
     "electron-is-dev": "^1.1.0"
   },
   "devDependencies": {
-    "electron": "^7.0.0"
-  },
-  "keywords": [
-    "capacitor",
-    "electron"
-  ],
-  "author": "",
-  "license": "ISC"
+    "electron": "^7.0.0",
+    "electron-builder": "^22.5.1"
+  }
 }
