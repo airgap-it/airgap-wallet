@@ -86,6 +86,9 @@ export class DelegationDetailPage {
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
+    const delegatorDetails = this.delegatorDetails$.value
+    const secondaryActions = delegatorDetails ? delegatorDetails.secondaryActions : undefined
+
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
       component: DelegateEditPopoverComponent,
       componentProps: {
@@ -93,33 +96,28 @@ export class DelegationDetailPage {
           ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
           : true,
         delegateeLabel: this.delegateeLabel,
-        hasMultipleDelegatees: this.currentDelegatees.length > 1
+        hasMultipleDelegatees: this.currentDelegatees.length > 1,
+        secondaryDelegatorActions: secondaryActions
       },
       event,
       translucent: true
     })
 
-    function isDelegateeAddressObject(value: unknown): value is { delegateeAddress: string } {
-      return value instanceof Object && 'delegateeAddress' in value
-    }
-
-    function isChangeToAirGapObject(value: unknown): value is { changeToAirGap: boolean } {
-      return value instanceof Object && 'changeToAirGap' in value
-    }
-
-    function isShowDelegateeListObject(value: unknown): value is { showDelegateeList: boolean } {
-      return value instanceof Object && 'showDelegateeList' in value
+    function isObjectOf<T>(value: unknown, ...fields: string[]): value is T {
+      return value instanceof Object && fields.every(field => field in value)
     }
 
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
-        if (isDelegateeAddressObject(data)) {
+        if (isObjectOf<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
           this.changeDisplayedDetails(data.delegateeAddress)
-        } else if (isChangeToAirGapObject(data) && supportsAirGapDelegation(this.wallet.coinProtocol)) {
+        } else if (isObjectOf<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
           this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
-        } else if (isShowDelegateeListObject(data)) {
+        } else if (isObjectOf<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
           this.showDelegateesList()
+        } else if (isObjectOf<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
+          this.callSecondaryAction(data.secondaryActionType)
         } else {
           console.log('Unknown option selected.')
         }
@@ -129,7 +127,7 @@ export class DelegationDetailPage {
     return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async callMainAction(type: string): Promise<void> {
+  public callMainAction(type: string) {
     const delegatorDetails = this.delegatorDetails$.value
     if (!delegatorDetails) {
       return
@@ -140,8 +138,16 @@ export class DelegationDetailPage {
       return
     }
 
-    const actionType = delegatorDetails.mainActions.find(action => action.type.toString() === type).type
-    this.prepareDelegationAction(actionType)
+    this.callAction(delegatorDetails.mainActions, type)
+  }
+
+  public callSecondaryAction(type: string) {
+    const delegatorDetails = this.delegatorDetails$.value
+    if (!delegatorDetails) {
+      return
+    }
+
+    this.callAction(delegatorDetails.secondaryActions || [], type)
   }
 
   public onActiveActionChange(activeDelegatorAction: string | null) {
@@ -273,6 +279,17 @@ export class DelegationDetailPage {
     this.delegateeAddress$.next(address)
   }
 
+  private callAction(actions: AirGapDelegatorAction[], type: string) {
+    const action = actions.find(action => action.type.toString() === type)
+    const actionType = action ? action.type : undefined
+
+    if (actionType) {
+      this.prepareDelegationAction(actionType)
+    } else {
+      console.warn('Unknown action')
+    }
+  }
+
   private async prepareDelegationAction(actionType: any): Promise<void> {
     this.loader = await this.loadingController.create({
       message: 'Preparing transaction...'
@@ -294,7 +311,9 @@ export class DelegationDetailPage {
       this.dismissLoader()
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router
+        .navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION, { skipLocationChange: true })
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
       this.dismissLoader()
 
@@ -314,7 +333,9 @@ export class DelegationDetailPage {
     }
 
     this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/delegation-list/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl('/delegation-list/' + DataServiceKey.DETAIL, { skipLocationChange: true })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private dismissLoader() {

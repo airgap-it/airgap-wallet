@@ -108,13 +108,8 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   ): Promise<AirGapDelegatorDetails> {
     const delegatorExtraInfo = await protocol.getDelegationInfo(delegatorDetails.address)
 
-    const delegateAction = this.createDelegatorAction(
-      delegatorDetails.availableActions,
-      [TezosDelegatorAction.DELEGATE, TezosDelegatorAction.CHANGE_BAKER],
-      'Delegate',
-      this.formBuilder.group({ delegate: bakerDetails.address })
-    )
-    const undelegateAction = this.createDelegatorAction(delegatorDetails.availableActions, [TezosDelegatorAction.UNDELEGATE], 'Undelegate')
+    const delegateAction = this.createDelegateAction(delegatorDetails.availableActions, bakerDetails.address)
+    const undelegateAction = this.createUndelegateAction(delegatorDetails.availableActions)
 
     const [displayDetails, displayRewards] = await Promise.all([
       this.createDelegatorDisplayDetails(protocol, delegatorDetails, delegatorExtraInfo, bakerDetails.address),
@@ -143,6 +138,25 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
         description: 'Payout Schedule'
       })
     ]
+  }
+
+  private createDelegateAction(availableActions: DelegatorAction[], bakerAddress: string): AirGapDelegatorAction | null {
+    return this.createDelegatorAction(
+      availableActions,
+      [TezosDelegatorAction.DELEGATE, TezosDelegatorAction.CHANGE_BAKER],
+      'Delegate',
+      this.formBuilder.group({ delegate: bakerAddress })
+    )
+  }
+
+  private createUndelegateAction(availableActions: DelegatorAction[]): AirGapDelegatorAction | null {
+    const action = this.createDelegatorAction(availableActions, [TezosDelegatorAction.UNDELEGATE], 'Undelegate')
+
+    if (action) {
+      action.iconName = 'close-outline'
+    }
+
+    return action
   }
 
   private createDelegatorAction(

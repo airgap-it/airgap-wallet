@@ -19,6 +19,7 @@ export interface AirGapDelegatorAction {
   form?: FormGroup
   label: string
   confirmLabel?: string
+  iconName?: string
   args?: UIInputWidget<any>[]
   description?: string
 }
