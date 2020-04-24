@@ -17,17 +17,9 @@ export interface AirGapDelegateeUsageDetails {
 export interface AirGapDelegatorAction {
   type: any
   form?: FormGroup
-  args?: UIInputWidget<any>[]
-}
-
-export interface AirGapMainDelegatorAction extends AirGapDelegatorAction {
-  isAvailable: boolean
-  description?: string
-}
-
-export interface AirGapExtraDelegatorAction extends AirGapDelegatorAction {
   label: string
-  confirmLabel: string
+  confirmLabel?: string
+  args?: UIInputWidget<any>[]
   description?: string
 }
 
@@ -37,9 +29,8 @@ export interface AirGapDelegateeDetails extends DelegateeDetails {
 }
 
 export interface AirGapDelegatorDetails extends DelegatorDetails {
-  delegateAction: AirGapMainDelegatorAction
-  undelegateAction: AirGapMainDelegatorAction
-  extraActions?: AirGapExtraDelegatorAction[]
+  mainActions?: AirGapDelegatorAction[]
+  secondaryActions?: AirGapDelegatorAction[]
   displayDetails?: UIWidget[]
   displayRewards?: UIRewardList
 }

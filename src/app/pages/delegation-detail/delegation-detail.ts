@@ -6,7 +6,6 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegatorAction,
-  AirGapMainDelegatorAction,
   AirGapDelegationDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -29,12 +28,6 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
   styleUrls: ['./delegation-detail.scss']
 })
 export class DelegationDetailPage {
-  public delegateActionId: string
-  public delegateButton: string = 'Delegate'
-
-  public undelegateActionId: string
-  public undelegateButton: string = 'Undelegate'
-
   public wallet: AirGapMarketWallet
 
   public delegationForms: Map<string, FormGroup> = new Map()
@@ -54,14 +47,8 @@ export class DelegationDetailPage {
 
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
-    const mainActions = [details.delegateAction, details.undelegateAction]
 
-    const availableActions = [
-      ...mainActions.filter(action => action.isAvailable),
-      ...(details.extraActions ? details.extraActions.length : [])
-    ]
-
-    return availableActions.length > 1 || availableActions.some(action => !!action.description || !!action.args)
+    return details.mainActions && details.mainActions.some(action => !!action.description || !!action.args)
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
@@ -142,47 +129,28 @@ export class DelegationDetailPage {
     return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async callAction(): Promise<void> {
-    if (this.activeDelegatorAction === undefined || this.activeDelegatorAction === null) {
-      this.navController.back()
-      return
-    }
-
+  public async callMainAction(type: string): Promise<void> {
     const delegatorDetails = this.delegatorDetails$.value
     if (!delegatorDetails) {
       return
     }
 
-    let actionType: any
-    switch (this.activeDelegatorAction) {
-      case this.delegateActionId.toString():
-        actionType = delegatorDetails.delegateAction.type
-        break
-      case this.undelegateActionId.toString():
-        actionType = delegatorDetails.undelegateAction.type
-        break
-      default:
-        actionType = delegatorDetails.extraActions.find(action => action.type.toString() === this.activeDelegatorAction).type
+    if (!delegatorDetails.mainActions || delegatorDetails.mainActions.length === 0) {
+      this.navController.back()
+      return
     }
 
+    const actionType = delegatorDetails.mainActions.find(action => action.type.toString() === type).type
     this.prepareDelegationAction(actionType)
   }
 
-  public onActiveActionChange() {
-    switch (this.activeDelegatorAction) {
-      case this.delegateActionId:
-        this.activeDelegatorActionConfirmButton = this.delegateButton
-        break
-      case this.undelegateActionId:
-        this.activeDelegatorActionConfirmButton = this.undelegateButton
-        break
-      default:
-        const activeAction = this.delegatorDetails$.value.extraActions
-          ? this.delegatorDetails$.value.extraActions.find(action => action.type.toString() === this.activeDelegatorAction)
-          : null
+  public onActiveActionChange(activeDelegatorAction: string | null) {
+    const activeAction = this.delegatorDetails$.value.mainActions
+      ? this.delegatorDetails$.value.mainActions.find(action => action.type.toString() === activeDelegatorAction)
+      : null
 
-        this.activeDelegatorActionConfirmButton = activeAction.confirmLabel
-    }
+    this.activeDelegatorAction = activeDelegatorAction
+    this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel || activeAction.label : null
   }
 
   private initView() {
@@ -232,28 +200,14 @@ export class DelegationDetailPage {
 
         this.setupAllActions(details)
         this.setupFormObservers()
-        this.delegateActionId = details.delegateAction.type ? details.delegateAction.type.toString() : 'delegate'
-        this.undelegateActionId = details.undelegateAction.type ? details.undelegateAction.type.toString() : 'undelegate'
-        this.setActiveDelegatorAction(details)
+        this.initActiveDelegatorAction(details)
       }
     })
   }
 
   private setupAllActions(details: AirGapDelegatorDetails) {
-    this.setupMainActions(details)
-    this.setupExtraActions(details)
-  }
-
-  private setupMainActions(details: AirGapDelegatorDetails) {
-    const mainActions: AirGapMainDelegatorAction[] = [details.delegateAction, details.undelegateAction]
-
-    this.setupActions(
-      mainActions.filter(action => action && action.type !== undefined && action.isAvailable && (action.args || action.form))
-    )
-  }
-
-  private setupExtraActions(details: AirGapDelegatorDetails) {
-    this.setupActions(details.extraActions || [])
+    this.setupActions(details.mainActions || [])
+    this.setupActions(details.secondaryActions || [])
   }
 
   private setupActions(actions: AirGapDelegatorAction[]) {
@@ -304,19 +258,9 @@ export class DelegationDetailPage {
     })
   }
 
-  private setActiveDelegatorAction(details: AirGapDelegatorDetails) {
-    if (details.delegateAction.isAvailable) {
-      this.activeDelegatorAction = this.delegateActionId
-      this.activeDelegatorActionConfirmButton = this.delegateButton
-    } else if (details.undelegateAction.isAvailable) {
-      this.activeDelegatorAction = this.undelegateActionId
-      this.activeDelegatorActionConfirmButton = this.undelegateButton
-    } else {
-      const activeAction = details.extraActions ? details.extraActions[0] : null
-
-      this.activeDelegatorAction = activeAction && activeAction ? activeAction.type.toString() : null
-      this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel : null
-    }
+  private initActiveDelegatorAction(details: AirGapDelegatorDetails) {
+    const activeAction = details.mainActions ? details.mainActions[0] : null
+    this.onActiveActionChange(activeAction ? activeAction.type.toString() : null)
   }
 
   private updateDisplayedDetails(details: AirGapDelegationDetails[] | null) {

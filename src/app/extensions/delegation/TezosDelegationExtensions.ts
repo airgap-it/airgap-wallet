@@ -4,7 +4,7 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapMainDelegatorAction
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
@@ -108,12 +108,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   ): Promise<AirGapDelegatorDetails> {
     const delegatorExtraInfo = await protocol.getDelegationInfo(delegatorDetails.address)
 
-    const delegateAction = this.createMainDelegatorAction(
+    const delegateAction = this.createDelegatorAction(
       delegatorDetails.availableActions,
       [TezosDelegatorAction.DELEGATE, TezosDelegatorAction.CHANGE_BAKER],
+      'Delegate',
       this.formBuilder.group({ delegate: bakerDetails.address })
     )
-    const undelegateAction = this.createMainDelegatorAction(delegatorDetails.availableActions, [TezosDelegatorAction.UNDELEGATE])
+    const undelegateAction = this.createDelegatorAction(delegatorDetails.availableActions, [TezosDelegatorAction.UNDELEGATE], 'Undelegate')
 
     const [displayDetails, displayRewards] = await Promise.all([
       this.createDelegatorDisplayDetails(protocol, delegatorDetails, delegatorExtraInfo, bakerDetails.address),
@@ -122,8 +123,8 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     return {
       ...delegatorDetails,
-      delegateAction,
-      undelegateAction,
+      mainActions: delegateAction ? [delegateAction] : undefined,
+      secondaryActions: undelegateAction ? [undelegateAction] : undefined,
       displayDetails,
       displayRewards: displayRewards
     }
@@ -144,23 +145,21 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     ]
   }
 
-  private createMainDelegatorAction(
+  private createDelegatorAction(
     availableActions: DelegatorAction[],
     types: TezosDelegatorAction[],
+    label: string,
     form?: FormGroup
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const action = availableActions.find(action => types.includes(action.type))
 
     return action
       ? {
           type: action.type,
-          form: form,
-          isAvailable: true
+          label,
+          form: form
         }
-      : {
-          type: null,
-          isAvailable: false
-        }
+      : null
   }
 
   private async createDelegatorDisplayDetails(
