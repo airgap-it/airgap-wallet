@@ -55,7 +55,7 @@ export class AppComponent {
 
     await this.platform.ready()
 
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       this.statusBar.setStyle({ style: StatusBarStyle.Light })
       this.statusBar.setBackgroundColor({ color: '#FFFFFF' })
       this.splashScreen.hide()
@@ -66,7 +66,7 @@ export class AppComponent {
     this.appInfoProvider
       .getVersionNumber()
       .then(version => {
-        if (this.platform.is('cordova')) {
+        if (this.platform.is('hybrid')) {
           setSentryRelease('app_' + version)
         } else if (this.webExtensionProvider.isWebExtension()) {
           setSentryRelease('ext_' + version)
@@ -120,7 +120,7 @@ export class AppComponent {
         this.config.set('backButtonText', back)
       })
     }
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
           if (data.url.startsWith('airgap-wallet://')) {

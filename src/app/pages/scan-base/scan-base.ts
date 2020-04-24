@@ -19,7 +19,7 @@ export class ScanBasePage {
   constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {}
 
   public async ionViewWillEnter(): Promise<void> {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       await this.platform.ready()
       await this.checkCameraPermissionsAndActivate()
     }
@@ -39,7 +39,7 @@ export class ScanBasePage {
   }
 
   public ionViewDidEnter(): void {
-    if (!this.platform.is('cordova')) {
+    if (!this.platform.is('hybrid')) {
       this.hasCameraPermission = true
       this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
@@ -57,7 +57,7 @@ export class ScanBasePage {
   }
 
   public ionViewWillLeave(): void {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       this.scanner.destroy()
     } else {
       this.zxingScanner.resetCodeReader()
@@ -65,7 +65,7 @@ export class ScanBasePage {
   }
 
   public startScan(): void {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       this.scanner.show()
       this.scanner.scan(
         text => {

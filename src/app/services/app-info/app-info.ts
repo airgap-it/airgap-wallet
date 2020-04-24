@@ -18,7 +18,7 @@ export class AppInfoProvider {
   }
 
   public async updateVersions() {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       await this.platform.ready()
       this.appName = await this.app.getAppName()
       this.packageName = await this.app.getPackageName()
