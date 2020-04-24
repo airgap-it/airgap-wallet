@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
-var cordova: any
+
+declare var cordova: any
 
 @Component({
   selector: 'page-exchange-custom',

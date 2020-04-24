@@ -229,8 +229,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatedAmount: BigNumber
   ): AirGapMainDelegatorAction {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
-
-    const maxDelegationAmount = availableBalance.minus(requiredFee)
+    const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
     const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, {
       protocolIdentifier: protocol.identifier,
