@@ -78,7 +78,6 @@
     "angularx-qrcode": "^1.5.3",
     "bignumber.js": "8.0.1",
     "chart.js": "^2.8.0",
-    "com.lampa.startapp": "^6.1.6",
     "cordova-android": "8.1.0",
     "cordova-electron": "^1.1.1",
     "cordova-ios": "5.0.1",
@@ -171,7 +170,6 @@
       "cordova-plugin-x-socialsharing": {
         "ANDROID_SUPPORT_V4_VERSION": "28.+"
       },
-      "com.lampa.startapp": {},
       "cordova-plugin-qrscanner": {},
       "cordova-sqlite-storage": {},
       "cordova.plugins.diagnostic": {

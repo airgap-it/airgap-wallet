@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core'
-import { AlertController, Platform } from '@ionic/angular'
+import { Injectable, Inject } from '@angular/core'
+import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { AppPlugin } from '@capacitor/core'
 import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { serializedDataToUrlString } from '../../utils/utils'
@@ -9,53 +10,37 @@ import { SerializerService } from '../serializer/serializer.service'
 
 import { AccountProvider } from './../account/account.provider'
 
-declare let window: any
+import { APP_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeepLinkProvider {
   constructor(
-    private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly translateService: TranslateService,
     private readonly accountProvider: AccountProvider,
-    private readonly serializerService: SerializerService
+    private readonly serializerService: SerializerService,
+    @Inject(APP_PLUGIN) private readonly app: AppPlugin
   ) {}
 
   public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
     const deeplinkUrl: string = url.includes('://') ? url : serializedDataToUrlString(url)
 
     return new Promise((resolve, reject) => {
-      let sApp: { start(successCallback: () => void, errorCallback: (error: any) => void): void }
-
-      if (this.platform.is('android')) {
-        sApp = window.startApp.set({
-          action: 'ACTION_VIEW',
-          uri: deeplinkUrl,
-          flags: ['FLAG_ACTIVITY_NEW_TASK']
-        })
-      } else if (this.platform.is('ios')) {
-        sApp = window.startApp.set(deeplinkUrl)
-      } else {
-        this.showDeeplinkOnlyOnDevicesAlert()
-
-        return reject()
-      }
-
-      sApp.start(
-        () => {
+      this.app
+        .openUrl({ url: deeplinkUrl })
+        .then(() => {
           console.log('Deeplink called')
           resolve()
-        },
-        error => {
+        })
+        .catch(error => {
           console.error('deeplink used', deeplinkUrl)
           console.error(error)
           this.showAppNotFoundAlert()
 
-          return reject()
-        }
-      )
+          reject()
+        })
     })
   }
 
