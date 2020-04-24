@@ -246,7 +246,7 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    const transactions: IAirGapTransaction[] = await promiseTimeout(3000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
       return []
