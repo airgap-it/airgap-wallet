@@ -123,13 +123,13 @@ export class ExchangePage {
 
   private async getSupportedToProtocols(from: string): Promise<string[]> {
     if (from === ProtocolSymbols.TZBTC) {
-      return this.filterValidProtocols([ProtocolSymbols.BTC])
+      return this.filterValidProtocols([ProtocolSymbols.BTC], false)
     }
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
     if (from === ProtocolSymbols.BTC) {
       toProtocols.push(ProtocolSymbols.TZBTC)
     }
-    return this.filterValidProtocols(toProtocols)
+    return this.filterValidProtocols(toProtocols, false)
   }
 
   async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
