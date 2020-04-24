@@ -1,0 +1,18 @@
+<ion-card class="ion-padding">
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="2">
+      <strong>{{ widget.indexColLabel }}</strong>
+    </ion-col>
+    <ion-col>
+      <strong>{{ widget.amountColLabel }}</strong>
+    </ion-col>
+    <ion-col>
+      <strong>{{ widget.payoutColLabel }}</strong>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-justify-content-center ion-padding-bottom" *ngFor="let reward of widget.rewards">
+    <ion-col size="2">#{{ reward.index }}</ion-col>
+    <ion-col>{{ reward.amount }}</ion-col>
+    <ion-col>{{ reward.timestamp | date: 'HH:mm dd.LL.yy' }}</ion-col>
+  </ion-row>
+</ion-card>

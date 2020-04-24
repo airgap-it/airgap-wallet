@@ -1,203 +1,290 @@
-<ion-header no-border no-shadow>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>
-      {{ 'transaction-prepare.title' | translate: { title: wallet.coinProtocol.symbol | uppercase } }}
-    </ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        {{ 'transaction-prepare.title' | translate: { title: wallet.coinProtocol.symbol | uppercase } }}
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
 <ion-content class="ion-no-padding">
-  <form [formGroup]="transactionForm" class="ion-padding-bottom">
-    <ion-row class="ion-padding-horizontal ion-padding-top">
-      <ion-col size="10" class="ion-no-padding">
-        <ion-row>
-          <ion-col class="balance__container ion-no-padding">
-            <ion-row>
-              <p class="font--size__large ion-no-margin">
-                <strong>
-                  {{ wallet.currentBalance?.toNumber() | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 10 }
-                  }}
-                </strong>
-              </p>
-            </ion-row>
-            <ion-row>
-              <ion-text color="blackLight">
-                <p class="ion-no-margin">
-                  ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
-                  wallet.currentMarketPrice } | number: '1.2-2' }}
+  <ion-grid fixed="true" class="ion-no-padding">
+    <form [formGroup]="transactionForm" class="ion-padding-bottom">
+      <ion-row class="ion-padding-horizontal ion-padding-top">
+        <ion-col size="10" class="ion-no-padding">
+          <ion-row>
+            <ion-col class="balance__container ion-no-padding">
+              <ion-row>
+                <p class="font--size__large ion-no-margin">
+                  <strong>
+                    {{ availableBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits:
+                    wallet.coinProtocol.decimals + 1 } }}
+                  </strong>
                 </p>
-              </ion-text>
-            </ion-row>
-          </ion-col>
-        </ion-row>
-        <ion-row>
+              </ion-row>
+              <ion-row>
+                <ion-text color="blackLight">
+                  <p class="ion-no-margin">
+                    ${{ availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+                    wallet.currentMarketPrice } | number: '1.2-2' }}
+                  </p>
+                </ion-text>
+              </ion-row>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12" class="ion-no-padding">
+              <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
+                <ion-label color="blackLight" position="stacked">{{ 'Send To' | translate }}</ion-label>
+                <ion-textarea
+                  [attr.disabled]="forceMigration"
+                  [placeholder]="wallet.coinProtocol.addressPlaceholder"
+                  formControlName="address"
+                  id="address-input"
+                ></ion-textarea>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="2" class="ion-no-padding">
+          <ion-row class="ion-justify-content-center ion-align-items-center">
+            <ion-avatar>
+              <identicon [address]="wallet.receivingPublicAddress"></identicon>
+            </ion-avatar>
+          </ion-row>
+          <ion-row class="ion-justify-content-center ion-align-items-center">
+            <div class="line--vertical"></div>
+          </ion-row>
+          <ion-row class="ion-justify-content-center ion-align-items-center">
+            <ion-avatar>
+              <identicon [address]="transactionForm.get('address').value"></identicon>
+            </ion-avatar>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+      <ion-row
+        class="error--address ion-padding-horizontal"
+        *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
+      >
+        <ion-col size="12" class="ion-no-padding">
+          <ion-text class="ion-no-margin" color="danger">
+            <p
+              class="ion-no-margin"
+              [innerHTML]="
+              'transaction-prepare.error.address_label' | translate: { addressPlaceholder: this.wallet.coinProtocol.addressPlaceholder }
+            "
+            ></p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-padding-horizontal ion-padding-bottom address-to__buttons">
+        <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="pasteClipboard()">
+          {{ 'transaction-prepare.paste_label' | translate }}
+        </ion-button>
+        <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="openScanner()">
+          <ion-icon slot="start" name="barcode-outline"></ion-icon>
+          {{ 'transaction-prepare.to-address-scan_label' | translate }}
+        </ion-button>
+      </ion-row>
+      <div class="divider--line"></div>
+      <ion-row class="ion-padding-horizontal ion-padding-top ion-align-items-center amount__container">
+        <ion-col size="9" class="ion-no-padding amount--container__input">
+          <ion-item class="ion-no-padding" lines="none">
+            <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+              {{ 'transaction-prepare.amount_label' | translate }}
+            </ion-label>
+            <ion-input
+              [attr.disabled]="forceMigration"
+              formControlName="amount"
+              type="number"
+              id="amount-input"
+              placeholder="0.0"
+            ></ion-input>
+          </ion-item>
+          <ion-text class="ion-no-margin" color="blackLight">
+            <p class="ion-no-margin">${{ transactionForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
+          </ion-text>
+        </ion-col>
+        <ion-col size="3" class="ion-no-padding">
+          <ion-toolbar>
+            <ion-buttons slot="end">
+              <ion-button
+                shape="round"
+                [fill]="sendMaxAmount ? 'solid' : 'outline'"
+                size="small"
+                color="secondary"
+                (click)="toggleMaxAmount()"
+              >
+                {{ 'transaction-prepare.fee.max_label' | translate }}
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-padding-horizontal ion-padding-bottom">
+        <ion-col size="12" *ngIf="!transactionForm.controls['amount'].valid">
+          <ion-text class="ion-no-margin" color="danger">
+            <p class="ion-no-margin">
+              {{ 'transaction-prepare.error.amount_label' | translate }}
+            </p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <div class="divider--line"></div>
+      <!-- TODO: remove `ng-container` when we properly support Substrate fee/tip model -->
+      <ng-container *ngIf="!isSubstrate">
+        <ion-row class="fee--amount__label ion-padding-horizontal">
           <ion-col size="12" class="ion-no-padding">
-            <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
-              <ion-label color="blackLight" position="stacked">{{ 'Send To' | translate }}</ion-label>
-              <ion-textarea
-                [attr.disabled]="forceMigration"
-                [placeholder]="wallet.coinProtocol.addressPlaceholder"
-                formControlName="address"
-                id="address-input"
-              ></ion-textarea>
+            <ion-item lines="none" class="ion-no-padding">
+              <ion-text class="ion-no-margin" color="blackLight">
+                <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+              </ion-text>
+              <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode"></ion-toggle>
             </ion-item>
           </ion-col>
         </ion-row>
-      </ion-col>
-      <ion-col size="2" class="ion-no-padding">
-        <ion-row class="ion-justify-content-center ion-align-items-center">
-          <ion-avatar>
-            <identicon [address]="wallet.receivingPublicAddress"></identicon>
-          </ion-avatar>
+        <ion-row nowrap class="ion-padding-horizontal">
+          <ion-col size="12" class="ion-no-padding">
+            <ion-item class="ion-no-padding" lines="none">
+              <ion-range
+                [attr.disabled]="forceMigration"
+                min="0"
+                max="2"
+                step="1"
+                snaps="true"
+                formControlName="feeLevel"
+                id="feeLevel-input"
+                class="range-slider ion-no-padding"
+              >
+                <ion-icon slot="start" color="black" name="hourglass-outline"></ion-icon>
+                <ion-icon slot="end" color="black" name="rocket-outline"></ion-icon>
+              </ion-range>
+            </ion-item>
+          </ion-col>
         </ion-row>
-        <ion-row class="ion-justify-content-center ion-align-items-center">
-          <div class="line--vertical"></div>
+        <ion-row class="ion-padding-horizontal">
+          <ion-col size="6" class="ion-no-padding">
+            <small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small>
+          </ion-col>
+          <ion-col size="6" class="ion-no-padding ion-text-right">
+            <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
+          </ion-col>
         </ion-row>
-        <ion-row class="ion-justify-content-center ion-align-items-center">
-          <ion-avatar>
-            <identicon [address]="transactionForm.get('address').value"></identicon>
-          </ion-avatar>
+        <ion-row class="ion-padding-horizontal" *ngIf="transactionForm.get('isAdvancedMode').value">
+          <ion-col size="12" class="ion-no-padding">
+            <ion-item class="advanced-item" class="ion-no-padding">
+              <ion-label position="stacked"></ion-label>
+              <ion-input
+                [attr.disabled]="forceMigration || disableFees"
+                id="fee-input"
+                formControlName="fee"
+                type="string"
+                class="ion-no-padding"
+              ></ion-input>
+              <span slot="end" class="input--placeholder">
+                {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
+              </span>
+            </ion-item>
+          </ion-col>
         </ion-row>
-      </ion-col>
-    </ion-row>
-    <ion-row
-      class="error--address ion-padding-horizontal"
-      *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
-    >
-      <ion-col size="12" class="ion-no-padding">
-        <ion-text class="ion-no-margin" color="danger">
-          <p
-            class="ion-no-margin"
-            [innerHTML]="
-              'transaction-prepare.error.address_label' | translate: { addressPlaceholder: this.wallet.coinProtocol.addressPlaceholder }
-            "
-          ></p>
-        </ion-text>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal ion-padding-bottom address-to__buttons">
-      <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="pasteClipboard()">
-        {{ 'transaction-prepare.paste_label' | translate }}
-      </ion-button>
-      <ion-button [attr.disabled]="forceMigration" fill="outline" size="small" color="secondary" shape="round" (click)="openScanner()">
-        <ion-icon slot="start" name="md-barcode"></ion-icon>
-        {{ 'transaction-prepare.to-address-scan_label' | translate }}
-      </ion-button>
-    </ion-row>
-    <div class="divider--line"></div>
-    <ion-row class="ion-padding-horizontal ion-padding-top ion-align-items-center amount__container">
-      <ion-col size="9" class="ion-no-padding amount--container__input">
-        <ion-item class="ion-no-padding" lines="none">
-          <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-            {{ 'transaction-prepare.amount_label' | translate }}
-          </ion-label>
-          <ion-input
-            [attr.disabled]="forceMigration"
-            formControlName="amount"
-            type="number"
-            id="amount-input"
-            placeholder="0.0"
-          ></ion-input>
-        </ion-item>
-        <ion-text class="ion-no-margin" color="blackLight">
-          <p class="ion-no-margin">${{ transactionForm.get('amount').value * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
-        </ion-text>
-      </ion-col>
-      <ion-col size="3" class="ion-no-padding">
-        <ion-toolbar>
-          <ion-buttons slot="end">
-            <ion-button
-              shape="round"
-              [fill]="sendMaxAmount ? 'solid' : 'outline'"
-              size="small"
-              color="secondary"
-              (click)="toggleMaxAmount()"
-            >
-              {{ 'transaction-prepare.fee.max_label' | translate }}
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal ion-padding-bottom">
-      <ion-col size="12" *ngIf="!transactionForm.controls['amount'].valid">
-        <ion-text class="ion-no-margin" color="danger">
-          <p class="ion-no-margin">
-            {{ 'transaction-prepare.error.amount_label' | translate }}
-          </p>
-        </ion-text>
-      </ion-col>
-    </ion-row>
-    <div class="divider--line"></div>
-    <ion-row class="fee--amount__label ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-item lines="none" class="ion-no-padding">
-          <ion-text class="ion-no-margin" color="blackLight">
-            <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+        <ion-row class="fee-amount__help ion-padding-horizontal" *ngIf="!disableFees">
+          <ion-text color="blackLight">
+            <p class="ion-no-margin">
+              <span id="fee-amount">
+                <ng-container *ngIf="transactionForm.controls['fee'].invalid" color="primary">
+                  {{ 'transaction-prepare.amount_label' | translate }}
+                </ng-container>
+                <ng-container *ngIf="transactionForm.controls['fee'].valid" color="primary">
+                  ${{ transactionForm.get('fee').value * feeCurrentMarketPrice | number: '1.2-4' }}
+                </ng-container>
+              </span>
+              <span id="fee-amount-advanced" *ngIf="!transactionForm.get('isAdvancedMode').value">
+                ({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+              </span>
+            </p>
           </ion-text>
-          <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode"></ion-toggle>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row nowrap class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-item class="ion-no-padding" lines="none">
-          <ion-range
-            [attr.disabled]="forceMigration"
-            min="0"
-            max="2"
-            step="1"
-            snaps="true"
-            formControlName="feeLevel"
-            id="feeLevel-input"
-            class="range-slider ion-no-padding"
-          >
-            <ion-icon slot="start" color="black" name="md-hourglass"></ion-icon>
-            <ion-icon slot="end" color="black" name="md-rocket"></ion-icon>
-          </ion-range>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal">
-      <ion-col size="6" class="ion-no-padding">
-        <small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small>
-      </ion-col>
-      <ion-col size="6" class="ion-no-padding ion-text-right">
-        <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal" *ngIf="transactionForm.get('isAdvancedMode').value">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-item class="advanced-item" class="ion-no-padding">
-          <ion-label position="stacked"></ion-label>
-          <ion-input [attr.disabled]="forceMigration" id="fee-input" formControlName="fee" type="string" class="ion-no-padding"></ion-input>
-          <span slot="end" class="input--placeholder">
-            {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
-          </span>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row class="fee-amount__help ion-padding-horizontal">
-      <ion-text color="blackLight">
-        <p class="ion-no-margin">
-          <span id="fee-amount">
-            <ng-container *ngIf="transactionForm.controls['fee'].invalid" color="primary">
-              {{ 'transaction-prepare.amount_label' | translate }}
-            </ng-container>
-            <ng-container *ngIf="transactionForm.controls['fee'].valid" color="primary">
-              ${{ transactionForm.get('fee').value * feeCurrentMarketPrice | number: '1.2-4' }}
-            </ng-container>
-          </span>
-          <span id="fee-amount-advanced" *ngIf="!transactionForm.get('isAdvancedMode').value">
-            ({{ transactionForm.get('fee').value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
-          </span>
-        </p>
-      </ion-text>
-    </ion-row>
-  </form>
+        </ion-row>
+      </ng-container>
+      <!-- TODO: remove it when we properly support Substrate fee/tip model -->
+      <ng-container *ngIf="isSubstrate">
+        <ion-row class="fee--amount__label ion-padding-horizontal">
+          <ion-col size="12" class="ion-no-padding">
+            <ion-item lines="none" class="ion-no-padding">
+              <ion-text class="ion-no-margin" color="blackLight">
+                <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+              </ion-text>
+              <ion-toggle slot="end" mode="md" checked="true" [disabled]="true"></ion-toggle>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row nowrap class="ion-padding-horizontal">
+          <ion-col size="12" class="ion-no-padding">
+            <ion-item class="ion-no-padding" lines="none">
+              <ion-range
+                [attr.disabled]="true"
+                min="0"
+                max="2"
+                step="1"
+                snaps="true"
+                formControlName="feeLevel"
+                id="feeLevel-input"
+                class="range-slider ion-no-padding"
+              >
+                <ion-icon slot="start" color="black" name="hourglass-outline"></ion-icon>
+                <ion-icon slot="end" color="black" name="rocket-outline"></ion-icon>
+              </ion-range>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-horizontal">
+          <ion-col size="6" class="ion-no-padding">
+            <small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small>
+          </ion-col>
+          <ion-col size="6" class="ion-no-padding ion-text-right">
+            <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
+          </ion-col>
+        </ion-row>
+        <ion-row class="ion-padding-horizontal" *ngIf="transactionForm.get('isAdvancedMode').value">
+          <ion-col size="12" class="ion-no-padding">
+            <ion-item class="advanced-item" class="ion-no-padding">
+              <ion-label position="stacked"></ion-label>
+              <ion-input
+                [attr.disabled]="forceMigration || disableFees"
+                id="fee-input"
+                formControlName="fee"
+                type="string"
+                class="ion-no-padding"
+              ></ion-input>
+              <span slot="end" class="input--placeholder">
+                {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row class="fee-amount__help ion-padding-horizontal" *ngIf="!disableFees">
+          <ion-text color="blackLight">
+            <p class="ion-no-margin">
+              <span id="fee-amount">
+                <ng-container *ngIf="substrateFee.isNaN()" color="primary">
+                  <ion-skeleton-text animated style="width: 15%;"></ion-skeleton-text>
+                </ng-container>
+                <ng-container *ngIf="!substrateFee.isNaN()" color="primary">
+                  ${{ substrateFee.multipliedBy(wallet.currentMarketPrice).toString() | number: '1.2-4' }}
+                </ng-container>
+              </span>
+              <span id="fee-amount-advanced" *ngIf="!substrateFee.isNaN()">
+                ({{ substrateFee.toString() | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+              </span>
+            </p>
+          </ion-text>
+        </ion-row>
+      </ng-container>
+    </form>
+  </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button

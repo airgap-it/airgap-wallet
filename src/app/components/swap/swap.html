@@ -49,8 +49,8 @@
     <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
     <ion-row>
       <h5>
-        {{ selectedProtocol?.identifier | uppercase }}
-        <ion-icon name="md-arrow-dropdown"></ion-icon>
+        {{ selectedProtocol?.symbol | uppercase }}
+        <ion-icon name="chevron-down-outline"></ion-icon>
       </h5>
     </ion-row>
   </ion-col>
@@ -59,11 +59,11 @@
   <portfolio-item
     [wallet]="selectedWallet"
     tappable
+    [hideDelegationBadge]="true"
     [isExpendable]="supportedWallets?.length > 1"
     [hideFiatAmounts]="true"
     (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
-    [maxDigits]="8"
   ></portfolio-item>
   <ng-container *ngIf="expandWalletSelection">
     <ion-list lines="none" margin-top [@expandWalletAnimation]>
@@ -75,7 +75,6 @@
           tappable
           [hideFiatAmounts]="true"
           [isExpendable]="false"
-          [maxDigits]="8"
         ></portfolio-item>
       </ng-container>
     </ion-list>

@@ -126,6 +126,19 @@
   ion-alert {
     --max-width: calc(100% - 32px);
   }
+
+  /* no padding and margin for small buttons */
+  page-exchange {
+    .button-small {
+      --padding-start: 0;
+      --padding-end: 0;
+      margin: 0;
+    }
+  }
+
+  ion-split-pane {
+    --side-max-width: 10vw;
+  }
 }
 
 .ion-color-white {
@@ -184,6 +197,19 @@ page-account-address {
   ion-avatar {
     width: 64px;
     height: 64px;
+  }
+}
+
+portfolio-item {
+  div[slot='end'] {
+    margin-inline-start: 8px;
+  }
+}
+page-portfolio {
+  portfolio-item {
+    div[slot='end'] {
+      margin-inline-end: 0;
+    }
   }
 }
 

@@ -1,0 +1,35 @@
+<ion-row *ngIf="transactionType === 'pendingTransaction' && hasPendingTransactions">
+  <ion-col size="10" class="ion-padding-horizontal">
+    <ion-text class="font--weight__bold" color="primary">
+      <p class="ion-no-margin">{{ 'account-transaction-list.pending-transactions.label' | translate }}</p>
+    </ion-text>
+  </ion-col>
+  <ion-col size="12" class="ion-no-padding">
+    <ion-button (click)="openBlockexplorer()" fill="outline" color="secondary" shape="round" slot="start" size="small">
+      <ion-icon slot="start" name="open"></ion-icon>
+      {{ 'account-transaction-list.pending-transactions.open-blockexplorer_label' | translate }}
+    </ion-button>
+  </ion-col>
+</ion-row>
+
+<ion-row class="ion-padding-horizontal" *ngIf="transactionType === 'exchangeTransaction' && hasExchangeTransactions">
+  <ion-text class="font--weight__bold" color="primary">
+    <p>{{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}</p>
+  </ion-text>
+</ion-row>
+
+<ion-list lines="none" class="ion-padding-bottom" *ngIf="transactions !== undefined && transactions.length > 0">
+  <ng-container *ngFor="let tx of transactions">
+    <transaction-item [tx]="tx" [transactionType]="transactionType" (click)="openTransactionDetailPage(tx)"></transaction-item>
+  </ng-container>
+  <ion-row *ngIf="isRefreshing && !initialTransactionsLoaded" class="loading-content ion-justify-content-center">
+    <ion-spinner color="black"></ion-spinner>
+  </ion-row>
+</ion-list>
+
+<ng-container *ngIf="transactionType === 'normalTransaction'">
+  <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && transactions.length === 0">
+    <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
+    <p>{{ 'account-transaction-list.no-transactions_text' | translate }}</p>
+  </div>
+</ng-container>

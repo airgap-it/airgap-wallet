@@ -42,7 +42,7 @@ export class PortfolioPage {
 
       this.refreshWalletGroups(wallets)
     })
-    this.walletsProvider.walledChangedObservable.subscribe(() => {
+    this.walletsProvider.walletChangedObservable.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList())
     })
   }
@@ -124,7 +124,7 @@ export class PortfolioPage {
 
   public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
-    this.operationsProvider.refreshAllDelegationStatuses()
+    this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
     await Promise.all([
       this.walletsProvider.getWalletList().map(wallet => {

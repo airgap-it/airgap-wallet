@@ -1,0 +1,10 @@
+.gatekeeper--logo {
+  width: 40vw;
+}
+ion-card {
+  height: calc(100% - 20px);
+  img {
+    max-width: 128px;
+    height: auto;
+  }
+}

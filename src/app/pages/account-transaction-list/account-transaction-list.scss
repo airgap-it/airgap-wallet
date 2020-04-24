@@ -1,20 +1,3 @@
-.empty--list__container {
-  height: 25vh;
-  padding-top: 48px;
-  .empty--list__image {
-    height: 30vh;
-  }
-}
-.empty-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  font-weight: 100;
-  font-size: 1.4rem;
-  height: 50%;
-}
 .loading-header {
   color: white;
   font-weight: 300;
@@ -40,16 +23,10 @@
 ion-fab {
   width: 100%;
 }
-ion-header {
-  ion-toolbar,
-  ion-row {
-    background-color: white;
-  }
-}
-p {
-  margin: 0px;
-}
 
 svg {
   stroke: none;
+}
+.action--container {
+  background: #fff;
 }

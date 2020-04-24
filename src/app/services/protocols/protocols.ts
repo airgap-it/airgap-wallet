@@ -15,36 +15,24 @@ export enum ProtocolSymbols {
   ETH = 'eth',
   XTZ = 'xtz',
   XTZ_KT = 'xtz-kt',
-  TZBTC = 'xtz-btc',
-  COSMOS = 'cosmos'
+  COSMOS = 'cosmos',
+  POLKADOT = 'polkadot',
+  KUSAMA = 'kusama',
+  TZBTC = 'xtz-btc'
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProtocolsProvider {
-  public subProtocols: SubAccount[] = [
-    {
-      protocol: 'eth',
-      subProtocols: [
-        {
-          symbol: 'AE-ERC20',
-          name: 'æternity Ethereum Token',
-          marketSymbol: 'ae',
-          identifier: 'eth-erc20-ae',
-          contractAddress: '0x5ca9a71b1d01849c0a95490cc00559717fcf0d1d',
-          decimals: 18
-        }
-      ]
-    }
-  ]
+  public subProtocols: SubAccount[] = []
 
   constructor() {
     /* */
   }
 
   public getEnabledSubProtocols() {
-    return ['eth-erc20-ae', 'xtz-btc']
+    return ['xtz-btc', 'eth-erc20-xchf']
   }
 
   public addProtocols() {

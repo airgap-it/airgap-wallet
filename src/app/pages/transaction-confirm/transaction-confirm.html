@@ -1,15 +1,18 @@
-<ion-header no-border no-shadow>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'transaction-confirm.title' | translate }}</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'transaction-confirm.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <signed-transaction [signedTx]="signedTransactionSync"></signed-transaction>
-
+  <ion-grid fixed="true" class="ion-no-padding">
+    <signed-transaction [signedTxs]="signedTransactionsSync"></signed-transaction>
+  </ion-grid>
   <ion-fab vertical="bottom" slot="fixed">
     <ion-row>
       <ion-col>

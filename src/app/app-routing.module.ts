@@ -118,27 +118,26 @@ const routes: Routes = [
     loadChildren: () => import('./pages/transaction-confirm/transaction-confirm.module').then(m => m.TransactionConfirmPageModule)
   },
   {
-    path: 'delegation-baker-detail/:id',
+    path: 'delegation-detail/:id',
     resolve: {
       special: DataResolverService
     },
-    loadChildren: () =>
-      import('./pages/delegation-baker-detail/delegation-baker-detail.module').then(m => m.DelegationBakerDetailPageModule)
+    loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   },
   {
-    path: 'delegation-cosmos/:id',
+    path: 'delegation-list/:id',
     resolve: {
       special: DataResolverService
     },
-    loadChildren: () => import('./pages/delegation-cosmos/delegation-cosmos.module').then(m => m.DelegationCosmosPageModule)
+    loadChildren: () => import('./pages/delegation-list/delegation-list.module').then(m => m.DelegationListPageModule)
   },
   {
-    path: 'delegation-validator-list/:id',
-    resolve: {
-      special: DataResolverService
-    },
-    loadChildren: () =>
-      import('./pages/delegation-validator-list/delegation-validator-list.module').then(m => m.DelegationValidatorListPageModule)
+    path: 'exchange-select',
+    loadChildren: () => import('./pages/exchange-select/exchange-select.module').then(m => m.ExchangeSelectPageModule)
+  },
+  {
+    path: 'exchange-custom',
+    loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
   }
 ]
 @NgModule({

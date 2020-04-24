@@ -1,43 +1,63 @@
-<ion-header no-border>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>
-      {{ 'transaction-qr.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}
-    </ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        {{ 'transaction-qr.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
 <ion-content class="ion-padding ion-margin-bottom">
-  <ion-row>
-    <h5 [innerHTML]="'transaction-qr.text' | translate"></h5>
-  </ion-row>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-row>
+      <h5 [innerHTML]="'transaction-qr.text' | translate"></h5>
+    </ion-row>
 
-  <ion-row class="ion-justify-content-center ion-padding-vertical">
-    <qr-clipboard id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
-    <ion-text>
-      <h1 *ngIf="qrDataTooBig">
-        {{ 'transaction-qr.qr-data-too-big_warning' | translate }}
-      </h1>
-    </ion-text>
-  </ion-row>
+    <ion-row class="ion-justify-content-center ion-padding-vertical">
+      <qr-clipboard id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
+      <ion-text>
+        <h1 *ngIf="qrDataTooBig">
+          {{ 'transaction-qr.qr-data-too-big_warning' | translate }}
+        </h1>
+      </ion-text>
+    </ion-row>
 
-  <ng-container *ngIf="airGapTxs && airGapTxs.length > 1">
-    Total Operations: {{ aggregatedInfo.numberOfTxs }}
-    <br />
-    Total Amount: {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier,
-    maxDigits: undefined } }}
-    <br />
-    Total Fee: {{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier } }}
-  </ng-container>
+    <ng-container *ngIf="airGapTxs && airGapTxs.length > 1">
+      <ion-row class="ion-padding-bottom ion-text-center">
+        <ion-col size="4" class="content--align__center-center">
+          <h5>
+            {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier, maxDigits:
+            undefined } }}
+          </h5>
+        </ion-col>
+        <ion-col size="4" class="content--align__center-center">
+          <h5>{{ aggregatedInfo.numberOfTxs }}</h5>
+        </ion-col>
+        <ion-col size="4" class="content--align__center-center">
+          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier } }}</h5>
+        </ion-col>
+        <ion-col size="4">
+          <small>Amount</small>
+        </ion-col>
+        <ion-col size="4">
+          <small>Operations</small>
+        </ion-col>
+        <ion-col size="4">
+          <small>Fee</small>
+        </ion-col>
+      </ion-row>
+    </ng-container>
 
-  <ng-container *ngIf="airGapTxs">
-    <from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></from-to>
-  </ng-container>
+    <ng-container *ngIf="airGapTxs">
+      <from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></from-to>
+    </ng-container>
 
-  <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>
-
+    <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>
+  </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">
       {{ 'transaction-qr.done_label' | translate }}

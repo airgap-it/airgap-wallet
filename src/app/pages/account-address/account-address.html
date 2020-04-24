@@ -1,4 +1,4 @@
-<ion-header no-border>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -8,28 +8,28 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-row class="ion-padding">
-    <ion-col>
+  <ion-row class="ion-padding-vertical">
+    <ion-col size="12">
       <ion-avatar>
         <identicon [address]="wallet.receivingPublicAddress"></identicon>
       </ion-avatar>
       <currency-symbol class="symbol--icon" [symbol]="wallet.coinProtocol.symbol"></currency-symbol>
     </ion-col>
-    <ion-col>
+    <ion-col size="12">
       <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol | uppercase }}</h2>
       <p>
         {{ 'wallet-address.address_label' | translate }}:
         <br />
         <span (click)="copyAddressToClipboard()" class="text--selectable typography--mono">
           {{ wallet.receivingPublicAddress }}
-          <ion-icon name="md-clipboard"></ion-icon>
+          <ion-icon name="clipboard-outline"></ion-icon>
         </span>
       </p>
     </ion-col>
   </ion-row>
 
   <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [size]="240"></qr-clipboard>
+    <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [shouldPrefixSingleQrWithUrl]="false" [size]="240"></qr-clipboard>
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

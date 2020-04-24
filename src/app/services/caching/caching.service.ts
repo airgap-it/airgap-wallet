@@ -1,7 +1,6 @@
-import { CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet, IAirGapTransaction, CosmosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
@@ -25,7 +24,7 @@ export interface PriceSampleIdentifier {
 }
 
 export interface StorageObject {
-  value: any[]
+  value: any
   timestamp: number
 }
 
@@ -44,11 +43,6 @@ export class CachingService {
 
   public setPriceData(identifier: PriceSampleIdentifier, value: any): Promise<any> {
     const uniqueId = `${identifier.timeUnit}_${identifier.protocolIdentifier}_${identifier.key}`
-    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
-  }
-
-  public setValidators(value: CosmosValidator[]): Promise<any> {
-    const uniqueId = CachingServiceKey.VALIDATORS
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
@@ -76,10 +70,8 @@ export class CachingService {
     return new Promise<MarketDataSample[]>(async resolve => {
       const cachedData: StorageObject = await this.storage.get(uniqueId)
       if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
-        console.log('there is cached market data for', coinProtocol)
         resolve(cachedData.value)
       } else {
-        console.log('there NO cached market data for', coinProtocol)
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
           promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {
@@ -99,6 +91,16 @@ export class CachingService {
         promise
           .then((prices: MarketDataSample[]) => {
             let filteredPrices: MarketDataSample[] = prices
+            if (timeUnit === 'days') {
+              filteredPrices = prices.filter((_value, index) => {
+                return index % 5 === 0
+              })
+            }
+            if (timeUnit === 'hours') {
+              filteredPrices = prices.filter((_value, index) => {
+                return index % 2 === 0
+              })
+            }
             if (timeUnit === 'minutes') {
               filteredPrices = prices.filter((_value, index) => {
                 return index % 20 === 0
@@ -118,22 +120,6 @@ export class CachingService {
             resolve(marketSample)
           })
           .catch(console.error)
-      }
-    })
-  }
-
-  public async fetchValidators(): Promise<CosmosValidator[]> {
-    const uniqueId = CachingServiceKey.VALIDATORS
-    return new Promise<CosmosValidator[]>(async resolve => {
-      const validatorsObject: StorageObject = await this.storage.get(uniqueId)
-      if (validatorsObject && validatorsObject.timestamp > Date.now() - 30 * 60 * 1000) {
-        console.log('FROM CACHE: validators')
-        resolve(validatorsObject.value)
-      } else {
-        const protocol = new CosmosProtocol()
-        const validators = await protocol.fetchValidators()
-        this.setValidators(validators)
-        resolve(validators)
       }
     })
   }

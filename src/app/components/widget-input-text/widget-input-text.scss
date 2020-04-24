@@ -1,0 +1,17 @@
+.value__container {
+  .item-inner {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+  ion-input {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin: 0;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+  .value--container__input,
+  .value--container__input .item-inner {
+    padding-right: 0;
+  }
+}

@@ -47,7 +47,7 @@ export class AccountProvider {
 
   private readonly walletChangedBehaviour: Subject<void> = new Subject()
 
-  get walledChangedObservable() {
+  get walletChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
@@ -160,6 +160,8 @@ export class AccountProvider {
       wallets = []
     }
 
+    const walletInitPromises: Promise<void>[] = []
+
     wallets.forEach(wallet => {
       const airGapWallet = new AirGapMarketWallet(
         wallet.protocolIdentifier,
@@ -168,41 +170,15 @@ export class AccountProvider {
         wallet.derivationPath,
         wallet.addressIndex
       )
-
       // add derived addresses
       airGapWallet.addresses = wallet.addresses
-
-      // if we have no addresses, derive using webworker and sync, else just sync
-      if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
-        const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
-
-        airGapWorker.onmessage = event => {
-          airGapWallet.addresses = event.data.addresses
-          airGapWallet
-            .synchronize()
-            .then(() => {
-              this.triggerWalletChanged()
-            })
-            .catch(console.error)
-        }
-
-        airGapWorker.postMessage({
-          protocolIdentifier: airGapWallet.protocolIdentifier,
-          publicKey: airGapWallet.publicKey,
-          isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
-          derivationPath: airGapWallet.derivationPath,
-          addressIndex: airGapWallet.addressIndex
-        })
-      } else {
-        airGapWallet
-          .synchronize()
-          .then(() => {
-            this.triggerWalletChanged()
-          })
-          .catch(console.error)
-      }
-
+      walletInitPromises.push(this.initializeWallet(airGapWallet))
       this.walletList.push(airGapWallet)
+    })
+
+    Promise.all(walletInitPromises).then(() => {
+      this.triggerWalletChanged()
+      this.drawChartProvider.drawChart()
     })
 
     /* Use for Testing of Skeleton
@@ -219,6 +195,46 @@ export class AccountProvider {
 
     this.wallets.next(this.walletList)
     this.pushProvider.registerWallets(this.walletList)
+  }
+
+  private async initializeWallet(airGapWallet: AirGapMarketWallet): Promise<void> {
+    return new Promise<void>(resolve => {
+      // if we have no addresses, derive using webworker and sync, else just sync
+      if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
+        const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
+
+        airGapWorker.onmessage = event => {
+          airGapWallet.addresses = event.data.addresses
+          airGapWallet
+            .synchronize()
+            .then(() => {
+              resolve()
+            })
+            .catch(error => {
+              console.error(error)
+              resolve()
+            })
+        }
+
+        airGapWorker.postMessage({
+          protocolIdentifier: airGapWallet.protocolIdentifier,
+          publicKey: airGapWallet.publicKey,
+          isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
+          derivationPath: airGapWallet.derivationPath,
+          addressIndex: airGapWallet.addressIndex
+        })
+      } else {
+        airGapWallet
+          .synchronize()
+          .then(() => {
+            resolve()
+          })
+          .catch(error => {
+            console.error(error)
+            resolve()
+          })
+      }
+    })
   }
 
   public getWalletList(): AirGapMarketWallet[] {

@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, Platform, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
 
 declare let cordova
@@ -19,7 +21,7 @@ declare let cordova
 export class AccountEditPopoverComponent implements OnInit {
   private readonly wallet: AirGapMarketWallet
   private readonly onDelete: Function
-  private readonly onUndelegate: Function
+
   // Tezos
   public importAccountAction: ButtonAction<string[], ImportAccoutActionContext>
   public isTezosKT: boolean = false
@@ -38,7 +40,6 @@ export class AccountEditPopoverComponent implements OnInit {
     this.wallet = this.navParams.get('wallet')
     this.importAccountAction = this.navParams.get('importAccountAction')
     this.onDelete = this.navParams.get('onDelete')
-    this.onUndelegate = this.navParams.get('onUndelegate')
   }
 
   public async copyAddressToClipboard(): Promise<void> {
@@ -46,11 +47,11 @@ export class AccountEditPopoverComponent implements OnInit {
     await this.dismissPopover()
   }
 
-  public openBlockExplorer(): void {
+  public async openBlockExplorer(): Promise<void> {
     const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocolIdentifier)
 
     let blockexplorer: string = protocol.blockExplorer
-    blockexplorer = protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    blockexplorer = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
     this.openUrl(blockexplorer)
   }
   private openUrl(url: string): void {
@@ -66,19 +67,13 @@ export class AccountEditPopoverComponent implements OnInit {
     if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
     }
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ || this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
-      this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(this.wallet.receivingPublicAddress)
+    if (supportsDelegation(this.wallet.coinProtocol)) {
+      this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(
+        this.wallet.coinProtocol,
+        this.wallet.receivingPublicAddress
+      )
     }
     // tezos end
-  }
-
-  public async undelegate(): Promise<void> {
-    await this.dismissPopover()
-    if (this.onUndelegate) {
-      this.onUndelegate()
-    } else {
-      handleErrorSentry(ErrorCategory.OTHER)('onUndelegate not defined')
-    }
   }
 
   public async delete(): Promise<void> {
