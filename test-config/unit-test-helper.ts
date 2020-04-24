@@ -23,12 +23,12 @@ import {
   ToastControllerMock
 } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
-import { AppMock, AppInfoPluginMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
+import { AppMock, AppInfoMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {
     app: new AppMock(),
-    appInfo: new AppInfoPluginMock(),
+    appInfo: new AppInfoMock(),
     platform: new PlatformMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),

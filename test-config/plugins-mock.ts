@@ -5,7 +5,7 @@ export class AppMock {
   public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
-export class AppInfoPluginMock {
+export class AppInfoMock {
   public get: jasmine.Spy = newSpy(
     'set',
     Promise.resolve({
@@ -15,6 +15,11 @@ export class AppInfoPluginMock {
       versionCode: 0
     })
   )
+}
+
+export class ClipboardMock {
+  public read: jasmine.Spy = newSpy('read', Promise.resolve())
+  public write: jasmine.Spy = newSpy('write', Promise.resolve())
 }
 
 export class SplashScreenMock {
