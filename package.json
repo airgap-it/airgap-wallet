@@ -62,7 +62,6 @@
     "@download/blockies": "^1.0.3",
     "@ionic-native/app-version": "^5.5.0",
     "@ionic-native/barcode-scanner": "^5.5.0",
-    "@ionic-native/clipboard": "^5.5.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/diagnostic": "^5.5.0",
     "@ionic-native/keyboard": "^5.5.0",
@@ -82,7 +81,6 @@
     "chart.js": "^2.8.0",
     "com.lampa.startapp": "^6.1.6",
     "cordova-android": "8.1.0",
-    "cordova-clipboard": "^1.2.1",
     "cordova-electron": "^1.1.1",
     "cordova-ios": "5.0.1",
     "cordova-plugin-app-version": "^0.1.9",
@@ -179,7 +177,6 @@
       "com.lampa.startapp": {},
       "cordova-plugin-qrscanner": {},
       "cordova-sqlite-storage": {},
-      "cordova-clipboard": {},
       "cordova.plugins.diagnostic": {
         "ANDROID_SUPPORT_VERSION": "28.+"
       },
