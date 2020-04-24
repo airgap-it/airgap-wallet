@@ -60,7 +60,6 @@
     "@capacitor/core": "1.5.1",
     "@capacitor/ios": "^1.5.1",
     "@download/blockies": "^1.0.3",
-    "@ionic-native/app-version": "^5.5.0",
     "@ionic-native/barcode-scanner": "^5.5.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/diagnostic": "^5.5.0",
@@ -83,7 +82,6 @@
     "cordova-android": "8.1.0",
     "cordova-electron": "^1.1.1",
     "cordova-ios": "5.0.1",
-    "cordova-plugin-app-version": "^0.1.9",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-plugin-x-socialsharing": "^5.4.4",
     "cordova-sqlite-storage": "^2.6.0",
@@ -173,7 +171,6 @@
       "cordova-plugin-x-socialsharing": {
         "ANDROID_SUPPORT_V4_VERSION": "28.+"
       },
-      "cordova-plugin-app-version": {},
       "com.lampa.startapp": {},
       "cordova-plugin-qrscanner": {},
       "cordova-sqlite-storage": {},

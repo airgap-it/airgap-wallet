@@ -7,7 +7,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
-import { AppVersion } from '@ionic-native/app-version/ngx'
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { Keyboard } from '@ionic-native/keyboard/ngx'
@@ -54,9 +53,16 @@ import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
-import { APP_PLUGIN, BROWSER_PLUGIN, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
+import {
+  APP_PLUGIN,
+  BROWSER_PLUGIN,
+  CLIPBOARD_PLUGIN,
+  SPLASH_SCREEN_PLUGIN,
+  STATUS_BAR_PLUGIN,
+  APP_INFO_PLUGIN
+} from './capacitor-plugins/injection-tokens'
 
-const { App, Browser, Clipboard, SplashScreen, StatusBar } = Plugins
+const { App, AppInfo, Browser, Clipboard, SplashScreen, StatusBar } = Plugins
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -99,6 +105,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   ],
   providers: [
     { provide: APP_PLUGIN, useValue: App },
+    { provide: APP_INFO_PLUGIN, useValue: AppInfo },
     { provide: BROWSER_PLUGIN, useValue: Browser },
     { provide: CLIPBOARD_PLUGIN, useValue: Clipboard },
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
@@ -113,7 +120,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     DrawChartService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     ScannerProvider,
-    AppVersion,
     Diagnostic,
     AccountProvider,
     StorageProvider,

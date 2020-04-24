@@ -6,14 +6,6 @@
     <param name="android-package" value="com.lampa.startapp.startApp"/>
   </feature>
 
-  <feature name="Clipboard">
-    <param name="android-package" value="com.verso.cordova.clipboard.Clipboard"/>
-  </feature>
-
-  <feature name="AppVersion">
-    <param name="android-package" value="uk.co.whiteoctober.cordova.AppVersion"/>
-  </feature>
-
   <feature name="QRScanner">
     <param name="android-package" value="com.bitpay.cordova.qrscanner.QRScanner"/>
   </feature>
@@ -33,11 +25,6 @@
 
   <feature name="Diagnostic_Camera">
     <param name="android-package" value="cordova.plugins.Diagnostic_Camera"/>
-    <param name="onload" value="true"/>
-  </feature>
-
-  <feature name="IonicDeeplinkPlugin">
-    <param name="android-package" value="io.ionic.links.IonicDeeplink"/>
     <param name="onload" value="true"/>
   </feature>
 

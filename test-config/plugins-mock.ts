@@ -5,6 +5,18 @@ export class AppMock {
   public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
+export class AppInfoPluginMock {
+  public get: jasmine.Spy = newSpy(
+    'set',
+    Promise.resolve({
+      appName: 'AirGap.UnitTest',
+      packageName: 'AirGap',
+      versionName: '0.0.0',
+      versionCode: 0
+    })
+  )
+}
+
 export class SplashScreenMock {
   public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }

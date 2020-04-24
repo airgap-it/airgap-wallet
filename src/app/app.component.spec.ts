@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing'
-import { AppVersion } from '@ionic-native/app-version/ngx'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
-import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, APP_INFO_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 import { AppComponent } from './app.component'
 
@@ -15,9 +14,9 @@ describe('AppComponent', () => {
       unitHelper.testBed({
         providers: [
           { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
-          { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen },
-          { provide: AppVersion, useValue: unitHelper.mockRefs.appVersion }
+          { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen }
         ],
         declarations: [AppComponent]
       })
@@ -43,10 +42,7 @@ describe('AppComponent', () => {
 
   it('should initialize the app', async () => {
     TestBed.createComponent(AppComponent)
-    expect(unitHelper.mockRefs.appVersion.getAppName).toHaveBeenCalled()
-    expect(unitHelper.mockRefs.appVersion.getPackageName).toHaveBeenCalled()
-    expect(unitHelper.mockRefs.appVersion.getVersionCode).toHaveBeenCalled()
-    expect(unitHelper.mockRefs.appVersion.getVersionNumber).toHaveBeenCalled()
+    expect(unitHelper.mockRefs.appInfo.get).toHaveBeenCalled()
   })
   */
 

@@ -87,13 +87,6 @@ export class NavParamsMock {
   }
 }
 
-export class AppVersionMock {
-  public getAppName: jasmine.Spy = newSpy('getAppName', Promise.resolve('AirGap.UnitTest'))
-  public getPackageName: jasmine.Spy = newSpy('getPackageName', Promise.resolve('AirGap'))
-  public getVersionNumber: jasmine.Spy = newSpy('getVersionNumber', Promise.resolve('0.0.0'))
-  public getVersionCode: jasmine.Spy = newSpy('getVersionCode', Promise.resolve('0'))
-}
-
 export class PlatformMock {
   public ready: jasmine.Spy = newSpy('ready', Promise.resolve())
 

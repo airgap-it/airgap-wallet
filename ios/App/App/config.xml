@@ -6,14 +6,6 @@
     <param name="ios-package" value="startApp"/>
   </feature>
 
-  <feature name="Clipboard">
-    <param name="ios-package" value="CDVClipboard"/>
-  </feature>
-
-  <feature name="AppVersion">
-    <param name="ios-package" value="AppVersion"/>
-  </feature>
-
   <feature name="QRScanner">
     <param name="ios-package" value="QRScanner"/>
   </feature>
@@ -35,10 +27,6 @@
   <feature name="Diagnostic_Camera">
     <param name="ios-package" value="Diagnostic_Camera"/>
     <param name="onload" value="true"/>
-  </feature>
-
-  <feature name="IonicDeeplinkPlugin">
-    <param name="ios-package" value="IonicDeeplinkPlugin" onload="true"/>
   </feature>
 
   <feature name="PushNotification">
