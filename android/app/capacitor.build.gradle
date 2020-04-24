@@ -10,7 +10,6 @@ android {
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
 
-    implementation "com.android.support:support-v4:24.1.1+"
     implementation "com.android.support:support-v4:28.+"
     implementation "com.android.support:appcompat-v7:28.+"
     implementation "com.android.support:support-v13:27.+"

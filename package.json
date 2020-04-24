@@ -82,7 +82,6 @@
     "cordova-electron": "^1.1.1",
     "cordova-ios": "5.0.1",
     "cordova-plugin-qrscanner": "3.0.1",
-    "cordova-plugin-x-socialsharing": "^5.4.4",
     "cordova-sqlite-storage": "^2.6.0",
     "cordova-support-google-services": "^1.1.0",
     "cordova.plugins.diagnostic": "^4.0.12",
@@ -167,9 +166,6 @@
   "description": "The Most Secure Practical Way To Do Crypto Transactions",
   "cordova": {
     "plugins": {
-      "cordova-plugin-x-socialsharing": {
-        "ANDROID_SUPPORT_V4_VERSION": "28.+"
-      },
       "cordova-plugin-qrscanner": {},
       "cordova-sqlite-storage": {},
       "cordova.plugins.diagnostic": {

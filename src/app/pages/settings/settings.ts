@@ -1,7 +1,8 @@
-import { Component } from '@angular/core'
+import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { SharePlugin } from '@capacitor/core'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
@@ -9,6 +10,8 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SerializerService } from '../../services/serializer/serializer.service'
 import { IntroductionPage } from '../introduction/introduction'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+
+import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 declare var window: any
 
@@ -26,7 +29,8 @@ export class SettingsPage {
     private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
 
   public about(): void {
@@ -35,24 +39,20 @@ export class SettingsPage {
 
   public share(): void {
     const options = {
-      message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',
-      // not supported on some apps (Facebook, Instagram)
-      subject: 'Checkout airgap.it', // fi. for email
-      url: 'https://www.airgap.it',
-      chooserTitle: 'Pick an app' // Android only, you can override the default share sheet title
+      title: 'Checkout airgap.it', // Set a title for any message. This will be the subject if sharing to email
+      text: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.', // Set some text to share
+      url: 'https://www.airgap.it', // Set a URL to share
+      dialogTitle: 'Pick an app' // Set a title for the share modal. Android only
     }
 
-    const onSuccess: (result: any) => void = (result: any): void => {
-      console.log(`Share completed: ${result.completed}`) // On Android apps mostly return false even while it's true
-      console.log(`Shared to app: ${result.app}`)
-      // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
-    }
-
-    const onError: (msg: string) => void = (msg: string): void => {
-      console.log('Sharing failed with message: ' + msg)
-    }
-
-    window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError)
+    this.sharePlugin
+      .share(options)
+      .then(result => {
+        console.log(`Share completed: ${result}`)
+      })
+      .catch(error => {
+        console.log('Sharing failed with error: ' + error)
+      })
   }
 
   public async introduction(): Promise<void> {
