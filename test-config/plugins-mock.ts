@@ -22,6 +22,15 @@ export class ClipboardMock {
   public write: jasmine.Spy = newSpy('write', Promise.resolve())
 }
 
+export class PermissionsMock {
+  public query: jasmine.Spy = newSpy('query', Promise.resolve())
+}
+
+export class PushNotificationsMock {
+  public register: jasmine.Spy = newSpy('register', Promise.resolve())
+  public addListener: jasmine.Spy = newSpy('addListener', {})
+}
+
 export class SplashScreenMock {
   public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }

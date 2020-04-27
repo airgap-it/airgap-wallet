@@ -20,9 +20,5 @@
     <param name="onload" value="true"/>
   </feature>
 
-  <feature name="PushNotification">
-    <param name="ios-package" value="PushPlugin"/>
-  </feature>
-
   
 </widget>

@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core'
-import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
+import { Injectable, Inject } from '@angular/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { PermissionsPlugin, PushNotificationsPlugin, PushNotification, PushNotificationToken, PermissionType } from '@capacitor/core'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
+
+import { PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'
@@ -19,29 +21,20 @@ export class PushProvider {
   private readonly registrationId: ReplaySubject<string> = new ReplaySubject(1)
   private registerCalled: boolean = false
 
-  private readonly options: PushOptions = {
-    android: {},
-    ios: {
-      alert: 'true',
-      badge: true,
-      sound: 'false'
-    },
-    windows: {}
-  }
-
   constructor(
     private readonly platform: Platform,
-    private readonly push: Push,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly storageProvider: StorageProvider,
     private readonly modalController: ModalController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
+    @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
   }
 
-  public notificationCallback = (_notification: NotificationEventResponse): void => undefined
+  public notificationCallback = (_notification: PushNotification): void => undefined
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
@@ -50,9 +43,9 @@ export class PushProvider {
       return
     }
 
-    const { isEnabled }: { isEnabled: boolean } = await this.push.hasPermission()
+    const hasPermissions = await this.hasPermissions()
 
-    if (isEnabled) {
+    if (hasPermissions) {
       await this.register()
     }
   }
@@ -133,13 +126,13 @@ export class PushProvider {
 
     this.registerCalled = true
 
-    const pushObject: PushObject = this.push.init(this.options)
+    await this.pushNotifications.register()
 
-    pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
+    this.pushNotifications.addListener('pushNotificationReceived', (notification: PushNotification) => {
       console.debug('Received a notification', notification)
       this.toastController
         .create({
-          message: `${notification.title}: ${notification.message}`,
+          message: `${notification.title}: ${notification.body}`,
           buttons: [
             {
               text: 'Ok',
@@ -158,14 +151,19 @@ export class PushProvider {
       }
     })
 
-    pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      console.debug('device registered', registration)
-      this.registrationId.next(registration.registrationId)
+    this.pushNotifications.addListener('registration', (token: PushNotificationToken) => {
+      console.debug('device registered', token)
+      this.registrationId.next(token.value)
     })
 
-    pushObject.on('error').subscribe((error: Error) => {
+    this.pushNotifications.addListener('registrationError', error => {
       console.error('Error with Push plugin', error)
       handleErrorSentry(ErrorCategory.PUSH)(error)
     })
+  }
+
+  private async hasPermissions(): Promise<boolean> {
+    const result = await this.permissions.query({ name: PermissionType.Notifications })
+    return result.state === 'granted'
   }
 }

@@ -115,10 +115,6 @@
     <plugin name="cordova.plugins.diagnostic" spec="4.0.12">
         <variable name="ANDROID_SUPPORT_VERSION" value="28.+" />
     </plugin>
-    <plugin name="phonegap-plugin-push" spec="2.2.3">
-        <variable name="ANDROID_SUPPORT_V13_VERSION" value="28.+" />
-        <variable name="FCM_VERSION" value="11.6.2" />
-    </plugin>
     <engine name="android" spec="8.1.0" />
     <engine name="ios" spec="5.0.1" />
 </widget>

@@ -3,7 +3,6 @@ import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
-import { Push } from '@ionic-native/push/ngx'
 import { AlertController, IonicModule, LoadingController, NavController, Platform, ToastController } from '@ionic/angular'
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
@@ -23,13 +22,16 @@ import {
   ToastControllerMock
 } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
-import { AppMock, AppInfoMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
+import { AppMock, AppInfoMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
+import { PUSH_NOTIFICATIONS_PLUGIN, PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 export class UnitHelper {
   public readonly mockRefs = {
     app: new AppMock(),
     appInfo: new AppInfoMock(),
     platform: new PlatformMock(),
+    permissions: new PermissionsMock(),
+    pushNotifications: new PushNotificationsMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
     deeplink: new DeeplinkMock(),
@@ -63,7 +65,8 @@ export class UnitHelper {
       { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
-      Push,
+      { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissions },
+      { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
       { provide: LoadingController, useValue: this.mockRefs.loadingController }

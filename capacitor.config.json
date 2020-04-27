@@ -5,6 +5,9 @@
   "npmClient": "npm",
   "webDir": "www",
   "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["alert"]
+    },
     "SplashScreen": {
       "launchAutoHide": false,
       "androidSplashResourceName": "screen"

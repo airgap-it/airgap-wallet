@@ -64,7 +64,6 @@
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/diagnostic": "^5.5.0",
     "@ionic-native/keyboard": "^5.5.0",
-    "@ionic-native/push": "^5.24.0",
     "@ionic-native/qr-scanner": "^5.5.0",
     "@ionic/angular": "5.0.0",
     "@ionic/core": "5.0.4",
@@ -83,7 +82,6 @@
     "cordova-ios": "5.0.1",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-sqlite-storage": "^2.6.0",
-    "cordova-support-google-services": "^1.1.0",
     "cordova.plugins.diagnostic": "^4.0.12",
     "core-js": "^2.5.4",
     "cryptocompare": "^1.0.0",
@@ -99,8 +97,6 @@
     "ng-lottie": "^0.3.2",
     "ng2-charts": "2.2.3",
     "ngx-moment": "^3.4.0",
-    "phonegap-plugin-multidex": "^1.0.0",
-    "phonegap-plugin-push": "^2.2.3",
     "prettier": "^1.17.0",
     "pretty-quick": "^1.10.0",
     "rxjs": "~6.5.3",
@@ -170,10 +166,6 @@
       "cordova-sqlite-storage": {},
       "cordova.plugins.diagnostic": {
         "ANDROID_SUPPORT_VERSION": "28.+"
-      },
-      "phonegap-plugin-push": {
-        "ANDROID_SUPPORT_V13_VERSION": "28.+",
-        "FCM_VERSION": "11.6.2"
       }
     },
     "platforms": [

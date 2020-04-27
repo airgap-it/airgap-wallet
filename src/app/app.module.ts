@@ -10,7 +10,6 @@ import { RouteReuseStrategy } from '@angular/router'
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { Keyboard } from '@ionic-native/keyboard/ngx'
-import { Push } from '@ionic-native/push/ngx'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
@@ -58,12 +57,14 @@ import {
   APP_INFO_PLUGIN,
   BROWSER_PLUGIN,
   CLIPBOARD_PLUGIN,
+  PERMISSIONS_PLUGIN,
+  PUSH_NOTIFICATIONS_PLUGIN,
   SHARE_PLUGIN,
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from './capacitor-plugins/injection-tokens'
 
-const { App, AppInfo, Browser, Clipboard, Share, SplashScreen, StatusBar } = Plugins
+const { App, AppInfo, Browser, Clipboard, Permissions, PushNotifications, Share, SplashScreen, StatusBar } = Plugins
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -109,6 +110,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     { provide: APP_INFO_PLUGIN, useValue: AppInfo },
     { provide: BROWSER_PLUGIN, useValue: Browser },
     { provide: CLIPBOARD_PLUGIN, useValue: Clipboard },
+    { provide: PERMISSIONS_PLUGIN, useValue: Permissions },
+    { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: PushNotifications },
     { provide: SHARE_PLUGIN, useValue: Share },
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
@@ -137,7 +140,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     WebExtensionProvider,
     AppInfoProvider,
     PushProvider,
-    Push,
     PushBackendProvider,
     SerializerService
   ],

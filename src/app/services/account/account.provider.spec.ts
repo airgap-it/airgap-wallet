@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing'
-import { Push } from '@ionic-native/push/ngx'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { take } from 'rxjs/operators'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { AccountProvider } from '../../services/account/account.provider'
+
+import { PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
@@ -14,7 +15,10 @@ describe('AccountProvider', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [Push]
+        providers: [
+          { provide: PERMISSIONS_PLUGIN, useValue: unitHelper.mockRefs.permissions },
+          { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications }
+        ]
       })
     )
       .compileComponents()
