@@ -214,7 +214,6 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return {
       ...delegatorDetails,
       mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
-      secondaryActions: extraActions,
       displayDetails
     }
   }
