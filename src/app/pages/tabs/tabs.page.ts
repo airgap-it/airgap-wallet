@@ -38,7 +38,10 @@ export class TabsPage {
     if (this.webExtensionProvider.isWebExtension()) {
       await this.showWebExtensionIntroduction()
     }
-    await this.showWalletIntroduction().catch(console.error)
+    const alreadyOpenByDeepLink = await this.storageProvider.get(SettingsKey.DEEP_LINK)
+    if (!alreadyOpenByDeepLink) {
+      await this.showWalletIntroduction().catch(console.error)
+    }
   }
 
   private async showWalletIntroduction() {
