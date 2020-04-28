@@ -126,8 +126,6 @@ export class PushProvider {
 
     this.registerCalled = true
 
-    await this.pushNotifications.register()
-
     this.pushNotifications.addListener('pushNotificationReceived', (notification: PushNotification) => {
       console.debug('Received a notification', notification)
       this.toastController
@@ -160,6 +158,8 @@ export class PushProvider {
       console.error('Error with Push plugin', error)
       handleErrorSentry(ErrorCategory.PUSH)(error)
     })
+
+    await this.pushNotifications.register()
   }
 
   private async hasPermissions(): Promise<boolean> {
