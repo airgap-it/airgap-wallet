@@ -24,7 +24,7 @@
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
     <tezos-delegation-card
-      *ngIf="wallet.protocolIdentifier === 'xtz'"
+      *ngIf="wallet.protocolIdentifier === 'xtz' && wallet.currentBalance"
       [wallet]="wallet"
       [isDelegated]="isKtDelegated"
       [delegateAmount]="wallet.currentBalance"
@@ -118,7 +118,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="wallet.currentBalance.toNumber() === 0"
+          [disabled]="wallet.currentBalance?.toNumber() === 0"
           shape="round"
         >
           <ion-icon slot="start" name="send-outline"></ion-icon>
