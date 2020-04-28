@@ -68,7 +68,7 @@ export class ActionGroup {
         })
         const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
         addTokenAction.onComplete = async (): Promise<void> => {
-          addTokenAction.getLinkedAction().context.location.back()
+          addTokenAction.getLinkedAction().context.location.navigateRoot('')
         }
 
         return addTokenAction
@@ -143,7 +143,7 @@ export class ActionGroup {
         })
         const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
         addTokenAction.onComplete = async (): Promise<void> => {
-          addTokenAction.getLinkedAction().context.location.back()
+          addTokenAction.getLinkedAction().context.location.navigateRoot('')
         }
 
         return addTokenAction
