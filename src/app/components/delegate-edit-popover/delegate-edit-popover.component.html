@@ -14,4 +14,8 @@
     <ion-icon name="list-outline" color="dark" slot="end"></ion-icon>
     Show {{ delegateeLabel }} List
   </ion-item>
+  <ion-item *ngFor="let action of secondaryDelegatorActions || []" button detail="false" (click)="callSecondaryAction(action.type)">
+    <ion-icon [name]="action.iconName || 'send-outline'" color="dark" slot="end"></ion-icon>
+    {{ action.confirmLabel || action.label }}
+  </ion-item>
 </ion-list>

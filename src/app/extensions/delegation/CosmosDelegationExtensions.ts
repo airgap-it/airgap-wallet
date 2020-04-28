@@ -4,8 +4,7 @@ import {
   AirGapDelegationDetails,
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
-  AirGapMainDelegatorAction,
-  AirGapExtraDelegatorAction
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -214,9 +213,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     return {
       ...delegatorDetails,
-      delegateAction,
-      undelegateAction,
-      extraActions,
+      mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
       displayDetails
     }
   }
@@ -227,7 +224,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     availableBalance: BigNumber,
     delegatedAmount: BigNumber
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
@@ -258,6 +255,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.DELEGATE],
+      'Delegate',
       maxDelegationAmount,
       new BigNumber(1),
       baseDescription + extraDescription
@@ -269,7 +267,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatorDetails: DelegatorDetails,
     validator: string,
     delegatedAmount: BigNumber
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
@@ -281,6 +279,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.UNDELEGATE],
+      'Undelegate',
       delegatedAmount,
       new BigNumber(1),
       description
@@ -292,10 +291,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     availableActions: DelegatorAction[],
     validator: string,
     types: CosmosDelegationActionType[],
+    label: string,
     maxAmount: BigNumber,
     minAmount: BigNumber,
     description: string
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const action = availableActions.find(action => types.includes(action.type))
 
     if (action && maxAmount.gte(minAmount)) {
@@ -321,7 +321,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       return {
         type: action.type,
         form,
-        isAvailable: true,
+        label,
         description,
         args: [
           this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, {
@@ -333,17 +333,14 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       }
     }
 
-    return {
-      type: null,
-      isAvailable: false
-    }
+    return null
   }
 
   private async createExtraActions(
     protocol: CosmosProtocol,
     availableActions: DelegatorAction[],
     rewards: BigNumber
-  ): Promise<AirGapExtraDelegatorAction[]> {
+  ): Promise<AirGapDelegatorAction[]> {
     const mainActionTypes = [CosmosDelegationActionType.DELEGATE, CosmosDelegationActionType.UNDELEGATE]
     return Promise.all(
       availableActions
@@ -368,7 +365,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private async createWithdrawRewardsAction(protocol: CosmosProtocol, rewards: BigNumber): Promise<Partial<AirGapExtraDelegatorAction>> {
+  private async createWithdrawRewardsAction(protocol: CosmosProtocol, rewards: BigNumber): Promise<Partial<AirGapDelegatorAction>> {
     const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10

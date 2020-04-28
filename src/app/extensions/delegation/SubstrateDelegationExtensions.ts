@@ -2,9 +2,8 @@ import { SubstrateProtocol, SubstratePayee } from 'airgap-coin-lib'
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
-  AirGapMainDelegatorAction,
-  AirGapExtraDelegatorAction,
-  AirGapDelegationDetails
+  AirGapDelegationDetails,
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import BigNumber from 'bignumber.js'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
@@ -33,6 +32,16 @@ const supportedActions = [
   SubstrateStakingActionType.WITHDRAW_UNBONDED,
   SubstrateStakingActionType.COLLECT_REWARDS
 ]
+
+// sorted by priority
+const delegateActions = [
+  SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.CHANGE_NOMINATION,
+  SubstrateStakingActionType.BOND_EXTRA
+]
+
+// sorted by priority
+const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION]
 
 enum ArgumentName {
   TARGETS = 'targets',
@@ -142,12 +151,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       })
     )
 
+    const delegateAction = extraNominatorDetails.mainActions
+      ? extraNominatorDetails.mainActions.find(action => delegateActions.includes(action.type))
+      : undefined
+
     const showExpectedRewardWidget =
-      totalPreviousReward &&
-      commission &&
-      validatorDetails.status === 'Active' &&
-      extraNominatorDetails.delegateAction.isAvailable &&
-      extraNominatorDetails.delegateAction.form
+      totalPreviousReward && commission && validatorDetails.status === 'Active' && delegateAction && delegateAction.form
 
     if (showExpectedRewardWidget) {
       const expectedRewardWidget = new UIIconText({
@@ -156,7 +165,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         description: 'Expected reward'
       })
 
-      extraNominatorDetails.delegateAction.form.valueChanges.subscribe(value => {
+      delegateAction.form.valueChanges.subscribe(value => {
         expectedRewardWidget.doAfterReached(
           WidgetState.INIT,
           () => {
@@ -185,7 +194,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const nominatorDetails = await protocol.accountController.getNominatorDetails(address, validators)
     const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
 
-    const delegateAction: AirGapMainDelegatorAction = await this.createDelegateAction(
+    const delegateAction: AirGapDelegatorAction = await this.createDelegateAction(
       protocol,
       nominatorDetails.stakingDetails,
       availableActions,
@@ -193,16 +202,14 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       validators
     )
 
-    const undelegateAction: AirGapMainDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const extraActions: AirGapExtraDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
+    const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
+    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
     const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
     const displayRewards: UIRewardList | undefined = this.createDelegatorDisplayRewards(protocol, nominatorDetails)
 
     return {
       ...nominatorDetails,
-      delegateAction,
-      undelegateAction,
-      extraActions,
+      mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
       displayDetails,
       displayRewards: displayRewards
     }
@@ -214,16 +221,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     availableActions: DelegatorAction[],
     nominatorAddress: string,
     validators: string[]
-  ): Promise<AirGapMainDelegatorAction> {
-    // sorted by priority
-    const types = [
-      SubstrateStakingActionType.BOND_NOMINATE,
-      SubstrateStakingActionType.CHANGE_NOMINATION,
-      SubstrateStakingActionType.BOND_EXTRA
-    ]
+  ): Promise<AirGapDelegatorAction | null> {
     const actions = availableActions
-      .filter(action => types.includes(action.type))
-      .sort((a1, a2) => types.indexOf(a1.type) - types.indexOf(a2.type))
+      .filter(action => delegateActions.includes(action.type))
+      .sort((a1, a2) => delegateActions.indexOf(a1.type) - delegateActions.indexOf(a2.type))
 
     const action = actions[0]
 
@@ -268,25 +269,25 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
       return {
         type: action.type,
-        isAvailable: true,
+        label: 'Delegate',
         description: 'Delegate description',
         form,
         args: argWidgets
       }
     }
 
-    return {
-      type: null,
-      description: !hasSufficientFunds ? 'Not enough balance' : undefined,
-      isAvailable: false
-    }
+    return null
   }
 
   private createUndelegateAction(
     stakingDetails: SubstrateStakingDetails | null,
     availableActions: DelegatorAction[]
-  ): AirGapMainDelegatorAction {
-    const action = availableActions.find(action => action.type === SubstrateStakingActionType.CANCEL_NOMINATION)
+  ): AirGapDelegatorAction | null {
+    const actions = availableActions
+      .filter(action => undelegateActions.includes(action.type))
+      .sort((a1, a2) => delegateActions.indexOf(a1.type) - delegateActions.indexOf(a2.type))
+
+    const action = actions[0]
 
     if (action) {
       if (stakingDetails) {
@@ -296,20 +297,17 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
         return {
           type: action.type,
-          isAvailable: true,
+          label: 'Undelegate',
           description: 'Undelegate description',
           form
         }
       }
     }
 
-    return {
-      type: null,
-      isAvailable: false
-    }
+    return null
   }
 
-  private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapExtraDelegatorAction[] {
+  private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapDelegatorAction[] {
     return availableActions
       .filter(
         action =>
