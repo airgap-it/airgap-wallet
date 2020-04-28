@@ -46,3 +46,5 @@ src/assets/libs/airgap-coin-lib.browserify.js
 
 screenshots/
 reports/
+
+electron/build/

@@ -14,7 +14,7 @@
   "build": {
     "appId": "it.airgap.wallet",
     "directories": {
-      "output": "electron/build"
+      "output": "build"
     },
     "nsis": {
       "artifactName": "${productName}-${version}.${ext}"

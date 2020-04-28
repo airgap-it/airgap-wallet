@@ -11,13 +11,20 @@ WORKDIR /app
 
 # set version
 ARG VERSION
-RUN sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" package.json
+RUN sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json
 
 # install dependencies
 RUN npm install
+RUN npm --prefix electron/ install
 
 # browserify coin-lib
 RUN npm run browserify-coinlib
 
-# build and package 
-RUN npm run electron:build:windows
+# build Ionic project
+RUN npm run build:electron
+
+# copy files
+RUN npx cap sync electron
+
+# build package
+RUN npm --prefix electron/ run electron:build:windows
