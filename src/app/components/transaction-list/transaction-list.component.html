@@ -29,7 +29,7 @@
 
 <ng-container *ngIf="transactionType === 'normalTransaction'">
   <div class="empty-list ion-padding-horizontal" *ngIf="!isRefreshing && transactions.length === 0">
-    <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
+    <img class="ion-padding-vertical" src="./assets/img/empty-state-no-transaction.svg" />
     <p>{{ 'account-transaction-list.no-transactions_text' | translate }}</p>
   </div>
 </ng-container>
