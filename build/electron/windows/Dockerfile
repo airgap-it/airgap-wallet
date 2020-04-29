@@ -27,4 +27,4 @@ RUN npm run build:electron
 RUN npx cap sync electron
 
 # build package
-RUN npm --prefix electron/ run electron:build:windows
+RUN npm --prefix electron/ run build:windows

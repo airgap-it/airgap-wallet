@@ -6,10 +6,10 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "electron:start": "electron ./",
-    "electron:build:mac": "electron-builder --mac --publish=never",
-    "electron:build:linux": "electron-builder --linux --publish=never",
-    "electron:build:windows": "electron-builder --win --publish=never"
+    "start": "electron ./",
+    "build:mac": "electron-builder --mac --publish=never",
+    "build:linux": "electron-builder --linux --publish=never",
+    "build:windows": "electron-builder --win --publish=never"
   },
   "build": {
     "appId": "it.airgap.wallet",

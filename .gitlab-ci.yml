@@ -122,7 +122,7 @@ build_mac:
     - npm --prefix electron/ install
     - npm run build:electron
     - npx cap sync electron
-    - npm --prefix electron/ run electron:build:mac
+    - npm --prefix electron/ run build:mac
   artifacts:
     name: 'electron_macos'
     paths:

@@ -32,6 +32,7 @@
     "extension:build:extension-only": "cd web-extension && tsc && webpack && cd .. && node ./scripts/copy-extension-files.js",
     "extension:build:dev": "npm run build && npm run extension:build:extension-only",
     "extension:build:all": "npm run build --prod && npm run extension:build:extension-only",
+    "electron": "npm --prefix electron/ run start",
     "prepare-prod-build": "npm run disable-pure-getters && npm run configure-mangle",
     "disable-pure-getters": "replace 'pure_getters: buildOptions.buildOptimizer' 'pure_getters: false' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",
     "configure-mangle": "replace 'safari10: true' 'safari10: true, keep_fnames: true' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",

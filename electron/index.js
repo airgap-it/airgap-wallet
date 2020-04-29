@@ -11,7 +11,7 @@ let mainWindow = null
 let splashScreen = null
 
 //Change this if you do not wish to have a splash screen
-let useSplashScreen = true
+let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
 const menuTemplateDev = [
