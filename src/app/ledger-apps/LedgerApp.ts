@@ -25,7 +25,11 @@ export abstract class LedgerApp {
   }
 
   protected derivationPathToBuffer(derivationPath: string): Buffer {
-    // TODO
-    throw new Error('Not implemented')
+    const deriveJunctions = derivationPath
+      .split('/')
+      .map(junction => junction.replace(/\'|h/, ''))
+      .map(junction => parseInt(junction))
+
+    return Buffer.from(deriveJunctions)
   }
 }
