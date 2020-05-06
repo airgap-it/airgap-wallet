@@ -260,7 +260,8 @@ export class ExchangePage {
           this.fromWallet.protocolIdentifier,
           this.toWallet.protocolIdentifier,
           this.toWallet.receivingPublicAddress,
-          this.amount.toString()
+          this.amount.toString(),
+          this.fromWallet.receivingPublicAddress
         )
 
         const amountExpectedTo = await this.getExchangeAmount()

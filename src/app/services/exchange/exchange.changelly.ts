@@ -134,7 +134,13 @@ class ChangellyApi {
     return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, params)
   }
 
-  createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<CreateTransactionResponse> {
+  createTransaction(
+    fromCurrency: string,
+    toCurrency: string,
+    toAddress: string,
+    amount: string,
+    _fromAddress?: string
+  ): Promise<CreateTransactionResponse> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -142,7 +148,7 @@ class ChangellyApi {
     const params = {
       from: fromCurrency,
       to: toCurrency,
-      address,
+      address: toAddress,
       amount
     }
     return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
