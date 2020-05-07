@@ -129,22 +129,23 @@ class ChangeNowApi {
   async createTransaction(
     fromCurrency: string,
     toCurrency: string,
-    address: string,
-    amount: string
+    toAddress: string,
+    amount: string,
+    fromAddress?: string
   ): Promise<TransactionChangeNowResponse> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const apiKey = 'changenow'
+    const apiKey = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
     const body = {
       from: fromCurrency,
       to: toCurrency,
-      address: address,
+      address: toAddress,
       amount: amount,
       extraId: '',
       userId: '',
       contactEmail: '',
-      refundAddress: '',
+      refundAddress: fromAddress ? fromAddress : '',
       refundExtraId: ''
     }
 

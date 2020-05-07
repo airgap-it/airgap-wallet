@@ -79,8 +79,14 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.validateAddress(currency, address)
   }
 
-  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<any> {
-    return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
+  public createTransaction(
+    fromCurrency: string,
+    toCurrency: string,
+    toAddress: string,
+    amount: string,
+    fromAddress?: string
+  ): Promise<any> {
+    return this.exchange.createTransaction(fromCurrency, toCurrency, toAddress, amount, fromAddress)
   }
 
   public getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
