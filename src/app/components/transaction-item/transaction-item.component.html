@@ -32,6 +32,11 @@
     <!-- status of tx-->
   </p>
   <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
+    <!-- TODO: styling by @pascal, to view badge change condition to "tx.status && tx.status === 'applied'"-->
+    <ion-badge *ngIf="tx.status && tx.status !== 'applied'" color="primary">
+      {{ tx.status }}
+    </ion-badge>
+
     <ion-col class="ion-no-padding">
       <ion-row class="ion-justify-content-end">
         <ion-text color="blackLight">
