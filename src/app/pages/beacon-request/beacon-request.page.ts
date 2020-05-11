@@ -103,15 +103,6 @@ export class BeaconRequestPage implements OnInit {
 
     this.inputs = [
       {
-        name: 'read_address',
-        type: 'checkbox',
-        label: 'Read Address',
-        value: PermissionScope.READ_ADDRESS,
-        icon: 'eye',
-        checked: request.scopes.indexOf(PermissionScope.READ_ADDRESS) >= 0
-      },
-
-      {
         name: 'sign',
         type: 'checkbox',
         label: 'Sign transactions',
@@ -145,7 +136,6 @@ export class BeaconRequestPage implements OnInit {
         const response: PermissionResponseInput = {
           id: request.id,
           type: BeaconMessageType.PermissionResponse,
-          accountIdentifier: `${selectedWallet.publicKey}-${request.network.name}`,
           pubkey: selectedWallet.publicKey,
           network: request.network,
           scopes
