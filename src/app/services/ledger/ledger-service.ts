@@ -1,99 +1,91 @@
 import { Injectable } from '@angular/core'
+import { ChildProcess } from 'child_process'
 
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import BluetoothTransport from '@ledgerhq/hw-transport-node-ble'
-import { ProtocolSymbols } from '../protocols/protocols'
-import Transport from '@ledgerhq/hw-transport'
-import { LedgerApp } from 'src/app/ledger-apps/LedgerApp'
-import { KusamaLedgerApp } from 'src/app/ledger-apps/substrate/KusamaLedgerApp'
-import { PolkadotLedgerApp } from 'src/app/ledger-apps/substrate/PolkadotLedgerApp'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-export enum LedgerConnectionType {
-  USB,
-  BLE
-}
+import { ElectronProcessService } from '../electron-process/electron-process-service'
+import { LedgerConnection } from './ledger-connection'
+import { LedgerProcessMessageType, LedgerProcessMessage, LedgerProcessMessageReply } from './ledger-message'
+import { Deferred } from 'src/app/helpers/promise'
 
-export interface LedgerConnection {
-  id: string
-  connectionType: LedgerConnectionType
-}
+const LEDGER_PROCESS = 'ledger'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LedgerService {
-  public readonly supportedApps: Map<ProtocolSymbols, (transport: Transport) => LedgerApp> = new Map([
-    [ProtocolSymbols.KUSAMA, (transport: Transport) => new KusamaLedgerApp(transport)],
-    [ProtocolSymbols.POLKADOT, (transport: Transport) => new PolkadotLedgerApp(transport)]
-  ] as [ProtocolSymbols, (transport: Transport) => LedgerApp][])
+  private ledgerProcess: ChildProcess | null = null
+  private messageDeferred: Map<string, Deferred<any>> = new Map()
+
+  constructor(private readonly processService: ElectronProcessService) {}
 
   public async getConnectedDevices(): Promise<LedgerConnection[]> {
-    const devices = await Promise.all([this.getUsbDevices(), this.getBleDevices()])
+    const messageReplies = await Promise.all([
+      this.sendToLedgerApp(LedgerProcessMessageType.GET_DEVICES_USB),
+      this.sendToLedgerApp(LedgerProcessMessageType.GET_DEVICES_BLE)
+    ])
 
-    return devices.reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+    return messageReplies.map(reply => reply.devices).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
   }
 
-  public async importWallet(identifier: ProtocolSymbols, ledgerConnection: LedgerConnection): Promise<AirGapMarketWallet> {
-    return this.openApp(identifier, ledgerConnection, app => app.importWallet())
+  public async importWallet(identifier: string, ledgerConnection: LedgerConnection): Promise<AirGapMarketWallet> {
+    const requestId = `${identifier}_${ledgerConnection.id}`
+    const { wallet } = await this.sendToLedgerApp(
+      LedgerProcessMessageType.IMPORT_WALLET,
+      {
+        protocolIdentifier: identifier,
+        ledgerConnection
+      },
+      requestId
+    )
+
+    return wallet
   }
 
-  public async signTransaction(identifier: ProtocolSymbols, ledgerConnection: LedgerConnection, transaction: any): Promise<string> {
-    return this.openApp(identifier, ledgerConnection, app => app.signTranscation(transaction))
+  public async signTransaction(identifier: string, ledgerConnection: LedgerConnection, transaction: any): Promise<string> {
+    const requestId = `${identifier}_${ledgerConnection.id}_${new Date().getTime().toString()}`
+    const { signedTransaction } = await this.sendToLedgerApp(
+      LedgerProcessMessageType.SIGN_TRANSACTION,
+      {
+        protocolIdentifier: identifier,
+        ledgerConnection,
+        transaction
+      },
+      requestId
+    )
+
+    return signedTransaction
   }
 
-  private async getUsbDevices(): Promise<LedgerConnection[]> {
-    return TransportNodeHid.list()
-      .then(descriptors =>
-        descriptors.map(descriptor => ({
-          id: descriptor,
-          connectionType: LedgerConnectionType.USB
-        }))
-      )
-      .catch(() => [])
-  }
-
-  private async getBleDevices(): Promise<LedgerConnection[]> {
-    return new Promise(resolve => {
-      const devices = []
-      BluetoothTransport.listen({
-        next: event => {
-          if (event.type === 'add') {
-            devices.push({
-              id: event.descriptor,
-              connectionType: LedgerConnectionType.BLE
-            })
-          }
-        },
-        error: () => resolve([]),
-        complete: () => resolve(devices)
-      })
-    })
-  }
-
-  private async openApp<T>(
-    identifier: ProtocolSymbols,
-    ledgerConnection: LedgerConnection,
-    action: (app: LedgerApp) => Promise<T>
-  ): Promise<T> {
-    const appFactory: (transport: Transport) => LedgerApp = this.supportedApps[identifier]
-
-    if (appFactory) {
-      const transport = await this.connectWithDevice(ledgerConnection)
-      const app = appFactory(transport)
-
-      return action(app).finally(() => transport.close())
-    } else {
-      return Promise.reject('Protocol app is not supported')
+  private async sendToLedgerApp<T extends LedgerProcessMessageType>(
+    type: T,
+    data?: LedgerProcessMessage<T>,
+    requestId?: string
+  ): Promise<LedgerProcessMessage<LedgerProcessMessageReply<T>>> {
+    if (!this.ledgerProcess) {
+      // TODO: provide process path
+      this.ledgerProcess = await this.processService.spawnProcess(LEDGER_PROCESS, '')
+      this.ledgerProcess.on('message', message => this.onLedgerProcessMessage(message.promiseId, message.data))
     }
+
+    const deferredId = requestId ? `${type}_${requestId}` : type
+    const deferred = new Deferred<LedgerProcessMessage<LedgerProcessMessageReply<T>>>()
+    this.messageDeferred.set(deferredId, deferred)
+
+    this.ledgerProcess.send({
+      type,
+      deferredId,
+      data
+    })
+
+    return deferred.promise
   }
 
-  private async connectWithDevice(ledgerConnection: LedgerConnection): Promise<Transport> {
-    switch (ledgerConnection.connectionType) {
-      case LedgerConnectionType.USB:
-        return TransportNodeHid.open(ledgerConnection.id)
-      case LedgerConnectionType.BLE:
-        return BluetoothTransport.open(ledgerConnection.id)
+  private onLedgerProcessMessage<T extends LedgerProcessMessageType>(promiseId: string, message: LedgerProcessMessage<T>) {
+    console.log('message received', message)
+    const deferred = this.messageDeferred.get(promiseId)
+    if (deferred) {
+      deferred.resolve(message)
     }
   }
 }

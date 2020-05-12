@@ -27,7 +27,7 @@ enum Instruction {
    * 1 byte      - bytes in payload
    * 4 bytes x 5 - derivation path chunks
    */
-  GET_ADDRESS = 0x01,
+  GET_ADDRESS_ED25519 = 0x01,
   /*
    * Command:
    * 1 byte  - application ID
@@ -97,7 +97,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
      */
     const response = await this.transport.send(
       this.appIdentifier,
-      Instruction.GET_ADDRESS,
+      Instruction.GET_ADDRESS_ED25519,
       RequiresConfirmation.NO,
       0,
       this.createPayload(derivationPath)

@@ -1,5 +1,7 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
+const { fork } = require('child_process')
+const { join } = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -7,7 +9,13 @@ let mainWindow
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 800, height: 600 })
+  mainWindow = new BrowserWindow({
+    height: 920,
+    width: 1600,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
 
   // and load the index.html of the app.
   mainWindow.loadFile('www/index.html')
@@ -48,3 +56,14 @@ app.on('activate', function() {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('spawn-process', function(event, deferredId, name, path) {
+  console.log('spawn-process')
+  const params = []
+  const options = {
+    stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+  }
+
+  const process = fork(join(__dirname, path), params, options)
+  event.reply('spawn-process-reply', deferredId, name, process)
+})

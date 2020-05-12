@@ -9,6 +9,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 import { SerializerService } from '../serializer/serializer.service'
 
 import { AccountProvider } from './../account/account.provider'
+import { isString } from 'util'
 
 declare let window: any
 
@@ -25,8 +26,8 @@ export class DeepLinkProvider {
     private readonly storageProvider: StorageProvider
   ) {}
 
-  public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
-    const deeplinkUrl: string = url.includes('://') ? url : serializedDataToUrlString(url)
+  public sameDeviceDeeplink(url: string | string[] = 'airgap-vault://'): Promise<void> {
+    const deeplinkUrl: string = isString(url) && url.includes('://') ? url : serializedDataToUrlString(url)
 
     return new Promise((resolve, reject) => {
       let sApp: { start(successCallback: () => void, errorCallback: (error: any) => void): void }
