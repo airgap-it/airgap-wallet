@@ -2,76 +2,49 @@ import { Injectable } from '@angular/core'
 
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-import { ElectronProcessService } from '../electron-process/electron-process-service'
-import { LedgerConnection } from './ledger-connection'
-import { LedgerProcessMessageType, LedgerProcessMessage, LedgerProcessMessageReply } from './ledger-message'
-
-// TODO: provide path
-const ledgerProcess = {
-  name: 'ledger',
-  path: ''
-}
+import { ProtocolSymbols } from '../protocols/protocols'
+import { LedgerConnection, LedgerTransport, LedgerConnectionType } from 'src/app/ledger/transport/LedgerTransport'
+import { LedgerTransportElectron } from 'src/app/ledger/transport/LedgerTransportElectron'
+import { LedgerApp } from 'src/app/ledger/app/LedgerApp'
+import { KusamaLedgerApp } from 'src/app/ledger/app/substrate/KusamaLedgerApp'
+import { PolkadotLedgerApp } from 'src/app/ledger/app/substrate/PolkadotLedgerApp'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LedgerService {
-  private messagePromises: Map<string, Promise<any>> = new Map()
-
-  constructor(private readonly processService: ElectronProcessService) {}
+  private readonly supportedApps: Map<string, (transport: LedgerTransport) => LedgerApp> = new Map([
+    [ProtocolSymbols.KUSAMA, transport => new KusamaLedgerApp(transport)],
+    [ProtocolSymbols.POLKADOT, transport => new PolkadotLedgerApp(transport)]
+  ] as [string, (transport: LedgerTransport) => LedgerApp][])
 
   public async getConnectedDevices(): Promise<LedgerConnection[]> {
-    const messageReplies = await Promise.all([
-      this.sendToLedgerApp(LedgerProcessMessageType.GET_DEVICES_USB),
-      this.sendToLedgerApp(LedgerProcessMessageType.GET_DEVICES_BLE)
+    const devices = await Promise.all([
+      LedgerTransportElectron.getConnectedDevices(LedgerConnectionType.USB),
+      LedgerTransportElectron.getConnectedDevices(LedgerConnectionType.BLE)
     ])
 
-    return messageReplies.map(reply => reply.devices).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+    return devices.reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
   }
 
   public async importWallet(identifier: string, ledgerConnection: LedgerConnection): Promise<AirGapMarketWallet> {
-    const requestId = `${identifier}_${ledgerConnection.id}`
-    const { wallet } = await this.sendToLedgerApp(
-      LedgerProcessMessageType.IMPORT_WALLET,
-      {
-        protocolIdentifier: identifier,
-        ledgerConnection
-      },
-      requestId
-    )
-
-    return wallet
+    return this.openApp(identifier, ledgerConnection, app => app.importWallet())
   }
 
   public async signTransaction(identifier: string, ledgerConnection: LedgerConnection, transaction: any): Promise<string> {
-    const requestId = `${identifier}_${ledgerConnection.id}_${new Date().getTime().toString()}`
-    const { signedTransaction } = await this.sendToLedgerApp(
-      LedgerProcessMessageType.SIGN_TRANSACTION,
-      {
-        protocolIdentifier: identifier,
-        ledgerConnection,
-        transaction
-      },
-      requestId
-    )
-
-    return signedTransaction
+    return this.openApp(identifier, ledgerConnection, app => app.signTranscation(transaction))
   }
 
-  private async sendToLedgerApp<T extends LedgerProcessMessageType>(
-    type: T,
-    data?: LedgerProcessMessage<T>,
-    requestId?: string
-  ): Promise<LedgerProcessMessage<LedgerProcessMessageReply<T>>> {
-    const promiseId = requestId ? `${type}_${requestId}` : type
-    let promise = this.messagePromises.get(promiseId)
-    if (!promise) {
-      promise = this.processService.sendToProcess(ledgerProcess, promiseId, {
-        type,
-        ...(data ? data : {})
-      })
-      this.messagePromises.set(promiseId, promise)
+  private async openApp<T>(identifier: string, ledgerConnection: LedgerConnection, action: (app: LedgerApp) => Promise<T>): Promise<T> {
+    const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps[identifier]
+
+    if (appFactory) {
+      const transport = await LedgerTransportElectron.open(ledgerConnection.type, ledgerConnection.deviceId)
+      const app = appFactory(transport)
+
+      return action(app).finally(() => transport.close())
+    } else {
+      return Promise.reject('Protocol app is not supported')
     }
-    return promise
   }
 }

@@ -58,32 +58,20 @@ app.on('activate', function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+const processPaths = new Map([['ledger', join(__dirname, 'ledger-transport.js')]])
+
 const childProcesses = new Map()
 const callbacks = new Map()
 
-ipcMain.on('spawn-process', function(event, requestId, name, path) {
-  const params = []
-  const options = {
-    stdio: ['inherit', 'inherit', 'inherit', 'ipc']
-  }
+ipcMain.on('spawn-process', function(event, requestId, name) {
+  const child = childProcesses.get(name)
+  const reply = child ? child.pid : spawnProcess(name)
 
-  const child = fork(path, params, options)
-  child.on('message', message => {
-    const callback = callbacks.get(message.requestId)
-
-    if (callback) {
-      callback(message)
-      callbacks.delete(message.requestId)
-    }
-  })
-
-  childProcesses.set(child.pid, child)
-
-  event.reply('spawn-process-reply', requestId, name, child.pid)
+  event.reply('spawn-process-reply', requestId, reply)
 })
 
-ipcMain.on('send-to-child', function(event, requestId, pid, data) {
-  const child = childProcesses.get(pid)
+ipcMain.on('send-to-child', function(event, requestId, name, data) {
+  const child = childProcesses.get(name)
   if (!child) {
     event.reply('send-to-child-reply', requestId, { error: 'Process is not running.' })
   } else {
@@ -94,3 +82,30 @@ ipcMain.on('send-to-child', function(event, requestId, pid, data) {
     })
   }
 })
+
+function spawnProcess(name) {
+  const params = []
+  const options = {
+    stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+  }
+
+  const path = processPaths.get(name)
+
+  if (path) {
+    const child = fork(path, params, options)
+    child.on('message', message => {
+      const callback = callbacks.get(message.requestId)
+
+      if (callback) {
+        callback(message)
+        callbacks.delete(message.requestId)
+      }
+    })
+
+    childProcesses.set(name, child)
+
+    return child.pid
+  } else {
+    return { error: 'Unknown process name.' }
+  }
+}
