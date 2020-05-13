@@ -18,6 +18,9 @@ export class LedgerService {
     [ProtocolSymbols.POLKADOT, transport => new PolkadotLedgerApp(transport)]
   ] as [string, (transport: LedgerTransport) => LedgerApp][])
 
+  private readonly openTransports: Map<string, LedgerTransport> = new Map()
+  private readonly runningApps: Map<string, LedgerApp> = new Map()
+
   public async getConnectedDevices(): Promise<LedgerConnection[]> {
     const devices = await Promise.all([
       LedgerTransportElectron.getConnectedDevices(LedgerConnectionType.USB),
@@ -27,24 +30,83 @@ export class LedgerService {
     return devices.reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
   }
 
+  public async openConnection(ledgerConnection: LedgerConnection): Promise<void> {
+    await this.openLedgerTransport(ledgerConnection)
+  }
+
+  public async closeConnection(ledgerConnection?: LedgerConnection): Promise<void> {
+    if (!ledgerConnection) {
+      this.closeAllLedgerTransports()
+    } else {
+      this.closeLedgerTransport(ledgerConnection)
+    }
+  }
+
   public async importWallet(identifier: string, ledgerConnection: LedgerConnection): Promise<AirGapMarketWallet> {
-    return this.openApp(identifier, ledgerConnection, app => app.importWallet())
+    return this.withApp(identifier, ledgerConnection, app => app.importWallet())
   }
 
   public async signTransaction(identifier: string, ledgerConnection: LedgerConnection, transaction: any): Promise<string> {
-    return this.openApp(identifier, ledgerConnection, app => app.signTranscation(transaction))
+    return this.withApp(identifier, ledgerConnection, app => app.signTranscation(transaction))
   }
 
-  private async openApp<T>(identifier: string, ledgerConnection: LedgerConnection, action: (app: LedgerApp) => Promise<T>): Promise<T> {
+  private async withApp<T>(identifier: string, ledgerConnection: LedgerConnection, action: (app: LedgerApp) => Promise<T>): Promise<T> {
+    const appKey = this.getAppKey(identifier, ledgerConnection)
+    let app = this.runningApps.get(appKey)
+    if (!app) {
+      app = await this.openLedgerApp(identifier, ledgerConnection)
+    }
+
+    return action(app)
+  }
+
+  private async openLedgerTransport(ledgerConnection: LedgerConnection): Promise<LedgerTransport> {
+    const transport = await LedgerTransportElectron.open(ledgerConnection.type, ledgerConnection.descriptor)
+    this.openTransports.set(this.getTransportKey(ledgerConnection), transport)
+
+    return transport
+  }
+
+  private async closeAllLedgerTransports(): Promise<void> {
+    await Promise.all(Array.from(this.openTransports.values()).map(transport => transport.close()))
+    this.openTransports.clear()
+    this.runningApps.clear()
+  }
+
+  private async closeLedgerTransport(ledgerConnection: LedgerConnection): Promise<void> {
+    const transportKey = this.getTransportKey(ledgerConnection)
+    const transport = this.openTransports.get(transportKey)
+    if (transport) {
+      await transport.close()
+
+      this.openTransports.delete(transportKey)
+      Array.from(this.runningApps.keys())
+        .filter(key => key.includes(transportKey))
+        .forEach(key => this.runningApps.delete(key))
+    }
+  }
+
+  private async openLedgerApp(identifier: string, ledgerConnection: LedgerConnection): Promise<LedgerApp> {
     const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps[identifier]
 
-    if (appFactory) {
-      const transport = await LedgerTransportElectron.open(ledgerConnection.type, ledgerConnection.descriptor)
-      const app = appFactory(transport)
-
-      return action(app).finally(() => transport.close())
-    } else {
+    if (!appFactory) {
       return Promise.reject('Protocol app is not supported')
     }
+
+    const transportKey = this.getTransportKey(ledgerConnection)
+    let transport = this.openTransports.get(transportKey)
+    if (!transport) {
+      transport = await this.openLedgerTransport(ledgerConnection)
+    }
+
+    return appFactory(transport)
+  }
+
+  private getTransportKey(ledgerConnection: LedgerConnection): string {
+    return `${ledgerConnection.type}_${ledgerConnection.descriptor}`
+  }
+
+  private getAppKey(identifier: string, ledgerConnection: LedgerConnection): string {
+    return `${identifier}_${this.getTransportKey(ledgerConnection)}`
   }
 }
