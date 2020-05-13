@@ -42,6 +42,7 @@ app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    Object.entries(childProcesses).forEach(([_pid, child]) => child.kill())
     app.quit()
   }
 })
@@ -57,13 +58,39 @@ app.on('activate', function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('spawn-process', function(event, deferredId, name, path) {
-  console.log('spawn-process')
+const childProcesses = new Map()
+const callbacks = new Map()
+
+ipcMain.on('spawn-process', function(event, requestId, name, path) {
   const params = []
   const options = {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc']
   }
 
-  const process = fork(join(__dirname, path), params, options)
-  event.reply('spawn-process-reply', deferredId, name, process)
+  const child = fork(path, params, options)
+  child.on('message', message => {
+    const callback = callbacks.get(message.requestId)
+
+    if (callback) {
+      callback(message)
+      callbacks.delete(message.requestId)
+    }
+  })
+
+  childProcesses.set(child.pid, child)
+
+  event.reply('spawn-process-reply', requestId, name, child.pid)
+})
+
+ipcMain.on('send-to-child', function(event, requestId, pid, data) {
+  const child = childProcesses.get(pid)
+  if (!child) {
+    event.reply('send-to-child-reply', requestId, { error: 'Process is not running.' })
+  } else {
+    callbacks.set(requestId, message => event.reply('send-to-child-reply', message.requestId, message.data))
+    child.send({
+      requestId,
+      data
+    })
+  }
 })

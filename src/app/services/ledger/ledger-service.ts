@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core'
-import { ChildProcess } from 'child_process'
 
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { ElectronProcessService } from '../electron-process/electron-process-service'
 import { LedgerConnection } from './ledger-connection'
 import { LedgerProcessMessageType, LedgerProcessMessage, LedgerProcessMessageReply } from './ledger-message'
-import { Deferred } from 'src/app/helpers/promise'
 
-const LEDGER_PROCESS = 'ledger'
+// TODO: provide path
+const ledgerProcess = {
+  name: 'ledger',
+  path: ''
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class LedgerService {
-  private ledgerProcess: ChildProcess | null = null
-  private messageDeferred: Map<string, Deferred<any>> = new Map()
+  private messagePromises: Map<string, Promise<any>> = new Map()
 
   constructor(private readonly processService: ElectronProcessService) {}
 
@@ -62,30 +63,15 @@ export class LedgerService {
     data?: LedgerProcessMessage<T>,
     requestId?: string
   ): Promise<LedgerProcessMessage<LedgerProcessMessageReply<T>>> {
-    if (!this.ledgerProcess) {
-      // TODO: provide process path
-      this.ledgerProcess = await this.processService.spawnProcess(LEDGER_PROCESS, '')
-      this.ledgerProcess.on('message', message => this.onLedgerProcessMessage(message.promiseId, message.data))
+    const promiseId = requestId ? `${type}_${requestId}` : type
+    let promise = this.messagePromises.get(promiseId)
+    if (!promise) {
+      promise = this.processService.sendToProcess(ledgerProcess, promiseId, {
+        type,
+        ...(data ? data : {})
+      })
+      this.messagePromises.set(promiseId, promise)
     }
-
-    const deferredId = requestId ? `${type}_${requestId}` : type
-    const deferred = new Deferred<LedgerProcessMessage<LedgerProcessMessageReply<T>>>()
-    this.messageDeferred.set(deferredId, deferred)
-
-    this.ledgerProcess.send({
-      type,
-      deferredId,
-      data
-    })
-
-    return deferred.promise
-  }
-
-  private onLedgerProcessMessage<T extends LedgerProcessMessageType>(promiseId: string, message: LedgerProcessMessage<T>) {
-    console.log('message received', message)
-    const deferred = this.messageDeferred.get(promiseId)
-    if (deferred) {
-      deferred.resolve(message)
-    }
+    return promise
   }
 }
