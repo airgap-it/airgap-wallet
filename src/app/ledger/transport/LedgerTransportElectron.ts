@@ -7,15 +7,22 @@ export class LedgerTransportElectron extends LedgerTransport {
   }
 
   public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnection[]> {
-    const { devices } = await LedgerTransportElectron.bridge.sendToLedgerApp(LedgerProcessMessageType.GET_DEVICES, { type: connectionType })
+    const { devices } = await LedgerTransportElectron.bridge.sendToLedger(
+      LedgerProcessMessageType.GET_DEVICES,
+      {
+        connectionType
+      },
+      connectionType
+    )
+
     return devices
   }
 
   public static async open(connectionType: LedgerConnectionType, descriptor: string): Promise<LedgerTransportElectron> {
-    const { transportId } = await LedgerTransportElectron.bridge.sendToLedgerApp(
+    const { transportId } = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.OPEN,
       {
-        type: connectionType,
+        connectionType,
         descriptor
       },
       `${connectionType}_${descriptor}`
@@ -28,7 +35,7 @@ export class LedgerTransportElectron extends LedgerTransport {
   }
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
-    const { response } = await LedgerTransportElectron.bridge.sendToLedgerApp(
+    const { response } = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.SEND,
       {
         transportId: this.transportId,
@@ -43,7 +50,7 @@ export class LedgerTransportElectron extends LedgerTransport {
     return response
   }
   public async close(): Promise<void> {
-    await LedgerTransportElectron.bridge.sendToLedgerApp(
+    await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.CLOSE,
       {
         transportId: this.transportId

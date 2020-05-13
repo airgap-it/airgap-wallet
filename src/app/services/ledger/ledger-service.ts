@@ -39,7 +39,7 @@ export class LedgerService {
     const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps[identifier]
 
     if (appFactory) {
-      const transport = await LedgerTransportElectron.open(ledgerConnection.type, ledgerConnection.deviceId)
+      const transport = await LedgerTransportElectron.open(ledgerConnection.type, ledgerConnection.descriptor)
       const app = appFactory(transport)
 
       return action(app).finally(() => transport.close())

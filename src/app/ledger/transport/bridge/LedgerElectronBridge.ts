@@ -11,18 +11,19 @@ export enum LedgerProcessMessageType {
   SEND = 'send',
   SEND_REPLY = 'send-reply',
 
-  CLOSE = 'close'
+  CLOSE = 'close',
+  CLOSE_REPLY = 'close-reply'
 }
 
 export interface GetDevicesMessage {
-  type: LedgerConnectionType
+  connectionType: LedgerConnectionType
 }
 export interface GetDevicesMessageReply {
   devices: LedgerConnection[]
 }
 
 export interface OpenMessage {
-  type: LedgerConnectionType
+  connectionType: LedgerConnectionType
   descriptor: string
 }
 export interface OpenMessageReply {
@@ -67,6 +68,8 @@ export type LedgerProcessMessageReply<T extends LedgerProcessMessageType> = T ex
   ? LedgerProcessMessageType.OPEN_REPLY
   : T extends LedgerProcessMessageType.SEND
   ? LedgerProcessMessageType.SEND_REPLY
+  : T extends LedgerProcessMessageType.CLOSE
+  ? LedgerProcessMessageType.CLOSE_REPLY
   : never
 
 const LEDGER_PROCESS_NAME = 'ledger'
@@ -86,7 +89,7 @@ export class LedgerElectronBridge {
 
   private constructor(private electronProcess: ElectronProcess) {}
 
-  public async sendToLedgerApp<T extends LedgerProcessMessageType>(
+  public async sendToLedger<T extends LedgerProcessMessageType>(
     type: T,
     data?: LedgerProcessMessage<T>,
     requestId?: string
@@ -94,10 +97,7 @@ export class LedgerElectronBridge {
     const promiseId = requestId ? `${type}_${requestId}` : type
     let promise = this.messagePromises.get(promiseId)
     if (!promise) {
-      promise = this.electronProcess.send(promiseId, {
-        type,
-        ...(data ? data : {})
-      })
+      promise = this.electronProcess.send(promiseId, type, data)
       this.messagePromises.set(promiseId, promise)
     }
     return promise

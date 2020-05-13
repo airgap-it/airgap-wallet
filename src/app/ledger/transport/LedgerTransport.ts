@@ -4,7 +4,7 @@ export enum LedgerConnectionType {
 }
 
 export interface LedgerConnection {
-  deviceId: string
+  descriptor: string
   type: LedgerConnectionType
 }
 

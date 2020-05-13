@@ -70,7 +70,7 @@ ipcMain.on('spawn-process', function(event, requestId, name) {
   event.reply('spawn-process-reply', requestId, reply)
 })
 
-ipcMain.on('send-to-child', function(event, requestId, name, data) {
+ipcMain.on('send-to-child', function(event, requestId, name, type, data) {
   const child = childProcesses.get(name)
   if (!child) {
     event.reply('send-to-child-reply', requestId, { error: 'Process is not running.' })
@@ -78,6 +78,7 @@ ipcMain.on('send-to-child', function(event, requestId, name, data) {
     callbacks.set(requestId, message => event.reply('send-to-child-reply', message.requestId, message.data))
     child.send({
       requestId,
+      type,
       data
     })
   }

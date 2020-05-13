@@ -18,7 +18,7 @@ export class ElectronProcess {
     this.initMessageListeners()
   }
 
-  public async send<T>(requestId: string, data: any): Promise<T> {
+  public async send<T>(requestId: string, messageType: string, data?: any): Promise<T> {
     if (!this.pid) {
       const spawnDeferred = this.getSpawnDeferred()
 
@@ -29,7 +29,7 @@ export class ElectronProcess {
     const sendDeferred = new Deferred<T>()
     this.ipcDeferred.set(sendDeferredId, sendDeferred)
 
-    ipcRenderer.send(ElectronProcessMessage.SEND, sendDeferredId, this.name, data)
+    ipcRenderer.send(ElectronProcessMessage.SEND, sendDeferredId, this.name, messageType, data)
 
     return sendDeferred.promise
   }
