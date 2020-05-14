@@ -251,6 +251,10 @@
     "import_label": "Import"
   },
 
+  "account-import-ledger": {
+    "title": "Import Account"
+  },
+
   "from-to": {
     "type_label": "Type",
     "amount_label": "Amount",
@@ -287,6 +291,7 @@
   "tabs": {
     "wallets": "Accounts",
     "scan": "Scan QRs",
+    "ledger_import": "Ledger Import",
     "settings": "Settings",
     "exchange": "Exchange"
   },

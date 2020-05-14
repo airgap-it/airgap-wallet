@@ -13,9 +13,13 @@
               <ion-icon slot="start" name="list-outline"></ion-icon>
               <ion-label>{{ 'tabs.wallets' | translate }}</ion-label>
             </ion-item>
-            <ion-item routerLink="tabs/scan">
+            <ion-item routerLink="tabs/scan" *ngIf="!isElectron">
               <ion-icon slot="start" name="barcode-outline"></ion-icon>
               <ion-label>{{ 'tabs.scan' | translate }}</ion-label>
+            </ion-item>
+            <ion-item routerLink="tabs/ledger-import" *ngIf="isElectron">
+              <ion-icon slot="start" name="key-outline"></ion-icon>
+              <ion-label>{{ 'tabs.ledger_import' | translate }}</ion-label>
             </ion-item>
             <ion-item routerLink="tabs/exchange">
               <ion-icon slot="start" name="repeat-outline"></ion-icon>

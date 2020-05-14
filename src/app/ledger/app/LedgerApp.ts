@@ -1,12 +1,10 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGapSignedTransaction'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 
 import { LedgerTransport } from '../transport/LedgerTransport'
 
 export abstract class LedgerApp {
   public abstract appIdentifier: number
-  public abstract protocolIdentifier: ProtocolSymbols
 
   public constructor(protected readonly transport: LedgerTransport) {}
 

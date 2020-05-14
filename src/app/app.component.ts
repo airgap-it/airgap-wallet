@@ -24,6 +24,7 @@ import { generateGUID } from './utils/utils'
 })
 export class AppComponent {
   public isMobile = false
+  public isElectron = false
 
   constructor(
     private readonly platform: Platform,
@@ -45,6 +46,7 @@ export class AppComponent {
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('mobile')
+    this.isElectron = this.platform.is('electron')
   }
 
   public async initializeApp() {

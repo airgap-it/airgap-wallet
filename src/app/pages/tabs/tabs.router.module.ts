@@ -27,6 +27,10 @@ const routes: Routes = [
         ]
       },
       {
+        path: 'ledger-import',
+        loadChildren: () => import('../account-import-ledger/account-import-ledger.module').then(m => m.AccountImportLedgerPageModule)
+      },
+      {
         path: 'exchange',
         children: [
           {

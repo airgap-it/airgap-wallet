@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
 
 import { ProtocolSymbols } from '../protocols/protocols'
 import { LedgerConnection, LedgerTransport, LedgerConnectionType } from 'src/app/ledger/transport/LedgerTransport'
@@ -20,6 +20,11 @@ export class LedgerService {
 
   private readonly openTransports: Map<string, LedgerTransport> = new Map()
   private readonly runningApps: Map<string, LedgerApp> = new Map()
+
+  public getSupportedProtocols(): ICoinProtocol[] {
+    const protocolIdentifiers: string[] = Array.from(this.supportedApps.keys())
+    return supportedProtocols().filter(protocol => protocolIdentifiers.includes(protocol.identifier))
+  }
 
   public async getConnectedDevices(): Promise<LedgerConnection[]> {
     const devices = await Promise.all([
@@ -57,7 +62,12 @@ export class LedgerService {
       app = await this.openLedgerApp(identifier, ledgerConnection)
     }
 
-    return action(app)
+    const isAvailable = await app.isAvailable()
+    if (isAvailable) {
+      return action(app)
+    } else {
+      return Promise.reject(`Couldn't find app for ${identifier} protocol.`)
+    }
   }
 
   private async openLedgerTransport(ledgerConnection: LedgerConnection): Promise<LedgerTransport> {
@@ -87,10 +97,10 @@ export class LedgerService {
   }
 
   private async openLedgerApp(identifier: string, ledgerConnection: LedgerConnection): Promise<LedgerApp> {
-    const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps[identifier]
+    const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps.get(identifier)
 
     if (!appFactory) {
-      return Promise.reject('Protocol app is not supported')
+      return Promise.reject(`${identifier} Ledger app is not supported`)
     }
 
     const transportKey = this.getTransportKey(ledgerConnection)
