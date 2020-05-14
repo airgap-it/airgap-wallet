@@ -3,6 +3,10 @@ const TransportNodeBle = require('@ledgerhq/hw-transport-node-ble').default
 
 const transports = new Map()
 
+process.on('exit', async () => {
+  await closeAll()
+})
+
 process.on('message', async message => {
   if (process.send) {
     let data = {}
@@ -32,6 +36,7 @@ process.on('message', async message => {
           break
       }
     } catch (error) {
+      console.log(error)
       data = { error }
     }
 
@@ -92,6 +97,11 @@ async function close(transportId) {
     await transport.close()
     transports.delete(transportId)
   }
+}
+
+async function closeAll() {
+  await Promise.all(Array.from(transports.values()).map(transport => transport.close()))
+  transports.clear()
 }
 
 async function getUsbDevices() {

@@ -3,8 +3,10 @@ import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { Router } from '@angular/router'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { LoadingController } from '@ionic/angular'
+import { LoadingController, AlertController } from '@ionic/angular'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { TranslateService } from '@ngx-translate/core'
+import { isString } from 'util'
 
 @Component({
   selector: 'page-account-import-ledger',
@@ -21,7 +23,9 @@ export class AccountImportLedgerPage {
   constructor(
     private readonly router: Router,
     private readonly dataService: DataService,
+    private readonly alertCtrl: AlertController,
     private readonly loadingController: LoadingController,
+    private readonly translateService: TranslateService,
     private readonly ledgerService: LedgerService
   ) {
     this.supportedProtocols = this.ledgerService.getSupportedProtocols()
@@ -41,11 +45,7 @@ export class AccountImportLedgerPage {
   }
 
   public async importAccount(protocolIdentifier: string) {
-    this.loader = await this.loadingController.create({
-      message: 'Importing account...'
-    })
-
-    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+    await this.showLoader('Importing account...')
 
     try {
       const ledgerConnection = (await this.ledgerService.getConnectedDevices())[0]
@@ -56,9 +56,39 @@ export class AccountImportLedgerPage {
       }
     } catch (error) {
       console.warn(error)
+      this.promptError(error)
     } finally {
       this.dismissLoader()
     }
+  }
+
+  private async promptError(error: unknown) {
+    let message: string
+    if (isString(error)) {
+      message = error
+    } else if (error instanceof Error) {
+      message = error.message
+    } else {
+      message = this.translateService.instant('account-import-ledger.error-alert.unknown')
+    }
+
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('account-import-ledger.error-alert.header'),
+      message,
+      buttons: [
+        {
+          text: this.translateService.instant('account-import-ledger.error-alert.confirm')
+        }
+      ]
+    })
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
+  private async showLoader(message: string) {
+    this.dismissLoader()
+    this.loader = await this.loadingController.create({ message })
+
+    await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
   }
 
   private dismissLoader() {

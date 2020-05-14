@@ -252,7 +252,12 @@
   },
 
   "account-import-ledger": {
-    "title": "Import Account"
+    "title": "Import Account",
+    "error-alert": {
+      "header": "Error",
+      "unknown": "Unkown error has occurred",
+      "confirm": "OK"
+    }
   },
 
   "from-to": {
@@ -547,7 +552,12 @@
   "ledger-sign": {
     "title": "{{title}} Transaction Details",
     "text": "Connect the Ledger device and sign the transaction.",
-    "confirm_label": "Sign"
+    "confirm_label": "Sign",
+    "error-alert": {
+      "header": "Error",
+      "unknown": "Unkown error has occurred",
+      "confirm": "OK"
+    }
   }
 
 }
