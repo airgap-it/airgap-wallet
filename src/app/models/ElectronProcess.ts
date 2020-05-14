@@ -1,6 +1,10 @@
 import { Deferred } from './Deferred'
 
-const { ipcRenderer } = window.require('electron')
+let ipcRenderer
+
+function initElectronDeps(electron) {
+  ipcRenderer = electron.ipcRenderer
+}
 
 enum ElectronProcessMessage {
   SPAWN = 'spawn-process',
@@ -15,7 +19,14 @@ export class ElectronProcess {
   private ipcDeferred: Map<string, Deferred<any>> = new Map()
 
   constructor(private readonly name: string) {
-    this.initMessageListeners()
+    if (window.require) {
+      const electron = window.require('electron')
+      initElectronDeps(electron)
+
+      this.initMessageListeners()
+    } else {
+      throw new Error('ElectronProcess can be used only within Electron.')
+    }
   }
 
   public async send<T>(requestId: string, messageType: string, data?: any): Promise<T> {

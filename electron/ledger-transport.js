@@ -6,29 +6,33 @@ const transports = new Map()
 process.on('message', async message => {
   if (process.send) {
     let data = {}
-    switch (message.type) {
-      case 'get-devices':
-        const devices = await getConnectedDevices(message.data.connectionType)
-        data = { devices }
-        break
-      case 'open':
-        const transportId = await openTransport(message.data.connectionType, message.data.descriptor)
-        data = { transportId }
-        break
-      case 'send':
-        const response = await send(
-          message.data.transportId,
-          message.data.cls,
-          message.data.ins,
-          message.data.p1,
-          message.data.p2,
-          message.data.data
-        )
-        data = { response }
-        break
-      case 'close':
-        await close(message.data.transportId)
-        break
+    try {
+      switch (message.type) {
+        case 'get-devices':
+          const devices = await getConnectedDevices(message.data.connectionType)
+          data = { devices }
+          break
+        case 'open':
+          const transportId = await openTransport(message.data.connectionType, message.data.descriptor)
+          data = { transportId }
+          break
+        case 'send':
+          const response = await send(
+            message.data.transportId,
+            message.data.cls,
+            message.data.ins,
+            message.data.p1,
+            message.data.p2,
+            message.data.data
+          )
+          data = { response }
+          break
+        case 'close':
+          await close(message.data.transportId)
+          break
+      }
+    } catch (error) {
+      data = { error }
     }
 
     process.send({
@@ -62,6 +66,7 @@ async function openTransport(connectionType, descriptor) {
       open = TransportNodeBle.open
       break
     default:
+      console.log(connectionType)
       return Promise.reject('Unknown connection type.')
   }
   const transport = await open(descriptor)
@@ -93,8 +98,8 @@ async function getUsbDevices() {
   return TransportNodeHid.list()
     .then(descriptors => {
       return descriptors.map(descriptor => ({
-        id: descriptor,
-        connectionType: 'USB'
+        descriptor,
+        type: 'USB'
       }))
     })
     .catch(() => [])
@@ -107,8 +112,8 @@ async function getBleDevices() {
       next: event => {
         if (event.type === 'add') {
           devices.push({
-            id: event.descriptor,
-            connectionType: 'BLE'
+            descriptor: event.descriptor,
+            type: 'BLE'
           })
         }
       },

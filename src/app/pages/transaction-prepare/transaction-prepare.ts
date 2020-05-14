@@ -94,17 +94,12 @@ export class TransactionPreparePage {
 
     // TODO: remove it when we properly support Polkadot fee/tip model
     if (this.isSubstrate) {
-      this.substrateFee$
-        .pipe(
-          debounceTime(300),
-          distinctUntilChanged()
+      this.substrateFee$.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+        this.substrateFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
+        this.transactionForm.controls.fee.setValue(
+          this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
         )
-        .subscribe(value => {
-          this.substrateFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
-          this.transactionForm.controls.fee.setValue(
-            this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
-          )
-        })
+      })
       this.calculatePolkadotFee()
     }
   }
@@ -237,11 +232,11 @@ export class TransactionPreparePage {
     const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
+      const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

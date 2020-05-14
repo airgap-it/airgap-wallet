@@ -300,12 +300,12 @@ export class DelegationDetailPage {
     try {
       const form = this.delegationForms.get(actionType)
       const data = form ? form.value : undefined
-      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+      const { airGapTxs, unsignedTx } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
 
       this.dismissLoader()

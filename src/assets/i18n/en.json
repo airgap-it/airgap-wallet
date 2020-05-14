@@ -227,6 +227,15 @@
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
 
+  "interaction-selection-desktop": {
+    "title": "TODO",
+    "heading": "TODO",
+    "vault_label": "AirGap Vault",
+    "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
+    "ledger_label": "Ledger",
+    "ledger_info": "TODO"
+  },
+
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
@@ -528,6 +537,12 @@
 		"text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
 		"cancel_label": "No",
 		"ok_label": "Yes!"
+  },
+
+  "ledger-sign": {
+    "title": "{{title}} Transaction Details",
+    "text": "Connect the Ledger device and sign the transaction.",
+    "confirm_label": "Sign"
   }
 
 }

@@ -138,6 +138,13 @@ const routes: Routes = [
   {
     path: 'exchange-custom',
     loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
+  },
+  {
+    path: 'ledger-sign/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/ledger-sign/ledger-sign.module').then(m => m.LedgerSignPageModule)
   }
 ]
 @NgModule({
