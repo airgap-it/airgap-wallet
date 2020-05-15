@@ -290,6 +290,7 @@ export class AccountTransactionListPage {
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
+    console.log(this.transactions)
   }
 
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
@@ -323,6 +324,7 @@ export class AccountTransactionListPage {
   }
 
   public async presentEditPopover(event): Promise<void> {
+    console.log(this.wallet.protocolIdentifier)
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
