@@ -4,6 +4,9 @@ FROM node:10
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
 RUN apt-get install -yq git
 
+# Required by @ledgerhq dependencies
+RUN apt-get install libusb-1.0-0
+
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
 # installs, work.
