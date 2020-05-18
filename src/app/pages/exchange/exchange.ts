@@ -1,5 +1,5 @@
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
-import { ModalController, LoadingController } from '@ionic/angular'
+import { ModalController, LoadingController, AlertController } from '@ionic/angular'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
@@ -11,6 +11,7 @@ import { ExchangeProvider, ExchangeTransaction } from '../../services/exchange/e
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
+import { TranslateService } from '@ngx-translate/core'
 
 enum ExchangePageState {
   LOADING,
@@ -37,6 +38,7 @@ export class ExchangePage {
   public minExchangeAmount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
   public activeExchange: string
+  public disableExchangeSelection: boolean = false
 
   get isTZBTCExchange(): boolean {
     return (
@@ -48,6 +50,8 @@ export class ExchangePage {
   public exchangePageStates = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
 
+  public loading: HTMLIonLoadingElement
+
   constructor(
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
@@ -55,8 +59,9 @@ export class ExchangePage {
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly loadingController: LoadingController,
-
-    private readonly modalController: ModalController
+    private readonly translateService: TranslateService,
+    private readonly modalController: ModalController,
+    private readonly alertCtrl: AlertController
   ) {
     this.exchangeProvider.getActiveExchange().subscribe(exchange => {
       this.activeExchange = exchange
@@ -64,12 +69,12 @@ export class ExchangePage {
   }
 
   public async ionViewWillEnter() {
-    this.setup()
+    this.setup().catch(() => this.showLoadingErrorAlert())
   }
 
-  private filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): string[] {
+  private async filterSupportedProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
-    const result = protocols.filter(supportedProtocol =>
+    let result = protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
           wallet.protocolIdentifier === supportedProtocol &&
@@ -115,21 +120,68 @@ export class ExchangePage {
     }
   }
 
+  private async showLoadingErrorAlert() {
+    const faultyExchange = this.activeExchange
+    this.exchangeProvider.switchActiveExchange()
+    const newExchange = this.activeExchange
+    this.setup() // setup new exchange
+      .then(() => this.switchExchange(faultyExchange, newExchange))
+      .catch(() => this.displaySetupFail())
+  }
+
+  private async switchExchange(faultyExchange: string, newExchange: string) {
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('exchange.loading.setup'),
+      message: `${faultyExchange} could currently not be loaded, switched to ${newExchange}`, // this.translateService.instant('exchange.loading.message'),
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'ok',
+          role: 'cancel'
+        }
+      ]
+    })
+    this.disableExchangeSelection = true // temporarily disable user to switch to exchange for which loading error occured
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
+  private async displaySetupFail() {
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('exchange.loading.setup'),
+      message: this.translateService.instant('exchange.loading.message'),
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'ok',
+          role: 'cancel'
+        }
+      ]
+    })
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
   private async getSupportedFromProtocols(): Promise<string[]> {
-    const fromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
-    fromProtocols.push(ProtocolSymbols.TZBTC)
-    return this.filterValidProtocols(fromProtocols)
+    const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
+    allFromProtocols.push(ProtocolSymbols.TZBTC)
+    const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
+    const exchangeableFromProtocols = (await Promise.all(
+      supportedFromProtocols.map(async fromProtocol => {
+        const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
+        return availableToCurrencies.length > 0 ? fromProtocol : undefined
+      })
+    )).filter(fromProtocol => fromProtocol !== undefined)
+    return exchangeableFromProtocols
   }
 
   private async getSupportedToProtocols(from: string): Promise<string[]> {
     if (from === ProtocolSymbols.TZBTC) {
-      return this.filterValidProtocols([ProtocolSymbols.BTC])
+      return this.filterSupportedProtocols([ProtocolSymbols.BTC], false)
     }
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
     if (from === ProtocolSymbols.BTC) {
       toProtocols.push(ProtocolSymbols.TZBTC)
     }
-    return this.filterValidProtocols(toProtocols)
+    return this.filterSupportedProtocols(toProtocols, false)
   }
 
   async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
@@ -156,12 +208,16 @@ export class ExchangePage {
 
     this.loadWalletsForSelectedFromProtocol()
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async setToProtocol(protocol: ICoinProtocol): Promise<void> {
     this.selectedToProtocol = protocol
     this.loadWalletsForSelectedToProtocol()
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   private loadWalletsForSelectedFromProtocol() {
@@ -198,11 +254,15 @@ export class ExchangePage {
   async setFromWallet(wallet: AirGapMarketWallet) {
     this.fromWallet = wallet
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async setToWallet(wallet: AirGapMarketWallet) {
     this.toWallet = wallet
     this.loadDataFromExchange()
+    // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
+    this.accountProvider.triggerWalletChanged()
   }
 
   async amountSet(amount: string) {
@@ -252,7 +312,8 @@ export class ExchangePage {
           this.fromWallet.protocolIdentifier,
           this.toWallet.protocolIdentifier,
           this.toWallet.receivingPublicAddress,
-          this.amount.toString()
+          this.amount.toString(),
+          this.fromWallet.receivingPublicAddress
         )
 
         const amountExpectedTo = await this.getExchangeAmount()

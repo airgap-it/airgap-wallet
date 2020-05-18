@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
+import { AlertController, Platform, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
@@ -78,13 +78,14 @@ export class AccountTransactionListPage {
     public readonly translateService: TranslateService,
     public readonly operationsProvider: OperationsProvider,
     public readonly popoverCtrl: PopoverController,
+    public readonly toastController: ToastController,
+    public readonly loadingController: LoadingController,
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
     public readonly dataService: DataService,
     private readonly route: ActivatedRoute,
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
-    private readonly toastController: ToastController,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService
@@ -121,7 +122,9 @@ export class AccountTransactionListPage {
     }
 
     this.actionGroup = new ActionGroup(this)
-    this.actions = this.actionGroup.getActions()
+    this.actionGroup.getActions().then(actions => {
+      this.actions = actions
+    })
 
     this.init()
   }
@@ -163,6 +166,7 @@ export class AccountTransactionListPage {
         router: this.router
       })
       action.start()
+      return
     } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
       info = {
         wallet: this.wallet,
@@ -245,7 +249,7 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    const transactions: IAirGapTransaction[] = await promiseTimeout(3000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(() => {
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
       return []
@@ -289,6 +293,7 @@ export class AccountTransactionListPage {
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
+    console.log(this.transactions)
   }
 
   public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
@@ -322,6 +327,7 @@ export class AccountTransactionListPage {
   }
 
   public async presentEditPopover(event): Promise<void> {
+    console.log(this.wallet.protocolIdentifier)
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {

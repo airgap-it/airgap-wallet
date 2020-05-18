@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/angular/node_modules/@ionic/core'
+import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 
 @Component({
   selector: 'app-delegate-edit-popover',
@@ -11,6 +12,7 @@ export class DelegateEditPopoverComponent {
   public readonly hideAirGap: boolean
   public readonly delegateeLabel: string
   public readonly hasMultipleDelegatees: boolean
+  public readonly secondaryDelegatorActions: AirGapDelegatorAction[]
 
   constructor(
     private readonly alertController: AlertController,
@@ -20,6 +22,7 @@ export class DelegateEditPopoverComponent {
     this.hideAirGap = this.navParams.get('hideAirGap')
     this.delegateeLabel = this.navParams.get('delegateeLabel')
     this.hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
+    this.secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
   }
 
   public async changeDelegatee(): Promise<void> {
@@ -68,5 +71,9 @@ export class DelegateEditPopoverComponent {
 
   public async showAllDelegatees() {
     this.popoverController.dismiss({ showDelegateeList: true })
+  }
+
+  public async callSecondaryAction(type: string) {
+    this.popoverController.dismiss({ secondaryActionType: type })
   }
 }

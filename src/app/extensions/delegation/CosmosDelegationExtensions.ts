@@ -4,8 +4,7 @@ import {
   AirGapDelegationDetails,
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
-  AirGapMainDelegatorAction,
-  AirGapExtraDelegatorAction
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -208,15 +207,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
-    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, rewards)
+    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
     const displayDetails = this.createDisplayDetails(protocol, totalDelegatedAmount, rewards)
 
     return {
       ...delegatorDetails,
-      delegateAction,
-      undelegateAction,
-      extraActions,
+      mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
       displayDetails
     }
   }
@@ -227,10 +224,9 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     availableBalance: BigNumber,
     delegatedAmount: BigNumber
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
-
-    const maxDelegationAmount = availableBalance.minus(requiredFee)
+    const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
     const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, {
       protocolIdentifier: protocol.identifier,
@@ -259,6 +255,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.DELEGATE],
+      'Delegate',
       maxDelegationAmount,
       new BigNumber(1),
       baseDescription + extraDescription
@@ -270,7 +267,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatorDetails: DelegatorDetails,
     validator: string,
     delegatedAmount: BigNumber
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
@@ -282,6 +279,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.UNDELEGATE],
+      'Undelegate',
       delegatedAmount,
       new BigNumber(1),
       description
@@ -293,10 +291,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     availableActions: DelegatorAction[],
     validator: string,
     types: CosmosDelegationActionType[],
+    label: string,
     maxAmount: BigNumber,
     minAmount: BigNumber,
     description: string
-  ): AirGapMainDelegatorAction {
+  ): AirGapDelegatorAction | null {
     const action = availableActions.find(action => types.includes(action.type))
 
     if (action && maxAmount.gte(minAmount)) {
@@ -322,7 +321,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       return {
         type: action.type,
         form,
-        isAvailable: true,
+        label,
         description,
         args: [
           this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, {
@@ -334,26 +333,25 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       }
     }
 
-    return {
-      type: null,
-      isAvailable: false
-    }
+    return null
   }
 
   private async createExtraActions(
     protocol: CosmosProtocol,
     availableActions: DelegatorAction[],
+    validator: string,
     rewards: BigNumber
-  ): Promise<AirGapExtraDelegatorAction[]> {
+  ): Promise<AirGapDelegatorAction[]> {
     const mainActionTypes = [CosmosDelegationActionType.DELEGATE, CosmosDelegationActionType.UNDELEGATE]
+    const excludedActionTypes = [CosmosDelegationActionType.WITHDRAW_ALL_REWARDS]
     return Promise.all(
       availableActions
-        .filter(action => !mainActionTypes.includes(action.type))
+        .filter(action => !mainActionTypes.includes(action.type) && !excludedActionTypes.includes(action.type))
         .map(async action => {
           let partial = {}
           switch (action.type) {
-            case CosmosDelegationActionType.WITHDRAW_REWARDS:
-              partial = await this.createWithdrawRewardsAction(protocol, rewards)
+            case CosmosDelegationActionType.WITHDRAW_VALIDATOR_REWARDS:
+              partial = await this.createWithdrawRewardsAction(protocol, validator, rewards)
               break
             default:
               partial = {}
@@ -369,7 +367,15 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private async createWithdrawRewardsAction(protocol: CosmosProtocol, rewards: BigNumber): Promise<Partial<AirGapExtraDelegatorAction>> {
+  private async createWithdrawRewardsAction(
+    protocol: CosmosProtocol,
+    validator: string,
+    rewards: BigNumber
+  ): Promise<Partial<AirGapDelegatorAction>> {
+    const form = this.formBuilder.group({
+      [ArgumentName.VALIDATOR]: validator
+    })
+
     const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
@@ -378,6 +384,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return {
       label: 'Rewards',
       confirmLabel: 'Claim Rewards',
+      form,
       description: `You can claim up to <span class="style__strong color__primary">${rewardsFormatted}</span> in rewards for this delegation.`
     }
   }
