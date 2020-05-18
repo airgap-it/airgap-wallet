@@ -13,7 +13,6 @@ import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
@@ -38,7 +37,6 @@ export class OperationsProvider {
   private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
   constructor(
-    private readonly accountProvider: AccountProvider,
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
     private readonly serializerService: SerializerService,
@@ -94,6 +92,15 @@ export class OperationsProvider {
       return [defaultDelegatee || (await protocol.getDefaultDelegatee())]
     }
     return current
+  }
+
+  public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<DelegatorDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    return protocol.getDelegatorDetailsFromAddress(wallet.receivingPublicAddress)
   }
 
   public async getDelegationDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapDelegationDetails[]> {
@@ -356,27 +363,6 @@ export class OperationsProvider {
     } finally {
       this.hideLoader(loader)
     }
-  }
-
-  public async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, ProtocolSymbols.XTZ_KT, index)
-
-    if (wallet) {
-      return wallet
-    }
-
-    wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
-      xtzWallet.publicKey,
-      xtzWallet.isExtendedPublicKey,
-      xtzWallet.derivationPath,
-      index
-    )
-    wallet.addresses = ktAddresses
-    await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-
-    return wallet
   }
 
   private async getAndShowLoader() {

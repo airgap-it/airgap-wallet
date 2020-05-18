@@ -38,15 +38,8 @@ export class ExtensionsService {
   ) {}
 
   public async loadDelegationExtensions(): Promise<void> {
-    const extensions = await Promise.all(
-      this.extensions.map(
-        async ([protocol, extensionFactory]) =>
-          [protocol, await extensionFactory()] as [new () => ICoinDelegateProtocol, ProtocolDelegationExtensions<any>]
-      )
+    await Promise.all(
+      this.extensions.map(async ([protocol, extensionFactory]) => await ProtocolDelegationExtensions.load(protocol, extensionFactory))
     )
-
-    for (let [protocol, extension] of extensions) {
-      ProtocolDelegationExtensions.load(protocol, extension)
-    }
   }
 }

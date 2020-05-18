@@ -56,6 +56,6 @@ export class DelegationListPage {
 
   public navigateToDetails(address: string) {
     this.callback(address)
-    this.navController.back()
+    this.navController.pop()
   }
 }

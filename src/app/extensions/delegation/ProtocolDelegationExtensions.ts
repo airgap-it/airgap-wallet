@@ -12,12 +12,16 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   private static readonly CREATE_DELEGATEES_SUMMARY_KEY = 'createDelegateesSummary'
   private static readonly CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY = 'createAccountExtendedDetails'
 
-  public static load<T extends ICoinDelegateProtocol>(protocol: new () => T, extensions: ProtocolDelegationExtensions<T>) {
+  public static async load<T extends ICoinDelegateProtocol>(
+    protocol: new () => T,
+    extensionFactory: () => Promise<ProtocolDelegationExtensions<T>>
+  ) {
     const alreadyLoaded =
       this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY) &&
       this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY)
 
     if (!alreadyLoaded) {
+      const extensions = await extensionFactory()
       this.extend(
         protocol,
         extensions,
