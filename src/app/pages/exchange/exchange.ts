@@ -72,9 +72,9 @@ export class ExchangePage {
     this.setup().catch(() => this.showLoadingErrorAlert())
   }
 
-  private filterValidProtocols(protocols: string[], filterZeroBalance: boolean = true): string[] {
+  private async filterSupportedProtocols(protocols: string[], filterZeroBalance: boolean = true): Promise<string[]> {
     const walletList = this.accountProvider.getWalletList()
-    const result = protocols.filter(supportedProtocol =>
+    let result = protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
           wallet.protocolIdentifier === supportedProtocol &&
@@ -161,20 +161,27 @@ export class ExchangePage {
   }
 
   private async getSupportedFromProtocols(): Promise<string[]> {
-    const fromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
-    fromProtocols.push(ProtocolSymbols.TZBTC)
-    return this.filterValidProtocols(fromProtocols)
+    const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
+    allFromProtocols.push(ProtocolSymbols.TZBTC)
+    const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
+    const exchangeableFromProtocols = (await Promise.all(
+      supportedFromProtocols.map(async fromProtocol => {
+        const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
+        return availableToCurrencies.length > 0 ? fromProtocol : undefined
+      })
+    )).filter(fromProtocol => fromProtocol !== undefined)
+    return exchangeableFromProtocols
   }
 
   private async getSupportedToProtocols(from: string): Promise<string[]> {
     if (from === ProtocolSymbols.TZBTC) {
-      return this.filterValidProtocols([ProtocolSymbols.BTC], false)
+      return this.filterSupportedProtocols([ProtocolSymbols.BTC], false)
     }
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
     if (from === ProtocolSymbols.BTC) {
       toProtocols.push(ProtocolSymbols.TZBTC)
     }
-    return this.filterValidProtocols(toProtocols, false)
+    return this.filterSupportedProtocols(toProtocols, false)
   }
 
   async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
