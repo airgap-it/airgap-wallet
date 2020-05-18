@@ -1,8 +1,8 @@
-import { Injectable, Inject } from '@angular/core'
-import { Platform } from '@ionic/angular'
+import { Inject, Injectable } from '@angular/core'
 import { AppPlugin, BrowserPlugin } from '@capacitor/core'
+import { Platform } from '@ionic/angular'
 
-import { APP_PLUGIN, BROWSER_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { APP_PLUGIN, BROWSER_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +14,11 @@ export class BrowserService {
     @Inject(BROWSER_PLUGIN) private readonly browser: BrowserPlugin
   ) {}
 
-  public openUrl(url: string) {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      this.app.openUrl({ url })
+  public async openUrl(url: string): Promise<void> {
+    if (this.platform.is('ios') || this.platform.is('android') || this.platform.is('electron')) {
+      await this.app.openUrl({ url })
     } else {
-      this.browser.open({ url })
+      await this.browser.open({ url })
     }
   }
 }
