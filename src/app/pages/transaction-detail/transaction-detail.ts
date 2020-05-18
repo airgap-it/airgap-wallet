@@ -17,7 +17,7 @@ export class TransactionDetailPage {
     }
 
     this.lottieConfig = {
-      path: '/assets/animations/pending.json'
+      path: './assets/animations/pending.json'
     }
   }
 

@@ -64,7 +64,7 @@ export class AccountTransactionListPage {
   public actions: Action<any, any>[]
 
   public lottieConfig: { path: string } = {
-    path: '/assets/animations/loading.json'
+    path: './assets/animations/loading.json'
   }
 
   private readonly TRANSACTION_LIMIT: number = 10
