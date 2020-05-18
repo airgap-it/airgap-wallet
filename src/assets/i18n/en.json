@@ -6,6 +6,7 @@
     "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegation",
     "undelegate_label": "Undelegate",
+    "claim_rewards_label": "Claim Rewards",
     "vote_label": "Voting",
     "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
@@ -367,6 +368,11 @@
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
     }
+    ,"loading": {
+      "setup": "Setting up exchange ... ",
+      "header": "Loading Error",
+      "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
+    } 
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",

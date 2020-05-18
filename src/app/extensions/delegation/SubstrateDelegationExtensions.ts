@@ -29,8 +29,7 @@ const supportedActions = [
   SubstrateStakingActionType.BOND_EXTRA,
   SubstrateStakingActionType.CANCEL_NOMINATION,
   SubstrateStakingActionType.CHANGE_NOMINATION,
-  SubstrateStakingActionType.WITHDRAW_UNBONDED,
-  SubstrateStakingActionType.COLLECT_REWARDS
+  SubstrateStakingActionType.WITHDRAW_UNBONDED
 ]
 
 // sorted by priority
@@ -327,11 +326,6 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
             label = 'Withdraw Unbonded'
             confirmLabel = 'Withdraw'
             description = 'Withdraw unbonded description'
-            break
-          case SubstrateStakingActionType.COLLECT_REWARDS:
-            label = 'Collect Rewards'
-            confirmLabel = 'Collect'
-            description = 'Collect rewards description'
             break
         }
 

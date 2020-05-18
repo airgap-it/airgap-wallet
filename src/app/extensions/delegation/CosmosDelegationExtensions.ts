@@ -207,7 +207,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
-    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, rewards)
+    const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
     const displayDetails = this.createDisplayDetails(protocol, totalDelegatedAmount, rewards)
 
@@ -339,17 +339,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private async createExtraActions(
     protocol: CosmosProtocol,
     availableActions: DelegatorAction[],
+    validator: string,
     rewards: BigNumber
   ): Promise<AirGapDelegatorAction[]> {
     const mainActionTypes = [CosmosDelegationActionType.DELEGATE, CosmosDelegationActionType.UNDELEGATE]
+    const excludedActionTypes = [CosmosDelegationActionType.WITHDRAW_ALL_REWARDS]
     return Promise.all(
       availableActions
-        .filter(action => !mainActionTypes.includes(action.type))
+        .filter(action => !mainActionTypes.includes(action.type) && !excludedActionTypes.includes(action.type))
         .map(async action => {
           let partial = {}
           switch (action.type) {
-            case CosmosDelegationActionType.WITHDRAW_REWARDS:
-              partial = await this.createWithdrawRewardsAction(protocol, rewards)
+            case CosmosDelegationActionType.WITHDRAW_VALIDATOR_REWARDS:
+              partial = await this.createWithdrawRewardsAction(protocol, validator, rewards)
               break
             default:
               partial = {}
@@ -365,7 +367,15 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private async createWithdrawRewardsAction(protocol: CosmosProtocol, rewards: BigNumber): Promise<Partial<AirGapDelegatorAction>> {
+  private async createWithdrawRewardsAction(
+    protocol: CosmosProtocol,
+    validator: string,
+    rewards: BigNumber
+  ): Promise<Partial<AirGapDelegatorAction>> {
+    const form = this.formBuilder.group({
+      [ArgumentName.VALIDATOR]: validator
+    })
+
     const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
@@ -374,6 +384,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return {
       label: 'Rewards',
       confirmLabel: 'Claim Rewards',
+      form,
       description: `You can claim up to <span class="style__strong color__primary">${rewardsFormatted}</span> in rewards for this delegation.`
     }
   }

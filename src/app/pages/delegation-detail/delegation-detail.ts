@@ -328,7 +328,7 @@ export class DelegationDetailPage {
       delegateeLabel: this.delegateeLabel,
       currentDelegatees: this.currentDelegatees,
       callback: (address: string) => {
-        this.delegateeAddress$.next(address)
+        this.changeDisplayedDetails(address)
       }
     }
 

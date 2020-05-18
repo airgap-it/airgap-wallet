@@ -41,6 +41,7 @@ export interface ExchangeTransaction {
 })
 export class ExchangeProvider implements Exchange {
   private exchange: Exchange
+  private exchangeIdentifier: ExchangeEnum
   private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
 
   private pendingTransactions: ExchangeTransaction[] = []
@@ -51,9 +52,11 @@ export class ExchangeProvider implements Exchange {
       switch (exchange) {
         case ExchangeEnum.CHANGELLY:
           this.exchange = new ChangellyExchange(this.http)
+          this.exchangeIdentifier = ExchangeEnum.CHANGELLY
           break
         case ExchangeEnum.CHANGENOW:
           this.exchange = new ChangeNowExchange(this.http)
+          this.exchangeIdentifier = ExchangeEnum.CHANGENOW
           break
       }
     })
@@ -112,6 +115,17 @@ export class ExchangeProvider implements Exchange {
 
   public setActiveExchange(exchange: string) {
     this.exchangeSubject.next(exchange)
+  }
+
+  public switchActiveExchange() {
+    switch (this.exchangeIdentifier) {
+      case ExchangeEnum.CHANGELLY:
+        this.setActiveExchange(ExchangeEnum.CHANGENOW)
+        break
+      case ExchangeEnum.CHANGENOW:
+        this.setActiveExchange(ExchangeEnum.CHANGELLY)
+        break
+    }
   }
 
   public getActiveExchange() {
