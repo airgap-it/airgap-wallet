@@ -34,6 +34,7 @@ async function createWindow() {
     height: 920,
     width: 1600,
     show: false,
+    icon: path.join(__dirname, 'resources', 'icons', 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'node_modules', '@capacitor', 'electron', 'dist', 'electron-bridge.js')
