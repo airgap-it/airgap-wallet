@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosKtProtocol, PolkadotProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, PolkadotProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -15,6 +14,7 @@ import { DecimalValidator } from '../../validators/DecimalValidator'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -42,7 +42,6 @@ export class TransactionPreparePage {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly _ngZone: NgZone,
-    private readonly http: HttpClient,
     private readonly clipboardProvider: ClipboardService,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService
@@ -73,7 +72,7 @@ export class TransactionPreparePage {
     this.isSubstrate =
       this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT || this.wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA
 
-    this.useWallet()
+    this.updateFeeEstimate()
 
     this.onChanges()
   }
@@ -83,6 +82,8 @@ export class TransactionPreparePage {
       this.sendMaxAmount = false
       if (this.isSubstrate) {
         this.calculatePolkadotFee()
+      } else {
+        this.updateFeeEstimate()
       }
     })
 
@@ -136,84 +137,33 @@ export class TransactionPreparePage {
     }
   }
 
-  public useWallet() {
+  private async updateFeeEstimate() {
+    const feeDefaults = await this.estimateFees()
+
+    this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
+      this._ngZone.run(() => {
+        switch (val) {
+          case 0:
+            this.transactionForm.controls.fee.setValue(feeDefaults.low)
+            break
+          case 1:
+            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
+            break
+          case 2:
+            this.transactionForm.controls.fee.setValue(feeDefaults.high)
+            break
+          default:
+            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
+        }
+      })
+    })
+
     // set fee per default to low
     this.transactionForm.controls.fee.setValue(
-      new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
+      new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
+        -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).e + 1
+      )
     )
-    // TODO: Remove this code after we implement a fee system
-    if (this.wallet.protocolIdentifier === 'ae') {
-      this.http.get('https://api-airgap.gke.papers.tech/fees').subscribe((result: any) => {
-        if (result && result.low && result.medium && result.high) {
-          this.wallet.coinProtocol.feeDefaults.low = new BigNumber(result.low).toString(10)
-          this.wallet.coinProtocol.feeDefaults.medium = new BigNumber(result.medium).toString(10)
-          this.wallet.coinProtocol.feeDefaults.high = new BigNumber(result.high).toString(10)
-          this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low)
-        }
-        this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
-          this._ngZone.run(() => {
-            switch (val) {
-              case 0:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.low)
-                break
-              case 1:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium)
-                break
-              case 2:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.high)
-                break
-              default:
-                this.transactionForm.controls.fee.setValue(this.wallet.coinProtocol.feeDefaults.medium)
-            }
-          })
-        })
-      })
-    } else if (this.wallet.protocolIdentifier === 'xtz-kt' && this.forceMigration) {
-      if (this.forceMigration) {
-        this._ngZone.run(() => {
-          const protocol: TezosKtProtocol = this.wallet.coinProtocol as TezosKtProtocol
-          this.transactionForm.controls.fee.setValue(
-            protocol.migrationFee
-              .shiftedBy(-protocol.feeDecimals)
-              .toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
-          )
-        })
-      }
-    } else {
-      this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
-        this._ngZone.run(() => {
-          switch (val) {
-            case 0:
-              this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.low).toFixed(
-                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
-                )
-              )
-              break
-            case 1:
-              this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
-                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
-                )
-              )
-              break
-            case 2:
-              this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.high).toFixed(
-                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
-                )
-              )
-              break
-            default:
-              this.transactionForm.controls.fee.setValue(
-                new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
-                  -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1
-                )
-              )
-          }
-        })
-      })
-    }
   }
 
   public async calculatePolkadotFee() {
@@ -229,6 +179,12 @@ export class TransactionPreparePage {
 
       this.substrateFee$.next(fee)
     }
+  }
+
+  private async estimateFees(): Promise<FeeDefaults> {
+    const { address: formAddress, amount: formAmount } = this.transactionForm.value
+    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+    return await this.operationsProvider.estimateFees(this.wallet, formAddress, amount)
   }
 
   public async prepareTransaction() {

@@ -30,6 +30,7 @@ import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 
 @Injectable({
   providedIn: 'root'
@@ -355,6 +356,15 @@ export class OperationsProvider {
       throw error
     } finally {
       this.hideLoader(loader)
+    }
+  }
+
+  public async estimateFees(wallet: AirGapMarketWallet, address: string, amount: BigNumber, data?: any): Promise<FeeDefaults> {
+    try {
+      return await wallet.estimateFees([address], [amount.toFixed()], data)
+    } catch (error) {
+      console.error(error)
+      return wallet.coinProtocol.feeDefaults
     }
   }
 
