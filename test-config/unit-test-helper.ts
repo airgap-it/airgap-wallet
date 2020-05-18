@@ -23,7 +23,9 @@ import {
 } from './mocks-ionic'
 import { StorageMock } from './storage-mock'
 import { AppMock, AppInfoMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
-import { PUSH_NOTIFICATIONS_PLUGIN, PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PermissionsProvider } from 'src/app/services/permissions/permissions'
+import { PermissionsProviderMock } from './service-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {
@@ -31,6 +33,7 @@ export class UnitHelper {
     appInfo: new AppInfoMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
+    permissionsProvider: new PermissionsProviderMock(),
     pushNotifications: new PushNotificationsMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
@@ -65,7 +68,7 @@ export class UnitHelper {
       { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
-      { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissions },
+      { provide: PermissionsProvider, useValue: this.mockRefs.permissionsProvider },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },

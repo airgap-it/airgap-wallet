@@ -5,7 +5,8 @@ import { take } from 'rxjs/operators'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { AccountProvider } from '../../services/account/account.provider'
 
-import { PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PermissionsProvider } from '../permissions/permissions'
 
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
@@ -16,7 +17,7 @@ describe('AccountProvider', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          { provide: PERMISSIONS_PLUGIN, useValue: unitHelper.mockRefs.permissions },
+          { provide: PermissionsProvider, useValue: unitHelper.mockRefs.permissionsProvider },
           { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications }
         ]
       })
