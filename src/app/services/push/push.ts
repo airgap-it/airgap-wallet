@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
-import { PermissionsPlugin, PushNotificationsPlugin, PushNotification, PushNotificationToken, PermissionType } from '@capacitor/core'
+import { PushNotificationsPlugin, PushNotification, PushNotificationToken } from '@capacitor/core'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -12,7 +12,8 @@ import { SettingsKey, StorageProvider } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
 
-import { PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PermissionsProvider, PermissionStatus } from '../permissions/permissions'
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class PushProvider {
     private readonly storageProvider: StorageProvider,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
+    private readonly permissionsProvider: PermissionsProvider,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
@@ -43,9 +44,9 @@ export class PushProvider {
       return
     }
 
-    const hasPermissions = await this.hasPermissions()
+    const permissionStatus = await this.permissionsProvider.hasNotificationsPermission()
 
-    if (hasPermissions) {
+    if (permissionStatus === PermissionStatus.GRANTED) {
       await this.register()
     }
   }
@@ -160,10 +161,5 @@ export class PushProvider {
     })
 
     await this.pushNotifications.register()
-  }
-
-  private async hasPermissions(): Promise<boolean> {
-    const result = await this.permissions.query({ name: PermissionType.Notifications })
-    return result.state === 'granted'
   }
 }

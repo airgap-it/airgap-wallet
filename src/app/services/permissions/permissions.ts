@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core'
+import { Injectable, Inject } from '@angular/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { AlertController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PermissionsPlugin, PermissionType } from '@capacitor/core'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',
-  NOT_REQUESTED = 'NOT_REQUESTED',
-  DENIED_ALWAYS = 'DENIED_ALWAYS',
   DENIED = 'DENIED',
   UNKNOWN = 'UNKNOWN'
 }
@@ -21,12 +21,19 @@ export enum PermissionTypes {
   providedIn: 'root'
 })
 export class PermissionsProvider {
-  constructor(private readonly platform: Platform, private readonly diagnostic: Diagnostic, private readonly alertCtrl: AlertController) {}
+  constructor(
+    private readonly platform: Platform,
+    private readonly diagnostic: Diagnostic,
+    private readonly alertCtrl: AlertController,
+    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin
+  ) {}
 
   public async hasCameraPermission(): Promise<PermissionStatus> {
-    const permission: string = await this.diagnostic.getCameraAuthorizationStatus(false)
+    return this.checkPermission(PermissionType.Camera)
+  }
 
-    return this.getPermissionStatus(permission)
+  public async hasNotificationsPermission(): Promise<PermissionStatus> {
+    return this.checkPermission(PermissionType.Notifications)
   }
 
   public async requestPermissions(permissions: PermissionTypes[]): Promise<void> {
@@ -68,29 +75,25 @@ export class PermissionsProvider {
 
   private async canAskForPermission(permission: PermissionTypes): Promise<boolean> {
     let canAskForPermission: boolean = true
-    if (this.platform.is('android')) {
-      if (permission === PermissionTypes.CAMERA) {
-        const permissionStatus: PermissionStatus = await this.hasCameraPermission()
-        canAskForPermission = !(permissionStatus === PermissionStatus.DENIED_ALWAYS)
-      }
-    } else if (this.platform.is('ios')) {
-      if (permission === PermissionTypes.CAMERA) {
-        const permissionStatus: PermissionStatus = await this.hasCameraPermission()
-        canAskForPermission = !(permissionStatus === PermissionStatus.DENIED)
-      }
+
+    if (permission === PermissionTypes.CAMERA) {
+      const permissionStatus: PermissionStatus = await this.hasCameraPermission()
+      canAskForPermission = !(permissionStatus === PermissionStatus.DENIED)
     }
 
     return canAskForPermission
   }
 
-  private async getPermissionStatus(permission: string): Promise<PermissionStatus> {
-    if (this.isGranted(permission)) {
+  private async checkPermission(type: PermissionType): Promise<PermissionStatus> {
+    const permission = await this.permissions.query({ name: type })
+
+    return this.getPermissionStatus(permission.state)
+  }
+
+  private async getPermissionStatus(permission: 'granted' | 'denied' | 'prompt'): Promise<PermissionStatus> {
+    if (permission === 'granted') {
       return PermissionStatus.GRANTED
-    } else if (this.isNotRequested(permission)) {
-      return PermissionStatus.NOT_REQUESTED
-    } else if (this.isDeniedAlways(permission)) {
-      return PermissionStatus.DENIED_ALWAYS
-    } else if (this.isDenied(permission)) {
+    } else if (permission === 'denied') {
       return PermissionStatus.DENIED
     } else {
       return PermissionStatus.UNKNOWN
@@ -115,21 +118,5 @@ export class PermissionsProvider {
       ]
     })
     alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
-  }
-
-  private isGranted(permission: string): boolean {
-    return permission === this.diagnostic.permissionStatus.GRANTED || permission === this.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE
-  }
-
-  private isNotRequested(permission: string): boolean {
-    return permission === this.diagnostic.permissionStatus.NOT_REQUESTED
-  }
-
-  private isDeniedAlways(permission: string): boolean {
-    return permission === this.diagnostic.permissionStatus.DENIED_ALWAYS || permission === this.diagnostic.permissionStatus.RESTRICTED
-  }
-
-  private isDenied(permission: string): boolean {
-    return !(this.isGranted(permission) || this.isNotRequested(permission))
   }
 }

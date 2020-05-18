@@ -35,7 +35,6 @@ export class ScanPage extends ScanBasePage {
     private readonly ngZone: NgZone
   ) {
     super(platform, scanner, permissionsProvider)
-    this.isBrowser = !this.platform.is('hybrid')
   }
 
   public async ionViewWillEnter(): Promise<void> {

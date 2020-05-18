@@ -32,7 +32,6 @@ export class ScanAddressPage extends ScanBasePage {
       const info = this.route.snapshot.data.special
       this.callback = info.callback
     }
-    this.isBrowser = !this.platform.is('hybrid')
   }
 
   public checkScan(resultString: string): void {

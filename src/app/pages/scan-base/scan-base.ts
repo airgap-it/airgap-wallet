@@ -10,24 +10,34 @@ export class ScanBasePage {
   public selectedDevice: MediaDeviceInfo
   public scannerEnabled: boolean = true
 
-  public isBrowser: boolean = false
-
   public hasCameras: boolean = false
 
   public hasCameraPermission: boolean = false
 
-  constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {}
+  public readonly isMobile: boolean
+  public readonly isElectron: boolean
+  public readonly isBrowser: boolean
+
+  constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {
+    this.isMobile = this.platform.is('hybrid')
+    this.isElectron = this.platform.is('electron')
+    this.isBrowser = !(this.isMobile || this.isElectron)
+  }
 
   public async ionViewWillEnter(): Promise<void> {
-    if (this.platform.is('hybrid')) {
+    if (this.isMobile || this.isElectron) {
       await this.platform.ready()
       await this.checkCameraPermissionsAndActivate()
     }
   }
 
   public async requestPermission(): Promise<void> {
-    await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
-    await this.checkCameraPermissionsAndActivate()
+    if (this.isMobile) {
+      await this.permissionsProvider.userRequestsPermissions([PermissionTypes.CAMERA])
+      await this.checkCameraPermissionsAndActivate()
+    } else if (this.isElectron) {
+      this.startScanBrowser()
+    }
   }
 
   public async checkCameraPermissionsAndActivate(): Promise<void> {
@@ -39,25 +49,14 @@ export class ScanBasePage {
   }
 
   public ionViewDidEnter(): void {
-    if (!this.platform.is('hybrid')) {
+    if (this.isBrowser) {
       this.hasCameraPermission = true
-      this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
-        console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
-      })
-      if (this.selectedDevice) {
-        // Not the first time that we open scanner
-        this.zxingScanner.startScan(this.selectedDevice)
-      }
-      this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
-        this.hasCameras = true
-        this.availableDevices = devices
-        this.selectedDevice = devices[0]
-      })
+      this.startScanBrowser()
     }
   }
 
   public ionViewWillLeave(): void {
-    if (this.platform.is('hybrid')) {
+    if (this.isMobile) {
       this.scanner.destroy()
     } else {
       this.zxingScanner.resetCodeReader()
@@ -65,23 +64,42 @@ export class ScanBasePage {
   }
 
   public startScan(): void {
-    if (this.platform.is('hybrid')) {
-      this.scanner.show()
-      this.scanner.scan(
-        text => {
-          this.checkScan(text)
-        },
-        error => {
-          console.warn(error)
-          this.startScan()
-        }
-      )
+    if (this.isMobile) {
+      this.startScanMobile()
     } else {
-      // We don't need to do anything in the browser because it keeps scanning
+      this.startScanBrowser()
     }
   }
 
   public checkScan(resultString: string): void {
     console.error(`The checkScan method needs to be overwritten. Ignoring text ${resultString}`)
+  }
+
+  private startScanMobile() {
+    this.scanner.show()
+    this.scanner.scan(
+      text => {
+        this.checkScan(text)
+      },
+      error => {
+        console.warn(error)
+        this.startScan()
+      }
+    )
+  }
+
+  private startScanBrowser() {
+    this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
+      console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
+    })
+    if (this.selectedDevice) {
+      // Not the first time that we open scanner
+      this.zxingScanner.startScan(this.selectedDevice)
+    }
+    this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
+      this.hasCameras = true
+      this.availableDevices = devices
+      this.selectedDevice = devices[0]
+    })
   }
 }
