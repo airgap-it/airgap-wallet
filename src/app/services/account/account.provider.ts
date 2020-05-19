@@ -15,6 +15,7 @@ import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 import { isType } from 'src/app/utils/utils'
+import { OperationsProvider } from '../operations/operations'
 
 enum NotificationKind {
   CTA_Tip = 'cta_tip',
@@ -61,6 +62,7 @@ export class AccountProvider {
     private readonly alertController: AlertController,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,
+    private readonly opertaionsProvider: OperationsProvider,
     private readonly dataService: DataService,
     private readonly router: Router
   ) {
@@ -82,6 +84,7 @@ export class AccountProvider {
         languageService: this.languageService,
         alertController: this.alertController,
         toastController: this.toastController,
+        operationsProvider: this.opertaionsProvider,
         dataService: this.dataService,
         router: this.router
       }

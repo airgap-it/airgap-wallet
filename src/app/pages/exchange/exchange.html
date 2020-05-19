@@ -77,7 +77,7 @@
           </ion-row>
         </ion-col>
         <ion-col class="ion-no-padding justify--content__end">
-          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
+          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()" [disabled]="disableExchangeSelection">
             {{ 'exchange.switch-exchange_label' | translate }}
             <ion-icon name="chevron-down-outline"></ion-icon>
           </ion-button>

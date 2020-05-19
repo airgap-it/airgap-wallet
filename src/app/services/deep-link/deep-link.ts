@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@angular/core'
 import { AlertController } from '@ionic/angular'
+import { StorageProvider, SettingsKey } from './../storage/storage'
 import { TranslateService } from '@ngx-translate/core'
 import { AppPlugin } from '@capacitor/core'
 import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
@@ -21,7 +22,8 @@ export class DeepLinkProvider {
     private readonly translateService: TranslateService,
     private readonly accountProvider: AccountProvider,
     private readonly serializerService: SerializerService,
-    @Inject(APP_PLUGIN) private readonly app: AppPlugin
+    @Inject(APP_PLUGIN) private readonly app: AppPlugin,
+    private readonly storageProvider: StorageProvider
   ) {}
 
   public sameDeviceDeeplink(url: string = 'airgap-vault://'): Promise<void> {
@@ -85,6 +87,7 @@ export class DeepLinkProvider {
   }
 
   public async walletDeepLink(): Promise<{ wallet: AirGapMarketWallet; airGapTxs: IAirGapTransaction[]; serializedTx: string[] }> {
+    this.storageProvider.set(SettingsKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
     const url: URL = new URL(location.href)
     const publicKey: string = url.searchParams.get('publicKey')
     const rawUnsignedTx: unknown = JSON.parse(url.searchParams.get('rawUnsignedTx'))

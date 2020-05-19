@@ -12,7 +12,7 @@
       </ion-buttons>
     </ion-toolbar>
     <ion-row style="display: block"><portfolio-item [wallet]="wallet" [maxDigits]="0"></portfolio-item></ion-row>
-    <ion-row class="ion-padding-top ion-padding-horizontal">
+    <ion-row class="ion-padding-top ion-padding-horizontal action--container">
       <ion-button *ngFor="let action of actions" color="secondary" (click)="action.start()" shape="round" size="small" fill="outline">
         <ion-icon slot="start" [name]="action.context.icon"></ion-icon>
         {{ action.context.name | translate }}
@@ -24,7 +24,7 @@
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
     <tezos-delegation-card
-      *ngIf="wallet.protocolIdentifier === 'xtz'"
+      *ngIf="wallet.protocolIdentifier === 'xtz' && wallet.currentBalance"
       [wallet]="wallet"
       [isDelegated]="isKtDelegated"
       [delegateAmount]="wallet.currentBalance"
@@ -118,7 +118,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="wallet.currentBalance.toNumber() === 0"
+          [disabled]="wallet.currentBalance?.toNumber() === 0"
           shape="round"
         >
           <ion-icon slot="start" name="send-outline"></ion-icon>
