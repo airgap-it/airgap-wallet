@@ -82,7 +82,7 @@ export class TransactionPreparePage {
   public onChanges(): void {
     this.transactionForm
       .get('address')
-      .valueChanges.pipe(debounceTime(0))
+      .valueChanges.pipe(debounceTime(500))
       .subscribe((val: string) => {
         if (val && val.length > 0) {
           this.updateFeeEstimate()
@@ -91,7 +91,7 @@ export class TransactionPreparePage {
 
     this.transactionForm
       .get('amount')
-      .valueChanges.pipe(debounceTime(0))
+      .valueChanges.pipe(debounceTime(500))
       .subscribe(() => {
         this.sendMaxAmount = false
         this.updateFeeEstimate()
@@ -122,12 +122,17 @@ export class TransactionPreparePage {
       })
     })
 
-    this.feeDefaults$.pipe(distinctUntilChanged()).subscribe(value => {
-      if (value) {
-        // set medium as default
-        this.transactionForm.controls.feeLevel.setValue(1)
-      }
-    })
+    this.feeDefaults$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(value => {
+        if (value) {
+          // set medium as default
+          this.transactionForm.controls.feeLevel.setValue(1)
+        }
+      })
 
     // TODO: remove it when we properly support Polkadot fee/tip model
     if (this.isSubstrate) {
@@ -201,9 +206,10 @@ export class TransactionPreparePage {
     const { address: formAddress, amount: formAmount } = this.transactionForm.value
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
 
-    return this.transactionForm.controls.address.valid && this.transactionForm.controls.amount.valid
-      ? this.operationsProvider.estimateFees(this.wallet, formAddress, amount)
-      : undefined
+    const isAddressValid = this.transactionForm.controls.address.valid
+    const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
+
+    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, formAddress, amount) : undefined
   }
 
   public async prepareTransaction() {
