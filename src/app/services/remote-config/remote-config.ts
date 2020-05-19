@@ -5,8 +5,9 @@ import BigNumber from 'bignumber.js'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
+const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.prod.gke.papers.tech/api/v1'
 
-export interface BakerConfig {
+export interface TezosBakerConfig {
   name: string
   address: string
   fee: BigNumber
@@ -15,6 +16,42 @@ export interface BakerConfig {
     cycles: number
     time: string
   }
+}
+export interface TezosBakerDetails {
+  alias: string
+  address: string
+  hasLogo: boolean
+  hasPayoutAddress?: boolean
+  logoReference?: string
+  accountType?: 'address' | 'contract'
+}
+
+type TezosBakerDetailsResponse = { [address: string]: Omit<TezosBakerDetails, 'address'> }
+
+export interface CosmosValidatorDetails {
+  operator_address: string
+  consensus_pubkey: string
+  jailed: false
+  status: number
+  tokens: BigNumber
+  delegator_shares: BigNumber
+  description: {
+    moniker: string
+    identity: string
+    website: string
+    details: string
+  }
+  unbonding_height: string
+  unbonding_time: string
+  commission: {
+    commission_rates: {
+      rate: BigNumber
+      max_rate: BigNumber
+      max_change_rate: BigNumber
+    }
+    update_time: string
+  }
+  min_self_delegation: string
 }
 
 export interface AeFirstVote {
@@ -30,8 +67,8 @@ export interface AeFirstVote {
 export class RemoteConfigProvider {
   constructor(private readonly httpClient: HttpClient) {}
 
-  public async tezosBakers(): Promise<BakerConfig[]> {
-    const responsePromise = this.httpClient.get<BakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
+  public async tezosBakers(): Promise<TezosBakerConfig[]> {
+    const responsePromise = this.httpClient.get<TezosBakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
     responsePromise.catch(handleErrorSentry(ErrorCategory.OTHER))
     const response = await responsePromise
 
@@ -44,6 +81,49 @@ export class RemoteConfigProvider {
         payout: {
           cycles: config.payout.cycles,
           time: config.payout.time
+        }
+      }
+    })
+  }
+
+  public async getKnownBakers(): Promise<TezosBakerDetails[]> {
+    const response: TezosBakerDetailsResponse = await this.httpClient
+      .get<TezosBakerDetailsResponse>(`${COIN_LIB_SERVICE}/tz/bakers`)
+      .toPromise()
+      .catch(error => {
+        handleErrorSentry(ErrorCategory.OTHER)(error)
+        return {}
+      })
+
+    return Object.entries(response).map(([address, details]) => {
+      return {
+        address,
+        ...details
+      }
+    })
+  }
+
+  public async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
+    const response: CosmosValidatorDetails[] = await this.httpClient
+      .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`)
+      .toPromise()
+      .catch(error => {
+        handleErrorSentry(ErrorCategory.OTHER)(error)
+        return []
+      })
+
+    return response.map(details => {
+      return {
+        ...details,
+        tokens: new BigNumber(details.tokens),
+        delegator_shares: new BigNumber(details.delegator_shares),
+        commission: {
+          ...details.commission,
+          commission_rates: {
+            rate: new BigNumber(details.commission.commission_rates.rate),
+            max_rate: new BigNumber(details.commission.commission_rates.max_rate),
+            max_change_rate: new BigNumber(details.commission.commission_rates.max_change_rate)
+          }
         }
       }
     })

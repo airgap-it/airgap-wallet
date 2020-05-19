@@ -6,7 +6,7 @@ import {
   AirGapDelegationDetails,
   AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
+import { RemoteConfigProvider, TezosBakerConfig } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import BigNumber from 'bignumber.js'
@@ -35,7 +35,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   public delegateeLabel: string = 'Baker'
 
   private constructor(
-    private readonly airGapBakerConfig: BakerConfig,
+    private readonly airGapBakerConfig: TezosBakerConfig,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverter: AmountConverterPipe,
     private readonly formBuilder: FormBuilder
@@ -125,7 +125,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
   }
 
-  private createDelegateeDisplayDetails(bakerConfig: BakerConfig | null): UIWidget[] {
+  private createDelegateeDisplayDetails(bakerConfig: TezosBakerConfig | null): UIWidget[] {
     return [
       new UIIconText({
         iconName: 'logo-usd',
@@ -228,7 +228,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     delegatorExtraInfo: DelegationInfo,
     baker: string,
     bakerRewards: DelegationRewardInfo[],
-    bakerConfig?: BakerConfig
+    bakerConfig?: TezosBakerConfig
   ): UIWidget[] {
     const nextPayout = this.getNextPayoutMoment(delegatorExtraInfo, bakerRewards, bakerConfig ? bakerConfig.payout.cycles : undefined)
 
