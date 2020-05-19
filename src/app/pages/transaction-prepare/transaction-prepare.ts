@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, PolkadotProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, SubstrateProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -30,6 +30,8 @@ export class TransactionPreparePage {
   public sendMaxAmount = false
   public forceMigration = false
   public disableFees = false
+
+  public feeDefaults$: BehaviorSubject<FeeDefaults | undefined> = new BehaviorSubject(undefined)
 
   // temporary fields until we figure out how to handle Substrate fee/tip model
   public isSubstrate = false
@@ -78,18 +80,52 @@ export class TransactionPreparePage {
   }
 
   public onChanges(): void {
-    this.transactionForm.get('amount').valueChanges.subscribe(() => {
-      this.sendMaxAmount = false
-      if (this.isSubstrate) {
-        this.calculatePolkadotFee()
-      } else {
+    this.transactionForm
+      .get('address')
+      .valueChanges.pipe(debounceTime(0))
+      .subscribe((val: string) => {
+        if (val && val.length > 0) {
+          this.updateFeeEstimate()
+        }
+      })
+
+    this.transactionForm
+      .get('amount')
+      .valueChanges.pipe(debounceTime(0))
+      .subscribe(() => {
+        this.sendMaxAmount = false
         this.updateFeeEstimate()
-      }
-    })
+      })
 
     this.transactionForm.get('fee').valueChanges.subscribe((val: string) => {
       if (this.sendMaxAmount) {
         this.setMaxAmount(val)
+      }
+    })
+
+    this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
+      const feeDefaults = this.feeDefaults$.value || this.wallet.coinProtocol.feeDefaults
+      this._ngZone.run(() => {
+        switch (val) {
+          case 0:
+            this.transactionForm.controls.fee.setValue(feeDefaults.low)
+            break
+          case 1:
+            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
+            break
+          case 2:
+            this.transactionForm.controls.fee.setValue(feeDefaults.high)
+            break
+          default:
+            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
+        }
+      })
+    })
+
+    this.feeDefaults$.pipe(distinctUntilChanged()).subscribe(value => {
+      if (value) {
+        // set medium as default
+        this.transactionForm.controls.feeLevel.setValue(1)
       }
     })
 
@@ -106,7 +142,7 @@ export class TransactionPreparePage {
             this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
           )
         })
-      this.calculatePolkadotFee()
+      this.calculateSubstrateFee()
     }
   }
 
@@ -138,40 +174,20 @@ export class TransactionPreparePage {
   }
 
   private async updateFeeEstimate() {
-    const feeDefaults = await this.estimateFees()
-
-    this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
-      this._ngZone.run(() => {
-        switch (val) {
-          case 0:
-            this.transactionForm.controls.fee.setValue(feeDefaults.low)
-            break
-          case 1:
-            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
-            break
-          case 2:
-            this.transactionForm.controls.fee.setValue(feeDefaults.high)
-            break
-          default:
-            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
-        }
-      })
-    })
-
-    // set fee per default to low
-    this.transactionForm.controls.fee.setValue(
-      new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).toFixed(
-        -1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.medium).e + 1
-      )
-    )
+    if (this.isSubstrate) {
+      this.calculateSubstrateFee()
+    } else {
+      const feeDefaults = await this.estimateFees()
+      this.feeDefaults$.next(feeDefaults)
+    }
   }
 
-  public async calculatePolkadotFee() {
+  public async calculateSubstrateFee() {
     const { address: formAddress, amount: formAmount } = this.transactionForm.value
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
 
     if (this.isSubstrate && !amount.isNaN() && amount.isInteger()) {
-      const fee = await (this.wallet.coinProtocol as PolkadotProtocol).getTransferFeeEstimate(
+      const fee = await (this.wallet.coinProtocol as SubstrateProtocol).getTransferFeeEstimate(
         this.wallet.publicKey,
         formAddress,
         amount.toString(10)
@@ -181,10 +197,13 @@ export class TransactionPreparePage {
     }
   }
 
-  private async estimateFees(): Promise<FeeDefaults> {
+  private async estimateFees(): Promise<FeeDefaults | undefined> {
     const { address: formAddress, amount: formAmount } = this.transactionForm.value
     const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
-    return await this.operationsProvider.estimateFees(this.wallet, formAddress, amount)
+
+    return this.transactionForm.controls.address.valid && this.transactionForm.controls.amount.valid
+      ? this.operationsProvider.estimateFees(this.wallet, formAddress, amount)
+      : undefined
   }
 
   public async prepareTransaction() {

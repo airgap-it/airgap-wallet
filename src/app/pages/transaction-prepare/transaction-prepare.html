@@ -143,7 +143,7 @@
               <ion-text class="ion-no-margin" color="blackLight">
                 <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
               </ion-text>
-              <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode"></ion-toggle>
+              <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [disabled]="!(feeDefaults$ | async)"></ion-toggle>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -151,7 +151,7 @@
           <ion-col size="12" class="ion-no-padding">
             <ion-item class="ion-no-padding" lines="none">
               <ion-range
-                [attr.disabled]="forceMigration"
+                [attr.disabled]="forceMigration || !(feeDefaults$ | async)"
                 min="0"
                 max="2"
                 step="1"
