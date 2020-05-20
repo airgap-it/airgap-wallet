@@ -12,9 +12,28 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 import { BehaviorSubject } from 'rxjs'
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { debounceTime } from 'rxjs/operators'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+
+interface TransactionPrepareState {
+  availableBalance: BigNumber
+  forceMigration: boolean
+  feeDefaults: FeeDefaults
+  feeCurrentMarketPrice: number
+  sendMaxAmount: boolean
+  disableAdvancedMode: boolean
+  disableFeeSlider: boolean
+  disablePrepareButton: boolean
+  estimatingFeeDefaults: boolean
+
+  address: string
+  addressDirty: boolean
+  amount: number
+  feeLevel: number
+  fee: number
+  isAdvancedMode: boolean
+}
 
 @Component({
   selector: 'page-transaction-prepare',
@@ -22,21 +41,17 @@ import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
   styleUrls: ['./transaction-prepare.scss']
 })
 export class TransactionPreparePage {
+  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(undefined)
+  public get state(): Partial<TransactionPrepareState> {
+    return this.state$.value || {}
+  }
+
   public wallet: AirGapMarketWallet
-  public availableBalance: BigNumber
   public transactionForm: FormGroup
   public amountForm: FormGroup
-  public feeCurrentMarketPrice: number
-  public sendMaxAmount = false
-  public forceMigration = false
-  public disableFees = false
 
-  public feeDefaults$: BehaviorSubject<FeeDefaults | undefined> = new BehaviorSubject(undefined)
-
-  // temporary fields until we figure out how to handle Substrate fee/tip model
-  public isSubstrate = false
-  public substrateFee: BigNumber = new BigNumber(NaN)
-  private substrateFee$: BehaviorSubject<string> = new BehaviorSubject('')
+  // temporary field until we figure out how to handle Substrate fee/tip model
+  private readonly isSubstrate: boolean
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -48,112 +63,204 @@ export class TransactionPreparePage {
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService
   ) {
-    let address = ''
-    let wallet: AirGapMarketWallet
-    let amount = 0
-
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      address = info.address || ''
-      amount = info.amount || 0
-      wallet = info.wallet
-      this.setWallet(wallet)
-      this.transactionForm = formBuilder.group({
+      const address: string = info.address || ''
+      const amount: number = info.amount || 0
+      const wallet: AirGapMarketWallet = info.wallet
+      const forceMigration: boolean = info.forceMigration || false
+
+      this.transactionForm = this.formBuilder.group({
         address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
         amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
         feeLevel: [0, [Validators.required]],
         fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
         isAdvancedMode: [false, []]
       })
-      if (info.forceMigration) {
-        this.forceMigration = info.forceMigration
-        this.setMaxAmount('0')
-      }
+
+      this.wallet = wallet
+
+      this.isSubstrate =
+        wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA || wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT
+
+      this.initState()
+        .then(() => {
+          this.updateState({ forceMigration })
+          this.onChanges()
+          this.updateFeeEstimate()
+        })
+        .catch(handleErrorSentry(ErrorCategory.OTHER))
     }
-
-    this.isSubstrate =
-      this.wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT || this.wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA
-
-    this.updateFeeEstimate()
-
-    this.onChanges()
   }
 
   public onChanges(): void {
+    this.state$.subscribe((state: TransactionPrepareState) => {
+      this.onStateUpdated(state)
+    })
+
     this.transactionForm
       .get('address')
       .valueChanges.pipe(debounceTime(500))
-      .subscribe((val: string) => {
-        if (val && val.length > 0) {
-          this.updateFeeEstimate()
-        }
+      .subscribe((value: string) => {
+        this.updateState({
+          address: value,
+          addressDirty: false
+        })
+        this.updateFeeEstimate()
       })
 
     this.transactionForm
       .get('amount')
       .valueChanges.pipe(debounceTime(500))
-      .subscribe(() => {
-        this.sendMaxAmount = false
+      .subscribe((value: number) => {
+        this.updateState({
+          amount: value,
+          sendMaxAmount: false
+        })
         this.updateFeeEstimate()
       })
 
-    this.transactionForm.get('fee').valueChanges.subscribe((val: string) => {
-      if (this.sendMaxAmount) {
-        this.setMaxAmount(val)
-      }
-    })
-
-    this.transactionForm.get('feeLevel').valueChanges.subscribe(val => {
-      const feeDefaults = this.feeDefaults$.value || this.wallet.coinProtocol.feeDefaults
-      this._ngZone.run(() => {
-        switch (val) {
-          case 0:
-            this.transactionForm.controls.fee.setValue(feeDefaults.low)
-            break
-          case 1:
-            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
-            break
-          case 2:
-            this.transactionForm.controls.fee.setValue(feeDefaults.high)
-            break
-          default:
-            this.transactionForm.controls.fee.setValue(feeDefaults.medium)
-        }
+    this.transactionForm.get('fee').valueChanges.subscribe((value: number) => {
+      this.updateState({
+        fee: value
       })
     })
 
-    this.feeDefaults$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(value => {
-        if (value) {
-          // set medium as default
-          this.transactionForm.controls.feeLevel.setValue(1)
-        }
+    this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
+      this.updateState({
+        feeLevel: value
       })
+    })
 
-    // TODO: remove it when we properly support Polkadot fee/tip model
-    if (this.isSubstrate) {
-      this.substrateFee$
-        .pipe(
-          debounceTime(300),
-          distinctUntilChanged()
-        )
-        .subscribe(value => {
-          this.substrateFee = new BigNumber(value).shiftedBy(-this.wallet.coinProtocol.feeDecimals)
-          this.transactionForm.controls.fee.setValue(
-            this.substrateFee.toFixed(-1 * new BigNumber(this.wallet.coinProtocol.feeDefaults.low).e + 1)
-          )
-        })
-      this.calculateSubstrateFee()
-    }
+    this.transactionForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
+      this.updateState({
+        isAdvancedMode: value
+      })
+    })
   }
 
-  public async setWallet(wallet: AirGapMarketWallet) {
-    this.wallet = wallet
+  private async initState(): Promise<void> {
+    const [feeCurrentMarketPrice, availableBalance]: [number, BigNumber] = await Promise.all([
+      this.calculateFeeCurrentMarketPrice(this.wallet),
+      this.getAvailableBalance(this.wallet)
+    ])
 
+    this.state$.next({
+      availableBalance,
+      forceMigration: false,
+      feeDefaults: this.wallet.coinProtocol.feeDefaults,
+      feeCurrentMarketPrice,
+      sendMaxAmount: false,
+      disableAdvancedMode: this.isSubstrate,
+      disableFeeSlider: true,
+      disablePrepareButton: true,
+      estimatingFeeDefaults: false,
+      address: this.transactionForm.controls.address.value,
+      addressDirty: false,
+      amount: this.transactionForm.controls.amount.value,
+      feeLevel: this.transactionForm.controls.feeLevel.value,
+      fee: this.transactionForm.controls.fee.value,
+      isAdvancedMode: this.transactionForm.controls.isAdvancedMode.value
+    })
+  }
+
+  private updateState(newState: Partial<TransactionPrepareState>): void {
+    let sendMaxAmount: boolean
+    if (newState.forceMigration !== undefined) {
+      sendMaxAmount = newState.forceMigration
+    } else if (newState.sendMaxAmount !== undefined) {
+      sendMaxAmount = newState.sendMaxAmount
+    } else {
+      sendMaxAmount = this.state.sendMaxAmount
+    }
+
+    const feeDefaults: FeeDefaults = newState.feeDefaults || this.state.feeDefaults
+    const feeDefaultsWithLevel: { [level: number]: string } = {
+      0: feeDefaults.low,
+      1: feeDefaults.medium,
+      2: feeDefaults.high
+    }
+
+    let fee: string | number
+    if (newState.feeLevel !== undefined) {
+      fee = feeDefaultsWithLevel[newState.feeLevel]
+    } else if (newState.fee !== undefined) {
+      fee = newState.fee
+    } else if (feeDefaults) {
+      fee = feeDefaultsWithLevel[this.state.feeLevel]
+    } else {
+      fee = this.state.fee
+    }
+
+    if (newState.sendMaxAmount) {
+      this.setMaxAmount()
+    }
+
+    const amount: number = newState.amount !== undefined ? newState.amount : this.state.amount
+
+    const disableAdvancedMode: boolean =
+      this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode)
+    const disableFeeSlider: boolean = this.isSubstrate || newState.estimatingFeeDefaults || !feeDefaults
+    const disablePrepareButton: boolean = this.transactionForm.invalid || newState.estimatingFeeDefaults || amount <= 0
+
+    const updated: TransactionPrepareState = {
+      ...this.state$.value,
+      ...newState,
+      sendMaxAmount,
+      feeDefaults,
+      fee: new BigNumber(fee).toNumber(),
+      amount,
+      disableAdvancedMode,
+      disableFeeSlider,
+      disablePrepareButton
+    }
+
+    this.state$.next(updated)
+  }
+
+  private onStateUpdated(newState: TransactionPrepareState): void {
+    const formValues: {
+      address: string
+      amount: number
+      feeLevel: number
+      fee: number
+      isAdvanceMode: boolean
+    } = this.transactionForm.value
+
+    function getDifferences<T, K extends Extract<keyof T, keyof TransactionPrepareState>>(
+      target: T,
+      state: TransactionPrepareState,
+      ...properties: K[]
+    ): Partial<T> {
+      const targetProperties: K[] = properties.length > 0 ? properties : (Object.keys(target).filter((key: string) => key in state) as K[])
+
+      const differences: [K, T[K]][] = targetProperties
+        .filter((property: K) => {
+          const targetValue: T[K] = target[property]
+          const stateValue: TransactionPrepareState[K] = state[property]
+
+          return typeof targetValue === typeof stateValue && (targetValue as any) !== (stateValue as any)
+        })
+        .map((property: K) => [property, state[property] as unknown] as [K, T[K]])
+
+      const differencesObject: Partial<T> = {}
+      differences.forEach(([name, value]: [K, T[K]]) => {
+        differencesObject[name] = value
+      })
+
+      return differencesObject
+    }
+
+    const formDifferences = getDifferences(formValues, newState)
+    this._ngZone.run(() => {
+      this.transactionForm.patchValue(formDifferences, { emitEvent: false })
+      if (newState.addressDirty) {
+        this.transactionForm.controls.address.markAsDirty()
+      }
+    })
+  }
+
+  private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
     if (wallet.protocolIdentifier === ProtocolSymbols.TZBTC) {
       const newWallet = new AirGapMarketWallet(
         'xtz',
@@ -162,63 +269,80 @@ export class TransactionPreparePage {
         'm/44h/1729h/0h/0h'
       )
       await newWallet.synchronize()
-      this.feeCurrentMarketPrice = newWallet.currentMarketPrice.toNumber()
+      return newWallet.currentMarketPrice.toNumber()
     } else {
-      this.feeCurrentMarketPrice = wallet.currentMarketPrice.toNumber()
+      return wallet.currentMarketPrice.toNumber()
     }
+  }
+
+  private async getAvailableBalance(wallet: AirGapMarketWallet): Promise<BigNumber> {
     // TODO: refactor this so that we do not need to check for the protocols
     if (
       wallet.protocolIdentifier === ProtocolSymbols.COSMOS ||
       wallet.protocolIdentifier === ProtocolSymbols.KUSAMA ||
       wallet.protocolIdentifier === ProtocolSymbols.POLKADOT
     ) {
-      this.availableBalance = new BigNumber(await wallet.coinProtocol.getAvailableBalanceOfAddresses([this.wallet.addresses[0]]))
+      return new BigNumber(await wallet.coinProtocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {
-      this.availableBalance = this.wallet.currentBalance
+      return wallet.currentBalance
     }
   }
 
   private async updateFeeEstimate() {
     if (this.isSubstrate) {
       this.calculateSubstrateFee()
-    } else {
-      const feeDefaults = await this.estimateFees()
-      this.feeDefaults$.next(feeDefaults)
+    } else if (!this.state.isAdvancedMode) {
+      this.updateState({ estimatingFeeDefaults: true })
+
+      const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
+
+      this.updateState({
+        estimatingFeeDefaults: false,
+        feeDefaults,
+        feeLevel: feeDefaults ? 1 : this.state.feeLevel
+      })
     }
   }
 
   public async calculateSubstrateFee() {
-    const { address: formAddress, amount: formAmount } = this.transactionForm.value
-    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
 
     if (this.isSubstrate && !amount.isNaN() && amount.isInteger()) {
       const fee = await (this.wallet.coinProtocol as SubstrateProtocol).getTransferFeeEstimate(
         this.wallet.publicKey,
-        formAddress,
+        this.state.address,
         amount.toString(10)
       )
 
-      this.substrateFee$.next(fee)
+      this.updateState({
+        fee: new BigNumber(fee)
+          .shiftedBy(-this.wallet.coinProtocol.feeDecimals)
+          .integerValue(BigNumber.ROUND_DOWN)
+          .toNumber()
+      })
     }
   }
 
   private async estimateFees(): Promise<FeeDefaults | undefined> {
-    const { address: formAddress, amount: formAmount } = this.transactionForm.value
-    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
 
     const isAddressValid = this.transactionForm.controls.address.valid
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
-    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, formAddress, amount) : undefined
+    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, this.state.address, amount) : undefined
   }
 
   public async prepareTransaction() {
-    const { address: formAddress, amount: formAmount, fee: formFee } = this.transactionForm.value
-    const amount = new BigNumber(formAmount).shiftedBy(this.wallet.coinProtocol.decimals)
-    const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const fee = new BigNumber(this.state.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(this.wallet, formAddress, amount, fee)
+      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
+        this.wallet,
+        this.state.address,
+        amount,
+        fee
+      )
       const info = {
         wallet: this.wallet,
         airGapTxs,
@@ -232,8 +356,8 @@ export class TransactionPreparePage {
   }
 
   public openScanner() {
-    const callback = address => {
-      this.transactionForm.controls.address.setValue(address)
+    const callback = (address: string) => {
+      this.updateState({ address })
     }
     const info = {
       callback
@@ -242,27 +366,38 @@ export class TransactionPreparePage {
     this.router.navigateByUrl('/scan-address/' + DataServiceKey.SCAN).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public toggleMaxAmount() {
-    this.sendMaxAmount = !this.sendMaxAmount
-    if (this.sendMaxAmount) {
-      this.setMaxAmount(this.transactionForm.value.fee)
-    }
+  public toggleMaxAmount(): void {
+    this.updateState({
+      sendMaxAmount: !this.state.sendMaxAmount
+    })
   }
 
-  private async setMaxAmount(formFee: string) {
-    // We need to pass the fee here because during the "valueChanges" call the form is not updated
-    const fee = new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
-    const amount = await this.wallet.getMaxTransferValue(fee.toFixed())
-    this.transactionForm.controls.amount.setValue(amount.shiftedBy(-this.wallet.coinProtocol.decimals).toFixed(), {
-      emitEvent: false
+  private async setMaxAmount(formFee?: number | string): Promise<void> {
+    let fee: BigNumber
+    if (formFee !== undefined) {
+      fee = new BigNumber(formFee)
+    } else {
+      const feeEstimate = await this.wallet.estimateFees([this.state.address], [this.state.availableBalance.toFixed()])
+      fee = new BigNumber(feeEstimate.medium)
+    }
+
+    const amount = await this.wallet.getMaxTransferValue(fee.shiftedBy(this.wallet.coinProtocol.feeDecimals).toFixed())
+
+    this.updateState({
+      amount: new BigNumber(amount)
+        .shiftedBy(-this.wallet.coinProtocol.decimals)
+        .integerValue(BigNumber.ROUND_DOWN)
+        .toNumber()
     })
   }
 
   public pasteClipboard() {
     this.clipboardProvider.paste().then(
       (text: string) => {
-        this.transactionForm.controls.address.setValue(text)
-        this.transactionForm.controls.address.markAsDirty()
+        this.updateState({
+          address: text,
+          addressDirty: true
+        })
       },
       (err: string) => {
         console.error('Error: ' + err)
