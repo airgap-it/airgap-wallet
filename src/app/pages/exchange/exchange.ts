@@ -7,7 +7,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeTransaction, ExchangeEnum } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
@@ -327,8 +327,6 @@ export class ExchangePage {
           amount.shiftedBy(this.fromWallet.coinProtocol.decimals)
         )
 
-        console.log(feeEstimation)
-
         const info = {
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocolIdentifier,
@@ -346,18 +344,19 @@ export class ExchangePage {
         const txId = result.id
         let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
 
-        const exchangeTxInfo = {
+        const exchangeTxInfo: ExchangeTransaction = {
           receivingAddress: this.toWallet.addresses[0],
           sendingAddress: this.fromWallet.addresses[0],
           fromCurrency: this.fromWallet.protocolIdentifier,
           toCurrency: this.toWallet.protocolIdentifier,
           amountExpectedFrom: this.amount,
           amountExpectedTo: amountExpectedTo.toString(),
+          fee: feeEstimation.medium,
           status: txStatus,
-          exchange: this.activeExchange,
+          exchange: this.activeExchange as ExchangeEnum,
           id: txId,
           timestamp: new BigNumber(Date.now()).toNumber()
-        } as ExchangeTransaction
+        }
 
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
       } catch (error) {
