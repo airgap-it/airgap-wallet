@@ -12,6 +12,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { TranslateService } from '@ngx-translate/core'
+import { OperationsProvider } from 'src/app/services/operations/operations'
 
 enum ExchangePageState {
   LOADING,
@@ -61,7 +62,8 @@ export class ExchangePage {
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService,
     private readonly modalController: ModalController,
-    private readonly alertCtrl: AlertController
+    private readonly alertCtrl: AlertController,
+    private readonly operationsProvider: OperationsProvider
   ) {
     this.exchangeProvider.getActiveExchange().subscribe(exchange => {
       this.activeExchange = exchange
@@ -317,6 +319,16 @@ export class ExchangePage {
         )
 
         const amountExpectedTo = await this.getExchangeAmount()
+
+        const amount = result.amountExpectedFrom ? new BigNumber(result.amountExpectedFrom) : this.amount
+        const feeEstimation = await this.operationsProvider.estimateFees(
+          this.fromWallet,
+          result.payinAddress,
+          amount.shiftedBy(this.fromWallet.coinProtocol.decimals)
+        )
+
+        console.log(feeEstimation)
+
         const info = {
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocolIdentifier,
@@ -324,7 +336,8 @@ export class ExchangePage {
           toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocolIdentifier])[0],
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
-          amountExpectedTo: amountExpectedTo
+          amountExpectedTo: amountExpectedTo,
+          fee: feeEstimation.medium
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
