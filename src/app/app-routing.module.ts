@@ -142,6 +142,10 @@ const routes: Routes = [
   {
     path: 'exchange-custom',
     loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
+  },
+  {
+    path: 'beacon-permission-list',
+    loadChildren: () => import('./pages/beacon-permission-list/beacon-permission-list.module').then(m => m.BeaconPermissionListPageModule)
   }
 ]
 @NgModule({

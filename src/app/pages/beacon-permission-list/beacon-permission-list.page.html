@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>beacon-permission-list</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Connected dApps</ion-label>
+    </ion-list-header>
+    <ion-item lines="none" *ngFor="let permission of permissions">
+      <ion-label>
+        <h3>
+          <strong>{{ permission.appMetadata.name }}</strong>
+          <small>{{ permission.website }}</small>
+        </h3>
+        <div class="d-flex ion-align-items-center">
+          <identicon [address]="permission.address"></identicon>
+          <p class="ion-no-margin">{{ permission.address }}</p>
+        </div>
+        <ion-badge color="light">
+          {{ permission.scopes }}
+        </ion-badge>
+      </ion-label>
+      <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission)">
+        Remove
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

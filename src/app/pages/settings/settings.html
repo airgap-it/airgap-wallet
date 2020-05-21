@@ -49,6 +49,10 @@
       <ion-list-header class="ion-no-margin" lines="none">
         <ion-label>{{ 'settings.beacon.label' | translate }}</ion-label>
       </ion-list-header>
+      <ion-item (click)="beaconPermissions()" detail="true">
+        <ion-icon src="/assets/img/beacon_logo_black.svg" slot="start"></ion-icon>
+        {{ 'settings.beacon.beacon_permission_list_label' | translate }}
+      </ion-item>
       <ion-item (click)="beaconSettings()" detail="true">
         <ion-icon src="/assets/img/beacon_logo_black.svg" slot="start"></ion-icon>
         {{ 'settings.beacon.settings_label' | translate }}

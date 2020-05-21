@@ -18,7 +18,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
   providedIn: 'root'
 })
 export class BeaconService {
-  private client: WalletClient | undefined
+  public client: WalletClient | undefined
   private requests: [string, any][] = []
 
   constructor(private readonly modalController: ModalController) {
