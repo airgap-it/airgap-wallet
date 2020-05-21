@@ -11,7 +11,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
-import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
