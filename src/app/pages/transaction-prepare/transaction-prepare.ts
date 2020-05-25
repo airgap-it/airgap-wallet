@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, SubstrateProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -22,6 +22,7 @@ interface TransactionPrepareState {
   feeDefaults: FeeDefaults
   feeCurrentMarketPrice: number
   sendMaxAmount: boolean
+  disableSendMaxAmount: boolean
   disableAdvancedMode: boolean
   disableFeeSlider: boolean
   disablePrepareButton: boolean
@@ -106,7 +107,8 @@ export class TransactionPreparePage {
       .subscribe((value: string) => {
         this.updateState({
           address: value,
-          addressDirty: false
+          addressDirty: false,
+          disableSendMaxAmount: false
         })
         this.updateFeeEstimate()
       })
@@ -159,6 +161,7 @@ export class TransactionPreparePage {
       feeDefaults: this.wallet.coinProtocol.feeDefaults,
       feeCurrentMarketPrice,
       sendMaxAmount: false,
+      disableSendMaxAmount: true,
       disableAdvancedMode: this.isSubstrate,
       disableFeeSlider: true,
       disablePrepareButton: true,
@@ -173,6 +176,7 @@ export class TransactionPreparePage {
   }
 
   private updateState(newState: Partial<TransactionPrepareState>): void {
+    const newFeeLevel: number = this.isSubstrate ? 0 : newState.feeLevel
     const feeDefaults: FeeDefaults = newState.feeDefaults || this.state.feeDefaults
     const feeDefaultsWithLevel: { [level: number]: string } = {
       0: feeDefaults.low,
@@ -181,7 +185,7 @@ export class TransactionPreparePage {
     }
 
     let fee: string | number
-    if (newState.feeLevel !== undefined) {
+    if (newFeeLevel !== undefined) {
       fee = feeDefaultsWithLevel[newState.feeLevel]
     } else if (newState.fee !== undefined) {
       fee = newState.fee
@@ -205,6 +209,7 @@ export class TransactionPreparePage {
       sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : this.state.sendMaxAmount,
       feeDefaults,
       fee: new BigNumber(fee).toNumber(),
+      feeLevel: newFeeLevel !== undefined ? newFeeLevel : this.state.feeLevel,
       amount: newState.amount !== undefined ? newState.amount : this.state.amount,
       disableAdvancedMode,
       disableFeeSlider,
@@ -285,9 +290,7 @@ export class TransactionPreparePage {
   }
 
   private async updateFeeEstimate(): Promise<void> {
-    if (this.isSubstrate) {
-      this.calculateSubstrateFee()
-    } else if (!this.state.isAdvancedMode) {
+    if (!this.state.isAdvancedMode) {
       this.updateState({
         estimatingFeeDefaults: true,
         disableFeeSlider: true,
@@ -302,25 +305,6 @@ export class TransactionPreparePage {
         feeLevel: feeDefaults ? 1 : this.state.feeLevel,
         disableFeeSlider: !feeDefaults,
         disablePrepareButton: !feeDefaults || this.state.amount <= 0
-      })
-    }
-  }
-
-  public async calculateSubstrateFee() {
-    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-
-    if (this.isSubstrate && !amount.isNaN() && amount.isInteger()) {
-      const fee = await (this.wallet.coinProtocol as SubstrateProtocol).getTransferFeeEstimate(
-        this.wallet.publicKey,
-        this.state.address,
-        amount.toString(10)
-      )
-
-      this.updateState({
-        fee: new BigNumber(fee)
-          .shiftedBy(-this.wallet.coinProtocol.feeDecimals)
-          .decimalPlaces(this.wallet.coinProtocol.feeDecimals)
-          .toNumber()
       })
     }
   }
@@ -416,6 +400,7 @@ export class TransactionPreparePage {
         this.updateState({
           address: text,
           addressDirty: true,
+          disableSendMaxAmount: false,
           disablePrepareButton: this.state.amount <= 0
         })
         this.updateFeeEstimate()
