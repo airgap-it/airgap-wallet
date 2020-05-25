@@ -84,8 +84,10 @@ export class TransactionPreparePage {
         wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA || wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT
 
       this.initState()
-        .then(() => {
-          this.updateState({ forceMigration })
+        .then(async () => {
+          if (forceMigration) {
+            await this.forceMigration()
+          }
           this.onChanges()
           this.updateFeeEstimate()
         })
@@ -112,19 +114,33 @@ export class TransactionPreparePage {
     this.transactionForm
       .get('amount')
       .valueChanges.pipe(debounceTime(500))
-      .subscribe((value: number) => {
-        this.updateState({
-          amount: value,
-          sendMaxAmount: false
-        })
-        this.updateFeeEstimate()
+      .subscribe((value: string) => {
+        const amount = new BigNumber(value)
+        if (!amount.isNaN()) {
+          this.updateState({
+            amount: amount.toNumber()
+          })
+          this.updateFeeEstimate()
+        }
       })
 
-    this.transactionForm.get('fee').valueChanges.subscribe((value: number) => {
+    this.transactionForm.get('amount').valueChanges.subscribe(() => {
       this.updateState({
-        fee: value
+        sendMaxAmount: false
       })
     })
+
+    this.transactionForm
+      .get('fee')
+      .valueChanges.pipe(debounceTime(500))
+      .subscribe((value: string) => {
+        const fee = new BigNumber(value)
+        if (!fee.isNaN) {
+          this.updateState({
+            fee: fee.toNumber()
+          })
+        }
+      })
 
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
       this.updateState({
@@ -165,15 +181,6 @@ export class TransactionPreparePage {
   }
 
   private updateState(newState: Partial<TransactionPrepareState>): void {
-    let sendMaxAmount: boolean
-    if (newState.forceMigration !== undefined) {
-      sendMaxAmount = newState.forceMigration
-    } else if (newState.sendMaxAmount !== undefined) {
-      sendMaxAmount = newState.sendMaxAmount
-    } else {
-      sendMaxAmount = this.state.sendMaxAmount
-    }
-
     const feeDefaults: FeeDefaults = newState.feeDefaults || this.state.feeDefaults
     const feeDefaultsWithLevel: { [level: number]: string } = {
       0: feeDefaults.low,
@@ -192,11 +199,7 @@ export class TransactionPreparePage {
       fee = this.state.fee
     }
 
-    if (newState.sendMaxAmount) {
-      this.setMaxAmount()
-    }
-
-    const amount: number = newState.amount !== undefined ? newState.amount : this.state.amount
+    const amount: number = newState.amount || this.state.amount
 
     const disableAdvancedMode: boolean =
       this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode)
@@ -206,7 +209,7 @@ export class TransactionPreparePage {
     const updated: TransactionPrepareState = {
       ...this.state$.value,
       ...newState,
-      sendMaxAmount,
+      sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : this.state.sendMaxAmount,
       feeDefaults,
       fee: new BigNumber(fee).toNumber(),
       amount,
@@ -317,7 +320,7 @@ export class TransactionPreparePage {
       this.updateState({
         fee: new BigNumber(fee)
           .shiftedBy(-this.wallet.coinProtocol.feeDecimals)
-          .integerValue(BigNumber.ROUND_DOWN)
+          .decimalPlaces(this.wallet.coinProtocol.feeDecimals)
           .toNumber()
       })
     }
@@ -366,29 +369,46 @@ export class TransactionPreparePage {
     this.router.navigateByUrl('/scan-address/' + DataServiceKey.SCAN).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public toggleMaxAmount(): void {
+  public async toggleMaxAmount(): Promise<void> {
     this.updateState({
       sendMaxAmount: !this.state.sendMaxAmount
     })
+
+    if (this.state.sendMaxAmount) {
+      const maxAmount = await this.getMaxAmount()
+      this.updateState({
+        amount: maxAmount
+      })
+      this.updateFeeEstimate()
+    }
   }
 
-  private async setMaxAmount(formFee?: number | string): Promise<void> {
+  private async forceMigration(): Promise<void> {
+    this.updateState({ sendMaxAmount: true })
+
+    const maxAmount = await this.getMaxAmount()
+
+    this.updateState({
+      forceMigration: true,
+      amount: maxAmount
+    })
+  }
+
+  private async getMaxAmount(formFee?: number | string): Promise<number> {
     let fee: BigNumber
     if (formFee !== undefined) {
       fee = new BigNumber(formFee)
     } else {
       const feeEstimate = await this.wallet.estimateFees([this.state.address], [this.state.availableBalance.toFixed()])
-      fee = new BigNumber(feeEstimate.medium)
+      fee = new BigNumber(feeEstimate.high)
     }
 
     const amount = await this.wallet.getMaxTransferValue(fee.shiftedBy(this.wallet.coinProtocol.feeDecimals).toFixed())
 
-    this.updateState({
-      amount: new BigNumber(amount)
-        .shiftedBy(-this.wallet.coinProtocol.decimals)
-        .integerValue(BigNumber.ROUND_DOWN)
-        .toNumber()
-    })
+    return new BigNumber(amount)
+      .shiftedBy(-this.wallet.coinProtocol.decimals)
+      .decimalPlaces(this.wallet.coinProtocol.decimals)
+      .toNumber()
   }
 
   public pasteClipboard() {
