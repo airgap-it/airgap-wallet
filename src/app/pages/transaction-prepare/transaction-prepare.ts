@@ -116,30 +116,22 @@ export class TransactionPreparePage {
       .valueChanges.pipe(debounceTime(500))
       .subscribe((value: string) => {
         const amount = new BigNumber(value)
-        if (!amount.isNaN()) {
-          this.updateState({
-            amount: amount.toNumber()
-          })
-          this.updateFeeEstimate()
-        }
+        this.updateState({
+          sendMaxAmount: false,
+          amount: amount.isNaN() ? 0 : amount.toNumber(),
+          disablePrepareButton: amount.isNaN() || amount.lte(0)
+        })
+        this.updateFeeEstimate()
       })
-
-    this.transactionForm.get('amount').valueChanges.subscribe(() => {
-      this.updateState({
-        sendMaxAmount: false
-      })
-    })
 
     this.transactionForm
       .get('fee')
       .valueChanges.pipe(debounceTime(500))
       .subscribe((value: string) => {
         const fee = new BigNumber(value)
-        if (!fee.isNaN) {
-          this.updateState({
-            fee: fee.toNumber()
-          })
-        }
+        this.updateState({
+          fee: fee.isNaN() ? 0 : fee.toNumber()
+        })
       })
 
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
@@ -193,18 +185,19 @@ export class TransactionPreparePage {
       fee = feeDefaultsWithLevel[newState.feeLevel]
     } else if (newState.fee !== undefined) {
       fee = newState.fee
-    } else if (feeDefaults) {
-      fee = feeDefaultsWithLevel[this.state.feeLevel]
     } else {
-      fee = this.state.fee
+      fee = feeDefaultsWithLevel[this.state.feeLevel]
     }
-
-    const amount: number = newState.amount || this.state.amount
 
     const disableAdvancedMode: boolean =
       this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode)
-    const disableFeeSlider: boolean = this.isSubstrate || newState.estimatingFeeDefaults || !feeDefaults
-    const disablePrepareButton: boolean = this.transactionForm.invalid || newState.estimatingFeeDefaults || amount <= 0
+
+    const disableFeeSlider: boolean =
+      this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : this.state.disableFeeSlider)
+
+    const disablePrepareButton: boolean =
+      this.transactionForm.invalid ||
+      (newState.disablePrepareButton !== undefined ? newState.disablePrepareButton : this.state.disablePrepareButton)
 
     const updated: TransactionPrepareState = {
       ...this.state$.value,
@@ -212,7 +205,7 @@ export class TransactionPreparePage {
       sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : this.state.sendMaxAmount,
       feeDefaults,
       fee: new BigNumber(fee).toNumber(),
-      amount,
+      amount: newState.amount !== undefined ? newState.amount : this.state.amount,
       disableAdvancedMode,
       disableFeeSlider,
       disablePrepareButton
@@ -291,18 +284,24 @@ export class TransactionPreparePage {
     }
   }
 
-  private async updateFeeEstimate() {
+  private async updateFeeEstimate(): Promise<void> {
     if (this.isSubstrate) {
       this.calculateSubstrateFee()
     } else if (!this.state.isAdvancedMode) {
-      this.updateState({ estimatingFeeDefaults: true })
+      this.updateState({
+        estimatingFeeDefaults: true,
+        disableFeeSlider: true,
+        disablePrepareButton: true
+      })
 
       const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
 
       this.updateState({
         estimatingFeeDefaults: false,
         feeDefaults,
-        feeLevel: feeDefaults ? 1 : this.state.feeLevel
+        feeLevel: feeDefaults ? 1 : this.state.feeLevel,
+        disableFeeSlider: !feeDefaults,
+        disablePrepareButton: !feeDefaults || this.state.amount <= 0
       })
     }
   }
@@ -416,8 +415,10 @@ export class TransactionPreparePage {
       (text: string) => {
         this.updateState({
           address: text,
-          addressDirty: true
+          addressDirty: true,
+          disablePrepareButton: this.state.amount <= 0
         })
+        this.updateFeeEstimate()
       },
       (err: string) => {
         console.error('Error: ' + err)
