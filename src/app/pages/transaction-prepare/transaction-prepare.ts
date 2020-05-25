@@ -108,7 +108,8 @@ export class TransactionPreparePage {
         this.updateState({
           address: value,
           addressDirty: false,
-          disableSendMaxAmount: false
+          disableSendMaxAmount: false,
+          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
         })
         this.updateFeeEstimate()
       })
@@ -121,7 +122,7 @@ export class TransactionPreparePage {
         this.updateState({
           sendMaxAmount: false,
           amount: amount.isNaN() ? 0 : amount.toNumber(),
-          disablePrepareButton: amount.isNaN() || amount.lte(0)
+          disablePrepareButton: this.transactionForm.invalid || amount.isNaN() || amount.lte(0)
         })
         this.updateFeeEstimate()
       })
@@ -132,19 +133,32 @@ export class TransactionPreparePage {
       .subscribe((value: string) => {
         const fee = new BigNumber(value)
         this.updateState({
-          fee: fee.isNaN() ? 0 : fee.toNumber()
+          fee: fee.isNaN() ? 0 : fee.toNumber(),
+          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
         })
+
+        if (this.state.sendMaxAmount) {
+          this.updateWithMaxAmount(fee.toString(10))
+        }
       })
 
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
+      const fee = new BigNumber(this.getFeeFromLevel(value))
       this.updateState({
-        feeLevel: value
+        fee: fee.toNumber(),
+        feeLevel: value,
+        disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
       })
+
+      if (this.state.sendMaxAmount) {
+        this.updateWithMaxAmount(fee.toString(10))
+      }
     })
 
     this.transactionForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
       this.updateState({
-        isAdvancedMode: value
+        isAdvancedMode: value,
+        disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
       })
     })
   }
@@ -176,44 +190,32 @@ export class TransactionPreparePage {
   }
 
   private updateState(newState: Partial<TransactionPrepareState>): void {
-    const newFeeLevel: number = this.isSubstrate ? 0 : newState.feeLevel
-    const feeDefaults: FeeDefaults = newState.feeDefaults || this.state.feeDefaults
-    const feeDefaultsWithLevel: { [level: number]: string } = {
-      0: feeDefaults.low,
-      1: feeDefaults.medium,
-      2: feeDefaults.high
-    }
-
-    let fee: string | number
-    if (newFeeLevel !== undefined) {
-      fee = feeDefaultsWithLevel[newState.feeLevel]
-    } else if (newState.fee !== undefined) {
-      fee = newState.fee
-    } else {
-      fee = feeDefaultsWithLevel[this.state.feeLevel]
-    }
-
-    const disableAdvancedMode: boolean =
-      this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode)
-
-    const disableFeeSlider: boolean =
-      this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : this.state.disableFeeSlider)
-
-    const disablePrepareButton: boolean =
-      this.transactionForm.invalid ||
-      (newState.disablePrepareButton !== undefined ? newState.disablePrepareButton : this.state.disablePrepareButton)
-
     const updated: TransactionPrepareState = {
-      ...this.state$.value,
-      ...newState,
+      availableBalance: newState.availableBalance || this.state.availableBalance,
+      forceMigration: newState.forceMigration !== undefined ? newState.forceMigration : this.state.forceMigration,
+
+      feeDefaults: newState.feeDefaults || this.state.feeDefaults,
+      feeCurrentMarketPrice:
+        newState.feeCurrentMarketPrice !== undefined ? newState.feeCurrentMarketPrice : this.state.feeCurrentMarketPrice,
+
       sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : this.state.sendMaxAmount,
-      feeDefaults,
-      fee: new BigNumber(fee).toNumber(),
-      feeLevel: newFeeLevel !== undefined ? newFeeLevel : this.state.feeLevel,
+
+      disableSendMaxAmount: newState.disableSendMaxAmount !== undefined ? newState.disableSendMaxAmount : this.state.disableSendMaxAmount,
+      disableAdvancedMode:
+        this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode),
+      disableFeeSlider:
+        this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : this.state.disableFeeSlider),
+      disablePrepareButton: newState.disablePrepareButton !== undefined ? newState.disablePrepareButton : this.state.disablePrepareButton,
+
+      estimatingFeeDefaults:
+        newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : this.state.estimatingFeeDefaults,
+
+      address: newState.address !== undefined ? newState.address : this.state.address,
+      addressDirty: newState.addressDirty !== undefined ? newState.addressDirty : this.state.addressDirty,
       amount: newState.amount !== undefined ? newState.amount : this.state.amount,
-      disableAdvancedMode,
-      disableFeeSlider,
-      disablePrepareButton
+      feeLevel: newState.fee !== undefined ? newState.feeLevel : this.state.feeLevel,
+      fee: newState.fee !== undefined ? newState.fee : this.state.fee,
+      isAdvancedMode: newState.isAdvancedMode !== undefined ? newState.isAdvancedMode : this.state.isAdvancedMode
     }
 
     this.state$.next(updated)
@@ -298,13 +300,15 @@ export class TransactionPreparePage {
       })
 
       const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
+      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this.state.feeLevel
 
       this.updateState({
         estimatingFeeDefaults: false,
         feeDefaults,
-        feeLevel: feeDefaults ? 1 : this.state.feeLevel,
+        fee: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toNumber(),
+        feeLevel,
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.state.amount <= 0
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || this.state.amount <= 0
       })
     }
   }
@@ -316,6 +320,20 @@ export class TransactionPreparePage {
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
     return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, this.state.address, amount) : undefined
+  }
+
+  private getFeeFromLevel(feeLevel: number, feeDefaults?: FeeDefaults): string {
+    const defaults = feeDefaults || this.state.feeDefaults
+    switch (feeLevel) {
+      case 0:
+        return defaults.low
+      case 1:
+        return defaults.medium
+      case 2:
+        return defaults.high
+      default:
+        return defaults.medium
+    }
   }
 
   public async prepareTransaction() {
@@ -358,40 +376,31 @@ export class TransactionPreparePage {
     })
 
     if (this.state.sendMaxAmount) {
-      const maxAmount = await this.getMaxAmount()
-      this.updateState({
-        amount: maxAmount
-      })
+      await this.updateWithMaxAmount()
       this.updateFeeEstimate()
     }
   }
 
   private async forceMigration(): Promise<void> {
-    this.updateState({ sendMaxAmount: true })
-
-    const maxAmount = await this.getMaxAmount()
-
     this.updateState({
       forceMigration: true,
-      amount: maxAmount
+      sendMaxAmount: true
     })
+    await this.updateWithMaxAmount()
   }
 
-  private async getMaxAmount(formFee?: number | string): Promise<number> {
-    let fee: BigNumber
-    if (formFee !== undefined) {
-      fee = new BigNumber(formFee)
-    } else {
-      const feeEstimate = await this.wallet.estimateFees([this.state.address], [this.state.availableBalance.toFixed()])
-      fee = new BigNumber(feeEstimate.high)
+  private async updateWithMaxAmount(formFee?: string): Promise<void> {
+    const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals) : undefined
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this.state.address, fee)
+
+    const formAmount = maxAmount.shiftedBy(-this.wallet.coinProtocol.decimals).decimalPlaces(this.wallet.coinProtocol.decimals)
+
+    if (!maxAmount.isNaN()) {
+      this.updateState({
+        amount: formAmount.toNumber(),
+        disablePrepareButton: this.transactionForm.invalid || formAmount.isNaN() || formAmount.lte(0)
+      })
     }
-
-    const amount = await this.wallet.getMaxTransferValue(fee.shiftedBy(this.wallet.coinProtocol.feeDecimals).toFixed())
-
-    return new BigNumber(amount)
-      .shiftedBy(-this.wallet.coinProtocol.decimals)
-      .decimalPlaces(this.wallet.coinProtocol.decimals)
-      .toNumber()
   }
 
   public pasteClipboard() {
@@ -401,7 +410,7 @@ export class TransactionPreparePage {
           address: text,
           addressDirty: true,
           disableSendMaxAmount: false,
-          disablePrepareButton: this.state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
         })
         this.updateFeeEstimate()
       },
