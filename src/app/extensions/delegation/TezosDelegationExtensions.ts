@@ -226,7 +226,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
         switchMap(tezosRewards =>
           from(protocol.calculatePayout(accountAddress, tezosRewards)).pipe(
             map(payout => {
-              console.log(payout, cycle)
               return payout
                 ? `~${this.amountConverter.transform(new BigNumber(payout.payout).minus(new BigNumber(payout.payout).times(fee)), {
                     protocolIdentifier: protocol.identifier,
@@ -251,8 +250,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
     const amountByCycle = await this.getRewardAmountsByCycle(address, delegatorExtraInfo.value)
-
-    console.log(amountByCycle)
     return new UIRewardList({
       rewards: rewardInfo.slice(0, 5).map(reward => ({
         index: reward.cycle,
