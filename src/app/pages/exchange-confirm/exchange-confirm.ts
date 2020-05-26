@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ExchangeProvider } from 'src/app/services/exchange/exchange'
-declare let cordova
+
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
   selector: 'page-exchange-confirm',
@@ -38,9 +38,9 @@ export class ExchangeConfirmPage {
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly route: ActivatedRoute,
-    public platform: Platform,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly browserService: BrowserService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -90,19 +90,11 @@ export class ExchangeConfirmPage {
     }
   }
 
-  private openUrl(url: string) {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
-  }
-
   public changellyUrl() {
-    this.openUrl('https://old.changelly.com/aml-kyc')
+    this.browserService.openUrl('https://old.changelly.com/aml-kyc')
   }
 
   public changeNowUrl() {
-    this.openUrl('https://support.changenow.io/hc/en-us/articles/360011609979')
+    this.browserService.openUrl('https://support.changenow.io/hc/en-us/articles/360011609979')
   }
 }

@@ -14,7 +14,7 @@ export class IntroductionPage {
   public isBrowser: boolean = false
 
   constructor(public platform: Platform, public modalController: ModalController) {
-    this.isBrowser = !this.platform.is('cordova')
+    this.isBrowser = !this.platform.is('hybrid')
   }
 
   public dismiss() {
