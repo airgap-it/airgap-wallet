@@ -159,6 +159,10 @@ export class DelegationDetailPage {
     this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel || activeAction.label : null
   }
 
+  public changeDelegatee() {
+    // TODO: open known delegatees list
+  }
+
   private initView() {
     this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
 
