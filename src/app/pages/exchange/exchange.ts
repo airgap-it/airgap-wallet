@@ -166,6 +166,9 @@ export class ExchangePage {
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
     const exchangeableFromProtocols = (await Promise.all(
       supportedFromProtocols.map(async fromProtocol => {
+        if (fromProtocol === ProtocolSymbols.TZBTC) {
+          return fromProtocol
+        }
         const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
         return availableToCurrencies.length > 0 ? fromProtocol : undefined
       })
