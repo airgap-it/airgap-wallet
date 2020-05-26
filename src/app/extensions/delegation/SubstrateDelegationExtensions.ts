@@ -211,7 +211,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     return {
       ...nominatorDetails,
-      mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
+      mainActions: [delegateAction, ...extraActions].filter(action => !!action),
+      secondaryActions: [undelegateAction].filter(action => !!action),
       displayDetails,
       displayRewards: displayRewards
     }
@@ -300,7 +301,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         return {
           type: action.type,
           label: 'Undelegate',
-          description: 'Undelegate description',
+          iconName: 'close-outline',
           form
         }
       }
