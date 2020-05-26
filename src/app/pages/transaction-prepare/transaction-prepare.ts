@@ -17,6 +17,10 @@ import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
+interface TransactionFormState<T> {
+  value: T
+  dirty: boolean
+}
 interface TransactionPrepareState {
   availableBalance: BigNumber | null
   forceMigration: boolean
@@ -31,12 +35,11 @@ interface TransactionPrepareState {
   estimatingMaxAmount: boolean
   estimatingFeeDefaults: boolean
 
-  address: string
-  addressDirty: boolean
-  amount: string
-  feeLevel: number
-  fee: string
-  isAdvancedMode: boolean
+  address: TransactionFormState<string>
+  amount: TransactionFormState<string>
+  feeLevel: TransactionFormState<number>
+  fee: TransactionFormState<string>
+  isAdvancedMode: TransactionFormState<boolean>
 }
 
 @Component({
@@ -109,10 +112,12 @@ export class TransactionPreparePage {
       .valueChanges.pipe(debounceTime(500))
       .subscribe((value: string) => {
         this.updateState({
-          address: value,
-          addressDirty: false,
+          address: {
+            value,
+            dirty: true
+          },
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       })
@@ -124,7 +129,10 @@ export class TransactionPreparePage {
         const amount = new BigNumber(value)
         this.updateState({
           sendMaxAmount: false,
-          amount: amount.isNaN() ? '0' : amount.toFixed(),
+          amount: {
+            value: amount.isNaN() ? '' : amount.toFixed(),
+            dirty: true
+          },
           disablePrepareButton: this.transactionForm.invalid || amount.isNaN() || amount.lte(0)
         })
         this.updateFeeEstimate()
@@ -136,8 +144,11 @@ export class TransactionPreparePage {
       .subscribe((value: string) => {
         const fee = new BigNumber(value)
         this.updateState({
-          fee: fee.isNaN() ? '0' : fee.toFixed(),
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
+          fee: {
+            value: fee.isNaN() ? '' : fee.toFixed(),
+            dirty: true
+          },
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
         })
 
         if (this._state.sendMaxAmount) {
@@ -147,11 +158,20 @@ export class TransactionPreparePage {
 
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
       const fee = new BigNumber(this.getFeeFromLevel(value))
-      this.updateState({
-        fee: fee.toFixed(),
-        feeLevel: value,
-        disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
-      })
+      this.updateState(
+        {
+          fee: {
+            value: fee.toFixed(),
+            dirty: false
+          },
+          feeLevel: {
+            value,
+            dirty: true
+          },
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+        },
+        false
+      )
 
       if (this._state.sendMaxAmount) {
         this.updateWithMaxAmount(fee.toString(10))
@@ -159,10 +179,16 @@ export class TransactionPreparePage {
     })
 
     this.transactionForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
-      this.updateState({
-        isAdvancedMode: value,
-        disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
-      })
+      this.updateState(
+        {
+          isAdvancedMode: {
+            value,
+            dirty: true
+          },
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+        },
+        false
+      )
     })
   }
 
@@ -179,12 +205,26 @@ export class TransactionPreparePage {
       disablePrepareButton: true,
       estimatingMaxAmount: false,
       estimatingFeeDefaults: false,
-      address: this.transactionForm.controls.address.value,
-      addressDirty: false,
-      amount: this.transactionForm.controls.amount.value,
-      feeLevel: this.transactionForm.controls.feeLevel.value,
-      fee: this.transactionForm.controls.fee.value,
-      isAdvancedMode: this.transactionForm.controls.isAdvancedMode.value
+      address: {
+        value: this.transactionForm.controls.address.value,
+        dirty: false
+      },
+      amount: {
+        value: this.transactionForm.controls.amount.value,
+        dirty: false
+      },
+      feeLevel: {
+        value: this.transactionForm.controls.feeLevel.value,
+        dirty: false
+      },
+      fee: {
+        value: this.transactionForm.controls.fee.value,
+        dirty: false
+      },
+      isAdvancedMode: {
+        value: this.transactionForm.controls.isAdvancedMode.value,
+        dirty: false
+      }
     }
     this.state = this._state
 
@@ -231,56 +271,41 @@ export class TransactionPreparePage {
       estimatingFeeDefaults:
         newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
 
-      address: newState.address !== undefined ? newState.address : currentState.address,
-      addressDirty: newState.addressDirty !== undefined ? newState.addressDirty : currentState.addressDirty,
-      amount: newState.amount !== undefined ? newState.amount : currentState.amount,
-      feeLevel: newState.fee !== undefined ? newState.feeLevel : currentState.feeLevel,
-      fee: newState.fee !== undefined ? newState.fee : currentState.fee,
-      isAdvancedMode: newState.isAdvancedMode !== undefined ? newState.isAdvancedMode : currentState.isAdvancedMode
+      address: newState.address || currentState.address,
+      amount: newState.amount || currentState.amount,
+      feeLevel: newState.feeLevel || currentState.feeLevel,
+      fee: newState.fee || currentState.fee,
+      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
     }
   }
 
   private onStateUpdated(newState: TransactionPrepareState): void {
     this.state = newState
 
-    const formValues: {
-      address: string
-      amount: string
-      feeLevel: number
-      fee: string
-      isAdvanceMode: boolean
-    } = this.transactionForm.value
+    this.updateTransactionForm({
+      address: this.state.address,
+      amount: this.state.amount,
+      fee: this.state.fee,
+      feeLevel: this.state.feeLevel,
+      isAdvancedMode: this.state.isAdvancedMode
+    })
+  }
 
-    function getDifferences<T, K extends Extract<keyof T, keyof TransactionPrepareState>>(
-      target: T,
-      state: TransactionPrepareState,
-      ...properties: K[]
-    ): Partial<T> {
-      const targetProperties: K[] = properties.length > 0 ? properties : (Object.keys(target).filter((key: string) => key in state) as K[])
+  private updateTransactionForm(formState: { [key: string]: TransactionFormState<any> }) {
+    const formValues = this.transactionForm.value
+    const updated = {}
 
-      const differences: [K, T[K]][] = targetProperties
-        .filter((property: K) => {
-          const targetValue: T[K] = target[property]
-          const stateValue: TransactionPrepareState[K] = state[property]
-
-          return (targetValue as any) !== (stateValue as any)
-        })
-        .map((property: K) => [property, state[property] as unknown] as [K, T[K]])
-
-      const differencesObject: Partial<T> = {}
-      differences.forEach(([name, value]: [K, T[K]]) => {
-        differencesObject[name] = value
-      })
-
-      return differencesObject
-    }
-
-    const formDifferences = getDifferences(formValues, newState)
-    this._ngZone.run(() => {
-      this.transactionForm.patchValue(formDifferences, { emitEvent: false })
-      if (newState.addressDirty) {
-        this.transactionForm.controls.address.markAsDirty()
+    Object.keys(formValues).forEach((key: string) => {
+      if (key in formState && !formState[key].dirty && formState[key].value !== formValues[key]) {
+        updated[key] = formState[key].value
       }
+    })
+
+    this._ngZone.run(() => {
+      this.transactionForm.patchValue(updated, { emitEvent: false })
+      Object.keys(updated).forEach((key: string) => {
+        this.transactionForm.controls[key].markAsDirty()
+      })
     })
   }
 
@@ -313,7 +338,7 @@ export class TransactionPreparePage {
   }
 
   private async updateFeeEstimate(): Promise<void> {
-    if (!this._state.isAdvancedMode) {
+    if (!this._state.isAdvancedMode.value) {
       this.updateState({
         estimatingFeeDefaults: true,
         disableFeeSlider: true,
@@ -321,26 +346,34 @@ export class TransactionPreparePage {
       })
 
       const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
-      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this._state.feeLevel
+      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this._state.feeLevel.value
 
       this.updateState({
         estimatingFeeDefaults: false,
         feeDefaults,
-        fee: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toFixed(),
-        feeLevel,
+        fee: {
+          value: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toFixed(),
+          dirty: false
+        },
+        feeLevel: {
+          value: feeLevel,
+          dirty: false
+        },
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
       })
     }
   }
 
   private async estimateFees(): Promise<FeeDefaults | undefined> {
-    const amount = new BigNumber(this._state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.coinProtocol.decimals)
 
     const isAddressValid = this.transactionForm.controls.address.valid
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
-    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, this._state.address, amount) : undefined
+    return isAddressValid && isAmountValid
+      ? this.operationsProvider.estimateFees(this.wallet, this._state.address.value, amount)
+      : undefined
   }
 
   private getFeeFromLevel(feeLevel: number, feeDefaults?: FeeDefaults): string {
@@ -358,13 +391,13 @@ export class TransactionPreparePage {
   }
 
   public async prepareTransaction() {
-    const amount = new BigNumber(this._state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-    const fee = new BigNumber(this._state.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.coinProtocol.decimals)
+    const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
         this.wallet,
-        this._state.address,
+        this._state.address.value,
         amount,
         fee
       )
@@ -382,7 +415,12 @@ export class TransactionPreparePage {
 
   public openScanner() {
     const callback = (address: string) => {
-      this.updateState({ address })
+      this.updateState({
+        address: {
+          value: address,
+          dirty: false
+        }
+      })
     }
     const info = {
       callback
@@ -419,7 +457,7 @@ export class TransactionPreparePage {
     })
 
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address, fee)
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address.value, fee)
 
     const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, {
       protocol: this.wallet.coinProtocol,
@@ -429,7 +467,10 @@ export class TransactionPreparePage {
     if (!maxAmount.isNaN()) {
       this.updateState({
         estimatingMaxAmount: false,
-        amount: formAmount,
+        amount: {
+          value: formAmount,
+          dirty: false
+        },
         disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lte(0)
       })
     }
@@ -439,10 +480,12 @@ export class TransactionPreparePage {
     this.clipboardProvider.paste().then(
       (text: string) => {
         this.updateState({
-          address: text,
-          addressDirty: true,
+          address: {
+            value: text,
+            dirty: false
+          },
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       },
