@@ -134,7 +134,8 @@
                 color="secondary"
                 (click)="toggleMaxAmount()"
               >
-                {{ 'transaction-prepare.fee.max_label' | translate }}
+                <ion-spinner name="lines-small" color="primary" *ngIf="state.estimatingMaxAmount"></ion-spinner>
+                <span *ngIf="!state.estimatingMaxAmount">{{ 'transaction-prepare.fee.max_label' | translate }}</span>
               </ion-button>
             </ion-buttons>
           </ion-toolbar>

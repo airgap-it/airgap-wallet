@@ -17,15 +17,17 @@ import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 
 interface TransactionPrepareState {
-  availableBalance: BigNumber
+  availableBalance: BigNumber | null
   forceMigration: boolean
   feeDefaults: FeeDefaults
-  feeCurrentMarketPrice: number
+  feeCurrentMarketPrice: number | null
   sendMaxAmount: boolean
   disableSendMaxAmount: boolean
   disableAdvancedMode: boolean
   disableFeeSlider: boolean
   disablePrepareButton: boolean
+
+  estimatingMaxAmount: boolean
   estimatingFeeDefaults: boolean
 
   address: string
@@ -42,17 +44,16 @@ interface TransactionPrepareState {
   styleUrls: ['./transaction-prepare.scss']
 })
 export class TransactionPreparePage {
-  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(undefined)
-  public get state(): Partial<TransactionPrepareState> {
-    return this.state$.value || {}
-  }
-
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
   public amountForm: FormGroup
 
   // temporary field until we figure out how to handle Substrate fee/tip model
   private readonly isSubstrate: boolean
+
+  public state: TransactionPrepareState
+  private _state: TransactionPrepareState
+  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -97,7 +98,7 @@ export class TransactionPreparePage {
   }
 
   public onChanges(): void {
-    this.state$.subscribe((state: TransactionPrepareState) => {
+    this.state$.pipe(debounceTime(200)).subscribe((state: TransactionPrepareState) => {
       this.onStateUpdated(state)
     })
 
@@ -109,7 +110,7 @@ export class TransactionPreparePage {
           address: value,
           addressDirty: false,
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
         })
         this.updateFeeEstimate()
       })
@@ -134,10 +135,10 @@ export class TransactionPreparePage {
         const fee = new BigNumber(value)
         this.updateState({
           fee: fee.isNaN() ? 0 : fee.toNumber(),
-          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
         })
 
-        if (this.state.sendMaxAmount) {
+        if (this._state.sendMaxAmount) {
           this.updateWithMaxAmount(fee.toString(10))
         }
       })
@@ -147,10 +148,10 @@ export class TransactionPreparePage {
       this.updateState({
         fee: fee.toNumber(),
         feeLevel: value,
-        disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
+        disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
       })
 
-      if (this.state.sendMaxAmount) {
+      if (this._state.sendMaxAmount) {
         this.updateWithMaxAmount(fee.toString(10))
       }
     })
@@ -158,27 +159,23 @@ export class TransactionPreparePage {
     this.transactionForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
       this.updateState({
         isAdvancedMode: value,
-        disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
+        disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
       })
     })
   }
 
   private async initState(): Promise<void> {
-    const [feeCurrentMarketPrice, availableBalance]: [number, BigNumber] = await Promise.all([
-      this.calculateFeeCurrentMarketPrice(this.wallet),
-      this.getAvailableBalance(this.wallet)
-    ])
-
-    this.state$.next({
-      availableBalance,
+    this._state = {
+      availableBalance: null,
       forceMigration: false,
       feeDefaults: this.wallet.coinProtocol.feeDefaults,
-      feeCurrentMarketPrice,
+      feeCurrentMarketPrice: null,
       sendMaxAmount: false,
       disableSendMaxAmount: true,
       disableAdvancedMode: this.isSubstrate,
       disableFeeSlider: true,
       disablePrepareButton: true,
+      estimatingMaxAmount: false,
       estimatingFeeDefaults: false,
       address: this.transactionForm.controls.address.value,
       addressDirty: false,
@@ -186,42 +183,64 @@ export class TransactionPreparePage {
       feeLevel: this.transactionForm.controls.feeLevel.value,
       fee: this.transactionForm.controls.fee.value,
       isAdvancedMode: this.transactionForm.controls.isAdvancedMode.value
+    }
+    this.state = this._state
+
+    const [feeCurrentMarketPrice, availableBalance]: [number, BigNumber] = await Promise.all([
+      this.calculateFeeCurrentMarketPrice(this.wallet),
+      this.getAvailableBalance(this.wallet)
+    ])
+
+    this.updateState({
+      availableBalance,
+      feeCurrentMarketPrice
     })
   }
 
-  private updateState(newState: Partial<TransactionPrepareState>): void {
-    const updated: TransactionPrepareState = {
-      availableBalance: newState.availableBalance || this.state.availableBalance,
-      forceMigration: newState.forceMigration !== undefined ? newState.forceMigration : this.state.forceMigration,
+  private updateState(newState: Partial<TransactionPrepareState>, debounce: boolean = true): void {
+    this._state = this.reduceState(this._state, newState)
 
-      feeDefaults: newState.feeDefaults || this.state.feeDefaults,
-      feeCurrentMarketPrice:
-        newState.feeCurrentMarketPrice !== undefined ? newState.feeCurrentMarketPrice : this.state.feeCurrentMarketPrice,
-
-      sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : this.state.sendMaxAmount,
-
-      disableSendMaxAmount: newState.disableSendMaxAmount !== undefined ? newState.disableSendMaxAmount : this.state.disableSendMaxAmount,
-      disableAdvancedMode:
-        this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : this.state.disableAdvancedMode),
-      disableFeeSlider:
-        this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : this.state.disableFeeSlider),
-      disablePrepareButton: newState.disablePrepareButton !== undefined ? newState.disablePrepareButton : this.state.disablePrepareButton,
-
-      estimatingFeeDefaults:
-        newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : this.state.estimatingFeeDefaults,
-
-      address: newState.address !== undefined ? newState.address : this.state.address,
-      addressDirty: newState.addressDirty !== undefined ? newState.addressDirty : this.state.addressDirty,
-      amount: newState.amount !== undefined ? newState.amount : this.state.amount,
-      feeLevel: newState.fee !== undefined ? newState.feeLevel : this.state.feeLevel,
-      fee: newState.fee !== undefined ? newState.fee : this.state.fee,
-      isAdvancedMode: newState.isAdvancedMode !== undefined ? newState.isAdvancedMode : this.state.isAdvancedMode
+    if (debounce) {
+      this.state$.next(this._state)
+    } else {
+      this.onStateUpdated(this._state)
     }
+  }
 
-    this.state$.next(updated)
+  private reduceState(currentState: TransactionPrepareState, newState: Partial<TransactionPrepareState>): TransactionPrepareState {
+    return {
+      availableBalance: newState.availableBalance !== undefined ? newState.availableBalance : currentState.availableBalance,
+      forceMigration: newState.forceMigration !== undefined ? newState.forceMigration : currentState.forceMigration,
+
+      feeDefaults: newState.feeDefaults || currentState.feeDefaults,
+      feeCurrentMarketPrice:
+        newState.feeCurrentMarketPrice !== undefined ? newState.feeCurrentMarketPrice : currentState.feeCurrentMarketPrice,
+
+      sendMaxAmount: newState.sendMaxAmount !== undefined ? newState.sendMaxAmount : currentState.sendMaxAmount,
+
+      disableSendMaxAmount: newState.disableSendMaxAmount !== undefined ? newState.disableSendMaxAmount : currentState.disableSendMaxAmount,
+      disableAdvancedMode:
+        this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : currentState.disableAdvancedMode),
+      disableFeeSlider:
+        this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : currentState.disableFeeSlider),
+      disablePrepareButton: newState.disablePrepareButton !== undefined ? newState.disablePrepareButton : currentState.disablePrepareButton,
+
+      estimatingMaxAmount: newState.estimatingMaxAmount !== undefined ? newState.estimatingMaxAmount : currentState.estimatingMaxAmount,
+      estimatingFeeDefaults:
+        newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
+
+      address: newState.address !== undefined ? newState.address : currentState.address,
+      addressDirty: newState.addressDirty !== undefined ? newState.addressDirty : currentState.addressDirty,
+      amount: newState.amount !== undefined ? newState.amount : currentState.amount,
+      feeLevel: newState.fee !== undefined ? newState.feeLevel : currentState.feeLevel,
+      fee: newState.fee !== undefined ? newState.fee : currentState.fee,
+      isAdvancedMode: newState.isAdvancedMode !== undefined ? newState.isAdvancedMode : currentState.isAdvancedMode
+    }
   }
 
   private onStateUpdated(newState: TransactionPrepareState): void {
+    this.state = newState
+
     const formValues: {
       address: string
       amount: number
@@ -292,7 +311,7 @@ export class TransactionPreparePage {
   }
 
   private async updateFeeEstimate(): Promise<void> {
-    if (!this.state.isAdvancedMode) {
+    if (!this._state.isAdvancedMode) {
       this.updateState({
         estimatingFeeDefaults: true,
         disableFeeSlider: true,
@@ -300,7 +319,7 @@ export class TransactionPreparePage {
       })
 
       const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
-      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this.state.feeLevel
+      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this._state.feeLevel
 
       this.updateState({
         estimatingFeeDefaults: false,
@@ -308,22 +327,22 @@ export class TransactionPreparePage {
         fee: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toNumber(),
         feeLevel,
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || this.state.amount <= 0
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || this._state.amount <= 0
       })
     }
   }
 
   private async estimateFees(): Promise<FeeDefaults | undefined> {
-    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const amount = new BigNumber(this._state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
 
     const isAddressValid = this.transactionForm.controls.address.valid
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
-    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, this.state.address, amount) : undefined
+    return isAddressValid && isAmountValid ? this.operationsProvider.estimateFees(this.wallet, this._state.address, amount) : undefined
   }
 
   private getFeeFromLevel(feeLevel: number, feeDefaults?: FeeDefaults): string {
-    const defaults = feeDefaults || this.state.feeDefaults
+    const defaults = feeDefaults || this._state.feeDefaults
     switch (feeLevel) {
       case 0:
         return defaults.low
@@ -337,13 +356,13 @@ export class TransactionPreparePage {
   }
 
   public async prepareTransaction() {
-    const amount = new BigNumber(this.state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
-    const fee = new BigNumber(this.state.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(this._state.amount).shiftedBy(this.wallet.coinProtocol.decimals)
+    const fee = new BigNumber(this._state.fee).shiftedBy(this.wallet.coinProtocol.feeDecimals)
 
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
         this.wallet,
-        this.state.address,
+        this._state.address,
         amount,
         fee
       )
@@ -371,11 +390,14 @@ export class TransactionPreparePage {
   }
 
   public async toggleMaxAmount(): Promise<void> {
-    this.updateState({
-      sendMaxAmount: !this.state.sendMaxAmount
-    })
+    this.updateState(
+      {
+        sendMaxAmount: !this._state.sendMaxAmount
+      },
+      false
+    )
 
-    if (this.state.sendMaxAmount) {
+    if (this._state.sendMaxAmount) {
       await this.updateWithMaxAmount()
       this.updateFeeEstimate()
     }
@@ -390,13 +412,18 @@ export class TransactionPreparePage {
   }
 
   private async updateWithMaxAmount(formFee?: string): Promise<void> {
+    this.updateState({
+      estimatingMaxAmount: true
+    })
+
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this.state.address, fee)
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address, fee)
 
     const formAmount = maxAmount.shiftedBy(-this.wallet.coinProtocol.decimals).decimalPlaces(this.wallet.coinProtocol.decimals)
 
     if (!maxAmount.isNaN()) {
       this.updateState({
+        estimatingMaxAmount: false,
         amount: formAmount.toNumber(),
         disablePrepareButton: this.transactionForm.invalid || formAmount.isNaN() || formAmount.lte(0)
       })
@@ -410,7 +437,7 @@ export class TransactionPreparePage {
           address: text,
           addressDirty: true,
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || this.state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
         })
         this.updateFeeEstimate()
       },
