@@ -33,13 +33,12 @@
         </div>
       </ng-container>
 
-      <!-- TODO: styling by @pascal? -->
       <ng-container *ngIf="transaction.status">
         <ion-label position="stacked" class="ion-text-uppercase">
           {{ 'from-to.status_label' | translate }}
         </ion-label>
-        <div [ngClass]="transaction.data ? 'ion-padding-bottom' : ''">
-          <span class="typography--mono">
+        <div class="ion-padding-bottom">
+          <span class="typography--mono ion-text-capitalize">
             {{ transaction.status }}
           </span>
         </div>
