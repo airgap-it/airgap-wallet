@@ -270,16 +270,51 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         )
       }
 
+      const description = this.createDelegateActionDescription(protocol, action.type, stakingDetails ? stakingDetails.active : 0, maxValue)
+
       return {
         type: action.type,
         label: 'Delegate',
-        description: 'Delegate description',
+        description,
         form,
         args: argWidgets
       }
     }
 
     return null
+  }
+
+  private createDelegateActionDescription(
+    protocol: SubstrateProtocol,
+    actionType: SubstrateStakingActionType,
+    bonded: string | number | BigNumber,
+    maxValue: string | number | BigNumber
+  ): string | undefined {
+    const bondedFormatted = this.amountConverterPipe.transform(bonded, {
+      protocolIdentifier: protocol.identifier,
+      maxDigits: 10
+    })
+    const maxValueFormatted = this.amountConverterPipe.transform(maxValue, {
+      protocolIdentifier: protocol.identifier,
+      maxDigits: 10
+    })
+
+    let description: string | undefined
+    switch (actionType) {
+      case SubstrateStakingActionType.BOND_NOMINATE:
+        description = `Select the amount you want to delegate. You can delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
+        break
+      case SubstrateStakingActionType.BOND_EXTRA:
+        description = `You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated. You can additionally delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
+        break
+      case SubstrateStakingActionType.CHANGE_NOMINATION:
+        description = `Change your delegation. You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated.`
+        break
+      default:
+        description = undefined
+    }
+
+    return description
   }
 
   private createUndelegateAction(
