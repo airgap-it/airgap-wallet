@@ -15,6 +15,7 @@ import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
 interface TransactionPrepareState {
   availableBalance: BigNumber | null
@@ -32,9 +33,9 @@ interface TransactionPrepareState {
 
   address: string
   addressDirty: boolean
-  amount: number
+  amount: string
   feeLevel: number
-  fee: number
+  fee: string
   isAdvancedMode: boolean
 }
 
@@ -63,7 +64,8 @@ export class TransactionPreparePage {
     private readonly _ngZone: NgZone,
     private readonly clipboardProvider: ClipboardService,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly amountConverterPipe: AmountConverterPipe
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -110,7 +112,7 @@ export class TransactionPreparePage {
           address: value,
           addressDirty: false,
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
         })
         this.updateFeeEstimate()
       })
@@ -122,7 +124,7 @@ export class TransactionPreparePage {
         const amount = new BigNumber(value)
         this.updateState({
           sendMaxAmount: false,
-          amount: amount.isNaN() ? 0 : amount.toNumber(),
+          amount: amount.isNaN() ? '0' : amount.toFixed(),
           disablePrepareButton: this.transactionForm.invalid || amount.isNaN() || amount.lte(0)
         })
         this.updateFeeEstimate()
@@ -134,8 +136,8 @@ export class TransactionPreparePage {
       .subscribe((value: string) => {
         const fee = new BigNumber(value)
         this.updateState({
-          fee: fee.isNaN() ? 0 : fee.toNumber(),
-          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
+          fee: fee.isNaN() ? '0' : fee.toFixed(),
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
         })
 
         if (this._state.sendMaxAmount) {
@@ -146,9 +148,9 @@ export class TransactionPreparePage {
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
       const fee = new BigNumber(this.getFeeFromLevel(value))
       this.updateState({
-        fee: fee.toNumber(),
+        fee: fee.toFixed(),
         feeLevel: value,
-        disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
+        disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
       })
 
       if (this._state.sendMaxAmount) {
@@ -159,7 +161,7 @@ export class TransactionPreparePage {
     this.transactionForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
       this.updateState({
         isAdvancedMode: value,
-        disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
+        disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
       })
     })
   }
@@ -243,9 +245,9 @@ export class TransactionPreparePage {
 
     const formValues: {
       address: string
-      amount: number
+      amount: string
       feeLevel: number
-      fee: number
+      fee: string
       isAdvanceMode: boolean
     } = this.transactionForm.value
 
@@ -261,7 +263,7 @@ export class TransactionPreparePage {
           const targetValue: T[K] = target[property]
           const stateValue: TransactionPrepareState[K] = state[property]
 
-          return typeof targetValue === typeof stateValue && (targetValue as any) !== (stateValue as any)
+          return (targetValue as any) !== (stateValue as any)
         })
         .map((property: K) => [property, state[property] as unknown] as [K, T[K]])
 
@@ -324,10 +326,10 @@ export class TransactionPreparePage {
       this.updateState({
         estimatingFeeDefaults: false,
         feeDefaults,
-        fee: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toNumber(),
+        fee: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toFixed(),
         feeLevel,
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || this._state.amount <= 0
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
       })
     }
   }
@@ -419,13 +421,16 @@ export class TransactionPreparePage {
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals) : undefined
     const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address, fee)
 
-    const formAmount = maxAmount.shiftedBy(-this.wallet.coinProtocol.decimals).decimalPlaces(this.wallet.coinProtocol.decimals)
+    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, {
+      protocol: this.wallet.coinProtocol,
+      maxDigits: this.wallet.coinProtocol.decimals + 1
+    })
 
     if (!maxAmount.isNaN()) {
       this.updateState({
         estimatingMaxAmount: false,
-        amount: formAmount.toNumber(),
-        disablePrepareButton: this.transactionForm.invalid || formAmount.isNaN() || formAmount.lte(0)
+        amount: formAmount,
+        disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lte(0)
       })
     }
   }
@@ -437,7 +442,7 @@ export class TransactionPreparePage {
           address: text,
           addressDirty: true,
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || this._state.amount <= 0
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount).lte(0)
         })
         this.updateFeeEstimate()
       },

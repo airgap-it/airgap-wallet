@@ -120,7 +120,7 @@
             ></ion-input>
           </ion-item>
           <ion-text class="ion-no-margin" color="blackLight">
-            <p class="ion-no-margin">${{ state.amount * wallet.currentMarketPrice.toNumber() | number: '1.2-2' }}</p>
+            <p class="ion-no-margin">${{ wallet.currentMarketPrice.times(state.amount).toNumber() | number: '1.2-2' }}</p>
           </ion-text>
         </ion-col>
         <ion-col size="3" class="ion-no-padding">
