@@ -7,6 +7,7 @@ import {
   SubstrateSignatureType
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateSignature'
 import { SubstrateTransactionPayload } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
+import { Buffer } from 'buffer'
 
 enum Instruction {
   /*
@@ -80,32 +81,42 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
        * 1 byte  - device is locked
        * 2 bytes - return code
        */
-      const response = await this.transport.send(this.appIdentifier, Instruction.GET_VERSION, 0, 0, this.createPayload(null))
-      return response.readUInt16BE(8) === ReturnCode.SUCCESS
-    } catch {
+      const response = await this.transport.send(this.appIdentifier, Instruction.GET_VERSION, 0, 0)
+
+      return response.readUInt16BE(response.length - 2) === ReturnCode.SUCCESS
+    } catch (error) {
+      console.warn(error)
+
       return false
     }
   }
 
   public async importWallet(): Promise<AirGapMarketWallet> {
     const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
-    /*
-     * Reponse:
-     * 32 bytes - public key
-     * ? bytes  - address
-     * 2 bytes  - return code
-     */
-    const response = await this.transport.send(
-      this.appIdentifier,
-      Instruction.GET_ADDRESS_ED25519,
-      RequiresConfirmation.NO,
-      0,
-      this.createPayload(derivationPath)
-    )
 
-    const publicKey = response.slice(0, 32).toString('hex')
+    try {
+      /*
+       * Reponse:
+       * 32 bytes - public key
+       * ? bytes  - address
+       * 2 bytes  - return code
+       */
+      const response: Buffer = await this.transport.send(
+        this.appIdentifier,
+        Instruction.GET_ADDRESS_ED25519,
+        RequiresConfirmation.NO,
+        0,
+        derivationPath
+      )
 
-    return new AirGapMarketWallet(this.protocol.identifier, publicKey, false, this.protocol.standardDerivationPath)
+      const publicKey: string = response.slice(0, 32).toString('hex')
+
+      return new AirGapMarketWallet(this.protocol.identifier, publicKey, false, this.protocol.standardDerivationPath)
+    } catch (error) {
+      console.warn(error)
+
+      return Promise.reject(error)
+    }
   }
 
   public async signTranscation(transaction: RawSubstrateTransaction): Promise<string> {
@@ -125,24 +136,29 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     transaction: SubstrateTransaction,
     payload: SubstrateTransactionPayload
   ): Promise<SubstrateTransaction> {
-    /*
-     * Reponse:
-     * 65 bytes - signature
-     * 2 bytes  - return code
-     */
-    const response = await this.signMessage(Buffer.from(payload.encode(), 'hex'))
-    const returnCode = response.readUInt16BE(65)
+    try {
+      /*
+       * Reponse:
+       * 65 bytes - signature
+       * 2 bytes  - return code
+       */
+      const response = await this.signMessage(Buffer.from(payload.encode(), 'hex'))
+      const returnCode = response.readUInt16BE(response.length - 2)
 
-    if (returnCode !== ReturnCode.SUCCESS) {
-      throw new Error(`Signing transaction failed with error code ${returnCode}.`)
+      if (returnCode !== ReturnCode.SUCCESS) {
+        throw new Error(`Signing transaction failed with error code ${returnCode}.`)
+      }
+
+      const signatureType = SubstrateSignatureType[SubstrateSignatureType[response.readUInt8(0)]]
+      const signatureBuffer = response.slice(1, 64)
+
+      const signature = SubstrateSignature.create(signatureType, signatureBuffer)
+
+      return SubstrateTransaction.fromTransaction(transaction, { signature })
+    } catch (error) {
+      console.warn(error)
+      return Promise.reject(error)
     }
-
-    const signatureType = SubstrateSignatureType[SubstrateSignatureType[response.readUInt8(0)]]
-    const signatureBuffer = response.slice(1, 64)
-
-    const signature = SubstrateSignature.create(signatureType, signatureBuffer)
-
-    return SubstrateTransaction.fromTransaction(transaction, { signature })
   }
 
   private async signMessage(message: Buffer): Promise<Buffer> {
@@ -173,9 +189,9 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
   }
 
   private async signSendPayloadChunk(chunk: Buffer, descriptor: PayloadDescriptor): Promise<Buffer> {
-    const response = await this.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, this.createPayload(chunk))
+    const response = await this.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, chunk)
 
-    const returnCode = response.slice(0, -2)
+    const returnCode = response.slice(-2)
     if (returnCode.readUInt16BE(0) === ReturnCode.SUCCESS) {
       throw new Error(`Sending initial data to SIGN failed with error code ${returnCode}.`)
     }

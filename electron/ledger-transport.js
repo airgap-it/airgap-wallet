@@ -27,9 +27,9 @@ process.on('message', async message => {
             message.data.ins,
             message.data.p1,
             message.data.p2,
-            message.data.data
+            message.data.hexData ? Buffer.from(message.data.hexData, 'hex') : undefined
           )
-          data = { response }
+          data = { response: response ? response.toString('hex') : undefined }
           break
         case 'close':
           await close(message.data.transportId)

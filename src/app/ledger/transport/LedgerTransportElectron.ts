@@ -1,13 +1,19 @@
-import { LedgerTransport, LedgerConnection, LedgerConnectionType } from './LedgerTransport'
-import { LedgerElectronBridge, LedgerProcessMessageType } from './bridge/LedgerElectronBridge'
+import {
+  GetDevicesMessageReply,
+  LedgerElectronBridge,
+  LedgerProcessMessageType,
+  OpenMessageReply,
+  SendMessageReply
+} from './bridge/LedgerElectronBridge'
+import { LedgerConnection, LedgerConnectionType, LedgerTransport } from './LedgerTransport'
 
 export class LedgerTransportElectron extends LedgerTransport {
-  private static get bridge() {
+  private static get bridge(): LedgerElectronBridge {
     return LedgerElectronBridge.getInstance()
   }
 
   public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnection[]> {
-    const { devices } = await LedgerTransportElectron.bridge.sendToLedger(
+    const { devices }: GetDevicesMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.GET_DEVICES,
       {
         connectionType
@@ -19,7 +25,7 @@ export class LedgerTransportElectron extends LedgerTransport {
   }
 
   public static async open(connectionType: LedgerConnectionType, descriptor: string): Promise<LedgerTransportElectron> {
-    const { transportId } = await LedgerTransportElectron.bridge.sendToLedger(
+    const { transportId }: OpenMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.OPEN,
       {
         connectionType,
@@ -27,6 +33,7 @@ export class LedgerTransportElectron extends LedgerTransport {
       },
       `${connectionType}_${descriptor}`
     )
+
     return new LedgerTransportElectron(connectionType, transportId)
   }
 
@@ -35,7 +42,7 @@ export class LedgerTransportElectron extends LedgerTransport {
   }
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
-    const { response } = await LedgerTransportElectron.bridge.sendToLedger(
+    const { response }: SendMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.SEND,
       {
         transportId: this.transportId,
@@ -43,11 +50,12 @@ export class LedgerTransportElectron extends LedgerTransport {
         ins,
         p1,
         p2,
-        data
+        hexData: data ? data.toString('hex') : undefined
       },
       `${this.transportId}_${cla}_${ins}_${new Date().getTime().toString()}`
     )
-    return response
+
+    return Buffer.isBuffer(response) ? response : Buffer.from(response, 'hex')
   }
   public async close(): Promise<void> {
     await LedgerTransportElectron.bridge.sendToLedger(

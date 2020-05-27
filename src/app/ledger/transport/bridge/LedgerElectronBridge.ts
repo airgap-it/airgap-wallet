@@ -36,10 +36,11 @@ export interface SendMessage {
   ins: number
   p1: number
   p2: number
-  data?: Buffer
+  hexData?: string
 }
+
 export interface SendMessageReply {
-  response: Buffer
+  response: Buffer | string
 }
 
 export interface CloseMessage {

@@ -3,6 +3,11 @@ import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGa
 
 import { LedgerTransport } from '../transport/LedgerTransport'
 
+const BYTES_DERIVATION_JUNCTION: number = 4
+
+const MASK_HARD_DERIVATION: number = 0x80000000
+const MASK_SOFT_DERIVATION: number = 0x00000000
+
 export abstract class LedgerApp {
   public abstract appIdentifier: number
 
@@ -12,22 +17,29 @@ export abstract class LedgerApp {
   public abstract async importWallet(): Promise<AirGapMarketWallet>
   public abstract async signTranscation(transaction: any): Promise<IAirGapSignedTransaction>
 
-  protected createPayload(data: null | Buffer | Uint8Array): Buffer {
-    const payloadLength = Buffer.alloc(1)
-    if (data === null) {
-      return Buffer.from([0])
-    } else {
-      payloadLength.writeUInt8(data.length, 0)
-      return Buffer.concat([payloadLength, data])
-    }
-  }
-
   protected derivationPathToBuffer(derivationPath: string): Buffer {
-    const deriveJunctions = derivationPath
+    const deriveJunctions: number[] = derivationPath
       .split('/')
-      .map(junction => junction.replace(/\'|h/, ''))
-      .map(junction => parseInt(junction))
+      .map((junction: string) => {
+        const isHard: boolean = !!junction.match(/\d+[\'|h]/)
+        const index: number = parseInt(isHard ? junction.slice(0, -1) : junction, 10)
+        const mask: number = isHard ? MASK_HARD_DERIVATION : MASK_SOFT_DERIVATION
 
-    return Buffer.from(deriveJunctions)
+        if (isNaN(index)) {
+          return null
+        } else {
+          const masked: string = (BigInt(mask) | BigInt(index)).toString()
+
+          return parseInt(masked, 10)
+        }
+      })
+      .filter((index: number | null) => index !== null)
+
+    const buffer: Buffer = Buffer.alloc(deriveJunctions.length * BYTES_DERIVATION_JUNCTION)
+    deriveJunctions.forEach((junction: number, index: number) => {
+      buffer.writeUInt32LE(junction, index * BYTES_DERIVATION_JUNCTION)
+    })
+
+    return buffer
   }
 }

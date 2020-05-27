@@ -75,7 +75,10 @@ ipcMain.on('send-to-child', function(event, requestId, name, type, data) {
   if (!child) {
     event.reply('send-to-child-reply', requestId, { error: 'Process is not running.' })
   } else {
-    callbacks.set(requestId, message => event.reply('send-to-child-reply', message.requestId, message.data))
+    callbacks.set(requestId, message => {
+      event.reply('send-to-child-reply', message.requestId, message.data)
+    })
+
     child.send({
       requestId,
       type,
