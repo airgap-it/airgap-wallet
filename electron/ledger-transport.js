@@ -23,7 +23,7 @@ process.on('message', async message => {
         case 'send':
           const response = await send(
             message.data.transportId,
-            message.data.cls,
+            message.data.cla,
             message.data.ins,
             message.data.p1,
             message.data.p2,
@@ -81,10 +81,10 @@ async function openTransport(connectionType, descriptor) {
   return transportId
 }
 
-async function send(transportId, cls, ins, p1, p2, data) {
+async function send(transportId, cla, ins, p1, p2, data) {
   const transport = transports.get(transportId)
   if (transport) {
-    const response = await transport.send(cls, ins, p1, p2, data)
+    const response = await transport.send(cla, ins, p1, p2, data)
     return response
   } else {
     return Buffer.alloc(0)
