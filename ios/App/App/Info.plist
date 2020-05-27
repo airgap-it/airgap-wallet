@@ -50,6 +50,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>AirGap uses your camera to scan QR Codes of transactions.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>AirGap does not need your location data.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>AirGap does not need access to your photo library.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
