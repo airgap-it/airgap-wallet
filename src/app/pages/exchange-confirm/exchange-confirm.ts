@@ -48,16 +48,16 @@ export class ExchangeConfirmPage {
       this.toWallet = info.toWallet
       this.fromCurrency = info.fromCurrency
       this.toCurrency = info.toCurrency
-      this.toWallet
       this.exchangeResult = info.exchangeResult
+      this.fee = info.fee
 
       this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
       this.amountExpectedTo = this.exchangeResult.amountExpectedTo ? this.exchangeResult.amountExpectedTo : info.amountExpectedTo
+
+      this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
+      this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
+      this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
     }
-    this.fee = this.fromWallet.coinProtocol.feeDefaults.medium
-    this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
-    this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
-    this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
 
     this.exchangeProvider.getActiveExchange().subscribe(exchange => {
       this.activeExchange = exchange

@@ -12,6 +12,7 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
 import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
@@ -56,7 +57,8 @@ describe('TransactionPrepare Page', () => {
           {
             provide: ActivatedRoute,
             useValue: routeInfo
-          }
+          },
+          AmountConverterPipe
         ],
         declarations: [TransactionPreparePage]
       })
@@ -122,7 +124,7 @@ describe('TransactionPrepare Page', () => {
   // })
 
   it('should only give an error if the amount has more than the allowed digits', () => {
-    component.setWallet(ethWallet)
+    component.wallet = ethWallet
     const validAmounts = [19, 108, 4.345234523452345, 0.0000000000000001, 0.0000000000000001]
     validAmounts.forEach(validAmount => {
       component.transactionForm.controls.amount.setValue(validAmount)
@@ -133,7 +135,7 @@ describe('TransactionPrepare Page', () => {
 
     const invalidAmounts = [0.0000000000000000001, -1.24]
     invalidAmounts.forEach(invalidAmount => {
-      component.setWallet(ethWallet)
+      component.wallet = ethWallet
       component.transactionForm.controls.amount.setValue(invalidAmount)
       fixture.detectChanges()
 
