@@ -1,16 +1,19 @@
-import { Injectable } from '@angular/core'
-import { NotificationEventResponse, Push, PushObject, PushOptions, RegistrationEventResponse } from '@ionic-native/push/ngx'
+import { Injectable, Inject } from '@angular/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
+import { PushNotificationsPlugin, PushNotification, PushNotificationToken } from '@capacitor/core'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
+
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { PermissionsProvider, PermissionStatus } from '../permissions/permissions'
 
 @Injectable({
   providedIn: 'root'
@@ -19,40 +22,31 @@ export class PushProvider {
   private readonly registrationId: ReplaySubject<string> = new ReplaySubject(1)
   private registerCalled: boolean = false
 
-  private readonly options: PushOptions = {
-    android: {},
-    ios: {
-      alert: 'true',
-      badge: true,
-      sound: 'false'
-    },
-    windows: {}
-  }
-
   constructor(
     private readonly platform: Platform,
-    private readonly push: Push,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly storageProvider: StorageProvider,
     private readonly modalController: ModalController,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly permissionsProvider: PermissionsProvider,
+    @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
   }
 
-  public notificationCallback = (_notification: NotificationEventResponse): void => undefined
+  public notificationCallback = (_notification: PushNotification): void => undefined
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
 
-    if (!this.platform.is('cordova')) {
+    if (!this.platform.is('hybrid')) {
       return
     }
 
-    const { isEnabled }: { isEnabled: boolean } = await this.push.hasPermission()
+    const permissionStatus = await this.permissionsProvider.hasNotificationsPermission()
 
-    if (isEnabled) {
+    if (permissionStatus === PermissionStatus.GRANTED) {
       await this.register()
     }
   }
@@ -133,13 +127,11 @@ export class PushProvider {
 
     this.registerCalled = true
 
-    const pushObject: PushObject = this.push.init(this.options)
-
-    pushObject.on('notification').subscribe(async (notification: NotificationEventResponse) => {
+    this.pushNotifications.addListener('pushNotificationReceived', (notification: PushNotification) => {
       console.debug('Received a notification', notification)
       this.toastController
         .create({
-          message: `${notification.title}: ${notification.message}`,
+          message: `${notification.title}: ${notification.body}`,
           buttons: [
             {
               text: 'Ok',
@@ -158,14 +150,16 @@ export class PushProvider {
       }
     })
 
-    pushObject.on('registration').subscribe(async (registration: RegistrationEventResponse) => {
-      console.debug('device registered', registration)
-      this.registrationId.next(registration.registrationId)
+    this.pushNotifications.addListener('registration', (token: PushNotificationToken) => {
+      console.debug('device registered', token)
+      this.registrationId.next(token.value)
     })
 
-    pushObject.on('error').subscribe((error: Error) => {
+    this.pushNotifications.addListener('registrationError', error => {
       console.error('Error with Push plugin', error)
       handleErrorSentry(ErrorCategory.PUSH)(error)
     })
+
+    await this.pushNotifications.register()
   }
 }

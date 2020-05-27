@@ -12,13 +12,13 @@ export class ScannerProvider {
   constructor(private readonly platform: Platform) {}
 
   public askForPermission() {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       QRScanner.openSettings()
     }
   }
 
   public hasPermission(): Promise<[boolean, boolean]> {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       return new Promise((resolve, reject) => {
         const onDone = (err, status) => {
           if (err) {
@@ -67,7 +67,7 @@ export class ScannerProvider {
   }
 
   public show() {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       if (this.isShowing) {
         return
       }
@@ -78,13 +78,13 @@ export class ScannerProvider {
   }
 
   public stopScan() {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       QRScanner.cancelScan(null)
     }
   }
 
   public destroy() {
-    if (this.platform.is('cordova')) {
+    if (this.platform.is('hybrid')) {
       this.isShowing = false
       QRScanner.pausePreview()
       QRScanner.destroy()

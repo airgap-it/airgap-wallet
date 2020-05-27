@@ -30,6 +30,7 @@ export interface ExchangeTransaction {
   toCurrency: string
   amountExpectedFrom: BigNumber
   amountExpectedTo: string
+  fee: string
   status: string
   exchange: ExchangeEnum
   id: string
@@ -41,6 +42,7 @@ export interface ExchangeTransaction {
 })
 export class ExchangeProvider implements Exchange {
   private exchange: Exchange
+  private exchangeIdentifier: ExchangeEnum
   private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
 
   private pendingTransactions: ExchangeTransaction[] = []
@@ -51,9 +53,11 @@ export class ExchangeProvider implements Exchange {
       switch (exchange) {
         case ExchangeEnum.CHANGELLY:
           this.exchange = new ChangellyExchange(this.http)
+          this.exchangeIdentifier = ExchangeEnum.CHANGELLY
           break
         case ExchangeEnum.CHANGENOW:
           this.exchange = new ChangeNowExchange(this.http)
+          this.exchangeIdentifier = ExchangeEnum.CHANGENOW
           break
       }
     })
@@ -79,8 +83,14 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.validateAddress(currency, address)
   }
 
-  public createTransaction(fromCurrency: string, toCurrency: string, address: string, amount: string): Promise<any> {
-    return this.exchange.createTransaction(fromCurrency, toCurrency, address, amount)
+  public createTransaction(
+    fromCurrency: string,
+    toCurrency: string,
+    toAddress: string,
+    amount: string,
+    fromAddress?: string
+  ): Promise<any> {
+    return this.exchange.createTransaction(fromCurrency, toCurrency, toAddress, amount, fromAddress)
   }
 
   public getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
@@ -108,6 +118,17 @@ export class ExchangeProvider implements Exchange {
     this.exchangeSubject.next(exchange)
   }
 
+  public switchActiveExchange() {
+    switch (this.exchangeIdentifier) {
+      case ExchangeEnum.CHANGELLY:
+        this.setActiveExchange(ExchangeEnum.CHANGENOW)
+        break
+      case ExchangeEnum.CHANGENOW:
+        this.setActiveExchange(ExchangeEnum.CHANGELLY)
+        break
+    }
+  }
+
   public getActiveExchange() {
     return this.exchangeSubject.asObservable()
   }
@@ -127,7 +148,7 @@ export class ExchangeProvider implements Exchange {
         to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
-        fee: new BigNumber(protocol.feeDefaults.medium).times(10 ** protocol.decimals).toString(),
+        fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
         extra: tx.status

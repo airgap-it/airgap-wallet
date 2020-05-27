@@ -75,7 +75,9 @@ class ChangeNowApi {
 
   constructor(public http: HttpClient, protected baseURL = 'https://changenow.io/api/v1') {
     this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
+    this.identifierExchangeToAirGapMap.set('atom', 'cosmos')
     this.identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
+    this.identifierAirGapToExchangeMap.set('cosmos', 'atom')
   }
 
   convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
@@ -99,6 +101,7 @@ class ChangeNowApi {
       .get(`${this.baseURL}/currencies?active=true`)
       .toPromise()) as CurrencyDetailResponse[]
     const fromCurrencies = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
   }
 
@@ -129,22 +132,23 @@ class ChangeNowApi {
   async createTransaction(
     fromCurrency: string,
     toCurrency: string,
-    address: string,
-    amount: string
+    toAddress: string,
+    amount: string,
+    fromAddress?: string
   ): Promise<TransactionChangeNowResponse> {
     fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const apiKey = 'changenow'
+    const apiKey = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
     const body = {
       from: fromCurrency,
       to: toCurrency,
-      address: address,
+      address: toAddress,
       amount: amount,
       extraId: '',
       userId: '',
       contactEmail: '',
-      refundAddress: '',
+      refundAddress: fromAddress ? fromAddress : '',
       refundExtraId: ''
     }
 

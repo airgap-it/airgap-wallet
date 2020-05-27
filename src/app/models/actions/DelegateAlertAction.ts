@@ -1,14 +1,25 @@
-import { AlertController, PopoverController } from '@ionic/angular'
+import { AlertController, PopoverController, ToastController, LoadingController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
 import { LanguageService } from '../../services/language/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
-import { AirGapTezosDelegateAction, AirGapTezosDelegateActionContext } from './TezosDelegateAction'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { AirGapDelegatorAction } from './DelegatorAction'
+import { TezosDelegatorAction, AirGapMarketWallet } from 'airgap-coin-lib'
+import { DataService } from 'src/app/services/data/data.service'
+import { Router } from '@angular/router'
 
-export interface DelegateAlertActionContext extends AirGapTezosDelegateActionContext {
+export interface DelegateAlertActionContext {
   isAccepted?: boolean
+  wallet: AirGapMarketWallet
+  delegate: string
+  toastController: ToastController
+  loadingController: LoadingController
+  operationsProvider: OperationsProvider
+  dataService: DataService
+  router: Router
   popoverController: PopoverController
   languageService: LanguageService
   alertController: AlertController
@@ -22,11 +33,17 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
     name: 'Tip Us',
     icon: 'logo-usd'
   }
-  private readonly delegateAction: AirGapTezosDelegateAction
+  private readonly delegateAction: AirGapDelegatorAction
 
   constructor(context: DelegateAlertActionContext) {
     super(context)
-    this.delegateAction = new AirGapTezosDelegateAction(context)
+    this.delegateAction = new AirGapDelegatorAction({
+      type: TezosDelegatorAction.DELEGATE,
+      data: {
+        delegate: context.delegate
+      },
+      ...context
+    })
   }
 
   protected async perform(): Promise<void> {

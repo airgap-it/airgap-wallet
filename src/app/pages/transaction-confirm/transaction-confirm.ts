@@ -6,8 +6,7 @@ import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, Sig
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-
-declare var cordova
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 const SECOND: number = 1000
 
@@ -33,7 +32,8 @@ export class TransactionConfirmPage {
     private readonly alertCtrl: AlertController,
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
-    private readonly pushBackendProvider: PushBackendProvider
+    private readonly pushBackendProvider: PushBackendProvider,
+    private readonly browserService: BrowserService
   ) {}
 
   public dismiss(): void {
@@ -178,7 +178,7 @@ export class TransactionConfirmPage {
           {
             text: 'Open Blockexplorer',
             handler: (): void => {
-              this.openUrl(blockexplorer)
+              this.browserService.openUrl(blockexplorer)
 
               this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             }
@@ -195,13 +195,5 @@ export class TransactionConfirmPage {
         alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
-  }
-
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
   }
 }
