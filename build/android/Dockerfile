@@ -55,6 +55,9 @@ RUN npm run configure-mangle
 # remove unused cordova-diagnostic-plugin features
 RUN npm run apply-diagnostic-modules
 
+# browserify coin-lib
+RUN npm run browserify-coinlib
+
 # build ionic
 RUN ionic build --prod
 
