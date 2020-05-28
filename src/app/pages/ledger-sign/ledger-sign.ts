@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
@@ -69,8 +69,16 @@ export class LedgerSignPage {
       }
 
       const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.ledgerConnection, this.unsignedTx)
+      const signedTransactionSync: IACMessageDefinitionObject = {
+        type: IACMessageType.MessageSignResponse,
+        protocol: this.wallet.protocolIdentifier,
+        payload: {
+          transaction: signedTx,
+          accountIdentifier: this.wallet.publicKey.substr(-6)
+        }
+      }
       const info = {
-        signedTransactionsSync: signedTx
+        signedTransactionsSync: [signedTransactionSync]
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -91,7 +99,6 @@ export class LedgerSignPage {
 
       if (this.ledgerConnection) {
         await this.ledgerService.openConnection(this.ledgerConnection)
-        console.log('Connected with', this.ledgerConnection.descriptor)
       }
     } catch (error) {
       console.warn(error)
