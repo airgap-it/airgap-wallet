@@ -121,14 +121,10 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
   public async signTranscation(transaction: RawSubstrateTransaction): Promise<string> {
     const txs = this.protocol.transactionController.decodeDetails(transaction.encoded)
-    const promises = txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload))
-
-    const signed = []
-    for (let promise of promises) {
-      signed.push(await promise)
-    }
+    const signed = await Promise.all(txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload)))
 
     txs.forEach((tx, index) => (tx.transaction = signed[index]))
+
     return this.protocol.transactionController.encodeDetails(txs)
   }
 
@@ -150,7 +146,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       }
 
       const signatureType = SubstrateSignatureType[SubstrateSignatureType[response.readUInt8(0)]]
-      const signatureBuffer = response.slice(1, 64)
+      const signatureBuffer = response.slice(1, 65)
 
       const signature = SubstrateSignature.create(signatureType, signatureBuffer)
 
