@@ -102,8 +102,8 @@ export class BeaconService {
     await this.client.respond(message)
   }
 
-  public async addPeer(pubKey: string, relayServer: string, name: string): Promise<void> {
-    this.client.addPeer({ pubKey, relayServer, name } as any)
+  public async addPeer(publicKey: string, relayServer: string, name: string): Promise<void> {
+    this.client.addPeer({ publicKey, relayServer, name } as any)
   }
 
   public async getPeers(): Promise<P2PPairInfo[]> {
