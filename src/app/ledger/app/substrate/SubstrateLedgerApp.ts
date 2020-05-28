@@ -173,7 +173,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     function getDescriptor(index: number): PayloadDescriptor {
       if (index === 0) {
         return PayloadDescriptor.INIT
-      } else if (index < chunks.length) {
+      } else if (index < chunks.length - 1) {
         return PayloadDescriptor.ADD
       } else {
         return PayloadDescriptor.LAST
@@ -192,8 +192,10 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     const response = await this.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, chunk)
 
     const returnCode = response.slice(-2)
-    if (returnCode.readUInt16BE(0) === ReturnCode.SUCCESS) {
-      throw new Error(`Sending initial data to SIGN failed with error code ${returnCode}.`)
+    if (returnCode.readUInt16BE(0) !== ReturnCode.SUCCESS) {
+      throw new Error(
+        `Sending data to SIGN failed with error code 0x${returnCode.toString('hex')}. (descriptor: ${PayloadDescriptor[descriptor]})`
+      )
     }
 
     return response
