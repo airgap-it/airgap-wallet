@@ -136,7 +136,7 @@ export class BeaconRequestPage implements OnInit {
         const response: PermissionResponseInput = {
           id: request.id,
           type: BeaconMessageType.PermissionResponse,
-          pubkey: selectedWallet.publicKey,
+          publicKey: selectedWallet.publicKey,
           network: request.network,
           scopes
         }

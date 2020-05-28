@@ -16,7 +16,7 @@ export class BeaconPermissionListPage {
   }
 
   public async loadPermissions(): Promise<void> {
-    this.permissions = await this.beaconService.client.permissionManager.getPermissions()
+    this.permissions = await this.beaconService.client.getPermissions()
   }
 
   public async deletePermission(permission: PermissionInfo): Promise<void> {
@@ -33,7 +33,7 @@ export class BeaconPermissionListPage {
         {
           text: 'Yes',
           handler: async (): Promise<void> => {
-            await this.beaconService.client.permissionManager.removePermission(permission.accountIdentifier)
+            await this.beaconService.client.removePermission(permission.accountIdentifier)
             await this.loadPermissions()
           }
         }
