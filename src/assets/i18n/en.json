@@ -255,7 +255,7 @@
     "title": "Import Account",
     "error-alert": {
       "header": "Error",
-      "unknown": "Unkown error has occurred",
+      "unknown": "Unkown error has occurred. Try reconnecting your device.",
       "confirm": "OK"
     }
   },
@@ -555,7 +555,7 @@
     "confirm_label": "Sign",
     "error-alert": {
       "header": "Error",
-      "unknown": "Unkown error has occurred",
+      "unknown": "Unkown error has occurred. Try reconnecting your device.",
       "confirm": "OK"
     }
   }
