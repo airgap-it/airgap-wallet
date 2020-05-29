@@ -159,8 +159,20 @@ export class DelegationDetailPage {
     this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel || activeAction.label : null
   }
 
-  public changeDelegatee() {
-    // TODO: open known delegatees list
+  public showDelegateesList() {
+    const info = {
+      wallet: this.wallet,
+      delegateeLabel: this.delegateeLabel,
+      currentDelegatees: this.currentDelegatees,
+      callback: (address: string) => {
+        this.changeDisplayedDetails(address)
+      }
+    }
+
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router
+      .navigateByUrl('/delegation-list/' + DataServiceKey.DETAIL, { skipLocationChange: true })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private initView() {
@@ -324,22 +336,6 @@ export class DelegationDetailPage {
       console.warn(error)
       this.showToast(error.message)
     }
-  }
-
-  private showDelegateesList() {
-    const info = {
-      wallet: this.wallet,
-      delegateeLabel: this.delegateeLabel,
-      currentDelegatees: this.currentDelegatees,
-      callback: (address: string) => {
-        this.changeDisplayedDetails(address)
-      }
-    }
-
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router
-      .navigateByUrl('/delegation-list/' + DataServiceKey.DETAIL, { skipLocationChange: true })
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private dismissLoader() {

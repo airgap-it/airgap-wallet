@@ -14,8 +14,30 @@
 
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="filteredDelegatees && filteredDelegatees.length > 0; else loadingTemplate">
+    <ng-container *ngIf="currentDelegatees && currentDelegatees.length > 0">
       <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              TODO Your {{ delegateeLabel }}s
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
+        <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of currentDelegatees">
+          <widget-account-summary [widget]="delegatee"></widget-account-summary>
+        </div>
+      </ion-list>
+    </ng-container>
+
+    <ng-container *ngIf="filteredDelegatees; else loadingTemplate">
+      <ion-list lines="none" *ngIf="filteredDelegatees.length > 0">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              TODO Known {{ delegateeLabel }}s
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
         <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of filteredDelegatees">
           <widget-account-summary [widget]="delegatee"></widget-account-summary>
         </div>

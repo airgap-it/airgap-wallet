@@ -41,7 +41,7 @@
 
     <ion-row class="ion-padding-top ion-padding-horizontal action--container" *ngIf="(delegateeDetails$ | async)">
       <ion-col size="12" class="ion-no-padding">
-        <ion-button (click)="changeDelegatee()" color="secondary" shape="round" size="small" fill="outline">
+        <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
           <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
           Change {{ delegateeLabel }}
         </ion-button>

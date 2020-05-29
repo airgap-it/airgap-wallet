@@ -17,9 +17,11 @@ export class DelegationListPage {
   public delegateeLabel: string
 
   public searchTerm: string = ''
+
+  public currentDelegatees: UIAccountSummary[]
+  public knownDelegatees: UIAccountSummary[]
   public filteredDelegatees: UIAccountSummary[]
 
-  private delegatees: UIAccountSummary[]
   private callback: (address: string) => void
 
   constructor(
@@ -34,17 +36,19 @@ export class DelegationListPage {
       this.callback = info.callback
 
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then(summary => {
-        this.delegatees = summary
-        this.filteredDelegatees = summary
+        this.currentDelegatees = summary.filter(summary => info.currentDelegatees.includes(summary.address))
+        this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
+
+        this.filteredDelegatees = this.knownDelegatees
       })
     }
   }
 
   public setFilteredItems(searchTerm: string) {
     if (searchTerm.length === 0) {
-      this.filteredDelegatees = this.delegatees
+      this.filteredDelegatees = this.currentDelegatees
     } else {
-      this.filteredDelegatees = this.delegatees.filter(delegatee => {
+      this.filteredDelegatees = this.currentDelegatees.filter(delegatee => {
         const searchTermLowerCase = searchTerm.toLowerCase()
         const hasMatchingAddress = delegatee.address.toLowerCase().includes(searchTermLowerCase)
         const hasMatchingName = delegatee.header[0].toLowerCase().includes(searchTermLowerCase)
