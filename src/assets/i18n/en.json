@@ -536,6 +536,7 @@
     "title": "Beacon Permissions",
     "connected-dapps": "Connected DApps",
     "remove_label": "Remove",
+    "no-permissions": "No permissions have been given.",
     "delete-permission-alert": {
       "header": "Delete Permission?",
       "message": "Are you sure you want to delete this permission? The DApp will not be able to perform operations anymore until new permissions are granted.",
