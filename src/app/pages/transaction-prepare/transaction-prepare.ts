@@ -444,10 +444,14 @@ export class TransactionPreparePage {
   }
 
   private async forceMigration(): Promise<void> {
-    this.updateState({
-      forceMigration: true,
-      sendMaxAmount: true
-    })
+    this.updateState(
+      {
+        forceMigration: true,
+        sendMaxAmount: true,
+        disablePrepareButton: false
+      },
+      false
+    )
     await this.updateWithMaxAmount()
   }
 
