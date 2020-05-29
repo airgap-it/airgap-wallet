@@ -108,9 +108,13 @@ export class LedgerSignPage {
     }
   }
 
-  private async promptError(error) {
+  private async promptError(error: unknown) {
     let message: string
     if (isString(error)) {
+      if (error === 'Rejected') {
+        return
+      }
+
       message = error
     } else if (error instanceof Error) {
       message = error.message

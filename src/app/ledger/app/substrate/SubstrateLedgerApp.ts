@@ -9,6 +9,7 @@ import {
 import { SubstrateTransactionPayload } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
 import { Buffer } from 'buffer'
 import { ReturnCode } from '../../ReturnCode'
+import { isType } from 'src/app/utils/utils'
 
 enum Instruction {
   /*
@@ -90,6 +91,10 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     const txs = this.protocol.transactionController.decodeDetails(transaction.encoded)
     const signed = await Promise.all(txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload)))
 
+    if (signed.some(tx => tx === null)) {
+      return Promise.reject('Rejected')
+    }
+
     txs.forEach((tx, index) => (tx.transaction = signed[index]))
 
     return this.protocol.transactionController.encodeDetails(txs)
@@ -98,7 +103,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
   private async signSubstrateTransaction(
     transaction: SubstrateTransaction,
     payload: SubstrateTransactionPayload
-  ): Promise<SubstrateTransaction> {
+  ): Promise<SubstrateTransaction | null> {
     try {
       /*
        * Reponse:
@@ -119,6 +124,12 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
       return SubstrateTransaction.fromTransaction(transaction, { signature })
     } catch (error) {
+      if (isType<{ statusCode: number }>(error, 'statusCode')) {
+        switch (error.statusCode) {
+          case ReturnCode.COMMAND_NOT_ALLOWED: // thrown when operation rejected
+            return null
+        }
+      }
       return Promise.reject(error)
     }
   }
