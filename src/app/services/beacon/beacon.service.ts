@@ -32,14 +32,11 @@ export class BeaconService {
     return this.client.connect(async message => {
       console.log('WALLET gotEncryptedMessage:', message)
 
-      console.log('typeof', typeof message)
-
       await this.presentModal(message)
     })
   }
 
   async presentModal(request: BeaconRequestOutputMessage) {
-    console.log('presentModal')
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
       componentProps: {
@@ -52,11 +49,11 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(messageId: string, requestPayload: any) {
+  public async addVaultRequest(messageId: string, requestPayload: any): Promise<void> {
     this.requests.push([messageId, requestPayload])
   }
 
-  public async getVaultRequest(signedMessage: string, hash: string) {
+  public async getVaultRequest(signedMessage: string, hash: string): Promise<void> {
     // TODO: Refactor this once we have IDs in the serializer between Wallet <=> Vault
     this.requests = this.requests.filter(request => {
       if (signedMessage === request[1]) {
