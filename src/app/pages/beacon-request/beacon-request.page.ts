@@ -15,6 +15,7 @@ import {
   BroadcastRequestOutput,
   PermissionResponseInput
 } from '@airgap/beacon-sdk'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -55,7 +56,6 @@ export class BeaconRequestPage implements OnInit {
   ) {}
 
   public async ngOnInit(): Promise<void> {
-    console.log('new request', this.request)
     this.requesterName = this.request.appMetadata.name
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
       this.title = 'Permission Request'
@@ -92,7 +92,7 @@ export class BeaconRequestPage implements OnInit {
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === 'xtz') // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
@@ -159,7 +159,7 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === 'xtz') // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
@@ -186,8 +186,6 @@ export class BeaconRequestPage implements OnInit {
         data: serializedChunks
       }
 
-      console.log('info', info)
-
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
@@ -198,7 +196,7 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === 'xtz') // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
@@ -250,7 +248,7 @@ export class BeaconRequestPage implements OnInit {
 
     const signedTransactionSync: IACMessageDefinitionObject = {
       type: IACMessageType.MessageSignResponse,
-      protocol: 'xtz',
+      protocol: ProtocolSymbols.XTZ,
       payload: {
         accountIdentifier: '',
         transaction: signedTx // wait for SDK to correctly serialize
