@@ -1,19 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
-import { Clipboard } from '@ionic-native/clipboard/ngx'
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 
-import { NavParamsMock, PlatformMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/mocks-ionic'
+import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+
+import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
@@ -46,17 +47,18 @@ describe('TransactionPrepare Page', () => {
       unitHelper.testBed({
         providers: [
           AccountProvider,
-          Clipboard,
           { provide: Storage, useClass: StorageMock },
           { provide: NavParams, useClass: NavParamsMock },
-          { provide: StatusBar, useClass: StatusBarMock },
-          { provide: SplashScreen, useClass: SplashScreenMock },
+          { provide: CLIPBOARD_PLUGIN, useClass: ClipboardMock },
+          { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
+          { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },
           ClipboardService,
           {
             provide: ActivatedRoute,
             useValue: routeInfo
-          }
+          },
+          AmountConverterPipe
         ],
         declarations: [TransactionPreparePage]
       })
@@ -122,7 +124,7 @@ describe('TransactionPrepare Page', () => {
   // })
 
   it('should only give an error if the amount has more than the allowed digits', () => {
-    component.setWallet(ethWallet)
+    component.wallet = ethWallet
     const validAmounts = [19, 108, 4.345234523452345, 0.0000000000000001, 0.0000000000000001]
     validAmounts.forEach(validAmount => {
       component.transactionForm.controls.amount.setValue(validAmount)
@@ -133,7 +135,7 @@ describe('TransactionPrepare Page', () => {
 
     const invalidAmounts = [0.0000000000000000001, -1.24]
     invalidAmounts.forEach(invalidAmount => {
-      component.setWallet(ethWallet)
+      component.wallet = ethWallet
       component.transactionForm.controls.amount.setValue(invalidAmount)
       fixture.detectChanges()
 

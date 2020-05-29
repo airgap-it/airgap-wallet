@@ -41,14 +41,12 @@
     },
     "no-transactions_text": "There are no transactions yet for this account."
   },
-
   "account-transaction-detail": {
     "available_label": "Available",
     "delegated_label": "Delegated",
     "unbonding_label": "Unbonding",
     "reward_label": "Unclaimed Rewards"
   },
-
   "introduction": {
     "title": "The New Crypto Wallet Standard",
     "highest": {
@@ -74,14 +72,13 @@
     "vault-install_label": "Install AirGap Vault",
     "continue_label": "Let's Go"
   },
-
   "introduction-download": {
     "title": "Install AirGap Vault",
     "heading": "Let's install AirGap Vault!",
     "description": "Not sure how and where to install AirGap Vault and AirGap Wallet? We have a detailed step by step guide with all the instructions.",
     "guide-link_label": "Show Guide",
     "text": "There are a few ways to install AirGap Vault, choose the one that fits the best for you.",
-    "android": "Android",    
+    "android": "Android",
     "play-store_text": "Install AirGap Vault directly from the Google Play Store for this or a dedicated device.",
     "iOS": "iOS",
     "app-store_text": "Install AirGap Vault directly from the App Store for this or a dedicated device.",
@@ -93,12 +90,10 @@
     "install-distro_text": "Install AirGap Vault Distribution on a dedicated computer for signing transactions air gapped.",
     "go_label": "Let's Go"
   },
-
   "portfolio": {
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
     "add-coins_label": "Add Coins"
   },
-
   "scan": {
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",
@@ -106,19 +101,16 @@
     "empty-state_heading": "In order to scan QR codes, AirGap Wallet needs the <span class=\"style__strong color__primary\">camera permission</span>.",
     "grant-permission_label": "Grant permission"
   },
-
   "scan-address": {
     "title": "Scan Account Address",
     "text": "Scan the QR code of an account address."
   },
-
   "scan-sync": {
     "title": "Sync Account Data",
     "text": "Open AirGap Vault, select an <span ion-text color='white'>account</span> and then <span ion-text color='white'>Sync</span>, scan the Sync QR code with AirGap Wallet.",
     "description": "No private keys or any non-public data will be shared during this process.",
     "scan_label": "Scan Sync QR Code"
   },
-
   "settings": {
     "title": "Settings",
     "help_label": "Help & Support",
@@ -153,14 +145,12 @@
       "about_label": "About Beacon"
     }
   },
-
   "select-wallet": {
     "title": "Select Account",
     "text": "You've scanned an address. Select one of the following accounts to send from.",
     "compatible_label": "These accounts appear to be compatible",
     "incompatible_label": "These accounts appear to be incompatible"
   },
-
   "web-extension-disclaimer": {
     "heading": "This is a <span class=\"style__strong color__primary\">ALPHA</span> version, only use with small amounts of funds.",
     "text": "The extesion has been currently tested with.",
@@ -171,18 +161,15 @@
     "description": "Other platforms or dapps might work, we would be really grateful for every input, issue report or feature request.",
     "accept_label": "I understand"
   },
-
   "about": {
     "title": "About"
   },
-
   "transaction-confirm": {
     "title": "Confirm Transaction",
     "decline_label": "Decline",
     "confirm_label": "Confirm",
     "qr-data-too-big_warning": "The QR code could not be created, the transaction's data is too big"
   },
-
   "transaction-detail": {
     "title": "Transaction Detail",
     "open-blockexplorer_label": "Open Blockexplorer",
@@ -198,7 +185,6 @@
       "heading": "Status: Successful!"
     }
   },
-
   "transaction-prepare": {
     "title": "Send {{title}}",
     "to-address_label": "To Address",
@@ -217,13 +203,11 @@
       "address_label": "Looks like a wrong address format, it should start with <strong>{{addressPlaceholder}}</strong>"
     }
   },
-
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
     "done_label": "Done"
   },
-
   "interaction-selection": {
     "title": "Vault Interaction",
     "heading": "How would you like to interact with <span class=\"style__strong color__primary\">AirGap Vault</span>?",
@@ -232,13 +216,11 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
     "done_label": "Done"
   },
-
   "account-import": {
     "title": "Confirm Import",
     "text": "Would you like to import the following account?",
@@ -247,24 +229,21 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-
   "from-to": {
     "type_label": "Type",
     "amount_label": "Amount",
     "fee_label": "Fee",
     "time_label": "Time",
     "data_label": "Data",
+    "status_label": "Status",
     "from_label": "From",
     "to_label": "To",
     "transaction-details_label": "Display extra transaction details"
   },
-
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
-
   "back-button": "Back",
-
   "wallet-edit-popover-component": {
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
@@ -273,25 +252,21 @@
     "delete_label": "Remove",
     "block_explorer": "Open Blockexplorer"
   },
-
   "account-edit-popover-component": {
     "header": "Confirm Account Removal",
     "message": "Do you want to remove this account? You can always sync it again from your vault.",
     "delete": "Remove",
     "cancel": "Cancel"
-  },  
-
+  },
   "tabs": {
     "wallets": "Accounts",
     "scan": "Scan QRs",
     "settings": "Settings",
     "exchange": "Exchange"
   },
-
   "add-account": {
     "title": "Add Coins"
   },
-
   "add-sub-account": {
     "title": "Add {{ typeLabel }}",
     "delegation_heading": "In order to <span class=\"style__strong color__primary\">delegate</span> your XTZ, you have to import or create a new account first before you can delegate.",
@@ -304,14 +279,12 @@
     "add-accounts_label": "Add {{ typeLabel }}",
     "no-imports_text": "No {{ typeLabel }} found to import."
   },
-
   "sub-account-select": {
     "title": "Select Account",
     "text": "Select the <strong>Account</strong> you want to delegate. You will need to sign a transaction to confirm the delegation.",
     "accounts_label": "Accounts"
   },
-
- "account-import-onboarding": {
+  "account-import-onboarding": {
     "title": "Add {{protocolName}}",
     "text": "You need the AirGap Vault application to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
     "sub-protocol_text": "<strong>{{subProtocol}}</strong> can not be added without a <strong>{{protocol}}</strong> account.",
@@ -338,14 +311,12 @@
     "next": "Next",
     "open_vault": "Open Vault"
   },
-
   "sub-account-import": {
     "title": "Select Accounts",
     "text": "Select the Account you want to add for <strong>{{subProtocolName}}</strong>.",
     "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
     "import-all_label": "Import All"
   },
-
   "deep-link": {
     "not-supported-alert": {
       "title": "Oops",
@@ -406,7 +377,7 @@
     "changelly_disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "changenow_disclaimer": "Exchange services provided by ChangeNow. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">ChangeNow AML/KYC</span>."
   },
-    "exchange-custom": {
+  "exchange-custom": {
     "title": "Select a Gatekeeper",
     "text": "Exchange to tzBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
     "confirm-exchange_label": "Confirm Exchange",
@@ -423,12 +394,12 @@
       "title": "Sygnum",
       "text": "Sygnum is the world’s first digital asset bank, and a digital asset specialist with global reach. Sygnum offers a portfolio of regulated banking services which seamlessly integrates traditional and digital assets into one account, including major national currencies, Bitcoin, Ethereum, a Digital CHF and asset tokens. Founded on Swiss and Singapore heritage, Sygnum empowers institutional clients to invest in the digital asset economy with complete trust."
     },
-     "taurus": {
-       "title": "Taurus",
+    "taurus": {
+      "title": "Taurus",
       "text": "Taurus Group SA is a leading Swiss company in digital assets and blockchain. It was founded by senior executives with a background in banking, IT, cybersecurity and regulation. Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
     },
-     "woorton": {
-       "title": "Woorton",
+    "woorton": {
+      "title": "Woorton",
       "text": "Woorton provides 24/7 cryptocurrency liquidity via API or voice trading. Their bank-grade trading infrastructure allows them to deploy capital on exchanges with proprietary trading algorithms and enhance the liquidity of all types of assets. They offer seamless access to digital assets and provide investors, brokerage desks and payments providers around the world. Woorton provides liquidity in tzBTC against 20 currencies including BTC, ETH, USD, EUR, CHF, GBP, stablecoins and more."
     },
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
@@ -448,7 +419,7 @@
     "your-rewards": "Your Rewards",
     "cycles": "{{cycles}} Cycles",
     "delegate": "Delegate",
-    "done": "Done", 
+    "done": "Done",
     "unknown": "Unknown"
   },
   "delegation-cosmos": {
@@ -457,10 +428,10 @@
     "status-inactive_label": "inactive",
     "your-rewards_label": "Your Rewards",
     "delegate_label": "Delegate",
-    "undelegate_label": "Undelegate",    
+    "undelegate_label": "Undelegate",
     "commission_label": "Commission",
     "voting-power_label": "Voting Power",
-    "withdraw_rewards_label": "Claim Rewards",    
+    "withdraw_rewards_label": "Claim Rewards",
     "your-account": {
       "label": "Your Account",
       "balance_label": "Current Balance",
@@ -480,7 +451,6 @@
       "text": "You currently have no rewards to claim",
       "claim-rewards_text": "You can claim up to <span class=\"style__strong color__primary\">{{delegationReward}}</span> in rewards for this delegation."
     }
-   
   },
   "introduction-push": {
     "title": "Push Notifications",
@@ -533,15 +503,13 @@
     "cancel_label": "No",
     "ok_label": "Yes!"
   },
-
   "action-alert-delegation": {
     "heading": "Thank you for using AirGap!",
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
     "ok_label": "Yes!"
-  },
-  
-  "beacon-request": {
+	},
+	"beacon-request": {
     "title": "Connection Request",
     "sign-data_label": "Do you want to sign the following data?",
     "request": {

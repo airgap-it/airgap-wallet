@@ -46,7 +46,7 @@
     </ion-row>
   </ion-col>
   <ion-col (click)="doRadio()" size="4" class="coin__selection ion-padding">
-    <ion-row><img [src]="'assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
+    <ion-row><img [src]="'./assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
     <ion-row>
       <h5>
         {{ selectedProtocol?.symbol | uppercase }}

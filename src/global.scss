@@ -177,3 +177,8 @@ page-scan {
     }
   }
 }
+
+.active-link {
+  font-weight: 500;
+  --color-selected: var(--ion-color-secondary);
+}

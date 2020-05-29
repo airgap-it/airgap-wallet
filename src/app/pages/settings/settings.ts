@@ -1,16 +1,17 @@
-import { Component } from '@angular/core'
+import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { SharePlugin } from '@capacitor/core'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../../services/serializer/serializer.service'
 import { IntroductionPage } from '../introduction/introduction'
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
-declare var window: any
-declare var cordova: any
+import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'page-settings',
@@ -25,7 +26,9 @@ export class SettingsPage {
     private readonly modalController: ModalController,
     private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider
+    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly browserService: BrowserService,
+    @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
 
   public about(): void {
@@ -42,24 +45,20 @@ export class SettingsPage {
 
   public share(): void {
     const options = {
-      message: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.',
-      // not supported on some apps (Facebook, Instagram)
-      subject: 'Checkout airgap.it', // fi. for email
-      url: 'https://www.airgap.it',
-      chooserTitle: 'Pick an app' // Android only, you can override the default share sheet title
+      title: 'Checkout airgap.it', // Set a title for any message. This will be the subject if sharing to email
+      text: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.', // Set some text to share
+      url: 'https://www.airgap.it', // Set a URL to share
+      dialogTitle: 'Pick an app' // Set a title for the share modal. Android only
     }
 
-    const onSuccess: (result: any) => void = (result: any): void => {
-      console.log(`Share completed: ${result.completed}`) // On Android apps mostly return false even while it's true
-      console.log(`Shared to app: ${result.app}`)
-      // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
-    }
-
-    const onError: (msg: string) => void = (msg: string): void => {
-      console.log('Sharing failed with message: ' + msg)
-    }
-
-    window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError)
+    this.sharePlugin
+      .share(options)
+      .then(result => {
+        console.log(`Share completed: ${result}`)
+      })
+      .catch(error => {
+        console.log('Sharing failed with error: ' + error)
+      })
   }
 
   public async introduction(): Promise<void> {
@@ -76,7 +75,7 @@ export class SettingsPage {
   }
 
   public feedback(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-wallet/issues')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-wallet/issues')
   }
 
   public async telegram(): Promise<void> {
@@ -109,11 +108,11 @@ export class SettingsPage {
           handler: (data: string): void => {
             switch (data) {
               case 'Chinese':
-                this.openUrl('https://t.me/AirGap_cn')
+                this.browserService.openUrl('https://t.me/AirGap_cn')
                 break
               case 'International':
               default:
-                this.openUrl('https://t.me/AirGap')
+                this.browserService.openUrl('https://t.me/AirGap')
             }
           }
         }
@@ -124,7 +123,7 @@ export class SettingsPage {
   }
 
   public translate(): void {
-    this.openUrl('https://translate.sook.ch/')
+    this.browserService.openUrl('https://translate.sook.ch/')
   }
 
   /*
@@ -135,31 +134,23 @@ export class SettingsPage {
   */
 
   public githubDistro(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-distro')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-distro')
   }
 
   public githubWebSigner(): void {
-    this.openUrl('https://github.com/airgap-it/airgap-web-signer')
+    this.browserService.openUrl('https://github.com/airgap-it/airgap-web-signer')
   }
 
   public githubWallet(): void {
-    this.openUrl('https://github.com/airgap-it')
+    this.browserService.openUrl('https://github.com/airgap-it')
   }
 
   public faq(): void {
-    this.openUrl('https://airgap.it/#faq')
+    this.browserService.openUrl('https://airgap.it/#faq')
   }
 
   public aboutBeacon(): void {
-    this.openUrl('https://walletbeacon.io')
-  }
-
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+    this.browserService.openUrl('https://walletbeacon.io')
   }
 
   public pasteClipboard(): void {

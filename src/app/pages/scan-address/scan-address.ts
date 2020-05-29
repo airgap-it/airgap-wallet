@@ -32,7 +32,6 @@ export class ScanAddressPage extends ScanBasePage {
       const info = this.route.snapshot.data.special
       this.callback = info.callback
     }
-    this.isBrowser = !this.platform.is('cordova')
   }
 
   public checkScan(resultString: string): void {
@@ -45,7 +44,7 @@ export class ScanAddressPage extends ScanBasePage {
     if (!this.callbackCalled) {
       console.log('scan callback', text)
       this.callbackCalled = true
-      if (this.platform.is('cordova')) {
+      if (this.platform.is('hybrid')) {
         this.scanner.stopScan()
       } else {
         this.zxingScanner.resetCodeReader()

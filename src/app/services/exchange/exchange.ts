@@ -30,6 +30,7 @@ export interface ExchangeTransaction {
   toCurrency: string
   amountExpectedFrom: BigNumber
   amountExpectedTo: string
+  fee: string
   status: string
   exchange: ExchangeEnum
   id: string
@@ -147,7 +148,7 @@ export class ExchangeProvider implements Exchange {
         to: [tx.receivingAddress],
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
-        fee: new BigNumber(protocol.feeDefaults.medium).times(10 ** protocol.decimals).toString(),
+        fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
         extra: tx.status
