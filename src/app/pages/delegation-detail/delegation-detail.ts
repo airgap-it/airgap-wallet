@@ -21,6 +21,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { isObjectOf } from 'src/app/utils/utils'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -102,10 +103,6 @@ export class DelegationDetailPage {
       event,
       translucent: true
     })
-
-    function isObjectOf<T>(value: unknown, ...fields: string[]): value is T {
-      return value instanceof Object && fields.every(field => field in value)
-    }
 
     popover
       .onDidDismiss()

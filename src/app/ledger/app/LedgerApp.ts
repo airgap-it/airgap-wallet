@@ -13,7 +13,6 @@ export abstract class LedgerApp {
 
   public constructor(protected readonly transport: LedgerTransport) {}
 
-  public abstract async isAvailable(): Promise<boolean>
   public abstract async importWallet(): Promise<AirGapMarketWallet>
   public abstract async signTranscation(transaction: any): Promise<IAirGapSignedTransaction>
 

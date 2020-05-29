@@ -8,6 +8,7 @@ import {
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateSignature'
 import { SubstrateTransactionPayload } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
 import { Buffer } from 'buffer'
+import { ReturnCode } from '../../ReturnCode'
 
 enum Instruction {
   /*
@@ -41,17 +42,6 @@ enum Instruction {
   SIGN = 0x02
 }
 
-enum ReturnCode {
-  EXECUTION_ERROR = 0x6400,
-  EMPTY_BUFFER = 0x6982,
-  OUTPUT_TOO_SMALL = 0x6983,
-  NOT_ALLOWED = 0x6986,
-  INSTRUCTION_NOT_SUPPORTED = 0x6d00,
-  APP_NOT_SUPPORTED = 0x6e00,
-  UNKNOWN = 0x6f00,
-  SUCCESS = 0x9000
-}
-
 enum RequiresConfirmation {
   NO = 0,
   YES = 1
@@ -69,27 +59,6 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
   public appIdentifier: number = 0x99
 
   protected abstract protocol: SubstrateProtocol
-
-  public async isAvailable(): Promise<boolean> {
-    try {
-      /*
-       * Reponse:
-       * 1 byte  - test mode
-       * 2 bytes - version major
-       * 2 bytes - version minor
-       * 2 bytes - version patch
-       * 1 byte  - device is locked
-       * 2 bytes - return code
-       */
-      const response = await this.transport.send(this.appIdentifier, Instruction.GET_VERSION, 0, 0)
-
-      return response.readUInt16BE(response.length - 2) === ReturnCode.SUCCESS
-    } catch (error) {
-      console.warn(error)
-
-      return false
-    }
-  }
 
   public async importWallet(): Promise<AirGapMarketWallet> {
     const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
@@ -113,8 +82,6 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
       return new AirGapMarketWallet(this.protocol.identifier, publicKey, false, this.protocol.standardDerivationPath)
     } catch (error) {
-      console.warn(error)
-
       return Promise.reject(error)
     }
   }
@@ -152,7 +119,6 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
       return SubstrateTransaction.fromTransaction(transaction, { signature })
     } catch (error) {
-      console.warn(error)
       return Promise.reject(error)
     }
   }

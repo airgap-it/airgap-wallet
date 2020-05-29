@@ -8,6 +8,8 @@ import { LedgerTransportElectron } from 'src/app/ledger/transport/LedgerTranspor
 import { LedgerApp } from 'src/app/ledger/app/LedgerApp'
 import { KusamaLedgerApp } from 'src/app/ledger/app/substrate/KusamaLedgerApp'
 import { PolkadotLedgerApp } from 'src/app/ledger/app/substrate/PolkadotLedgerApp'
+import { isObjectOf } from 'src/app/utils/utils'
+import { ReturnCode } from 'src/app/ledger/ReturnCode'
 
 @Injectable({
   providedIn: 'root'
@@ -57,17 +59,14 @@ export class LedgerService {
 
   private async withApp<T>(identifier: string, ledgerConnection: LedgerConnection, action: (app: LedgerApp) => Promise<T>): Promise<T> {
     const appKey = this.getAppKey(identifier, ledgerConnection)
+
     let app = this.runningApps.get(appKey)
     if (!app) {
       app = await this.openLedgerApp(identifier, ledgerConnection)
+      this.runningApps.set(appKey, app)
     }
 
-    const isAvailable = await app.isAvailable()
-    if (isAvailable) {
-      return action(app)
-    } else {
-      return Promise.reject(`Couldn't find app for ${identifier} protocol.`)
-    }
+    return action(app).catch((error: unknown) => Promise.reject(this.getError(error)))
   }
 
   private async openLedgerTransport(ledgerConnection: LedgerConnection): Promise<LedgerTransport> {
@@ -118,5 +117,18 @@ export class LedgerService {
 
   private getAppKey(identifier: string, ledgerConnection: LedgerConnection): string {
     return `${identifier}_${this.getTransportKey(ledgerConnection)}`
+  }
+
+  private getError(error: unknown): string | unknown {
+    if (isObjectOf<{ statusCode: number }>(error, 'statusCode')) {
+      switch (error.statusCode) {
+        case ReturnCode.CLA_NOT_SUPPORTED:
+          return "Could not detect the app. Make sure it's open."
+      }
+    } else if (isObjectOf<{ message: string }>(error, 'message')) {
+      return error.message
+    }
+
+    return error
   }
 }

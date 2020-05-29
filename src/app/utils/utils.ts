@@ -87,3 +87,7 @@ export function parseIACUrl(url: string | string[], parameter: string): string[]
 export function serializedDataToUrlString(data: string | string[], host: string = 'airgap-vault://', parameter: string = 'd'): string {
   return `${host}?${parameter}=${Array.isArray(data) ? data.join(',') : data}`
 }
+
+export function isObjectOf<T>(value: unknown, ...fields: string[]): value is T {
+  return value instanceof Object && fields.every(field => field in value)
+}
