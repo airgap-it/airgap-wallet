@@ -102,16 +102,16 @@ export class BeaconService {
     await this.client.respond(message)
   }
 
-  public async addPeer(publicKey: string, relayServer: string, name: string): Promise<void> {
-    this.client.addPeer({ publicKey, relayServer, name } as any)
+  public async addPeer(peer: P2PPairInfo): Promise<void> {
+    await this.client.addPeer(peer)
   }
 
   public async getPeers(): Promise<P2PPairInfo[]> {
-    return this.client.getPeers() as any
+    return this.client.getPeers()
   }
 
   public async removePeer(peer: P2PPairInfo): Promise<void> {
-    await this.client.removePeer(peer as any)
+    await this.client.removePeer(peer)
   }
 
   public async removeAllPeers(): Promise<void> {

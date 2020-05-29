@@ -20,9 +20,8 @@ export class SettingsBeaconPage implements OnInit {
     this.connectedPeers = await this.beaconService.getPeers()
   }
 
-  public async removePeer(peerId: P2PPairInfo): Promise<void> {
-    console.log('peer', peerId)
-    await this.beaconService.removePeer(peerId)
+  public async removePeer(peer: P2PPairInfo): Promise<void> {
+    await this.beaconService.removePeer(peer)
     await this.loadPeers()
   }
 
