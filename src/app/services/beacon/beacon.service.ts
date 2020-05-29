@@ -9,7 +9,7 @@ import {
   WalletClient
 } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { LoadingController, ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -21,7 +21,7 @@ export class BeaconService {
   public client: WalletClient | undefined
   private requests: [string, any][] = []
 
-  constructor(private readonly modalController: ModalController) {
+  constructor(private readonly modalController: ModalController, private readonly loadingController: LoadingController) {
     this.init()
   }
 
@@ -103,7 +103,13 @@ export class BeaconService {
   }
 
   public async addPeer(peer: P2PPairInfo): Promise<void> {
+    const loading: HTMLIonLoadingElement = await this.loadingController.create({
+      message: 'Connecting to Beacon Network...',
+      duration: 3000
+    })
+    await loading.present()
     await this.client.addPeer(peer)
+    await loading.dismiss()
   }
 
   public async getPeers(): Promise<P2PPairInfo[]> {
