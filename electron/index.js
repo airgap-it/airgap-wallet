@@ -1,7 +1,8 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, ipcMain } = require('electron')
 const isDevMode = require('electron-is-dev')
 const { CapacitorSplashScreen, configCapacitor } = require('@capacitor/electron')
 
+const childProcess = require('child_process')
 const path = require('path')
 
 // Place holders for our windows so they don't get garbage collected.
@@ -88,7 +89,7 @@ app.on('activate', function() {
 })
 
 // Define any IPC or other custom functionality below here
-const processPaths = new Map([['ledger', join(__dirname, 'ledger-transport.js')]])
+const processPaths = new Map([['ledger', path.join(__dirname, 'ledger-transport.js')]])
 
 const childProcesses = new Map()
 const callbacks = new Map()
@@ -126,7 +127,7 @@ function spawnProcess(name) {
   const path = processPaths.get(name)
 
   if (path) {
-    const child = fork(path, params, options)
+    const child = childProcess.fork(path, params, options)
     child.on('message', message => {
       const callback = callbacks.get(message.requestId)
 
