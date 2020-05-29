@@ -13,8 +13,6 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
-declare var window: any
-
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html'
@@ -35,6 +33,14 @@ export class SettingsPage {
 
   public about(): void {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public beaconPermissions(): void {
+    this.router.navigateByUrl('/beacon-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public beaconSettings(): void {
+    this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public share(): void {
@@ -141,6 +147,10 @@ export class SettingsPage {
 
   public faq(): void {
     this.browserService.openUrl('https://airgap.it/#faq')
+  }
+
+  public aboutBeacon(): void {
+    this.browserService.openUrl('https://walletbeacon.io')
   }
 
   public pasteClipboard(): void {

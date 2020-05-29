@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'beacon-permission-list.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>{{ 'beacon-permission-list.connected-dapps' | translate }}</ion-label>
+      </ion-list-header>
+      <div *ngIf="permissions.length === 0" class="empty-list ion-padding-horizontal">
+        <img class="ion-padding-vertical" src="../../assets/img/empty-state-no-transaction.svg" />
+        <p>
+          {{ 'beacon-permission-list.no-permissions' | translate }}
+        </p>
+      </div>
+      <ion-item lines="none" *ngFor="let permission of permissions">
+        <ion-label>
+          <h3>
+            <strong>{{ permission.appMetadata.name }}</strong>
+            <small>{{ permission.website }}</small>
+          </h3>
+          <div class="d-flex ion-align-items-center">
+            <identicon [address]="permission.address"></identicon>
+            <p class="ion-no-margin">{{ permission.address }}</p>
+          </div>
+          <ion-badge color="light">
+            {{ permission.scopes }}
+          </ion-badge>
+        </ion-label>
+        <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission)">
+          {{ 'beacon-permission-list.remove_label' | translate }}
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  </ion-grid>
+</ion-content>
