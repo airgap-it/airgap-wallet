@@ -11,7 +11,7 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
-import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
@@ -110,10 +110,10 @@ export class ActionGroup {
   }
 
   private getTezosKTActions(): Action<any, any>[] {
-    const migrateAction = new ButtonAction<void, AirGapTezosMigrateActionContext>(
-      { name: 'account-transaction-list.migrate_label', icon: 'return-down-back-outline', identifier: 'migrate-action' },
+    const migrateAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
       () => {
-        return new AirGapTezosMigrateAction({
+        const action = new AirGapTezosMigrateAction({
           wallet: this.callerContext.wallet,
           mainWallet: this.callerContext.mainWallet,
           alertCtrl: this.callerContext.alertCtrl,
@@ -121,6 +121,8 @@ export class ActionGroup {
           dataService: this.callerContext.dataService,
           router: this.callerContext.router
         })
+
+        return action
       }
     )
     return [migrateAction]
