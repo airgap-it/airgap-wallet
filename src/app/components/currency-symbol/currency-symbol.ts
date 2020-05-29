@@ -8,7 +8,7 @@ export class CurrencySymbolComponent {
   @Input()
   private readonly symbol: string
 
-  public symbolURL: string = 'assets/symbols/generic-coin.svg'
+  public symbolURL: string = './assets/symbols/generic-coin.svg'
 
   constructor() {
     /* */
@@ -23,7 +23,7 @@ export class CurrencySymbolComponent {
   }
 
   public loadImage() {
-    const imageUrl = 'assets/symbols/' + this.symbol.toLowerCase() + '.svg'
+    const imageUrl = './assets/symbols/' + this.symbol.toLowerCase() + '.svg'
     const img = new Image()
     img.onload = () => {
       this.symbolURL = imageUrl

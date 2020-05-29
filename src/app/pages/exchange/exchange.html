@@ -15,7 +15,7 @@
       <ion-row class="onboarding__container ion-padding">
         <ion-col size="12">
           <h3 class="ion-no-margin" [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
-          <ion-col class="content--align__center-center ion-no-padding"><img src="assets/img/token_swap.svg" /></ion-col>
+          <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
           <p class="ion-no-margin ion-padding-bottom">
             {{ 'exchange.onboarding.description' | translate }}
           </p>
@@ -30,7 +30,7 @@
       <ion-row class="onboarding__container ion-padding">
         <ion-col size="12">
           <h3 class="ion-no-margin" [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
-          <ion-col class="content--align__center-center ion-no-padding"><img src="assets/img/token_swap.svg" /></ion-col>
+          <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
           <p class="ion-no-margin ion-padding-bottom">
             {{ 'exchange.no-currencies.description' | translate }}
           </p>
@@ -72,12 +72,12 @@
                 {{ 'exchange.powered-by_label' | translate }}
               </small>
             </ion-text>
-            <img *ngIf="activeExchange === 'ChangeNow'" src="assets/img/changenow_logo.svg" />
-            <img *ngIf="activeExchange === 'Changelly'" src="assets/img/changelly_logo.svg" />
+            <img *ngIf="activeExchange === 'ChangeNow'" src="./assets/img/changenow_logo.svg" />
+            <img *ngIf="activeExchange === 'Changelly'" src="./assets/img/changelly_logo.svg" />
           </ion-row>
         </ion-col>
         <ion-col class="ion-no-padding justify--content__end">
-          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()">
+          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()" [disabled]="disableExchangeSelection">
             {{ 'exchange.switch-exchange_label' | translate }}
             <ion-icon name="chevron-down-outline"></ion-icon>
           </ion-button>

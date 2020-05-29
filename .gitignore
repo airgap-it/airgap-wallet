@@ -15,6 +15,7 @@ log.txt
 npm-debug.log*
 
 .idea/
+.gradle/
 .sourcemaps/
 .sass-cache/
 .tmp/
@@ -45,3 +46,5 @@ src/assets/libs/airgap-coin-lib.browserify.js
 
 screenshots/
 reports/
+
+electron/build/

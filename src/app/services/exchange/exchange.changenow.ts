@@ -75,7 +75,9 @@ class ChangeNowApi {
 
   constructor(public http: HttpClient, protected baseURL = 'https://changenow.io/api/v1') {
     this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
+    this.identifierExchangeToAirGapMap.set('atom', 'cosmos')
     this.identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
+    this.identifierAirGapToExchangeMap.set('cosmos', 'atom')
   }
 
   convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
@@ -99,6 +101,7 @@ class ChangeNowApi {
       .get(`${this.baseURL}/currencies?active=true`)
       .toPromise()) as CurrencyDetailResponse[]
     const fromCurrencies = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
   }
 

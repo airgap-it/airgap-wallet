@@ -6,6 +6,8 @@ import { ExchangeTransaction } from '../exchange/exchange'
 export enum SettingsKey {
   INTRODUCTION = 'introduction',
   WALLET_INTRODUCTION = 'walletIntroduction',
+  CAMERA_PERMISSION_ASKED = 'cameraPermissionAsked',
+  DEEP_LINK = 'deepLink',
   WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
   PUSH_INTRODUCTION = 'pushIntroduction',
   EXCHANGE_INTEGRATION = 'exchangeIntroduction',
@@ -37,6 +39,8 @@ interface IBroadcastTransaction {
 interface SettingsKeyReturnType {
   [SettingsKey.INTRODUCTION]: boolean
   [SettingsKey.WALLET_INTRODUCTION]: boolean
+  [SettingsKey.CAMERA_PERMISSION_ASKED]: boolean
+  [SettingsKey.DEEP_LINK]: boolean
   [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean
   [SettingsKey.PUSH_INTRODUCTION]: boolean
   [SettingsKey.EXCHANGE_INTEGRATION]: boolean
@@ -55,6 +59,8 @@ type SettingsKeyReturnDefaults = { [key in SettingsKey]: SettingsKeyReturnType[k
 const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.INTRODUCTION]: false,
   [SettingsKey.WALLET_INTRODUCTION]: false,
+  [SettingsKey.CAMERA_PERMISSION_ASKED]: false,
+  [SettingsKey.DEEP_LINK]: false,
   [SettingsKey.WEB_EXTENSION_DISCLAIMER]: false,
   [SettingsKey.PUSH_INTRODUCTION]: false,
   [SettingsKey.EXCHANGE_INTEGRATION]: false,

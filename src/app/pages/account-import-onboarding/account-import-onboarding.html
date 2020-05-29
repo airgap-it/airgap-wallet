@@ -32,14 +32,14 @@
         <div class="slide-zoom">
           <ion-row class="ion-align-items-center on-padding-bottom ion-margin-bottom sub-protocol__container">
             <ion-col size="5">
-              <img src="assets/symbols/{{protocol.symbol.toLowerCase()}}.svg" />
+              <img src="./assets/symbols/{{protocol.symbol.toLowerCase()}}.svg" />
               <h5>{{protocol.name}}</h5>
             </ion-col>
             <ion-col size="2" class="ion-justify-content-center">
               <ion-icon name="link-outline" color="dark" size="large"></ion-icon>
             </ion-col>
             <ion-col size="5">
-              <img src="assets/symbols/{{subProtocol.symbol.toLowerCase()}}.svg" />
+              <img src="./assets/symbols/{{subProtocol.symbol.toLowerCase()}}.svg" />
               <h5>{{subProtocol.name}}</h5>
             </ion-col>
           </ion-row>
@@ -59,7 +59,7 @@
       </ion-slide>
       <ion-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
-          <img [src]="'/assets/img/' + slide1" />
+          <img [src]="'./assets/img/' + slide1" />
           <ion-text>
             <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.text' | translate"></p>
           </ion-text>
@@ -70,20 +70,20 @@
       </ion-slide>
       <ion-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
-          <img [src]="'/assets/img/' + slide2" />
+          <img [src]="'./assets/img/' + slide2" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
         </div>
       </ion-slide>
       <ion-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
-          <img [src]="'/assets/img/' + slide3" />
+          <img [src]="'./assets/img/' + slide3" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
         </div>
       </ion-slide>
       <ion-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
-          <img [src]="'/assets/img/' + slide4" />
+          <img [src]="'./assets/img/' + slide4" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
           <p
             class="ion-text-left"

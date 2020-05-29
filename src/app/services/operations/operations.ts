@@ -13,7 +13,6 @@ import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
@@ -21,9 +20,8 @@ import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/de
 import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
-  AirGapMainDelegatorAction,
-  AirGapExtraDelegatorAction,
-  AirGapDelegationDetails
+  AirGapDelegationDetails,
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
@@ -31,6 +29,7 @@ import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +38,6 @@ export class OperationsProvider {
   private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
   constructor(
-    private readonly accountProvider: AccountProvider,
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
     private readonly serializerService: SerializerService,
@@ -97,6 +95,15 @@ export class OperationsProvider {
     return current
   }
 
+  public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<DelegatorDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    return protocol.getDelegatorDetailsFromAddress(wallet.receivingPublicAddress)
+  }
+
   public async getDelegationDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapDelegationDetails[]> {
     const protocol = wallet.coinProtocol
     if (!supportsDelegation(protocol)) {
@@ -142,18 +149,15 @@ export class OperationsProvider {
     return {
       ...delegatorDetails,
       delegatees: delegatorDetails.delegatees,
-      delegateAction: this.createDefaultMainDelegatorAction(
-        delegatorDetails.availableActions,
-        delegatees,
-        defaultDelegateActionTypeKeywords,
-        defaultMainParamNameKeywords
-      ),
-      undelegateAction: this.createDefaultMainDelegatorAction(
-        delegatorDetails.availableActions,
-        delegatees,
-        defaultUndelegateActionTypeKeywords,
-        defaultMainParamNameKeywords
-      ),
+      mainActions: delegatorDetails.availableActions
+        ? this.createDefaultMainDelegatorActions(
+            delegatorDetails.availableActions,
+            delegatees,
+            defaultDelegateActionTypeKeywords,
+            defaultUndelegateActionTypeKeywords,
+            defaultMainParamNameKeywords
+          )
+        : [],
       displayRewards: delegatorDetails.rewards
         ? new UIRewardList({
             rewards: delegatorDetails.rewards.slice(0, 5),
@@ -161,20 +165,31 @@ export class OperationsProvider {
             amountColLabel: 'Reward',
             payoutColLabel: 'Payout'
           })
-        : undefined,
-      extraActions: this.createDefaultExtraDelegatorActions(delegatorDetails.availableActions, [
-        ...defaultDelegateActionTypeKeywords,
-        ...defaultUndelegateActionTypeKeywords
-      ])
+        : undefined
     }
   }
 
-  private createDefaultMainDelegatorAction(
+  private createDefaultMainDelegatorActions(
+    availableActions: DelegatorAction[],
+    delegatees: string[],
+    delegateActionTypeKeywords: string[],
+    undelegateActionTypeKeywords: string[],
+    delegateeArgKeywords: string[]
+  ): AirGapDelegatorAction[] | undefined {
+    return [
+      this.createDefaultDelegateAction(availableActions, delegatees, delegateActionTypeKeywords, delegateeArgKeywords, 'Delegate'),
+      this.createDefaultDelegateAction(availableActions, delegatees, undelegateActionTypeKeywords, delegateeArgKeywords, 'Undelegate'),
+      ...this.createDefaultExtraActions(availableActions, [...delegateActionTypeKeywords, ...undelegateActionTypeKeywords])
+    ].filter(action => !!action)
+  }
+
+  private createDefaultDelegateAction(
     availableActions: DelegatorAction[],
     delegatees: string[],
     typeKeywords: any[],
-    argsKeywords: string[] = []
-  ): AirGapMainDelegatorAction {
+    argsKeywords: string[] = [],
+    label: string
+  ): AirGapDelegatorAction | null {
     const action = availableActions.find(action => typeKeywords.includes(action.type))
     if (action) {
       const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
@@ -184,7 +199,7 @@ export class OperationsProvider {
 
       return {
         type: action.type,
-        isAvailable: true,
+        label,
         form: form,
         args: args
           ? args.map(
@@ -198,34 +213,26 @@ export class OperationsProvider {
       }
     }
 
-    return {
-      type: null,
-      isAvailable: false
-    }
+    return null
   }
 
-  private createDefaultExtraDelegatorActions(
-    availableActions: DelegatorAction[] | undefined,
-    ignoreTypeKeywords: any[]
-  ): AirGapExtraDelegatorAction[] | undefined {
-    const extraActions = availableActions ? availableActions.filter(action => !ignoreTypeKeywords.includes(action.type)) : []
+  private createDefaultExtraActions(availableActions: DelegatorAction[], ignoreTypeKeywords: string[]): AirGapDelegatorAction[] {
+    const extraActions = availableActions.filter(action => !ignoreTypeKeywords.includes(action.type))
 
-    return extraActions.length > 0
-      ? extraActions.map(action => ({
-          type: action.type,
-          label: action.type.toString(),
-          confirmLabel: action.type.toString(),
-          args: action.args
-            ? action.args.map(
-                arg =>
-                  new UIInputText({
-                    id: arg,
-                    label: arg
-                  })
-              )
-            : undefined
-        }))
-      : undefined
+    return extraActions.map(action => ({
+      type: action.type,
+      label: action.type.toString(),
+      confirmLabel: action.type.toString(),
+      args: action.args
+        ? action.args.map(
+            arg =>
+              new UIInputText({
+                id: arg,
+                label: arg
+              })
+          )
+        : undefined
+    }))
   }
 
   public async prepareDelegatorAction(
@@ -359,25 +366,18 @@ export class OperationsProvider {
     }
   }
 
-  public async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, ProtocolSymbols.XTZ_KT, index)
+  public async estimateMaxTransferAmount(wallet: AirGapMarketWallet, destination: string, fee?: BigNumber): Promise<BigNumber> {
+    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined)
+    return new BigNumber(maxAmount)
+  }
 
-    if (wallet) {
-      return wallet
+  public async estimateFees(wallet: AirGapMarketWallet, address: string, amount: BigNumber, data?: any): Promise<FeeDefaults> {
+    try {
+      return await wallet.estimateFees([address], [amount.toFixed()], data)
+    } catch (error) {
+      console.error(error)
+      return wallet.coinProtocol.feeDefaults
     }
-
-    wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
-      xtzWallet.publicKey,
-      xtzWallet.isExtendedPublicKey,
-      xtzWallet.derivationPath,
-      index
-    )
-    wallet.addresses = ktAddresses
-    await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-
-    return wallet
   }
 
   private async getAndShowLoader() {
