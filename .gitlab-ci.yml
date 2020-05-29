@@ -45,8 +45,8 @@ build_android:
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
-    - docker build -f build/android/Dockerfile -t $GOOGLE_TAG_ANDROID_CURRENT --build-arg SENTRY_DSN=$SENTRY_DSN --build-arg BUILD_NR="$CI_PIPELINE_ID" --build-arg VERSION="$VERSION" .
+    - sed -i -e "s/versionName \"0.0.0\"/versionName \"$VERSION\"/g" android/app/build.gradle
+    - docker build -f build/android/Dockerfile -t $GOOGLE_TAG_ANDROID_CURRENT --build-arg BUILD_NR="$CI_PIPELINE_ID" --build-arg VERSION="$VERSION" .
     - docker run --name $CI_PIPELINE_ID $GOOGLE_TAG_ANDROID_CURRENT echo "container ran."
     - docker cp $CI_PIPELINE_ID:/app/android-release-unsigned.apk airgap-wallet-release-unsigned-$CI_PIPELINE_ID.apk
     - docker cp $CI_PIPELINE_ID:/app/android-debug.apk airgap-wallet-debug-$CI_PIPELINE_ID.apk
@@ -65,23 +65,19 @@ build_ios:
     - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
-    - sed -i -e "s/ios-CFBundleVersion=\"0.0.0\"/ios-CFBundleVersion=\"1.0.$CI_PIPELINE_ID\"/g" config.xml
-    - sed -i -e "s/version=\"0.0.0\"/version=\"$VERSION\"/g" config.xml
     - nvm use v10.13.0
     - npm install
     - npm run disable-pure-getters
     - npm run configure-mangle
-    - ionic cordova platform add ios
-    - pushd platforms/ios/ && pod install && popd # Push plugin pod dependencies don't get installed sometimes
-    - ionic cordova build ios --prod --release
-    - find ./resources/ -name "*.png" -exec convert "{}" -alpha off "{}" \;
-    - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -destination generic/platform=iOS build -allowProvisioningUpdates
-    - xcodebuild -workspace platforms/ios/AirGap\ Wallet.xcworkspace -scheme "AirGap Wallet" -sdk iphoneos -configuration AppStoreDistribution archive -archivePath platforms/ios/AirGap\ Wallet.xcarchive
-    - xcodebuild -exportArchive -archivePath platforms/ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath platforms/ios/ -allowProvisioningUpdates
-    - xcrun altool --upload-app -f platforms/ios/AirGap\ Wallet.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
+    - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
+    - ionic build --prod
+    - npx cap sync ios
+    - xcodebuild -workspace ios/App/App.xcworkspace -scheme "App" -destination generic/platform=iOS -configuration Release archive -archivePath ios/AirGap\ Wallet.xcarchive MARKETING_VERSION=$VERSION CURRENT_PROJECT_VERSION=1.0.$CI_PIPELINE_ID -allowProvisioningUpdates
+    - xcodebuild -exportArchive -archivePath ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ios/ -allowProvisioningUpdates
+    - xcrun altool --upload-app -f ios/App.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   artifacts:
     paths:
-      - platforms/ios/AirGap\ Wallet.ipa
+      - ios/AirGap\ Wallet.ipa
   tags:
     - ios
 
@@ -89,9 +85,12 @@ build_mac:
   stage: native_build
   when: manual
   script:
-    - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" package.json'
+    - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
     - npm install
-    - npm run electron:build:mac
+    - npm --prefix electron/ install
+    - npm run build:electron
+    - npx cap sync electron
+    - npm --prefix electron/ run build:mac
   artifacts:
     name: 'electron_macos'
     paths:

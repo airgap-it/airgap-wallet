@@ -7,11 +7,12 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
+import { ExchangeProvider, ExchangeTransaction, ExchangeEnum } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { TranslateService } from '@ngx-translate/core'
+import { OperationsProvider } from 'src/app/services/operations/operations'
 
 enum ExchangePageState {
   LOADING,
@@ -61,7 +62,8 @@ export class ExchangePage {
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService,
     private readonly modalController: ModalController,
-    private readonly alertCtrl: AlertController
+    private readonly alertCtrl: AlertController,
+    private readonly operationsProvider: OperationsProvider
   ) {
     this.exchangeProvider.getActiveExchange().subscribe(exchange => {
       this.activeExchange = exchange
@@ -166,6 +168,9 @@ export class ExchangePage {
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
     const exchangeableFromProtocols = (await Promise.all(
       supportedFromProtocols.map(async fromProtocol => {
+        if (fromProtocol === ProtocolSymbols.TZBTC) {
+          return fromProtocol
+        }
         const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
         return availableToCurrencies.length > 0 ? fromProtocol : undefined
       })
@@ -317,6 +322,14 @@ export class ExchangePage {
         )
 
         const amountExpectedTo = await this.getExchangeAmount()
+
+        const amount = result.amountExpectedFrom ? new BigNumber(result.amountExpectedFrom) : this.amount
+        const feeEstimation = await this.operationsProvider.estimateFees(
+          this.fromWallet,
+          result.payinAddress,
+          amount.shiftedBy(this.fromWallet.coinProtocol.decimals)
+        )
+
         const info = {
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocolIdentifier,
@@ -324,7 +337,8 @@ export class ExchangePage {
           toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocolIdentifier])[0],
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
-          amountExpectedTo: amountExpectedTo
+          amountExpectedTo: amountExpectedTo,
+          fee: feeEstimation.medium
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
@@ -333,18 +347,19 @@ export class ExchangePage {
         const txId = result.id
         let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
 
-        const exchangeTxInfo = {
+        const exchangeTxInfo: ExchangeTransaction = {
           receivingAddress: this.toWallet.addresses[0],
           sendingAddress: this.fromWallet.addresses[0],
           fromCurrency: this.fromWallet.protocolIdentifier,
           toCurrency: this.toWallet.protocolIdentifier,
           amountExpectedFrom: this.amount,
           amountExpectedTo: amountExpectedTo.toString(),
+          fee: feeEstimation.medium,
           status: txStatus,
-          exchange: this.activeExchange,
+          exchange: this.activeExchange as ExchangeEnum,
           id: txId,
           timestamp: new BigNumber(Date.now()).toNumber()
-        } as ExchangeTransaction
+        }
 
         this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
       } catch (error) {

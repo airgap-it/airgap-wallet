@@ -1,7 +1,6 @@
 // tslint:disable:max-classes-per-file
 
-const newSpy: (name: string, returnValue: any) => jasmine.Spy = (name: string, returnValue: any): jasmine.Spy =>
-  jasmine.createSpy(name).and.returnValue(returnValue)
+import { newSpy } from './unit-test-helper'
 
 export type Spied<T> = { [Method in keyof T]: jasmine.Spy }
 
@@ -88,13 +87,6 @@ export class NavParamsMock {
   }
 }
 
-export class AppVersionMock {
-  public getAppName: jasmine.Spy = newSpy('getAppName', Promise.resolve('AirGap.UnitTest'))
-  public getPackageName: jasmine.Spy = newSpy('getPackageName', Promise.resolve('AirGap'))
-  public getVersionNumber: jasmine.Spy = newSpy('getVersionNumber', Promise.resolve('0.0.0'))
-  public getVersionCode: jasmine.Spy = newSpy('getVersionCode', Promise.resolve('0'))
-}
-
 export class PlatformMock {
   public ready: jasmine.Spy = newSpy('ready', Promise.resolve())
 
@@ -156,15 +148,19 @@ export class PlatformMock {
 
 export class NavControllerMock {
   public pop(): any {
-    return new Promise((resolve: Function): void => {
-      resolve()
-    })
+    return new Promise(
+      (resolve: Function): void => {
+        resolve()
+      }
+    )
   }
 
   public push(_ctrl: any, _args: any): any {
-    return new Promise((resolve: Function): void => {
-      resolve()
-    })
+    return new Promise(
+      (resolve: Function): void => {
+        resolve()
+      }
+    )
   }
 
   public getActive(): any {
@@ -182,15 +178,6 @@ export class NavControllerMock {
   public registerChildNav(_nav: any): void {
     return
   }
-}
-
-export class StatusBarMock {
-  public styleDefault: jasmine.Spy = newSpy('styleDefault', Promise.resolve())
-  public backgroundColorByHexString: jasmine.Spy = newSpy('backgroundColorByHexString', Promise.resolve())
-}
-
-export class SplashScreenMock {
-  public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }
 
 export class DeeplinkMock {

@@ -17,6 +17,8 @@ import * as moment from 'moment'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormBuilder, FormGroup } from '@angular/forms'
+import { switchMap, map } from 'rxjs/operators'
+import { from } from 'rxjs'
 
 const hoursPerCycle: number = 68
 
@@ -195,6 +197,48 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return details
   }
 
+  private async getRewardAmountsByCycle(accountAddress: string, bakerAddress: string): Promise<Map<number, string>> {
+    const protocol = new TezosProtocol()
+    const calculatedRewardsMap = new Map<number, string>()
+
+    const currentCycle = await protocol.fetchCurrentCycle()
+    const cycles = [...Array(6).keys()].map(num => currentCycle - num)
+
+    const rewardsByCycle = await Promise.all(
+      cycles.map(async cycle => {
+        return {
+          cycle: cycle,
+          reward: await this.getRewardAmountByCycle(accountAddress, bakerAddress, cycle)
+        }
+      })
+    )
+    rewardsByCycle.forEach(rewardByCycle => {
+      calculatedRewardsMap.set(rewardByCycle.cycle, rewardByCycle.reward)
+    })
+    return calculatedRewardsMap
+  }
+
+  private async getRewardAmountByCycle(accountAddress: string, bakerAddress: string, cycle: number): Promise<string> {
+    const fee = this.airGapBakerConfig.fee
+    const protocol = new TezosProtocol()
+    return from(protocol.calculateRewards(bakerAddress, cycle))
+      .pipe(
+        switchMap(tezosRewards =>
+          from(protocol.calculatePayout(accountAddress, tezosRewards)).pipe(
+            map(payout => {
+              return payout
+                ? `~${this.amountConverter.transform(new BigNumber(payout.payout).minus(new BigNumber(payout.payout).times(fee)), {
+                    protocolIdentifier: protocol.identifier,
+                    maxDigits: 6
+                  })}`
+                : null
+            })
+          )
+        )
+      )
+      .toPromise()
+  }
+
   private async createDelegatorDisplayRewards(
     protocol: TezosProtocol,
     address: string,
@@ -205,14 +249,11 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
 
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
-
+    const amountByCycle = await this.getRewardAmountsByCycle(address, delegatorExtraInfo.value)
     return new UIRewardList({
       rewards: rewardInfo.slice(0, 5).map(reward => ({
         index: reward.cycle,
-        amount: `~${this.amountConverter.transform(reward.reward, {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
-        })}`,
+        amount: amountByCycle.get(reward.cycle),
         collected: reward.payout < new Date(),
         timestamp: reward.payout.getTime()
       })),
