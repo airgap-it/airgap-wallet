@@ -48,7 +48,6 @@ process.on('message', async message => {
           break
       }
     } catch (error) {
-      console.log(error)
       data = { error }
     }
 
@@ -83,7 +82,6 @@ async function openTransport(connectionType, descriptor) {
       open = TransportNodeBle.open
       break
     default:
-      console.log(connectionType)
       return Promise.reject('Unknown connection type.')
   }
   const transport = await open(descriptor)
