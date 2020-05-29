@@ -143,7 +143,7 @@
       "label": "Beacon",
       "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
-      "permission-list_label": "Beacon Permission List"
+      "permission-list_label": "Beacon Permissions"
     }
   },
   "select-wallet": {
@@ -533,7 +533,7 @@
     }
   },
   "beacon-permission-list": {
-    "title": "Beacon Permission List",
+    "title": "Beacon Permissions",
     "connected-dapps": "Connected DApps",
     "remove_label": "Remove",
     "delete-permission-alert": {
