@@ -33,6 +33,7 @@
     "extension:build:dev": "npm run build && npm run extension:build:extension-only",
     "extension:build:all": "npm run build --prod && npm run extension:build:extension-only",
     "electron": "npm --prefix electron/ run start",
+    "electron:install": "npm --prefix electron/ install --",
     "prepare-prod-build": "npm run disable-pure-getters && npm run configure-mangle",
     "disable-pure-getters": "replace 'pure_getters: buildOptions.buildOptimizer' 'pure_getters: false' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",
     "configure-mangle": "replace 'safari10: true' 'safari10: true, keep_fnames: true' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",
@@ -69,19 +70,15 @@
     "@ionic/angular": "5.0.0",
     "@ionic/core": "5.0.4",
     "@ionic/storage": "^2.2.0",
-    "@ledgerhq/hw-transport": "^5.13.1",
-    "@ledgerhq/hw-transport-node-ble": "^5.13.1",
-    "@ledgerhq/hw-transport-node-hid-singleton": "^5.13.1",
     "@ngx-translate/core": "^11.0.1",
     "@ngx-translate/http-loader": "^4.0.0",
     "@sentry/browser": "5.1.3",
     "@zxing/ngx-scanner": "1.3.0",
-    "airgap-coin-lib": "^0.8.3-beta.15",
+    "airgap-coin-lib": "^0.8.4-beta.0",
     "angular2-template-loader": "^0.6.2",
     "angularx-qrcode": "^1.5.3",
     "bignumber.js": "8.0.1",
     "chart.js": "^2.8.0",
-    "child_process": "^1.0.2",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-sqlite-storage": "^2.6.0",
     "cordova.plugins.diagnostic": "^4.0.12",
@@ -127,7 +124,6 @@
     "browserify": "^16.2.3",
     "clipboardy": "^2.0.0",
     "codelyzer": "^5.1.2",
-    "electron": "^8.2.1",
     "ionic-mocks": "^1.3.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
@@ -174,10 +170,5 @@
       "android",
       "ios"
     ]
-  },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "child_process": false
   }
 }

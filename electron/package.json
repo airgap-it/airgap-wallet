@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "start": "electron ./",
+    "postinstall": "npx electron-rebuild",
     "build:mac": "electron-builder --mac --publish=never",
     "build:linux": "electron-builder --linux --publish=never",
     "build:windows": "electron-builder --win --publish=never"
@@ -22,10 +23,14 @@
   },
   "dependencies": {
     "@capacitor/electron": "^2.0.1",
+    "@ledgerhq/hw-transport": "^5.15.0",
+    "@ledgerhq/hw-transport-node-ble": "^5.15.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "^5.15.0",
     "electron-is-dev": "^1.1.0"
   },
   "devDependencies": {
     "electron": "^7.0.0",
-    "electron-builder": "^22.5.1"
+    "electron-builder": "^22.5.1",
+    "electron-rebuild": "^1.11.0"
   }
 }
