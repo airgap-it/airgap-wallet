@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { AccountProvider } from '../account/account.provider'
 import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
@@ -31,6 +30,7 @@ import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 
 export type SerializableTx =
   | RawTezosTransaction
@@ -47,7 +47,6 @@ export class OperationsProvider {
   private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
   constructor(
-    private readonly accountProvider: AccountProvider,
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
     private readonly serializerService: SerializerService,
@@ -103,6 +102,15 @@ export class OperationsProvider {
       return [defaultDelegatee || (await protocol.getDefaultDelegatee())]
     }
     return current
+  }
+
+  public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<DelegatorDetails> {
+    const protocol = wallet.coinProtocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    return protocol.getDelegatorDetailsFromAddress(wallet.receivingPublicAddress)
   }
 
   public async getDelegationDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapDelegationDetails[]> {
@@ -360,25 +368,18 @@ export class OperationsProvider {
     }
   }
 
-  public async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
-    let wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(xtzWallet.publicKey, ProtocolSymbols.XTZ_KT, index)
+  public async estimateMaxTransferAmount(wallet: AirGapMarketWallet, destination: string, fee?: BigNumber): Promise<BigNumber> {
+    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined)
+    return new BigNumber(maxAmount)
+  }
 
-    if (wallet) {
-      return wallet
+  public async estimateFees(wallet: AirGapMarketWallet, address: string, amount: BigNumber, data?: any): Promise<FeeDefaults> {
+    try {
+      return await wallet.estimateFees([address], [amount.toFixed()], data)
+    } catch (error) {
+      console.error(error)
+      return wallet.coinProtocol.feeDefaults
     }
-
-    wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
-      xtzWallet.publicKey,
-      xtzWallet.isExtendedPublicKey,
-      xtzWallet.derivationPath,
-      index
-    )
-    wallet.addresses = ktAddresses
-    await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-
-    return wallet
   }
 
   private async getAndShowLoader() {

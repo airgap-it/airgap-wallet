@@ -25,7 +25,7 @@
     </ion-text>
     <ion-progress-bar *ngIf="isMultiQr" style="height: 8px" color="secondary" [value]="percentageScanned"></ion-progress-bar>
 
-    <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center ">
+    <ion-row *ngIf="hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center ">
       <ion-col class="guides--container content--align__center-center">
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
@@ -39,7 +39,7 @@
     </ion-row>
 
     <ion-row
-      [hidden]="hasCameraPermission"
+      *ngIf="!hasCameraPermission"
       (click)="requestPermission()"
       class="row--height__100 ion-justify-content-center ion-align-items-center "
     >

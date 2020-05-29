@@ -16,7 +16,11 @@
         {{ tx.amount | amountConverter: { protocolIdentifier: tx.protocolIdentifier, maxDigits: 10 } }}
       </span>
     </h2>
-    <ion-text color="blackLight">
+
+    <ion-text class="address-container" color="blackLight">
+      <ion-badge class="ion-text-capitalize" *ngIf="tx.status && tx.status !== 'applied'" color="primary">
+        {{ tx.status }}
+      </ion-badge>
       <h3 class="typography--mono" *ngIf="transactionType !== 'exchangeTransaction'">
         <ng-container *ngIf="tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
         <ng-container *ngIf="!tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
@@ -29,7 +33,6 @@
   </ion-label>
   <p slot="end" *ngIf="transactionType === 'exchangeTransaction'">
     {{ tx.extra }}
-    <!-- status of tx-->
   </p>
   <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
     <ion-col class="ion-no-padding">

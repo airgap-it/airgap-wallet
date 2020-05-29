@@ -8,7 +8,7 @@ import { LedgerTransportElectron } from 'src/app/ledger/transport/LedgerTranspor
 import { LedgerApp } from 'src/app/ledger/app/LedgerApp'
 import { KusamaLedgerApp } from 'src/app/ledger/app/substrate/KusamaLedgerApp'
 import { PolkadotLedgerApp } from 'src/app/ledger/app/substrate/PolkadotLedgerApp'
-import { isObjectOf } from 'src/app/utils/utils'
+import { isType } from 'src/app/utils/utils'
 import { ReturnCode } from 'src/app/ledger/ReturnCode'
 
 @Injectable({
@@ -122,12 +122,12 @@ export class LedgerService {
   }
 
   private getError(error: unknown): string | unknown {
-    if (isObjectOf<{ statusCode: number }>(error, 'statusCode')) {
+    if (isType<{ statusCode: number }>(error, 'statusCode')) {
       switch (error.statusCode) {
         case ReturnCode.CLA_NOT_SUPPORTED:
           return "Could not detect the app. Make sure it's open."
       }
-    } else if (isObjectOf<{ message: string }>(error, 'message')) {
+    } else if (isType<{ message: string }>(error, 'message')) {
       return error.message
     }
 

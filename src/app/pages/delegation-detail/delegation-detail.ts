@@ -21,7 +21,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
-import { isObjectOf } from 'src/app/utils/utils'
+import { isType } from 'src/app/utils/utils'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -107,13 +107,13 @@ export class DelegationDetailPage {
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
-        if (isObjectOf<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
+        if (isType<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
           this.changeDisplayedDetails(data.delegateeAddress)
-        } else if (isObjectOf<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
+        } else if (isType<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
           this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
-        } else if (isObjectOf<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
+        } else if (isType<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
           this.showDelegateesList()
-        } else if (isObjectOf<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
+        } else if (isType<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
           this.callSecondaryAction(data.secondaryActionType)
         } else {
           console.log('Unknown option selected.')
@@ -325,7 +325,7 @@ export class DelegationDetailPage {
       delegateeLabel: this.delegateeLabel,
       currentDelegatees: this.currentDelegatees,
       callback: (address: string) => {
-        this.delegateeAddress$.next(address)
+        this.changeDisplayedDetails(address)
       }
     }
 

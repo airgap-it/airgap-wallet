@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, Platform, PopoverController, ToastController, NavController } from '@ionic/angular'
+import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
@@ -24,7 +24,8 @@ import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
-declare let cordova
+import { BrowserService } from 'src/app/services/browser/browser.service'
+
 export const refreshRate = 3000
 
 @Component({
@@ -78,16 +79,17 @@ export class AccountTransactionListPage {
     public readonly translateService: TranslateService,
     public readonly operationsProvider: OperationsProvider,
     public readonly popoverCtrl: PopoverController,
+    public readonly toastController: ToastController,
+    public readonly loadingController: LoadingController,
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
     public readonly dataService: DataService,
     private readonly route: ActivatedRoute,
-    private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
-    private readonly toastController: ToastController,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
-    private readonly extensionsService: ExtensionsService
+    private readonly extensionsService: ExtensionsService,
+    private readonly browserService: BrowserService
   ) {
     const info = this.route.snapshot.data.special
     if (this.route.snapshot.data.special) {
@@ -121,7 +123,9 @@ export class AccountTransactionListPage {
     }
 
     this.actionGroup = new ActionGroup(this)
-    this.actions = this.actionGroup.getActions()
+    this.actionGroup.getActions().then(actions => {
+      this.actions = actions
+    })
 
     this.init()
   }
@@ -193,15 +197,7 @@ export class AccountTransactionListPage {
   public async openBlockexplorer(): Promise<void> {
     const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
-    this.openUrl(blockexplorer)
-  }
-
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
-    }
+    this.browserService.openUrl(blockexplorer)
   }
 
   public doRefresh(event: any = null): void {

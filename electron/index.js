@@ -1,40 +1,69 @@
-// Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain } = require('electron')
-const { fork } = require('child_process')
-const { join } = require('path')
+const { app, BrowserWindow, Menu } = require('electron')
+const isDevMode = require('electron-is-dev')
+const { CapacitorSplashScreen, configCapacitor } = require('@capacitor/electron')
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+const path = require('path')
 
-function createWindow() {
-  // Create the browser window.
+// Place holders for our windows so they don't get garbage collected.
+let mainWindow = null
+
+// Placeholder for SplashScreen ref
+let splashScreen = null
+
+//Change this if you do not wish to have a splash screen
+let useSplashScreen = false
+
+// Create simple menu for easy devtools access, and for demo
+const menuTemplateDev = [
+  {
+    label: 'Options',
+    submenu: [
+      {
+        label: 'Open Dev Tools',
+        click() {
+          mainWindow.openDevTools()
+        }
+      }
+    ]
+  }
+]
+
+async function createWindow() {
+  // Define our main window size
   mainWindow = new BrowserWindow({
     height: 920,
     width: 1600,
+    show: false,
+    icon: path.join(__dirname, 'resources', 'icons', 'icon.png'),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      preload: path.join(__dirname, 'node_modules', '@capacitor', 'electron', 'dist', 'electron-bridge.js')
     }
   })
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('www/index.html')
+  configCapacitor(mainWindow)
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  if (isDevMode) {
+    // Set our above template to the Menu Object if we are in development mode, dont want users having the devtools.
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplateDev))
+    // If we are developers we might as well open the devtools by default.
+    mainWindow.webContents.openDevTools()
+  }
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+  if (useSplashScreen) {
+    splashScreen = new CapacitorSplashScreen(mainWindow, {})
+    splashScreen.init(false)
+  } else {
+    mainWindow.loadURL(`file://${__dirname}/app/index.html`)
+    mainWindow.webContents.on('dom-ready', () => {
+      mainWindow.show()
+    })
+  }
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// Some Electron APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 
 // Quit when all windows are closed.
@@ -58,9 +87,7 @@ app.on('activate', function() {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
+// Define any IPC or other custom functionality below here
 const processPaths = new Map([['ledger', join(__dirname, 'ledger-transport.js')]])
 
 const childProcesses = new Map()

@@ -10,8 +10,16 @@ import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
-import { ButtonAction } from './actions/ButtonAction'
+import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
+import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
+import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+
+interface DelegatorButtonActionContext extends ButtonActionContext {
+  type: any
+  data?: any
+}
 
 export interface WalletActionInfo {
   name: string
@@ -21,28 +29,28 @@ export interface WalletActionInfo {
 export class ActionGroup {
   constructor(private readonly callerContext: AccountTransactionListPage) {}
 
-  public getActions(): Action<any, any>[] {
-    const actionMap: Map<string, () => Action<any, any>[]> = new Map()
-    actionMap.set(ProtocolSymbols.XTZ, () => {
+  public async getActions(): Promise<Action<any, any>[]> {
+    const actionMap: Map<string, () => Promise<Action<any, any>[]>> = new Map()
+    actionMap.set(ProtocolSymbols.XTZ, async () => {
       return this.getTezosActions()
     })
-    actionMap.set(ProtocolSymbols.XTZ_KT, () => {
+    actionMap.set(ProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
     })
-    actionMap.set(ProtocolSymbols.ETH, () => {
+    actionMap.set(ProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
     })
-    actionMap.set(ProtocolSymbols.COSMOS, () => {
+    actionMap.set(ProtocolSymbols.COSMOS, async () => {
       return this.getCosmosActions()
     })
-    actionMap.set(ProtocolSymbols.POLKADOT, () => {
+    actionMap.set(ProtocolSymbols.POLKADOT, async () => {
       return this.getPolkadotActions()
     })
-    actionMap.set(ProtocolSymbols.KUSAMA, () => {
+    actionMap.set(ProtocolSymbols.KUSAMA, async () => {
       return this.getKusamaActions()
     })
 
-    const actionFunction: () => Action<any, any>[] | undefined = actionMap.get(this.callerContext.protocolIdentifier)
+    const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
     return actionFunction ? actionFunction() : []
   }
@@ -88,7 +96,7 @@ export class ActionGroup {
             this.callerContext.showToast('No accounts to import.')
           } else {
             for (const [index] of ktAddresses.entries()) {
-              await this.callerContext.operationsProvider.addKtAddress(this.callerContext.wallet, index, ktAddresses)
+              await this.addKtAddress(this.callerContext.wallet, index, ktAddresses)
             }
 
             this.callerContext.router.navigateByUrl('/').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -118,10 +126,16 @@ export class ActionGroup {
     return [migrateAction]
   }
 
-  private getCosmosActions(): Action<any, any>[] {
+  private async getCosmosActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
+    const extraDelegatorButtonActions = await this.createDelegatorButtonActions({
+      type: CosmosDelegationActionType.WITHDRAW_ALL_REWARDS,
+      name: 'account-transaction-list.claim_rewards_label',
+      icon: 'logo-usd',
+      identifier: 'claim-rewards'
+    })
 
-    return [delegateButtonAction]
+    return [delegateButtonAction, ...extraDelegatorButtonActions]
   }
 
   private getEthereumActions(): Action<any, any>[] {
@@ -165,6 +179,31 @@ export class ActionGroup {
     return [delegateButtonAction]
   }
 
+  private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
+    let wallet = this.callerContext.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
+      xtzWallet.publicKey,
+      ProtocolSymbols.XTZ_KT,
+      index
+    )
+
+    if (wallet) {
+      return wallet
+    }
+
+    wallet = new AirGapMarketWallet(
+      ProtocolSymbols.XTZ_KT,
+      xtzWallet.publicKey,
+      xtzWallet.isExtendedPublicKey,
+      xtzWallet.derivationPath,
+      index
+    )
+    wallet.addresses = ktAddresses
+    await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    await this.callerContext.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+
+    return wallet
+  }
+
   private createDelegateButtonAction(): ButtonAction<void, void> {
     return new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' }, () => {
       return new SimpleAction(() => {
@@ -181,5 +220,37 @@ export class ActionGroup {
         })
       })
     })
+  }
+
+  private async createDelegatorButtonActions(
+    ...contexts: DelegatorButtonActionContext[]
+  ): Promise<ButtonAction<void, AirGapDelegatorActionContext>[]> {
+    try {
+      const delegatorDetails = await this.callerContext.operationsProvider.getDelegatorDetails(this.callerContext.wallet)
+
+      if (delegatorDetails.availableActions) {
+        const availableActionTypes = delegatorDetails.availableActions.map(action => action.type)
+        return contexts
+          .filter(context => availableActionTypes.includes(context.type))
+          .map(context => {
+            return new ButtonAction<void, AirGapDelegatorActionContext>(context, () => {
+              return new AirGapDelegatorAction({
+                wallet: this.callerContext.wallet,
+                type: context.type,
+                data: context.data,
+                toastController: this.callerContext.toastController,
+                loadingController: this.callerContext.loadingController,
+                operationsProvider: this.callerContext.operationsProvider,
+                dataService: this.callerContext.dataService,
+                router: this.callerContext.router
+              })
+            })
+          })
+      }
+    } catch (error) {
+      console.warn(error)
+    }
+
+    return []
   }
 }
