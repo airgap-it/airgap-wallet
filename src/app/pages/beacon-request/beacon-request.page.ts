@@ -1,21 +1,24 @@
-import { BeaconErrorMessage, BeaconErrorType, BeaconMessageType, PermissionScope } from '@airgap/beacon-sdk'
+import {
+  BeaconErrorMessage,
+  BeaconErrorType,
+  BeaconMessageType,
+  BroadcastRequestOutput,
+  OperationRequestOutput,
+  PermissionRequestOutput,
+  PermissionResponseInput,
+  PermissionScope,
+  SignPayloadRequestOutput
+} from '@airgap/beacon-sdk'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
-import { IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
-import {
-  PermissionRequestOutput,
-  OperationRequestOutput,
-  SignPayloadRequestOutput,
-  BroadcastRequestOutput,
-  PermissionResponseInput
-} from '@airgap/beacon-sdk'
-import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -58,22 +61,22 @@ export class BeaconRequestPage implements OnInit {
   public async ngOnInit(): Promise<void> {
     this.requesterName = this.request.appMetadata.name
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
-      this.title = 'Permission Request'
+      this.title = 'beacon-request.title.permission-request'
       await this.permissionRequest(this.request)
     }
 
     if (this.request && this.request.type === BeaconMessageType.SignPayloadRequest) {
-      this.title = 'Sign Payload Request'
+      this.title = 'beacon-request.title.sign-payload-request'
       await this.signRequest(this.request)
     }
 
     if (this.request && this.request.type === BeaconMessageType.OperationRequest) {
-      this.title = 'Operation Request'
+      this.title = 'beacon-request.title.operation-request'
       await this.operationRequest(this.request)
     }
 
     if (this.request && this.request.type === BeaconMessageType.BroadcastRequest) {
-      this.title = 'Broadcast Request'
+      this.title = 'beacon-request.title.broadcast-request'
       await this.broadcastRequest(this.request)
     }
   }
@@ -102,7 +105,7 @@ export class BeaconRequestPage implements OnInit {
       {
         name: 'sign',
         type: 'checkbox',
-        label: 'Sign transactions',
+        label: 'beacon-request.permission.sign-transactions',
         value: PermissionScope.SIGN,
         icon: 'create',
         checked: request.scopes.indexOf(PermissionScope.SIGN) >= 0
@@ -111,7 +114,7 @@ export class BeaconRequestPage implements OnInit {
       {
         name: 'operation_request',
         type: 'checkbox',
-        label: 'Operation request',
+        label: 'beacon-request.permission.operation-request',
         value: PermissionScope.OPERATION_REQUEST,
         icon: 'color-wand',
         checked: request.scopes.indexOf(PermissionScope.OPERATION_REQUEST) >= 0
@@ -120,7 +123,7 @@ export class BeaconRequestPage implements OnInit {
       {
         name: 'threshold',
         type: 'checkbox',
-        label: 'Threshold',
+        label: 'beacon-request.permission.threshold',
         value: PermissionScope.THRESHOLD,
         icon: 'code-working',
         checked: request.scopes.indexOf(PermissionScope.THRESHOLD) >= 0

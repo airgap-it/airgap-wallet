@@ -1,13 +1,16 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>beacon-permission-list</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'beacon-permission-list.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
     <ion-list-header>
-      <ion-label>Connected dApps</ion-label>
+      <ion-label>{{ 'beacon-permission-list.connected-dapps' | translate }}</ion-label>
     </ion-list-header>
     <ion-item lines="none" *ngFor="let permission of permissions">
       <ion-label>
@@ -24,7 +27,7 @@
         </ion-badge>
       </ion-label>
       <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission)">
-        Remove
+        {{ 'remove_label' | translate }}
       </ion-button>
     </ion-item>
   </ion-list>

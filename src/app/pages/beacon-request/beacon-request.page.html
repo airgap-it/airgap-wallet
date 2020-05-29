@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ title }}</ion-title>
+      <ion-title>{{ title | translate }}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
@@ -20,7 +20,7 @@
             </ion-avatar>
             <ion-label class="ion-margin-start">
               <p>
-                Beacon request by dApp
+                {{ 'beacon-request.request-by-dapp_label' | translate }}
               </p>
               <h3>{{requesterName}}</h3>
             </ion-label>
@@ -68,7 +68,7 @@
             <ion-list lines="none">
               <ion-item *ngFor="let input of inputs">
                 <ion-icon name="{{input.icon}}" slot="start"></ion-icon>
-                <ion-label>{{ input.label }}</ion-label>
+                <ion-label>{{ input.label | translate }}</ion-label>
                 <ion-checkbox [(ngModel)]="input.checked" slot="end"></ion-checkbox>
               </ion-item>
             </ion-list>

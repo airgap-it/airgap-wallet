@@ -2,6 +2,7 @@ import { PermissionInfo } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { AlertController } from '@ionic/angular'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-beacon-permission-list',
@@ -11,7 +12,11 @@ import { BeaconService } from 'src/app/services/beacon/beacon.service'
 export class BeaconPermissionListPage {
   public permissions: PermissionInfo[] = []
 
-  constructor(private readonly beaconService: BeaconService, private readonly alertController: AlertController) {
+  constructor(
+    private readonly beaconService: BeaconService,
+    private readonly alertController: AlertController,
+    private readonly translate: TranslateService
+  ) {
     this.loadPermissions().catch(console.error)
   }
 
@@ -20,26 +25,34 @@ export class BeaconPermissionListPage {
   }
 
   public async deletePermission(permission: PermissionInfo): Promise<void> {
-    const alert: HTMLIonAlertElement = await this.alertController.create({
-      header: 'Delete Permission?',
-      message:
-        'Are you sure you want to delete this permission? The DApp will not be able to perform operations anymore until new permissions are granted.',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: 'Yes',
-          handler: async (): Promise<void> => {
-            await this.beaconService.client.removePermission(permission.accountIdentifier)
-            await this.loadPermissions()
-          }
-        }
-      ]
-    })
+    this.translate
+      .get([
+        'beacon-permission-list.delete-permission-alert.header',
+        'beacon-permission-list.delete-permission-alert.message',
+        'beacon-permission-list.delete-permission-alert.cancel_label',
+        'beacon-permission-list.delete-permission-alert.yes_label'
+      ])
+      .subscribe(async (translated: { [key: string]: string | undefined }) => {
+        const alert: HTMLIonAlertElement = await this.alertController.create({
+          header: translated['beacon-permission-list.delete-permission-alert.header'],
+          message: translated['beacon-permission-list.delete-permission-alert.message'],
+          buttons: [
+            {
+              text: translated['beacon-permission-list.delete-permission-alert.cancel_label'],
+              role: 'cancel',
+              cssClass: 'secondary'
+            },
+            {
+              text: translated['beacon-permission-list.delete-permission-alert.yes_label'],
+              handler: async (): Promise<void> => {
+                await this.beaconService.client.removePermission(permission.accountIdentifier)
+                await this.loadPermissions()
+              }
+            }
+          ]
+        })
 
-    await alert.present()
+        await alert.present()
+      })
   }
 }
