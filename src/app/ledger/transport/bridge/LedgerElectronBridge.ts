@@ -98,7 +98,7 @@ export class LedgerElectronBridge {
     const promiseId = requestId ? `${type}_${requestId}` : type
     let promise = this.messagePromises.get(promiseId)
     if (!promise) {
-      promise = this.electronProcess.send(promiseId, type, data)
+      promise = this.electronProcess.send(promiseId, type, data).finally(() => this.messagePromises.delete(promiseId))
       this.messagePromises.set(promiseId, promise)
     }
     return promise
