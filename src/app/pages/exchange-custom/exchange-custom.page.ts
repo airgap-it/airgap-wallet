@@ -1,7 +1,5 @@
 import { Component } from '@angular/core'
-import { Platform } from '@ionic/angular'
-
-declare var cordova: any
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
   selector: 'page-exchange-custom',
@@ -9,33 +7,25 @@ declare var cordova: any
   styleUrls: ['./exchange-custom.page.scss']
 })
 export class ExchangeCustomPage {
-  constructor(public readonly platform: Platform) {}
+  constructor(private readonly browserService: BrowserService) {}
 
   getTZBTC(gatekeeper: string) {
     switch (gatekeeper) {
       case 'bitcoin-suisse':
-        this.openUrl('https://login.bitcoinsuisse.com/Account/Register')
+        this.browserService.openUrl('https://login.bitcoinsuisse.com/Account/Register')
         break
       case 'bity':
-        this.openUrl('mailto:tzBTC@bity.com')
+        this.browserService.openUrl('mailto:tzBTC@bity.com')
         break
       case 'sygnum':
-        this.openUrl('mailto:info@sygnum.com')
+        this.browserService.openUrl('mailto:info@sygnum.com')
         break
       case 'taurus':
-        this.openUrl('mailto:tradingdesk@taurusgroup.ch')
+        this.browserService.openUrl('mailto:tradingdesk@taurusgroup.ch')
         break
       case 'woorton':
-        this.openUrl('https://www.woorton.com/tzBTC.php')
+        this.browserService.openUrl('https://www.woorton.com/tzBTC.php')
         break
-    }
-  }
-
-  private openUrl(url: string): void {
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      cordova.InAppBrowser.open(url, '_system', 'location=true')
-    } else {
-      window.open(url, '_blank')
     }
   }
 }

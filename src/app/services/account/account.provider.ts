@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { NotificationEventResponse } from '@ionic-native/push/ngx'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { PushNotification } from '@capacitor/core'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 
@@ -14,6 +14,7 @@ import { LanguageService } from '../language/language.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
+import { isType } from 'src/app/utils/utils'
 import { OperationsProvider } from '../operations/operations'
 
 enum NotificationKind {
@@ -74,7 +75,7 @@ export class AccountProvider {
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
 
-    this.pushProvider.notificationCallback = (notification: NotificationEventResponse): void => {
+    this.pushProvider.notificationCallback = (notification: PushNotification): void => {
       // We need a timeout because otherwise routing might fail
 
       const env = {
@@ -88,8 +89,8 @@ export class AccountProvider {
         router: this.router
       }
 
-      if (notification && notification.additionalData) {
-        const tippingInfo: CTAInfo = notification.additionalData
+      if (notification && isType<CTAInfo>(notification.data)) {
+        const tippingInfo: CTAInfo = notification.data
 
         if (tippingInfo.kind === NotificationKind.CTA_Tip) {
           const originWallet: AirGapMarketWallet = this.getWalletList().find((wallet: AirGapMarketWallet) =>

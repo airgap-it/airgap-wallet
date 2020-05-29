@@ -49,7 +49,7 @@ export class TransactionQrPage {
         }
       }
     }
-    this.isBrowser = !this.platform.is('cordova')
+    this.isBrowser = !this.platform.is('hybrid')
   }
 
   public done() {
