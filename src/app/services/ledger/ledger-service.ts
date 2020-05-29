@@ -43,9 +43,9 @@ export class LedgerService {
 
   public async closeConnection(ledgerConnection?: LedgerConnection): Promise<void> {
     if (!ledgerConnection) {
-      this.closeAllLedgerTransports()
+      return this.closeAllLedgerTransports()
     } else {
-      this.closeLedgerTransport(ledgerConnection)
+      return this.closeLedgerTransport(ledgerConnection)
     }
   }
 
@@ -66,7 +66,9 @@ export class LedgerService {
       this.runningApps.set(appKey, app)
     }
 
-    return action(app).catch((error: unknown) => Promise.reject(this.getError(error)))
+    return action(app)
+      .catch((error: unknown) => Promise.reject(this.getError(error)))
+      .finally(() => this.closeLedgerTransport(ledgerConnection))
   }
 
   private async openLedgerTransport(ledgerConnection: LedgerConnection): Promise<LedgerTransport> {
