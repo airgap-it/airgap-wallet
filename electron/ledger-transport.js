@@ -3,8 +3,20 @@ const TransportNodeBle = require('@ledgerhq/hw-transport-node-ble').default
 
 const transports = new Map()
 
-process.on('exit', async () => {
-  await closeAll()
+process.on('SIGINT', () => {
+  process.exit(-1)
+})
+
+process.on('SIGTERM', () => {
+  process.exit(-1)
+})
+
+process.on('disconnect', () => {
+  process.exit(0)
+})
+
+process.on('exit', () => {
+  closeAll()
 })
 
 process.on('message', async message => {
@@ -99,9 +111,9 @@ async function close(transportId) {
   }
 }
 
-async function closeAll() {
-  await Promise.all(Array.from(transports.values()).map(transport => transport.close()))
-  transports.clear()
+function closeAll() {
+  TransportNodeHid.disconnect()
+  TransportNodeBle.disconnect()
 }
 
 async function getUsbDevices() {

@@ -42,7 +42,10 @@ app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    Object.entries(childProcesses).forEach(([_pid, child]) => child.kill())
+    for (const [_, child] of childProcesses) {
+      child.kill()
+    }
+
     app.quit()
   }
 })
