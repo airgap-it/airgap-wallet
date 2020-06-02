@@ -20,6 +20,7 @@ export interface TezosBakerConfig {
 export interface TezosBakerDetails {
   alias: string
   address: string
+  logo?: Blob
   hasLogo: boolean
   hasPayoutAddress?: boolean
   logoReference?: string
@@ -86,33 +87,53 @@ export class RemoteConfigProvider {
     })
   }
 
-  public async getKnownBakers(): Promise<TezosBakerDetails[]> {
-    const response: TezosBakerDetailsResponse = await this.httpClient
+  public async getKnownTezosBakers(): Promise<TezosBakerDetails[]> {
+    const bakersResponse: TezosBakerDetailsResponse = await this.httpClient
       .get<TezosBakerDetailsResponse>(`${COIN_LIB_SERVICE}/tz/bakers`)
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
+
         return {}
       })
 
-    return Object.entries(response).map(([address, details]) => {
+    const logos: [string, Blob | undefined][] = await Promise.all(
+      Object.entries(bakersResponse)
+        .filter(([_, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => baker.hasLogo)
+        .map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
+          return this.httpClient
+            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { responseType: 'blob' })
+            .toPromise()
+            .then((logo: Blob) => [address, logo] as [string, Blob])
+            .catch(error => {
+              handleErrorSentry(ErrorCategory.OTHER)(error)
+
+              return [address, undefined] as [string, undefined]
+            })
+        })
+    )
+
+    logos.forEach(([address, logo]: [string, Blob | undefined]) => {
+      bakersResponse[address].logo = logo
+    })
+
+    return Object.entries(bakersResponse).map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
       return {
         address,
-        ...details
+        ...baker
       }
     })
   }
 
-  public async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
-    const response: CosmosValidatorDetails[] = await this.httpClient
+  public async getKnownCosmosValidators(): Promise<CosmosValidatorDetails[]> {
+    const promise: Promise<CosmosValidatorDetails[]> = this.httpClient
       .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`)
       .toPromise()
-      .catch(error => {
-        handleErrorSentry(ErrorCategory.OTHER)(error)
-        return []
-      })
 
-    return response.map(details => {
+    promise.catch(handleErrorSentry(ErrorCategory.OTHER))
+    const response: CosmosValidatorDetails[] = await promise
+
+    return response.map((details: CosmosValidatorDetails) => {
       return {
         ...details,
         tokens: new BigNumber(details.tokens),

@@ -2,8 +2,8 @@ import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 
 export interface UIAccountSummaryConfig extends UIWidgetConfig {
   address: string
-  header: [string, string]
-  description: [string, string]
+  header: string | [string, string]
+  description: string | [string, string]
 }
 
 export class UIAccountSummary extends UIWidget {
@@ -17,7 +17,7 @@ export class UIAccountSummary extends UIWidget {
     super(config)
 
     this.address = config.address
-    this.header = config.header
-    this.description = config.description
+    this.header = typeof config.header === 'string' ? [config.header, ''] : config.header
+    this.description = typeof config.description === 'string' ? [config.description, ''] : config.description
   }
 }

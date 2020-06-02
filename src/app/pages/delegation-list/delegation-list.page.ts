@@ -22,7 +22,7 @@ export class DelegationListPage {
   public knownDelegatees: UIAccountSummary[]
   public filteredDelegatees: UIAccountSummary[]
 
-  private callback: (address: string) => void
+  private readonly callback: (address: string) => void
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -46,9 +46,9 @@ export class DelegationListPage {
 
   public setFilteredItems(searchTerm: string) {
     if (searchTerm.length === 0) {
-      this.filteredDelegatees = this.currentDelegatees
+      this.filteredDelegatees = this.knownDelegatees
     } else {
-      this.filteredDelegatees = this.currentDelegatees.filter(delegatee => {
+      this.filteredDelegatees = this.knownDelegatees.filter(delegatee => {
         const searchTermLowerCase = searchTerm.toLowerCase()
         const hasMatchingAddress = delegatee.address.toLowerCase().includes(searchTermLowerCase)
         const hasMatchingName = delegatee.header[0].toLowerCase().includes(searchTermLowerCase)

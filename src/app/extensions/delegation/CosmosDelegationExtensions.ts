@@ -19,6 +19,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { RemoteConfigProvider, CosmosValidatorDetails } from 'src/app/services/remote-config/remote-config'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -30,13 +31,20 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private static instance: CosmosDelegationExtensions
 
   public static create(
+    remoteConfigProvider: RemoteConfigProvider,
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe
   ): CosmosDelegationExtensions {
     if (!CosmosDelegationExtensions.instance) {
-      CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe, shortenStringPipe)
+      CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(
+        remoteConfigProvider,
+        formBuilder,
+        decimalPipe,
+        amountConverterPipe,
+        shortenStringPipe
+      )
     }
 
     return CosmosDelegationExtensions.instance
@@ -46,6 +54,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   public delegateeLabel: string = 'Validator'
 
   private constructor(
+    private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
@@ -79,9 +88,16 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   }
 
   public async createDelegateesSummary(protocol: CosmosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const validatorsDetails = await Promise.all(delegatees.map(validator => protocol.fetchValidator(validator)))
-    return validatorsDetails.map(
-      details =>
+    const [knownValidators, validatorsDetails]: [CosmosValidatorDetails[], CosmosValidator[]] = await Promise.all([
+      this.remoteConfigProvider.getKnownCosmosValidators(),
+      Promise.all(delegatees.map((validator: string) => protocol.fetchValidator(validator)))
+    ])
+
+    return [
+      ...knownValidators.filter((validator: CosmosValidatorDetails) => !delegatees.includes(validator.operator_address)),
+      ...validatorsDetails
+    ].map(
+      (details: CosmosValidatorDetails | CosmosValidator) =>
         new UIAccountSummary({
           address: details.operator_address,
           header: [

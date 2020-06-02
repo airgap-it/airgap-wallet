@@ -6,7 +6,7 @@ import {
   AirGapDelegationDetails,
   AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, TezosBakerConfig } from 'src/app/services/remote-config/remote-config'
+import { RemoteConfigProvider, TezosBakerConfig, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import BigNumber from 'bignumber.js'
@@ -19,6 +19,8 @@ import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { switchMap, map } from 'rxjs/operators'
 import { from } from 'rxjs'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 const hoursPerCycle: number = 68
 
@@ -27,19 +29,30 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     remoteConfigProvider: RemoteConfigProvider,
     decimalPipe: DecimalPipe,
     amountConverter: AmountConverterPipe,
+    shortenStringPipe: ShortenStringPipe,
     formBuilder: FormBuilder
   ): Promise<TezosDelegationExtensions> {
     const bakersConfig = await remoteConfigProvider.tezosBakers()
-    return new TezosDelegationExtensions(bakersConfig[0], decimalPipe, amountConverter, formBuilder)
+
+    return new TezosDelegationExtensions(
+      remoteConfigProvider,
+      bakersConfig[0],
+      decimalPipe,
+      amountConverter,
+      shortenStringPipe,
+      formBuilder
+    )
   }
 
   public airGapDelegatee?: string = this.airGapBakerConfig.address
   public delegateeLabel: string = 'Baker'
 
   private constructor(
+    private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly airGapBakerConfig: TezosBakerConfig,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverter: AmountConverterPipe,
+    private readonly shortenStringPipe: ShortenStringPipe,
     private readonly formBuilder: FormBuilder
   ) {
     super()
@@ -55,6 +68,23 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const extraDetails = await this.getExtraDelegationDetails(protocol, delegationDetails.delegator, delegationDetails.delegatees[0])
 
     return [extraDetails]
+  }
+
+  public async createDelegateesSummary(protocol: TezosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const knownBakers: TezosBakerDetails[] = await this.remoteConfigProvider.getKnownTezosBakers()
+    const knownBakersAddresses: string[] = knownBakers.map((bakerDetails: TezosBakerDetails) => bakerDetails.address)
+
+    return [
+      ...knownBakers,
+      ...delegatees.filter((baker: string) => !knownBakersAddresses.includes(baker)).map((baker: string) => ({ address: baker }))
+    ].map(
+      (details: Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>) =>
+        new UIAccountSummary({
+          address: details.address,
+          header: details.alias || '',
+          description: this.shortenStringPipe.transform(details.address)
+        })
+    )
   }
 
   private async getExtraDelegationDetails(
