@@ -88,8 +88,9 @@ export class RemoteConfigProvider {
   }
 
   public async getKnownTezosBakers(): Promise<TezosBakerDetails[]> {
+    const headers: Record<string, string | string[]> = { Authorization: '00j5uz-l202uq251-ite2x6bl-gckpbr9' }
     const bakersResponse: TezosBakerDetailsResponse = await this.httpClient
-      .get<TezosBakerDetailsResponse>(`${COIN_LIB_SERVICE}/tz/bakers`)
+      .get<TezosBakerDetailsResponse>(`${COIN_LIB_SERVICE}/tz/bakers`, { headers })
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
@@ -102,7 +103,7 @@ export class RemoteConfigProvider {
         .filter(([_, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => baker.hasLogo)
         .map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
           return this.httpClient
-            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { responseType: 'blob' })
+            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { headers, responseType: 'blob' })
             .toPromise()
             .then((logo: Blob) => [address, logo] as [string, Blob])
             .catch(error => {
@@ -126,8 +127,9 @@ export class RemoteConfigProvider {
   }
 
   public async getKnownCosmosValidators(): Promise<CosmosValidatorDetails[]> {
+    const headers: Record<string, string> = { Authorization: '00j5uz-l202uq251-ite2x6bl-gckpbr9' }
     const promise: Promise<CosmosValidatorDetails[]> = this.httpClient
-      .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`)
+      .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`, { headers })
       .toPromise()
 
     promise.catch(handleErrorSentry(ErrorCategory.OTHER))
