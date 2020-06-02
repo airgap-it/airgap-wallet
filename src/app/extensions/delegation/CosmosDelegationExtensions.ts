@@ -58,6 +58,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   public delegateeLabel: string = 'delegation-detail-cosmos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-cosmos.delegatee-label-plural'
 
+  private knownValidators?: CosmosValidatorDetails[]
+
   private constructor(
     private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly formBuilder: FormBuilder,
@@ -94,7 +96,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
   public async createDelegateesSummary(protocol: CosmosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
     const [knownValidators, validatorsDetails]: [CosmosValidatorDetails[], CosmosValidator[]] = await Promise.all([
-      this.remoteConfigProvider.getKnownCosmosValidators(),
+      this.getKnownValidators(),
       Promise.all(delegatees.map((validator: string) => protocol.fetchValidator(validator)))
     ])
 
@@ -102,9 +104,10 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       ...knownValidators.filter((validator: CosmosValidatorDetails) => !delegatees.includes(validator.operator_address)),
       ...validatorsDetails
     ].map(
-      (details: CosmosValidatorDetails | CosmosValidator) =>
+      (details: CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)) =>
         new UIAccountSummary({
           address: details.operator_address,
+          image: details.logo ? details.logo : undefined,
           header: [
             details.description.moniker,
             this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString()) + '%'
@@ -441,5 +444,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
 
     return details
+  }
+
+  private async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
+    if (this.knownValidators === undefined) {
+      this.knownValidators = await this.remoteConfigProvider.getKnownCosmosValidators()
+    }
+
+    return this.knownValidators
   }
 }

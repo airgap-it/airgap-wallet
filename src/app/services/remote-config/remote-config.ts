@@ -20,7 +20,7 @@ export interface TezosBakerConfig {
 export interface TezosBakerDetails {
   alias: string
   address: string
-  logo?: Blob
+  logo?: string
   hasLogo: boolean
   hasPayoutAddress?: boolean
   logoReference?: string
@@ -53,6 +53,7 @@ export interface CosmosValidatorDetails {
     update_time: string
   }
   min_self_delegation: string
+  logo?: string
 }
 
 export interface AeFirstVote {
@@ -98,14 +99,18 @@ export class RemoteConfigProvider {
         return {}
       })
 
-    const logos: [string, Blob | undefined][] = await Promise.all(
+    const logos: [string, string | undefined][] = await Promise.all(
       Object.entries(bakersResponse)
         .filter(([_, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => baker.hasLogo)
         .map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
           return this.httpClient
-            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { headers, responseType: 'blob' })
+            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { headers, responseType: 'arraybuffer' })
             .toPromise()
-            .then((logo: Blob) => [address, logo] as [string, Blob])
+            .then((logo: ArrayBuffer) => {
+              const encoded: string = this.encodeBase64Image(logo, 'image/png')
+
+              return [address, encoded] as [string, string]
+            })
             .catch(error => {
               handleErrorSentry(ErrorCategory.OTHER)(error)
 
@@ -114,7 +119,7 @@ export class RemoteConfigProvider {
         })
     )
 
-    logos.forEach(([address, logo]: [string, Blob | undefined]) => {
+    logos.forEach(([address, logo]: [string, string | undefined]) => {
       bakersResponse[address].logo = logo
     })
 
@@ -128,27 +133,46 @@ export class RemoteConfigProvider {
 
   public async getKnownCosmosValidators(): Promise<CosmosValidatorDetails[]> {
     const headers: Record<string, string> = { Authorization: '00j5uz-l202uq251-ite2x6bl-gckpbr9' }
-    const promise: Promise<CosmosValidatorDetails[]> = this.httpClient
+    const validatorsResponse: CosmosValidatorDetails[] = await this.httpClient
       .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`, { headers })
       .toPromise()
+      .catch(error => {
+        handleErrorSentry(ErrorCategory.OTHER)(error)
 
-    promise.catch(handleErrorSentry(ErrorCategory.OTHER))
-    const response: CosmosValidatorDetails[] = await promise
+        return []
+      })
 
-    return response.map((details: CosmosValidatorDetails) => {
-      return {
-        ...details,
-        tokens: new BigNumber(details.tokens),
-        delegator_shares: new BigNumber(details.delegator_shares),
-        commission: {
-          ...details.commission,
-          commission_rates: {
-            rate: new BigNumber(details.commission.commission_rates.rate),
-            max_rate: new BigNumber(details.commission.commission_rates.max_rate),
-            max_change_rate: new BigNumber(details.commission.commission_rates.max_change_rate)
-          }
+    return Promise.all(
+      validatorsResponse.map(async (validator: CosmosValidatorDetails) => {
+        const logo: string | undefined = await this.httpClient
+          .get(`${COIN_LIB_SERVICE}/cosmos/validators/image/${validator.operator_address}`, { headers, responseType: 'arraybuffer' })
+          .toPromise()
+          .then((logo: ArrayBuffer) => this.encodeBase64Image(logo, 'image/png'))
+          .catch(() => {
+            return undefined
+          })
+
+        return {
+          ...validator,
+          tokens: new BigNumber(validator.tokens),
+          delegator_shares: new BigNumber(validator.delegator_shares),
+          commission: {
+            ...validator.commission,
+            commission_rates: {
+              rate: new BigNumber(validator.commission.commission_rates.rate),
+              max_rate: new BigNumber(validator.commission.commission_rates.max_rate),
+              max_change_rate: new BigNumber(validator.commission.commission_rates.max_change_rate)
+            }
+          },
+          logo
         }
-      }
-    })
+      })
+    )
+  }
+
+  private encodeBase64Image(image: ArrayBuffer, mimeType: string): string {
+    const buffer: Buffer = Buffer.from(image)
+
+    return `data:${mimeType};base64,${buffer.toString('base64')}`
   }
 }

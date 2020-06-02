@@ -26,6 +26,8 @@ import { TranslateService } from '@ngx-translate/core'
 const hoursPerCycle: number = 68
 
 export class TezosDelegationExtensions extends ProtocolDelegationExtensions<TezosProtocol> {
+  private static instance: TezosDelegationExtensions
+
   public static async create(
     remoteConfigProvider: RemoteConfigProvider,
     decimalPipe: DecimalPipe,
@@ -34,23 +36,30 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     translateService: TranslateService,
     formBuilder: FormBuilder
   ): Promise<TezosDelegationExtensions> {
-    const bakersConfig = await remoteConfigProvider.tezosBakers()
+    if (!TezosDelegationExtensions.instance) {
+      const bakersConfig: TezosBakerConfig[] = await remoteConfigProvider.tezosBakers()
+      const airGapBakerConfig: TezosBakerConfig = bakersConfig[0]
 
-    return new TezosDelegationExtensions(
-      remoteConfigProvider,
-      bakersConfig[0],
-      decimalPipe,
-      amountConverter,
-      shortenStringPipe,
-      translateService,
-      formBuilder
-    )
+      TezosDelegationExtensions.instance = new TezosDelegationExtensions(
+        remoteConfigProvider,
+        airGapBakerConfig,
+        decimalPipe,
+        amountConverter,
+        shortenStringPipe,
+        translateService,
+        formBuilder
+      )
+    }
+
+    return TezosDelegationExtensions.instance
   }
 
   public airGapDelegatee?: string = this.airGapBakerConfig.address
 
   public delegateeLabel: string = 'delegation-detail-tezos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-tezos.delegatee-label-plural'
+
+  private knownBakers?: TezosBakerDetails[]
 
   private constructor(
     private readonly remoteConfigProvider: RemoteConfigProvider,
@@ -76,7 +85,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   public async createDelegateesSummary(_protocol: TezosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const knownBakers: TezosBakerDetails[] = await this.remoteConfigProvider.getKnownTezosBakers()
+    const knownBakers: TezosBakerDetails[] = await this.getKnownBakers()
     const knownBakersAddresses: string[] = knownBakers.map((bakerDetails: TezosBakerDetails) => bakerDetails.address)
 
     return [
@@ -86,6 +95,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       (details: Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>) =>
         new UIAccountSummary({
           address: details.address,
+          image: details.logo ? details.logo : undefined,
           header: details.alias || '',
           description: this.shortenStringPipe.transform(details.address)
         })
@@ -108,11 +118,14 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private async getExtraBakerDetails(protocol: TezosProtocol, bakerDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
     const isAirGapBaker = bakerDetails.address === this.airGapBakerConfig.address
 
-    const bakerInfo = await protocol.bakerInfo(bakerDetails.address)
+    const [bakerInfo, knownBakers] = await Promise.all([protocol.bakerInfo(bakerDetails.address), this.getKnownBakers()])
 
     const bakerTotalUsage = new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
     const bakerCurrentUsage = new BigNumber(bakerInfo.stakingBalance)
     const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
+
+    const knownBaker = knownBakers.find((baker: TezosBakerDetails) => baker.address === bakerDetails.address)
+    const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
 
     let status: string
     if (bakerInfo.bakingActive && bakerUsage.lt(1)) {
@@ -126,7 +139,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const displayDetails = this.createDelegateeDisplayDetails(isAirGapBaker ? this.airGapBakerConfig : null)
 
     return {
-      name: isAirGapBaker ? this.airGapBakerConfig.name : this.translateService.instant('delegation-detail-tezos.unknown'),
+      name,
       status,
       address: bakerDetails.address,
       usageDetails: {
@@ -369,5 +382,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   private addPayoutDelayToMoment(time: Moment, payoutCycles?: number): Moment {
     return time.add(hoursPerCycle * 7 + payoutCycles || 0, 'h')
+  }
+
+  private async getKnownBakers(): Promise<TezosBakerDetails[]> {
+    if (this.knownBakers === undefined) {
+      this.knownBakers = await this.remoteConfigProvider.getKnownTezosBakers()
+    }
+
+    return this.knownBakers
   }
 }
