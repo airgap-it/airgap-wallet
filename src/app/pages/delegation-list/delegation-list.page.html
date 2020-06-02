@@ -42,6 +42,10 @@
           <widget-account-summary [widget]="delegatee"></widget-account-summary>
         </div>
       </ion-list>
+
+      <ion-infinite-scroll (ionInfinite)="loadMoreItems($event)">
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </ng-container>
 
     <ng-template #loadingTemplate>
