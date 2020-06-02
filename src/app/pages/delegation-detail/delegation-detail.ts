@@ -33,6 +33,7 @@ export class DelegationDetailPage {
   public delegationForms: Map<string, FormGroup> = new Map()
 
   public delegateeLabel: string
+  public delegateeLabelPlural: string
   public delegateeAccountWidget: UIAccount
 
   public delegatorBalanceWidget: UIIconText
@@ -96,6 +97,7 @@ export class DelegationDetailPage {
           ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
           : true,
         delegateeLabel: this.delegateeLabel,
+        delegateeLabelPlural: this.delegateeLabelPlural,
         hasMultipleDelegatees: this.currentDelegatees.length > 1,
         secondaryDelegatorActions: secondaryActions
       },
@@ -162,7 +164,7 @@ export class DelegationDetailPage {
   public showDelegateesList() {
     const info = {
       wallet: this.wallet,
-      delegateeLabel: this.delegateeLabel,
+      delegateeLabelPlural: this.delegateeLabelPlural,
       currentDelegatees: this.currentDelegatees,
       callback: (address: string) => {
         this.changeDisplayedDetails(address)
@@ -176,7 +178,13 @@ export class DelegationDetailPage {
   }
 
   private initView() {
-    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
+    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol)
+      ? this.wallet.coinProtocol.delegateeLabel
+      : 'delegation-detail.default-delegatee-label'
+
+    this.delegateeLabelPlural = supportsAirGapDelegation(this.wallet.coinProtocol)
+      ? this.wallet.coinProtocol.delegateeLabelPlural
+      : 'delegation-detail.defailt-delegatee-label-plural'
 
     this.subscribeObservables()
 

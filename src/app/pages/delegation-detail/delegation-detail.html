@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ delegateeLabel }} Detail</ion-title>
+      <ion-title>{{ "delegation-detail.title" | translate: { delegateeLabel: (delegateeLabel | translate) } }}</ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="presentEditPopover($event)" color="secondary">
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>
@@ -43,14 +43,14 @@
       <ion-col size="12" class="ion-no-padding">
         <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
           <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
-          Change {{ delegateeLabel }}
+          {{ "delegation-detail.change-delegatee_label" | translate: { delegateeLabel: (delegateeLabel | translate) } }}
         </ion-button>
       </ion-col>
     </ion-row>
 
     <ion-row class="ion-padding-horizontal ion-padding-bottom">
       <ion-col size="12" class="ion-no-padding">
-        <p>{{ (delegateeDetails$ | async)?.status | titlecase }}</p>
+        <p>{{ ((delegateeDetails$ | async)?.status | translate) | titlecase }}</p>
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
         <div class="progress--container">
@@ -132,7 +132,7 @@
           *ngIf="shouldDisplaySegmentButtons"
         >
           <ion-segment-button *ngFor="let main of (delegatorDetails$ | async).mainActions || []" [value]="main.type">
-            <ion-label>{{ main.label }}</ion-label>
+            <ion-label>{{ main.label | translate }}</ion-label>
           </ion-segment-button>
         </ion-segment>
 
@@ -141,7 +141,7 @@
             <ng-container *ngIf="activeDelegatorAction === main.type.toString()">
               <ion-row class="ion-padding-horizontal" *ngIf="main.description">
                 <ion-col size="12">
-                  <p [innerHtml]="main.description"></p>
+                  <p [innerHtml]="main.description | translate"></p>
                 </ion-col>
               </ion-row>
               <ion-row *ngFor="let arg of filterVisible(main.args)">
@@ -162,7 +162,7 @@
       <ion-col size="12" class="ion-no-padding">
         <ion-text color="primary">
           <p class="font--weight__bold ion-no-margin ion-ion-text">
-            Your delegation
+            {{ "delegation-detail.your-delegation_label" | translate }}
           </p>
         </ion-text>
       </ion-col>
@@ -204,7 +204,7 @@
       <ion-row class="ion-padding-horizontal">
         <ion-text color="primary">
           <p ion-text class="font--weight__bold ion-no-margin">
-            Your rewards
+            {{ "delegation-detail.your-rewards_label" | translate }}
           </p>
         </ion-text>
       </ion-row>
@@ -218,7 +218,7 @@
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="callMainAction(activeDelegatorAction)" [disabled]="!canProceed">
-      {{ activeDelegatorActionConfirmButton || 'Done' }}
+      {{ (activeDelegatorActionConfirmButton || "delegation-detail.done_button") | translate }}
     </ion-button>
   </ion-fab>
 </ion-content>

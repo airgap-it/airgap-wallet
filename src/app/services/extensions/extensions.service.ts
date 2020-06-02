@@ -11,14 +11,21 @@ import { SubstrateDelegationExtensions } from 'src/app/extensions/delegation/Sub
 import { TezosDelegationExtensions } from 'src/app/extensions/delegation/TezosDelegationExtensions'
 import { CosmosDelegationExtensions } from 'src/app/extensions/delegation/CosmosDelegationExtensions'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
+import { TranslateService } from '@ngx-translate/core'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
   private extensions: [new () => ICoinDelegateProtocol, () => Promise<ProtocolDelegationExtensions<any>>][] = [
-    [KusamaProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
-    [PolkadotProtocol, async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe)],
+    [
+      KusamaProtocol,
+      async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
+    ],
+    [
+      PolkadotProtocol,
+      async () => SubstrateDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
+    ],
     [
       TezosProtocol,
       async () =>
@@ -27,6 +34,7 @@ export class ExtensionsService {
           this.decimalPipe,
           this.amountConverterPipe,
           this.shortenStringPipe,
+          this.translateService,
           this.formBuilder
         )
     ],
@@ -38,7 +46,8 @@ export class ExtensionsService {
           this.formBuilder,
           this.decimalPipe,
           this.amountConverterPipe,
-          this.shortenStringPipe
+          this.shortenStringPipe,
+          this.translateService
         )
     ]
   ]
@@ -48,6 +57,7 @@ export class ExtensionsService {
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
+    private readonly translateService: TranslateService,
     private readonly remoteConfigProvider: RemoteConfigProvider
   ) {}
 

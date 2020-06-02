@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ delegateeLabel }} List</ion-title>
+      <ion-title>{{ "delegation-list.title" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}</ion-title>
     </ion-toolbar>
     <ion-toolbar>
       <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
@@ -19,7 +19,7 @@
         <ion-list-header>
           <ion-label>
             <ion-text color="primary" class="font--weight__bold ion-ion-text">
-              TODO Your {{ delegateeLabel }}s
+              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
             </ion-text>
           </ion-label>
         </ion-list-header>
@@ -34,7 +34,7 @@
         <ion-list-header>
           <ion-label>
             <ion-text color="primary" class="font--weight__bold ion-ion-text">
-              TODO Known {{ delegateeLabel }}s
+              {{ "delegation-list.known-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
             </ion-text>
           </ion-label>
         </ion-list-header>

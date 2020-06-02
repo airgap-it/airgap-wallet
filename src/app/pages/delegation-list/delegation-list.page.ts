@@ -14,7 +14,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 export class DelegationListPage {
   public wallet: AirGapMarketWallet
 
-  public delegateeLabel: string
+  public delegateeLabelPlural: string
 
   public searchTerm: string = ''
 
@@ -32,7 +32,7 @@ export class DelegationListPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
-      this.delegateeLabel = info.delegateeLabel
+      this.delegateeLabelPlural = info.delegateeLabelPlural
       this.callback = info.callback
 
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then(summary => {

@@ -161,9 +161,9 @@ export class OperationsProvider {
       displayRewards: delegatorDetails.rewards
         ? new UIRewardList({
             rewards: delegatorDetails.rewards.slice(0, 5),
-            indexColLabel: 'Index',
-            amountColLabel: 'Reward',
-            payoutColLabel: 'Payout'
+            indexColLabel: 'delegation-detail.rewards.index-col_label',
+            amountColLabel: 'delegation-detail.rewards.amount-col_label',
+            payoutColLabel: 'delegation-detail.rewards.payout-col_label'
           })
         : undefined
     }
@@ -177,8 +177,20 @@ export class OperationsProvider {
     delegateeArgKeywords: string[]
   ): AirGapDelegatorAction[] | undefined {
     return [
-      this.createDefaultDelegateAction(availableActions, delegatees, delegateActionTypeKeywords, delegateeArgKeywords, 'Delegate'),
-      this.createDefaultDelegateAction(availableActions, delegatees, undelegateActionTypeKeywords, delegateeArgKeywords, 'Undelegate'),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        delegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.delegate_label'
+      ),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        undelegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.undelegate_label'
+      ),
       ...this.createDefaultExtraActions(availableActions, [...delegateActionTypeKeywords, ...undelegateActionTypeKeywords])
     ].filter(action => !!action)
   }

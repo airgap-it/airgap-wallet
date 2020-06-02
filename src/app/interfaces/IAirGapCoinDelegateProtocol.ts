@@ -43,7 +43,9 @@ export interface AirGapDelegationDetails {
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   airGapDelegatee?: string
+
   delegateeLabel: string
+  delegateeLabelPlural: string
 
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
   createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>

@@ -1,13 +1,13 @@
 <ion-card class="ion-padding">
   <ion-row class="ion-justify-content-center ion-padding-bottom">
     <ion-col size="2">
-      <strong>{{ widget.indexColLabel }}</strong>
+      <strong>{{ widget.indexColLabel | translate }}</strong>
     </ion-col>
     <ion-col>
-      <strong>{{ widget.amountColLabel }}</strong>
+      <strong>{{ widget.amountColLabel | translate }}</strong>
     </ion-col>
     <ion-col>
-      <strong>{{ widget.payoutColLabel }}</strong>
+      <strong>{{ widget.payoutColLabel | translate }}</strong>
     </ion-col>
   </ion-row>
   <ion-row class="ion-justify-content-center ion-padding-bottom" *ngFor="let reward of widget.rewards">

@@ -20,6 +20,7 @@ import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.p
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { RemoteConfigProvider, CosmosValidatorDetails } from 'src/app/services/remote-config/remote-config'
+import { TranslateService } from '@ngx-translate/core'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -35,7 +36,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
-    shortenStringPipe: ShortenStringPipe
+    shortenStringPipe: ShortenStringPipe,
+    translateService: TranslateService
   ): CosmosDelegationExtensions {
     if (!CosmosDelegationExtensions.instance) {
       CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(
@@ -43,7 +45,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         formBuilder,
         decimalPipe,
         amountConverterPipe,
-        shortenStringPipe
+        shortenStringPipe,
+        translateService
       )
     }
 
@@ -51,19 +54,21 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   }
 
   public airGapDelegatee?: string = 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
-  public delegateeLabel: string = 'Validator'
+
+  public delegateeLabel: string = 'delegation-detail-cosmos.delegatee-label'
+  public delegateeLabelPlural: string = 'delegation-detail-cosmos.delegatee-label-plural'
 
   private constructor(
     private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly shortenStringPipe: ShortenStringPipe
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private readonly translateService: TranslateService
   ) {
     super()
   }
 
-  // TODO: add translations
   public async getExtraDelegationDetailsFromAddress(
     protocol: CosmosProtocol,
     delegator: string,
@@ -180,12 +185,12 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       new UIIconText({
         iconName: 'logo-usd',
         text: this.decimalPipe.transform(commission.times(100).toString()) + '%',
-        description: 'Commission'
+        description: 'delegation-detail-cosmos.commission_label'
       }),
       new UIIconText({
         iconName: 'sync-outline',
         text: this.decimalPipe.transform(votingPower.times(100).toString(), '1.0-2') + '%',
-        description: 'Voting Power'
+        description: 'delegation-detail-cosmos.voting-power_label'
       })
     )
 
@@ -258,12 +263,15 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const canDelegate = maxDelegationAmount.gt(0)
 
     const baseDescription = hasDelegated
-      ? `You have currently <span class="style__strong color__primary">${delegatedFormatted}</span> delegated to this validator.`
-      : 'Select the amount you want to delegate.'
+      ? this.translateService.instant('delegation-detail-cosmos.delegate.has-delegated_text', { delegated: delegatedFormatted })
+      : this.translateService.instant('delegation-detail-cosmos.delegate.not-delegated_text')
     const extraDescription = canDelegate
-      ? ` You can ${
-          hasDelegated ? 'additionally' : ''
-        } delegate up to <span class="style__strong color__primary">${maxDelegationFormatted}</span> (after transaction fees).`
+      ? ` ${this.translateService.instant(
+          hasDelegated
+            ? 'delegation-detail-cosmos.delegate.can-delegate-has-delegated_text'
+            : 'delegation-detail-cosmos.delegate.can-delegate-not-delegated_text',
+          { maxDelegation: maxDelegationFormatted }
+        )}`
       : ''
 
     return this.createMainDelegatorAction(
@@ -271,7 +279,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.DELEGATE],
-      'Delegate',
+      'delegation-detail-cosmos.delegate.label',
       maxDelegationAmount,
       new BigNumber(1),
       baseDescription + extraDescription
@@ -288,14 +296,14 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       protocolIdentifier: protocol.identifier,
       maxDigits: 10
     })
-    const description = `You have currently delegated to this validator, you can undelegate up to <span class="style__strong color__primary">${delegatedAmountFormatted}</span>.`
+    const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
 
     return this.createMainDelegatorAction(
       protocol,
       delegatorDetails.availableActions,
       validator,
       [CosmosDelegationActionType.UNDELEGATE],
-      'Undelegate',
+      'delegation-detail-cosmos.undelegate.label',
       delegatedAmount,
       new BigNumber(1),
       description
@@ -398,10 +406,10 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     })
 
     return {
-      label: 'Rewards',
-      confirmLabel: 'Claim Rewards',
+      label: 'delegation-detail-cosmos.rewards.label',
+      confirmLabel: 'delegation-detail-cosmos.rewards.button',
       form,
-      description: `You can claim up to <span class="style__strong color__primary">${rewardsFormatted}</span> in rewards for this delegation.`
+      description: this.translateService.instant('delegation-detail-cosmos.rewards.text', { rewards: rewardsFormatted })
     }
   }
 
@@ -415,7 +423,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           protocolIdentifier: protocol.identifier,
           maxDigits: 10
         }),
-        description: 'Currently Delegated'
+        description: 'delegation-detail-cosmos.currently-delegated_label'
       })
     )
 
@@ -427,7 +435,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
           }),
-          description: 'Unclaimed Rewards'
+          description: 'delegation-detail-cosmos.unclaimed-rewards_label'
         })
       )
     }

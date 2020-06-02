@@ -8,6 +8,7 @@ import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccou
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
+  private static readonly DELEGATEE_LABEL_PLURAL_KEY = 'delegateeLabelPlural'
   private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
   private static readonly CREATE_DELEGATEES_SUMMARY_KEY = 'createDelegateesSummary'
   private static readonly CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY = 'createAccountExtendedDetails'
@@ -27,6 +28,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         extensions,
         [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
+        [ProtocolDelegationExtensions.DELEGATEE_LABEL_PLURAL_KEY, 'property'],
         [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function'],
         [ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY, 'function'],
         [ProtocolDelegationExtensions.CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY, 'function']
@@ -71,7 +73,9 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   }
 
   public abstract airGapDelegatee?: string
+
   public abstract delegateeLabel: string
+  public abstract delegateeLabelPlural: string
 
   public abstract getExtraDelegationDetailsFromAddress(
     protocol: T,
@@ -102,12 +106,12 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     return new UIInputText({
       id,
       inputType: 'number',
-      label: 'Amount',
+      label: 'delegation-detail.amount_label',
       placeholder: '0.00',
       defaultValue: maxValue,
-      toggleFixedValueButton: 'Max',
+      toggleFixedValueButton: 'delegation-detail.max-amount_button',
       fixedValue: maxValue,
-      errorLabel: 'Invalid value',
+      errorLabel: 'delegation-detail.invalid-value_error',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
           const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
