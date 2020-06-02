@@ -208,12 +208,12 @@ export class DelegationDetailPage {
     })
 
     this.delegateeDetails$.subscribe(details => {
-      if (details) {
-        this.delegateeAccountWidget = new UIAccount({
-          name: details.name,
-          address: details.address
-        })
-      }
+      this.delegateeAccountWidget = details
+        ? new UIAccount({
+            name: details.name,
+            address: details.address
+          })
+        : null
     })
 
     this.delegatorDetails$.subscribe(async details => {
