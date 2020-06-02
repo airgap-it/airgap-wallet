@@ -4,7 +4,8 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapDelegatorAction
+  AirGapDelegatorAction,
+  AirGapRewardDisplayDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
@@ -63,7 +64,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     delegateeDetails: DelegateeDetails
   ): Promise<AirGapDelegationDetails> {
     const [delegator, delegatee] = await Promise.all([
-      this.getExtraDelegatorDetails(protocol, delegatorDetails, delegateeDetails),
+      this.getExtraDelegatorDetails(delegatorDetails, delegateeDetails),
       this.getExtraBakerDetails(protocol, delegateeDetails)
     ])
 
@@ -104,25 +105,37 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   private async getExtraDelegatorDetails(
-    protocol: TezosProtocol,
     delegatorDetails: DelegatorDetails,
     bakerDetails: DelegateeDetails
   ): Promise<AirGapDelegatorDetails> {
-    const delegatorExtraInfo = await protocol.getDelegationInfo(delegatorDetails.address)
-
     const delegateAction = this.createDelegateAction(delegatorDetails.availableActions, bakerDetails.address)
     const undelegateAction = this.createUndelegateAction(delegatorDetails.availableActions)
-
-    const [displayDetails, displayRewards] = await Promise.all([
-      this.createDelegatorDisplayDetails(protocol, delegatorDetails, delegatorExtraInfo, bakerDetails.address),
-      this.createDelegatorDisplayRewards(protocol, delegatorDetails.address, delegatorExtraInfo)
-    ])
 
     return {
       ...delegatorDetails,
       mainActions: delegateAction ? [delegateAction] : undefined,
-      secondaryActions: undelegateAction ? [undelegateAction] : undefined,
-      displayDetails,
+      secondaryActions: undelegateAction ? [undelegateAction] : undefined
+    }
+  }
+
+  public async getRewardDisplayDetails(
+    protocol: TezosProtocol,
+    delegator: string,
+    delegatees: string[]
+  ): Promise<AirGapRewardDisplayDetails | undefined> {
+    const delegationDetails = await protocol.getDelegationDetailsFromAddress(delegator, delegatees)
+    const delegatorExtraInfo = await protocol.getDelegationInfo(delegationDetails.delegator.address)
+    const [displayDetails, displayRewards] = await Promise.all([
+      this.createDelegatorDisplayDetails(
+        protocol,
+        delegationDetails.delegator,
+        delegatorExtraInfo,
+        delegationDetails.delegatees[0].address
+      ),
+      this.createDelegatorDisplayRewards(protocol, delegationDetails.delegator.address, delegatorExtraInfo)
+    ])
+    return {
+      displayDetails: displayDetails,
       displayRewards: displayRewards
     }
   }
@@ -197,25 +210,21 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return details
   }
 
+  // const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
+  //   oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
+  // )
+
   private async getRewardAmountsByCycle(accountAddress: string, bakerAddress: string): Promise<Map<number, string>> {
     const protocol = new TezosProtocol()
-    const calculatedRewardsMap = new Map<number, string>()
-
     const currentCycle = await protocol.fetchCurrentCycle()
     const cycles = [...Array(6).keys()].map(num => currentCycle - num)
-
-    const rewardsByCycle = await Promise.all(
-      cycles.map(async cycle => {
-        return {
-          cycle: cycle,
-          reward: await this.getRewardAmountByCycle(accountAddress, bakerAddress, cycle)
-        }
-      })
+    return new Map<number, string>(
+      await Promise.all(
+        cycles.map(
+          async (cycle): Promise<[number, string]> => [cycle, await this.getRewardAmountByCycle(accountAddress, bakerAddress, cycle)]
+        )
+      )
     )
-    rewardsByCycle.forEach(rewardByCycle => {
-      calculatedRewardsMap.set(rewardByCycle.cycle, rewardByCycle.reward)
-    })
-    return calculatedRewardsMap
   }
 
   private async getRewardAmountByCycle(accountAddress: string, bakerAddress: string, cycle: number): Promise<string> {

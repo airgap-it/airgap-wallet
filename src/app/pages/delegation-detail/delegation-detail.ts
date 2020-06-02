@@ -6,7 +6,8 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegatorAction,
-  AirGapDelegationDetails
+  AirGapDelegationDetails,
+  AirGapRewardDisplayDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
@@ -42,8 +43,10 @@ export class DelegationDetailPage {
 
   public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails | null> = new BehaviorSubject(null)
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails | null> = new BehaviorSubject(null)
+  public rewardDisplay$: BehaviorSubject<AirGapRewardDisplayDetails | null> = new BehaviorSubject(null)
 
   public canProceed: boolean = true
+  public hasRewardDetails: boolean | undefined = undefined
 
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
@@ -176,10 +179,19 @@ export class DelegationDetailPage {
     this.delegateeAddress$.subscribe(async address => {
       if (address) {
         this.updateDisplayedDetails(null)
-        const details = await this.operations.getDelegationDetails(this.wallet, [address])
-        if (details && details.length > 0) {
-          this.updateDisplayedDetails(details)
-        }
+        this.updateDisplayedRewards(null)
+
+        this.operations.getDelegationDetails(this.wallet, [address]).then(details => {
+          if (details && details.length > 0) {
+            this.updateDisplayedDetails(details)
+          }
+        })
+        this.operations.getRewardDisplayDetails(this.wallet, [address]).then(rewards => {
+          this.hasRewardDetails = rewards !== undefined
+          if (rewards) {
+            this.updateDisplayedRewards(rewards)
+          }
+        })
       }
     })
 
@@ -273,6 +285,10 @@ export class DelegationDetailPage {
     // TODO: support multiple cases
     this.delegateeDetails$.next(details ? details[0].delegatees[0] : null)
     this.delegatorDetails$.next(details ? details[0].delegator : null)
+  }
+
+  private updateDisplayedRewards(rewardDisplayDetails: AirGapRewardDisplayDetails) {
+    this.rewardDisplay$.next(rewardDisplayDetails)
   }
 
   private changeDisplayedDetails(address: string) {

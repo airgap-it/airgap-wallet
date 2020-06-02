@@ -4,7 +4,8 @@ import {
   AirGapDelegationDetails,
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
-  AirGapDelegatorAction
+  AirGapDelegatorAction,
+  AirGapRewardDisplayDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -216,6 +217,10 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       mainActions: [delegateAction, undelegateAction, ...extraActions].filter(action => !!action),
       displayDetails
     }
+  }
+
+  public async getRewardDisplayDetails(): Promise<AirGapRewardDisplayDetails | undefined> {
+    return undefined // rewards are not displayed as for Tezos for instance
   }
 
   private createDelegateAction(
