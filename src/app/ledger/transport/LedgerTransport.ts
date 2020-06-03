@@ -8,9 +8,9 @@ export interface LedgerConnection {
   type: LedgerConnectionType
 }
 
-export abstract class LedgerTransport {
-  abstract connectionType: LedgerConnectionType
+export interface LedgerTransport {
+  connectionType: LedgerConnectionType
 
-  abstract async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer>
-  abstract async close(): Promise<void>
+  send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer>
+  close(): Promise<void>
 }

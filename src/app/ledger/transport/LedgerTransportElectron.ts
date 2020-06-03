@@ -7,7 +7,7 @@ import {
 } from './bridge/LedgerElectronBridge'
 import { LedgerConnection, LedgerConnectionType, LedgerTransport } from './LedgerTransport'
 
-export class LedgerTransportElectron extends LedgerTransport {
+export class LedgerTransportElectron implements LedgerTransport {
   private static get bridge(): LedgerElectronBridge {
     return LedgerElectronBridge.getInstance()
   }
@@ -37,9 +37,7 @@ export class LedgerTransportElectron extends LedgerTransport {
     return new LedgerTransportElectron(connectionType, transportId)
   }
 
-  private constructor(readonly connectionType: LedgerConnectionType, private readonly transportId: string) {
-    super()
-  }
+  private constructor(readonly connectionType: LedgerConnectionType, private readonly transportId: string) {}
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
     const { response }: SendMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
