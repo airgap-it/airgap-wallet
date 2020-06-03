@@ -8,6 +8,7 @@ import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { BeaconService } from '../beacon/beacon.service'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -29,7 +30,8 @@ export class SchemeRoutingProvider {
     private readonly alertController: AlertController,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
-    private readonly serializerService: SerializerService
+    private readonly serializerService: SerializerService,
+    private readonly beaconService: BeaconService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -96,6 +98,18 @@ export class SchemeRoutingProvider {
     }
   ): Promise<IACResult> {
     this.router = router
+
+    // Check if it's a beacon request
+    try {
+      const json = JSON.parse(typeof data === 'string' ? data : data[0])
+      if (json.publicKey && json.relayServer) {
+        console.log('Beacon Pairing QR scanned', json)
+        await this.beaconService.addPeer({ name: json.name, publicKey: json.publicKey, relayServer: json.relayServer })
+      }
+    } catch (e) {
+      //
+    }
+
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
 
     if (error && !error.message) {

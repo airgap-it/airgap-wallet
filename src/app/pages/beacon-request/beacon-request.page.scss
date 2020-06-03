@@ -1,0 +1,17 @@
+.divider--line {
+  border-top: 2px solid var(--ion-color-primary);
+  margin-top: 32px;
+}
+img {
+  height: 48px !important;
+  width: 48px !important;
+}
+.request--container {
+  h5 {
+    word-break: break-all;
+  }
+  ion-avatar {
+    display: block;
+    margin: auto;
+  }
+}

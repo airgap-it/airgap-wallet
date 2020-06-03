@@ -138,6 +138,12 @@
       "enable-new-serializer_label": "Enable new serializer",
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
+    },
+    "beacon": {
+      "label": "Beacon",
+      "settings_label": "Beacon Settings",
+      "about_label": "About Beacon",
+      "permission-list_label": "Beacon Permissions"
     }
   },
   "select-wallet": {
@@ -564,5 +570,45 @@
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
     "ok_label": "Yes!"
+  },
+  "beacon-request": {
+    "sign-data_label": "Do you want to sign the following data?",
+    "request": {
+      "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
+      "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."
+    },
+    "connect_label": "Connect",
+    "continue_label": "Continue",
+    "done_label": "Done",
+    "request-by-dapp_label": "Beacon request by DApp",
+    "title": {
+      "permission-request": "Permission Request",
+      "sign-payload-request": "Sign Payload Request",
+      "operation-request": "Operation Request",
+      "broadcast-request": "Permission Request"
+    },
+    "permission": {
+      "sign-transactions": "Sign Transactions",
+      "operation-request": "Operation request",
+      "threshold": "Threshold"
+    }
+  },
+  "beacon-permission-list": {
+    "title": "Beacon Permissions",
+    "connected-dapps": "Connected DApps",
+    "remove_label": "Remove",
+    "no-permissions": "No permissions have been given.",
+    "delete-permission-alert": {
+      "header": "Delete Permission?",
+      "message": "Are you sure you want to delete this permission? The DApp will not be able to perform operations anymore until new permissions are granted.",
+      "cancel_label": "Cancel",
+      "yes_label": "Yes"
+    }
+  },
+  "settings-beacon": {
+    "title": "Beacon Settings",
+    "remove-all_label": "Remove All",
+    "delete_label": "Delete",
+    "no-peers": "Not connected to any peers"
   }
 }

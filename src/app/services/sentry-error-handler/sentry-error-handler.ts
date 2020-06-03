@@ -34,10 +34,11 @@ export enum ErrorCategory {
   STORAGE = 'storage',
   OPERATIONS_PROVIDER = 'operations_provider',
   PUSH = 'push',
-  OTHER = 'other'
+  OTHER = 'other',
+  BEACON = 'beacon'
 }
 
-const AIRGAP_ERROR_CATEGORY = 'airgap-error-category'
+const AIRGAP_ERROR_CATEGORY: string = 'airgap-error-category'
 
 const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
   return (error: any) => {

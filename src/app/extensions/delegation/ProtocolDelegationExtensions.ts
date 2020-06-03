@@ -10,6 +10,8 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
   private static readonly DELEGATEE_LABEL_PLURAL_KEY = 'delegateeLabelPlural'
   private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
+  private static readonly GET_REWARD_DISPLAY_DETAILS = 'getRewardDisplayDetails'
+
   private static readonly CREATE_DELEGATEES_SUMMARY_KEY = 'createDelegateesSummary'
   private static readonly CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY = 'createAccountExtendedDetails'
 
@@ -31,6 +33,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_PLURAL_KEY, 'property'],
         [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function'],
         [ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY, 'function'],
+        [ProtocolDelegationExtensions.GET_REWARD_DISPLAY_DETAILS, 'function'],
         [ProtocolDelegationExtensions.CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY, 'function']
       )
     }

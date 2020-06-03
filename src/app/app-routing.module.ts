@@ -125,6 +125,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   },
   {
+    path: 'settings-beacon',
+    loadChildren: () => import('./pages/settings-beacon/settings-beacon.module').then(m => m.SettingsBeaconPageModule)
+  },
+  {
     path: 'delegation-list/:id',
     resolve: {
       special: DataResolverService
@@ -138,6 +142,10 @@ const routes: Routes = [
   {
     path: 'exchange-custom',
     loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
+  },
+  {
+    path: 'beacon-permission-list',
+    loadChildren: () => import('./pages/beacon-permission-list/beacon-permission-list.module').then(m => m.BeaconPermissionListPageModule)
   }
 ]
 @NgModule({

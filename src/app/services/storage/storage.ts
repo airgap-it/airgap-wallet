@@ -82,13 +82,13 @@ export class StorageProvider {
 
   public async get<K extends SettingsKey>(key: K): Promise<SettingsKeyReturnType[K]> {
     const value: SettingsKeyReturnType[K] = (await this.storage.get(key)) || defaultValues[key]
-    console.log(`[SETTINGS_SERVICE:get] ${key}, returned: ${value}`)
+    console.log(`[SETTINGS_SERVICE:get] ${key}, returned:`, value)
 
     return value
   }
 
   public async set<K extends SettingsKey>(key: K, value: SettingsKeyReturnType[K]): Promise<any> {
-    console.log(`[SETTINGS_SERVICE:set] ${key}, ${value}`)
+    console.log(`[SETTINGS_SERVICE:set] ${key}`, value)
 
     return this.storage.set(key, value)
   }

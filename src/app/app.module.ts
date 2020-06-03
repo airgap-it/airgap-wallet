@@ -49,6 +49,8 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
+import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
+import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
@@ -72,7 +74,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage, IntroductionPushPage, ExchangeSelectPage],
+  entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage, ExchangeSelectPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -102,6 +104,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     PipesModule,
     ComponentsModule,
     ProtocolSelectPageModule,
+    BeaconRequestPageModule,
     ExchangeSelectPageModule,
     IntroductionPushPageModule
   ],
