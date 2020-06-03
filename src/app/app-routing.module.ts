@@ -146,6 +146,10 @@ const routes: Routes = [
   {
     path: 'beacon-permission-list',
     loadChildren: () => import('./pages/beacon-permission-list/beacon-permission-list.module').then(m => m.BeaconPermissionListPageModule)
+  },
+  {
+    path: 'error',
+    loadChildren: () => import('./pages/error/error.module').then(m => m.ErrorPageModule)
   }
 ]
 @NgModule({

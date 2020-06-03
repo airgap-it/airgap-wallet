@@ -13,12 +13,15 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
+import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
+
+import { ErrorPage } from '../error/error.page'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -205,7 +208,22 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
-    const transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
+    let transaction: TezosWrappedOperation | undefined
+    try {
+      transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
+    } catch (error) {
+      await this.dismiss()
+      const modal = await this.modalController.create({
+        component: ErrorPage,
+        componentProps: {
+          title: error.name,
+          message: error.message,
+          data: error.data ? error.data : error.stack
+        }
+      })
+
+      return modal.present()
+    }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
     await this.beaconService.addVaultRequest(request.id, forgedTransaction)
