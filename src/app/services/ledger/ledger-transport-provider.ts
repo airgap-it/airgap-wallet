@@ -22,7 +22,10 @@ export class LedgerTransportProvider {
     return []
   }
 
-  public async open(connectionType: LedgerConnectionType, descriptor: string): Promise<LedgerTransport | null> {
+  public async open(ledgerConnection?: LedgerConnection): Promise<LedgerTransport | null> {
+    const connectionType: LedgerConnectionType | undefined = ledgerConnection ? ledgerConnection.type : undefined
+    const descriptor: string | undefined = ledgerConnection ? ledgerConnection.descriptor : undefined
+
     if (this.platform.is('electron')) {
       return LedgerTransportElectron.open(connectionType, descriptor)
     }

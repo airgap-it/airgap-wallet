@@ -73,18 +73,17 @@ async function getConnectedDevices(connectionType) {
 }
 
 async function openTransport(connectionType, descriptor) {
-  let open
+  let transport
   switch (connectionType) {
     case 'USB':
-      open = TransportNodeHid.open
+      transport = await TransportNodeHid.open(descriptor)
       break
     case 'BLE':
-      open = TransportNodeBle.open
+      transport = await TransportNodeBle.open(descriptor)
       break
     default:
-      return Promise.reject('Unknown connection type.')
+      transport = await TransportNodeHid.create(3000, 3000)
   }
-  const transport = await open(descriptor)
   const transportId = `${connectionType}-${new Date().getTime().toString()}`
 
   transports.set(transportId, transport)

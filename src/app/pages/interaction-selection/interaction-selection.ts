@@ -36,7 +36,7 @@ export class InteractionSelectionPage {
       this.interactionData = info.data
     }
 
-    this.isDesktop = this.platform.is('electron')
+    this.isDesktop = this.platform.is('desktop')
   }
 
   public async ionViewDidEnter() {}

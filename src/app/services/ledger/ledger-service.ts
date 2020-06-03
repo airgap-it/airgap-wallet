@@ -40,7 +40,7 @@ export class LedgerService {
     return devices.reduce((flatten: LedgerConnection[], toFlatten: LedgerConnection[]) => flatten.concat(toFlatten), [])
   }
 
-  public async openConnection(ledgerConnection: LedgerConnection): Promise<void> {
+  public async openConnection(ledgerConnection?: LedgerConnection): Promise<void> {
     await this.openLedgerTransport(ledgerConnection)
   }
 
@@ -52,15 +52,15 @@ export class LedgerService {
     }
   }
 
-  public async importWallet(identifier: string, ledgerConnection: LedgerConnection): Promise<AirGapMarketWallet> {
-    return this.withApp(identifier, ledgerConnection, (app: LedgerApp) => app.importWallet())
+  public async importWallet(identifier: string, ledgerConnection?: LedgerConnection): Promise<AirGapMarketWallet> {
+    return this.withApp(identifier, (app: LedgerApp) => app.importWallet(), ledgerConnection)
   }
 
-  public async signTransaction(identifier: string, ledgerConnection: LedgerConnection, transaction: any): Promise<string> {
-    return this.withApp(identifier, ledgerConnection, (app: LedgerApp) => app.signTranscation(transaction))
+  public async signTransaction(identifier: string, transaction: any, ledgerConnection?: LedgerConnection): Promise<string> {
+    return this.withApp(identifier, (app: LedgerApp) => app.signTranscation(transaction), ledgerConnection)
   }
 
-  private async withApp<T>(identifier: string, ledgerConnection: LedgerConnection, action: (app: LedgerApp) => Promise<T>): Promise<T> {
+  private async withApp<T>(identifier: string, action: (app: LedgerApp) => Promise<T>, ledgerConnection?: LedgerConnection): Promise<T> {
     const appKey: string = this.getAppKey(identifier, ledgerConnection)
 
     let app: LedgerApp | undefined = this.runningApps.get(appKey)
@@ -74,8 +74,8 @@ export class LedgerService {
       .finally(() => this.closeLedgerTransport(ledgerConnection))
   }
 
-  private async openLedgerTransport(ledgerConnection: LedgerConnection): Promise<LedgerTransport> {
-    const transport: LedgerTransport | null = await this.transportProvider.open(ledgerConnection.type, ledgerConnection.descriptor)
+  private async openLedgerTransport(ledgerConnection?: LedgerConnection): Promise<LedgerTransport> {
+    const transport: LedgerTransport | null = await this.transportProvider.open(ledgerConnection)
     this.openTransports.set(this.getTransportKey(ledgerConnection), transport)
 
     return transport
@@ -87,7 +87,7 @@ export class LedgerService {
     this.runningApps.clear()
   }
 
-  private async closeLedgerTransport(ledgerConnection: LedgerConnection): Promise<void> {
+  private async closeLedgerTransport(ledgerConnection?: LedgerConnection): Promise<void> {
     const transportKey: string = this.getTransportKey(ledgerConnection)
     const transport: LedgerTransport | undefined = this.openTransports.get(transportKey)
     if (transport) {
@@ -100,7 +100,7 @@ export class LedgerService {
     }
   }
 
-  private async openLedgerApp(identifier: string, ledgerConnection: LedgerConnection): Promise<LedgerApp> {
+  private async openLedgerApp(identifier: string, ledgerConnection?: LedgerConnection): Promise<LedgerApp> {
     const appFactory: (transport: LedgerTransport) => LedgerApp = this.supportedApps.get(identifier)
 
     if (!appFactory) {
@@ -116,11 +116,11 @@ export class LedgerService {
     return appFactory(transport)
   }
 
-  private getTransportKey(ledgerConnection: LedgerConnection): string {
-    return `${ledgerConnection.type}_${ledgerConnection.descriptor}`
+  private getTransportKey(ledgerConnection?: LedgerConnection): string {
+    return ledgerConnection ? `${ledgerConnection.type}_${ledgerConnection.descriptor}` : 'defaultTransport'
   }
 
-  private getAppKey(identifier: string, ledgerConnection: LedgerConnection): string {
+  private getAppKey(identifier: string, ledgerConnection?: LedgerConnection): string {
     return `${identifier}_${this.getTransportKey(ledgerConnection)}`
   }
 
@@ -136,10 +136,12 @@ export class LedgerService {
 
     if (isType<{ statusCode: number }>(error, 'statusCode')) {
       const errorMessage: string | null = getErrorFromStatusCode(error.statusCode)
-      if (!errorMessage) {
+      if (errorMessage) {
         return errorMessage
       }
-    } else if (isType<{ message: string }>(error, 'message')) {
+    }
+
+    if (isType<{ message: string }>(error, 'message')) {
       return error.message
     }
 

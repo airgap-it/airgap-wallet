@@ -23,8 +23,8 @@ export interface GetDevicesMessageReply {
 }
 
 export interface OpenMessage {
-  connectionType: LedgerConnectionType
-  descriptor: string
+  connectionType?: LedgerConnectionType
+  descriptor?: string
 }
 export interface OpenMessageReply {
   transportId: string

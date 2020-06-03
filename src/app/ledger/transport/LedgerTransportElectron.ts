@@ -24,7 +24,7 @@ export class LedgerTransportElectron implements LedgerTransport {
     return devices
   }
 
-  public static async open(connectionType: LedgerConnectionType, descriptor: string): Promise<LedgerTransportElectron> {
+  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerTransportElectron> {
     const { transportId }: OpenMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.OPEN,
       {

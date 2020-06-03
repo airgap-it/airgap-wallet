@@ -48,14 +48,9 @@ export class AccountImportLedgerPage {
     await this.showLoader('Importing account...')
 
     try {
-      const ledgerConnection = (await this.ledgerService.getConnectedDevices())[0]
-      if (ledgerConnection) {
-        const wallet = await this.ledgerService.importWallet(protocolIdentifier, ledgerConnection)
-        this.dataService.setData(DataServiceKey.WALLET, wallet)
-        this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      } else {
-        this.promptError('Device has not been detected.')
-      }
+      const wallet = await this.ledgerService.importWallet(protocolIdentifier)
+      this.dataService.setData(DataServiceKey.WALLET, wallet)
+      this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
       console.warn(error)
       this.promptError(error)

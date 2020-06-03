@@ -56,19 +56,13 @@ export class LedgerSignPage {
         }
       }
     }
-
-    this.connectWithLedger()
   }
 
   public async signTx() {
     await this.showLoader('Signing transaction...')
 
     try {
-      if (!this.ledgerConnection) {
-        throw new Error('No device has been found.')
-      }
-
-      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.ledgerConnection, this.unsignedTx)
+      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.unsignedTx, this.ledgerConnection)
       const signedTransactionSync: IACMessageDefinitionObject = {
         type: IACMessageType.MessageSignResponse,
         protocol: this.wallet.protocolIdentifier,
@@ -82,24 +76,6 @@ export class LedgerSignPage {
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    } catch (error) {
-      console.warn(error)
-      this.promptError(error)
-    } finally {
-      this.dismissLoader()
-    }
-  }
-
-  private async connectWithLedger() {
-    await this.showLoader('Connecting device...')
-
-    try {
-      const connectedDevices = await this.ledgerService.getConnectedDevices()
-      this.ledgerConnection = connectedDevices[0]
-
-      if (this.ledgerConnection) {
-        await this.ledgerService.openConnection(this.ledgerConnection)
-      }
     } catch (error) {
       console.warn(error)
       this.promptError(error)
