@@ -20,6 +20,7 @@ import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { switchMap, map } from 'rxjs/operators'
 import { from } from 'rxjs'
+import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 const hoursPerCycle: number = 68
 
@@ -210,42 +211,65 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return details
   }
 
-  // const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-  //   oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
-  // )
-
-  private async getRewardAmountsByCycle(accountAddress: string, bakerAddress: string): Promise<Map<number, string>> {
-    const protocol = new TezosProtocol()
+  private async getRewardAmountsByCycle(
+    protocol: TezosProtocol,
+    accountAddress: string,
+    bakerAddress: string
+  ): Promise<Map<number, string>> {
     const currentCycle = await protocol.fetchCurrentCycle()
     const cycles = [...Array(6).keys()].map(num => currentCycle - num)
     return new Map<number, string>(
       await Promise.all(
         cycles.map(
-          async (cycle): Promise<[number, string]> => [cycle, await this.getRewardAmountByCycle(accountAddress, bakerAddress, cycle)]
+          async (cycle): Promise<[number, string]> => [
+            cycle,
+            await this.getRewardAmountByCycle(protocol, accountAddress, bakerAddress, cycle, currentCycle)
+          ]
         )
       )
     )
   }
 
-  private async getRewardAmountByCycle(accountAddress: string, bakerAddress: string, cycle: number): Promise<string> {
-    const fee = this.airGapBakerConfig.fee
-    const protocol = new TezosProtocol()
-    return from(protocol.calculateRewards(bakerAddress, cycle))
+  private async getRewardAmountByCycle(
+    protocol: TezosProtocol,
+    accountAddress: string,
+    bakerAddress: string,
+    cycle: number,
+    currentCycle: number
+  ): Promise<string> {
+    return from(protocol.calculateRewards(bakerAddress, cycle, currentCycle))
       .pipe(
         switchMap(tezosRewards =>
-          from(protocol.calculatePayout(accountAddress, tezosRewards)).pipe(
+          from(this.calculatePayout(protocol, accountAddress, tezosRewards)).pipe(
             map(payout => {
               return payout
-                ? `~${this.amountConverter.transform(new BigNumber(payout.payout).minus(new BigNumber(payout.payout).times(fee)), {
+                ? this.amountConverter.transform(new BigNumber(payout.payout), {
                     protocolIdentifier: protocol.identifier,
-                    maxDigits: 6
-                  })}`
+                    maxDigits: 10
+                  })
                 : null
             })
           )
         )
       )
       .toPromise()
+  }
+
+  private async calculatePayout(protocol: TezosProtocol, address: string, rewards: TezosRewards): Promise<TezosPayoutInfo> {
+    if (!rewards.delegatedContracts.includes(address)) {
+      return {
+        delegator: address,
+        share: '0',
+        payout: '0'
+      }
+    }
+    return protocol.calculatePayout(address, rewards).catch(() => {
+      return {
+        delegator: address,
+        share: '0',
+        payout: '0'
+      }
+    })
   }
 
   private async createDelegatorDisplayRewards(
@@ -258,14 +282,17 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
 
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
-    const amountByCycle = await this.getRewardAmountsByCycle(address, delegatorExtraInfo.value)
+    const amountByCycle = await this.getRewardAmountsByCycle(protocol, address, delegatorExtraInfo.value)
     return new UIRewardList({
-      rewards: rewardInfo.slice(0, 5).map(reward => ({
-        index: reward.cycle,
-        amount: amountByCycle.get(reward.cycle),
-        collected: reward.payout < new Date(),
-        timestamp: reward.payout.getTime()
-      })),
+      rewards: rewardInfo
+        .slice(0, 5)
+        .map(reward => ({
+          index: reward.cycle,
+          amount: amountByCycle.get(reward.cycle),
+          collected: reward.payout < new Date(),
+          timestamp: reward.payout.getTime()
+        }))
+        .reverse(),
       indexColLabel: 'Cycle',
       amountColLabel: 'Expected Reward',
       payoutColLabel: 'Earliest Payout'
