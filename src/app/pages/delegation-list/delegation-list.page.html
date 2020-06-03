@@ -5,6 +5,11 @@
         <ion-back-button></ion-back-button>
       </ion-buttons>
       <ion-title>{{ "delegation-list.title" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="presentPopover($event)" color="secondary">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
     </ion-toolbar>
     <ion-toolbar>
       <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>

@@ -22,11 +22,18 @@ export class DelegateEditPopoverComponent {
     private readonly navParams: NavParams,
     private readonly translateService: TranslateService
   ) {
-    this.hideAirGap = this.navParams.get('hideAirGap')
-    this.delegateeLabel = this.navParams.get('delegateeLabel')
-    this.delegateeLabelPlural = this.navParams.get('delegateeLabelPlural')
-    this.hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
-    this.secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
+    const hideAirGap = this.navParams.get('hideAirGap')
+    const delegateeLabel = this.navParams.get('delegateeLabel')
+    const delegateeLabelPlural = this.navParams.get('delegateeLabelPlural')
+    const hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
+    const secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
+
+    this.hideAirGap = hideAirGap !== undefined ? hideAirGap : true
+    this.delegateeLabel = delegateeLabel !== undefined ? delegateeLabel : 'delegation-detail.default-delegatee-label'
+    this.delegateeLabelPlural =
+      delegateeLabelPlural !== undefined ? delegateeLabelPlural : 'delegation-detail.default-delegatee-label-plural'
+    this.hasMultipleDelegatees = hasMultipleDelegatees !== undefined ? hasMultipleDelegatees : false
+    this.secondaryDelegatorActions = secondaryDelegatorActions !== undefined ? secondaryDelegatorActions : []
   }
 
   public async changeDelegatee(): Promise<void> {

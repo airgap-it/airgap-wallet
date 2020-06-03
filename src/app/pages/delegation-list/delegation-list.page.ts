@@ -3,8 +3,12 @@ import { ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { NavController } from '@ionic/angular'
+import { NavController, PopoverController } from '@ionic/angular'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { OverlayEventDetail } from '@ionic/core'
+import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
+import { isType } from 'src/app/utils/utils'
+import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'delegation-list',
@@ -14,6 +18,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 export class DelegationListPage {
   public wallet: AirGapMarketWallet
 
+  public delegateeLabel: string
   public delegateeLabelPlural: string
 
   public searchTerm: string = ''
@@ -27,13 +32,15 @@ export class DelegationListPage {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly navController: NavController,
-    private readonly operations: OperationsProvider
+    private readonly operations: OperationsProvider,
+    private readonly popoverController: PopoverController
   ) {}
 
   ngOnInit() {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
+      this.delegateeLabel = info.delegateeLabel
       this.delegateeLabelPlural = info.delegateeLabelPlural
       this.callback = info.callback
 
@@ -44,6 +51,31 @@ export class DelegationListPage {
         this.filteredDelegatees = this.getKnownDelegatees()
       })
     }
+  }
+
+  public async presentPopover(event: any): Promise<void> {
+    const popover: HTMLIonPopoverElement = await this.popoverController.create({
+      component: DelegateEditPopoverComponent,
+      componentProps: {
+        delegateeLabel: this.delegateeLabel,
+        delegateeLabelPlural: this.delegateeLabelPlural
+      },
+      event,
+      translucent: true
+    })
+
+    popover
+      .onDidDismiss()
+      .then(async ({ data }: OverlayEventDetail<unknown>) => {
+        if (isType<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
+          this.navigateToDetails(data.delegateeAddress)
+        } else {
+          console.log('Unknown option selected.')
+        }
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+
+    return popover.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public setFilteredItems(searchTerm: string): void {

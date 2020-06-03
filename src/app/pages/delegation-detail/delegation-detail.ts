@@ -164,6 +164,7 @@ export class DelegationDetailPage {
   public showDelegateesList() {
     const info = {
       wallet: this.wallet,
+      delegateeLabel: this.delegateeLabel,
       delegateeLabelPlural: this.delegateeLabelPlural,
       currentDelegatees: this.currentDelegatees,
       callback: (address: string) => {
