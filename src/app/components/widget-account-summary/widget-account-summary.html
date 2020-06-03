@@ -1,6 +1,6 @@
 <ion-item lines="none" class="ion-no-padding ion-no-margin">
   <ion-avatar slot="start">
-    <img *ngIf="widget.logo" [src]="widget.logo" />
+    <img *ngIf="widget.logo" [src]="widget.logo" (error)="widget.onInvalidLogo()" />
     <identicon *ngIf="!widget.logo" [address]="widget.address"></identicon>
   </ion-avatar>
   <ion-label>

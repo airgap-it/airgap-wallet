@@ -34,4 +34,8 @@ export class UIAccount extends UIWidget {
 
     this.shortenAddress = config.shortenAddress || false
   }
+
+  public onInvalidLogo(): void {
+    this.logo = undefined
+  }
 }

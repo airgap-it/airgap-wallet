@@ -24,4 +24,8 @@ export class UIAccountSummary extends UIWidget {
     this.header = typeof config.header === 'string' ? [config.header, ''] : config.header
     this.description = typeof config.description === 'string' ? [config.description, ''] : config.description
   }
+
+  public onInvalidLogo(): void {
+    this.logo = undefined
+  }
 }
