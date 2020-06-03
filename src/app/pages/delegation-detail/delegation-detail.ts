@@ -172,7 +172,7 @@ export class DelegationDetailPage {
       wallet: this.wallet,
       delegateeLabel: this.delegateeLabel,
       delegateeLabelPlural: this.delegateeLabelPlural,
-      currentDelegatees: this.currentDelegatees,
+      currentDelegatees: this.delegatorDetails$.value.delegatees,
       callback: (address: string) => {
         this.changeDisplayedDetails(address)
       }
