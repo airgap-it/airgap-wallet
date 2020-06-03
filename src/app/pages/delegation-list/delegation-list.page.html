@@ -19,8 +19,8 @@
 
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="currentDelegatees && currentDelegatees.length > 0">
-      <ion-list lines="none">
+    <ng-container *ngIf="currentDelegatees; else currentLoadingTemplate">
+      <ion-list lines="none" *ngIf="currentDelegatees.length > 0">
         <ion-list-header>
           <ion-label>
             <ion-text color="primary" class="font--weight__bold ion-ion-text">
@@ -34,7 +34,52 @@
       </ion-list>
     </ng-container>
 
-    <ng-container *ngIf="filteredDelegatees; else loadingTemplate">
+    <ng-template #currentLoadingTemplate>
+      <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-avatar slot="start">
+            <identicon></identicon>
+          </ion-avatar>
+          <ion-label>
+            <ion-text>
+              <ion-row class="ion-no-padding">
+                <ion-col size="9" class="ion-no-padding">
+                  <h2>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h2>
+                </ion-col>
+                <ion-col size="3" class="ion-no-padding">
+                  <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                </ion-col>
+              </ion-row>
+            </ion-text>
+            <ion-row class="ion-no-padding">
+              <ion-col size="4" class="ion-no-padding">
+                <ion-text>
+                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </ion-text>
+              </ion-col>
+              <ion-col size="8" class="ion-no-padding">
+                <ion-text>
+                  <p class="ion-no-margin">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                  </p>
+                </ion-text>
+              </ion-col>
+            </ion-row>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+
+    <ng-container *ngIf="filteredDelegatees; else filteredLoadingTemplate">
       <ion-list lines="none" *ngIf="filteredDelegatees.length > 0">
         <ion-list-header>
           <ion-label>
@@ -48,13 +93,20 @@
         </div>
       </ion-list>
 
-      <ion-infinite-scroll (ionInfinite)="loadMoreItems($event)">
+      <ion-infinite-scroll [disabled]="searchTerm.length > 0" (ionInfinite)="loadMoreItems($event)">
         <ion-infinite-scroll-content></ion-infinite-scroll-content>
       </ion-infinite-scroll>
     </ng-container>
 
-    <ng-template #loadingTemplate>
+    <ng-template #filteredLoadingTemplate>
       <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.known-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
         <ion-item>
           <ion-avatar slot="start">
             <identicon></identicon>

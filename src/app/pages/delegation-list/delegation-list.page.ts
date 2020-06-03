@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
@@ -33,7 +33,8 @@ export class DelegationListPage {
     private readonly route: ActivatedRoute,
     private readonly navController: NavController,
     private readonly operations: OperationsProvider,
-    private readonly popoverController: PopoverController
+    private readonly popoverController: PopoverController,
+    private readonly ngZone: NgZone
   ) {}
 
   ngOnInit() {
@@ -48,7 +49,9 @@ export class DelegationListPage {
         this.currentDelegatees = summary.filter(summary => info.currentDelegatees.includes(summary.address))
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
-        this.filteredDelegatees = this.getKnownDelegatees()
+        this.ngZone.run(() => {
+          this.filteredDelegatees = this.getKnownDelegatees()
+        })
       })
     }
   }
@@ -93,9 +96,12 @@ export class DelegationListPage {
   }
 
   public loadMoreItems(event: any): void {
-    this.filteredDelegatees = [...this.filteredDelegatees, ...this.getKnownDelegatees(this.filteredDelegatees.length - 1)].filter(
-      (value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index
-    )
+    if (this.searchTerm.length === 0) {
+      this.filteredDelegatees = [...this.filteredDelegatees, ...this.getKnownDelegatees(this.filteredDelegatees.length - 1)].filter(
+        (value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index
+      )
+    }
+
     event.target.complete()
     if (this.filteredDelegatees.length === this.knownDelegatees.length) {
       event.target.disable = true
