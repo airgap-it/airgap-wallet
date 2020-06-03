@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 
 const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
 const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.prod.gke.papers.tech/api/v1'
@@ -20,7 +21,7 @@ export interface TezosBakerConfig {
 export interface TezosBakerDetails {
   alias: string
   address: string
-  logo?: string
+  logo?: string | SafeUrl
   hasLogo: boolean
   hasPayoutAddress?: boolean
   logoReference?: string
@@ -53,7 +54,7 @@ export interface CosmosValidatorDetails {
     update_time: string
   }
   min_self_delegation: string
-  logo?: string
+  logo?: string | SafeUrl
 }
 
 export interface AeFirstVote {
@@ -67,7 +68,7 @@ export interface AeFirstVote {
   providedIn: 'root'
 })
 export class RemoteConfigProvider {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient, private readonly sanitizer: DomSanitizer) {}
 
   public async tezosBakers(): Promise<TezosBakerConfig[]> {
     const responsePromise = this.httpClient.get<TezosBakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
@@ -99,17 +100,15 @@ export class RemoteConfigProvider {
         return {}
       })
 
-    const logos: [string, string | undefined][] = await Promise.all(
+    const logos: [string, string | SafeUrl | undefined][] = await Promise.all(
       Object.entries(bakersResponse)
         .filter(([_, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => baker.hasLogo)
         .map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
           return this.httpClient
-            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { headers, responseType: 'arraybuffer' })
+            .get(`${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}`, { headers, responseType: 'blob' })
             .toPromise()
-            .then((logo: ArrayBuffer) => {
-              const encoded: string = this.encodeBase64Image(logo, 'image/png')
-
-              return [address, encoded] as [string, string]
+            .then((logo: Blob) => {
+              return [address, this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(logo))] as [string, SafeUrl]
             })
             .catch(error => {
               handleErrorSentry(ErrorCategory.OTHER)(error)
@@ -119,7 +118,7 @@ export class RemoteConfigProvider {
         })
     )
 
-    logos.forEach(([address, logo]: [string, string | undefined]) => {
+    logos.forEach(([address, logo]: [string, string | SafeUrl | undefined]) => {
       bakersResponse[address].logo = logo
     })
 
@@ -145,9 +144,9 @@ export class RemoteConfigProvider {
     return Promise.all(
       validatorsResponse.map(async (validator: CosmosValidatorDetails) => {
         const logo: string | undefined = await this.httpClient
-          .get(`${COIN_LIB_SERVICE}/cosmos/validators/image/${validator.operator_address}`, { headers, responseType: 'arraybuffer' })
+          .get(`${COIN_LIB_SERVICE}/cosmos/validators/image/${validator.operator_address}`, { headers, responseType: 'blob' })
           .toPromise()
-          .then((logo: ArrayBuffer) => this.encodeBase64Image(logo, 'image/png'))
+          .then((logo: Blob) => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(logo)))
           .catch(() => {
             return undefined
           })
@@ -168,11 +167,5 @@ export class RemoteConfigProvider {
         }
       })
     )
-  }
-
-  private encodeBase64Image(image: ArrayBuffer, mimeType: string): string {
-    const buffer: Buffer = Buffer.from(image)
-
-    return `data:${mimeType};base64,${buffer.toString('base64')}`
   }
 }

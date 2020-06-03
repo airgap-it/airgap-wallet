@@ -221,7 +221,8 @@ export class DelegationDetailPage {
       this.delegateeAccountWidget = details
         ? new UIAccount({
             name: details.name,
-            address: details.address
+            address: details.address,
+            logo: details.logo
           })
         : null
     })

@@ -1,6 +1,7 @@
 <ion-item lines="none" class="ion-no-padding ion-no-margin">
   <ion-avatar slot="start">
-    <identicon [address]="widget.address"></identicon>
+    <img *ngIf="widget.logo" [src]="widget.logo" />
+    <identicon *ngIf="!widget.logo" [address]="widget.address"></identicon>
   </ion-avatar>
   <ion-label>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.hasName">{{ widget.name }}</h2>

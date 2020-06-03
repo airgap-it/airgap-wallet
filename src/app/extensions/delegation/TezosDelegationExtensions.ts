@@ -96,7 +96,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       (details: Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>) =>
         new UIAccountSummary({
           address: details.address,
-          image: details.logo ? details.logo : undefined,
+          logo: details.logo ? details.logo : undefined,
           header: details.alias || '',
           description: this.shortenStringPipe.transform(details.address)
         })
@@ -143,6 +143,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       name,
       status,
       address: bakerDetails.address,
+      logo: knownBaker ? knownBaker.logo : undefined,
       usageDetails: {
         usage: bakerUsage,
         current: bakerCurrentUsage,

@@ -7,6 +7,7 @@ import { FormGroup } from '@angular/forms'
 import { UIRewardList } from '../models/widgets/display/UIRewardList'
 import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
+import { SafeUrl } from '@angular/platform-browser'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -25,6 +26,7 @@ export interface AirGapDelegatorAction {
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {
+  logo?: string | SafeUrl
   usageDetails?: AirGapDelegateeUsageDetails
   displayDetails?: UIWidget[]
 }

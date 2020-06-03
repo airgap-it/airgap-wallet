@@ -108,7 +108,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       (details: CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)) =>
         new UIAccountSummary({
           address: details.operator_address,
-          image: details.logo ? details.logo : undefined,
+          logo: details.logo ? details.logo : undefined,
           header: [
             details.description.moniker,
             this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString()) + '%'
@@ -157,11 +157,17 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private async getExtraValidatorDetails(protocol: CosmosProtocol, validatorDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
     const results = await Promise.all([
       protocol.nodeClient.fetchValidator(validatorDetails.address),
-      protocol.fetchSelfDelegation(validatorDetails.address)
+      protocol.fetchSelfDelegation(validatorDetails.address),
+      this.getKnownValidators()
     ])
 
     const allDetails = results[0]
     const selfDelegation = results[1]
+    const knownValidators = results[2]
+
+    const knownValidator = knownValidators.find(
+      (validator: CosmosValidatorDetails) => validator.operator_address === validatorDetails.address
+    )
 
     const currentUsage = new BigNumber(selfDelegation.shares)
     const totalUsage = new BigNumber(allDetails.tokens)
@@ -170,6 +176,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     return {
       ...validatorDetails,
+      logo: knownValidator ? knownValidator.logo : undefined,
       usageDetails: {
         usage: currentUsage.div(totalUsage),
         current: currentUsage,
