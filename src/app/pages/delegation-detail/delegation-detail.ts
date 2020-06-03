@@ -229,14 +229,13 @@ export class DelegationDetailPage {
 
     this.delegatorDetails$.subscribe(async details => {
       if (details) {
-        // TODO: add translations
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
           text: this.amountConverter.transform(details.balance, {
             protocolIdentifier: this.wallet.protocolIdentifier,
             maxDigits: 10
           }),
-          description: 'Your balance'
+          description: 'delegation-detail.your-balance_label'
         })
 
         this.setupAllActions(details)

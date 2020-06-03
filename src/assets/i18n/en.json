@@ -412,6 +412,7 @@
     "default-delegatee-label-plural": "Delegations",
     "change-delegatee_label": "Change {{ delegateeLabel }}",
     "your-delegation_label": "Your Delegation",
+    "your-balance_label": "Your Balance",
     "your-rewards_label": "Your Rewards",
     "done_button": "Done",
     "amount_label": "Amount",
