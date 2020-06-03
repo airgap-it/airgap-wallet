@@ -540,11 +540,13 @@
     "change-vote_label": "Change Vote",
     "done_label": "Done"
   },
+  "delegate-action-popover": {
+    "delegation-settings_label": "Delegation Settings",
+    "change-to-airgap-delegatee_label": "Change to AirGap {{ delegateeLabel }}"
+  },
   "delegate-edit-popover": {
     "delegation-settings_label": "Delegation Settings",
     "change-delegatee_label": "Change {{ delegateeLabel }}",
-    "change-to-airgap-delegatee_label": "Change to AirGap {{ delegateeLabel }}",
-    "show-delegatees-list_label": "Show {{ delegateeLabelPlural }} List",
     "change-alert": {
       "text": "Enter the address provided to you by the {{ delegateeLabel }}.",
       "placeholder_text": "{{ delegateeLabel }} address",

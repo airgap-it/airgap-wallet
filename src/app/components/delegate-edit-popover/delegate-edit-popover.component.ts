@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/angular/node_modules/@ionic/core'
-import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { TranslateService } from '@ngx-translate/core'
 
 @Component({
@@ -10,11 +9,8 @@ import { TranslateService } from '@ngx-translate/core'
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
-  public readonly hideAirGap: boolean
   public readonly delegateeLabel: string
   public readonly delegateeLabelPlural: string
-  public readonly hasMultipleDelegatees: boolean
-  public readonly secondaryDelegatorActions: AirGapDelegatorAction[]
 
   constructor(
     private readonly alertController: AlertController,
@@ -22,18 +18,12 @@ export class DelegateEditPopoverComponent {
     private readonly navParams: NavParams,
     private readonly translateService: TranslateService
   ) {
-    const hideAirGap = this.navParams.get('hideAirGap')
-    const delegateeLabel = this.navParams.get('delegateeLabel')
-    const delegateeLabelPlural = this.navParams.get('delegateeLabelPlural')
-    const hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
-    const secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
+    const delegateeLabel: string | undefined = this.navParams.get('delegateeLabel')
+    const delegateeLabelPlural: string | undefined = this.navParams.get('delegateeLabelPlural')
 
-    this.hideAirGap = hideAirGap !== undefined ? hideAirGap : true
     this.delegateeLabel = delegateeLabel !== undefined ? delegateeLabel : 'delegation-detail.default-delegatee-label'
     this.delegateeLabelPlural =
       delegateeLabelPlural !== undefined ? delegateeLabelPlural : 'delegation-detail.default-delegatee-label-plural'
-    this.hasMultipleDelegatees = hasMultipleDelegatees !== undefined ? hasMultipleDelegatees : false
-    this.secondaryDelegatorActions = secondaryDelegatorActions !== undefined ? secondaryDelegatorActions : []
   }
 
   public async changeDelegatee(): Promise<void> {
@@ -79,17 +69,5 @@ export class DelegateEditPopoverComponent {
         }
       ]
     }
-  }
-
-  public async changeDelegateeToAirGap() {
-    this.popoverController.dismiss({ changeToAirGap: true })
-  }
-
-  public async showAllDelegatees() {
-    this.popoverController.dismiss({ showDelegateeList: true })
-  }
-
-  public async callSecondaryAction(type: string) {
-    this.popoverController.dismiss({ secondaryActionType: type })
   }
 }

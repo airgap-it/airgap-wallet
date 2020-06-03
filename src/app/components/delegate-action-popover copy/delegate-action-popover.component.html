@@ -1,0 +1,13 @@
+<ion-list lines="none" no-detail class="ion-no-padding ion-no-margin">
+  <ion-list-header>
+    <ion-label>{{ 'delegate-action-popover.delegation-settings_label' | translate }}</ion-label>
+  </ion-list-header>
+  <ion-item *ngIf="!hideAirGap" button detail="false" (click)="changeDelegateeToAirGap()">
+    <ion-icon name="swap-vertical-outline" color="dark" slot="end"></ion-icon>
+    {{ 'delegate-action-popover.change-to-airgap-delegatee_label' | translate: { delegateeLabel: delegateeLabel | translate } }}
+  </ion-item>
+  <ion-item *ngFor="let action of secondaryDelegatorActions || []" button detail="false" (click)="callSecondaryAction(action.type)">
+    <ion-icon [name]="action.iconName || 'send-outline'" color="dark" slot="end"></ion-icon>
+    {{ action.confirmLabel || action.label | translate }}
+  </ion-item>
+</ion-list>

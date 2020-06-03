@@ -2,22 +2,10 @@
   <ion-list-header>
     <ion-label>{{ 'delegate-edit-popover.delegation-settings_label' | translate }}</ion-label>
   </ion-list-header>
-  <ion-item *ngIf="!hideAirGap" button detail="false" (click)="changeDelegateeToAirGap()">
-    <ion-icon name="swap-vertical-outline" color="dark" slot="end"></ion-icon>
-    {{ 'delegate-edit-popover.change-to-airgap-delegatee_label' | translate: { delegateeLabel: delegateeLabel | translate } }}
-  </ion-item>
   <ion-item button detail="false" (click)="changeDelegatee()">
     <ion-icon name="create-outline" color="dark" slot="end"></ion-icon>
     <span *ngIf="delegateeLabel">
       {{ 'delegate-edit-popover.change-delegatee_label' | translate: { delegateeLabel: delegateeLabel | translate } }}
     </span>
-  </ion-item>
-  <ion-item *ngIf="hasMultipleDelegatees" button detail="false" (click)="showAllDelegatees()">
-    <ion-icon name="list-outline" color="dark" slot="end"></ion-icon>
-    {{ 'delegate-edit-popover.show-delegatees-list_label' | translate: { delegateeLabelPlural: delegateeLabelPlural | translate } }}
-  </ion-item>
-  <ion-item *ngFor="let action of secondaryDelegatorActions || []" button detail="false" (click)="callSecondaryAction(action.type)">
-    <ion-icon [name]="action.iconName || 'send-outline'" color="dark" slot="end"></ion-icon>
-    {{ action.confirmLabel || action.label | translate }}
   </ion-item>
 </ion-list>

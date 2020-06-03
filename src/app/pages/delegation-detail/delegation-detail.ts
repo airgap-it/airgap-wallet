@@ -20,9 +20,9 @@ import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
-import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { isType } from 'src/app/utils/utils'
+import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -50,10 +50,24 @@ export class DelegationDetailPage {
   public canProceed: boolean = true
   public hasRewardDetails: boolean | undefined = undefined
 
+  public get showOverflowMenu(): boolean {
+    const delegatorDetails = this.delegatorDetails$.value
+
+    return (
+      !this.isAirGapDelegatee || (delegatorDetails && delegatorDetails.secondaryActions && delegatorDetails.secondaryActions.length > 0)
+    )
+  }
+
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
 
     return details.mainActions && details.mainActions.some(action => !!action.description || !!action.args)
+  }
+
+  private get isAirGapDelegatee(): boolean {
+    return supportsAirGapDelegation(this.wallet.coinProtocol)
+      ? this.wallet.coinProtocol.airGapDelegatee && this.delegateeAddress$.value === this.wallet.coinProtocol.airGapDelegatee
+      : true
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
@@ -95,14 +109,10 @@ export class DelegationDetailPage {
     const secondaryActions = delegatorDetails ? delegatorDetails.secondaryActions : undefined
 
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
-      component: DelegateEditPopoverComponent,
+      component: DelegateActionPopoverComponent,
       componentProps: {
-        hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
-          ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
-          : true,
+        hideAirGap: this.isAirGapDelegatee,
         delegateeLabel: this.delegateeLabel,
-        delegateeLabelPlural: this.delegateeLabelPlural,
-        hasMultipleDelegatees: this.currentDelegatees.length > 1,
         secondaryDelegatorActions: secondaryActions
       },
       event,
@@ -112,12 +122,8 @@ export class DelegationDetailPage {
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
-        if (isType<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
-          this.changeDisplayedDetails(data.delegateeAddress)
-        } else if (isType<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
+        if (isType<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
           this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
-        } else if (isType<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
-          this.showDelegateesList()
         } else if (isType<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
           this.callSecondaryAction(data.secondaryActionType)
         } else {
