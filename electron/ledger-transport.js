@@ -32,6 +32,9 @@ process.on('message', async message => {
           const transportId = await openTransport(message.data.connectionType, message.data.descriptor)
           data = { transportId }
           break
+        case 'decorate-app':
+          decorateAppApiMethods(message.data.transportId, message.data.self, message.data.methods, message.data.scrambleKey)
+          break
         case 'send':
           const response = await send(
             message.data.transportId,
@@ -84,10 +87,17 @@ async function openTransport(connectionType, descriptor) {
     default:
       transport = await TransportNodeHid.create(3000, 3000)
   }
-  const transportId = `${connectionType}-${new Date().getTime().toString()}`
+  const transportId = `${connectionType || 'default'}-${new Date().getTime().toString()}`
 
   transports.set(transportId, transport)
   return transportId
+}
+
+function decorateAppApiMethods(transportId, self, methods, scrambleKey) {
+  const transport = transports.get(transportId)
+  if (transport) {
+    transport.decorateAppAPIMethods(self, methods, scrambleKey)
+  }
 }
 
 async function send(transportId, cla, ins, p1, p2, data) {

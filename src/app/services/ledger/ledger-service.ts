@@ -57,7 +57,7 @@ export class LedgerService {
   }
 
   public async signTransaction(identifier: string, transaction: any, ledgerConnection?: LedgerConnection): Promise<string> {
-    return this.withApp(identifier, (app: LedgerApp) => app.signTranscation(transaction), ledgerConnection)
+    return this.withApp(identifier, (app: LedgerApp) => app.signTransaction(transaction), ledgerConnection)
   }
 
   private async withApp<T>(identifier: string, action: (app: LedgerApp) => Promise<T>, ledgerConnection?: LedgerConnection): Promise<T> {
@@ -66,6 +66,8 @@ export class LedgerService {
     let app: LedgerApp | undefined = this.runningApps.get(appKey)
     if (!app) {
       app = await this.openLedgerApp(identifier, ledgerConnection)
+      app.init()
+
       this.runningApps.set(appKey, app)
     }
 

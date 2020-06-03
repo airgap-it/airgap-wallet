@@ -39,6 +39,19 @@ export class LedgerTransportElectron implements LedgerTransport {
 
   private constructor(readonly connectionType: LedgerConnectionType, private readonly transportId: string) {}
 
+  public async decorateAppApiMethods(self: Object, methods: string[], scrambleKey: string): Promise<void> {
+    await LedgerTransportElectron.bridge.sendToLedger(
+      LedgerProcessMessageType.DECORATE_APP,
+      {
+        transportId: this.transportId,
+        self,
+        methods,
+        scrambleKey
+      },
+      `${this.transportId}_decorateAppApiMethods`
+    )
+  }
+
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
     const { response }: SendMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
       LedgerProcessMessageType.SEND,

@@ -4,8 +4,17 @@ import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
 async function getUsbDevices(): Promise<LedgerConnection[]> {
+  const isWebUsbSupported: boolean = await TransportWebUSB.isSupported()
   const isU2fSupported: boolean = await TransportU2F.isSupported()
-  const descriptorsPromise: Promise<readonly string[]> = isU2fSupported ? TransportU2F.list() : TransportWebUSB.list()
+
+  let descriptorsPromise: Promise<readonly string[]>
+  if (isU2fSupported) {
+    descriptorsPromise = TransportU2F.list()
+  } else if (isWebUsbSupported) {
+    descriptorsPromise = TransportWebUSB.list()
+  } else {
+    return []
+  }
 
   return descriptorsPromise
     .then((descriptors: readonly string[]) => {
@@ -72,6 +81,10 @@ export class LedgerTransportBrowser implements LedgerTransport {
   }
 
   private constructor(readonly connectionType: LedgerConnectionType, private readonly transport: Transport) {}
+
+  public async decorateAppApiMethods(self: Object, methods: string[], scrambleKey: string): Promise<void> {
+    this.transport.decorateAppAPIMethods(self, methods, scrambleKey)
+  }
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
     return this.transport.send(cla, ins, p1, p2, data)

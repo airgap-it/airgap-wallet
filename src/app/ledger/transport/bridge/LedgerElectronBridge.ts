@@ -8,6 +8,8 @@ export enum LedgerProcessMessageType {
   OPEN = 'open',
   OPEN_REPLY = 'open-reply',
 
+  DECORATE_APP = 'decorate-app',
+
   SEND = 'send',
   SEND_REPLY = 'send-reply',
 
@@ -26,8 +28,16 @@ export interface OpenMessage {
   connectionType?: LedgerConnectionType
   descriptor?: string
 }
+
 export interface OpenMessageReply {
   transportId: string
+}
+
+export interface DecorateAppMessage {
+  transportId: string
+  self: Object
+  methods: string[]
+  scrambleKey: string
 }
 
 export interface SendMessage {
@@ -55,6 +65,8 @@ export type LedgerProcessMessage<T extends LedgerProcessMessageType> = T extends
   ? OpenMessage
   : T extends LedgerProcessMessageType.OPEN_REPLY
   ? OpenMessageReply
+  : T extends LedgerProcessMessageType.DECORATE_APP
+  ? DecorateAppMessage
   : T extends LedgerProcessMessageType.SEND
   ? SendMessage
   : T extends LedgerProcessMessageType.SEND_REPLY

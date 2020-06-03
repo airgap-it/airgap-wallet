@@ -87,7 +87,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     }
   }
 
-  public async signTranscation(transaction: RawSubstrateTransaction): Promise<string> {
+  public async signTransaction(transaction: RawSubstrateTransaction): Promise<string> {
     const txs = this.protocol.transactionController.decodeDetails(transaction.encoded)
     const signed = await Promise.all(txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload)))
 

@@ -10,11 +10,16 @@ const MASK_SOFT_DERIVATION: number = 0x00000000
 
 export abstract class LedgerApp {
   public abstract appIdentifier: number
+  public abstract scrambleKey: string
 
   public constructor(protected readonly transport: LedgerTransport) {}
 
   public abstract async importWallet(): Promise<AirGapMarketWallet>
-  public abstract async signTranscation(transaction: any): Promise<IAirGapSignedTransaction>
+  public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
+
+  public init(): void {
+    this.transport.decorateAppApiMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
+  }
 
   protected derivationPathToBuffer(derivationPath: string): Buffer {
     const deriveJunctions: number[] = derivationPath
