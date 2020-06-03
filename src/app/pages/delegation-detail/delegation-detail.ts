@@ -71,7 +71,6 @@ export class DelegationDetailPage {
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
-  private currentDelegatees: string[] = []
 
   private loader: HTMLIonLoadingElement | undefined
 
@@ -197,7 +196,6 @@ export class DelegationDetailPage {
 
     this.operations.getCurrentDelegatees(this.wallet).then(addresses => {
       if (addresses) {
-        this.currentDelegatees = addresses
         this.delegateeAddress$.next(addresses[0])
       }
     })
