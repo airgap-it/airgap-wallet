@@ -4,7 +4,7 @@ import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefin
 import BigNumber from 'bignumber.js'
 
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { LedgerConnection } from 'src/app/ledger/transport/LedgerTransport'
+import { LedgerConnectionDetails } from 'src/app/ledger/connection/LedgerConnection'
 import { LoadingController, AlertController } from '@ionic/angular'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -26,7 +26,7 @@ export class LedgerSignPage {
   }
 
   private readonly unsignedTx: any
-  private ledgerConnection?: LedgerConnection
+  private ledgerConnection?: LedgerConnectionDetails
 
   private loader: HTMLIonLoadingElement | undefined
 

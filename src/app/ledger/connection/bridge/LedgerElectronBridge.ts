@@ -1,4 +1,4 @@
-import { LedgerConnection, LedgerConnectionType } from '../LedgerTransport'
+import { LedgerConnectionDetails, LedgerConnectionType } from '../LedgerConnection'
 import { ElectronProcess } from 'src/app/models/ElectronProcess'
 
 export enum LedgerProcessMessageType {
@@ -27,7 +27,7 @@ export interface GetDevicesMessage {
   connectionType: LedgerConnectionType
 }
 export interface GetDevicesMessageReply {
-  devices: LedgerConnection[]
+  devices: LedgerConnectionDetails[]
 }
 
 export interface OpenMessage {

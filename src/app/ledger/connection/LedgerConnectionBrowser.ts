@@ -1,9 +1,9 @@
-import { LedgerTransport, LedgerConnectionType, LedgerConnection } from './LedgerTransport'
+import { LedgerConnection, LedgerConnectionType, LedgerConnectionDetails } from './LedgerConnection'
 import Transport from '@ledgerhq/hw-transport'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
-async function getUsbDevices(): Promise<LedgerConnection[]> {
+async function getUsbDevices(): Promise<LedgerConnectionDetails[]> {
   const [isWebUsbSupported, isU2fSupported]: [boolean, boolean] = await Promise.all([
     TransportWebUSB.isSupported(),
     TransportU2F.isSupported()
@@ -59,8 +59,8 @@ async function openUsbTransport(descriptor?: string): Promise<Transport> {
   return transport ? transport : Promise.reject('USB connection not supported.')
 }
 
-export class LedgerTransportBrowser implements LedgerTransport {
-  public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnection[]> {
+export class LedgerConnectionBrowser implements LedgerConnection {
+  public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
     switch (connectionType) {
       case LedgerConnectionType.USB:
         return getUsbDevices()
@@ -69,7 +69,7 @@ export class LedgerTransportBrowser implements LedgerTransport {
     }
   }
 
-  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerTransportBrowser> {
+  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerConnectionBrowser> {
     let transport: Transport
     switch (connectionType) {
       case LedgerConnectionType.USB:
@@ -81,8 +81,8 @@ export class LedgerTransportBrowser implements LedgerTransport {
         transport = await openUsbTransport()
     }
 
-    return new LedgerTransportBrowser(connectionType, transport)
+    return new LedgerConnectionBrowser(connectionType, transport)
   }
 
-  private constructor(readonly connectionType: LedgerConnectionType, readonly hwTransport: Transport) {}
+  private constructor(readonly type: LedgerConnectionType, readonly transport: Transport) {}
 }

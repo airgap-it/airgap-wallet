@@ -1,8 +1,7 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGapSignedTransaction'
-import Transport from '@ledgerhq/hw-transport'
 
-import { LedgerTransport } from '../transport/LedgerTransport'
+import { LedgerConnection } from '../connection/LedgerConnection'
 
 const BYTES_DERIVATION_JUNCTION: number = 4
 
@@ -13,18 +12,11 @@ export abstract class LedgerApp {
   public abstract appIdentifier: number
   public abstract scrambleKey: string
 
-  protected readonly transport: Transport
+  public constructor(protected readonly connection: LedgerConnection) {}
 
-  public constructor(ledgerTransport: LedgerTransport) {
-    this.transport = ledgerTransport.hwTransport
-  }
-
+  public abstract init(): void
   public abstract async importWallet(): Promise<AirGapMarketWallet>
   public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
-
-  public init(): void {
-    this.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
-  }
 
   protected derivationPathToBuffer(derivationPath: string): Buffer {
     const deriveJunctions: number[] = derivationPath

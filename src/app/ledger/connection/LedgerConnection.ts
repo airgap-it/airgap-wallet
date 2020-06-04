@@ -5,12 +5,12 @@ export enum LedgerConnectionType {
   BLE = 'BLE'
 }
 
-export interface LedgerConnection {
+export interface LedgerConnectionDetails {
   descriptor: string
   type: LedgerConnectionType
 }
 
-export interface LedgerTransport {
-  connectionType: LedgerConnectionType
-  hwTransport: Transport
+export interface LedgerConnection {
+  type: LedgerConnectionType
+  transport: Transport
 }

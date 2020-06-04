@@ -61,6 +61,10 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
   protected abstract protocol: SubstrateProtocol
 
+  public init(): void {
+    this.connection.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
+  }
+
   public async importWallet(): Promise<AirGapMarketWallet> {
     const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
 
@@ -71,7 +75,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
        * ? bytes  - address
        * 2 bytes  - return code
        */
-      const response: Buffer = await this.transport.send(
+      const response: Buffer = await this.connection.transport.send(
         this.appIdentifier,
         Instruction.GET_ADDRESS_ED25519,
         RequiresConfirmation.NO,
@@ -162,7 +166,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
   }
 
   private async signSendPayloadChunk(chunk: Buffer, descriptor: PayloadDescriptor): Promise<Buffer> {
-    const response = await this.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, chunk)
+    const response = await this.connection.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, chunk)
 
     const returnCode = response.slice(-2)
     if (returnCode.readUInt16BE(0) !== ReturnCode.SUCCESS) {

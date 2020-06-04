@@ -6,7 +6,7 @@ import {
   SendMessageReply,
   ExchangeMessageReply
 } from './bridge/LedgerElectronBridge'
-import { LedgerConnection, LedgerConnectionType, LedgerTransport } from './LedgerTransport'
+import { LedgerConnectionDetails, LedgerConnectionType, LedgerConnection } from './LedgerConnection'
 
 import Transport from '@ledgerhq/hw-transport'
 
@@ -104,13 +104,13 @@ class TransportElectron implements Transport {
   }
 }
 
-export class LedgerTransportElectron implements LedgerTransport {
+export class LedgerConnectionElectron implements LedgerConnection {
   private static get bridge(): LedgerElectronBridge {
     return LedgerElectronBridge.getInstance()
   }
 
-  public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnection[]> {
-    const { devices }: GetDevicesMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
+  public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
+    const { devices }: GetDevicesMessageReply = await LedgerConnectionElectron.bridge.sendToLedger(
       LedgerProcessMessageType.GET_DEVICES,
       {
         connectionType
@@ -121,8 +121,8 @@ export class LedgerTransportElectron implements LedgerTransport {
     return devices
   }
 
-  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerTransportElectron> {
-    const { transportId }: OpenMessageReply = await LedgerTransportElectron.bridge.sendToLedger(
+  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerConnectionElectron> {
+    const { transportId }: OpenMessageReply = await LedgerConnectionElectron.bridge.sendToLedger(
       LedgerProcessMessageType.OPEN,
       {
         connectionType,
@@ -131,9 +131,9 @@ export class LedgerTransportElectron implements LedgerTransport {
       `${connectionType}_${descriptor}`
     )
 
-    const transport = new TransportElectron(transportId, LedgerTransportElectron.bridge)
-    return new LedgerTransportElectron(connectionType, transport)
+    const transport = new TransportElectron(transportId, LedgerConnectionElectron.bridge)
+    return new LedgerConnectionElectron(connectionType, transport)
   }
 
-  private constructor(readonly connectionType: LedgerConnectionType, readonly hwTransport: TransportElectron) {}
+  private constructor(readonly type: LedgerConnectionType, readonly transport: TransportElectron) {}
 }
