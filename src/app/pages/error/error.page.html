@@ -9,7 +9,7 @@
 <ion-content class="ion-padding">
   <p class="ion-margin-bottom">{{ message }}</p>
 
-  <pre *ngIf="data">{{ data | json }}</pre>
+  <pre *ngIf="data">{{ parsedData }}</pre>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button fill="outline" color="primary" (click)="dismiss()">
