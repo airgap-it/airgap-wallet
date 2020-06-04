@@ -1,8 +1,12 @@
 import {
+  BEACON_VERSION,
+  BeaconErrorType,
   BeaconMessageType,
   BeaconRequestOutputMessage,
   BeaconResponseInputMessage,
   BroadcastResponseInput,
+  Network,
+  NetworkType,
   OperationResponseInput,
   P2PPairInfo,
   SignPayloadResponseInput,
@@ -11,6 +15,7 @@ import {
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
+import { ErrorPage } from 'src/app/pages/error/error.page'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
@@ -30,9 +35,21 @@ export class BeaconService {
     await this.client.init()
 
     return this.client.connect(async message => {
-      console.log('WALLET gotEncryptedMessage:', message)
+      if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
+        const responseType: BeaconMessageType =
+          message.type === BeaconMessageType.PermissionRequest
+            ? BeaconMessageType.PermissionResponse
+            : message.type === BeaconMessageType.OperationRequest
+            ? BeaconMessageType.OperationResponse
+            : message.type === BeaconMessageType.BroadcastRequest
+            ? BeaconMessageType.BroadcastResponse
+            : BeaconMessageType.BroadcastResponse
+        // TODO: Add function to sdk that gets corresponding response type for request type
 
-      await this.presentModal(message)
+        return this.sendNetworkNotSupportedError(message.id, responseType)
+      } else {
+        await this.presentModal(message)
+      }
     })
   }
 
@@ -119,5 +136,42 @@ export class BeaconService {
 
   public async removeAllPeers(): Promise<void> {
     await this.client.removeAllPeers()
+  }
+
+  private async isNetworkSupported(network?: Network): Promise<boolean> {
+    if (!network) {
+      return true
+    }
+
+    return network.type === NetworkType.MAINNET
+  }
+
+  private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+    const modal = await this.modalController.create({
+      component: ErrorPage,
+      componentProps: {
+        title: error.name,
+        message: error.message,
+        data: error.data ? error.data : error.stack
+      }
+    })
+
+    return modal.present()
+  }
+
+  private async sendNetworkNotSupportedError(id: string, type: BeaconMessageType): Promise<void> {
+    const responseInput = {
+      id,
+      type,
+      errorType: BeaconErrorType.NETWORK_NOT_SUPPORTED
+    } as any
+
+    const response: BeaconResponseInputMessage = {
+      beaconId: await this.client.beaconId,
+      version: BEACON_VERSION,
+      ...responseInput
+    }
+    await this.respond(response)
+    await this.displayErrorPage(new Error('Network not supported!'))
   }
 }
