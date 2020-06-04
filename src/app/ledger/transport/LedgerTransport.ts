@@ -1,3 +1,5 @@
+import Transport from '@ledgerhq/hw-transport'
+
 export enum LedgerConnectionType {
   USB = 'USB',
   BLE = 'BLE'
@@ -10,8 +12,5 @@ export interface LedgerConnection {
 
 export interface LedgerTransport {
   connectionType: LedgerConnectionType
-
-  decorateAppApiMethods(self: Object, methods: string[], scrambleKey: string): Promise<void>
-  send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer>
-  close(): Promise<void>
+  hwTransport: Transport
 }

@@ -32,11 +32,8 @@ process.on('message', async message => {
           const transportId = await openTransport(message.data.connectionType, message.data.descriptor)
           data = { transportId }
           break
-        case 'decorate-app':
-          decorateAppApiMethods(message.data.transportId, message.data.self, message.data.methods, message.data.scrambleKey)
-          break
         case 'send':
-          const response = await send(
+          const sendResponse = await send(
             message.data.transportId,
             message.data.cla,
             message.data.ins,
@@ -44,10 +41,23 @@ process.on('message', async message => {
             message.data.p2,
             message.data.hexData ? Buffer.from(message.data.hexData, 'hex') : undefined
           )
-          data = { response: response ? response.toString('hex') : undefined }
+          data = { response: sendResponse }
+          break
+        case 'exchange':
+          const exchangeResponse = await exchange(message.data.transportId, message.data.apdu)
+          data = { response: exchangeResponse }
+          break
+        case 'set-exchange-timeout':
+          setExchangeTimeout(message.data.transportId, message.data.timeout)
           break
         case 'close':
           await close(message.data.transportId)
+          break
+        case 'decorate-app':
+          decorateAppAPIMethods(message.data.transportId, message.data.self, message.data.methods, message.data.scrambleKey)
+          break
+        case 'set-scramble-key':
+          setScrambleKey(message.data.transportId, message.data.key)
           break
       }
     } catch (error) {
@@ -93,20 +103,30 @@ async function openTransport(connectionType, descriptor) {
   return transportId
 }
 
-function decorateAppApiMethods(transportId, self, methods, scrambleKey) {
-  const transport = transports.get(transportId)
-  if (transport) {
-    transport.decorateAppAPIMethods(self, methods, scrambleKey)
-  }
-}
-
 async function send(transportId, cla, ins, p1, p2, data) {
   const transport = transports.get(transportId)
   if (transport) {
     const response = await transport.send(cla, ins, p1, p2, data)
-    return response
+    return response ? response : Buffer.alloc(0)
   } else {
     return Buffer.alloc(0)
+  }
+}
+
+async function exchange(transportId, apdu) {
+  const transport = transports.get(transportId)
+  if (transport) {
+    const response = await transport.exchange(apdu)
+    return response ? response : Buffer.alloc(0)
+  } else {
+    return Buffer.alloc(0)
+  }
+}
+
+function setExchangeTimeout(transportId, timeout) {
+  const transport = transports.get(transportId)
+  if (transport) {
+    transport.setExchangeTimeout(timeout)
   }
 }
 
@@ -121,6 +141,20 @@ async function close(transportId) {
 function closeAll() {
   TransportNodeHid.disconnect()
   TransportNodeBle.disconnect()
+}
+
+function decorateAppAPIMethods(transportId, self, methods, scrambleKey) {
+  const transport = transports.get(transportId)
+  if (transport) {
+    transport.decorateAppAPIMethods(self, methods, scrambleKey)
+  }
+}
+
+function setScrambleKey(transportId, key) {
+  const transport = transports.get(transportId)
+  if (transport) {
+    transport.setScrambleKey(key)
+  }
 }
 
 async function getUsbDevices() {

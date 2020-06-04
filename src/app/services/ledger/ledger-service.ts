@@ -84,7 +84,7 @@ export class LedgerService {
   }
 
   private async closeAllLedgerTransports(): Promise<void> {
-    await Promise.all(Array.from(this.openTransports.values()).map((transport: LedgerTransport) => transport.close()))
+    await Promise.all(Array.from(this.openTransports.values()).map((transport: LedgerTransport) => transport.hwTransport.close()))
     this.openTransports.clear()
     this.runningApps.clear()
   }
@@ -93,7 +93,7 @@ export class LedgerService {
     const transportKey: string = this.getTransportKey(ledgerConnection)
     const transport: LedgerTransport | undefined = this.openTransports.get(transportKey)
     if (transport) {
-      await transport.close()
+      await transport.hwTransport.close()
 
       this.openTransports.delete(transportKey)
       Array.from(this.runningApps.keys())

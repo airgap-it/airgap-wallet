@@ -8,13 +8,19 @@ export enum LedgerProcessMessageType {
   OPEN = 'open',
   OPEN_REPLY = 'open-reply',
 
-  DECORATE_APP = 'decorate-app',
-
   SEND = 'send',
   SEND_REPLY = 'send-reply',
 
+  EXCHANGE = 'exchange',
+  EXCHANGE_REPLY = 'exchange-reply',
+
+  SET_EXCHANGE_TIMEOUT = 'set-exchange-timeout',
+
   CLOSE = 'close',
-  CLOSE_REPLY = 'close-reply'
+  CLOSE_REPLY = 'close-reply',
+
+  DECORATE_APP = 'decorate-app',
+  SET_SCRAMBLE_KEY = 'set-scramble-key'
 }
 
 export interface GetDevicesMessage {
@@ -33,13 +39,6 @@ export interface OpenMessageReply {
   transportId: string
 }
 
-export interface DecorateAppMessage {
-  transportId: string
-  self: Object
-  methods: string[]
-  scrambleKey: string
-}
-
 export interface SendMessage {
   transportId: string
   cla: number
@@ -53,8 +52,34 @@ export interface SendMessageReply {
   response: Buffer | string
 }
 
+export interface ExchangeMessage {
+  transportId: string
+  apdu: string
+}
+
+export interface ExchangeMessageReply {
+  response: Buffer | string
+}
+
+export interface SetExchangeTimeoutMessage {
+  transportId: string
+  timeout: number
+}
+
 export interface CloseMessage {
   transportId: string
+}
+
+export interface DecorateAppMessage {
+  transportId: string
+  self: Object
+  methods: string[]
+  scrambleKey: string
+}
+
+export interface SetScrambleKeyMessage {
+  transportId: string
+  key: string
 }
 
 export type LedgerProcessMessage<T extends LedgerProcessMessageType> = T extends LedgerProcessMessageType.GET_DEVICES
@@ -65,14 +90,22 @@ export type LedgerProcessMessage<T extends LedgerProcessMessageType> = T extends
   ? OpenMessage
   : T extends LedgerProcessMessageType.OPEN_REPLY
   ? OpenMessageReply
-  : T extends LedgerProcessMessageType.DECORATE_APP
-  ? DecorateAppMessage
   : T extends LedgerProcessMessageType.SEND
   ? SendMessage
   : T extends LedgerProcessMessageType.SEND_REPLY
   ? SendMessageReply
+  : T extends LedgerProcessMessageType.EXCHANGE
+  ? ExchangeMessage
+  : T extends LedgerProcessMessageType.EXCHANGE_REPLY
+  ? ExchangeMessageReply
+  : T extends LedgerProcessMessageType.SET_EXCHANGE_TIMEOUT
+  ? SetExchangeTimeoutMessage
   : T extends LedgerProcessMessageType.CLOSE
   ? CloseMessage
+  : T extends LedgerProcessMessageType.DECORATE_APP
+  ? DecorateAppMessage
+  : T extends LedgerProcessMessageType.SET_SCRAMBLE_KEY
+  ? SetScrambleKeyMessage
   : never
 
 export type LedgerProcessMessageReply<T extends LedgerProcessMessageType> = T extends LedgerProcessMessageType.GET_DEVICES
@@ -81,6 +114,8 @@ export type LedgerProcessMessageReply<T extends LedgerProcessMessageType> = T ex
   ? LedgerProcessMessageType.OPEN_REPLY
   : T extends LedgerProcessMessageType.SEND
   ? LedgerProcessMessageType.SEND_REPLY
+  : T extends LedgerProcessMessageType.EXCHANGE
+  ? LedgerProcessMessageType.EXCHANGE_REPLY
   : T extends LedgerProcessMessageType.CLOSE
   ? LedgerProcessMessageType.CLOSE_REPLY
   : never

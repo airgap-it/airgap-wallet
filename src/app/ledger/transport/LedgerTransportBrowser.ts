@@ -84,17 +84,5 @@ export class LedgerTransportBrowser implements LedgerTransport {
     return new LedgerTransportBrowser(connectionType, transport)
   }
 
-  private constructor(readonly connectionType: LedgerConnectionType, private readonly transport: Transport) {}
-
-  public async decorateAppApiMethods(self: Object, methods: string[], scrambleKey: string): Promise<void> {
-    this.transport.decorateAppAPIMethods(self, methods, scrambleKey)
-  }
-
-  public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer): Promise<Buffer> {
-    return this.transport.send(cla, ins, p1, p2, data)
-  }
-
-  public async close(): Promise<void> {
-    return this.transport.close()
-  }
+  private constructor(readonly connectionType: LedgerConnectionType, readonly hwTransport: Transport) {}
 }

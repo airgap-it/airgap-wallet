@@ -1,5 +1,6 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGapSignedTransaction'
+import Transport from '@ledgerhq/hw-transport'
 
 import { LedgerTransport } from '../transport/LedgerTransport'
 
@@ -12,13 +13,17 @@ export abstract class LedgerApp {
   public abstract appIdentifier: number
   public abstract scrambleKey: string
 
-  public constructor(protected readonly transport: LedgerTransport) {}
+  protected readonly transport: Transport
+
+  public constructor(ledgerTransport: LedgerTransport) {
+    this.transport = ledgerTransport.hwTransport
+  }
 
   public abstract async importWallet(): Promise<AirGapMarketWallet>
   public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
 
   public init(): void {
-    this.transport.decorateAppApiMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
+    this.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
   }
 
   protected derivationPathToBuffer(derivationPath: string): Buffer {
