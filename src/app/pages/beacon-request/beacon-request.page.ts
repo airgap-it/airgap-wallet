@@ -95,6 +95,20 @@ export class BeaconRequestPage implements OnInit {
     await this.dismiss()
   }
 
+  private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+    await this.dismiss()
+    const modal = await this.modalController.create({
+      component: ErrorPage,
+      componentProps: {
+        title: error.name,
+        message: error.message,
+        data: error.data ? error.data : error.stack
+      }
+    })
+
+    return modal.present()
+  }
+
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
@@ -212,17 +226,7 @@ export class BeaconRequestPage implements OnInit {
     try {
       transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
     } catch (error) {
-      await this.dismiss()
-      const modal = await this.modalController.create({
-        component: ErrorPage,
-        componentProps: {
-          title: error.name,
-          message: error.message,
-          data: error.data ? error.data : error.stack
-        }
-      })
-
-      return modal.present()
+      return this.displayErrorPage(error)
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
