@@ -4,14 +4,16 @@ import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
 async function getUsbDevices(): Promise<LedgerConnection[]> {
-  const isWebUsbSupported: boolean = await TransportWebUSB.isSupported()
-  const isU2fSupported: boolean = await TransportU2F.isSupported()
+  const [isWebUsbSupported, isU2fSupported]: [boolean, boolean] = await Promise.all([
+    TransportWebUSB.isSupported(),
+    TransportU2F.isSupported()
+  ])
 
   let descriptorsPromise: Promise<readonly string[]>
-  if (isU2fSupported) {
-    descriptorsPromise = TransportU2F.list()
-  } else if (isWebUsbSupported) {
+  if (isWebUsbSupported) {
     descriptorsPromise = TransportWebUSB.list()
+  } else if (isU2fSupported) {
+    descriptorsPromise = TransportU2F.list()
   } else {
     return []
   }
@@ -27,24 +29,26 @@ async function getUsbDevices(): Promise<LedgerConnection[]> {
 }
 
 async function openUsbTransport(descriptor?: string): Promise<Transport> {
-  const isU2fSupported: boolean = await TransportU2F.isSupported()
-  const isWebUsbSupported: boolean = await TransportWebUSB.isSupported()
+  const [isWebUsbSupported, isU2fSupported]: [boolean, boolean] = await Promise.all([
+    TransportWebUSB.isSupported(),
+    TransportU2F.isSupported()
+  ])
 
   async function openTransport(_descriptor: string): Promise<Transport | null> {
-    if (isU2fSupported) {
-      return TransportU2F.open(_descriptor)
-    } else if (isWebUsbSupported) {
+    if (isWebUsbSupported) {
       return TransportWebUSB.open(_descriptor)
+    } else if (isU2fSupported) {
+      return TransportU2F.open(_descriptor)
     }
 
     return null
   }
 
   async function createTransport(timeout: number): Promise<Transport | null> {
-    if (isU2fSupported) {
+    if (isWebUsbSupported) {
+      return TransportWebUSB.create(timeout, timeout * 2)
+    } else if (isU2fSupported) {
       return TransportU2F.create(timeout, timeout)
-    } else if (isWebUsbSupported) {
-      return TransportWebUSB.create(timeout, timeout)
     }
 
     return null
