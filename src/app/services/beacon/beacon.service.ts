@@ -35,8 +35,6 @@ export class BeaconService {
     await this.client.init()
 
     return this.client.connect(async message => {
-      console.log('WALLET gotEncryptedMessage:', message)
-
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
         const responseType: BeaconMessageType =
           message.type === BeaconMessageType.PermissionRequest
