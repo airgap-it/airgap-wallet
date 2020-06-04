@@ -37,8 +37,18 @@ export class BeaconService {
     return this.client.connect(async message => {
       console.log('WALLET gotEncryptedMessage:', message)
 
-      if (!(await this.isNetworkSupported((message as any).network))) {
-        return this.sendNetworkNotSupportedError(message.id, BeaconMessageType.BroadcastResponse)
+      if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
+        const responseType: BeaconMessageType =
+          message.type === BeaconMessageType.PermissionRequest
+            ? BeaconMessageType.PermissionResponse
+            : message.type === BeaconMessageType.OperationRequest
+            ? BeaconMessageType.OperationResponse
+            : message.type === BeaconMessageType.BroadcastRequest
+            ? BeaconMessageType.BroadcastResponse
+            : BeaconMessageType.BroadcastResponse
+        // TODO: Add function to sdk that gets corresponding response type for request type
+
+        return this.sendNetworkNotSupportedError(message.id, responseType)
       } else {
         await this.presentModal(message)
       }

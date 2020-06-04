@@ -1,6 +1,4 @@
 import {
-  BeaconErrorMessage,
-  BeaconErrorType,
   BeaconMessageType,
   BroadcastRequestOutput,
   OperationRequestOutput,
@@ -149,24 +147,16 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async (): Promise<void> => {
       const scopes: PermissionScope[] = this.inputs.filter(input => input.checked).map(input => input.value)
-      if (scopes.length > 0) {
-        const response: PermissionResponseInput = {
-          id: request.id,
-          type: BeaconMessageType.PermissionResponse,
-          publicKey: selectedWallet.publicKey,
-          network: request.network,
-          scopes
-        }
 
-        await this.beaconService.respond(response)
-      } else {
-        const response: Omit<BeaconErrorMessage, 'beaconId' | 'version'> = {
-          id: request.id,
-          type: BeaconMessageType.PermissionResponse,
-          errorType: BeaconErrorType.NOT_GRANTED_ERROR
-        }
-        await this.beaconService.respond(response as any)
+      const response: PermissionResponseInput = {
+        id: request.id,
+        type: BeaconMessageType.PermissionResponse,
+        publicKey: selectedWallet.publicKey,
+        network: request.network,
+        scopes
       }
+
+      await this.beaconService.respond(response)
     }
   }
 
