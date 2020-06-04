@@ -11,6 +11,16 @@ const routes: Routes = [
     loadChildren: () => import('./pages/account-add/account-add.module').then(m => m.AccountAddPageModule)
   },
   {
+    path: 'account-import-interaction-selection/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/account-import-interaction-selection/account-import-interaction-selection.module').then(
+        m => m.AccountImportInteractionSelectionPageModule
+      )
+  },
+  {
     path: 'account-import-onboarding/:id',
     resolve: {
       special: DataResolverService

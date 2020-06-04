@@ -7,7 +7,7 @@ import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
 
-import { AccountImportLedgerPage } from './account-import-ledger'
+import { AccountInteractionSelectionPage } from './account-import-interaction-selection'
 
 @NgModule({
   imports: [
@@ -16,8 +16,8 @@ import { AccountImportLedgerPage } from './account-import-ledger'
     FormsModule,
     ComponentsModule,
     TranslateModule,
-    RouterModule.forChild([{ path: '', component: AccountImportLedgerPage }])
+    RouterModule.forChild([{ path: '', component: AccountInteractionSelectionPage }])
   ],
-  declarations: [AccountImportLedgerPage]
+  declarations: [AccountInteractionSelectionPage]
 })
-export class AccountImportLedgerPageModule {}
+export class AccountImportInteractionSelectionPageModule {}

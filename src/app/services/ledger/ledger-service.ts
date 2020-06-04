@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { AirGapMarketWallet, ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { ProtocolSymbols } from '../protocols/protocols'
 import { LedgerConnectionDetails, LedgerConnection, LedgerConnectionType } from 'src/app/ledger/connection/LedgerConnection'
@@ -25,10 +25,8 @@ export class LedgerService {
 
   constructor(private readonly connectionProvider: LedgerConnectionProvider) {}
 
-  public getSupportedProtocols(): ICoinProtocol[] {
-    const protocolIdentifiers: string[] = Array.from(this.supportedApps.keys())
-
-    return supportedProtocols().filter((protocol: ICoinProtocol) => protocolIdentifiers.includes(protocol.identifier))
+  public getSupportedProtocols(): string[] {
+    return Array.from(this.supportedApps.keys())
   }
 
   public async getConnectedDevices(): Promise<LedgerConnectionDetails[]> {

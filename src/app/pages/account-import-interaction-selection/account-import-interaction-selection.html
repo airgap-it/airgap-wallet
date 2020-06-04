@@ -1,0 +1,43 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        TODO
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <h3 class="ion-padding-bottom ion-no-margin" innerHTML="TODO"></h3>
+    <ion-row class="ion-no-padding">
+      <ion-col size="12" size-md="6">
+        <ion-row class="ion-justify-content-center ion-padding-top"><img src="./assets/img/sign-two-device.svg" /></ion-row>
+
+        <ion-row>
+          <ion-col size="12">
+            <ion-button id="offline" expand="block" size="default" color="primary" (click)="selectVault()" shape="round">
+              AirGap Vault
+            </ion-button>
+            <p>TODO</p>
+          </ion-col>
+        </ion-row>
+
+        <ion-row class="ion-justify-content-center"><img src="./assets/img/sign-one-device.svg" /></ion-row>
+
+        <ion-row>
+          <ion-col size="12">
+            <ion-button id="online" expand="block" color="primary" (click)="selectLedger()" shape="round">
+              Ledger
+            </ion-button>
+            <p>TODO</p>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
