@@ -7,8 +7,7 @@ import { ScannerProvider } from '../../services/scanner/scanner'
 export class ScanBasePage {
   public zxingScanner?: ZXingScannerComponent
   public availableDevices: MediaDeviceInfo[]
-  public selectedDevice: MediaDeviceInfo
-  public scannerEnabled: boolean = false
+  public selectedDevice: MediaDeviceInfo | null = null
 
   public hasCameras: boolean = false
 
@@ -59,8 +58,8 @@ export class ScanBasePage {
     if (this.isMobile) {
       this.scanner.destroy()
     } else if (this.zxingScanner) {
-      this.scannerEnabled = false
-      this.zxingScanner.resetCodeReader()
+      this.zxingScanner.enable = false
+      this.zxingScanner.codeReader.reset()
     }
   }
 
@@ -91,14 +90,16 @@ export class ScanBasePage {
 
   private startScanBrowser() {
     if (this.zxingScanner) {
-      this.scannerEnabled = true
+      this.zxingScanner.enable = true
       this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
       })
+
       if (this.selectedDevice) {
         // Not the first time that we open scanner
-        this.zxingScanner.startScan(this.selectedDevice)
+        this.zxingScanner.device = this.selectedDevice
       }
+
       this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
         this.hasCameras = true
         this.availableDevices = devices

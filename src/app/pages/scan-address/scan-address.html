@@ -20,13 +20,7 @@
       <ion-col class="guides--container content--align__center-center">
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
-      <zxing-scanner
-        *ngIf="isBrowser || isElectron"
-        #addressScanner
-        [device]="selectedDevice"
-        [scannerEnabled]="scannerEnabled"
-        (scanSuccess)="checkScan($event)"
-      ></zxing-scanner>
+      <zxing-scanner *ngIf="isBrowser || isElectron" #addressScanner (scanSuccess)="checkScan($event)"></zxing-scanner>
     </ion-row>
 
     <ion-row
