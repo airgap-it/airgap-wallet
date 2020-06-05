@@ -21,7 +21,7 @@
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
       <zxing-scanner
-        [hidden]="!isBrowser"
+        *ngIf="isBrowser || isElectron"
         #addressScanner
         [device]="selectedDevice"
         [scannerEnabled]="scannerEnabled"

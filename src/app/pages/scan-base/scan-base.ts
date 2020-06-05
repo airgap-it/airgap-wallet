@@ -5,10 +5,10 @@ import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../se
 import { ScannerProvider } from '../../services/scanner/scanner'
 
 export class ScanBasePage {
-  public zxingScanner: ZXingScannerComponent
+  public zxingScanner?: ZXingScannerComponent
   public availableDevices: MediaDeviceInfo[]
   public selectedDevice: MediaDeviceInfo
-  public scannerEnabled: boolean = true
+  public scannerEnabled: boolean = false
 
   public hasCameras: boolean = false
 
@@ -58,7 +58,8 @@ export class ScanBasePage {
   public ionViewWillLeave(): void {
     if (this.isMobile) {
       this.scanner.destroy()
-    } else {
+    } else if (this.zxingScanner) {
+      this.scannerEnabled = false
       this.zxingScanner.resetCodeReader()
     }
   }
@@ -89,17 +90,20 @@ export class ScanBasePage {
   }
 
   private startScanBrowser() {
-    this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
-      console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
-    })
-    if (this.selectedDevice) {
-      // Not the first time that we open scanner
-      this.zxingScanner.startScan(this.selectedDevice)
+    if (this.zxingScanner) {
+      this.scannerEnabled = true
+      this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
+        console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
+      })
+      if (this.selectedDevice) {
+        // Not the first time that we open scanner
+        this.zxingScanner.startScan(this.selectedDevice)
+      }
+      this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
+        this.hasCameras = true
+        this.availableDevices = devices
+        this.selectedDevice = devices[0]
+      })
     }
-    this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
-      this.hasCameras = true
-      this.availableDevices = devices
-      this.selectedDevice = devices[0]
-    })
   }
 }

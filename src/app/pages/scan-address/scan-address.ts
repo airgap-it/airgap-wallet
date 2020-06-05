@@ -17,8 +17,8 @@ export class ScanAddressPage extends ScanBasePage {
   private readonly callback: (address: string) => void
   private callbackCalled: boolean = false
 
-  @ViewChild('addressScanner', { static: true })
-  public zxingScanner: ZXingScannerComponent
+  @ViewChild('addressScanner')
+  public zxingScanner?: ZXingScannerComponent
 
   constructor(
     protected readonly platform: Platform,
@@ -46,7 +46,7 @@ export class ScanAddressPage extends ScanBasePage {
       this.callbackCalled = true
       if (this.platform.is('hybrid')) {
         this.scanner.stopScan()
-      } else {
+      } else if (this.zxingScanner) {
         this.zxingScanner.resetCodeReader()
       }
       this.navCtrl
