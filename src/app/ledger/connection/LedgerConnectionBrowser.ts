@@ -46,7 +46,7 @@ async function openUsbTransport(descriptor?: string): Promise<Transport> {
 
   async function createTransport(timeout: number): Promise<Transport | null> {
     if (isWebUsbSupported) {
-      return TransportWebUSB.create(timeout, timeout * 2)
+      return TransportWebUSB.create(timeout)
     } else if (isU2fSupported) {
       return TransportU2F.create(timeout, timeout)
     }
