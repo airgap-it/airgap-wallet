@@ -2,11 +2,17 @@ import { LedgerConnection, LedgerConnectionType, LedgerConnectionDetails } from 
 import Transport from '@ledgerhq/hw-transport'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
+import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 
 type TransportType = typeof TransportU2F | typeof TransportWebUSB
 
-function getPrioritizedUSBTransportTypes(_protocolIdentifier: string): TransportType[] {
-  return [TransportWebUSB, TransportU2F]
+function getPrioritizedUSBTransportTypes(protocolIdentifier: string): TransportType[] {
+  switch (protocolIdentifier) {
+    case ProtocolSymbols.XTZ:
+      return [TransportU2F, TransportWebUSB]
+    default:
+      return [TransportWebUSB, TransportU2F]
+  }
 }
 
 function getPrioritizedBLETransportTypes(_protocolIdentifier: string): TransportType[] {

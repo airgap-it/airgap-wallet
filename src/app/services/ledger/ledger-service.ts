@@ -11,6 +11,7 @@ import { isType } from 'src/app/utils/utils'
 import { ReturnCode } from 'src/app/ledger/ReturnCode'
 import { LedgerConnectionProvider } from './ledger-connection-provider'
 import { Platform } from '@ionic/angular'
+import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 
 const MAX_RETRIES = 1
 
@@ -20,7 +21,8 @@ const MAX_RETRIES = 1
 export class LedgerService {
   private readonly supportedApps: Map<string, (connection: LedgerConnection) => LedgerApp> = new Map([
     [ProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
-    [ProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)]
+    [ProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
+    [ProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new TezosLedgerApp(connection)]
   ] as [string, (connection: LedgerConnection) => LedgerApp][])
 
   private readonly openConnections: Map<string, LedgerConnection> = new Map()
