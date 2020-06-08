@@ -12,5 +12,5 @@ export interface LedgerConnectionDetails {
 
 export interface LedgerConnection {
   type: LedgerConnectionType
-  transport: Transport
+  transport: Transport<any>
 }

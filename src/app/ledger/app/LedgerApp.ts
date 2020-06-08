@@ -9,12 +9,12 @@ const MASK_HARD_DERIVATION: number = 0x80000000
 const MASK_SOFT_DERIVATION: number = 0x00000000
 
 export abstract class LedgerApp {
-  public abstract appIdentifier: number
-  public abstract scrambleKey: string
-
   public constructor(protected readonly connection: LedgerConnection) {}
 
-  public abstract init(): void
+  public init(): void {
+    // by default do nothing
+  }
+
   public abstract async importWallet(): Promise<AirGapMarketWallet>
   public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
 

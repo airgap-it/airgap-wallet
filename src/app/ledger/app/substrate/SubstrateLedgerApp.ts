@@ -57,9 +57,10 @@ enum PayloadDescriptor {
 const MAX_PAYLOAD_SIZE = 255
 
 export abstract class SubstrateLedgerApp extends LedgerApp {
-  public appIdentifier: number = 0x99
+  protected readonly appIdentifier: number = 0x99
+  protected abstract readonly scrambleKey: string
 
-  protected abstract protocol: SubstrateProtocol
+  protected abstract readonly protocol: SubstrateProtocol
 
   public init(): void {
     this.connection.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
