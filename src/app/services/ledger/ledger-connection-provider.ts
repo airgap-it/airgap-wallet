@@ -10,19 +10,19 @@ import { LedgerConnectionBrowser } from 'src/app/ledger/connection/LedgerConnect
 export class LedgerConnectionProvider {
   constructor(private readonly platform: Platform) {}
 
-  public async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
+  public async getConnectedDevices(protocolIdentifier: string, connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
     if (this.platform.is('electron')) {
       return LedgerConnectionElectron.getConnectedDevices(connectionType)
     }
 
     if (!this.platform.is('android') && !this.platform.is('ios')) {
-      return LedgerConnectionBrowser.getConnectedDevices(connectionType)
+      return LedgerConnectionBrowser.getConnectedDevices(protocolIdentifier, connectionType)
     }
 
     return []
   }
 
-  public async open(ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection | null> {
+  public async open(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection | null> {
     const connectionType: LedgerConnectionType | undefined = ledgerConnection ? ledgerConnection.type : undefined
     const descriptor: string | undefined = ledgerConnection ? ledgerConnection.descriptor : undefined
 
@@ -31,7 +31,7 @@ export class LedgerConnectionProvider {
     }
 
     if (!this.platform.is('android') && !this.platform.is('ios')) {
-      return LedgerConnectionBrowser.open(connectionType, descriptor)
+      return LedgerConnectionBrowser.open(protocolIdentifier, connectionType, descriptor)
     }
 
     return null

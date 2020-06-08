@@ -3,86 +3,70 @@ import Transport from '@ledgerhq/hw-transport'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
-async function getUsbDevices(): Promise<LedgerConnectionDetails[]> {
-  const [isWebUsbSupported, isU2fSupported]: [boolean, boolean] = await Promise.all([
-    TransportWebUSB.isSupported(),
-    TransportU2F.isSupported()
-  ])
+type TransportType = typeof TransportU2F | typeof TransportWebUSB
 
-  let descriptorsPromise: Promise<readonly string[]>
-  if (isWebUsbSupported) {
-    descriptorsPromise = TransportWebUSB.list()
-  } else if (isU2fSupported) {
-    descriptorsPromise = TransportU2F.list()
-  } else {
-    return []
-  }
-
-  return descriptorsPromise
-    .then((descriptors: readonly string[]) => {
-      return descriptors.map((descriptor: string) => ({
-        descriptor,
-        type: LedgerConnectionType.USB
-      }))
-    })
-    .catch(() => [])
+function getPrioritizedUSBTransportTypes(_protocolIdentifier: string): TransportType[] {
+  return [TransportWebUSB, TransportU2F]
 }
 
-async function openUsbTransport(descriptor?: string): Promise<Transport> {
-  const [isWebUsbSupported, isU2fSupported]: [boolean, boolean] = await Promise.all([
-    TransportWebUSB.isSupported(),
-    TransportU2F.isSupported()
-  ])
+function getPrioritizedBLETransportTypes(_protocolIdentifier: string): TransportType[] {
+  return [TransportU2F]
+}
 
-  async function openTransport(_descriptor: string): Promise<Transport | null> {
-    if (isWebUsbSupported) {
-      return TransportWebUSB.open(_descriptor)
-    } else if (isU2fSupported) {
-      return TransportU2F.open(_descriptor)
-    }
-
-    return null
+function getPrioritizedTransportTypes(protocolIdentifier: string, connectionType: LedgerConnectionType): TransportType[] {
+  switch (connectionType) {
+    case LedgerConnectionType.USB:
+      return getPrioritizedUSBTransportTypes(protocolIdentifier)
+    case LedgerConnectionType.BLE:
+      return getPrioritizedBLETransportTypes(protocolIdentifier)
+    default:
+      return []
   }
+}
 
-  async function createTransport(timeout: number): Promise<Transport | null> {
-    if (isWebUsbSupported) {
-      return TransportWebUSB.create(timeout)
-    } else if (isU2fSupported) {
-      return TransportU2F.create(timeout, timeout)
-    }
+async function getSupportedTransportType(protocolIdentifier: string, connectionType: LedgerConnectionType): Promise<TransportType | null> {
+  const transportTypes: TransportType[] = getPrioritizedTransportTypes(protocolIdentifier, connectionType)
+  const areSupported: boolean[] = await Promise.all(transportTypes.map((transport: TransportType) => transport.isSupported()))
+  const firstSupportedIndex: number = areSupported.indexOf(true)
 
-    return null
-  }
-
-  const transport: Transport | null = await (descriptor ? openTransport(descriptor) : createTransport(3000))
-
-  return transport ? transport : Promise.reject('USB connection not supported.')
+  return firstSupportedIndex > -1 ? transportTypes[firstSupportedIndex] : null
 }
 
 export class LedgerConnectionBrowser implements LedgerConnection {
-  public static async getConnectedDevices(connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
-    switch (connectionType) {
-      case LedgerConnectionType.USB:
-        return getUsbDevices()
-      default:
-        return []
+  public static async getConnectedDevices(
+    protocolIdentifier: string,
+    connectionType: LedgerConnectionType
+  ): Promise<LedgerConnectionDetails[]> {
+    const supportedTransportType: TransportType = await getSupportedTransportType(protocolIdentifier, connectionType)
+
+    return supportedTransportType
+      ? supportedTransportType
+          .list()
+          .then((descriptors: readonly string[]) => {
+            return descriptors.map((descriptor: string) => ({
+              descriptor,
+              type: connectionType
+            }))
+          })
+          .catch(() => [])
+      : []
+  }
+
+  public static async open(
+    protocolIdentifier: string,
+    connectionType: LedgerConnectionType = LedgerConnectionType.USB,
+    descriptor?: string
+  ): Promise<LedgerConnectionBrowser> {
+    const supportedTransportType: TransportType = await getSupportedTransportType(protocolIdentifier, connectionType)
+
+    if (supportedTransportType) {
+      const transport: Transport = await (descriptor ? supportedTransportType.open(descriptor) : supportedTransportType.create())
+
+      return new LedgerConnectionBrowser(connectionType, transport)
+    } else {
+      return Promise.reject(`Connection type ${connectionType} is not supported`)
     }
   }
 
-  public static async open(connectionType?: LedgerConnectionType, descriptor?: string): Promise<LedgerConnectionBrowser> {
-    let transport: Transport
-    switch (connectionType) {
-      case LedgerConnectionType.USB:
-        transport = await openUsbTransport(descriptor)
-        break
-      case LedgerConnectionType.BLE:
-        return Promise.reject('Web BLE is not supported.')
-      default:
-        transport = await openUsbTransport()
-    }
-
-    return new LedgerConnectionBrowser(connectionType, transport)
-  }
-
-  private constructor(readonly type: LedgerConnectionType, readonly transport: Transport) {}
+  private constructor(readonly type: LedgerConnectionType, readonly transport: Transport<any>) {}
 }

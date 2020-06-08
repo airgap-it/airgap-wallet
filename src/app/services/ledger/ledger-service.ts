@@ -29,17 +29,17 @@ export class LedgerService {
     return Array.from(this.supportedApps.keys())
   }
 
-  public async getConnectedDevices(): Promise<LedgerConnectionDetails[]> {
+  public async getConnectedDevices(protocolIdentifier: string): Promise<LedgerConnectionDetails[]> {
     const devices: [LedgerConnectionDetails[], LedgerConnectionDetails[]] = await Promise.all([
-      this.connectionProvider.getConnectedDevices(LedgerConnectionType.USB),
-      this.connectionProvider.getConnectedDevices(LedgerConnectionType.BLE)
+      this.connectionProvider.getConnectedDevices(protocolIdentifier, LedgerConnectionType.USB),
+      this.connectionProvider.getConnectedDevices(protocolIdentifier, LedgerConnectionType.BLE)
     ])
 
     return devices.reduce((flatten: LedgerConnectionDetails[], toFlatten: LedgerConnectionDetails[]) => flatten.concat(toFlatten), [])
   }
 
-  public async openConnection(ledgerConnection?: LedgerConnectionDetails): Promise<void> {
-    await this.openLedgerConnection(ledgerConnection)
+  public async openConnection(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<void> {
+    await this.openLedgerConnection(protocolIdentifier, ledgerConnection)
   }
 
   public async closeConnection(ledgerConnection?: LedgerConnectionDetails): Promise<void> {
@@ -50,12 +50,12 @@ export class LedgerService {
     }
   }
 
-  public async importWallet(identifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<AirGapMarketWallet> {
-    return this.withApp(identifier, (app: LedgerApp) => app.importWallet(), ledgerConnection)
+  public async importWallet(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<AirGapMarketWallet> {
+    return this.withApp(protocolIdentifier, (app: LedgerApp) => app.importWallet(), ledgerConnection)
   }
 
-  public async signTransaction(identifier: string, transaction: any, ledgerConnection?: LedgerConnectionDetails): Promise<string> {
-    return this.withApp(identifier, (app: LedgerApp) => app.signTransaction(transaction), ledgerConnection)
+  public async signTransaction(protocolIdentifier: string, transaction: any, ledgerConnection?: LedgerConnectionDetails): Promise<string> {
+    return this.withApp(protocolIdentifier, (app: LedgerApp) => app.signTransaction(transaction), ledgerConnection)
   }
 
   private async withApp<T>(
@@ -78,8 +78,8 @@ export class LedgerService {
       .finally(() => this.closeLedgerConnection(ledgerConnection))
   }
 
-  private async openLedgerConnection(ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection> {
-    const connection: LedgerConnection | null = await this.connectionProvider.open(ledgerConnection)
+  private async openLedgerConnection(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection> {
+    const connection: LedgerConnection | null = await this.connectionProvider.open(protocolIdentifier, ledgerConnection)
     this.openConnections.set(this.getConnectionKey(ledgerConnection), connection)
 
     return connection
@@ -114,7 +114,7 @@ export class LedgerService {
     const connectionKey: string = this.getConnectionKey(ledgerConnection)
     let connection: LedgerConnection | undefined = this.openConnections.get(connectionKey)
     if (!connection) {
-      connection = await this.openLedgerConnection(ledgerConnection)
+      connection = await this.openLedgerConnection(identifier, ledgerConnection)
     }
 
     return appFactory(connection)
