@@ -15,8 +15,8 @@ import { ScanBasePage } from '../scan-base/scan-base'
   styleUrls: ['./scan.scss']
 })
 export class ScanPage extends ScanBasePage {
-  @ViewChild('scanner', { static: true })
-  public zxingScanner: ZXingScannerComponent
+  @ViewChild('scanner')
+  public zxingScanner?: ZXingScannerComponent
 
   public percentageScanned: number = 0
   public numberOfQrsScanned: number = 0
