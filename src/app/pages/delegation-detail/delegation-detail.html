@@ -38,8 +38,7 @@
         </ng-template>
       </ion-col>
     </ion-row>
-
-    <ion-row class="ion-padding-top ion-padding-horizontal action--container" *ngIf="(delegateeDetails$ | async)">
+    <ion-row class="ion-padding-horizontal action--container" *ngIf="(delegateeDetails$ | async)">
       <ion-col size="12" class="ion-no-padding">
         <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
           <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
@@ -47,7 +46,6 @@
         </ion-button>
       </ion-col>
     </ion-row>
-
     <ion-row class="ion-padding-horizontal ion-padding-bottom">
       <ion-col size="12" class="ion-no-padding">
         <p>{{ ((delegateeDetails$ | async)?.status | translate) | titlecase }}</p>
