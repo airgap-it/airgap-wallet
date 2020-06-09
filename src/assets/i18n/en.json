@@ -518,14 +518,14 @@
     "heading": "Thank you for using AirGap!",
     "text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
     "cancel_label": "No",
-    "ok_label": "Yes!"
+    "ok_label": "Tip Now"
   },
 
   "action-alert-delegation": {
     "heading": "Thank you for using AirGap!",
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
-    "ok_label": "Yes!"
+    "ok_label": "Delegate Now"
   },
 
   "ledger-sign": {
@@ -535,7 +535,19 @@
     "error-alert": {
       "header": "Error",
       "unknown": "Unkown error has occurred. Try reconnecting your device.",
-      "confirm": "OK"
+      "confirm": "Okay"
     }
+  },
+
+  "account-import-interaction-selection": {
+  "title": "Select Signer Option",
+  "airgap-vault": {
+    "label": "AirGap Vault",
+    "text": "AirGap Vault can be installed on an offline smartphone or on the same device to securely sign transactions."
+  },
+  "ledger": {
+    "label": "Ledger",
+    "text": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
+  }
   }
 }

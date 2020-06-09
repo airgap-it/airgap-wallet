@@ -5,7 +5,7 @@
         <ion-back-button></ion-back-button>
       </ion-buttons>
       <ion-title>
-        TODO
+        {{ 'account-import-interaction-selection.title' | translate }}
       </ion-title>
     </ion-toolbar>
   </ion-grid>
@@ -21,9 +21,9 @@
         <ion-row>
           <ion-col size="12">
             <ion-button id="offline" expand="block" size="default" color="primary" (click)="selectVault()" shape="round">
-              AirGap Vault
+              {{ 'account-import-interaction-selection.airgap-vault.label' | translate }}
             </ion-button>
-            <p>TODO</p>
+            <p>{{ 'account-import-interaction-selection.airgap-vault.text' | translate }}</p>
           </ion-col>
         </ion-row>
 
@@ -32,9 +32,9 @@
         <ion-row>
           <ion-col size="12">
             <ion-button id="online" expand="block" color="primary" (click)="selectLedger()" shape="round">
-              Ledger
+              {{ 'account-import-interaction-selection.ledger.label' | translate }}
             </ion-button>
-            <p>TODO</p>
+            <p>{{ 'account-import-interaction-selection.ledger.text' | translate }}</p>
           </ion-col>
         </ion-row>
       </ion-col>
