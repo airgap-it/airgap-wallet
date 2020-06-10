@@ -232,7 +232,8 @@ export class DelegationDetailPage {
         ? new UIAccount({
             name: details.name,
             address: details.address,
-            logo: details.logo
+            logo: details.logo,
+            shortenAddress: true
           })
         : null
     })

@@ -7,8 +7,10 @@
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.hasName">{{ widget.name }}</h2>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="!widget.hasName">{{ widget.address | shortenString }}</h2>
 
-    <p *ngIf="widget.hasName && !widget.shortenAddress">{{ widget.address }}</p>
-    <p *ngIf="widget.hasName && widget.shortenAddress">{{ widget.address | shortenString }}</p>
+    <ion-text color="blackLight">
+      <p *ngIf="widget.hasName && !widget.shortenAddress" class="typography--mono">{{ widget.address }}</p>
+      <p *ngIf="widget.hasName && widget.shortenAddress" class="typography--mono">{{ widget.address | shortenString }}</p>
+    </ion-text>
 
     <h3 *ngIf="widget.description">{{ widget.description }}</h3>
   </ion-label>
