@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { NavController } from '@ionic/angular'
 
 export enum AccountImportInteractionType {
   VAULT,
@@ -15,7 +14,7 @@ export enum AccountImportInteractionType {
 export class AccountInteractionSelectionPage {
   private readonly callback: (interactionType: AccountImportInteractionType) => void
 
-  constructor(private readonly route: ActivatedRoute, private readonly navController: NavController) {
+  constructor(private readonly route: ActivatedRoute) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.callback = info.callback
@@ -32,6 +31,5 @@ export class AccountInteractionSelectionPage {
 
   private select(interactionType: AccountImportInteractionType): void {
     this.callback(interactionType)
-    this.navController.pop()
   }
 }
