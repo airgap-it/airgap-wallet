@@ -96,22 +96,23 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   }
 
   public async createDelegateesSummary(protocol: CosmosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const [knownValidators, validatorsDetails]: [CosmosValidatorDetails[], CosmosValidator[]] = await Promise.all([
-      this.getKnownValidators(),
-      Promise.all(delegatees.map((validator: string) => protocol.fetchValidator(validator)))
-    ])
+    const knownValidators: CosmosValidatorDetails[] = await this.getKnownValidators()
+    const knownValidatorAddresses: string[] = knownValidators.map((validator: CosmosValidatorDetails) => validator.operator_address)
 
-    return [
-      ...knownValidators.filter((validator: CosmosValidatorDetails) => !delegatees.includes(validator.operator_address)),
-      ...validatorsDetails
-    ].map(
+    const unkownValidators: CosmosValidator[] = await Promise.all(
+      delegatees
+        .filter((address: string) => !knownValidatorAddresses.includes(address))
+        .map((address: string) => protocol.fetchValidator(address))
+    )
+
+    return [...knownValidators, ...unkownValidators].map(
       (details: CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)) =>
         new UIAccountSummary({
           address: details.operator_address,
           logo: details.logo ? details.logo : undefined,
           header: [
             details.description.moniker,
-            this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString()) + '%'
+            `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
           ],
           description: [
             this.shortenStringPipe.transform(details.operator_address),
