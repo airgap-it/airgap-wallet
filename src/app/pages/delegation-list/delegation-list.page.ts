@@ -21,6 +21,8 @@ export class DelegationListPage {
   public delegateeLabel: string
   public delegateeLabelPlural: string
 
+  public areMultipleDelegationsSupported: boolean
+
   public searchTerm: string = ''
 
   public currentDelegatees: UIAccountSummary[]
@@ -43,6 +45,7 @@ export class DelegationListPage {
       this.wallet = info.wallet
       this.delegateeLabel = info.delegateeLabel
       this.delegateeLabelPlural = info.delegateeLabelPlural
+      this.areMultipleDelegationsSupported = info.areMultipleDelegationsSupported
       this.callback = info.callback
 
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then((summary: UIAccountSummary[]) => {

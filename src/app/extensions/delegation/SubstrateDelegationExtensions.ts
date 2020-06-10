@@ -75,6 +75,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   public delegateeLabel: string = 'delegation-detail-substrate.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-substrate.delegatee-label-plural'
+  public supportsMultipleDelegations: boolean = true
 
   private constructor(
     private readonly formBuilder: FormBuilder,

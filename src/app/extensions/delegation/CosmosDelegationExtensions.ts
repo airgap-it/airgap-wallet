@@ -58,6 +58,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
   public delegateeLabel: string = 'delegation-detail-cosmos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-cosmos.delegatee-label-plural'
+  public supportsMultipleDelegations: boolean = true
 
   private knownValidators?: CosmosValidatorDetails[]
 

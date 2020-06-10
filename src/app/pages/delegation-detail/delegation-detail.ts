@@ -71,6 +71,7 @@ export class DelegationDetailPage {
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
+  private areMultipleDelegationsSupported: boolean = false
 
   private loader: HTMLIonLoadingElement | undefined
 
@@ -171,6 +172,7 @@ export class DelegationDetailPage {
       wallet: this.wallet,
       delegateeLabel: this.delegateeLabel,
       delegateeLabelPlural: this.delegateeLabelPlural,
+      areMultipleDelegationsSupported: this.areMultipleDelegationsSupported,
       currentDelegatees: this.delegatorDetails$.value.delegatees,
       callback: (address: string) => {
         this.changeDisplayedDetails(address)
@@ -191,6 +193,10 @@ export class DelegationDetailPage {
     this.delegateeLabelPlural = supportsAirGapDelegation(this.wallet.coinProtocol)
       ? this.wallet.coinProtocol.delegateeLabelPlural
       : 'delegation-detail.defailt-delegatee-label-plural'
+
+    this.areMultipleDelegationsSupported = supportsAirGapDelegation(this.wallet.coinProtocol)
+      ? this.wallet.coinProtocol.supportsMultipleDelegations
+      : false
 
     this.subscribeObservables()
 

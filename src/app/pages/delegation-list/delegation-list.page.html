@@ -24,7 +24,8 @@
         <ion-list-header>
           <ion-label>
             <ion-text color="primary" class="font--weight__bold ion-ion-text">
-              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: (areMultipleDelegationsSupported ?
+              delegateeLabelPlural : delegateeLabel | translate) } }}
             </ion-text>
           </ion-label>
         </ion-list-header>

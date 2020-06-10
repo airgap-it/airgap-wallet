@@ -9,6 +9,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
   private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
   private static readonly DELEGATEE_LABEL_PLURAL_KEY = 'delegateeLabelPlural'
+  private static readonly SUPPORTS_MULTIPLE_DELEGATIONS_KEY = 'supportsMultipleDelegations'
   private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
   private static readonly GET_REWARD_DISPLAY_DETAILS = 'getRewardDisplayDetails'
 
@@ -21,7 +22,13 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   ) {
     const alreadyLoaded =
       this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY) &&
-      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY)
+      this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_PLURAL_KEY) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.SUPPORTS_MULTIPLE_DELEGATIONS_KEY) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_REWARD_DISPLAY_DETAILS) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY) &&
+      this.hasProperty(protocol, ProtocolDelegationExtensions.CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY)
 
     if (!alreadyLoaded) {
       const extensions = await extensionFactory()
@@ -31,6 +38,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
         [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
         [ProtocolDelegationExtensions.DELEGATEE_LABEL_PLURAL_KEY, 'property'],
+        [ProtocolDelegationExtensions.SUPPORTS_MULTIPLE_DELEGATIONS_KEY, 'property'],
         [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function'],
         [ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY, 'function'],
         [ProtocolDelegationExtensions.GET_REWARD_DISPLAY_DETAILS, 'function'],
@@ -79,6 +87,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
 
   public abstract delegateeLabel: string
   public abstract delegateeLabelPlural: string
+  public abstract supportsMultipleDelegations: boolean
 
   public abstract getExtraDelegationDetailsFromAddress(
     protocol: T,

@@ -59,6 +59,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   public delegateeLabel: string = 'delegation-detail-tezos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-tezos.delegatee-label-plural'
+  public supportsMultipleDelegations: boolean = false
 
   private knownBakers?: TezosBakerDetails[]
 
