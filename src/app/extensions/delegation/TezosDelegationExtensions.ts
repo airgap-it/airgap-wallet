@@ -90,18 +90,27 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const knownBakers: TezosBakerDetails[] = await this.getKnownBakers()
     const knownBakersAddresses: string[] = knownBakers.map((bakerDetails: TezosBakerDetails) => bakerDetails.address)
 
+    type BakerDetails = Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>
+
     return [
       ...knownBakers,
       ...delegatees.filter((baker: string) => !knownBakersAddresses.includes(baker)).map((baker: string) => ({ address: baker }))
-    ].map(
-      (details: Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>) =>
-        new UIAccountSummary({
-          address: details.address,
-          logo: details.logo ? details.logo : undefined,
-          header: details.alias || '',
-          description: this.shortenStringPipe.transform(details.address)
-        })
-    )
+    ]
+      .sort((a: BakerDetails, b: BakerDetails) => {
+        const aAlias: string = a.alias || ''
+        const bAlias: string = b.alias || ''
+
+        return aAlias.localeCompare(bAlias)
+      })
+      .map(
+        (details: BakerDetails) =>
+          new UIAccountSummary({
+            address: details.address,
+            logo: details.logo ? details.logo : undefined,
+            header: details.alias || '',
+            description: this.shortenStringPipe.transform(details.address)
+          })
+      )
   }
 
   private async getExtraDelegationDetails(

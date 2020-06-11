@@ -106,24 +106,28 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         .map((address: string) => protocol.fetchValidator(address))
     )
 
-    return [...knownValidators, ...unkownValidators].map(
-      (details: CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)) =>
-        new UIAccountSummary({
-          address: details.operator_address,
-          logo: details.logo ? details.logo : undefined,
-          header: [
-            details.description.moniker,
-            `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
-          ],
-          description: [
-            this.shortenStringPipe.transform(details.operator_address),
-            this.amountConverterPipe.transform(details.tokens, {
-              protocolIdentifier: protocol.identifier,
-              maxDigits: 10
-            })
-          ]
-        })
-    )
+    type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
+
+    return [...knownValidators, ...unkownValidators]
+      .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
+      .map(
+        (details: ValidatorDetails) =>
+          new UIAccountSummary({
+            address: details.operator_address,
+            logo: details.logo ? details.logo : undefined,
+            header: [
+              details.description.moniker,
+              `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
+            ],
+            description: [
+              this.shortenStringPipe.transform(details.operator_address),
+              this.amountConverterPipe.transform(details.tokens, {
+                protocolIdentifier: protocol.identifier,
+                maxDigits: 10
+              })
+            ]
+          })
+      )
   }
 
   public async createAccountExtendedDetails(protocol: CosmosProtocol, address: string): Promise<UIAccountExtendedDetails> {
