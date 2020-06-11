@@ -95,7 +95,7 @@ export class LedgerService {
     const connectionKey: string = this.getConnectionKey(ledgerConnection)
     const connection: LedgerConnection | undefined = this.openConnections.get(connectionKey)
     if (connection) {
-      await connection.transport.close()
+      connection.transport.close()
 
       this.openConnections.delete(connectionKey)
       Array.from(this.runningApps.keys())

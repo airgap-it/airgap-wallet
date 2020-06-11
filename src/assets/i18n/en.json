@@ -325,15 +325,19 @@
       "slide-2": "Open the {{protocolName}} app on your Ledger.",
       "slide-3": "Confirm to share your {{protocolName}} address with AirGap Wallet."
     },
-    "error-alert": {
-      "header": "Could not connect to Ledger.",
-      "message": "Please make sure your Ledger is plugged into the computer, unlocked and the {{protocolName}} app is open.",
-      "confirm": "OK"
+    "status-card": {
+      "connecting": "Connecting to Ledger...",
+      "error": {
+        "header": "Could not connect to Ledger.",
+        "message": "Please make sure your Ledger is plugged into the computer, unlocked and the {{protocolName}} app is open."
+      },
+      "success": "Successfully connected to Ledger",
+      "redirecting": "Redirecting...",
+      "retry_button": "Retry"
     },
-    "back": "Back",
-    "next": "Next",
-    "retry": "Retry",
-    "done": "Done"
+    "back_button": "Back",
+    "next_button": "Next",
+    "done_button": "Done"
   },
   "sub-account-import": {
     "title": "Select Accounts",

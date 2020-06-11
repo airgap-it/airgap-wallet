@@ -17,6 +17,38 @@
       [innerHTML]="'account-import-ledger-onboarding.text' | translate: { protocolName: protocol.name }"
       class="ion-padding-horizontal"
     ></p>
+    <ion-card class="ion-margin">
+      <ion-card-content>
+        <ion-item lines="none" class="ion-no-padding">
+          <ng-container *ngIf="isLoading">
+            <ion-spinner slot="start"></ion-spinner>
+            <ion-label>
+              <h3>{{ 'account-import-ledger-onboarding.status-card.connecting' | translate }}</h3>
+            </ion-label>
+          </ng-container>
+          <ng-container *ngIf="!isLoading && isSuccess !== undefined && !isSuccess">
+            <ion-icon name="alert-circle-outline" slot="start" size="large" color="warning"></ion-icon>
+            <ion-label class="ion-text-wrap">
+              <h3>
+                {{ 'account-import-ledger-onboarding.status-card.error.header' | translate }}
+              </h3>
+              <p>{{ 'account-import-ledger-onboarding.status-card.error.message' | translate: { protocolName: protocol.name } }}</p>
+            </ion-label>
+          </ng-container>
+          <ng-container *ngIf="!isLoading && isSuccess">
+            <ion-icon name="checkmark-circle-outline" slot="start" size="large" color="success"></ion-icon>
+            <ion-label class="ion-text-wrap">
+              <h3>{{ 'account-import-ledger-onboarding.status-card.success' | translate }}</h3>
+            </ion-label>
+          </ng-container>
+        </ion-item>
+        <ng-container *ngIf="!isLoading && isSuccess !== undefined && !isSuccess">
+          <ion-button fill="clear" color="primary" (click)="retry()">
+            {{ 'account-import-ledger-onboarding.status-card.retry_button' | translate }}
+          </ion-button>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
     <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
       <ion-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
         <div class="slide-zoom">
@@ -34,18 +66,15 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar class="ion-no-padding">
       <ion-buttons slot="end">
-        <ion-button *ngIf="canSlidePrev" [disabled]="isLoading" fill="clear" color="primary" (click)="slides.slidePrev()">
+        <ion-button *ngIf="canSlidePrev" fill="clear" color="primary" (click)="showPrevSlide()">
           <ion-icon name="arrow-back"></ion-icon>
-          {{ 'account-import-ledger-onboarding.back' | translate }}
+          {{ 'account-import-ledger-onboarding.back_button' | translate }}
         </ion-button>
-        <ion-button *ngIf="canRetry" [disabled]="isLoading" fill="clear" color="primary" (click)="importFromLedger()">
-          {{ 'account-import-ledger-onboarding.retry' | translate }}
+        <ion-button *ngIf="canFinish" fill="clear" color="primary" (click)="finish()">
+          {{ 'account-import-ledger-onboarding.done_button' | translate }}
         </ion-button>
-        <ion-button *ngIf="canFinish" [disabled]="isLoading" fill="clear" color="primary" (click)="finish()">
-          {{ 'account-import-ledger-onboarding.done' | translate }}
-        </ion-button>
-        <ion-button *ngIf="canSlideNext" [disabled]="isLoading" fill="clear" color="primary" (click)="slides.slideNext()">
-          {{ 'account-import-ledger-onboarding.next' | translate }}
+        <ion-button *ngIf="canSlideNext" fill="clear" color="primary" (click)="showNextSlide()">
+          {{ 'account-import-ledger-onboarding.next_button' | translate }}
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
       </ion-buttons>

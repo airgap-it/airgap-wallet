@@ -1,10 +1,9 @@
 import { Component, ViewChild } from '@angular/core'
-import { ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
+import { ICoinProtocol, getProtocolByIdentifier, AirGapMarketWallet } from 'airgap-coin-lib'
 import { ActivatedRoute, Router } from '@angular/router'
-import { IonSlides, AlertController } from '@ionic/angular'
+import { IonSlides } from '@ionic/angular'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { TranslateService } from '@ngx-translate/core'
 import { DataServiceKey, DataService } from 'src/app/services/data/data.service'
 
 @Component({
@@ -13,11 +12,7 @@ import { DataServiceKey, DataService } from 'src/app/services/data/data.service'
   styleUrls: ['./account-import-ledger-onboarding.scss']
 })
 export class AccountImportLedgerOnboardingPage {
-  public slideAssets: [string, string][] = [
-    ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
-    ['ledger_app_kusama.svg', 'account-import-ledger-onboarding.slides.slide-2'],
-    ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
-  ]
+  public slideAssets: [string, string][] = []
 
   @ViewChild(IonSlides, { static: true })
   public slides: IonSlides
@@ -37,61 +32,77 @@ export class AccountImportLedgerOnboardingPage {
 
   public canSlidePrev: boolean = false
   public canSlideNext: boolean = true
-  public canRetry: boolean = false
   public canFinish: boolean = false
 
-  public isLoading: boolean = false
+  public isLoading: boolean = true
+  public isSuccess?: boolean = undefined
+
+  private currentSlide: number = this.slideOpts.initialSlide
+
+  private importPromise?: Promise<void>
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dataService: DataService,
-    private readonly alertCtrl: AlertController,
-    private readonly translateService: TranslateService,
     private readonly ledgerService: LedgerService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.protocol = getProtocolByIdentifier(info.protocolIdentifier)
+
+      this.slideAssets = [
+        ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
+        [`ledger_app_${this.protocol.identifier}.svg`, 'account-import-ledger-onboarding.slides.slide-2'],
+        ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
+      ]
     }
+  }
+
+  public async showPrevSlide(): Promise<void> {
+    await this.slides.slidePrev()
+  }
+
+  public async showNextSlide(): Promise<void> {
+    if (this.currentSlide === 0 && this.isSuccess === undefined) {
+      await this.connectWithLedger()
+    }
+    await this.slides.slideNext()
   }
 
   public ionSlideDidChange(): void {
     this.slides
       .getActiveIndex()
       .then((val: number) => {
+        this.currentSlide = val
+
         const isEnd = val === this.slideAssets.length - 1
 
         this.canSlidePrev = val > 0
         this.canSlideNext = !isEnd
         this.canFinish = isEnd
 
-        if (isEnd) {
+        if (isEnd && this.isSuccess === undefined) {
           this.importFromLedger()
         }
       })
       .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
-  public async importFromLedger(): Promise<void> {
-    try {
-      this.isLoading = true
-
-      const wallet = await this.ledgerService.importWallet(this.protocol.identifier)
-      this.dataService.setData(DataServiceKey.WALLET, wallet)
-      this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      this.canRetry = false
-    } catch (error) {
-      this.canRetry = true
-      console.warn(error)
-      this.promptError()
-    } finally {
-      this.isLoading = false
-    }
+  public retry(): void {
+    this.isLoading = true
+    this.isSuccess = undefined
+    this.importFromLedger()
   }
 
   public finish(): void {
     this.router.navigateByUrl('/tabs/portfolio', { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async connectWithLedger(): Promise<void> {
+    this.isLoading = true
+
+    await this.ledgerService.openConnection(this.protocol.identifier)
   }
 
   private customProgressBar(current: number, total: number): string {
@@ -109,16 +120,26 @@ export class AccountImportLedgerOnboardingPage {
     return progressBarContainer
   }
 
-  private async promptError() {
-    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
-      header: this.translateService.instant('account-import-ledger-onboarding.error-alert.header'),
-      message: this.translateService.instant('account-import-ledger-onboarding.error-alert.message', { protocolName: this.protocol.name }),
-      buttons: [
-        {
-          text: this.translateService.instant('account-import-ledger-onboarding.error-alert.confirm')
-        }
-      ]
-    })
-    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  private async importFromLedger(): Promise<void> {
+    if (!this.importPromise) {
+      this.importPromise = this.ledgerService
+        .importWallet(this.protocol.identifier)
+        .then((wallet: AirGapMarketWallet) => {
+          this.isSuccess = true
+
+          this.dataService.setData(DataServiceKey.WALLET, wallet)
+          this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        })
+        .catch((error: any) => {
+          console.warn(error)
+          this.isSuccess = false
+        })
+        .finally(() => {
+          this.importPromise = undefined
+          this.isLoading = false
+        })
+    }
+
+    return this.importPromise
   }
 }
