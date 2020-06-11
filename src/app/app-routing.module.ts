@@ -29,6 +29,16 @@ const routes: Routes = [
       import('./pages/account-import-onboarding/account-import-onboarding.module').then(m => m.AccountImportOnboardingPageModule)
   },
   {
+    path: 'account-import-ledger-onboarding/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/account-import-ledger-onboarding/account-import-ledger-onboarding.module').then(
+        m => m.AccountImportLedgerOnboardingPageModule
+      )
+  },
+  {
     path: 'select-wallet/:id',
     resolve: {
       special: DataResolverService

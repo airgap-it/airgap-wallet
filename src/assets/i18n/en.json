@@ -234,16 +234,6 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-
-  "account-import-ledger": {
-    "title": "Import Account",
-    "error-alert": {
-      "header": "Error",
-      "unknown": "Unkown error has occurred. Try reconnecting your device.",
-      "confirm": "OK"
-    }
-  },
-
   "from-to": {
     "type_label": "Type",
     "amount_label": "Amount",
@@ -326,6 +316,24 @@
     "back": "Back",
     "next": "Next",
     "open_vault": "Open Vault"
+  },
+  "account-import-ledger-onboarding": {
+    "title": "Add {{protocolName}}",
+    "text": "You need a Ledger device with the {{protocolName}} application installed to add <strong>{{protocolName}}</strong>. Follow the instructions on the next few steps.",
+    "slides": {
+      "slide-1": "Connect your Ledger to your computer and unlock it by entering the pin code.",
+      "slide-2": "Open the {{protocolName}} app on your Ledger.",
+      "slide-3": "Confirm to share your {{protocolName}} address with AirGap Wallet."
+    },
+    "error-alert": {
+      "header": "Could not connect to Ledger.",
+      "message": "Please make sure your Ledger is plugged into the computer, unlocked and the {{protocolName}} app is open.",
+      "confirm": "OK"
+    },
+    "back": "Back",
+    "next": "Next",
+    "retry": "Retry",
+    "done": "Done"
   },
   "sub-account-import": {
     "title": "Select Accounts",

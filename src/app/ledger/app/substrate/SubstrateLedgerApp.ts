@@ -79,7 +79,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       const response: Buffer = await this.connection.transport.send(
         this.appIdentifier,
         Instruction.GET_ADDRESS_ED25519,
-        RequiresConfirmation.NO,
+        RequiresConfirmation.YES,
         0,
         derivationPath
       )

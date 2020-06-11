@@ -132,7 +132,8 @@ page-transaction-qr {
 }
 
 /* Account onboarding progress bar styling */
-page-account-import-onboarding {
+page-account-import-onboarding,
+page-account-import-ledger-onboarding {
   .swiper-pagination-custom {
     top: 0;
   }

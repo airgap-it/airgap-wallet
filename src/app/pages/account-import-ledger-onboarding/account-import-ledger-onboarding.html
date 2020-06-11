@@ -1,0 +1,54 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        <span [innerHTML]="'account-import-ledger-onboarding.title' | translate: { protocolName: protocol.name }"></span>
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <p
+      [innerHTML]="'account-import-ledger-onboarding.text' | translate: { protocolName: protocol.name }"
+      class="ion-padding-horizontal"
+    ></p>
+    <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
+      <ion-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
+        <div class="slide-zoom">
+          <img [src]="'./assets/img/' + slide[0]" />
+          <ion-text>
+            <p class="ion-text-left" [innerHTML]="slide[1] | translate: { protocolName: protocol.name }"></p>
+          </ion-text>
+        </div>
+      </ion-slide>
+    </ion-slides>
+  </ion-grid>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar class="ion-no-padding">
+      <ion-buttons slot="end">
+        <ion-button *ngIf="canSlidePrev" [disabled]="isLoading" fill="clear" color="primary" (click)="slides.slidePrev()">
+          <ion-icon name="arrow-back"></ion-icon>
+          {{ 'account-import-ledger-onboarding.back' | translate }}
+        </ion-button>
+        <ion-button *ngIf="canRetry" [disabled]="isLoading" fill="clear" color="primary" (click)="importFromLedger()">
+          {{ 'account-import-ledger-onboarding.retry' | translate }}
+        </ion-button>
+        <ion-button *ngIf="canFinish" [disabled]="isLoading" fill="clear" color="primary" (click)="finish()">
+          {{ 'account-import-ledger-onboarding.done' | translate }}
+        </ion-button>
+        <ion-button *ngIf="canSlideNext" [disabled]="isLoading" fill="clear" color="primary" (click)="slides.slideNext()">
+          {{ 'account-import-ledger-onboarding.next' | translate }}
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-grid>
+</ion-footer>
