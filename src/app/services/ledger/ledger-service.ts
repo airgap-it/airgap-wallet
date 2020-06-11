@@ -11,6 +11,8 @@ import { isType } from 'src/app/utils/utils'
 import { ReturnCode } from 'src/app/ledger/ReturnCode'
 import { LedgerConnectionProvider } from './ledger-connection-provider'
 
+const MAX_RETRIES = 1
+
 @Injectable({
   providedIn: 'root'
 })
@@ -61,7 +63,8 @@ export class LedgerService {
   private async withApp<T>(
     identifier: string,
     action: (app: LedgerApp) => Promise<T>,
-    ledgerConnection?: LedgerConnectionDetails
+    ledgerConnection?: LedgerConnectionDetails,
+    actionTry: number = 0
   ): Promise<T> {
     const appKey: string = this.getAppKey(identifier, ledgerConnection)
 
@@ -74,7 +77,15 @@ export class LedgerService {
     }
 
     return action(app)
-      .catch((error: unknown) => Promise.reject(this.getError(error)))
+      .catch(async (error: unknown) => {
+        if (this.isDisconnectedDeviceError(error) && actionTry < MAX_RETRIES) {
+          await this.closeLedgerConnection(ledgerConnection)
+
+          return this.withApp(identifier, action, ledgerConnection, actionTry + 1)
+        } else {
+          return Promise.reject(this.getError(error))
+        }
+      })
       .finally(() => this.closeLedgerConnection(ledgerConnection))
   }
 
@@ -95,12 +106,16 @@ export class LedgerService {
     const connectionKey: string = this.getConnectionKey(ledgerConnection)
     const connection: LedgerConnection | undefined = this.openConnections.get(connectionKey)
     if (connection) {
-      connection.transport.close()
-
-      this.openConnections.delete(connectionKey)
-      Array.from(this.runningApps.keys())
-        .filter((key: string) => key.includes(connectionKey))
-        .forEach((key: string) => this.runningApps.delete(key))
+      try {
+        await connection.transport.close()
+      } catch (error) {
+        console.warn(`Could not close Ledger connection: ${error}`)
+      } finally {
+        this.openConnections.delete(connectionKey)
+        Array.from(this.runningApps.keys())
+          .filter((key: string) => key.includes(connectionKey))
+          .forEach((key: string) => this.runningApps.delete(key))
+      }
     }
   }
 
@@ -126,6 +141,12 @@ export class LedgerService {
 
   private getAppKey(identifier: string, ledgerConnection?: LedgerConnectionDetails): string {
     return `${identifier}_${this.getConnectionKey(ledgerConnection)}`
+  }
+
+  private isDisconnectedDeviceError(error: unknown): boolean {
+    return (
+      isType<{ name: string }>(error, 'name') && (error.name === 'DisconnectedDevice' || error.name === 'DisconnectedDeviceDuringOperation')
+    )
   }
 
   private getError(error: unknown): string | unknown {
