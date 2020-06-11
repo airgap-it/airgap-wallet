@@ -14,9 +14,9 @@ import { DataServiceKey, DataService } from 'src/app/services/data/data.service'
 })
 export class AccountImportLedgerOnboardingPage {
   public slideAssets: [string, string][] = [
-    ['account-import-onboarding-slide_1-ledger.svg', 'account-import-ledger-onboarding.slides.slide-1'],
-    ['account-import-onboarding-slide_2-ledger.svg', 'account-import-ledger-onboarding.slides.slide-2'],
-    ['account-import-onboarding-slide_3-ledger.svg', 'account-import-ledger-onboarding.slides.slide-3']
+    ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
+    ['ledger_app_kusama.svg', 'account-import-ledger-onboarding.slides.slide-2'],
+    ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
   ]
 
   @ViewChild(IonSlides, { static: true })
