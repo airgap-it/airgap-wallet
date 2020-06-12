@@ -213,12 +213,12 @@
   },
 
   "interaction-selection-desktop": {
-    "title": "TODO",
+    "title": "Select Signer Option",
     "heading": "TODO",
     "vault_label": "AirGap Vault",
     "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
     "ledger_label": "Ledger",
-    "ledger_info": "TODO"
+    "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
   },
 
   "wallet-address": {

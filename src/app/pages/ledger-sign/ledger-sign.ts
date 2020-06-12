@@ -4,7 +4,6 @@ import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefin
 import BigNumber from 'bignumber.js'
 
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { LedgerConnectionDetails } from 'src/app/ledger/connection/LedgerConnection'
 import { LoadingController, AlertController } from '@ionic/angular'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -26,7 +25,6 @@ export class LedgerSignPage {
   }
 
   private readonly unsignedTx: any
-  private ledgerConnection?: LedgerConnectionDetails
 
   private loader: HTMLIonLoadingElement | undefined
 
@@ -56,13 +54,27 @@ export class LedgerSignPage {
         }
       }
     }
+    this.connectWithLedger()
+  }
+
+  private async connectWithLedger() {
+    await this.showLoader('Connecting device...')
+
+    try {
+      await this.ledgerService.openConnection(this.wallet.protocolIdentifier)
+    } catch (error) {
+      console.warn(error)
+      this.promptError(error)
+    } finally {
+      this.dismissLoader()
+    }
   }
 
   public async signTx() {
     await this.showLoader('Signing transaction...')
 
     try {
-      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.unsignedTx, this.ledgerConnection)
+      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.unsignedTx)
       const signedTransactionSync: IACMessageDefinitionObject = {
         type: IACMessageType.MessageSignResponse,
         protocol: this.wallet.protocolIdentifier,
@@ -95,7 +107,7 @@ export class LedgerSignPage {
     } else if (error instanceof Error) {
       message = error.message
     } else {
-      message = this.translateService.instant('account-import-ledger.error-alert.unknown')
+      message = this.translateService.instant('ledger-sign.error-alert.unknown')
     }
 
     const alert: HTMLIonAlertElement = await this.alertCtrl.create({

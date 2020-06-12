@@ -10,6 +10,7 @@ import { PolkadotLedgerApp } from 'src/app/ledger/app/substrate/PolkadotLedgerAp
 import { isType } from 'src/app/utils/utils'
 import { ReturnCode } from 'src/app/ledger/ReturnCode'
 import { LedgerConnectionProvider } from './ledger-connection-provider'
+import { Platform } from '@ionic/angular'
 
 const MAX_RETRIES = 1
 
@@ -25,7 +26,7 @@ export class LedgerService {
   private readonly openConnections: Map<string, LedgerConnection> = new Map()
   private readonly runningApps: Map<string, LedgerApp> = new Map()
 
-  constructor(private readonly connectionProvider: LedgerConnectionProvider) {}
+  constructor(private readonly platform: Platform, private readonly connectionProvider: LedgerConnectionProvider) {}
 
   public getSupportedProtocols(): string[] {
     return Array.from(this.supportedApps.keys())
@@ -90,8 +91,20 @@ export class LedgerService {
   }
 
   private async openLedgerConnection(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection> {
-    const connection: LedgerConnection | null = await this.connectionProvider.open(protocolIdentifier, ledgerConnection)
-    this.openConnections.set(this.getConnectionKey(ledgerConnection), connection)
+    const connectionKey: string = this.getConnectionKey(ledgerConnection)
+
+    let connection: LedgerConnection | null
+    if (!this.openConnections.has(connectionKey)) {
+      connection = await this.connectionProvider.open(protocolIdentifier, ledgerConnection)
+
+      if (connection === null) {
+        return Promise.reject(`Platforms ${this.platform.platforms().join(', ')} not supported.`)
+      }
+
+      this.openConnections.set(connectionKey, connection)
+    } else {
+      connection = this.openConnections.get(connectionKey)
+    }
 
     return connection
   }
