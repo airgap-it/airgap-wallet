@@ -24,12 +24,14 @@ export interface TezosBakerDetails {
   hasLogo: boolean
   hasPayoutAddress?: boolean
   logoReference?: string
-  stakingCapacity?: number | BigNumber
-  payoutPeriod?: number
-  fee?: number | BigNumber
+  stakingCapacity?: BigNumber
+  payoutDelay?: number
+  fee?: BigNumber
 }
 
-type TezosBakerDetailsResponse = { [address: string]: Omit<TezosBakerDetails, 'address'> }
+interface TezosBakerDetailsResponse {
+  [address: string]: Omit<TezosBakerDetails, 'address'>
+}
 
 export interface CosmosValidatorDetails {
   operator_address: string
