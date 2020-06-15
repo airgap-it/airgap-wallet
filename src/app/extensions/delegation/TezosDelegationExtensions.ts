@@ -107,7 +107,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
           new UIAccountSummary({
             address: details.address,
             logo: details.logo ? details.logo : undefined,
-            header: details.alias || '',
+            header: [
+              details.alias || '',
+              details.fee !== undefined ? `${this.decimalPipe.transform(new BigNumber(details.fee).times(100).toString())}%` : ''
+            ],
             description: this.shortenStringPipe.transform(details.address)
           })
       )

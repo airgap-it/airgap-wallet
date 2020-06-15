@@ -24,7 +24,9 @@ export interface TezosBakerDetails {
   hasLogo: boolean
   hasPayoutAddress?: boolean
   logoReference?: string
-  accountType?: 'address' | 'contract'
+  stakingCapacity?: number | BigNumber
+  payoutPeriod?: number
+  fee?: number | BigNumber
 }
 
 type TezosBakerDetailsResponse = { [address: string]: Omit<TezosBakerDetails, 'address'> }
@@ -102,6 +104,8 @@ export class RemoteConfigProvider {
       return {
         address,
         ...baker,
+        stakingCapacity: baker.stakingCapacity !== undefined ? new BigNumber(baker.stakingCapacity) : undefined,
+        fee: baker.fee !== undefined ? new BigNumber(baker.fee) : undefined,
         logo: baker.hasLogo ? `${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}` : undefined
       }
     })
