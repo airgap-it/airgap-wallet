@@ -1,4 +1,4 @@
-import { TezosProtocol, DelegationRewardInfo, DelegationInfo, TezosDelegatorAction } from 'airgap-coin-lib'
+import { TezosProtocol, DelegationInfo, TezosDelegatorAction } from 'airgap-coin-lib'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
   AirGapDelegateeDetails,
@@ -13,16 +13,9 @@ import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-conve
 import BigNumber from 'bignumber.js'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { Moment } from 'moment'
-import * as moment from 'moment'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormBuilder, FormGroup } from '@angular/forms'
-import { switchMap, map } from 'rxjs/operators'
-import { from } from 'rxjs'
-import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-
-const hoursPerCycle: number = 68
 
 export class TezosDelegationExtensions extends ProtocolDelegationExtensions<TezosProtocol> {
   public static async create(
@@ -126,17 +119,16 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   ): Promise<AirGapRewardDisplayDetails | undefined> {
     const delegationDetails = await protocol.getDelegationDetailsFromAddress(delegator, delegatees)
     const delegatorExtraInfo = await protocol.getDelegationInfo(delegationDetails.delegator.address)
-    const [displayDetails, displayRewards] = await Promise.all([
-      this.createDelegatorDisplayDetails(
-        protocol,
-        delegationDetails.delegator,
-        delegatorExtraInfo,
-        delegationDetails.delegatees[0].address
-      ),
-      this.createDelegatorDisplayRewards(protocol, delegationDetails.delegator.address, delegatorExtraInfo)
-    ])
+    const displayRewards: UIRewardList | undefined = await this.createDelegatorDisplayRewards(
+      protocol,
+      delegationDetails.delegator.address,
+      delegatorExtraInfo
+    ).catch(() => undefined)
+    if (displayRewards === undefined) {
+      return undefined
+    }
     return {
-      displayDetails: displayDetails,
+      displayDetails: undefined,
       displayRewards: displayRewards
     }
   }
@@ -192,86 +184,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       : null
   }
 
-  private async createDelegatorDisplayDetails(
-    protocol: TezosProtocol,
-    delegatorDetails: DelegatorDetails,
-    delegatorExtraInfo: DelegationInfo,
-    baker: string
-  ): Promise<UIWidget[]> {
-    const details = []
-    const bakerConfig = baker === this.airGapBakerConfig.address ? this.airGapBakerConfig : undefined
-
-    try {
-      const bakerRewards = await protocol.getDelegationRewards(baker)
-      details.push(...this.createFuturePayoutWidgets(protocol, delegatorDetails, delegatorExtraInfo, baker, bakerRewards, bakerConfig))
-    } catch (error) {
-      // Baker was never delegated
-    }
-
-    return details
-  }
-
-  private async getRewardAmountsByCycle(
-    protocol: TezosProtocol,
-    accountAddress: string,
-    bakerAddress: string
-  ): Promise<Map<number, string>> {
-    const currentCycle = await protocol.fetchCurrentCycle()
-    const cycles = [...Array(6).keys()].map(num => currentCycle - num)
-    return new Map<number, string>(
-      await Promise.all(
-        cycles.map(
-          async (cycle): Promise<[number, string]> => [
-            cycle,
-            await this.getRewardAmountByCycle(protocol, accountAddress, bakerAddress, cycle, currentCycle)
-          ]
-        )
-      )
-    )
-  }
-
-  private async getRewardAmountByCycle(
-    protocol: TezosProtocol,
-    accountAddress: string,
-    bakerAddress: string,
-    cycle: number,
-    currentCycle: number
-  ): Promise<string> {
-    return from(protocol.calculateRewards(bakerAddress, cycle, currentCycle))
-      .pipe(
-        switchMap(tezosRewards =>
-          from(this.calculatePayout(protocol, accountAddress, tezosRewards)).pipe(
-            map(payout => {
-              return payout
-                ? this.amountConverter.transform(new BigNumber(payout.payout), {
-                    protocolIdentifier: protocol.identifier,
-                    maxDigits: 10
-                  })
-                : null
-            })
-          )
-        )
-      )
-      .toPromise()
-  }
-
-  private async calculatePayout(protocol: TezosProtocol, address: string, rewards: TezosRewards): Promise<TezosPayoutInfo> {
-    if (!rewards.delegatedContracts.includes(address)) {
-      return {
-        delegator: address,
-        share: '0',
-        payout: '0'
-      }
-    }
-    return protocol.calculatePayout(address, rewards).catch(() => {
-      return {
-        delegator: address,
-        share: '0',
-        payout: '0'
-      }
-    })
-  }
-
   private async createDelegatorDisplayRewards(
     protocol: TezosProtocol,
     address: string,
@@ -280,82 +192,24 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
       return undefined
     }
-
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
-    const amountByCycle = await this.getRewardAmountsByCycle(protocol, address, delegatorExtraInfo.value)
     return new UIRewardList({
       rewards: rewardInfo
-        .slice(0, 5)
-        .map(reward => ({
-          index: reward.cycle,
-          amount: amountByCycle.get(reward.cycle),
-          collected: reward.payout < new Date(),
-          timestamp: reward.payout.getTime()
-        }))
+        .map(info => {
+          return {
+            index: info.cycle,
+            amount: this.amountConverter.transform(new BigNumber(info.reward), {
+              protocolIdentifier: protocol.identifier,
+              maxDigits: 10
+            }),
+            collected: info.payout < new Date(),
+            timestamp: info.payout.getTime()
+          }
+        })
         .reverse(),
       indexColLabel: 'Cycle',
       amountColLabel: 'Expected Reward',
       payoutColLabel: 'Earliest Payout'
     })
-  }
-
-  private createFuturePayoutWidgets(
-    protocol: TezosProtocol,
-    delegatorDetails: DelegatorDetails,
-    delegatorExtraInfo: DelegationInfo,
-    baker: string,
-    bakerRewards: DelegationRewardInfo[],
-    bakerConfig?: BakerConfig
-  ): UIWidget[] {
-    const nextPayout = this.getNextPayoutMoment(delegatorExtraInfo, bakerRewards, bakerConfig ? bakerConfig.payout.cycles : undefined)
-
-    const avgRoIPerCyclePercentage = bakerRewards
-      .map(rewardInfo => rewardInfo.totalRewards.plus(rewardInfo.totalFees).div(rewardInfo.stakingBalance))
-      .reduce((avg, value) => avg.plus(value))
-      .div(bakerRewards.length)
-
-    const avgRoIPerCycle = new BigNumber(avgRoIPerCyclePercentage).multipliedBy(delegatorDetails.balance)
-
-    return [
-      new UIIconText({
-        iconName: 'sync-outline',
-        text: nextPayout.fromNow(),
-        description: delegatorDetails.delegatees.includes(baker) ? 'Next Payout' : 'First Payout'
-      }),
-      new UIIconText({
-        iconName: 'alarm-outline',
-        text: this.amountConverter.transform(avgRoIPerCycle.toFixed(), {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
-        }),
-        description: 'Estimated Return per Cycle'
-      })
-    ]
-  }
-
-  private getNextPayoutMoment(
-    delegatorExtraInfo: DelegationInfo,
-    bakerRewards: DelegationRewardInfo[],
-    bakerPayoutCycles?: number
-  ): Moment {
-    let nextPayout: Moment
-    if (delegatorExtraInfo.isDelegated) {
-      const delegatedCycles = bakerRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
-      const delegatedDate = delegatorExtraInfo.delegatedDate
-
-      nextPayout = delegatedCycles.length > 0 ? moment(delegatedCycles[0].payout) : this.addPayoutDelayToMoment(moment(), bakerPayoutCycles)
-
-      if (this.addPayoutDelayToMoment(moment(delegatedDate), bakerPayoutCycles).isAfter(nextPayout)) {
-        nextPayout = this.addPayoutDelayToMoment(moment(delegatedDate), bakerPayoutCycles)
-      }
-    } else {
-      nextPayout = this.addPayoutDelayToMoment(moment(), bakerPayoutCycles)
-    }
-
-    return nextPayout
-  }
-
-  private addPayoutDelayToMoment(time: Moment, payoutCycles?: number): Moment {
-    return time.add(hoursPerCycle * 7 + payoutCycles || 0, 'h')
   }
 }
