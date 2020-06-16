@@ -7,7 +7,7 @@ import {
   AirGapDelegatorAction,
   AirGapRewardDisplayDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
+import { RemoteConfigProvider, TezosBakerDetails, TezosBakerCollection } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import BigNumber from 'bignumber.js'
@@ -57,7 +57,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   public delegateeLabelPlural: string = 'delegation-detail-tezos.delegatee-label-plural'
   public supportsMultipleDelegations: boolean = false
 
-  private knownBakers?: TezosBakerDetails[]
+  private knownBakers?: TezosBakerCollection
 
   private constructor(
     private readonly remoteConfigProvider: RemoteConfigProvider,
@@ -82,14 +82,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   public async createDelegateesSummary(_protocol: TezosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const knownBakers: TezosBakerDetails[] = await this.getKnownBakers()
-    const knownBakersAddresses: string[] = knownBakers.map((bakerDetails: TezosBakerDetails) => bakerDetails.address)
+    const knownBakers: TezosBakerCollection = await this.getKnownBakers()
 
-    type BakerDetails = Partial<TezosBakerDetails> & Pick<TezosBakerDetails, 'address'>
+    type BakerDetails = Partial<TezosBakerDetails> & Record<'address', string>
 
     return [
-      ...knownBakers,
-      ...delegatees.filter((baker: string) => !knownBakersAddresses.includes(baker)).map((baker: string) => ({ address: baker }))
+      ...Object.entries(knownBakers).map(([address, baker]: [string, TezosBakerDetails]) => ({ address, ...baker })),
+      ...delegatees.filter((baker: string) => !Object.keys(knownBakers).includes(baker)).map((baker: string) => ({ address: baker }))
     ]
       .sort((a: BakerDetails, b: BakerDetails) => {
         const aAlias: string = a.alias || ''
@@ -131,7 +130,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const bakerCurrentUsage = new BigNumber(bakerInfo.stakingBalance)
     const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
 
-    const knownBaker = knownBakers.find((baker: TezosBakerDetails) => baker.address === bakerDetails.address)
+    const knownBaker = knownBakers[bakerDetails.address]
     const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
 
     let status: string
@@ -265,8 +264,8 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   ): Promise<UIWidget[]> {
     const details = []
 
-    const knownBakers: TezosBakerDetails[] = await this.getKnownBakers()
-    const knownBaker = knownBakers.find((bakerDetails: TezosBakerDetails) => bakerDetails.address === baker)
+    const knownBakers: TezosBakerCollection = await this.getKnownBakers()
+    const knownBaker = knownBakers[baker]
 
     try {
       const bakerRewards = await protocol.getDelegationRewards(baker)
@@ -277,10 +276,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     return details
   }
-
-  // const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-  //   oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
-  // )
 
   private async getRewardAmountsByCycle(
     protocol: TezosProtocol,
@@ -307,10 +302,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     bakerAddress: string,
     cycle: number
   ): Promise<string> {
-    const knownBakers: TezosBakerDetails[] = await this.getKnownBakers()
+    const knownBakers: TezosBakerCollection = await this.getKnownBakers()
 
-    const knownBaker = knownBakers.find((baker: TezosBakerDetails) => baker.address === bakerAddress)
-    const firstWithFee = knownBakers.find((baker: TezosBakerDetails) => baker.fee)
+    const knownBaker = knownBakers[bakerAddress]
+    const firstWithFee = Object.values(knownBakers).find((baker: TezosBakerDetails) => baker.fee)
 
     const defaultFee = firstWithFee ? firstWithFee.fee : new BigNumber(0)
     const fee = knownBaker && knownBaker.fee ? knownBaker.fee : defaultFee
@@ -344,6 +339,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
     const amountByCycle = await this.getRewardAmountsByCycle(protocol, address, delegatorExtraInfo.value)
+
     return new UIRewardList({
       rewards: rewardInfo.slice(0, 5).map(reward => ({
         index: reward.cycle,
@@ -419,7 +415,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return time.add(hoursPerCycle * 7 + payoutCycles || 0, 'h')
   }
 
-  private async getKnownBakers(): Promise<TezosBakerDetails[]> {
+  private async getKnownBakers(): Promise<TezosBakerCollection> {
     if (this.knownBakers === undefined) {
       this.knownBakers = await this.remoteConfigProvider.getKnownTezosBakers()
     }

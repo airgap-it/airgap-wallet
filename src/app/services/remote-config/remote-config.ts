@@ -16,9 +16,12 @@ export interface TezosBakerConfig {
     time: string
   }
 }
+
+export interface TezosBakerCollection {
+  [address: string]: TezosBakerDetails
+}
 export interface TezosBakerDetails {
   alias: string
-  address: string
   logo?: string
   hasLogo: boolean
   hasPayoutAddress?: boolean
@@ -26,10 +29,6 @@ export interface TezosBakerDetails {
   stakingCapacity?: BigNumber
   payoutDelay?: number
   fee?: BigNumber
-}
-
-interface TezosBakerDetailsResponse {
-  [address: string]: Omit<TezosBakerDetails, 'address'>
 }
 
 export interface CosmosValidatorDetails {
@@ -72,9 +71,9 @@ export interface AeFirstVote {
 export class RemoteConfigProvider {
   constructor(private readonly httpClient: HttpClient) {}
 
-  public async getKnownTezosBakers(): Promise<TezosBakerDetails[]> {
-    const bakersResponse: TezosBakerDetailsResponse = await this.httpClient
-      .get<TezosBakerDetailsResponse>(`${COIN_LIB_SERVICE}/tz/bakers`)
+  public async getKnownTezosBakers(): Promise<TezosBakerCollection> {
+    const bakersResponse: TezosBakerCollection = await this.httpClient
+      .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/tz/bakers`)
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
@@ -82,15 +81,16 @@ export class RemoteConfigProvider {
         return {}
       })
 
-    return Object.entries(bakersResponse).map(([address, baker]: [string, Omit<TezosBakerDetails, 'address'>]) => {
-      return {
-        address,
+    Object.entries(bakersResponse).forEach(([address, baker]: [string, TezosBakerDetails]) => {
+      bakersResponse[address] = {
         ...baker,
         stakingCapacity: baker.stakingCapacity !== undefined ? new BigNumber(baker.stakingCapacity) : undefined,
         fee: baker.fee !== undefined ? new BigNumber(baker.fee) : undefined,
         logo: baker.hasLogo ? `${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}` : undefined
       }
     })
+
+    return bakersResponse
   }
 
   public async getKnownCosmosValidators(): Promise<CosmosValidatorDetails[]> {
