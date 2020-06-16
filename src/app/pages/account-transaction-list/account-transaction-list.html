@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ wallet?.coinProtocol.symbol | uppercase }} {{ 'account-transaction-list.title' | translate }}</ion-title>
+      <ion-title>{{ wallet?.coinProtocol.symbol }} {{ 'account-transaction-list.title' | translate }}</ion-title>
       <ion-buttons slot="end">
         <ion-button id="edit-popover" (click)="presentEditPopover($event)" color="secondary">
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>
