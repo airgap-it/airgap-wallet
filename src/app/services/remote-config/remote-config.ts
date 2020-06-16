@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-const CONFIG_BACKEND = 'https://config.airgap.prod.gke.papers.tech/'
 const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.prod.gke.papers.tech/api/v1'
 
 export interface TezosBakerConfig {
@@ -72,25 +71,6 @@ export interface AeFirstVote {
 })
 export class RemoteConfigProvider {
   constructor(private readonly httpClient: HttpClient) {}
-
-  public async tezosBakers(): Promise<TezosBakerConfig[]> {
-    const responsePromise = this.httpClient.get<TezosBakerConfig[]>(`${CONFIG_BACKEND}config/xtz/bakers`).toPromise()
-    responsePromise.catch(handleErrorSentry(ErrorCategory.OTHER))
-    const response = await responsePromise
-
-    return response.map(config => {
-      return {
-        name: config.name,
-        address: config.address,
-        fee: new BigNumber(config.fee),
-        enabled: config.enabled,
-        payout: {
-          cycles: config.payout.cycles,
-          time: config.payout.time
-        }
-      }
-    })
-  }
 
   public async getKnownTezosBakers(): Promise<TezosBakerDetails[]> {
     const bakersResponse: TezosBakerDetailsResponse = await this.httpClient

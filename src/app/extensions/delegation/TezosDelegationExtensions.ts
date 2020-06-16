@@ -7,7 +7,7 @@ import {
   AirGapDelegatorAction,
   AirGapRewardDisplayDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, TezosBakerConfig, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
+import { RemoteConfigProvider, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import BigNumber from 'bignumber.js'
