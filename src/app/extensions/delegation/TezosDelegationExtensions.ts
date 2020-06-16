@@ -143,7 +143,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       status = 'delegation-detail-tezos.status.deactivated'
     }
 
-    const displayDetails = this.createDelegateeDisplayDetails(knownBaker)
+    const displayDetails = this.createDelegateeDisplayDetails(protocol, knownBaker)
 
     return {
       name,
@@ -195,7 +195,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
   }
 
-  private createDelegateeDisplayDetails(baker?: TezosBakerDetails): UIWidget[] {
+  private createDelegateeDisplayDetails(protocol: TezosProtocol, baker?: TezosBakerDetails): UIWidget[] {
     return [
       new UIIconText({
         iconName: 'logo-usd',
@@ -209,7 +209,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
           baker && baker.payoutDelay !== undefined
             ? this.translateService.instant('delegation-detail-tezos.payout-schedule_text', {
                 cycles: baker.payoutDelay,
-                payoutTime: '2d 10h 12m' // TODO?: move to coin-lib
+                payoutTime: this.getFormattedCycleDuration(protocol)
               })
             : 'delegation-detail-tezos.unknown',
         description: 'delegation-detail-tezos.payout-schedule_label'
@@ -425,5 +425,15 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
 
     return this.knownBakers
+  }
+
+  private getFormattedCycleDuration(protocol: TezosProtocol): string {
+    const cycleDuration = moment.duration(protocol.minCycleDuration)
+
+    const days = Math.floor(cycleDuration.asDays())
+    const hours = Math.floor(cycleDuration.asHours() - days * 24)
+    const minutes = Math.floor(cycleDuration.asMinutes() - (days * 24 * 60 + hours * 60))
+
+    return `${days}d ${hours}h ${minutes}m`
   }
 }
