@@ -95,8 +95,8 @@ export class DelegationDetailPage {
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
       component: DelegateEditPopoverComponent,
       componentProps: {
-        hideAirGap: supportsAirGapDelegation(this.wallet.coinProtocol)
-          ? !this.wallet.coinProtocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.coinProtocol.airGapDelegatee)
+        hideAirGap: supportsAirGapDelegation(this.wallet.protocol)
+          ? !this.wallet.protocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.protocol.airGapDelegatee)
           : true,
         delegateeLabel: this.delegateeLabel,
         hasMultipleDelegatees: this.currentDelegatees.length > 1,
@@ -115,8 +115,8 @@ export class DelegationDetailPage {
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
         if (isObjectOf<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
           this.changeDisplayedDetails(data.delegateeAddress)
-        } else if (isObjectOf<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
-          this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
+        } else if (isObjectOf<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.protocol)) {
+          this.changeDisplayedDetails(this.wallet.protocol.airGapDelegatee)
         } else if (isObjectOf<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
           this.showDelegateesList()
         } else if (isObjectOf<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
@@ -163,7 +163,7 @@ export class DelegationDetailPage {
   }
 
   private initView() {
-    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol) ? this.wallet.coinProtocol.delegateeLabel : 'Delegation'
+    this.delegateeLabel = supportsAirGapDelegation(this.wallet.protocol) ? this.wallet.protocol.delegateeLabel : 'Delegation'
 
     this.subscribeObservables()
 
@@ -210,7 +210,7 @@ export class DelegationDetailPage {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
           text: this.amountConverter.transform(details.balance, {
-            protocolIdentifier: this.wallet.protocolIdentifier,
+            protocolIdentifier: this.wallet.protocol.identifier,
             maxDigits: 10
           }),
           description: 'Your balance'

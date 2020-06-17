@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { PushNotification } from '@capacitor/core'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
+import { isType } from 'src/app/utils/utils'
 
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
 import { LanguageService } from '../language/language.service'
+import { OperationsProvider } from '../operations/operations'
+import { defaultChainNetwork } from '../protocols/protocols'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
-import { isType } from 'src/app/utils/utils'
-import { OperationsProvider } from '../operations/operations'
 
 enum NotificationKind {
   CTA_Tip = 'cta_tip',
@@ -72,7 +73,7 @@ export class AccountProvider {
       })
       .catch(console.error)
     this.loadActiveAccountFromStorage().catch(console.error)
-    this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.coinProtocol))).subscribe(this.subWallets)
+    this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
 
     this.pushProvider.notificationCallback = (notification: PushNotification): void => {
@@ -137,8 +138,8 @@ export class AccountProvider {
   private getProtocolsFromWallets(wallets: AirGapMarketWallet[]) {
     const protocols: Map<string, ICoinProtocol> = new Map()
     wallets.forEach(wallet => {
-      if (!protocols.has(wallet.protocolIdentifier)) {
-        protocols.set(wallet.protocolIdentifier, wallet.coinProtocol)
+      if (!protocols.has(wallet.protocol.identifier)) {
+        protocols.set(wallet.protocol.identifier, wallet.protocol)
       }
     })
 
@@ -167,8 +168,10 @@ export class AccountProvider {
     const walletInitPromises: Promise<void>[] = []
 
     wallets.forEach(wallet => {
+      const protocol = getProtocolByIdentifier((wallet as any).protocolIdentifier, (wallet as any).chainNetwork || defaultChainNetwork)
+
       const airGapWallet = new AirGapMarketWallet(
-        wallet.protocolIdentifier,
+        protocol,
         wallet.publicKey,
         wallet.isExtendedPublicKey,
         wallet.derivationPath,
@@ -221,7 +224,7 @@ export class AccountProvider {
         }
 
         airGapWorker.postMessage({
-          protocolIdentifier: airGapWallet.protocolIdentifier,
+          protocolIdentifier: airGapWallet.protocol.identifier,
           publicKey: airGapWallet.publicKey,
           isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
           derivationPath: airGapWallet.derivationPath,
@@ -290,13 +293,13 @@ export class AccountProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.WALLET, this.walletList)
+    return this.storageProvider.set(SettingsKey.WALLET, this.walletList as any)
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {
     return wallet.addressIndex
-      ? `${wallet.protocolIdentifier}-${wallet.publicKey}-${wallet.addressIndex}`
-      : `${wallet.protocolIdentifier}-${wallet.publicKey}`
+      ? `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.addressIndex}`
+      : `${wallet.protocol.identifier}-${wallet.publicKey}`
   }
 
   public walletByPublicKeyAndProtocolAndAddressIndex(
@@ -305,7 +308,7 @@ export class AccountProvider {
     addressIndex?: number
   ): AirGapMarketWallet {
     return this.walletList.find(
-      wallet => wallet.publicKey === publicKey && wallet.protocolIdentifier === protocolIdentifier && wallet.addressIndex === addressIndex
+      wallet => wallet.publicKey === publicKey && wallet.protocol.identifier === protocolIdentifier && wallet.addressIndex === addressIndex
     )
   }
 
@@ -320,7 +323,7 @@ export class AccountProvider {
 
     return (
       wallet1.publicKey === wallet2.publicKey &&
-      wallet1.protocolIdentifier === wallet2.protocolIdentifier &&
+      wallet1.protocol.identifier === wallet2.protocol.identifier &&
       wallet1.addressIndex === wallet2.addressIndex
     )
   }
@@ -348,7 +351,7 @@ export class AccountProvider {
           const incompatibleWallets: AirGapMarketWallet[] = []
 
           this.walletList.forEach(wallet => {
-            if (compatibleProtocols.has(wallet.protocolIdentifier)) {
+            if (compatibleProtocols.has(wallet.protocol.identifier)) {
               compatibleWallets.push(wallet)
             } else {
               incompatibleWallets.push(wallet)

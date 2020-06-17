@@ -6,6 +6,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'swap',
@@ -75,7 +76,7 @@ export class SwapComponent {
     const protocols: ICoinProtocol[] = []
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
-        protocols.push(getProtocolByIdentifier(supportedProtocol))
+        protocols.push(getProtocolByIdentifier(supportedProtocol, defaultChainNetwork))
       } catch (error) {
         /* */
       }
@@ -93,7 +94,7 @@ export class SwapComponent {
       .onDidDismiss()
       .then((protocolIdentifier: any) => {
         if (protocolIdentifier && protocolIdentifier.data) {
-          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
+          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data, defaultChainNetwork))
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

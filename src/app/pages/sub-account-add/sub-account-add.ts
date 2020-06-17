@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
+import { ProtocolsProvider, defaultChainNetwork } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 export interface IAccountWrapper {
@@ -52,10 +52,11 @@ export class SubAccountAddPage {
       assertNever(this.subProtocolType)
     }
     if (this.subProtocolType === SubProtocolType.TOKEN) {
-      this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
+      this.wallet.protocol.subProtocols.forEach(subProtocol => {
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
+          const protocol = getProtocolByIdentifier(subProtocol.identifier, defaultChainNetwork)
           const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-            subProtocol.identifier,
+            protocol,
             this.wallet.publicKey,
             this.wallet.isExtendedPublicKey,
             this.wallet.derivationPath

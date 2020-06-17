@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
-import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, supportedProtocols } from 'airgap-coin-lib'
+import {
+  AccountShareResponse,
+  AirGapMarketWallet,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  supportedProtocols,
+  getProtocolByIdentifier
+} from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { SerializerService } from '../../services/serializer/serializer.service'
@@ -10,6 +17,7 @@ import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { BeaconService } from '../beacon/beacon.service'
 import { StorageProvider, SettingsKey } from '../storage/storage'
+import { defaultChainNetwork } from '../protocols/protocols'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -57,7 +65,7 @@ export class SchemeRoutingProvider {
         if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
           const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
             wallets,
-            (wallet: AirGapMarketWallet) => wallet.protocolIdentifier === protocol.identifier
+            (wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier
           )
 
           if (compatibleWallets.length > 0) {
@@ -147,8 +155,9 @@ export class SchemeRoutingProvider {
 
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
+    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol, defaultChainNetwork)
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      deserializedSyncs[0].protocol,
+      protocol,
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath

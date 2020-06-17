@@ -66,8 +66,8 @@ export class ExchangeConfirmPage {
 
   public async prepareTransaction() {
     const wallet = this.fromWallet
-    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
-    const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.protocol.decimals)
+    const fee = new BigNumber(this.fee).shiftedBy(wallet.protocol.feeDecimals)
 
     try {
       const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(

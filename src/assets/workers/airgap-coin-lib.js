@@ -9,7 +9,7 @@ self.onmessage = function(event) {
 
     var wallet = event.data;
     var airGapWallet = new airgapCoinLib.AirGapWallet(
-      wallet.protocolIdentifier,
+      wallet.protocol.identifier,
       wallet.publicKey,
       wallet.isExtendedPublicKey,
       wallet.derivationPath

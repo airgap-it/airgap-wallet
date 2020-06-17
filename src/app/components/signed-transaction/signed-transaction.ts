@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../../services/serializer/serializer.service'
+import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'signed-transaction',
@@ -46,7 +47,7 @@ export class SignedTransactionComponent implements OnChanges {
 
     // TODO: Handle multiple messages
     if (this.signedTxs) {
-      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTxs[0].protocol)
+      const protocol: ICoinProtocol = getProtocolByIdentifier(this.signedTxs[0].protocol, defaultChainNetwork)
       try {
         this.airGapTxs = (await Promise.all(
           this.signedTxs.map(signedTx => protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction))

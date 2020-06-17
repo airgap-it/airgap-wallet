@@ -75,11 +75,11 @@ export class PortfolioItemComponent {
 
   private async updateDelegationStatus() {
     if (this.wallet !== undefined && this.wallet.receivingPublicAddress !== undefined) {
-      if (!supportsDelegation(this.wallet.coinProtocol)) {
+      if (!supportsDelegation(this.wallet.protocol)) {
         this.isDelegated = null
       } else {
         this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-          this.wallet.coinProtocol as ICoinDelegateProtocol,
+          this.wallet.protocol as ICoinDelegateProtocol,
           this.wallet.receivingPublicAddress
         )
       }
@@ -91,10 +91,10 @@ export class PortfolioItemComponent {
       const converter = new AmountConverterPipe()
       const currentBalance: BigNumber = this.wallet.currentBalance
       const balanceFormatted = converter.transformValueOnly(currentBalance, {
-        protocol: this.wallet.coinProtocol,
+        protocol: this.wallet.protocol,
         maxDigits: this.digits()
       })
-      this.balance = `${balanceFormatted} ${this.wallet.coinProtocol.symbol}`
+      this.balance = `${balanceFormatted} ${this.wallet.protocol.symbol}`
       const balanceSplit = balanceFormatted.split('.')
       if (balanceSplit.length == 2) {
         const decimals = balanceSplit.pop()
@@ -105,9 +105,9 @@ export class PortfolioItemComponent {
 
   public digits(): number {
     if (this.maxDigits === undefined) {
-      return Math.min(this.wallet.coinProtocol.decimals + 1, this.defaultMaxDigits)
+      return Math.min(this.wallet.protocol.decimals + 1, this.defaultMaxDigits)
     } else {
-      return this.maxDigits == 0 ? this.wallet.coinProtocol.decimals + 1 : this.maxDigits
+      return this.maxDigits == 0 ? this.wallet.protocol.decimals + 1 : this.maxDigits
     }
   }
 

@@ -7,6 +7,7 @@ import * as cryptocompare from 'cryptocompare'
 import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
+import { defaultChainNetwork } from '../protocols/protocols'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -32,7 +33,7 @@ export class MarketDataService {
   public async getTransactionHistory(wallet: AirGapMarketWallet, transactions: IAirGapTransaction[]): Promise<TransactionHistoryObject[]> {
     const txHistory: TransactionHistoryObject[] = []
     // TODO fetch more than 50 txs?
-    const protocol = getProtocolByIdentifier(wallet.protocolIdentifier)
+    const protocol = getProtocolByIdentifier(wallet.protocol.identifier, defaultChainNetwork)
     transactions.forEach(transaction => {
       const amount = new BigNumber(transaction.amount).shiftedBy(-1 * protocol.decimals).toNumber()
       const fee = new BigNumber(transaction.fee).shiftedBy(-1 * protocol.decimals).toNumber() //
@@ -55,7 +56,7 @@ export class MarketDataService {
 
     let currentBalance = parseFloat(
       this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
-        protocol: wallet.coinProtocol,
+        protocol: wallet.protocol,
         maxDigits: 10
       })
     )
@@ -115,7 +116,7 @@ export class MarketDataService {
     return new Promise<number[]>(async resolve => {
       const wallets = this.walletsProvider.getWalletList()
       // TODO fetchMarketData() only once for each protocolIdentifier
-      const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.coinProtocol.marketSymbol))
+      const cryptoPricePromises = wallets.map(wallet => this.cachingService.fetchMarketData(interval, wallet.protocol.marketSymbol))
       const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
       const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
 
@@ -123,7 +124,7 @@ export class MarketDataService {
       const allWalletValues = [0, 0]
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setPriceData(
-          { timeUnit: interval, protocolIdentifier: wallet.coinProtocol.marketSymbol, key: CachingServiceKey.PRICESAMPLES },
+          { timeUnit: interval, protocolIdentifier: wallet.protocol.marketSymbol, key: CachingServiceKey.PRICESAMPLES },
           priceSamples[index]
         )
         this.cachingService.setTransactionData(

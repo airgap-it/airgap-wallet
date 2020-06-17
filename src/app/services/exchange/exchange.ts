@@ -7,6 +7,7 @@ import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 import { Injectable } from '@angular/core'
 import { StorageProvider, SettingsKey } from '../storage/storage'
+import { defaultChainNetwork } from '../protocols/protocols'
 
 export enum ExchangeEnum {
   CHANGELLY = 'Changelly',
@@ -139,7 +140,7 @@ export class ExchangeProvider implements Exchange {
   }
 
   public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): IAirGapTransaction[] {
-    const protocol = getProtocolByIdentifier(protocolIdentifier)
+    const protocol = getProtocolByIdentifier(protocolIdentifier, defaultChainNetwork)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
       const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()

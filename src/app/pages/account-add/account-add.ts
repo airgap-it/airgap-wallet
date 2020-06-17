@@ -67,7 +67,7 @@ export class AccountAddPage {
 
   public addSubAccount(subProtocolIdentifier: string) {
     const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
-    if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
+    if (this.accountProvider.getWalletList().filter(wallet => wallet.protocol.identifier === mainProtocolIdentifier).length > 0) {
       const info = {
         subProtocolIdentifier
       }

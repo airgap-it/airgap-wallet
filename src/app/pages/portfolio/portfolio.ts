@@ -53,7 +53,7 @@ export class PortfolioPage {
     const walletMap: Map<string, WalletGroup> = new Map()
 
     wallets.forEach((wallet: AirGapMarketWallet) => {
-      const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
+      const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
       if (walletMap.has(wallet.publicKey)) {
         const group: WalletGroup = walletMap.get(wallet.publicKey)
         if (isSubProtocol) {
@@ -76,7 +76,7 @@ export class PortfolioPage {
 
     groups.sort((group1: WalletGroup, group2: WalletGroup) => {
       if (group1.mainWallet && group2.mainWallet) {
-        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        return group1.mainWallet.protocol.symbol.localeCompare(group2.mainWallet.protocol.symbol)
       } else if (group1.mainWallet) {
         return -1
       } else if (group2.mainWallet) {
@@ -141,7 +141,7 @@ export class PortfolioPage {
 
     wallets.forEach(wallet => {
       const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
-        protocolIdentifier: wallet.protocolIdentifier,
+        protocolIdentifier: wallet.protocol.identifier,
         currentMarketPrice: wallet.currentMarketPrice
       })
       newTotal += Number(fiatValue)

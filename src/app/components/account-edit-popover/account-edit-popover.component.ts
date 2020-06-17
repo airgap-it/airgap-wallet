@@ -7,7 +7,7 @@ import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airg
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
+import { ProtocolSymbols, defaultChainNetwork } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
@@ -47,7 +47,7 @@ export class AccountEditPopoverComponent implements OnInit {
   }
 
   public async openBlockExplorer(): Promise<void> {
-    const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocolIdentifier)
+    const protocol: ICoinProtocol = getProtocolByIdentifier(this.wallet.protocol.identifier, defaultChainNetwork)
 
     let blockexplorer: string = protocol.blockExplorer
     blockexplorer = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
@@ -56,12 +56,12 @@ export class AccountEditPopoverComponent implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     // tezos
-    if (this.wallet.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.wallet.protocol.identifier === ProtocolSymbols.XTZ_KT) {
       this.isTezosKT = true
     }
-    if (supportsDelegation(this.wallet.coinProtocol)) {
+    if (supportsDelegation(this.wallet.protocol)) {
       this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(
-        this.wallet.coinProtocol,
+        this.wallet.protocol,
         this.wallet.receivingPublicAddress
       )
     }

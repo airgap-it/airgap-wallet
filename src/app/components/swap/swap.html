@@ -32,14 +32,14 @@
     </ion-row>
     <ion-row
       class="ion-padding-top"
-      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals))"
+      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals))"
     >
       <ion-text color="danger">
         <p
           class="ion-no-margin"
           [innerHTML]="
             'swap.amount-higher-than-balance-error_label'
-              | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals) }
+              | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals) }
           "
         ></p>
       </ion-text>

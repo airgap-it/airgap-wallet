@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -23,17 +24,18 @@ export class SubAccountImportPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
-      this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier)
+      this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier, defaultChainNetwork)
     }
 
     this.accountProvider.wallets
-      .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocolIdentifier === this.subProtocolIdentifier.split('-')[0])))
+      .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.identifier === this.subProtocolIdentifier.split('-')[0])))
       .subscribe(mainAccounts => {
         const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
+            const protocol = getProtocolByIdentifier(this.subProtocolIdentifier, defaultChainNetwork)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
-              this.subProtocolIdentifier,
+              protocol,
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,
               mainAccount.derivationPath

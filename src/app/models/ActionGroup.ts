@@ -6,7 +6,7 @@ import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
-import { ProtocolSymbols } from '../services/protocols/protocols'
+import { ProtocolSymbols, defaultChainNetwork } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
@@ -14,7 +14,7 @@ import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -192,13 +192,8 @@ export class ActionGroup {
       return wallet
     }
 
-    wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
-      xtzWallet.publicKey,
-      xtzWallet.isExtendedPublicKey,
-      xtzWallet.derivationPath,
-      index
-    )
+    const protocol = getProtocolByIdentifier(ProtocolSymbols.XTZ_KT, defaultChainNetwork)
+    wallet = new AirGapMarketWallet(protocol, xtzWallet.publicKey, xtzWallet.isExtendedPublicKey, xtzWallet.derivationPath, index)
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
     await this.callerContext.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))

@@ -104,14 +104,14 @@ export class AccountTransactionListPage {
     this.subscription = this.timer$.subscribe(async () => {
       if (this.formattedExchangeTransactions.length > 0) {
         this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-          this.wallet.protocolIdentifier,
+          this.wallet.protocol.identifier,
           this.wallet.addresses[0]
         )
         this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
       }
     })
 
-    this.protocolIdentifier = this.wallet.coinProtocol.identifier
+    this.protocolIdentifier = this.wallet.protocol.identifier
 
     if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
       this.mainWallet = info.mainWallet
@@ -139,7 +139,7 @@ export class AccountTransactionListPage {
 
     if (
       lastTx &&
-      lastTx.protocol === this.wallet.protocolIdentifier &&
+      lastTx.protocol === this.wallet.protocol.identifier &&
       lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
       lastTx.date > new Date().getTime() - 5 * 60 * 1000
     ) {
@@ -195,13 +195,13 @@ export class AccountTransactionListPage {
   }
 
   public async openBlockexplorer(): Promise<void> {
-    const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    const blockexplorer = await this.wallet.protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.browserService.openUrl(blockexplorer)
   }
 
   public doRefresh(event: any = null): void {
-    if (supportsDelegation(this.wallet.coinProtocol)) {
+    if (supportsDelegation(this.wallet.protocol)) {
       this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
 
@@ -258,7 +258,7 @@ export class AccountTransactionListPage {
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
     this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-      this.wallet.protocolIdentifier,
+      this.wallet.protocol.identifier,
       this.wallet.addresses[0]
     )
     this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
@@ -323,7 +323,7 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
+        importAccountAction: this.wallet.protocol.identifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }
@@ -338,7 +338,7 @@ export class AccountTransactionListPage {
   // Tezos
   public async isDelegated(): Promise<void> {
     const isDelegated = await this.operationsProvider.checkDelegated(
-      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      this.wallet.protocol as ICoinDelegateProtocol,
       this.wallet.receivingPublicAddress
     )
     this.isKtDelegated = isDelegated
@@ -378,7 +378,7 @@ export class AccountTransactionListPage {
   }
 
   private updateExtendedDetails() {
-    if (supportsDelegation(this.wallet.coinProtocol) && this.wallet.receivingPublicAddress !== undefined) {
+    if (supportsDelegation(this.wallet.protocol) && this.wallet.receivingPublicAddress !== undefined) {
       this.extensionsService.loadDelegationExtensions().then(async () => {
         this.accountExtendedDetails = await this.operationsProvider.getAccountExtendedDetails(this.wallet)
       })

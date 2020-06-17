@@ -10,7 +10,7 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ExchangeProvider, ExchangeTransaction, ExchangeEnum } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
+import { ProtocolSymbols, defaultChainNetwork } from 'src/app/services/protocols/protocols'
 import { TranslateService } from '@ngx-translate/core'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -79,12 +79,12 @@ export class ExchangePage {
     let result = protocols.filter(supportedProtocol =>
       walletList.some(
         wallet =>
-          wallet.protocolIdentifier === supportedProtocol &&
+          wallet.protocol.identifier === supportedProtocol &&
           (!filterZeroBalance || (filterZeroBalance && wallet.currentBalance.isGreaterThan(0)))
       )
     )
     const tzbtcIndex = result.indexOf(ProtocolSymbols.TZBTC)
-    if (tzbtcIndex !== -1 && !walletList.some(wallet => wallet.protocolIdentifier === ProtocolSymbols.BTC)) {
+    if (tzbtcIndex !== -1 && !walletList.some(wallet => wallet.protocol.identifier === ProtocolSymbols.BTC)) {
       result.splice(tzbtcIndex, 1)
     }
     return result
@@ -107,7 +107,7 @@ export class ExchangePage {
     } else {
       currentFromProtocol = fromProtocols[0]
     }
-    await this.setFromProtocol(getProtocolByIdentifier(currentFromProtocol))
+    await this.setFromProtocol(getProtocolByIdentifier(currentFromProtocol, defaultChainNetwork))
 
     if (this.exchangePageState === ExchangePageState.LOADING) {
       const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
@@ -206,7 +206,7 @@ export class ExchangePage {
       this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
       !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
     ) {
-      const toProtocol = getProtocolByIdentifier(this.supportedProtocolsTo[0])
+      const toProtocol = getProtocolByIdentifier(this.supportedProtocolsTo[0], defaultChainNetwork)
       this.selectedToProtocol = toProtocol
       this.loadWalletsForSelectedToProtocol()
     }
@@ -245,13 +245,13 @@ export class ExchangePage {
   private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
     return this.accountProvider
       .getWalletList()
-      .filter(wallet => wallet.protocolIdentifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
+      .filter(wallet => wallet.protocol.identifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
     return (
       !wallet ||
-      wallet.protocolIdentifier !== walletArray[0].protocolIdentifier ||
+      wallet.protocol.identifier !== walletArray[0].protocol.identifier ||
       walletArray.every(supportedWallet => !this.accountProvider.isSameWallet(supportedWallet, wallet))
     )
   }
@@ -292,7 +292,7 @@ export class ExchangePage {
       return new BigNumber(0)
     }
     return new BigNumber(
-      await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocolIdentifier, this.toWallet.protocolIdentifier)
+      await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocol.identifier, this.toWallet.protocol.identifier)
     )
   }
 
@@ -301,8 +301,8 @@ export class ExchangePage {
       return this.amount.toFixed()
     }
     return await this.exchangeProvider.getExchangeAmount(
-      this.fromWallet.protocolIdentifier,
-      this.toWallet.protocolIdentifier,
+      this.fromWallet.protocol.identifier,
+      this.toWallet.protocol.identifier,
       this.amount.toString()
     )
   }
@@ -314,8 +314,8 @@ export class ExchangePage {
       const loader = await this.getAndShowLoader()
       try {
         const result = await this.exchangeProvider.createTransaction(
-          this.fromWallet.protocolIdentifier,
-          this.toWallet.protocolIdentifier,
+          this.fromWallet.protocol.identifier,
+          this.toWallet.protocol.identifier,
           this.toWallet.receivingPublicAddress,
           this.amount.toString(),
           this.fromWallet.receivingPublicAddress
@@ -327,14 +327,14 @@ export class ExchangePage {
         const feeEstimation = await this.operationsProvider.estimateFees(
           this.fromWallet,
           result.payinAddress,
-          amount.shiftedBy(this.fromWallet.coinProtocol.decimals)
+          amount.shiftedBy(this.fromWallet.protocol.decimals)
         )
 
         const info = {
           fromWallet: this.fromWallet,
-          fromCurrency: this.fromWallet.protocolIdentifier,
+          fromCurrency: this.fromWallet.protocol.identifier,
           toWallet: this.toWallet,
-          toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocolIdentifier])[0],
+          toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocol.identifier])[0],
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
           amountExpectedTo: amountExpectedTo,
@@ -350,8 +350,8 @@ export class ExchangePage {
         const exchangeTxInfo: ExchangeTransaction = {
           receivingAddress: this.toWallet.addresses[0],
           sendingAddress: this.fromWallet.addresses[0],
-          fromCurrency: this.fromWallet.protocolIdentifier,
-          toCurrency: this.toWallet.protocolIdentifier,
+          fromCurrency: this.fromWallet.protocol.identifier,
+          toCurrency: this.toWallet.protocol.identifier,
           amountExpectedFrom: this.amount,
           amountExpectedTo: amountExpectedTo.toString(),
           fee: feeEstimation.medium,

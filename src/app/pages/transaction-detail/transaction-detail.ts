@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { getProtocolByIdentifier, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 @Component({
   selector: 'page-transaction-detail',
@@ -25,7 +26,7 @@ export class TransactionDetailPage {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
+    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier, defaultChainNetwork)
 
     let blockexplorer: string = protocol.blockExplorer
 

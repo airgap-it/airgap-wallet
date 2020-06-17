@@ -110,11 +110,11 @@ export class BeaconRequestPage implements OnInit {
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
-    this.address = await selectedWallet.coinProtocol.getAddressFromPublicKey(selectedWallet.publicKey)
+    this.address = await selectedWallet.protocol.getAddressFromPublicKey(selectedWallet.publicKey)
 
     this.inputs = [
       {
@@ -169,7 +169,7 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
@@ -181,7 +181,7 @@ export class BeaconRequestPage implements OnInit {
       const transaction = { binaryTransaction: request.payload }
       const serializedChunks = await this.serializerService.serialize([
         {
-          protocol: selectedWallet.coinProtocol.identifier,
+          protocol: selectedWallet.protocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: selectedWallet.publicKey,
@@ -206,7 +206,7 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
@@ -230,7 +230,7 @@ export class BeaconRequestPage implements OnInit {
     this.responseHandler = async () => {
       const serializedChunks = await this.serializerService.serialize([
         {
-          protocol: selectedWallet.coinProtocol.identifier,
+          protocol: selectedWallet.protocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: selectedWallet.publicKey,

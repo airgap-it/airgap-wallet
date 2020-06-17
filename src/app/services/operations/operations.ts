@@ -46,7 +46,7 @@ export class OperationsProvider {
   ) {}
 
   public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -67,7 +67,7 @@ export class OperationsProvider {
   }
 
   public async getAccountExtendedDetails(wallet: AirGapMarketWallet): Promise<UIAccountExtendedDetails> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -80,7 +80,7 @@ export class OperationsProvider {
   }
 
   public async getCurrentDelegatees(wallet: AirGapMarketWallet): Promise<string[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -97,7 +97,7 @@ export class OperationsProvider {
   }
 
   public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<DelegatorDetails> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -106,7 +106,7 @@ export class OperationsProvider {
   }
 
   public async getDelegationDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapDelegationDetails[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -117,7 +117,7 @@ export class OperationsProvider {
   }
 
   public async getRewardDisplayDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapRewardDisplayDetails> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -251,10 +251,10 @@ export class OperationsProvider {
   ): Promise<{ airGapTxs: IAirGapTransaction[]; serializedTxChunks: string[] }> {
     let airGapTxs = []
     let serializedTxChunks = []
-    if (supportsDelegation(wallet.coinProtocol)) {
-      const rawUnsignedTx = (await wallet.coinProtocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data))[0]
+    if (supportsDelegation(wallet.protocol)) {
+      const rawUnsignedTx = (await wallet.protocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data))[0]
 
-      airGapTxs = await wallet.coinProtocol.getTransactionDetails({
+      airGapTxs = await wallet.protocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
       })
@@ -290,9 +290,9 @@ export class OperationsProvider {
   public refreshAllDelegationStatuses(wallets: AirGapMarketWallet[]) {
     Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
       const address = entry[0]
-      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.coinProtocol))
+      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.protocol))
       if (wallet) {
-        this.getDelegationStatusOfAddress(wallet.coinProtocol as ICoinDelegateProtocol, address, true).catch(
+        this.getDelegationStatusOfAddress(wallet.protocol as ICoinDelegateProtocol, address, true).catch(
           handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)
         )
       }
@@ -305,7 +305,7 @@ export class OperationsProvider {
   ): Promise<string[]> {
     return this.serializerService.serialize([
       {
-        protocol: wallet.coinProtocol.identifier,
+        protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
@@ -332,10 +332,10 @@ export class OperationsProvider {
     try {
       let rawUnsignedTx
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      if (wallet.coinProtocol.identifier === ProtocolSymbols.XTZ_KT) {
+      if (wallet.protocol.identifier === ProtocolSymbols.XTZ_KT) {
         const tezosKtProtocol = new TezosKtProtocol()
         rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
-      } else if (wallet.coinProtocol.identifier === ProtocolSymbols.TZBTC) {
+      } else if (wallet.protocol.identifier === ProtocolSymbols.TZBTC) {
         const protocol = new TezosBTC()
 
         rawUnsignedTx = await protocol.transfer(
@@ -349,7 +349,7 @@ export class OperationsProvider {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
 
-      const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
+      const airGapTxs = await wallet.protocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: rawUnsignedTx
       })
@@ -385,7 +385,7 @@ export class OperationsProvider {
       return await wallet.estimateFees([address], [amount.toFixed()], data)
     } catch (error) {
       console.error(error)
-      return wallet.coinProtocol.feeDefaults
+      return wallet.protocol.feeDefaults
     }
   }
 

@@ -25,7 +25,7 @@ export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateAct
         .create({
           header: this.context.translateService.instant('account-transaction-list.migrate-alert.header'),
           message: `Do you want to transfer <span class=\"style__strong color__primary\">${this.context.wallet.currentBalance.shiftedBy(
-            -1 * this.context.wallet.coinProtocol.decimals
+            -1 * this.context.wallet.protocol.decimals
           )} XTZ</span> </strong> from <span class=\"style__strong color__primary\"> ${shortenString.transform(
             this.context.wallet.receivingPublicAddress
           )} </span> to <span class=\"style__strong color__primary\"> ${shortenString.transform(

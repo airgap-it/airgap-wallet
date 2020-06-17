@@ -1,6 +1,20 @@
 import { Injectable } from '@angular/core'
-import { addSubProtocol, GenericERC20, GenericERC20Configuration, TezosKtProtocol } from 'airgap-coin-lib'
+import {
+  addSubProtocol,
+  addSupportedProtocol,
+  AeternityProtocol,
+  BitcoinProtocol,
+  CosmosProtocol,
+  EthereumProtocol,
+  GenericERC20,
+  GenericERC20Configuration,
+  getProtocolByIdentifier,
+  GroestlcoinProtocol,
+  TezosKtProtocol,
+  TezosProtocol
+} from 'airgap-coin-lib'
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/Network'
 
 import { tokens } from './tokens'
 
@@ -8,6 +22,8 @@ interface SubAccount {
   protocol: string
   subProtocols: GenericERC20Configuration[]
 }
+
+export const defaultChainNetwork = { type: NetworkType.MAINNET, name: 'Mainnet', rpcUrl: 'https://rpc.localhost.com/' }
 
 export enum ProtocolSymbols {
   AE = 'ae',
@@ -28,7 +44,12 @@ export class ProtocolsProvider {
   public subProtocols: SubAccount[] = []
 
   constructor() {
-    /* */
+    addSupportedProtocol(new AeternityProtocol())
+    addSupportedProtocol(new BitcoinProtocol())
+    addSupportedProtocol(new EthereumProtocol())
+    addSupportedProtocol(new GroestlcoinProtocol())
+    addSupportedProtocol(new TezosProtocol())
+    addSupportedProtocol(new CosmosProtocol())
   }
 
   public getEnabledSubProtocols() {
@@ -36,12 +57,13 @@ export class ProtocolsProvider {
   }
 
   public addProtocols() {
-    addSubProtocol('xtz', new TezosKtProtocol())
-    addSubProtocol('xtz', new TezosBTC())
+    addSubProtocol(new TezosProtocol(), new TezosKtProtocol())
+    addSubProtocol(new TezosProtocol(), new TezosBTC())
     this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
+        const protocol = getProtocolByIdentifier(supportedSubAccount.protocol, defaultChainNetwork)
         addSubProtocol(
-          supportedSubAccount.protocol,
+          protocol,
           new GenericERC20({
             symbol: subProtocol.symbol,
             name: subProtocol.name,
@@ -55,7 +77,7 @@ export class ProtocolsProvider {
     })
     tokens.forEach(token => {
       addSubProtocol(
-        'eth',
+        new EthereumProtocol(),
         new GenericERC20({
           symbol: token.symbol,
           name: token.name,

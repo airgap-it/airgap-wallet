@@ -68,8 +68,8 @@
             <small *ngIf="(delegateeDetails$ | async); else delegateeUsageDetailsSkeleton">
               <span *ngIf="(delegateeDetails$ | async).usageDetails">
                 {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocolIdentifier:
-                wallet.protocolIdentifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() |
-                amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits: 3 } }}
+                wallet.protocol.identifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() |
+                amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 } }}
               </span>
             </small>
             <ng-template #delegateeUsageDetailsSkeleton>

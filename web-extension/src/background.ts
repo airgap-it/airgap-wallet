@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(async function(request) {
 
     chrome.storage.local.get('selectedAccount', async function(storage) {
       const ethWallet = storage.selectedAccount
-      const identifier = ethWallet.coinProtocol.identifier
+      const identifier = ethWallet.protocol.identifier
       const publicKey = ethWallet.publicKey
       console.log('publicKey: ', ethWallet.ad)
       console.log('JSON.stringify(rawUnsignedTx): ', JSON.stringify(rawUnsignedTx))
