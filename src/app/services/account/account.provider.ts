@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol, supportedProtocols, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol, supportedProtocols, TezosProtocol } from 'airgap-coin-lib'
 import { TezosProtocolNetwork, TezosProtocolOptions } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { ReplaySubject, Subject } from 'rxjs'
@@ -43,9 +43,12 @@ const getProtocolByIdentifierAndNetworkIdentifier = (
   )
   if (filteredProtocol) {
     return filteredProtocol
+  } else {
+    // TODO: Get for the right network
+    return getProtocolByIdentifier(targetProtocolIdentifier)
   }
 
-  throw new Error('No protocol found')
+  // throw new Error(`No protocol found ${targetProtocolIdentifier} ${networkIdentifier}`)
 }
 
 @Injectable({

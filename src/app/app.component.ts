@@ -51,9 +51,8 @@ export class AppComponent {
     const supportedLanguages = ['en', 'de', 'zh-cn']
 
     this.loadLanguages(supportedLanguages)
-    this.protocolsProvider.addProtocols()
 
-    await this.platform.ready()
+    await Promise.all([this.platform.ready(), this.protocolsProvider.isReady])
 
     if (this.platform.is('hybrid')) {
       this.statusBar.setStyle({ style: StatusBarStyle.Light })

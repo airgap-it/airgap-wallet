@@ -1,3 +1,4 @@
+import { ExposedPromise } from '@airgap/beacon-sdk/dist/utils/exposed-promise'
 import { Injectable } from '@angular/core'
 import {
   addSubProtocol,
@@ -50,6 +51,8 @@ interface SubAccount {
   providedIn: 'root'
 })
 export class ProtocolsProvider {
+  public _isReady: ExposedPromise<boolean> = new ExposedPromise()
+  public isReady: Promise<boolean> = this._isReady.promise
   public subProtocols: SubAccount[] = []
 
   constructor() {
@@ -87,6 +90,8 @@ export class ProtocolsProvider {
     )
 
     addSupportedProtocol(new CosmosProtocol())
+    this.addProtocols()
+    this._isReady.resolve(true)
   }
 
   public getEnabledSubProtocols() {
@@ -141,5 +146,6 @@ export class ProtocolsProvider {
         )
       )
     })
+    console.log('ADDED PROTOCOLS')
   }
 }
