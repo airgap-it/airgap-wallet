@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol, supportedProtocols, TezosProtocol } from 'airgap-coin-lib'
+import { TezosProtocolNetwork, TezosProtocolOptions } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 import { isType } from 'src/app/utils/utils'
@@ -29,6 +31,21 @@ interface CTAInfo {
   amount: string
   alertTitle: string
   alertDescription: string
+}
+
+const getProtocolByIdentifierAndNetworkIdentifier = (
+  targetProtocolIdentifier: ProtocolSymbols,
+  networkIdentifier: string
+): ICoinProtocol => {
+  const filteredProtocol = supportedProtocols().find(
+    protocol =>
+      protocol.identifier === targetProtocolIdentifier && (!networkIdentifier || protocol.options.network.identifier === networkIdentifier)
+  )
+  if (filteredProtocol) {
+    return filteredProtocol
+  }
+
+  throw new Error('No protocol found')
 }
 
 @Injectable({
@@ -167,7 +184,7 @@ export class AccountProvider {
     const walletInitPromises: Promise<void>[] = []
 
     wallets.forEach(wallet => {
-      const protocol = getProtocolByIdentifier(wallet.protocolIdentifier, (wallet as any).protocolNetwork)
+      const protocol = getProtocolByIdentifierAndNetworkIdentifier(wallet.protocolIdentifier, wallet.networkIdentifier)
 
       const airGapWallet = new AirGapMarketWallet(
         protocol,
@@ -291,8 +308,16 @@ export class AccountProvider {
     return this.persist()
   }
 
+  public async setWalletNetwork(wallet: AirGapMarketWallet, network: TezosProtocolNetwork): Promise<void> {
+    await wallet.setProtocol(new TezosProtocol(new TezosProtocolOptions(network)))
+
+    await this.persist()
+
+    this.triggerWalletChanged()
+  }
+
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.WALLET, this.walletList as any)
+    return this.storageProvider.set(SettingsKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {
