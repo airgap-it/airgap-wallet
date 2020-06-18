@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, ICoinProtocol, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
-import { TezosProtocolNetwork, TezosProtocolOptions } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
+import { TezosProtocolNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
 import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
@@ -115,7 +115,8 @@ export class AccountEditPopoverComponent implements OnInit {
         name: network.name,
         type: 'radio',
         label: network.name,
-        value: index
+        value: index,
+        checked: this.wallet.protocol.options.network.identifier === network.identifier
       })),
       buttons: [
         {
@@ -129,10 +130,9 @@ export class AccountEditPopoverComponent implements OnInit {
         {
           text: 'Ok',
           handler: async data => {
-            console.log('Confirm Ok', data)
-            console.log(networks[data])
-            await this.wallet.setProtocol(new TezosProtocol(new TezosProtocolOptions(networks[data])))
+            await this.walletsProvider.setWalletNetwork(this.wallet, networks[data])
             this.cdr.detectChanges()
+            await this.dismissPopover()
           }
         }
       ]
