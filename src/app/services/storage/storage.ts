@@ -22,8 +22,9 @@ export enum SettingsKey {
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS'
 }
 
-interface IPartialAirGapWallet {
+interface SerializedAirGapWallet {
   protocolIdentifier: ProtocolSymbols
+  networkIdentifier: string
   publicKey: string
   isExtendedPublicKey: boolean
   derivationPath: string
@@ -45,7 +46,7 @@ interface SettingsKeyReturnType {
   [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean
   [SettingsKey.PUSH_INTRODUCTION]: boolean
   [SettingsKey.EXCHANGE_INTEGRATION]: boolean
-  [SettingsKey.WALLET]: IPartialAirGapWallet[] | undefined
+  [SettingsKey.WALLET]: SerializedAirGapWallet[] | undefined
   [SettingsKey.SELECTED_ACCOUNT]: AirGapMarketWallet | undefined
   [SettingsKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
   [SettingsKey.USER_ID]: string | undefined
