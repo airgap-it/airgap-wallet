@@ -322,8 +322,8 @@ export class AccountProvider {
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {
     return wallet.addressIndex
-      ? `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.addressIndex}`
-      : `${wallet.protocol.identifier}-${wallet.publicKey}`
+      ? `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.protocol.options.network.identifier}-${wallet.addressIndex}`
+      : `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.protocol.options.network.identifier}`
   }
 
   public walletByPublicKeyAndProtocolAndAddressIndex(

@@ -53,10 +53,9 @@ export class AccountEditPopoverComponent implements OnInit {
   public async openBlockExplorer(): Promise<void> {
     const protocol: ICoinProtocol = this.wallet.protocol
 
-    let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer
+    const blockexplorer: string = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
-    blockexplorer = await protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
-    this.browserService.openUrl(blockexplorer)
+    await this.browserService.openUrl(blockexplorer)
   }
 
   public async ngOnInit(): Promise<void> {

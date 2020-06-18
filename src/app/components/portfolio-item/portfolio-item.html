@@ -1,4 +1,4 @@
-<ion-item *ngIf="wallet; else skeletonWallet" lines="none">
+<ion-item *ngIf="wallet; else skeletonWallet" lines="none" [color]="wallet.protocol.options.network.type === 'MAINNET' ? '' : 'danger' ">
   <ion-avatar slot="start">
     <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
     <currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="isToken"></currency-symbol>

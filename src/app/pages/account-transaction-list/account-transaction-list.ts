@@ -98,6 +98,7 @@ export class AccountTransactionListPage {
 
     this.updateExtendedDetails()
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
+      this.loadInitialTransactions(true)
       this.updateExtendedDetails()
     })
 
@@ -234,7 +235,10 @@ export class AccountTransactionListPage {
     event.target.complete()
   }
 
-  public async loadInitialTransactions(): Promise<void> {
+  public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
+    if (forceRefresh) {
+      this.transactions = []
+    }
     if (this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
@@ -281,7 +285,9 @@ export class AccountTransactionListPage {
       this.hasPendingTransactions = false
     }
 
-    this.accountProvider.triggerWalletChanged()
+    if (!forceRefresh) {
+      this.accountProvider.triggerWalletChanged()
+    }
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 

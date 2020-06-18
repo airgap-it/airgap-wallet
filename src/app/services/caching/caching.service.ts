@@ -46,8 +46,12 @@ export class CachingService {
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
+  private async getCacheId(wallet: AirGapMarketWallet, key: CachingServiceKey): Promise<string> {
+    return `${wallet.publicKey}_${wallet.protocol.options.network.identifier}_${key}`
+  }
+
   public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransaction[]> {
-    const uniqueId = `${wallet.publicKey}_${CachingServiceKey.TRANSACTIONS}`
+    const uniqueId = await this.getCacheId(wallet, CachingServiceKey.TRANSACTIONS)
 
     return new Promise<IAirGapTransaction[]>(async resolve => {
       const rawTransactions: StorageObject = await this.storage.get(uniqueId)
@@ -63,8 +67,8 @@ export class CachingService {
     })
   }
 
-  public fetchMarketData(timeUnit: any, coinProtocol: string): Promise<MarketDataSample[]> {
-    const uniqueId = `${timeUnit}_${coinProtocol}_${CachingServiceKey.PRICESAMPLES}`
+  public fetchMarketData(timeUnit: any, marketSymbol: string): Promise<MarketDataSample[]> {
+    const uniqueId = `${timeUnit}_${marketSymbol}_${CachingServiceKey.PRICESAMPLES}`
     const baseSymbol = 'USD'
 
     return new Promise<MarketDataSample[]>(async resolve => {
@@ -74,15 +78,15 @@ export class CachingService {
       } else {
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
-          promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {
+          promise = cryptocompare.histoDay(marketSymbol.toUpperCase(), baseSymbol, {
             limit: 365 - 1
           })
         } else if (timeUnit === 'hours') {
-          promise = cryptocompare.histoHour(coinProtocol.toUpperCase(), baseSymbol, {
+          promise = cryptocompare.histoHour(marketSymbol.toUpperCase(), baseSymbol, {
             limit: 7 * 24 - 1
           })
         } else if (timeUnit === 'minutes') {
-          promise = cryptocompare.histoMinute(coinProtocol.toUpperCase(), baseSymbol, {
+          promise = cryptocompare.histoMinute(marketSymbol.toUpperCase(), baseSymbol, {
             limit: 24 * 60 - 1
           })
         } else {

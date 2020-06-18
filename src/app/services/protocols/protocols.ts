@@ -65,9 +65,9 @@ export class ProtocolsProvider {
       'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
       new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
       new TezosProtocolNetworkExtras(
-        TezosNetwork.MAINNET,
+        TezosNetwork.CARTHAGENET,
         'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
-        TezosNetwork.MAINNET,
+        TezosNetwork.CARTHAGENET,
         'airgap00391'
       )
     )
