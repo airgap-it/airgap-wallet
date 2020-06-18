@@ -7,7 +7,7 @@ import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider, defaultChainNetwork } from '../../services/protocols/protocols'
+import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 export interface IAccountWrapper {
@@ -53,8 +53,9 @@ export class SubAccountAddPage {
     }
     if (this.subProtocolType === SubProtocolType.TOKEN) {
       this.wallet.protocol.subProtocols.forEach(subProtocol => {
+        console.log('checking sub protocol', subProtocol)
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
-          const protocol = getProtocolByIdentifier(subProtocol.identifier, defaultChainNetwork)
+          const protocol = getProtocolByIdentifier(subProtocol.identifier, this.wallet.protocol.options.network)
           const wallet: AirGapMarketWallet = new AirGapMarketWallet(
             protocol,
             this.wallet.publicKey,

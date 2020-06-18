@@ -13,9 +13,9 @@ import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 interface TransactionFormState<T> {
   value: T
@@ -87,7 +87,8 @@ export class TransactionPreparePage {
 
       this.wallet = wallet
 
-      this.isSubstrate = wallet.protocol.identifier === ProtocolSymbols.KUSAMA || wallet.protocol.identifier === ProtocolSymbols.POLKADOT
+      this.isSubstrate =
+        wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
 
       this.initState()
         .then(async () => {
@@ -309,7 +310,7 @@ export class TransactionPreparePage {
   }
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
-    if (wallet.protocol.identifier === ProtocolSymbols.TZBTC) {
+    if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
       const newWallet = new AirGapMarketWallet(
         new TezosProtocol(),
         'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
@@ -326,9 +327,9 @@ export class TransactionPreparePage {
   private async getAvailableBalance(wallet: AirGapMarketWallet): Promise<BigNumber> {
     // TODO: refactor this so that we do not need to check for the protocols
     if (
-      wallet.protocol.identifier === ProtocolSymbols.COSMOS ||
-      wallet.protocol.identifier === ProtocolSymbols.KUSAMA ||
-      wallet.protocol.identifier === ProtocolSymbols.POLKADOT
+      wallet.protocol.identifier === MainProtocolSymbols.COSMOS ||
+      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
+      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
     ) {
       return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {

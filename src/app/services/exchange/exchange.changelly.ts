@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+
+import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
+
+// tslint:disable:max-classes-per-file
 
 export interface CreateTransactionResponse {
   amountExpectedFrom: string
@@ -39,13 +43,13 @@ interface JsonRpcReturnWrapper<T> {
 }
 
 export class ChangellyTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  status: string
+  public status: string
 
   constructor(status: string) {
     this.status = status
   }
 
-  isPending(): boolean {
+  public isPending(): boolean {
     switch (this.status) {
       case 'finished':
       case 'failed':
@@ -59,12 +63,12 @@ export class ChangellyTransactionStatusResponse implements ExchangeTransactionSt
 }
 
 class ChangellyApi {
-  private identifierExchangeToAirGapMap = new Map<string, string>()
-  private identifierAirGapToExchangeMap = new Map<string, string>()
+  private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
+  private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(public http: HttpClient, private baseURL = 'https://swap.airgap.prod.gke.papers.tech/') {}
+  constructor(public http: HttpClient, private readonly baseURL: string = 'https://swap.airgap.prod.gke.papers.tech/') {}
 
-  async makeJsonRpcCall<T, R>(method, params: T): Promise<R> {
+  public async makeJsonRpcCall<T, R>(method: string, params: T): Promise<R> {
     const wrapper: JsonRpcWrapper<T> = {
       id: Math.random()
         .toString(36)
@@ -73,7 +77,7 @@ class ChangellyApi {
       method,
       params
     }
-    const response = await this.http.post<JsonRpcReturnWrapper<R>>(this.baseURL, wrapper).toPromise()
+    const response: JsonRpcReturnWrapper<R> = await this.http.post<JsonRpcReturnWrapper<R>>(this.baseURL, wrapper).toPromise()
     if (response.result) {
       return response.result
     } else {
@@ -81,85 +85,89 @@ class ChangellyApi {
     }
   }
 
-  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
-    return identifiers.map(identifier => {
-      return this.identifierExchangeToAirGapMap.has(identifier) ? this.identifierExchangeToAirGapMap.get(identifier) : identifier
+  public convertExchangeIdentifierToAirGapIdentifier(identifiers: ExchangeIdentifier[]): ProtocolSymbols[] {
+    return identifiers.map((identifier: ExchangeIdentifier) => {
+      return this.identifierExchangeToAirGapMap.has(identifier)
+        ? this.identifierExchangeToAirGapMap.get(identifier)
+        : (identifier as ProtocolSymbols)
     })
   }
 
-  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
-    return identifiers.map(identifier => {
+  public convertAirGapIdentifierToExchangeIdentifier(identifiers: ProtocolSymbols[]): ExchangeIdentifier[] {
+    return identifiers.map((identifier: ProtocolSymbols) => {
       return this.identifierAirGapToExchangeMap.has(identifier) ? this.identifierAirGapToExchangeMap.get(identifier) : identifier
     })
   }
 
-  async getAvailableFromCurrencies(): Promise<string[]> {
-    const method = 'getCurrencies'
-    const params = {}
-    const result = await this.makeJsonRpcCall<Object, string[]>(method, params)
+  public async getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
+    const method: string = 'getCurrencies'
+    const params: {} = {}
+    const result: ExchangeIdentifier[] = await this.makeJsonRpcCall<Object, ExchangeIdentifier[]>(method, params)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(result)
   }
 
-  getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-    const method = 'getMinAmount'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency
-    }
-    return this.makeJsonRpcCall<Object, string>(method, params)
+  public async getMinAmountForCurrency(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    const method: string = 'getMinAmount'
+
+    return this.makeJsonRpcCall<Object, string>(method, {
+      from: transformedFromCurrency,
+      to: transformedToCurrency
+    })
   }
 
-  getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-    const method = 'getExchangeAmount'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency,
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    const method: string = 'getExchangeAmount'
+
+    return this.makeJsonRpcCall<Object, string>(method, {
+      from: transformedFromCurrency,
+      to: transformedToCurrency,
       amount
-    }
-    return this.makeJsonRpcCall<Object, string>(method, params)
+    })
   }
 
-  validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
-    currency = this.convertAirGapIdentifierToExchangeIdentifier([currency])[0]
+  public async validateAddress(currency: ProtocolSymbols, address: string): Promise<{ result: false; message: string }> {
+    const transformedCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([currency])[0]
 
-    const method = 'validateAddress'
-    const params = {
-      currency,
+    const method: string = 'validateAddress'
+
+    return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, {
+      currency: transformedCurrency,
       address
-    }
-    return this.makeJsonRpcCall<Object, { result: false; message: string }>(method, params)
+    })
   }
 
-  createTransaction(
-    fromCurrency: string,
-    toCurrency: string,
+  public async createTransaction(
+    fromCurrency: ProtocolSymbols,
+    toCurrency: ProtocolSymbols,
     toAddress: string,
     amount: string,
     _fromAddress?: string
   ): Promise<CreateTransactionResponse> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const method = 'createTransaction'
-    const params = {
-      from: fromCurrency,
-      to: toCurrency,
+    const method: string = 'createTransaction'
+
+    return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, {
+      from: transformedFromCurrency,
+      to: transformedToCurrency,
       address: toAddress,
       amount
-    }
-    return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, params)
+    })
   }
 
-  async getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
-    const method = 'getStatus'
-    const params = {
+  public async getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
+    const method: string = 'getStatus'
+
+    const statusString: string = await this.makeJsonRpcCall<Object, string>(method, {
       id: transactionId
-    }
-    const statusString: string = await this.makeJsonRpcCall<Object, any>(method, params)
+    })
+
     return new ChangellyTransactionStatusResponse(statusString)
   }
 }
@@ -169,8 +177,9 @@ export class ChangellyExchange extends ChangellyApi implements Exchange {
     super(http)
   }
 
-  public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
-    const availableCurrencies = await this.getAvailableFromCurrencies()
-    return availableCurrencies.filter(availableCurrency => availableCurrency !== selectedFrom)
+  public async getAvailableToCurrenciesForCurrency(selectedFrom: ProtocolSymbols): Promise<ProtocolSymbols[]> {
+    const availableCurrencies: ProtocolSymbols[] = await this.getAvailableFromCurrencies()
+
+    return availableCurrencies.filter((availableCurrency: ProtocolSymbols) => availableCurrency !== selectedFrom)
   }
 }

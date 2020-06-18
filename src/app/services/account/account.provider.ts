@@ -13,7 +13,6 @@ import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
 import { LanguageService } from '../language/language.service'
 import { OperationsProvider } from '../operations/operations'
-import { defaultChainNetwork } from '../protocols/protocols'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
@@ -168,7 +167,7 @@ export class AccountProvider {
     const walletInitPromises: Promise<void>[] = []
 
     wallets.forEach(wallet => {
-      const protocol = getProtocolByIdentifier((wallet as any).protocolIdentifier, (wallet as any).chainNetwork || defaultChainNetwork)
+      const protocol = getProtocolByIdentifier(wallet.protocolIdentifier, (wallet as any).protocolNetwork)
 
       const airGapWallet = new AirGapMarketWallet(
         protocol,

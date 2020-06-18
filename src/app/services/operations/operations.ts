@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { ProtocolSymbols } from '../protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
 import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
@@ -31,6 +30,7 @@ import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Injectable({
   providedIn: 'root'
@@ -332,10 +332,10 @@ export class OperationsProvider {
     try {
       let rawUnsignedTx
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      if (wallet.protocol.identifier === ProtocolSymbols.XTZ_KT) {
+      if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_KT) {
         const tezosKtProtocol = new TezosKtProtocol()
         rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
-      } else if (wallet.protocol.identifier === ProtocolSymbols.TZBTC) {
+      } else if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
         const protocol = new TezosBTC()
 
         rawUnsignedTx = await protocol.transfer(

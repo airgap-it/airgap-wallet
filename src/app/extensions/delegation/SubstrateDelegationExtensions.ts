@@ -81,7 +81,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await protocol.options.config.accountController.getNominatorDetails(delegator, delegatees)
 
     const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
     const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, nominatorDetails, extraNominatorDetails)
@@ -102,7 +102,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
       validators.map(async validator => {
-        const validatorDetails = await protocol.accountController.getValidatorDetails(validator)
+        const validatorDetails = await protocol.options.config.accountController.getValidatorDetails(validator)
 
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
@@ -233,7 +233,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const results = await Promise.all([
       protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
-      protocol.nodeClient.getExistentialDeposit()
+      protocol.options.config.nodeClient.getExistentialDeposit()
     ])
 
     const maxValue = new BigNumber(results[0])

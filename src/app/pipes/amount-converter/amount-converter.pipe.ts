@@ -1,17 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
-import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 @Pipe({
   name: 'amountConverter'
 })
 export class AmountConverterPipe implements PipeTransform {
-  public transform(value: BigNumber | string | number, args: { protocolIdentifier: string; maxDigits: number }): string {
+  public transform(value: BigNumber | string | number, args: { protocolIdentifier: ProtocolSymbols; maxDigits: number }): string {
     let protocol
 
     try {
-      protocol = getProtocolByIdentifier(args.protocolIdentifier, defaultChainNetwork)
+      protocol = getProtocolByIdentifier(args.protocolIdentifier)
     } catch (e) {
       return ''
     }

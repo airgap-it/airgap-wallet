@@ -7,7 +7,6 @@ import * as cryptocompare from 'cryptocompare'
 import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
-import { defaultChainNetwork } from '../protocols/protocols'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -33,7 +32,7 @@ export class MarketDataService {
   public async getTransactionHistory(wallet: AirGapMarketWallet, transactions: IAirGapTransaction[]): Promise<TransactionHistoryObject[]> {
     const txHistory: TransactionHistoryObject[] = []
     // TODO fetch more than 50 txs?
-    const protocol = getProtocolByIdentifier(wallet.protocol.identifier, defaultChainNetwork)
+    const protocol = getProtocolByIdentifier(wallet.protocol.identifier)
     transactions.forEach(transaction => {
       const amount = new BigNumber(transaction.amount).shiftedBy(-1 * protocol.decimals).toNumber()
       const fee = new BigNumber(transaction.fee).shiftedBy(-1 * protocol.decimals).toNumber() //

@@ -6,7 +6,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Component({
   selector: 'swap',
@@ -41,7 +41,7 @@ export class SwapComponent {
   public readonly selectedProtocol: ICoinProtocol
 
   @Input()
-  public readonly supportedProtocols: string[] = []
+  public readonly supportedProtocols: ProtocolSymbols[] = []
 
   @Input()
   public readonly minExchangeAmount: BigNumber
@@ -76,7 +76,7 @@ export class SwapComponent {
     const protocols: ICoinProtocol[] = []
     this.supportedProtocols.forEach(supportedProtocol => {
       try {
-        protocols.push(getProtocolByIdentifier(supportedProtocol, defaultChainNetwork))
+        protocols.push(getProtocolByIdentifier(supportedProtocol))
       } catch (error) {
         /* */
       }
@@ -94,7 +94,7 @@ export class SwapComponent {
       .onDidDismiss()
       .then((protocolIdentifier: any) => {
         if (protocolIdentifier && protocolIdentifier.data) {
-          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data, defaultChainNetwork))
+          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

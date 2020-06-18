@@ -17,7 +17,6 @@ import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { BeaconService } from '../beacon/beacon.service'
 import { StorageProvider, SettingsKey } from '../storage/storage'
-import { defaultChainNetwork } from '../protocols/protocols'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -155,7 +154,7 @@ export class SchemeRoutingProvider {
 
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
-    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol, defaultChainNetwork)
+    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol as any) // TODO: Remove as any
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       protocol,
       walletSync.publicKey,

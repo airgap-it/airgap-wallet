@@ -5,14 +5,14 @@ import { map } from 'rxjs/operators'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Component({
   selector: 'page-sub-account-import',
   templateUrl: 'sub-account-import.html'
 })
 export class SubAccountImportPage {
-  private readonly subProtocolIdentifier: string
+  private readonly subProtocolIdentifier: ProtocolSymbols
 
   public subProtocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
@@ -24,7 +24,7 @@ export class SubAccountImportPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
-      this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier, defaultChainNetwork)
+      this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier)
     }
 
     this.accountProvider.wallets
@@ -33,7 +33,7 @@ export class SubAccountImportPage {
         const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
-            const protocol = getProtocolByIdentifier(this.subProtocolIdentifier, defaultChainNetwork)
+            const protocol = getProtocolByIdentifier(this.subProtocolIdentifier)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
               protocol,
               mainAccount.publicKey,

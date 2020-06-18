@@ -1,3 +1,7 @@
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+
+export type ExchangeIdentifier = string
+
 export interface ExchangeTransactionStatusResponse {
   status: string
 
@@ -5,8 +9,8 @@ export interface ExchangeTransactionStatusResponse {
 }
 
 export interface Exchange {
-  getAvailableFromCurrencies(): Promise<string[]>
-  getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]>
+  getAvailableFromCurrencies(): Promise<ProtocolSymbols[]>
+  getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]>
   getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string>
   getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string>
   validateAddress(currency: string, address: string): Promise<{ result: false; message: string }>

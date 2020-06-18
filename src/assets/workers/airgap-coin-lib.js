@@ -7,9 +7,10 @@ self.onmessage = function(event) {
   airgapCoinLib.isCoinlibReady().then(function() {
     console.log("start deriving addresses");
 
-    var wallet = event.data;
+		var wallet = event.data;
+		console.log(wallet)
     var airGapWallet = new airgapCoinLib.AirGapWallet(
-      wallet.protocol.identifier,
+      wallet.protocolIdentifier,
       wallet.publicKey,
       wallet.isExtendedPublicKey,
       wallet.derivationPath

@@ -10,6 +10,10 @@
     <ion-icon name="open-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.block_explorer' | translate }}
   </ion-item>
+  <ion-item id="network" button detail="false" (click)="changeNetwork()">
+    <ion-icon name="open-outline" color="dark" slot="end"></ion-icon>
+    Change network
+  </ion-item>
   <ion-item id="delete" button detail="false" (click)="delete()">
     <ion-icon name="trash-outline" color="dark" slot="end"></ion-icon>
     {{ 'wallet-edit-popover-component.delete_label' | translate }}

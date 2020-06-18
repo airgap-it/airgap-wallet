@@ -15,7 +15,6 @@ import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateActio
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
@@ -25,6 +24,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export const refreshRate = 3000
 
@@ -113,11 +113,11 @@ export class AccountTransactionListPage {
 
     this.protocolIdentifier = this.wallet.protocol.identifier
 
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       this.mainWallet = info.mainWallet
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ) {
+    if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
       this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
@@ -157,7 +157,7 @@ export class AccountTransactionListPage {
 
   public openPreparePage() {
     let info
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
         mainWallet: this.mainWallet,
@@ -168,7 +168,7 @@ export class AccountTransactionListPage {
       })
       action.start()
       return
-    } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
+    } else if (this.protocolIdentifier === SubProtocolSymbols.XTZ_BTC) {
       info = {
         wallet: this.wallet,
         address: '',

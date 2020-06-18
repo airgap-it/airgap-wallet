@@ -1,5 +1,3 @@
-import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
-import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -7,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
+import { Plugins } from '@capacitor/core'
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { Keyboard } from '@ionic-native/keyboard/ngx'
@@ -20,7 +19,8 @@ import { MaterialIconsModule } from 'ionic2-material-icons'
 import { LottieAnimationViewModule } from 'ng-lottie'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
-import { Plugins } from '@capacitor/core'
+import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
+import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -40,7 +40,11 @@ import { ExchangeProvider } from './services/exchange/exchange'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PermissionsProvider } from './services/permissions/permissions'
-import { ProtocolsProvider } from './services/protocols/protocols'
+
+import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
+import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
+import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
+import { ExtensionsService } from './services/extensions/extensions.service'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
@@ -49,14 +53,10 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
-import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
-import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
-import { ExtensionsService } from './services/extensions/extensions.service'
-import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 
 import {
-  APP_PLUGIN,
   APP_INFO_PLUGIN,
+  APP_PLUGIN,
   BROWSER_PLUGIN,
   CLIPBOARD_PLUGIN,
   PERMISSIONS_PLUGIN,
@@ -65,6 +65,7 @@ import {
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from './capacitor-plugins/injection-tokens'
+import { ProtocolsProvider } from './services/protocols/protocols'
 
 const { App, AppInfo, Browser, Clipboard, Permissions, PushNotifications, Share, SplashScreen, StatusBar } = Plugins
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ExchangeTransaction } from '../exchange/exchange'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export enum SettingsKey {
   INTRODUCTION = 'introduction',
@@ -22,7 +23,7 @@ export enum SettingsKey {
 }
 
 interface IPartialAirGapWallet {
-  protocolIdentifier: string
+  protocolIdentifier: ProtocolSymbols
   publicKey: string
   isExtendedPublicKey: boolean
   derivationPath: string

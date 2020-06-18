@@ -5,7 +5,6 @@ import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { defaultChainNetwork } from 'src/app/services/protocols/protocols'
 
 const DEEPLINK_VAULT_ADD_ACCOUNT: string = `airgap-vault://add-account/`
 
@@ -52,10 +51,10 @@ export class AccountImportOnboardingPage implements OnInit {
   public ngOnInit(): void {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      this.protocol = getProtocolByIdentifier(info.mainProtocolIdentifier, defaultChainNetwork)
+      this.protocol = getProtocolByIdentifier(info.mainProtocolIdentifier)
       this.indexEndingSlide = 3
       if (info.subProtocolIdentifier) {
-        this.subProtocol = getProtocolByIdentifier(info.subProtocolIdentifier, defaultChainNetwork)
+        this.subProtocol = getProtocolByIdentifier(info.subProtocolIdentifier)
         this.indexEndingSlide = 4
       }
     }
