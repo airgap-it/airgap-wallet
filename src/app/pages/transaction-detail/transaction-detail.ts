@@ -25,7 +25,7 @@ export class TransactionDetailPage {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier as any) // TODO: Remove as any
+    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
 
     let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer
 

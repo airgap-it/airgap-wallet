@@ -2,12 +2,12 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { BrowserService } from 'src/app/services/browser/browser.service'
 
 const SECOND: number = 1000
 
@@ -52,7 +52,7 @@ export class TransactionConfirmPage {
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTxs = this.signedTransactionsSync.map(signedTx => (signedTx.payload as SignedTransaction).transaction)
-    this.protocols = this.signedTransactionsSync.map(signedTx => getProtocolByIdentifier(signedTx.protocol as any)) // TODO: Remove as any
+    this.protocols = this.signedTransactionsSync.map(signedTx => getProtocolByIdentifier(signedTx.protocol))
   }
 
   public async broadcastTransaction() {

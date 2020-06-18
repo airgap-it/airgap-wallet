@@ -154,7 +154,7 @@ export class SchemeRoutingProvider {
 
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
-    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol as any) // TODO: Remove as any
+    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol)
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       protocol,
       walletSync.publicKey,

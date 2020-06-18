@@ -32,7 +32,7 @@ import { ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/
 
 import { tokens } from './tokens'
 
-interface GenericERC20Configuration {
+interface Token {
   symbol: string
   name: string
   marketSymbol: string
@@ -43,7 +43,7 @@ interface GenericERC20Configuration {
 
 interface SubAccount {
   protocol: ProtocolSymbols
-  subProtocols: GenericERC20Configuration[]
+  subProtocols: Token[]
 }
 
 @Injectable({
