@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -26,20 +27,24 @@ export class AccountAddPage {
     private readonly router: Router,
     private readonly dataService: DataService
   ) {
-    this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
-    this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
-      if (cv.subProtocols) {
-        const subProtocols = cv.subProtocols.filter(
-          subProtocol =>
-            subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-            this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
-        )
+    this.supportedAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .map(coin => coin)
+    this.supportedSubAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .reduce((pv, cv) => {
+        if (cv.subProtocols) {
+          const subProtocols = cv.subProtocols.filter(
+            subProtocol =>
+              subProtocol.subProtocolType === SubProtocolType.TOKEN &&
+              this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
+          )
 
-        return pv.concat(...subProtocols)
-      }
+          return pv.concat(...subProtocols)
+        }
 
-      return pv
-    }, [])
+        return pv
+      }, [])
     this.filterProtocols()
   }
 
