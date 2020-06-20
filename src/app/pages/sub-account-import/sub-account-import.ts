@@ -1,11 +1,12 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { map } from 'rxjs/operators'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -29,6 +30,7 @@ export class SubAccountImportPage {
 
     this.accountProvider.wallets
       .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.identifier === this.subProtocolIdentifier.split('-')[0])))
+      .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.options.network.type === NetworkType.MAINNET)))
       .subscribe(mainAccounts => {
         const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {

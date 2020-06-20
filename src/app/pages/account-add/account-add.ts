@@ -62,27 +62,39 @@ export class AccountAddPage {
     )
   }
 
-  public addAccount(protocolIdentifier: string) {
+  public addAccount(protocol: ICoinProtocol) {
     const info = {
-      mainProtocolIdentifier: protocolIdentifier
+      mainProtocolIdentifier: protocol.identifier
     }
     this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public addSubAccount(subProtocolIdentifier: string) {
-    const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
-    if (this.accountProvider.getWalletList().filter(wallet => wallet.protocol.identifier === mainProtocolIdentifier).length > 0) {
+  public addSubAccount(subProtocol: ICoinProtocol) {
+    const mainProtocolIdentifier = subProtocol.identifier.split('-')[0]
+    if (
+      this.accountProvider
+        .getWalletList()
+        .filter(
+          wallet =>
+            wallet.protocol.identifier === mainProtocolIdentifier &&
+            wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
+        ).length > 0
+    ) {
       const info = {
-        subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
       const info = {
         mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
