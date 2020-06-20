@@ -1,13 +1,15 @@
-import { BigNumber } from 'bignumber.js'
-import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
-import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { Injectable } from '@angular/core'
+import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { BigNumber } from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+
+import { SettingsKey, StorageProvider } from '../storage/storage'
+
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { Injectable } from '@angular/core'
-import { StorageProvider, SettingsKey } from '../storage/storage'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 
 export enum ExchangeEnum {
   CHANGELLY = 'Changelly',
@@ -152,6 +154,7 @@ export class ExchangeProvider implements Exchange {
         fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
+        networkIdentifier: protocol.options.network.identifier,
         extra: tx.status
       }
     })

@@ -1,3 +1,4 @@
+import { BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
@@ -22,8 +23,9 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 })
 export class TransactionConfirmPage {
   public signedTransactionsSync: IACMessageDefinitionObject[]
-  private signedTxs: string[]
-  public protocols: ICoinProtocol[]
+
+  public txInfos: [string, ICoinProtocol, (hash: string) => BeaconResponseInputMessage][] = []
+  public protocols: ICoinProtocol[] = []
 
   constructor(
     private readonly loadingCtrl: LoadingController,
@@ -51,8 +53,17 @@ export class TransactionConfirmPage {
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTxs = this.signedTransactionsSync.map(signedTx => (signedTx.payload as SignedTransaction).transaction)
-    this.protocols = this.signedTransactionsSync.map(signedTx => getProtocolByIdentifier(signedTx.protocol))
+    this.signedTransactionsSync.forEach(async signedTx => {
+      const protocol = getProtocolByIdentifier(signedTx.protocol)
+
+      const [createResponse, savedProtocol] = await this.beaconService.getVaultRequest((signedTx.payload as SignedTransaction).transaction)
+
+      const selectedProtocol =
+        createResponse && savedProtocol && savedProtocol.identifier === protocol.identifier ? savedProtocol : protocol
+
+      this.txInfos.push([(signedTx.payload as SignedTransaction).transaction, selectedProtocol, createResponse])
+      this.protocols.push(selectedProtocol)
+    })
   }
 
   public async broadcastTransaction() {
@@ -80,13 +91,16 @@ export class TransactionConfirmPage {
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
 
-    this.protocols.forEach((protocol, index) => {
+    this.txInfos.forEach(async ([signedTx, protocol, createResponse], index) => {
       protocol
-        .broadcastTransaction(this.signedTxs[index])
+        .broadcastTransaction(signedTx)
         .then(async txId => {
           console.log('transaction hash', txId)
 
-          this.beaconService.getVaultRequest(this.signedTxs[index], txId)
+          if (createResponse) {
+            const response = createResponse(txId)
+            this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+          }
 
           if (interval) {
             clearInterval(interval)
@@ -116,7 +130,7 @@ export class TransactionConfirmPage {
           // necessary for the transaction backend
           signed.amount = signed.amount.toString()
           signed.fee = signed.fee.toString()
-          signed.signedTx = this.signedTxs[index]
+          signed.signedTx = signedTx
           signed.hash = txId
 
           console.log('SIGNED TX', signed)
@@ -142,7 +156,7 @@ export class TransactionConfirmPage {
                   // necessary for the transaction backend
                   signed.amount = signed.amount.toString()
                   signed.fee = signed.fee.toString()
-                  signed.signedTx = this.signedTxs[index]
+                  signed.signedTx = signedTx
                   this.pushBackendProvider.postPendingTx(signed) // Don't await
                   // END POST TX TO BACKEND
                 } else {

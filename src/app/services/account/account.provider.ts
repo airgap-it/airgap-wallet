@@ -33,12 +33,12 @@ interface CTAInfo {
   alertDescription: string
 }
 
-const getProtocolByIdentifierAndNetworkIdentifier = (
+export const getProtocolByIdentifierAndNetworkIdentifier = (
   targetProtocolIdentifier: ProtocolSymbols,
   networkIdentifier: string
 ): ICoinProtocol => {
-  const filteredProtocol = supportedProtocols().find(
-    protocol =>
+  const filteredProtocol: ICoinProtocol | undefined = supportedProtocols().find(
+    (protocol: ICoinProtocol) =>
       protocol.identifier === targetProtocolIdentifier && (!networkIdentifier || protocol.options.network.identifier === networkIdentifier)
   )
   if (filteredProtocol) {

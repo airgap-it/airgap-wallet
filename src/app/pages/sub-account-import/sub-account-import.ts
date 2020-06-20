@@ -1,11 +1,10 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { map } from 'rxjs/operators'
 
-import { AccountProvider } from '../../services/account/account.provider'
+import { AccountProvider, getProtocolByIdentifierAndNetworkIdentifier } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -14,6 +13,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 })
 export class SubAccountImportPage {
   private readonly subProtocolIdentifier: ProtocolSymbols
+  private readonly networkIdentifier: string
 
   public subProtocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
@@ -25,12 +25,12 @@ export class SubAccountImportPage {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
-      this.subProtocol = getProtocolByIdentifier(this.subProtocolIdentifier)
+      this.networkIdentifier = info.networkIdentifier
+      this.subProtocol = getProtocolByIdentifierAndNetworkIdentifier(this.subProtocolIdentifier, this.networkIdentifier)
     }
 
     this.accountProvider.wallets
       .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.identifier === this.subProtocolIdentifier.split('-')[0])))
-      .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.options.network.type === NetworkType.MAINNET)))
       .subscribe(mainAccounts => {
         const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {

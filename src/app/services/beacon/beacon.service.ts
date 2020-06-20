@@ -4,27 +4,22 @@ import {
   BeaconMessageType,
   BeaconRequestOutputMessage,
   BeaconResponseInputMessage,
-  BroadcastResponseInput,
   Network,
-  NetworkType,
-  OperationResponseInput,
   P2PPairInfo,
-  SignPayloadResponseInput,
   WalletClient
 } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
+import { ICoinProtocol } from 'airgap-coin-lib'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
-
-import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
   providedIn: 'root'
 })
 export class BeaconService {
   public client: WalletClient | undefined
-  private requests: [string, any][] = []
+  private requests: [string, any, ICoinProtocol][] = []
 
   constructor(private readonly modalController: ModalController, private readonly loadingController: LoadingController) {
     this.init()
@@ -66,38 +61,49 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(messageId: string, requestPayload: any): Promise<void> {
-    this.requests.push([messageId, requestPayload])
+  public async addVaultRequest(messageId: string, requestPayload: any, protocol: ICoinProtocol): Promise<void> {
+    this.requests.push([messageId, requestPayload, protocol])
   }
 
-  public async getVaultRequest(signedMessage: string, hash: string): Promise<void> {
+  public async getVaultRequest(
+    signedMessage: string
+  ): Promise<[((hash: string) => BeaconResponseInputMessage | undefined) | undefined, ICoinProtocol | undefined]> {
     // TODO: Refactor this once we have IDs in the serializer between Wallet <=> Vault
+    let createResponse: (hash: string) => BeaconResponseInputMessage | undefined
+    let protocol: ICoinProtocol | undefined
+
     this.requests = this.requests.filter(request => {
       if (signedMessage === request[1]) {
-        const broadcastResponse: BroadcastResponseInput = {
-          id: request[0],
-          type: BeaconMessageType.BroadcastResponse,
-          transactionHash: hash
+        protocol = request[2]
+        createResponse = (hash: string): BeaconResponseInputMessage | undefined => {
+          return {
+            id: request[0],
+            type: BeaconMessageType.BroadcastResponse,
+            transactionHash: hash
+          }
         }
-        this.respond(broadcastResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1])) {
-        const signPayloadResponse: SignPayloadResponseInput = {
-          id: request[0],
-          type: BeaconMessageType.SignPayloadResponse,
-          signature: signedMessage.substr(signedMessage.length - 128)
+        protocol = request[2]
+        createResponse = (_hash: string): BeaconResponseInputMessage | undefined => {
+          return {
+            id: request[0],
+            type: BeaconMessageType.SignPayloadResponse,
+            signature: signedMessage.substr(signedMessage.length - 128)
+          }
         }
-        this.respond(signPayloadResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else if (signedMessage.startsWith(request[1].binaryTransaction)) {
-        const operationResponse: OperationResponseInput = {
-          id: request[0],
-          type: BeaconMessageType.OperationResponse,
-          transactionHash: hash
+        protocol = request[2]
+        createResponse = (hash: string): BeaconResponseInputMessage | undefined => {
+          return {
+            id: request[0],
+            type: BeaconMessageType.OperationResponse,
+            transactionHash: hash
+          }
         }
-        this.respond(operationResponse).catch(handleErrorSentry(ErrorCategory.BEACON))
 
         return false
       } else {
@@ -106,6 +112,8 @@ export class BeaconService {
         return true
       }
     })
+
+    return [createResponse, protocol]
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
@@ -138,12 +146,8 @@ export class BeaconService {
     await this.client.removeAllPeers()
   }
 
-  private async isNetworkSupported(network?: Network): Promise<boolean> {
-    if (!network) {
-      return true
-    }
-
-    return network.type === NetworkType.MAINNET
+  private async isNetworkSupported(_network?: Network): Promise<boolean> {
+    return true
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {

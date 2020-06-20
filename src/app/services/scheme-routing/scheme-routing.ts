@@ -4,19 +4,19 @@ import { AlertController } from '@ionic/angular'
 import {
   AccountShareResponse,
   AirGapMarketWallet,
+  getProtocolByIdentifier,
   IACMessageDefinitionObject,
   IACMessageType,
-  supportedProtocols,
-  getProtocolByIdentifier
+  supportedProtocols
 } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
-import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { BeaconService } from '../beacon/beacon.service'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { SettingsKey, StorageProvider } from '../storage/storage'
 
 export enum IACResult {
   SUCCESS = 0,
