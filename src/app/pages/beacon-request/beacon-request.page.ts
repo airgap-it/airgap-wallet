@@ -1,6 +1,4 @@
 import {
-  BeaconErrorMessage,
-  BeaconErrorType,
   BeaconMessageType,
   BroadcastRequestOutput,
   OperationRequestOutput,
@@ -13,12 +11,15 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
+import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
+
+import { ErrorPage } from '../error/error.page'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -92,6 +93,20 @@ export class BeaconRequestPage implements OnInit {
     await this.dismiss()
   }
 
+  private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+    await this.dismiss()
+    const modal = await this.modalController.create({
+      component: ErrorPage,
+      componentProps: {
+        title: error.name,
+        message: error.message,
+        data: error.data ? error.data : error.stack
+      }
+    })
+
+    return modal.present()
+  }
+
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
@@ -132,24 +147,16 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async (): Promise<void> => {
       const scopes: PermissionScope[] = this.inputs.filter(input => input.checked).map(input => input.value)
-      if (scopes.length > 0) {
-        const response: PermissionResponseInput = {
-          id: request.id,
-          type: BeaconMessageType.PermissionResponse,
-          publicKey: selectedWallet.publicKey,
-          network: request.network,
-          scopes
-        }
 
-        await this.beaconService.respond(response)
-      } else {
-        const response: Omit<BeaconErrorMessage, 'beaconId' | 'version'> = {
-          id: request.id,
-          type: BeaconMessageType.PermissionResponse,
-          errorType: BeaconErrorType.NOT_GRANTED_ERROR
-        }
-        await this.beaconService.respond(response as any)
+      const response: PermissionResponseInput = {
+        id: request.id,
+        type: BeaconMessageType.PermissionResponse,
+        publicKey: selectedWallet.publicKey,
+        network: request.network,
+        scopes
       }
+
+      await this.beaconService.respond(response)
     }
   }
 
@@ -205,7 +212,12 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
-    const transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
+    let transaction: TezosWrappedOperation | undefined
+    try {
+      transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
+    } catch (error) {
+      return this.displayErrorPage(error)
+    }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
     await this.beaconService.addVaultRequest(request.id, forgedTransaction)
