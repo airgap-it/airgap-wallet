@@ -126,12 +126,16 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private async getExtraBakerDetails(protocol: TezosProtocol, bakerDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
     const [bakerInfo, knownBakers] = await Promise.all([protocol.bakerInfo(bakerDetails.address), this.getKnownBakers()])
 
-    const bakerTotalUsage = new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
-    const bakerCurrentUsage = new BigNumber(bakerInfo.stakingBalance)
-    const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
-
     const knownBaker = knownBakers[bakerDetails.address]
     const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
+
+    const bakerTotalUsage =
+      knownBaker && knownBaker.stakingCapacity
+        ? knownBaker.stakingCapacity.shiftedBy(protocol.decimals)
+        : new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
+
+    const bakerCurrentUsage = BigNumber.minimum(new BigNumber(bakerInfo.stakingBalance), bakerTotalUsage)
+    const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
 
     let status: string
     if (bakerInfo.bakingActive && bakerUsage.lt(1)) {
@@ -152,7 +156,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       usageDetails: {
         usage: bakerUsage,
         current: bakerCurrentUsage,
-        total: knownBaker && knownBaker.stakingCapacity ? knownBaker.stakingCapacity.shiftedBy(protocol.decimals) : bakerTotalUsage
+        total: bakerTotalUsage
       },
       displayDetails
     }

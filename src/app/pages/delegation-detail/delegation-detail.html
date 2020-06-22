@@ -52,7 +52,10 @@
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
         <div class="progress--container">
-          <div class="progress--current" [style.width]="(delegateeDetails$ | async)?.usageDetails?.usage.toFixed(2) * 100 + '%'"></div>
+          <div
+            class="progress--current"
+            [style.width]="((delegateeDetails$ | async)?.usageDetails?.usage.toNumber() * 100).toFixed(2) + '%'"
+          ></div>
         </div>
       </ion-col>
       <ion-col size="12" class="ion-no-padding">
