@@ -81,7 +81,7 @@
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
     "@zxing/ngx-scanner": "3.0.0",
-    "airgap-coin-lib": "0.8.6",
+    "airgap-coin-lib": "0.8.7-beta.3",
     "angular2-template-loader": "^0.6.2",
     "angularx-qrcode": "^1.5.3",
     "bignumber.js": "8.0.1",
