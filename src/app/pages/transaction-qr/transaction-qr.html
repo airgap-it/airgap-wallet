@@ -5,7 +5,7 @@
         <ion-back-button></ion-back-button>
       </ion-buttons>
       <ion-title>
-        {{ 'transaction-qr.title' | translate: { title: wallet.protocolIdentifier | uppercase } }}
+        {{ 'transaction-qr.title' | translate: { title: wallet.coinProtocol.symbol } }}
       </ion-title>
     </ion-toolbar>
   </ion-grid>

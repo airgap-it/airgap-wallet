@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
 
+import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
@@ -25,13 +26,14 @@ export class TransactionConfirmPage {
   public protocols: ICoinProtocol[]
 
   constructor(
-    public loadingCtrl: LoadingController,
+    private readonly loadingCtrl: LoadingController,
     private readonly toastCtrl: ToastController,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly alertCtrl: AlertController,
     private readonly platform: Platform,
     private readonly storageProvider: StorageProvider,
+    private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService
   ) {}
@@ -83,6 +85,9 @@ export class TransactionConfirmPage {
         .broadcastTransaction(this.signedTxs[index])
         .then(async txId => {
           console.log('transaction hash', txId)
+
+          this.beaconService.getVaultRequest(this.signedTxs[index], txId)
+
           if (interval) {
             clearInterval(interval)
           }

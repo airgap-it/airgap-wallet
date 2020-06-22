@@ -191,7 +191,7 @@
       </ion-col>
     </ion-row>
 
-    <ng-container *ngIf="(delegatorDetails$ | async) && (delegatorDetails$ | async).displayRewards">
+    <ng-container *ngIf="(rewardDisplay$ | async) && (rewardDisplay$ | async).displayRewards else rewardsSkeleton">
       <ion-row class="ion-padding-horizontal">
         <ion-text color="primary">
           <p ion-text class="font--weight__bold ion-no-margin">
@@ -202,10 +202,32 @@
 
       <ion-row>
         <ion-col size="12">
-          <widget-reward-list [widget]="(delegatorDetails$ | async).displayRewards"></widget-reward-list>
+          <widget-reward-list [widget]="(rewardDisplay$ | async).displayRewards"></widget-reward-list>
         </ion-col>
       </ion-row>
     </ng-container>
+    <ng-template #rewardsSkeleton>
+      <ng-container *ngIf="hasRewardDetails === undefined">
+        <ion-card>
+          <ion-item lines="none">
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 100%; height:19px;"></ion-skeleton-text>
+              </h2>
+              <h3>
+                <ion-skeleton-text animated></ion-skeleton-text>
+              </h3>
+              <h3>
+                <ion-skeleton-text animated></ion-skeleton-text>
+              </h3>
+              <h3>
+                <ion-skeleton-text animated></ion-skeleton-text>
+              </h3>
+            </ion-label>
+          </ion-item>
+        </ion-card>
+      </ng-container>
+    </ng-template>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" color="primary" (click)="callMainAction(activeDelegatorAction)" [disabled]="!canProceed">

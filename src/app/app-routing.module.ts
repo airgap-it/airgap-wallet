@@ -145,6 +145,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then(m => m.DelegationDetailPageModule)
   },
   {
+    path: 'settings-beacon',
+    loadChildren: () => import('./pages/settings-beacon/settings-beacon.module').then(m => m.SettingsBeaconPageModule)
+  },
+  {
     path: 'delegation-list/:id',
     resolve: {
       special: DataResolverService
@@ -165,6 +169,14 @@ const routes: Routes = [
       special: DataResolverService
     },
     loadChildren: () => import('./pages/ledger-sign/ledger-sign.module').then(m => m.LedgerSignPageModule)
+  },
+  {
+    path: 'beacon-permission-list',
+    loadChildren: () => import('./pages/beacon-permission-list/beacon-permission-list.module').then(m => m.BeaconPermissionListPageModule)
+  },
+  {
+    path: 'error',
+    loadChildren: () => import('./pages/error/error.module').then(m => m.ErrorPageModule)
   }
 ]
 @NgModule({
