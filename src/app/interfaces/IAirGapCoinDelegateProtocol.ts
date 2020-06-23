@@ -33,12 +33,6 @@ export interface AirGapDelegatorDetails extends DelegatorDetails {
   mainActions?: AirGapDelegatorAction[]
   secondaryActions?: AirGapDelegatorAction[]
   displayDetails?: UIWidget[]
-  displayRewards?: UIRewardList
-}
-
-export interface AirGapRewardDisplayDetails {
-  displayDetails?: UIWidget[]
-  displayRewards?: UIRewardList
 }
 
 export interface AirGapDelegationDetails {
@@ -49,7 +43,7 @@ export interface AirGapDelegationDetails {
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   airGapDelegatee?: string
   delegateeLabel: string
-  getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<AirGapRewardDisplayDetails | undefined>
+  getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<UIRewardList | undefined>
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
   createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
   createAccountExtendedDetails(address: string): Promise<UIAccountExtendedDetails>
