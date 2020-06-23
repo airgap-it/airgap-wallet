@@ -2,7 +2,7 @@
   <ion-avatar slot="start" class="content--align__center-center border--container">
     <ion-icon [name]="widget.iconName"></ion-icon>
   </ion-avatar>
-  <ion-label>
+  <ion-label class="ion-text-wrap">
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.text">{{ widget.text | translate }}</h2>
     <h2 class="font--weight__bold" ion-text color="black" *ngIf="widget.textHTML" [innerHTML]="widget.textHTML | translate"></h2>
     <h3 *ngIf="widget.description">{{ widget.description | translate }}</h3>

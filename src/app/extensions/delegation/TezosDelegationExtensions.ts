@@ -203,11 +203,8 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       new UIIconText({
         iconName: 'sync-outline',
         textHTML:
-          baker && baker.payoutDelay !== undefined
-            ? this.translateService.instant('delegation-detail-tezos.payout-schedule_text', {
-                cycles: baker.payoutDelay,
-                payoutTime: this.getFormattedCycleDuration(protocol)
-              })
+          baker !== undefined && baker.payoutPeriod !== undefined && baker.payoutDelay !== undefined
+            ? this.getDetailedPayoutScheduleText(protocol, baker)
             : 'delegation-detail-tezos.unknown',
         description: 'delegation-detail-tezos.payout-schedule_label'
       })
@@ -291,8 +288,26 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return this.knownBakers
   }
 
-  private getFormattedCycleDuration(protocol: TezosProtocol): string {
-    const cycleDuration = moment.duration(protocol.minCycleDuration)
+  private getDetailedPayoutScheduleText(protocol: TezosProtocol, baker: TezosBakerDetails): string {
+    if (baker.payoutDelay === 1 && baker.payoutPeriod === 1) {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-cycle-last-rewards_text', {
+        payoutTime: this.getFormattedCycleDuration(protocol)
+      })
+    } else if (baker.payoutPeriod === 1) {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-cycle-delayed-rewards_text', {
+        payoutDelay: baker.payoutDelay,
+        payoutTime: this.getFormattedCycleDuration(protocol)
+      })
+    } else {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-n-cycle_text', {
+        cycles: baker.payoutPeriod,
+        payoutTime: this.getFormattedCycleDuration(protocol, baker.payoutPeriod)
+      })
+    }
+  }
+
+  private getFormattedCycleDuration(protocol: TezosProtocol, cycleNumber: number = 1): string {
+    const cycleDuration = moment.duration(cycleNumber * protocol.minCycleDuration)
 
     const days = Math.floor(cycleDuration.asDays())
     const hours = Math.floor(cycleDuration.asHours() - days * 24)

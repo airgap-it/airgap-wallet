@@ -27,6 +27,7 @@ export interface TezosBakerDetails {
   hasPayoutAddress?: boolean
   logoReference?: string
   stakingCapacity?: BigNumber
+  payoutPeriod?: number
   payoutDelay?: number
   fee?: BigNumber
 }
