@@ -464,9 +464,9 @@
       "deactivated": "Deactivated"
     },
     "fee_label": "Fee",
-    "payout-schedule-every-cycle-last-rewards_text": "Every Cycle (Rewards from last cycle) <small>{{ payoutTime }}</small>",
-    "payout-schedule-every-cycle-delayed-rewards_text": "Every Cycle (Rewards from {{ payoutDelay }} cycles ago) <small>{{ payoutTime }}</small>",
-    "payout-schedule-every-n-cycle_text": "Every {{ cycles }} Cycles <small>{{ payoutTime }}</small>",
+    "payout-schedule-every-cycle-last-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from last cycle</small>",
+    "payout-schedule-every-cycle-delayed-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from {{ payoutDelay }} cycles ago</small>",
+    "payout-schedule-every-n-cycle_text": "Every {{ payoutTime }} <small>Every {{ cycles }} cycle</small>",
     "payout-schedule_label": "Payout Schedule",
     "next-payout_label": "Next Payout",
     "first-payout_label": "First Payout",

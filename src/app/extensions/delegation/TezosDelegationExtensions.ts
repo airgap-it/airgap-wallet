@@ -295,13 +295,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       })
     } else if (baker.payoutPeriod === 1) {
       return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-cycle-delayed-rewards_text', {
-        payoutDelay: baker.payoutDelay,
-        payoutTime: this.getFormattedCycleDuration(protocol)
+        payoutTime: this.getFormattedCycleDuration(protocol),
+        payoutDelay: baker.payoutDelay
       })
     } else {
       return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-n-cycle_text', {
-        cycles: baker.payoutPeriod,
-        payoutTime: this.getFormattedCycleDuration(protocol, baker.payoutPeriod)
+        payoutTime: this.getFormattedCycleDuration(protocol, baker.payoutPeriod),
+        cycles: baker.payoutPeriod
       })
     }
   }
@@ -309,10 +309,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private getFormattedCycleDuration(protocol: TezosProtocol, cycleNumber: number = 1): string {
     const cycleDuration = moment.duration(cycleNumber * protocol.minCycleDuration)
 
-    const days = Math.floor(cycleDuration.asDays())
-    const hours = Math.floor(cycleDuration.asHours() - days * 24)
-    const minutes = Math.floor(cycleDuration.asMinutes() - (days * 24 * 60 + hours * 60))
-
-    return `${days}d ${hours}h ${minutes}m`
+    return cycleDuration.locale(this.translateService.currentLang).humanize()
   }
 }
