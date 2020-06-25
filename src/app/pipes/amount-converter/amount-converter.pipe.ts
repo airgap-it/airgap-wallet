@@ -19,7 +19,7 @@ export class AmountConverterPipe implements PipeTransform {
     if (amount === undefined) {
       return ''
     }
-    const result = `${amount} ${protocol.symbol.toUpperCase()}`
+    const result = `${amount} ${protocol.symbol}`
     return result
   }
 

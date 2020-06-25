@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ wallet.coinProtocol.symbol | uppercase }} {{ 'wallet-address.title' | translate }}</ion-title>
+    <ion-title>{{ wallet.coinProtocol.symbol }} {{ 'wallet-address.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,7 +16,7 @@
       <currency-symbol class="symbol--icon" [symbol]="wallet.coinProtocol.symbol"></currency-symbol>
     </ion-col>
     <ion-col size="12">
-      <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol | uppercase }}</h2>
+      <h2>{{ wallet.coinProtocol.name }} {{ wallet.coinProtocol.symbol }}</h2>
       <p>
         {{ 'wallet-address.address_label' | translate }}:
         <br />
