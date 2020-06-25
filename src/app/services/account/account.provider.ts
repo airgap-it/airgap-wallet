@@ -329,6 +329,10 @@ export class AccountProvider {
       : `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.protocol.options.network.identifier}`
   }
 
+  public walletBySerializerAccountIdentifier(accountIdentifier: string, protocolIdentifier: string): AirGapMarketWallet {
+    return this.walletList.find(wallet => wallet.publicKey.endsWith(accountIdentifier) && wallet.protocol.identifier === protocolIdentifier)
+  }
+
   public walletByPublicKeyAndProtocolAndAddressIndex(
     publicKey: string,
     protocolIdentifier: string,

@@ -3,6 +3,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
@@ -37,7 +38,8 @@ export class TransactionConfirmPage {
     private readonly storageProvider: StorageProvider,
     private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    private readonly accountService: AccountProvider
   ) {}
 
   public dismiss(): void {
@@ -56,10 +58,19 @@ export class TransactionConfirmPage {
     this.signedTransactionsSync.forEach(async signedTx => {
       const protocol = getProtocolByIdentifier(signedTx.protocol)
 
+      const wallet = this.accountService.walletBySerializerAccountIdentifier(
+        (signedTx.payload as SignedTransaction).accountIdentifier,
+        signedTx.protocol
+      )
+
       const [createResponse, savedProtocol] = await this.beaconService.getVaultRequest((signedTx.payload as SignedTransaction).transaction)
 
       const selectedProtocol =
-        createResponse && savedProtocol && savedProtocol.identifier === protocol.identifier ? savedProtocol : protocol
+        createResponse && savedProtocol && savedProtocol.identifier === protocol.identifier
+          ? savedProtocol
+          : wallet && wallet.protocol
+          ? wallet.protocol
+          : protocol
 
       this.txInfos.push([(signedTx.payload as SignedTransaction).transaction, selectedProtocol, createResponse])
       this.protocols.push(selectedProtocol)
