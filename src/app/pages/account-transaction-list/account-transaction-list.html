@@ -118,7 +118,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="wallet.currentBalance?.toNumber() === 0 || wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT"
+          [disabled]="wallet.currentBalance?.toNumber() === 0 || wallet.coinProtocol.identifier === 'polkadot'"
           shape="round"
         >
           <ion-icon slot="start" name="send-outline"></ion-icon>
