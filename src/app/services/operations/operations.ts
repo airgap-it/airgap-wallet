@@ -1,4 +1,3 @@
-import { AirGapRewardDisplayDetails } from './../../interfaces/IAirGapCoinDelegateProtocol'
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
@@ -116,11 +115,12 @@ export class OperationsProvider {
       : [await this.getDefaultDelegationDetails(protocol, wallet.receivingPublicAddress, delegatees)]
   }
 
-  public async getRewardDisplayDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapRewardDisplayDetails> {
+  public async getRewardDisplayDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIRewardList | undefined> {
     const protocol = wallet.coinProtocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
+
     return supportsAirGapDelegation(protocol) ? protocol.getRewardDisplayDetails(wallet.receivingPublicAddress, delegatees) : undefined
   }
 
@@ -166,15 +166,7 @@ export class OperationsProvider {
             defaultUndelegateActionTypeKeywords,
             defaultMainParamNameKeywords
           )
-        : [],
-      displayRewards: delegatorDetails.rewards
-        ? new UIRewardList({
-            rewards: delegatorDetails.rewards.slice(0, 5),
-            indexColLabel: 'delegation-detail.rewards.index-col_label',
-            amountColLabel: 'delegation-detail.rewards.amount-col_label',
-            payoutColLabel: 'delegation-detail.rewards.payout-col_label'
-          })
-        : undefined
+        : []
     }
   }
 

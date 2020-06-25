@@ -104,6 +104,16 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     ]
   }
 
+  public async getRewardDisplayDetails(
+    protocol: SubstrateProtocol,
+    delegator: string,
+    delegatees: string[]
+  ): Promise<UIRewardList | undefined> {
+    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+
+    return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
+  }
+
   private async getExtraValidatorsDetails(
     protocol: SubstrateProtocol,
     validators: string[],
@@ -217,14 +227,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
     const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
     const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
-    const displayRewards: UIRewardList | undefined = this.createDelegatorDisplayRewards(protocol, nominatorDetails)
 
     return {
       ...nominatorDetails,
       mainActions: [delegateAction, ...extraActions].filter(action => !!action),
       secondaryActions: [undelegateAction].filter(action => !!action),
-      displayDetails,
-      displayRewards: displayRewards
+      displayDetails
     }
   }
 

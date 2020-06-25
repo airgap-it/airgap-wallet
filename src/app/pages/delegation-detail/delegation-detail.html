@@ -201,7 +201,7 @@
       </ion-col>
     </ion-row>
 
-    <ng-container *ngIf="(rewardDisplay$ | async) && (rewardDisplay$ | async).displayRewards else rewardsSkeleton">
+    <ng-container *ngIf="(rewardDisplay$ | async) else rewardsSkeleton">
       <ion-row class="ion-padding-horizontal">
         <ion-text color="primary">
           <p ion-text class="font--weight__bold ion-no-margin">
@@ -212,7 +212,7 @@
 
       <ion-row>
         <ion-col size="12">
-          <widget-reward-list [widget]="(rewardDisplay$ | async).displayRewards"></widget-reward-list>
+          <widget-reward-list [widget]="(rewardDisplay$ | async)"></widget-reward-list>
         </ion-col>
       </ion-row>
     </ng-container>

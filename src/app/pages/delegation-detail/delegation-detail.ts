@@ -1,28 +1,28 @@
 import { Component } from '@angular/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
+import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
+import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
+import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
+import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import {
   AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegatorAction,
   AirGapDelegationDetails,
-  AirGapRewardDisplayDetails
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { OperationsProvider } from 'src/app/services/operations/operations'
-import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import { FormGroup, FormBuilder } from '@angular/forms'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { LoadingController, PopoverController, NavController, ToastController } from '@ionic/angular'
 import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
-import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { isType } from 'src/app/utils/utils'
-import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -45,7 +45,7 @@ export class DelegationDetailPage {
 
   public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails | null> = new BehaviorSubject(null)
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails | null> = new BehaviorSubject(null)
-  public rewardDisplay$: BehaviorSubject<AirGapRewardDisplayDetails | null> = new BehaviorSubject(null)
+  public rewardDisplay$: BehaviorSubject<UIRewardList | null> = new BehaviorSubject(null)
 
   public canProceed: boolean = true
   public hasRewardDetails: boolean | undefined = undefined
@@ -320,8 +320,8 @@ export class DelegationDetailPage {
     this.delegatorDetails$.next(details ? details[0].delegator : null)
   }
 
-  private updateDisplayedRewards(rewardDisplayDetails: AirGapRewardDisplayDetails) {
-    this.rewardDisplay$.next(rewardDisplayDetails)
+  private updateDisplayedRewards(rewardDisplay: UIRewardList) {
+    this.rewardDisplay$.next(rewardDisplay)
   }
 
   private changeDisplayedDetails(address: string) {

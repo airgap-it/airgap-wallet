@@ -1,13 +1,14 @@
-import { ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { UIWidget } from '../models/widgets/UIWidget'
-import { UIInputWidget } from '../models/widgets/UIInputWidget'
-import BigNumber from 'bignumber.js'
-import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
-import { UIRewardList } from '../models/widgets/display/UIRewardList'
-import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
-import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
 import { SafeUrl } from '@angular/platform-browser'
+import { ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import BigNumber from 'bignumber.js'
+
+import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
+import { UIRewardList } from '../models/widgets/display/UIRewardList'
+import { UIInputWidget } from '../models/widgets/UIInputWidget'
+import { UIWidget } from '../models/widgets/UIWidget'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -35,12 +36,6 @@ export interface AirGapDelegatorDetails extends DelegatorDetails {
   mainActions?: AirGapDelegatorAction[]
   secondaryActions?: AirGapDelegatorAction[]
   displayDetails?: UIWidget[]
-  displayRewards?: UIRewardList
-}
-
-export interface AirGapRewardDisplayDetails {
-  displayDetails?: UIWidget[]
-  displayRewards?: UIRewardList
 }
 
 export interface AirGapDelegationDetails {
@@ -55,7 +50,7 @@ export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   delegateeLabelPlural: string
   supportsMultipleDelegations: boolean
 
-  getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<AirGapRewardDisplayDetails | undefined>
+  getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<UIRewardList | undefined>
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
   createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
   createAccountExtendedDetails(address: string): Promise<UIAccountExtendedDetails>
