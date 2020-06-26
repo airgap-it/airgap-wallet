@@ -10,6 +10,7 @@ import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 const SECOND: number = 1000
 
@@ -136,16 +137,19 @@ export class TransactionConfirmPage {
           this.showTransactionSuccessfulAlert(protocol, txId)
 
           // POST TX TO BACKEND
-          const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
-            .payload as SignedTransaction))[0] as any
-          // necessary for the transaction backend
-          signed.amount = signed.amount.toString()
-          signed.fee = signed.fee.toString()
-          signed.signedTx = signedTx
-          signed.hash = txId
+          // Only send it if we are on mainnet
+          if (protocol.options.network.type === NetworkType.MAINNET) {
+            const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
+              .payload as SignedTransaction))[0] as any
+            // necessary for the transaction backend
+            signed.amount = signed.amount.toString()
+            signed.fee = signed.fee.toString()
+            signed.signedTx = signedTx
+            signed.hash = txId
 
-          console.log('SIGNED TX', signed)
-          this.pushBackendProvider.postPendingTx(signed) // Don't await
+            console.log('SIGNED TX', signed)
+            this.pushBackendProvider.postPendingTx(signed) // Don't await
+          }
           // END POST TX TO BACKEND
         })
         .catch(error => {
