@@ -1,13 +1,14 @@
-import { supportsDelegation } from 'src/app/helpers/delegation'
 import { Component, Input } from '@angular/core'
 import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import BigNumber from 'bignumber.js'
 import { Observable, Subscription } from 'rxjs'
+import { supportsDelegation } from 'src/app/helpers/delegation'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
 import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'portfolio-item',
@@ -15,6 +16,8 @@ import BigNumber from 'bignumber.js'
   styleUrls: ['./portfolio-item.scss']
 })
 export class PortfolioItemComponent {
+  public readonly networkType: typeof NetworkType = NetworkType
+
   public isActive: boolean = false
 
   @Input()

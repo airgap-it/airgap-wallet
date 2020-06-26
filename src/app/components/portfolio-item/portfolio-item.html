@@ -1,4 +1,4 @@
-<ion-item *ngIf="wallet; else skeletonWallet" lines="none" [color]="wallet.protocol.options.network.type === 'MAINNET' ? '' : 'danger' ">
+<ion-item *ngIf="wallet; else skeletonWallet" lines="none">
   <ion-avatar slot="start">
     <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
     <currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="isToken"></currency-symbol>
@@ -25,6 +25,10 @@
         </h3>
       </ion-text>
     </ng-container>
+
+    <ion-badge *ngIf="wallet.protocol.options.network.type !== networkType.MAINNET" color="danger" class="badge__margin">
+      {{ wallet.protocol.options.network.name }}
+    </ion-badge>
 
     <ion-badge *ngIf="(isDelegated | async) !== null && !hideDelegationBadge" color="secondary">
       {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
