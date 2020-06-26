@@ -4,7 +4,8 @@ import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { TezosProtocolNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
-import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ProtocolNetwork } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -28,6 +29,8 @@ export class AccountEditPopoverComponent implements OnInit {
   public isTezosKT: boolean = false
   public isDelegated: boolean = false
 
+  public networks: ProtocolNetwork[] = []
+
   constructor(
     private readonly alertCtrl: AlertController,
     private readonly navParams: NavParams,
@@ -43,6 +46,14 @@ export class AccountEditPopoverComponent implements OnInit {
     this.wallet = this.navParams.get('wallet')
     this.importAccountAction = this.navParams.get('importAccountAction')
     this.onDelete = this.navParams.get('onDelete')
+    if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
+      this.protocolsProvider
+        .getNetworksForProtocol(this.wallet.protocol.identifier)
+        .then((networks: ProtocolNetwork[]) => {
+          this.networks = networks
+        })
+        .catch(console.error)
+    }
   }
 
   public async copyAddressToClipboard(): Promise<void> {
@@ -106,11 +117,9 @@ export class AccountEditPopoverComponent implements OnInit {
   }
 
   public async changeNetwork() {
-    const networks = (await this.protocolsProvider.getNetworksForProtocol(this.wallet.protocol.identifier)) as TezosProtocolNetwork[]
-
     const alert = await this.alertCtrl.create({
       header: 'Network',
-      inputs: networks.map((network, index) => ({
+      inputs: this.networks.map((network, index) => ({
         name: network.name,
         type: 'radio',
         label: network.name,
@@ -129,7 +138,7 @@ export class AccountEditPopoverComponent implements OnInit {
         {
           text: 'Ok',
           handler: async data => {
-            await this.walletsProvider.setWalletNetwork(this.wallet, networks[data])
+            await this.walletsProvider.setWalletNetwork(this.wallet, this.networks[data] as TezosProtocolNetwork)
             this.cdr.detectChanges()
             await this.dismissPopover()
           }
