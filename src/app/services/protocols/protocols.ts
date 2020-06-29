@@ -56,42 +56,44 @@ export class ProtocolsProvider {
   public subProtocols: SubAccount[] = []
 
   constructor() {
-    addSupportedProtocol(new AeternityProtocol())
-    addSupportedProtocol(new BitcoinProtocol())
-    addSupportedProtocol(new EthereumProtocol())
-    addSupportedProtocol(new GroestlcoinProtocol())
-    addSupportedProtocol(new TezosProtocol())
+    try {
+      addSupportedProtocol(new AeternityProtocol())
+      addSupportedProtocol(new BitcoinProtocol())
+      addSupportedProtocol(new EthereumProtocol())
+      addSupportedProtocol(new GroestlcoinProtocol())
+      addSupportedProtocol(new TezosProtocol())
 
-    const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Carthagenet',
-      NetworkType.TESTNET,
-      'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
-      new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.CARTHAGENET,
-        'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
-        TezosNetwork.CARTHAGENET,
-        'airgap00391'
-      )
-    )
-    const carthagenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(carthagenetNetwork))
-
-    addSupportedProtocol(carthagenetProtocol)
-
-    addSubProtocol(carthagenetProtocol, new TezosKtProtocol(new TezosProtocolOptions(carthagenetNetwork)))
-    addSubProtocol(
-      carthagenetProtocol,
-      new TezosBTC(
-        new TezosFAProtocolOptions(
-          carthagenetNetwork,
-          new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1TH8YZqLy2GFe7yy2JC7oazRj8nyMtzy4W')
+      const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+        'Carthagenet',
+        NetworkType.TESTNET,
+        'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+        new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
+        new TezosProtocolNetworkExtras(
+          TezosNetwork.CARTHAGENET,
+          'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
+          TezosNetwork.CARTHAGENET,
+          'airgap00391'
         )
       )
-    )
+      const carthagenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(carthagenetNetwork))
 
-    addSupportedProtocol(new CosmosProtocol())
-    this.addProtocols()
-    this._isReady.resolve(true)
+      addSupportedProtocol(carthagenetProtocol)
+
+      addSubProtocol(carthagenetProtocol, new TezosKtProtocol(new TezosProtocolOptions(carthagenetNetwork)))
+      addSubProtocol(
+        carthagenetProtocol,
+        new TezosBTC(
+          new TezosFAProtocolOptions(
+            carthagenetNetwork,
+            new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1TH8YZqLy2GFe7yy2JC7oazRj8nyMtzy4W')
+          )
+        )
+      )
+
+      addSupportedProtocol(new CosmosProtocol())
+      this.addProtocols()
+      this._isReady.resolve(true)
+    } catch (e) {}
   }
 
   public getEnabledSubProtocols() {
