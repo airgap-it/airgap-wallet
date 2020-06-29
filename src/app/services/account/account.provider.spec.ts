@@ -34,7 +34,7 @@ describe('AccountProvider', () => {
     expect(accountProvider instanceof AccountProvider).toBe(true)
   })
 
-  it('should successfully add and persist ETH wallets', async () => {
+  it('should successfully add and persist ETH wallets', async done => {
     expect(accountProvider.getWalletList().length).toEqual(1)
     await accountProvider.addWallet(
       new AirGapMarketWallet(
@@ -45,6 +45,7 @@ describe('AccountProvider', () => {
       )
     )
     expect(accountProvider.getWalletList().length).toEqual(2)
+    done()
   })
 
   it('should be able to compare wallets', async () => {
