@@ -251,7 +251,8 @@
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
     "delete_label": "Remove",
-    "block_explorer": "Open Blockexplorer"
+    "block-explorer_label": "Open Blockexplorer",
+    "change-network_label": "Change Network"
   },
   "account-edit-popover-component": {
     "header": "Confirm Account Removal",
