@@ -1,10 +1,17 @@
 <ng-container *ngIf="transaction">
+  <ion-row class="ion-align-items-center ion-padding">
+    <ion-col size="4">
+      <ion-row class="ion-justify-content-center">
+        <ng-container *ngIf="networkInfo && networkInfo.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
+          Network:
+          <ion-badge class="badge__margin" color="danger">{{ networkInfo.name }}</ion-badge>
+          <ion-badge *ngIf="networkInfo.type === networkType.CUSTOM" class="badge__margin">{{networkInfo.rpcUrl}}</ion-badge>
+        </ng-container>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+
   <address-row *ngFor="let address of transaction.from" [address]="address" label="{{ 'from-to.from_label' | translate }}"></address-row>
-  <ion-item *ngIf="networkInfo && networkInfo.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
-    <ion-label>
-      Network: {{ networkInfo.name }} {{ networkInfo.rpcUrl }}
-    </ion-label>
-  </ion-item>
 
   <ion-row class="ion-align-items-center ion-padding-top">
     <ion-col size="3" class="ion-no-padding">
