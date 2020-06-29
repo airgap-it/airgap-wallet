@@ -3,14 +3,23 @@ var window = self;
 // available as airgapCoinLib due to browserify postInstall hook
 self.importScripts("../libs/airgap-coin-lib.browserify.js");
 
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.AeternityProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.BitcoinProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.EthereumProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.GroestlcoinProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.TezosProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.CosmosProtocol())
+
 self.onmessage = function(event) {
   airgapCoinLib.isCoinlibReady().then(function() {
     console.log("start deriving addresses");
 
 		var wallet = event.data;
-		console.log(wallet)
+    
+    const protocol = airgapCoinLib.getProtocolByIdentifier(wallet.protocolIdentifier)
+
     var airGapWallet = new airgapCoinLib.AirGapWallet(
-      wallet.protocolIdentifier,
+      protocol,
       wallet.publicKey,
       wallet.isExtendedPublicKey,
       wallet.derivationPath
