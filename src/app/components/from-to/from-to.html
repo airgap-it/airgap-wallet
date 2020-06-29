@@ -1,6 +1,11 @@
 <ng-container *ngIf="transaction">
   <address-row *ngFor="let address of transaction.from" [address]="address" label="{{ 'from-to.from_label' | translate }}"></address-row>
-  Network: {{ transaction.networkIdentifier }}
+  <ion-item *ngIf="networkInfo && networkInfo.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
+    <ion-label>
+      Network: {{ networkInfo.name }} {{ networkInfo.rpcUrl }}
+    </ion-label>
+  </ion-item>
+
   <ion-row class="ion-align-items-center ion-padding-top">
     <ion-col size="3" class="ion-no-padding">
       <ion-row class="ion-justify-content-center">
