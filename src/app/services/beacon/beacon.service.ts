@@ -5,27 +5,43 @@ import {
   BeaconRequestOutputMessage,
   BeaconResponseInputMessage,
   Network,
+  NetworkType as BeaconNetworkType,
   P2PPairInfo,
   WalletClient
 } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
+
+import { BeaconRequest, SerializedBeaconRequest, SettingsKey, StorageProvider } from '../storage/storage'
+import {
+  TezosProtocolNetwork,
+  TezblockBlockExplorer,
+  TezosProtocolNetworkExtras,
+  TezosProtocolOptions
+} from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
+import { TezosNetwork, TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Injectable({
   providedIn: 'root'
 })
 export class BeaconService {
   public client: WalletClient | undefined
-  private requests: [string, any, ICoinProtocol][] = []
+  private requests: BeaconRequest[] = []
 
-  constructor(private readonly modalController: ModalController, private readonly loadingController: LoadingController) {
+  constructor(
+    private readonly modalController: ModalController,
+    private readonly loadingController: LoadingController,
+    private readonly storage: StorageProvider
+  ) {
     this.init()
   }
 
   public async init(): Promise<boolean> {
+    this.requests = await this.getRequestsFromStorage()
     this.client = new WalletClient({ name: 'AirGapWallet' })
     await this.client.init()
 
@@ -48,6 +64,18 @@ export class BeaconService {
     })
   }
 
+  public async getRequestsFromStorage(): Promise<BeaconRequest[]> {
+    const requests: SerializedBeaconRequest[] = await this.storage.get(SettingsKey.BEACON_REQUESTS)
+
+    return await Promise.all(
+      requests.map(
+        async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
+          return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
+        }
+      )
+    )
+  }
+
   async presentModal(request: BeaconRequestOutputMessage) {
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
@@ -63,6 +91,7 @@ export class BeaconService {
 
   public async addVaultRequest(messageId: string, requestPayload: any, protocol: ICoinProtocol): Promise<void> {
     this.requests.push([messageId, requestPayload, protocol])
+    this.persistRequests()
   }
 
   public async getVaultRequest(
@@ -113,7 +142,29 @@ export class BeaconService {
       }
     })
 
+    this.persistRequests()
+
     return [createResponse, protocol]
+  }
+
+  public async persistRequests(): Promise<void> {
+    const requests: SerializedBeaconRequest[] = this.requests.map(request => ({
+      messageId: request[0],
+      payload: request[1],
+      protocolIdentifier: request[2].identifier,
+      network: {
+        name: request[2].options.network.name,
+        type:
+          request[2].options.network.type === NetworkType.MAINNET
+            ? BeaconNetworkType.MAINNET
+            : request[2].options.network.type === NetworkType.TESTNET
+            ? BeaconNetworkType.CARTHAGENET
+            : BeaconNetworkType.CUSTOM,
+        rpcUrl: request[2].options.network.rpcUrl
+      }
+    }))
+
+    return this.storage.set(SettingsKey.BEACON_REQUESTS, requests)
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
@@ -177,5 +228,66 @@ export class BeaconService {
     }
     await this.respond(response)
     await this.displayErrorPage(new Error('Network not supported!'))
+  }
+
+  public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
+    const configs: { [key in BeaconNetworkType]: TezosProtocolNetwork } = {
+      [BeaconNetworkType.MAINNET]: {
+        identifier: undefined,
+        name: undefined,
+        type: undefined,
+        rpcUrl: undefined,
+        blockExplorer: undefined,
+        extras: {
+          network: undefined,
+          conseilUrl: undefined,
+          conseilNetwork: undefined,
+          conseilApiKey: undefined
+        }
+      },
+      [BeaconNetworkType.CARTHAGENET]: {
+        identifier: undefined,
+        name: network.name || 'Carthagenet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.CARTHAGENET,
+          conseilUrl: 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
+          conseilNetwork: TezosNetwork.CARTHAGENET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.CUSTOM]: {
+        identifier: undefined,
+        name: network.name || 'Custom Network',
+        type: NetworkType.CUSTOM,
+        rpcUrl: network.rpcUrl || '',
+        blockExplorer: new TezblockBlockExplorer(''),
+        extras: {
+          network: TezosNetwork.MAINNET,
+          conseilUrl: '',
+          conseilNetwork: TezosNetwork.MAINNET,
+          conseilApiKey: ''
+        }
+      }
+    }
+
+    return new TezosProtocol(
+      new TezosProtocolOptions(
+        new TezosProtocolNetwork(
+          configs[network.type].name,
+          configs[network.type].type,
+          configs[network.type].rpcUrl,
+          configs[network.type].blockExplorer,
+          new TezosProtocolNetworkExtras(
+            configs[network.type].extras.network,
+            configs[network.type].extras.conseilUrl,
+            configs[network.type].extras.conseilNetwork,
+            configs[network.type].extras.conseilApiKey
+          )
+        )
+      )
+    )
   }
 }

@@ -1,7 +1,6 @@
 import {
   BeaconMessageType,
   BroadcastRequestOutput,
-  Network,
   NetworkType as BeaconNetworkType,
   OperationRequestOutput,
   PermissionRequestOutput,
@@ -13,15 +12,7 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import {
-  TezblockBlockExplorer,
-  TezosProtocolNetwork,
-  TezosProtocolNetworkExtras,
-  TezosProtocolOptions
-} from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
 import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
@@ -223,9 +214,7 @@ export class BeaconRequestPage implements OnInit {
     }
 
     if (request.network.type !== BeaconNetworkType.MAINNET) {
-      const network = await this.getProtocolBasedOnNetwork(request.network)
-
-      tezosProtocol = new TezosProtocol(new TezosProtocolOptions(network))
+      tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
     let transaction: TezosWrappedOperation | undefined
@@ -271,9 +260,7 @@ export class BeaconRequestPage implements OnInit {
     const signedTx: string = request.signedTransaction
 
     if (request.network.type !== BeaconNetworkType.MAINNET) {
-      const network = await this.getProtocolBasedOnNetwork(request.network)
-
-      tezosProtocol = new TezosProtocol(new TezosProtocolOptions(network))
+      tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
     await this.beaconService.addVaultRequest(request.id, signedTx, tezosProtocol)
@@ -300,20 +287,5 @@ export class BeaconRequestPage implements OnInit {
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
-  }
-
-  private async getProtocolBasedOnNetwork(network: Network): Promise<TezosProtocolNetwork> {
-    return new TezosProtocolNetwork(
-      network.name || (network.type === BeaconNetworkType.CARTHAGENET ? 'Carthagenet' : 'Custom Network'),
-      network.type === BeaconNetworkType.CARTHAGENET ? NetworkType.TESTNET : NetworkType.CUSTOM,
-      network.rpcUrl || (network.type === BeaconNetworkType.CARTHAGENET ? 'https://tezos-carthagenet-node-1.kubernetes.papers.tech' : ''),
-      new TezblockBlockExplorer(network.type === BeaconNetworkType.CARTHAGENET ? 'https://carthagenet.tezblock.io' : ''),
-      new TezosProtocolNetworkExtras(
-        network.type === BeaconNetworkType.CARTHAGENET ? TezosNetwork.CARTHAGENET : TezosNetwork.MAINNET,
-        network.type === BeaconNetworkType.CARTHAGENET ? 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech' : '',
-        network.type === BeaconNetworkType.CARTHAGENET ? TezosNetwork.CARTHAGENET : TezosNetwork.MAINNET,
-        network.type === BeaconNetworkType.CARTHAGENET ? 'airgap00391' : ''
-      )
-    )
   }
 }
