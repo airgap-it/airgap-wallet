@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol } from 'airgap-coin-lib'
 import { take } from 'rxjs/operators'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { AccountProvider } from '../../services/account/account.provider'
-
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { PermissionsProvider } from '../permissions/permissions'
 
 describe('AccountProvider', () => {
@@ -38,26 +37,31 @@ describe('AccountProvider', () => {
   it('should successfully add and persist ETH wallets', async () => {
     expect(accountProvider.getWalletList().length).toEqual(1)
     await accountProvider.addWallet(
-      new AirGapMarketWallet('eth', '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996', false, `m/44'/60'/0'/0/0`)
+      new AirGapMarketWallet(
+        new EthereumProtocol(),
+        '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
+        false,
+        `m/44'/60'/0'/0/0`
+      )
     )
     expect(accountProvider.getWalletList().length).toEqual(2)
   })
 
   it('should be able to compare wallets', async () => {
     const wallet1 = new AirGapMarketWallet(
-      'eth',
+      new EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`
     )
     const wallet1Same = new AirGapMarketWallet(
-      'eth',
+      new EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`
     )
     const wallet2 = new AirGapMarketWallet(
-      'btc',
+      new BitcoinProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`
@@ -73,7 +77,7 @@ describe('AccountProvider', () => {
 
   it('should successfully add and persist BTC wallets', async () => {
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      'btc',
+      new BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`
@@ -86,7 +90,7 @@ describe('AccountProvider', () => {
 
   it('should update wallet observalbe when adding a wallet', async done => {
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      'btc',
+      new BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`
