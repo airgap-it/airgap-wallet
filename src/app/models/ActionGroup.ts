@@ -193,7 +193,14 @@ export class ActionGroup {
     }
 
     const protocol = getProtocolByIdentifier(SubProtocolSymbols.XTZ_KT)
-    wallet = new AirGapMarketWallet(protocol, xtzWallet.publicKey, xtzWallet.isExtendedPublicKey, xtzWallet.derivationPath, index)
+    wallet = new AirGapMarketWallet(
+      protocol,
+      xtzWallet.publicKey,
+      xtzWallet.isExtendedPublicKey,
+      xtzWallet.derivationPath,
+      xtzWallet.priceService,
+      index
+    )
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
     await this.callerContext.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))

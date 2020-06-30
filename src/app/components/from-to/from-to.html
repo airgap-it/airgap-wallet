@@ -67,9 +67,16 @@
   <ion-row class="ion-align-items-center ion-padding-top">
     <ion-col size="9" offset="3">
       <ion-row>
-        <ng-container *ngIf="networkInfo && networkInfo.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
-          <ion-badge class="badge__margin" color="danger">{{ networkInfo.name }}</ion-badge>
-          <ion-badge *ngIf="networkInfo.type === networkType.CUSTOM" class="badge__margin">{{networkInfo.rpcUrl}}</ion-badge>
+        <ng-container
+          *ngIf="transaction.network && transaction.network.type !== networkType.MAINNET"
+          class="ion-no-padding"
+          lines="none"
+          slot="start"
+        >
+          <ion-badge class="badge__margin" color="danger">{{ transaction.network.name }}</ion-badge>
+          <ion-badge *ngIf="transaction.network.type === networkType.CUSTOM" class="badge__margin">
+            {{transaction.network.rpcUrl}}
+          </ion-badge>
         </ng-container>
       </ion-row>
     </ion-col>

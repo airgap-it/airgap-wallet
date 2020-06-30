@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { map } from 'rxjs/operators'
+import { PriceService } from 'src/app/services/price/price.service'
 
 import { AccountProvider, getProtocolByIdentifierAndNetworkIdentifier } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -20,7 +21,12 @@ export class SubAccountImportPage {
 
   public typeLabel: string = ''
 
-  constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly accountProvider: AccountProvider) {
+  constructor(
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly accountProvider: AccountProvider,
+    private readonly priceService: PriceService
+  ) {
     this.subWallets = []
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -40,7 +46,8 @@ export class SubAccountImportPage {
               protocol,
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,
-              mainAccount.derivationPath
+              mainAccount.derivationPath,
+              this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses
             promises.push(airGapMarketWallet.synchronize())

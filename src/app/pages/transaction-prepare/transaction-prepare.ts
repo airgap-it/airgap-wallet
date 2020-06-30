@@ -3,7 +3,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
 import { AirGapMarketWallet, TezosProtocol } from 'airgap-coin-lib'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { PriceService } from 'src/app/services/price/price.service'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -11,11 +17,6 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
-import { BehaviorSubject } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 interface TransactionFormState<T> {
   value: T
@@ -68,7 +69,8 @@ export class TransactionPreparePage {
     private readonly clipboardProvider: ClipboardService,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly amountConverterPipe: AmountConverterPipe
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly priceService: PriceService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -315,7 +317,8 @@ export class TransactionPreparePage {
         new TezosProtocol(),
         'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
         false,
-        'm/44h/1729h/0h/0h'
+        'm/44h/1729h/0h/0h',
+        this.priceService
       )
       await newWallet.synchronize()
       return newWallet.currentMarketPrice.toNumber()

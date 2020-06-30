@@ -62,6 +62,7 @@ export class ProtocolsProvider {
       addSupportedProtocol(new EthereumProtocol())
       addSupportedProtocol(new GroestlcoinProtocol())
       addSupportedProtocol(new TezosProtocol())
+      addSupportedProtocol(new CosmosProtocol())
 
       const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
         'Carthagenet',
@@ -90,7 +91,6 @@ export class ProtocolsProvider {
         )
       )
 
-      addSupportedProtocol(new CosmosProtocol())
       this.addProtocols()
       this._isReady.resolve(true)
     } catch (e) {}

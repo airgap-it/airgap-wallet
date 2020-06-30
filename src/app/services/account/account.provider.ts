@@ -15,6 +15,7 @@ import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
 import { LanguageService } from '../language/language.service'
 import { OperationsProvider } from '../operations/operations'
+import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
@@ -84,7 +85,8 @@ export class AccountProvider {
     private readonly loadingController: LoadingController,
     private readonly opertaionsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly priceService: PriceService
   ) {
     this.loadWalletsFromStorage()
       .then(() => {
@@ -194,6 +196,7 @@ export class AccountProvider {
         wallet.publicKey,
         wallet.isExtendedPublicKey,
         wallet.derivationPath,
+        this.priceService,
         wallet.addressIndex
       )
       // add derived addresses

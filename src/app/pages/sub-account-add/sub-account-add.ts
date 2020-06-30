@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
+import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -34,7 +35,8 @@ export class SubAccountAddPage {
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
-    private readonly protocolsProvider: ProtocolsProvider
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly priceService: PriceService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -60,7 +62,8 @@ export class SubAccountAddPage {
             protocol,
             this.wallet.publicKey,
             this.wallet.isExtendedPublicKey,
-            this.wallet.derivationPath
+            this.wallet.derivationPath,
+            this.priceService
           )
           const exists: boolean = this.accountProvider.walletExists(wallet)
           if (!exists) {

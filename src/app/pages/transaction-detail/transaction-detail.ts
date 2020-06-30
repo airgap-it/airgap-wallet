@@ -28,7 +28,7 @@ export class TransactionDetailPage {
 
     const protocol: ICoinProtocol = getProtocolByIdentifierAndNetworkIdentifier(
       this.transaction.protocolIdentifier,
-      this.transaction.networkIdentifier
+      this.transaction.network.identifier
     )
 
     let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer

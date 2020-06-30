@@ -154,7 +154,7 @@ export class ExchangeProvider implements Exchange {
         fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
-        networkIdentifier: protocol.options.network.identifier,
+        network: protocol.options.network,
         extra: tx.status
       }
     })

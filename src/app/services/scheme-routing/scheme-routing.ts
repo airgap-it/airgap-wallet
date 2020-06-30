@@ -15,6 +15,7 @@ import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
+import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 
@@ -40,7 +41,8 @@ export class SchemeRoutingProvider {
     private readonly dataService: DataService,
     private readonly serializerService: SerializerService,
     private readonly beaconService: BeaconService,
-    private readonly storageProvider: StorageProvider
+    private readonly storageProvider: StorageProvider,
+    private readonly priceService: PriceService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -159,7 +161,8 @@ export class SchemeRoutingProvider {
       protocol,
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
-      walletSync.derivationPath
+      walletSync.derivationPath,
+      this.priceService
     )
     if (this.router) {
       this.dataService.setData(DataServiceKey.WALLET, wallet)
