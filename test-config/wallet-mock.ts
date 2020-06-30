@@ -1,6 +1,24 @@
-import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
+
+// tslint:disable:max-classes-per-file
+
+export class PriceServiceMock implements AirGapWalletPriceService {
+  public async getCurrentMarketPrice(_protocol: ICoinProtocol, _baseSymbol: string): Promise<BigNumber> {
+    throw new Error('Method not implemented.')
+  }
+  public async getMarketPricesOverTime(
+    _protocol: ICoinProtocol,
+    _timeUnit: TimeUnit,
+    _numberOfMinutes: number,
+    _date: Date,
+    _baseSymbol: string
+  ): Promise<MarketDataSample[]> {
+    throw new Error('Method not implemented.')
+  }
+}
 
 class WalletMock {
   public ethWallet: AirGapMarketWallet = Object.assign(
@@ -8,7 +26,8 @@ class WalletMock {
       new EthereumProtocol(),
       '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
       false,
-      "m/44'/60'/0'/0/0"
+      "m/44'/60'/0'/0/0",
+      new PriceServiceMock()
     ),
     {
       currentMarketPrice: new BigNumber('100')
@@ -36,7 +55,8 @@ class WalletMock {
     new BitcoinProtocol(),
     'xpub6CcLgL3yuTNxguFdSikacKj93R77GMToq1488BKLdZMAQ2BfrVQrx31phHwqhx4kRUTNCeyiWiqvppaykiXM9w8RWJFbhj1etsCgBckA2bF',
     false,
-    "m/44'/0'/0'"
+    "m/44'/0'/0'",
+    new PriceServiceMock()
   )
   public btcTransaction: IAirGapTransaction = {
     from: ['1JzeZaZwb1gLxQEwexUn4XmZ3tmSfuesBo'],
