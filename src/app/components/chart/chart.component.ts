@@ -16,7 +16,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
-  public currentChart: TimeUnit | string = TimeUnit.Minutes
+  public currentChart: TimeUnit = TimeUnit.Minutes
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -101,7 +101,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     })
   }
 
-  public async drawChart(timeInterval: TimeUnit | string): Promise<void> {
+  public async drawChart(timeInterval: TimeUnit): Promise<void> {
     this.chartLabels = []
     this.chartDatasets = [{ data: [], label: 'Price' }]
 
