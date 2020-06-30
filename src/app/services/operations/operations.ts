@@ -30,7 +30,8 @@ import { FormBuilder } from '@angular/forms'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 @Injectable({
   providedIn: 'root'
@@ -91,6 +92,11 @@ export class OperationsProvider {
       if (supportsAirGapDelegation(protocol)) {
         defaultDelegatee = protocol.airGapDelegatee
       }
+      // Replace default baker with testnet baker
+      if (protocol.identifier === MainProtocolSymbols.XTZ && protocol.options.network.type !== NetworkType.MAINNET) {
+        defaultDelegatee = 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+      }
+
       return [defaultDelegatee || (await protocol.getDefaultDelegatee())]
     }
     return current
