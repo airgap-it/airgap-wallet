@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
 import { AirGapMarketWallet, TezosProtocol } from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
@@ -49,6 +50,8 @@ interface TransactionPrepareState {
   styleUrls: ['./transaction-prepare.scss']
 })
 export class TransactionPreparePage {
+  public readonly networkType: typeof NetworkType = NetworkType
+
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
   public amountForm: FormGroup
