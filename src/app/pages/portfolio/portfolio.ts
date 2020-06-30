@@ -50,12 +50,12 @@ export class PortfolioPage {
   private refreshWalletGroups(wallets: AirGapMarketWallet[]) {
     const groups: WalletGroup[] = []
 
-    const walletMap: Map<string, WalletGroup> = new Map()
+    const walletMap: Map<[string, string], WalletGroup> = new Map()
 
     wallets.forEach((wallet: AirGapMarketWallet) => {
       const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
-      if (walletMap.has(wallet.publicKey)) {
-        const group: WalletGroup = walletMap.get(wallet.publicKey)
+      if (walletMap.has([wallet.protocolIdentifier, wallet.publicKey])) {
+        const group: WalletGroup = walletMap.get([wallet.protocolIdentifier, wallet.publicKey])
         if (isSubProtocol) {
           group.subWallets.push(wallet)
         } else {
@@ -63,9 +63,9 @@ export class PortfolioPage {
         }
       } else {
         if (isSubProtocol) {
-          walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
+          walletMap.set([wallet.protocolIdentifier, wallet.publicKey], { mainWallet: undefined, subWallets: [wallet] })
         } else {
-          walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
+          walletMap.set([wallet.protocolIdentifier, wallet.publicKey], { mainWallet: wallet, subWallets: [] })
         }
       }
     })
