@@ -16,6 +16,8 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
+  public readonly timeUnits: typeof TimeUnit = TimeUnit
+
   public currentChart: TimeUnit = TimeUnit.Minutes
   public chartType: string = 'line'
   public chartLabels: string[] = []
