@@ -11,8 +11,16 @@ import {
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  IAirGapTransaction,
+  ICoinProtocol,
+  TezosProtocol
+} from 'airgap-coin-lib'
 import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
+import { NetworkType, ProtocolNetwork } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
@@ -41,8 +49,11 @@ interface CheckboxInput {
   styleUrls: ['./beacon-request.page.scss']
 })
 export class BeaconRequestPage implements OnInit {
+  public readonly networkType: typeof NetworkType = NetworkType
+
   public title: string = ''
   public request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  public network: ProtocolNetwork | undefined
   public requesterName: string = ''
   public address: string = ''
   public inputs: CheckboxInput[] = []
@@ -62,6 +73,7 @@ export class BeaconRequestPage implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     this.requesterName = this.request.appMetadata.name
+    this.network = await this.getNetworkFromRequest(this.request)
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
       this.title = 'beacon-request.title.permission-request'
       await this.permissionRequest(this.request)
@@ -81,6 +93,17 @@ export class BeaconRequestPage implements OnInit {
       this.title = 'beacon-request.title.broadcast-request'
       await this.broadcastRequest(this.request)
     }
+  }
+
+  public async getNetworkFromRequest(
+    request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  ): Promise<ProtocolNetwork | undefined> {
+    if (!request || request.type === BeaconMessageType.SignPayloadRequest) {
+      return undefined
+    }
+    const protocol: ICoinProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
+
+    return protocol.options.network
   }
 
   public async dismiss(): Promise<void> {
