@@ -6,8 +6,7 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegatorAction,
-  AirGapDelegationDetails,
-  AirGapRewardDisplayDetails
+  AirGapDelegationDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
@@ -22,6 +21,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -43,7 +43,7 @@ export class DelegationDetailPage {
 
   public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails | null> = new BehaviorSubject(null)
   public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails | null> = new BehaviorSubject(null)
-  public rewardDisplay$: BehaviorSubject<AirGapRewardDisplayDetails | null> = new BehaviorSubject(null)
+  public rewardDisplay$: BehaviorSubject<UIRewardList | null> = new BehaviorSubject(null)
 
   public canProceed: boolean = true
   public hasRewardDetails: boolean | undefined = undefined
@@ -287,8 +287,8 @@ export class DelegationDetailPage {
     this.delegatorDetails$.next(details ? details[0].delegator : null)
   }
 
-  private updateDisplayedRewards(rewardDisplayDetails: AirGapRewardDisplayDetails) {
-    this.rewardDisplay$.next(rewardDisplayDetails)
+  private updateDisplayedRewards(rewardDisplay: UIRewardList) {
+    this.rewardDisplay$.next(rewardDisplay)
   }
 
   private changeDisplayedDetails(address: string) {

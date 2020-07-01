@@ -4,8 +4,7 @@ import {
   AirGapDelegateeDetails,
   AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapDelegatorAction,
-  AirGapRewardDisplayDetails
+  AirGapDelegatorAction
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
 import { DecimalPipe } from '@angular/common'
@@ -116,21 +115,11 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     protocol: TezosProtocol,
     delegator: string,
     delegatees: string[]
-  ): Promise<AirGapRewardDisplayDetails | undefined> {
+  ): Promise<UIRewardList | undefined> {
     const delegationDetails = await protocol.getDelegationDetailsFromAddress(delegator, delegatees)
     const delegatorExtraInfo = await protocol.getDelegationInfo(delegationDetails.delegator.address)
-    const displayRewards: UIRewardList | undefined = await this.createDelegatorDisplayRewards(
-      protocol,
-      delegationDetails.delegator.address,
-      delegatorExtraInfo
-    ).catch(() => undefined)
-    if (displayRewards === undefined) {
-      return undefined
-    }
-    return {
-      displayDetails: undefined,
-      displayRewards: displayRewards
-    }
+
+    return this.createDelegatorDisplayRewards(protocol, delegationDetails.delegator.address, delegatorExtraInfo).catch(() => undefined)
   }
 
   private createDelegateeDisplayDetails(bakerConfig: BakerConfig | null): UIWidget[] {
@@ -194,19 +183,17 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
     return new UIRewardList({
-      rewards: rewardInfo
-        .map(info => {
-          return {
-            index: info.cycle,
-            amount: this.amountConverter.transform(new BigNumber(info.reward), {
-              protocolIdentifier: protocol.identifier,
-              maxDigits: 10
-            }),
-            collected: info.payout < new Date(),
-            timestamp: info.payout.getTime()
-          }
-        })
-        .reverse(),
+      rewards: rewardInfo.map(info => {
+        return {
+          index: info.cycle,
+          amount: this.amountConverter.transform(new BigNumber(info.reward), {
+            protocolIdentifier: protocol.identifier,
+            maxDigits: 10
+          }),
+          collected: info.payout < new Date(),
+          timestamp: info.payout.getTime()
+        }
+      }),
       indexColLabel: 'Cycle',
       amountColLabel: 'Expected Reward',
       payoutColLabel: 'Earliest Payout'
