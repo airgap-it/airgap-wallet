@@ -33,18 +33,15 @@ export class CachingService {
   constructor(private readonly storage: Storage) {}
 
   public async setTransactionData(identifier: TransactionIdentifier, value: any): Promise<any> {
-    console.log('cache', 'setTransactionData', identifier, value)
     const uniqueId = `${identifier.publicKey}_${identifier.key}`
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
   private async getCacheId(wallet: AirGapMarketWallet, key: CachingServiceKey): Promise<string> {
-    console.log('cache', 'getCacheId', key)
     return `${wallet.publicKey}_${wallet.protocol.options.network.identifier}_${key}`
   }
 
   public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransaction[]> {
-    console.log('cache', 'fetchTransactions', wallet)
     const uniqueId = await this.getCacheId(wallet, CachingServiceKey.TRANSACTIONS)
 
     return new Promise<IAirGapTransaction[]>(async resolve => {
