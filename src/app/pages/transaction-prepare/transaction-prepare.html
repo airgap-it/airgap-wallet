@@ -13,8 +13,8 @@
 
 <ion-content class="ion-no-padding">
   <ion-grid fixed="true">
-    <ion-row class="ion-align-items-center ion-padding-horizontal ion-padding-top">
-      <ion-col size="10">
+    <ion-row class="ion-padding-horizontal">
+      <ion-col class="ion-no-padding">
         <ion-row>
           <ng-container
             *ngIf="wallet.protocol.options.network && wallet.protocol.options.network.type !== networkType.MAINNET"
@@ -22,8 +22,8 @@
             lines="none"
             slot="start"
           >
-            <ion-badge class="badge__margin" color="danger">{{ wallet.protocol.options.network.name }}</ion-badge>
-            <ion-badge *ngIf="wallet.protocol.options.network.type === networkType.CUSTOM" class="badge__margin">
+            <ion-badge color="danger">{{ wallet.protocol.options.network.name }}</ion-badge>
+            <ion-badge *ngIf="wallet.protocol.options.network.type === networkType.CUSTOM">
               {{wallet.protocol.options.network.rpcUrl}}
             </ion-badge>
           </ng-container>
