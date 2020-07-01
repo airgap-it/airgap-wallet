@@ -38,7 +38,7 @@
               {{ permission.network.type }}
             </ion-badge>
 
-            <ion-badge class="badge__margin" *ngIf="permission.network.type === networkType.CUSTOM">
+            <ion-badge class="badge__margin" *ngIf="permission.network.rpcUrl">
               {{ permission.network.rpcUrl }}
             </ion-badge>
           </div>
