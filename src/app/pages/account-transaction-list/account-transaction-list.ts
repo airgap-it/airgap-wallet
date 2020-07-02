@@ -23,8 +23,8 @@ import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BrowserService } from 'src/app/services/browser/browser.service'
-import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export const refreshRate = 3000
 
@@ -34,6 +34,9 @@ export const refreshRate = 3000
   styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
+  public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
+  public subProtocolSymbols: typeof SubProtocolSymbols = SubProtocolSymbols
+
   private timer$ = timer(0, refreshRate)
   private subscription: Subscription = new Subscription()
 
@@ -329,7 +332,8 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        importAccountAction: this.wallet.protocol.identifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
+        importAccountAction:
+          this.wallet.protocol.identifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }

@@ -24,7 +24,7 @@
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
     <tezos-delegation-card
-      *ngIf="wallet.protocol.identifier === 'xtz' && wallet.currentBalance"
+      *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && wallet.currentBalance"
       [wallet]="wallet"
       [isDelegated]="isKtDelegated"
       [delegateAmount]="wallet.currentBalance"
@@ -32,7 +32,7 @@
       (onUndelegatedClick)="openDelegationDetails()"
     ></tezos-delegation-card>
     <card-actionable
-      *ngIf="wallet.protocol.identifier === 'xtz-kt'"
+      *ngIf="wallet.protocol.identifier === subProtocolSymbols.XTZ_KT"
       [imageLeft]="false"
       [imageName]="'babylon-migration.svg'"
       [text]="'account-transaction-list.migrate-babylon_card.text' | translate"

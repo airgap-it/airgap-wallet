@@ -19,8 +19,8 @@
     <empty-state
       *ngIf="!subAccounts.length"
       [text]="'add-sub-account.no-imports_text' | translate: { typeLabel: typeLabel | translate }"
-      [imageName]="wallet.protocol.identifier === 'xtz' ? 'no-imports.svg' : 'currencies-empty.svg'"
-      [fullHeight]="wallet.protocol.identifier === 'xtz' ? false : true"
+      [imageName]="wallet.protocol.identifier === mainProtocolSymbols.XTZ ? 'no-imports.svg' : 'currencies-empty.svg'"
+      [fullHeight]="wallet.protocol.identifier === mainProtocolSymbols.XTZ ? false : true"
     ></empty-state>
 
     <ion-row class="ion-no-padding" *ngFor="let subAccount of subAccounts; let i = index">

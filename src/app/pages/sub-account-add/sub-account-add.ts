@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
@@ -22,6 +23,8 @@ export interface IAccountWrapper {
   styleUrls: ['./sub-account-add.scss']
 })
 export class SubAccountAddPage {
+  public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
+
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
   public actionCallback: (context: AddTokenActionContext) => void
