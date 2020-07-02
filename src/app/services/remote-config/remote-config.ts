@@ -74,7 +74,7 @@ export class RemoteConfigProvider {
 
   public async getKnownTezosBakers(): Promise<TezosBakerCollection> {
     const bakersResponse: TezosBakerCollection = await this.httpClient
-      .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/tz/bakers`)
+      .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/tz/bakers?acceptsDelegations=true`)
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
