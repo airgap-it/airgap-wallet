@@ -1,15 +1,15 @@
-import { ICoinDelegateProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { AirGapDelegationDetails, IAirGapCoinDelegateProtocol } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIInputTextConfig, UIInputText } from 'src/app/models/widgets/input/UIInputText'
+import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { AirGapDelegationDetails, IAirGapCoinDelegateProtocol } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly extensionProperitesWithType: [keyof IAirGapCoinDelegateProtocol, 'property' | 'function'][] = [
-    ['airGapDelegatee', 'property'],
     ['delegateeLabel', 'property'],
+    ['airGapDelegatee', 'function'],
     ['getExtraDelegationDetailsFromAddress', 'function'],
     ['createDelegateesSummary', 'function'],
     ['getRewardDisplayDetails', 'function'],
@@ -68,7 +68,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     }
   }
 
-  public abstract airGapDelegatee?: string
+  public abstract airGapDelegatee(protocol: T): string | undefined
   public abstract delegateeLabel: string
 
   public abstract getExtraDelegationDetailsFromAddress(

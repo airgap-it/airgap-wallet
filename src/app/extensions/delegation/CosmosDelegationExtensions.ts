@@ -42,7 +42,6 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return CosmosDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
   public delegateeLabel: string = 'Validator'
 
   private constructor(
@@ -52,6 +51,10 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     private readonly shortenStringPipe: ShortenStringPipe
   ) {
     super()
+  }
+
+  public airGapDelegatee(_protocol: CosmosProtocol): string {
+    return 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
   }
 
   // TODO: add translations

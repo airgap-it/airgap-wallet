@@ -1,20 +1,22 @@
-import { TezosProtocol, DelegationInfo, TezosDelegatorAction } from 'airgap-coin-lib'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, FormGroup } from '@angular/forms'
+import { DelegationInfo, TezosDelegatorAction, TezosProtocol } from 'airgap-coin-lib'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import BigNumber from 'bignumber.js'
 import {
   AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapDelegatorAction
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
-import { DecimalPipe } from '@angular/common'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import BigNumber from 'bignumber.js'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
-import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { BakerConfig, RemoteConfigProvider } from 'src/app/services/remote-config/remote-config'
+
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 export class TezosDelegationExtensions extends ProtocolDelegationExtensions<TezosProtocol> {
   public static async create(
@@ -27,7 +29,15 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return new TezosDelegationExtensions(bakersConfig[0], decimalPipe, amountConverter, formBuilder)
   }
 
-  public airGapDelegatee?: string = this.airGapBakerConfig.address
+  public airGapDelegatee(protocol: TezosProtocol): string | undefined {
+    if (protocol.options.network.type !== NetworkType.MAINNET) {
+      return 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+    }
+
+    return this.airGapBakerConfig.address
+  }
+
+  // Replace default baker with testnet baker
   public delegateeLabel: string = 'Baker'
 
   private constructor(

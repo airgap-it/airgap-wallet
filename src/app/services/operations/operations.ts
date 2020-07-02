@@ -1,36 +1,35 @@
-import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
+import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, ICoinDelegateProtocol, TezosKtProtocol } from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
   RawEthereumTransaction,
   RawTezosTransaction
 } from 'airgap-coin-lib/dist/serializer/types'
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { supportsAirGapDelegation, supportsDelegation } from 'src/app/helpers/delegation'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegationDetails,
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
-import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
-import {
-  AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegationDetails,
-  AirGapDelegatorAction
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
-import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
-import { FormBuilder } from '@angular/forms'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
-import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 @Injectable({
   providedIn: 'root'
@@ -89,11 +88,7 @@ export class OperationsProvider {
     if (current.length === 0) {
       let defaultDelegatee: string
       if (supportsAirGapDelegation(protocol)) {
-        defaultDelegatee = protocol.airGapDelegatee
-      }
-      // Replace default baker with testnet baker
-      if (protocol.identifier === MainProtocolSymbols.XTZ && protocol.options.network.type !== NetworkType.MAINNET) {
-        defaultDelegatee = 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+        defaultDelegatee = protocol.airGapDelegatee()
       }
 
       return [defaultDelegatee || (await protocol.getDefaultDelegatee())]

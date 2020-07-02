@@ -1,28 +1,29 @@
-import { SubstrateProtocol, SubstratePayee } from 'airgap-coin-lib'
-import {
-  AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegationDetails,
-  AirGapDelegatorAction
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import BigNumber from 'bignumber.js'
-import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
-import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
-import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, Validators } from '@angular/forms'
+import { SubstratePayee, SubstrateProtocol } from 'airgap-coin-lib'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import * as moment from 'moment'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
+import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegationDetails,
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
+import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 const supportedActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
@@ -64,7 +65,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return SubstrateDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = undefined
+  public airGapDelegatee(_protocol: SubstrateProtocol): string | undefined {
+    return undefined
+  }
+
   public delegateeLabel: string = 'Validator'
 
   private constructor(

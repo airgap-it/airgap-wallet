@@ -96,7 +96,7 @@ export class DelegationDetailPage {
       component: DelegateEditPopoverComponent,
       componentProps: {
         hideAirGap: supportsAirGapDelegation(this.wallet.protocol)
-          ? !this.wallet.protocol.airGapDelegatee || this.currentDelegatees.includes(this.wallet.protocol.airGapDelegatee)
+          ? !this.wallet.protocol.airGapDelegatee() || this.currentDelegatees.includes(this.wallet.protocol.airGapDelegatee())
           : true,
         delegateeLabel: this.delegateeLabel,
         hasMultipleDelegatees: this.currentDelegatees.length > 1,
@@ -116,7 +116,7 @@ export class DelegationDetailPage {
         if (isObjectOf<{ delegateeAddress: string }>(data, 'delegateeAddress')) {
           this.changeDisplayedDetails(data.delegateeAddress)
         } else if (isObjectOf<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.protocol)) {
-          this.changeDisplayedDetails(this.wallet.protocol.airGapDelegatee)
+          this.changeDisplayedDetails(this.wallet.protocol.airGapDelegatee())
         } else if (isObjectOf<{ showDelegateeList: boolean }>(data, 'showDelegateeList')) {
           this.showDelegateesList()
         } else if (isObjectOf<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
