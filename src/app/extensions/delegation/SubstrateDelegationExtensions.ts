@@ -26,7 +26,9 @@ import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 
 const supportedActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.BOND_EXTRA,
+  SubstrateStakingActionType.UNBOND,
   SubstrateStakingActionType.CANCEL_NOMINATION,
   SubstrateStakingActionType.CHANGE_NOMINATION,
   SubstrateStakingActionType.WITHDRAW_UNBONDED
@@ -35,12 +37,13 @@ const supportedActions = [
 // sorted by priority
 const delegateActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.CHANGE_NOMINATION,
   SubstrateStakingActionType.BOND_EXTRA
 ]
 
 // sorted by priority
-const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION]
+const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION, SubstrateStakingActionType.UNBOND]
 
 enum ArgumentName {
   TARGETS = 'targets',
@@ -215,7 +218,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
 
     const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
+    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(
+      protocol,
+      nominatorDetails.stakingDetails,
+      availableActions
+    )
     const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
 
     return {
@@ -307,22 +314,18 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       maxDigits: 10
     })
 
-    let description: string | undefined
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
-        description = `Select the amount you want to delegate. You can delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
-        break
+        return `Select the amount you want to delegate. You can delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
+      case SubstrateStakingActionType.NOMINATE:
+        return `Delegate to this validator. You have currenly <span class="style__strong color__primary">${bondedFormatted}</span> bonded.`
       case SubstrateStakingActionType.BOND_EXTRA:
-        description = `You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated. You can additionally delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
-        break
+        return `You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated. You can additionally delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
       case SubstrateStakingActionType.CHANGE_NOMINATION:
-        description = `Change your delegation. You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated.`
-        break
+        return `Change your delegation. You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated.`
       default:
-        description = undefined
+        return undefined
     }
-
-    return description
   }
 
   private createUndelegateAction(
@@ -331,37 +334,51 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): AirGapDelegatorAction | null {
     const actions = availableActions
       .filter(action => undelegateActions.includes(action.type))
-      .sort((a1, a2) => delegateActions.indexOf(a1.type) - delegateActions.indexOf(a2.type))
+      .sort((a1, a2) => undelegateActions.indexOf(a1.type) - undelegateActions.indexOf(a2.type))
 
     const action = actions[0]
 
-    if (action) {
-      if (stakingDetails) {
-        const form = this.formBuilder.group({
-          [ArgumentName.VALUE]: [stakingDetails.active]
-        })
+    if (action && stakingDetails) {
+      const form = this.formBuilder.group({
+        [ArgumentName.VALUE]: [stakingDetails.active]
+      })
 
-        return {
-          type: action.type,
-          label: 'Undelegate',
-          iconName: 'close-outline',
-          form
-        }
+      const label = this.createUndelegateActionLabel(action.type)
+
+      return {
+        type: action.type,
+        label,
+        iconName: 'close-outline',
+        form
       }
     }
 
     return null
   }
 
-  private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapDelegatorAction[] {
+  private createUndelegateActionLabel(actionType: SubstrateStakingActionType): string | undefined {
+    switch (actionType) {
+      case SubstrateStakingActionType.CANCEL_NOMINATION:
+        return 'Undelegate'
+      case SubstrateStakingActionType.UNBOND:
+        return 'Unbond'
+      default:
+        return undefined
+    }
+  }
+
+  private createDelegatorExtraActions(
+    protocol: SubstrateProtocol,
+    stakingDetails: SubstrateStakingDetails,
+    availableActions: DelegatorAction[]
+  ): AirGapDelegatorAction[] {
+    const totalUnlockedFormatted = this.amountConverterPipe.transform(stakingDetails.unlocked, {
+      protocolIdentifier: protocol.identifier,
+      maxDigits: 10
+    })
+
     return availableActions
-      .filter(
-        action =>
-          action.type !== SubstrateStakingActionType.BOND_NOMINATE &&
-          action.type !== SubstrateStakingActionType.BOND_EXTRA &&
-          action.type !== SubstrateStakingActionType.CANCEL_NOMINATION &&
-          action.type !== SubstrateStakingActionType.CHANGE_NOMINATION
-      )
+      .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
       .map(action => {
         let label: string
         let confirmLabel: string
@@ -372,7 +389,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           case SubstrateStakingActionType.WITHDRAW_UNBONDED:
             label = 'Withdraw Unbonded'
             confirmLabel = 'Withdraw'
-            description = 'Withdraw unbonded description'
+            description = `You can withdraw <span class="style__strong color__primary">${totalUnlockedFormatted}</span> of unbonded funds.`
             break
         }
 
