@@ -9,6 +9,7 @@ import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { BeaconService } from '../beacon/beacon.service'
+import { StorageProvider, SettingsKey } from '../storage/storage'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -31,7 +32,8 @@ export class SchemeRoutingProvider {
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly serializerService: SerializerService,
-    private readonly beaconService: BeaconService
+    private readonly beaconService: BeaconService,
+    private readonly storageProvider: StorageProvider
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -141,6 +143,8 @@ export class SchemeRoutingProvider {
   }
 
   public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
+    this.storageProvider.set(SettingsKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
