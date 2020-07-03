@@ -369,14 +369,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private createDelegatorExtraActions(
     protocol: SubstrateProtocol,
-    stakingDetails: SubstrateStakingDetails,
+    stakingDetails: SubstrateStakingDetails | undefined,
     availableActions: DelegatorAction[]
   ): AirGapDelegatorAction[] {
-    const totalUnlockedFormatted = this.amountConverterPipe.transform(stakingDetails.unlocked, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
-    })
-
     return availableActions
       .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
       .map(action => {
@@ -387,9 +382,19 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
         switch (action.type) {
           case SubstrateStakingActionType.WITHDRAW_UNBONDED:
+            const totalUnlockedFormatted: string | undefined = stakingDetails
+              ? this.amountConverterPipe.transform(stakingDetails.unlocked, {
+                  protocolIdentifier: protocol.identifier,
+                  maxDigits: 10
+                })
+              : undefined
+
             label = 'Withdraw Unbonded'
             confirmLabel = 'Withdraw'
-            description = `You can withdraw <span class="style__strong color__primary">${totalUnlockedFormatted}</span> of unbonded funds.`
+            description = totalUnlockedFormatted
+              ? `You can withdraw <span class="style__strong color__primary">${totalUnlockedFormatted}</span> of unbonded funds.`
+              : `You can withdraw unbonded funds.`
+
             break
         }
 
