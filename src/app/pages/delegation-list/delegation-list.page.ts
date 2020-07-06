@@ -1,6 +1,6 @@
-import { Component, NgZone } from '@angular/core'
+import { Component, NgZone, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { NavController, PopoverController } from '@ionic/angular'
+import { NavController, Platform, PopoverController, IonInfiniteScroll } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
@@ -15,6 +15,9 @@ import { isType } from 'src/app/utils/utils'
   styleUrls: ['./delegation-list.page.scss']
 })
 export class DelegationListPage {
+  private static DEFAULT_ITEM_LOADING_STEP = 10
+  private static DESKTOP_ITEM_LOADING_STEP = 30
+
   public wallet: AirGapMarketWallet
 
   public delegateeLabel: string
@@ -28,15 +31,22 @@ export class DelegationListPage {
   public knownDelegatees: UIAccountSummary[] = []
   public filteredDelegatees: UIAccountSummary[] = []
 
+  @ViewChild(IonInfiniteScroll)
+  public infiniteScroll?: IonInfiniteScroll
+
   private callback: (address: string) => void
+  private readonly isDesktop: boolean
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly navController: NavController,
     private readonly operations: OperationsProvider,
     private readonly popoverController: PopoverController,
-    private readonly ngZone: NgZone
-  ) {}
+    private readonly ngZone: NgZone,
+    private readonly platform: Platform
+  ) {
+    this.isDesktop = this.platform.is('desktop')
+  }
 
   ngOnInit() {
     if (this.route.snapshot.data.special) {
@@ -52,7 +62,7 @@ export class DelegationListPage {
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
         this.ngZone.run(() => {
-          this.loadMoreItems()
+          this.loadMoreItems(this.isDesktop ? DelegationListPage.DESKTOP_ITEM_LOADING_STEP : DelegationListPage.DEFAULT_ITEM_LOADING_STEP)
         })
       })
     }
@@ -97,18 +107,18 @@ export class DelegationListPage {
     }
   }
 
-  public loadMoreItems(event?: any): void {
+  public async loadMoreItems(step: number = DelegationListPage.DEFAULT_ITEM_LOADING_STEP): Promise<void> {
     if (this.searchTerm.length === 0) {
       this.filteredDelegatees = [
         ...this.filteredDelegatees,
-        ...this.getKnownDelegatees(Math.max(this.filteredDelegatees.length - 1, 0))
+        ...this.getKnownDelegatees(Math.max(this.filteredDelegatees.length - 1, 0), step)
       ].filter((value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index)
     }
 
-    if (event) {
-      event.target.complete()
+    if (this.infiniteScroll) {
+      await this.infiniteScroll.complete()
       if (this.filteredDelegatees.length === this.knownDelegatees.length) {
-        event.target.disable = true
+        this.infiniteScroll.disabled = true
       }
     }
   }
@@ -118,7 +128,7 @@ export class DelegationListPage {
     this.navController.pop()
   }
 
-  private getKnownDelegatees(startIndex: number = 0, step: number = 10): UIAccountSummary[] {
+  private getKnownDelegatees(startIndex: number = 0, step: number = DelegationListPage.DEFAULT_ITEM_LOADING_STEP): UIAccountSummary[] {
     return this.knownDelegatees.slice(0, startIndex + step)
   }
 }

@@ -94,7 +94,7 @@
         </div>
       </ion-list>
 
-      <ion-infinite-scroll [disabled]="searchTerm.length > 0" (ionInfinite)="loadMoreItems($event)">
+      <ion-infinite-scroll [disabled]="searchTerm.length > 0" (ionInfinite)="loadMoreItems()">
         <ion-infinite-scroll-content></ion-infinite-scroll-content>
       </ion-infinite-scroll>
     </ng-container>
