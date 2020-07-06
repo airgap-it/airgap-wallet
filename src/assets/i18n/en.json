@@ -503,10 +503,14 @@
     "undelegate": {
       "label": "Undelegate"
     },
+    "unbond": {
+      "label": "Unbond"
+    },
     "withdraw-unbonded": {
       "label": "Withdraw Unboded",
       "button": "Withdraw",
-      "text": ""
+      "text-full": "You can withdraw <span class=\"style__strong color__primary\">{{ unlocked }}</span> of unbonded funds.",
+      "text-short": "You can withdraw unbonded funds."
     },
     "rewards": {
       "index-col_label": "Era",

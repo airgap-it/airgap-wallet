@@ -27,7 +27,9 @@ import { TranslateService } from '@ngx-translate/core'
 
 const supportedActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.BOND_EXTRA,
+  SubstrateStakingActionType.UNBOND,
   SubstrateStakingActionType.CANCEL_NOMINATION,
   SubstrateStakingActionType.CHANGE_NOMINATION,
   SubstrateStakingActionType.WITHDRAW_UNBONDED
@@ -36,12 +38,13 @@ const supportedActions = [
 // sorted by priority
 const delegateActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.CHANGE_NOMINATION,
   SubstrateStakingActionType.BOND_EXTRA
 ]
 
 // sorted by priority
-const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION]
+const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION, SubstrateStakingActionType.UNBOND]
 
 enum ArgumentName {
   TARGETS = 'targets',
@@ -225,7 +228,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
 
     const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(availableActions)
+    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(
+      protocol,
+      nominatorDetails.stakingDetails,
+      availableActions
+    )
     const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
 
     return {
@@ -317,29 +324,23 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       maxDigits: 10
     })
 
-    let description: string | undefined
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
-        description = this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
+        return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
           maxDelegation: maxValueFormatted
         })
-        break
       case SubstrateStakingActionType.BOND_EXTRA:
-        description = this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
+        return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
           bonded: bondedFormatted,
           maxDelegation: maxValueFormatted
         })
-        break
       case SubstrateStakingActionType.CHANGE_NOMINATION:
-        description = this.translateService.instant('delegation-detail-substrate.delegate.change-nomination_text', {
+        return this.translateService.instant('delegation-detail-substrate.delegate.change-nomination_text', {
           bonded: bondedFormatted
         })
-        break
       default:
-        description = undefined
+        return undefined
     }
-
-    return description
   }
 
   private createUndelegateAction(
@@ -348,37 +349,46 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): AirGapDelegatorAction | null {
     const actions = availableActions
       .filter(action => undelegateActions.includes(action.type))
-      .sort((a1, a2) => delegateActions.indexOf(a1.type) - delegateActions.indexOf(a2.type))
+      .sort((a1, a2) => undelegateActions.indexOf(a1.type) - undelegateActions.indexOf(a2.type))
 
     const action = actions[0]
 
-    if (action) {
-      if (stakingDetails) {
-        const form = this.formBuilder.group({
-          [ArgumentName.VALUE]: [stakingDetails.active]
-        })
+    if (action && stakingDetails) {
+      const form = this.formBuilder.group({
+        [ArgumentName.VALUE]: [stakingDetails.active]
+      })
 
-        return {
-          type: action.type,
-          label: 'delegation-detail-substrate.undelegate.label',
-          iconName: 'close-outline',
-          form
-        }
+      const label = this.createUndelegateActionLabel(action.type)
+
+      return {
+        type: action.type,
+        label,
+        iconName: 'close-outline',
+        form
       }
     }
 
     return null
   }
 
-  private createDelegatorExtraActions(availableActions: DelegatorAction[]): AirGapDelegatorAction[] {
+  private createUndelegateActionLabel(actionType: SubstrateStakingActionType): string | undefined {
+    switch (actionType) {
+      case SubstrateStakingActionType.CANCEL_NOMINATION:
+        return 'delegation-detail-substrate.undelegate.label'
+      case SubstrateStakingActionType.UNBOND:
+        return 'delegation-detail-substrate.unbond.label'
+      default:
+        return undefined
+    }
+  }
+
+  private createDelegatorExtraActions(
+    protocol: SubstrateProtocol,
+    stakingDetails: SubstrateStakingDetails | undefined,
+    availableActions: DelegatorAction[]
+  ): AirGapDelegatorAction[] {
     return availableActions
-      .filter(
-        action =>
-          action.type !== SubstrateStakingActionType.BOND_NOMINATE &&
-          action.type !== SubstrateStakingActionType.BOND_EXTRA &&
-          action.type !== SubstrateStakingActionType.CANCEL_NOMINATION &&
-          action.type !== SubstrateStakingActionType.CHANGE_NOMINATION
-      )
+      .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
       .map(action => {
         let label: string
         let confirmLabel: string
@@ -387,9 +397,21 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
         switch (action.type) {
           case SubstrateStakingActionType.WITHDRAW_UNBONDED:
+            const totalUnlockedFormatted: string | undefined = stakingDetails
+              ? this.amountConverterPipe.transform(stakingDetails.unlocked, {
+                  protocolIdentifier: protocol.identifier,
+                  maxDigits: 10
+                })
+              : undefined
+
             label = 'delegation-detail-substrate.withdraw-unbonded.label'
             confirmLabel = 'delegation-detail-substrate.withdraw-unbonded.button'
-            description = 'delegation-detail-substrate.withdraw-unbonded.text'
+            description = totalUnlockedFormatted
+              ? this.translateService.instant('delegation-detail-substrate.withdraw-unbonded.text-full', {
+                  unlocked: totalUnlockedFormatted
+                })
+              : 'delegation-detail-substrate.withdraw-unbonded.text-short'
+
             break
         }
 

@@ -72,6 +72,10 @@ export class CachingService {
       if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
         resolve(cachedData.value)
       } else {
+        if (coinProtocol.length === 0) {
+          resolve([])
+        }
+
         let promise: Promise<MarketDataSample[]>
         if (timeUnit === 'days') {
           promise = cryptocompare.histoDay(coinProtocol.toUpperCase(), baseSymbol, {
