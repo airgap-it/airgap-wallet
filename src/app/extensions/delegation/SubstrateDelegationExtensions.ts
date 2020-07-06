@@ -25,16 +25,6 @@ import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substr
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { TranslateService } from '@ngx-translate/core'
 
-const supportedActions = [
-  SubstrateStakingActionType.BOND_NOMINATE,
-  SubstrateStakingActionType.NOMINATE,
-  SubstrateStakingActionType.BOND_EXTRA,
-  SubstrateStakingActionType.UNBOND,
-  SubstrateStakingActionType.CANCEL_NOMINATION,
-  SubstrateStakingActionType.CHANGE_NOMINATION,
-  SubstrateStakingActionType.WITHDRAW_UNBONDED
-]
-
 // sorted by priority
 const delegateActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
@@ -45,6 +35,8 @@ const delegateActions = [
 
 // sorted by priority
 const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION, SubstrateStakingActionType.UNBOND]
+
+const supportedActions = [...delegateActions, ...undelegateActions, SubstrateStakingActionType.WITHDRAW_UNBONDED]
 
 enum ArgumentName {
   TARGETS = 'targets',
