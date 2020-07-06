@@ -1,14 +1,13 @@
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-
-import { OperationsProvider } from 'src/app/services/operations/operations'
 import { NavController, PopoverController } from '@ionic/angular'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { OverlayEventDetail } from '@ionic/core'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { DelegateEditPopoverComponent } from 'src/app/components/delegate-edit-popover/delegate-edit-popover.component'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { isType } from 'src/app/utils/utils'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'delegation-list',
@@ -25,9 +24,9 @@ export class DelegationListPage {
 
   public searchTerm: string = ''
 
-  public currentDelegatees: UIAccountSummary[]
-  public knownDelegatees: UIAccountSummary[]
-  public filteredDelegatees: UIAccountSummary[]
+  public currentDelegatees: UIAccountSummary[] = []
+  public knownDelegatees: UIAccountSummary[] = []
+  public filteredDelegatees: UIAccountSummary[] = []
 
   private callback: (address: string) => void
 
@@ -53,7 +52,7 @@ export class DelegationListPage {
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
         this.ngZone.run(() => {
-          this.filteredDelegatees = this.getKnownDelegatees()
+          this.loadMoreItems()
         })
       })
     }
@@ -98,16 +97,19 @@ export class DelegationListPage {
     }
   }
 
-  public loadMoreItems(event: any): void {
+  public loadMoreItems(event?: any): void {
     if (this.searchTerm.length === 0) {
-      this.filteredDelegatees = [...this.filteredDelegatees, ...this.getKnownDelegatees(this.filteredDelegatees.length - 1)].filter(
-        (value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index
-      )
+      this.filteredDelegatees = [
+        ...this.filteredDelegatees,
+        ...this.getKnownDelegatees(Math.max(this.filteredDelegatees.length - 1, 0))
+      ].filter((value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index)
     }
 
-    event.target.complete()
-    if (this.filteredDelegatees.length === this.knownDelegatees.length) {
-      event.target.disable = true
+    if (event) {
+      event.target.complete()
+      if (this.filteredDelegatees.length === this.knownDelegatees.length) {
+        event.target.disable = true
+      }
     }
   }
 
