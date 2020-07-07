@@ -10,7 +10,7 @@ import { DecimalPipe } from '@angular/common'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DelegateeDetails, DelegatorDetails, DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import BigNumber from 'bignumber.js'
-import { CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
+import { CosmosValidator, CosmosUnbondingDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
@@ -189,8 +189,9 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatorDetails: DelegatorDetails,
     validator: string
   ): Promise<AirGapDelegatorDetails> {
-    const [delegations, availableBalance, rewards] = await Promise.all([
+    const [delegations, unbondingDelegations, availableBalance, rewards] = await Promise.all([
       protocol.fetchDelegations(delegatorDetails.address),
+      protocol.fetchUnbondingDelegations(delegatorDetails.address),
       protocol.getAvailableBalanceOfAddresses([delegatorDetails.address]).then(availableBalance => new BigNumber(availableBalance)),
       protocol
         .fetchRewardForDelegation(delegatorDetails.address, validator)
@@ -203,13 +204,18 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         ? delegations.find(delegation => delegation.validator_address === validator).balance
         : 0
     )
-    const totalDelegatedAmount = new BigNumber(delegations.map(delegation => parseFloat(delegation.balance)).reduce((a, b) => a + b, 0))
+
+    const unbondingAmount = unbondingDelegations
+      .filter((unbonding: CosmosUnbondingDelegation) => unbonding.validator_address === validator)
+      .map((unbonding: CosmosUnbondingDelegation) => unbonding.entries)
+      .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+      .reduce((sum, next) => sum.plus(next.balance), new BigNumber(0))
 
     const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
-    const displayDetails = this.createDisplayDetails(protocol, totalDelegatedAmount, rewards)
+    const displayDetails = this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
 
     return {
       ...delegatorDetails,
@@ -389,19 +395,39 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDisplayDetails(protocol: CosmosProtocol, totalDelegatedAmount: BigNumber, rewards: BigNumber): UIWidget[] {
+  private createDisplayDetails(
+    protocol: CosmosProtocol,
+    delegatedAmount: BigNumber,
+    unbondingAmount: BigNumber,
+    rewards: BigNumber
+  ): UIWidget[] {
     const details = []
 
-    details.push(
-      new UIIconText({
-        iconName: 'people-outline',
-        text: this.amountConverterPipe.transform(totalDelegatedAmount, {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
-        }),
-        description: 'Currently Delegated'
-      })
-    )
+    if (delegatedAmount.gt(0)) {
+      details.push(
+        new UIIconText({
+          iconName: 'people-outline',
+          text: this.amountConverterPipe.transform(delegatedAmount, {
+            protocolIdentifier: protocol.identifier,
+            maxDigits: 10
+          }),
+          description: 'Currently Delegated'
+        })
+      )
+    }
+
+    if (unbondingAmount.gt(0)) {
+      details.push(
+        new UIIconText({
+          iconName: 'people-outline',
+          text: this.amountConverterPipe.transform(unbondingAmount, {
+            protocolIdentifier: protocol.identifier,
+            maxDigits: 10
+          }),
+          description: 'Unbonding'
+        })
+      )
+    }
 
     if (rewards.gt(0)) {
       details.push(
