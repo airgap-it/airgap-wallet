@@ -113,7 +113,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         (details: ValidatorDetails) =>
           new UIAccountSummary({
             address: details.operator_address,
-            logo: details.logo ? details.logo : undefined,
+            logo: details.logo,
             header: [
               details.description.moniker,
               `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
