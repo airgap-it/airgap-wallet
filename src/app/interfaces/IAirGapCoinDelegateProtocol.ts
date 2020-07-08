@@ -1,12 +1,14 @@
-import { ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { UIWidget } from '../models/widgets/UIWidget'
-import { UIInputWidget } from '../models/widgets/UIInputWidget'
-import BigNumber from 'bignumber.js'
-import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FormGroup } from '@angular/forms'
-import { UIRewardList } from '../models/widgets/display/UIRewardList'
-import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
+import { SafeUrl } from '@angular/platform-browser'
+import { ICoinDelegateProtocol } from 'airgap-coin-lib'
+import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import BigNumber from 'bignumber.js'
+
 import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'
+import { UIRewardList } from '../models/widgets/display/UIRewardList'
+import { UIInputWidget } from '../models/widgets/UIInputWidget'
+import { UIWidget } from '../models/widgets/UIWidget'
 
 export interface AirGapDelegateeUsageDetails {
   usage: BigNumber
@@ -25,6 +27,7 @@ export interface AirGapDelegatorAction {
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {
+  logo?: string | SafeUrl
   usageDetails?: AirGapDelegateeUsageDetails
   displayDetails?: UIWidget[]
 }
@@ -42,7 +45,11 @@ export interface AirGapDelegationDetails {
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   airGapDelegatee?: string
+
   delegateeLabel: string
+  delegateeLabelPlural: string
+  supportsMultipleDelegations: boolean
+
   getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<UIRewardList | undefined>
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
   createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
