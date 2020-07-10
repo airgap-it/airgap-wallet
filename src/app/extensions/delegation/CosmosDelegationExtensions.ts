@@ -464,7 +464,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
           }),
-          description: 'Unbonding'
+          description: 'delegation-detail-cosmos.unbonding_label'
         })
       )
     }
