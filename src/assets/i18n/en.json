@@ -437,6 +437,7 @@
     "commission_label": "Commission",
     "voting-power_label": "Voting Power",
     "currently-delegated_label": "Currently Delegated",
+    "unbonding_label": "Unbonding",
     "unclaimed-rewards_label": "Unclaimed Rewards",
     "delegate": {
       "label": "Delegate",
