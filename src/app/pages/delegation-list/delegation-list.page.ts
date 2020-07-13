@@ -27,15 +27,21 @@ export class DelegationListPage {
 
   public searchTerm: string = ''
 
+  public readonly isDesktop: boolean
+
   public currentDelegatees: UIAccountSummary[] = []
   public knownDelegatees: UIAccountSummary[] = []
   public filteredDelegatees: UIAccountSummary[] = []
+  public displayedDelegatees: UIAccountSummary[] = []
 
   @ViewChild(IonInfiniteScroll)
   public infiniteScroll?: IonInfiniteScroll
 
   private callback: (address: string) => void
-  private readonly isDesktop: boolean
+
+  private get itemLoadingStep(): number {
+    return this.isDesktop ? DelegationListPage.DESKTOP_ITEM_LOADING_STEP : DelegationListPage.DEFAULT_ITEM_LOADING_STEP
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -61,8 +67,10 @@ export class DelegationListPage {
         this.currentDelegatees = summary.filter(summary => info.currentDelegatees.includes(summary.address))
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
+        this.filteredDelegatees = this.knownDelegatees
+
         this.ngZone.run(() => {
-          this.loadMoreItems(this.isDesktop ? DelegationListPage.DESKTOP_ITEM_LOADING_STEP : DelegationListPage.DEFAULT_ITEM_LOADING_STEP)
+          this.loadMoreItems(this.itemLoadingStep)
         })
       })
     }
@@ -95,7 +103,7 @@ export class DelegationListPage {
 
   public setFilteredItems(searchTerm: string): void {
     if (searchTerm.length === 0) {
-      this.filteredDelegatees = this.getKnownDelegatees()
+      this.filteredDelegatees = this.knownDelegatees
     } else {
       this.filteredDelegatees = this.knownDelegatees.filter((delegatee: UIAccountSummary) => {
         const searchTermLowerCase: string = searchTerm.toLowerCase()
@@ -105,19 +113,21 @@ export class DelegationListPage {
         return hasMatchingAddress || hasMatchingName
       })
     }
+
+    this.displayedDelegatees = this.getFilteredDlegatees()
   }
 
-  public async loadMoreItems(step: number = DelegationListPage.DEFAULT_ITEM_LOADING_STEP): Promise<void> {
+  public async loadMoreItems(step: number = this.itemLoadingStep): Promise<void> {
     if (this.searchTerm.length === 0) {
-      this.filteredDelegatees = [
-        ...this.filteredDelegatees,
-        ...this.getKnownDelegatees(Math.max(this.filteredDelegatees.length - 1, 0), step)
+      this.displayedDelegatees = [
+        ...this.displayedDelegatees,
+        ...this.getFilteredDlegatees(Math.max(this.displayedDelegatees.length - 1, 0), step)
       ].filter((value: UIAccountSummary, index: number, array: UIAccountSummary[]) => array.indexOf(value) === index)
     }
 
     if (this.infiniteScroll) {
       await this.infiniteScroll.complete()
-      if (this.filteredDelegatees.length === this.knownDelegatees.length) {
+      if (this.displayedDelegatees.length === this.knownDelegatees.length) {
         this.infiniteScroll.disabled = true
       }
     }
@@ -128,7 +138,7 @@ export class DelegationListPage {
     this.navController.pop()
   }
 
-  private getKnownDelegatees(startIndex: number = 0, step: number = DelegationListPage.DEFAULT_ITEM_LOADING_STEP): UIAccountSummary[] {
-    return this.knownDelegatees.slice(0, startIndex + step)
+  private getFilteredDlegatees(startIndex: number = 0, step: number = this.itemLoadingStep): UIAccountSummary[] {
+    return this.filteredDelegatees.slice(0, startIndex + step)
   }
 }

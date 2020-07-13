@@ -429,7 +429,8 @@
   "delegation-list": {
     "title": "{{ delegateeLabelPlural }} List",
     "your-delegatees_label": "Your {{ delegateeLabelPlural }}",
-    "known-delegatees_label": "Known {{ delegateeLabelPlural }}"
+    "known-delegatees_label": "Known {{ delegateeLabelPlural }}",
+    "load-more": "Load more"
   },
   "delegation-detail-cosmos": {
     "delegatee-label": "Validator",
