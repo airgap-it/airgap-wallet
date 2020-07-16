@@ -8,7 +8,7 @@ import {
   Network,
   NetworkType,
   OperationResponseInput,
-  P2PPairInfo,
+  P2PPairingRequest,
   SignPayloadResponseInput,
   WalletClient
 } from '@airgap/beacon-sdk'
@@ -31,7 +31,7 @@ export class BeaconService {
   }
 
   public async init(): Promise<boolean> {
-    this.client = new WalletClient({ name: 'AirGapWallet' })
+    this.client = new WalletClient({ name: 'AirGap Wallet' })
     await this.client.init()
 
     return this.client.connect(async message => {
@@ -116,7 +116,7 @@ export class BeaconService {
     await this.client.respond(message)
   }
 
-  public async addPeer(peer: P2PPairInfo): Promise<void> {
+  public async addPeer(peer: P2PPairingRequest): Promise<void> {
     const loading: HTMLIonLoadingElement = await this.loadingController.create({
       message: 'Connecting to Beacon Network...',
       duration: 3000
@@ -126,11 +126,11 @@ export class BeaconService {
     await loading.dismiss()
   }
 
-  public async getPeers(): Promise<P2PPairInfo[]> {
+  public async getPeers(): Promise<P2PPairingRequest[]> {
     return this.client.getPeers()
   }
 
-  public async removePeer(peer: P2PPairInfo): Promise<void> {
+  public async removePeer(peer: P2PPairingRequest): Promise<void> {
     await this.client.removePeer(peer)
   }
 
