@@ -101,8 +101,13 @@
       >
         <ion-infinite-scroll-content></ion-infinite-scroll-content>
       </ion-infinite-scroll>
-      <ion-button *ngIf="isDesktop && displayedDelegatees.length < filteredDelegatees.length" (click)="loadMoreItems()">
-        {{ "delegation-list.load-more" | translate }}
+      <ion-button
+        fill="outline"
+        expand="block"
+        *ngIf="isDesktop && displayedDelegatees.length < filteredDelegatees.length"
+        (click)="loadMoreItems()"
+      >
+        {{ "delegation-list.load-more_label" | translate }}
       </ion-button>
     </ng-container>
 
