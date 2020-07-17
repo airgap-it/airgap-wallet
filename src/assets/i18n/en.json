@@ -431,7 +431,8 @@
     "title": "{{ delegateeLabelPlural }} List",
     "your-delegatees_label": "Your {{ delegateeLabelPlural }}",
     "known-delegatees_label": "Known {{ delegateeLabelPlural }}",
-    "load-more_label": "Load more"
+    "load-more_label": "Load more",
+    "not-supported_text": "Currently the {{ delegateeLabelPlural }} list is not yet supported but you can manually delegate to an address with \"Change Validator\" in the three-dot menu."
   },
   "delegation-detail-cosmos": {
     "delegatee-label": "Validator",
