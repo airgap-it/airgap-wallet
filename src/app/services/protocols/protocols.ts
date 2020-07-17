@@ -10,6 +10,8 @@ import {
   GenericERC20,
   getProtocolByIdentifier,
   GroestlcoinProtocol,
+  KusamaProtocol,
+  PolkadotProtocol,
   supportedProtocols,
   TezosKtProtocol,
   TezosProtocol
@@ -63,6 +65,8 @@ export class ProtocolsProvider {
       addSupportedProtocol(new GroestlcoinProtocol())
       addSupportedProtocol(new TezosProtocol())
       addSupportedProtocol(new CosmosProtocol())
+      addSupportedProtocol(new PolkadotProtocol())
+      addSupportedProtocol(new KusamaProtocol())
 
       const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
         'Carthagenet',

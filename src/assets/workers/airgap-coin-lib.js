@@ -9,6 +9,8 @@ airgapCoinLib.addSupportedProtocol(new airgapCoinLib.EthereumProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.GroestlcoinProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.TezosProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.CosmosProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.KusamaProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.PolkadotProtocol())
 
 self.onmessage = function(event) {
   airgapCoinLib.isCoinlibReady().then(function() {
