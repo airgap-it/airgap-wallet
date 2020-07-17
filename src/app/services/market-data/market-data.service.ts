@@ -7,6 +7,7 @@ import * as cryptocompare from 'cryptocompare'
 import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -116,17 +117,17 @@ export class MarketDataService {
       const wallets = this.walletsProvider.getWalletList()
       // TODO fetchMarketData() only once for each protocolIdentifier
       const cryptoPricePromises = wallets.map(wallet => wallet.getMarketPricesOverTime(interval, 0, new Date()))
-      const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
+      const transactionResultPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
       const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
-
-      const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
+      const transactionResultsByWallet: IAirGapTransactionResult[] = await Promise.all(transactionResultPromises)
       const allWalletValues = [0, 0]
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setTransactionData(
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
-          transactionsByWallet[index]
+          transactionResultsByWallet[index].transactions
         )
-        const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
+        const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionResultsByWallet[index].transactions)
+
         walletValues.forEach((walletValue, idx) => {
           if (!Number.isNaN(walletValue)) {
             if (allWalletValues[idx] > 0) {

@@ -1,3 +1,4 @@
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
@@ -41,10 +42,10 @@ export class CachingService {
     return `${wallet.publicKey}_${wallet.protocol.options.network.identifier}_${key}`
   }
 
-  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransaction[]> {
+  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
     const uniqueId = await this.getCacheId(wallet, CachingServiceKey.TRANSACTIONS)
 
-    return new Promise<IAirGapTransaction[]>(async resolve => {
+    return new Promise<IAirGapTransactionResult>(async resolve => {
       const rawTransactions: StorageObject = await this.storage.get(uniqueId)
       if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000) {
         rawTransactions.value.map(transaction => {
@@ -53,7 +54,7 @@ export class CachingService {
         })
         resolve(rawTransactions.value)
       } else {
-        resolve(wallet.fetchTransactions(50, 0))
+        resolve(wallet.fetchTransactions(50))
       }
     })
   }

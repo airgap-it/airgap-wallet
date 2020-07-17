@@ -1,8 +1,8 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
+import { AlertController, PopoverController, ToastController, NavController, LoadingController, IonInfiniteScroll } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
@@ -25,6 +25,7 @@ import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccou
 
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 
 export const refreshRate = 3000
 
@@ -69,7 +70,7 @@ export class AccountTransactionListPage {
   public lottieConfig: { path: string } = {
     path: './assets/animations/loading.json'
   }
-
+  private transactionResult: IAirGapTransactionResult
   private readonly TRANSACTION_LIMIT: number = 10
   private readonly actionGroup: ActionGroup
 
@@ -205,6 +206,8 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null): void {
+    console.log('doRefresh')
+
     if (supportsDelegation(this.wallet.protocol)) {
       this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
@@ -223,11 +226,9 @@ export class AccountTransactionListPage {
       return event.target.complete()
     }
 
-    const offset: number = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
-    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
+    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT)
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
-    this.txOffset = this.transactions.length
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
@@ -289,7 +290,7 @@ export class AccountTransactionListPage {
     }
 
     if (!forceRefresh) {
-      this.accountProvider.triggerWalletChanged()
+      // this.accountProvider.triggerWalletChanged()
     }
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
@@ -297,15 +298,16 @@ export class AccountTransactionListPage {
     this.infiniteEnabled = true
   }
 
-  public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
-    const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
-      this.wallet.fetchTransactions(limit, offset),
+  public async getTransactions(limit: number = 10): Promise<IAirGapTransaction[]> {
+    const [transactionResult]: [IAirGapTransactionResult, void] = await Promise.all([
+      this.transactionResult ? this.wallet.fetchTransactions(limit, this.transactionResult.cursor) : this.wallet.fetchTransactions(limit),
       this.wallet.synchronize().catch(error => {
         console.error(error)
       })
     ])
 
-    return transactions
+    this.transactionResult = transactionResult
+    return transactionResult.transactions
   }
 
   public mergeTransactions(oldTransactions: IAirGapTransaction[], newTransactions: IAirGapTransaction[]): IAirGapTransaction[] {
