@@ -290,7 +290,7 @@ export class AccountTransactionListPage {
     }
 
     if (!forceRefresh) {
-      // this.accountProvider.triggerWalletChanged()
+      this.accountProvider.triggerWalletChanged()
     }
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
