@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/angular/node_modules/@ionic/core'
-import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-delegate-edit-popover',
@@ -9,20 +9,21 @@ import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegatePro
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
-  public readonly hideAirGap: boolean
   public readonly delegateeLabel: string
-  public readonly hasMultipleDelegatees: boolean
-  public readonly secondaryDelegatorActions: AirGapDelegatorAction[]
+  public readonly delegateeLabelPlural: string
 
   constructor(
     private readonly alertController: AlertController,
     private readonly popoverController: PopoverController,
-    private readonly navParams: NavParams
+    private readonly navParams: NavParams,
+    private readonly translateService: TranslateService
   ) {
-    this.hideAirGap = this.navParams.get('hideAirGap')
-    this.delegateeLabel = this.navParams.get('delegateeLabel')
-    this.hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
-    this.secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
+    const delegateeLabel: string | undefined = this.navParams.get('delegateeLabel')
+    const delegateeLabelPlural: string | undefined = this.navParams.get('delegateeLabelPlural')
+
+    this.delegateeLabel = delegateeLabel !== undefined ? delegateeLabel : 'delegation-detail.default-delegatee-label'
+    this.delegateeLabelPlural =
+      delegateeLabelPlural !== undefined ? delegateeLabelPlural : 'delegation-detail.default-delegatee-label-plural'
   }
 
   public async changeDelegatee(): Promise<void> {
@@ -33,20 +34,23 @@ export class DelegateEditPopoverComponent {
   }
 
   private async createAlertOptions(): Promise<AlertOptions> {
-    // TODO: add translations
     return {
-      header: 'Delegation Settings',
-      message: `Enter the address provided to you by the ${this.delegateeLabel}.`,
+      header: this.translateService.instant('delegate-edit-popover.delegation-settings_label'),
+      message: this.translateService.instant('delegate-edit-popover.change-alert.text', {
+        delegateeLabel: this.translateService.instant(this.delegateeLabel)
+      }),
       inputs: [
         {
           name: 'delegateeAddress',
           id: 'delegatee-address',
-          placeholder: `${this.delegateeLabel} address`
+          placeholder: this.translateService.instant('delegate-edit-popover.change-alert.placeholder_text', {
+            delegateeLabel: this.translateService.instant(this.delegateeLabel)
+          })
         }
       ],
       buttons: [
         {
-          text: 'Cancel',
+          text: this.translateService.instant('delegate-edit-popover.change-alert.cancel_label'),
           role: 'cancel',
           cssClass: 'secondary',
           handler: (): void => {
@@ -54,7 +58,9 @@ export class DelegateEditPopoverComponent {
           }
         },
         {
-          text: `Set ${this.delegateeLabel}`,
+          text: this.translateService.instant('delegate-edit-popover.change-alert.set-delegatee_label', {
+            delegateeLabel: this.translateService.instant(this.delegateeLabel)
+          }),
           handler: ({ delegateeAddress }: { delegateeAddress: string }): boolean => {
             this.popoverController.dismiss({ delegateeAddress })
 
@@ -63,17 +69,5 @@ export class DelegateEditPopoverComponent {
         }
       ]
     }
-  }
-
-  public async changeDelegateeToAirGap() {
-    this.popoverController.dismiss({ changeToAirGap: true })
-  }
-
-  public async showAllDelegatees() {
-    this.popoverController.dismiss({ showDelegateeList: true })
-  }
-
-  public async callSecondaryAction(type: string) {
-    this.popoverController.dismiss({ secondaryActionType: type })
   }
 }

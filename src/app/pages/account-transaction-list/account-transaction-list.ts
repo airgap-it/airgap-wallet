@@ -17,7 +17,7 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { StorageProvider } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
@@ -130,25 +130,6 @@ export class AccountTransactionListPage {
     this.actionGroup.getActions().then(actions => {
       this.actions = actions
     })
-
-    this.init()
-  }
-
-  public async init(): Promise<void> {
-    const lastTx: {
-      protocol: string
-      accountIdentifier: string
-      date: number
-    } = await this.storageProvider.get(SettingsKey.LAST_TX_BROADCAST)
-
-    if (
-      lastTx &&
-      lastTx.protocol === this.wallet.protocol.identifier &&
-      lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
-      lastTx.date > new Date().getTime() - 5 * 60 * 1000
-    ) {
-      this.hasPendingTransactions = true
-    }
   }
 
   public showNoTransactionScreen(): boolean {

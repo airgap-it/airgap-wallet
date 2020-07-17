@@ -14,6 +14,10 @@ export class PriceService implements AirGapWalletPriceService {
   constructor(private readonly http: HttpClient) {}
 
   public async getCurrentMarketPrice(protocol: ICoinProtocol, baseSymbol: string): Promise<BigNumber> {
+    if (protocol.marketSymbol.length === 0) {
+      return new BigNumber(0)
+    }
+
     const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[protocol.marketSymbol]
     if (pendingRequest) {
       return pendingRequest
@@ -66,6 +70,10 @@ export class PriceService implements AirGapWalletPriceService {
     _date: Date,
     baseSymbol: string
   ): Promise<MarketDataSample[]> {
+    if (protocol.marketSymbol.length === 0) {
+      return []
+    }
+
     const marketSymbol = protocol.marketSymbol
     console.log('cache', 'fetchMarketData', timeUnit, marketSymbol)
     // const uniqueId = `${timeUnit}_${marketSymbol}_${CachingServiceKey.PRICESAMPLES}`

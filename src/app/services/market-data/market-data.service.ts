@@ -141,8 +141,12 @@ export class MarketDataService {
     })
   }
 
-  public fetchCurrentMarketPrice(marketSymbol: string, baseSymbol = 'USD'): Promise<BigNumber> {
+  public fetchCurrentMarketPrice(marketSymbol: string, baseSymbol = 'USD'): Promise<BigNumber | undefined> {
     return new Promise(resolve => {
+      if (marketSymbol.length === 0) {
+        resolve(undefined)
+      }
+
       cryptocompare.price(marketSymbol.toUpperCase(), baseSymbol).then(prices => {
         const currentMarketPrice = new BigNumber(prices.USD)
         resolve(currentMarketPrice)
