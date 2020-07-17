@@ -1,29 +1,30 @@
-import { SubstrateProtocol, SubstratePayee } from 'airgap-coin-lib'
-import {
-  AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegationDetails,
-  AirGapDelegatorAction
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import BigNumber from 'bignumber.js'
-import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
-import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
-import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, Validators } from '@angular/forms'
+import { TranslateService } from '@ngx-translate/core'
+import { SubstratePayee, SubstrateProtocol } from 'airgap-coin-lib'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import * as moment from 'moment'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
+import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegationDetails,
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
-import { TranslateService } from '@ngx-translate/core'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
+import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 // sorted by priority
 const delegateActions = [
@@ -66,7 +67,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return SubstrateDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = undefined
+  public airGapDelegatee(_protocol: SubstrateProtocol): string | undefined {
+    return undefined
+  }
 
   public delegateeLabel: string = 'delegation-detail-substrate.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-substrate.delegatee-label-plural'
@@ -86,7 +89,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
 
     const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
     const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, nominatorDetails, extraNominatorDetails)
@@ -104,7 +107,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegator: string,
     delegatees: string[]
   ): Promise<UIRewardList | undefined> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
 
     return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
   }
@@ -117,7 +120,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
       validators.map(async validator => {
-        const validatorDetails = await protocol.accountController.getValidatorDetails(validator)
+        const validatorDetails = await protocol.options.accountController.getValidatorDetails(validator)
 
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
@@ -250,7 +253,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const results = await Promise.all([
       protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
-      protocol.nodeClient.getExistentialDeposit()
+      protocol.options.nodeClient.getExistentialDeposit()
     ])
 
     const maxValue = new BigNumber(results[0])

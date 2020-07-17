@@ -1,12 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
 @Pipe({
   name: 'cryptoToFiat'
 })
 export class CryptoToFiatPipe implements PipeTransform {
-  public transform(value: BigNumber, args: { protocolIdentifier: string; currentMarketPrice: BigNumber }): any {
+  public transform(value: BigNumber, args: { protocolIdentifier: ProtocolSymbols; currentMarketPrice: BigNumber }): any {
     if (
       !args ||
       !args.currentMarketPrice ||

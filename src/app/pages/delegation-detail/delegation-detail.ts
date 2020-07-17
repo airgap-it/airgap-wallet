@@ -65,8 +65,8 @@ export class DelegationDetailPage {
   }
 
   private get isAirGapDelegatee(): boolean {
-    return supportsAirGapDelegation(this.wallet.coinProtocol)
-      ? this.wallet.coinProtocol.airGapDelegatee && this.delegateeAddress$.value === this.wallet.coinProtocol.airGapDelegatee
+    return supportsAirGapDelegation(this.wallet.protocol)
+      ? this.wallet.protocol.airGapDelegatee() && this.delegateeAddress$.value === this.wallet.protocol.airGapDelegatee()
       : true
   }
 
@@ -122,8 +122,8 @@ export class DelegationDetailPage {
     popover
       .onDidDismiss()
       .then(async ({ data }: OverlayEventDetail<unknown>) => {
-        if (isType<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.coinProtocol)) {
-          this.changeDisplayedDetails(this.wallet.coinProtocol.airGapDelegatee)
+        if (isType<{ changeToAirGap: boolean }>(data, 'changeToAirGap') && supportsAirGapDelegation(this.wallet.protocol)) {
+          this.changeDisplayedDetails(this.wallet.protocol.airGapDelegatee())
         } else if (isType<{ secondaryActionType: string }>(data, 'secondaryActionType')) {
           this.callSecondaryAction(data.secondaryActionType)
         } else {
@@ -186,16 +186,16 @@ export class DelegationDetailPage {
   }
 
   private initView() {
-    this.delegateeLabel = supportsAirGapDelegation(this.wallet.coinProtocol)
-      ? this.wallet.coinProtocol.delegateeLabel
+    this.delegateeLabel = supportsAirGapDelegation(this.wallet.protocol)
+      ? this.wallet.protocol.delegateeLabel
       : 'delegation-detail.default-delegatee-label'
 
-    this.delegateeLabelPlural = supportsAirGapDelegation(this.wallet.coinProtocol)
-      ? this.wallet.coinProtocol.delegateeLabelPlural
+    this.delegateeLabelPlural = supportsAirGapDelegation(this.wallet.protocol)
+      ? this.wallet.protocol.delegateeLabelPlural
       : 'delegation-detail.defailt-delegatee-label-plural'
 
-    this.areMultipleDelegationsSupported = supportsAirGapDelegation(this.wallet.coinProtocol)
-      ? this.wallet.coinProtocol.supportsMultipleDelegations
+    this.areMultipleDelegationsSupported = supportsAirGapDelegation(this.wallet.protocol)
+      ? this.wallet.protocol.supportsMultipleDelegations
       : false
 
     this.subscribeObservables()
@@ -243,7 +243,7 @@ export class DelegationDetailPage {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
           text: this.amountConverter.transform(details.balance, {
-            protocolIdentifier: this.wallet.protocolIdentifier,
+            protocolIdentifier: this.wallet.protocol.identifier,
             maxDigits: 10
           }),
           description: 'delegation-detail.your-balance_label'

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { getProtocolByIdentifier, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifierAndNetworkIdentifier } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
@@ -25,9 +26,12 @@ export class TransactionDetailPage {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = getProtocolByIdentifier(this.transaction.protocolIdentifier)
+    const protocol: ICoinProtocol = getProtocolByIdentifierAndNetworkIdentifier(
+      this.transaction.protocolIdentifier,
+      this.transaction.network.identifier
+    )
 
-    let blockexplorer: string = protocol.blockExplorer
+    let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer
 
     if (hash) {
       blockexplorer = await protocol.getBlockExplorerLinkForTxId(hash)
@@ -36,6 +40,6 @@ export class TransactionDetailPage {
         this.transaction.isInbound ? this.transaction.to[0] : this.transaction.from[0]
       )
     }
-    this.browserService.openUrl(blockexplorer)
+    await this.browserService.openUrl(blockexplorer)
   }
 }

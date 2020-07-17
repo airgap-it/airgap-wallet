@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { DelegationInfo, TezosDelegatorAction, TezosProtocol } from 'airgap-coin-lib'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
 import {
@@ -46,7 +47,13 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return TezosDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
+  public airGapDelegatee(protocol: TezosProtocol): string | undefined {
+    if (protocol.options.network.type !== NetworkType.MAINNET) {
+      return 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+    }
+
+    return 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
+  }
 
   public delegateeLabel: string = 'delegation-detail-tezos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-tezos.delegatee-label-plural'

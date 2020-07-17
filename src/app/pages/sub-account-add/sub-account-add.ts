@@ -1,9 +1,11 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -21,6 +23,8 @@ export interface IAccountWrapper {
   styleUrls: ['./sub-account-add.scss']
 })
 export class SubAccountAddPage {
+  public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
+
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
   public actionCallback: (context: AddTokenActionContext) => void
@@ -34,7 +38,8 @@ export class SubAccountAddPage {
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
-    private readonly protocolsProvider: ProtocolsProvider
+    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly priceService: PriceService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -52,13 +57,16 @@ export class SubAccountAddPage {
       assertNever(this.subProtocolType)
     }
     if (this.subProtocolType === SubProtocolType.TOKEN) {
-      this.wallet.coinProtocol.subProtocols.forEach(subProtocol => {
+      this.wallet.protocol.subProtocols.forEach(subProtocol => {
+        console.log('checking sub protocol', subProtocol)
         if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
+          const protocol = getProtocolByIdentifier(subProtocol.identifier, this.wallet.protocol.options.network)
           const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-            subProtocol.identifier,
+            protocol,
             this.wallet.publicKey,
             this.wallet.isExtendedPublicKey,
-            this.wallet.derivationPath
+            this.wallet.derivationPath,
+            this.priceService
           )
           const exists: boolean = this.accountProvider.walletExists(wallet)
           if (!exists) {

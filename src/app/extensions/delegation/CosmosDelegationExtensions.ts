@@ -53,8 +53,6 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     return CosmosDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
-
   public delegateeLabel: string = 'delegation-detail-cosmos.delegatee-label'
   public delegateeLabelPlural: string = 'delegation-detail-cosmos.delegatee-label-plural'
   public supportsMultipleDelegations: boolean = true
@@ -72,6 +70,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     super()
   }
 
+  public airGapDelegatee(_protocol: CosmosProtocol): string {
+    return 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
+  }
+
+  // TODO: add translations
   public async getExtraDelegationDetailsFromAddress(
     protocol: CosmosProtocol,
     delegator: string,

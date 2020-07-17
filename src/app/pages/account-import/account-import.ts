@@ -53,7 +53,7 @@ export class AccountImportPage {
     if (this.wallets.walletExists(this.wallet)) {
       this.wallet = this.wallets.walletByPublicKeyAndProtocolAndAddressIndex(
         this.wallet.publicKey,
-        this.wallet.protocolIdentifier,
+        this.wallet.protocol.identifier,
         this.wallet.addressIndex
       )
       this.walletAlreadyExists = true
@@ -67,7 +67,7 @@ export class AccountImportPage {
       const whitelistedProtocols: string[] = ['eth', 'ae']
 
       this.walletImportable = whitelistedProtocols.some(
-        (whitelistedProtocol: string) => this.wallet.coinProtocol.identifier === whitelistedProtocol
+        (whitelistedProtocol: string) => this.wallet.protocol.identifier === whitelistedProtocol
       )
 
       if (!this.walletImportable) {
@@ -96,7 +96,7 @@ export class AccountImportPage {
     }
 
     airGapWorker.postMessage({
-      protocolIdentifier: this.wallet.protocolIdentifier,
+      protocolIdentifier: this.wallet.protocol.identifier,
       publicKey: this.wallet.publicKey,
       isExtendedPublicKey: this.wallet.isExtendedPublicKey,
       derivationPath: this.wallet.derivationPath

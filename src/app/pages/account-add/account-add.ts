@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -26,20 +27,24 @@ export class AccountAddPage {
     private readonly router: Router,
     private readonly dataService: DataService
   ) {
-    this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
-    this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
-      if (cv.subProtocols) {
-        const subProtocols = cv.subProtocols.filter(
-          subProtocol =>
-            subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-            this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
-        )
+    this.supportedAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .map(coin => coin)
+    this.supportedSubAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .reduce((pv, cv) => {
+        if (cv.subProtocols) {
+          const subProtocols = cv.subProtocols.filter(
+            subProtocol =>
+              subProtocol.subProtocolType === SubProtocolType.TOKEN &&
+              this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
+          )
 
-        return pv.concat(...subProtocols)
-      }
+          return pv.concat(...subProtocols)
+        }
 
-      return pv
-    }, [])
+        return pv
+      }, [])
     this.filterProtocols()
   }
 
@@ -57,27 +62,39 @@ export class AccountAddPage {
     )
   }
 
-  public addAccount(protocolIdentifier: string) {
+  public addAccount(protocol: ICoinProtocol) {
     const info = {
-      mainProtocolIdentifier: protocolIdentifier
+      mainProtocolIdentifier: protocol.identifier
     }
     this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public addSubAccount(subProtocolIdentifier: string) {
-    const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
-    if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
+  public addSubAccount(subProtocol: ICoinProtocol) {
+    const mainProtocolIdentifier = subProtocol.identifier.split('-')[0]
+    if (
+      this.accountProvider
+        .getWalletList()
+        .filter(
+          wallet =>
+            wallet.protocol.identifier === mainProtocolIdentifier &&
+            wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
+        ).length > 0
+    ) {
       const info = {
-        subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
       const info = {
         mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }

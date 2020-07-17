@@ -5,14 +5,31 @@
         <ion-back-button></ion-back-button>
       </ion-buttons>
       <ion-title>
-        {{ 'transaction-prepare.title' | translate: { title: wallet.coinProtocol.symbol } }}
+        {{ 'transaction-prepare.title' | translate: { title: wallet.protocol.symbol } }}
       </ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
 
 <ion-content class="ion-no-padding">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid fixed="true">
+    <ion-row class="ion-padding-horizontal">
+      <ion-col class="ion-no-padding">
+        <ion-row>
+          <ng-container
+            *ngIf="wallet.protocol.options.network && wallet.protocol.options.network.type !== networkType.MAINNET"
+            class="ion-no-padding"
+            lines="none"
+            slot="start"
+          >
+            <ion-badge color="danger">{{ wallet.protocol.options.network.name }}</ion-badge>
+            <ion-badge *ngIf="wallet.protocol.options.network.type === networkType.CUSTOM">
+              {{wallet.protocol.options.network.rpcUrl}}
+            </ion-badge>
+          </ng-container>
+        </ion-row>
+      </ion-col>
+    </ion-row>
     <form [formGroup]="transactionForm" class="ion-padding-bottom">
       <ion-row class="ion-padding-horizontal ion-padding-top">
         <ion-col size="10" class="ion-no-padding">
@@ -21,15 +38,15 @@
               <ion-row>
                 <p class="font--size__large ion-no-margin">
                   <strong>
-                    {{ state.availableBalance | amountConverter: { protocolIdentifier: wallet.protocolIdentifier, maxDigits:
-                    wallet.coinProtocol.decimals + 1 } }}
+                    {{ state.availableBalance | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits:
+                    wallet.protocol.decimals + 1 } }}
                   </strong>
                 </p>
               </ion-row>
               <ion-row>
                 <ion-text color="blackLight">
                   <p class="ion-no-margin">
-                    ${{ state.availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocolIdentifier, currentMarketPrice:
+                    ${{ state.availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
                     wallet.currentMarketPrice } | number: '1.2-2' }}
                   </p>
                 </ion-text>
@@ -42,7 +59,7 @@
                 <ion-label color="blackLight" position="stacked">{{ 'Send To' | translate }}</ion-label>
                 <ion-textarea
                   [attr.disabled]="state.forceMigration"
-                  [placeholder]="wallet.coinProtocol.addressPlaceholder"
+                  [placeholder]="wallet.protocol.addressPlaceholder"
                   formControlName="address"
                   id="address-input"
                 ></ion-textarea>
@@ -75,7 +92,7 @@
             <p
               class="ion-no-margin"
               [innerHTML]="
-              'transaction-prepare.error.address_label' | translate: { addressPlaceholder: wallet.coinProtocol.addressPlaceholder }
+              'transaction-prepare.error.address_label' | translate: { addressPlaceholder: wallet.protocol.addressPlaceholder }
             "
             ></p>
           </ion-text>
@@ -155,7 +172,7 @@
         <ion-col size="12" class="ion-no-padding">
           <ion-item lines="none" class="ion-no-padding">
             <ion-text class="ion-no-margin" color="blackLight">
-              <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})</ion-label>
+              <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})</ion-label>
             </ion-text>
             <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [attr.disabled]="state.disableAdvancedMode"></ion-toggle>
           </ion-item>
@@ -200,7 +217,7 @@
               class="ion-no-padding"
             ></ion-input>
             <span slot="end" class="input--placeholder">
-              {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.coinProtocol.feeSymbol | uppercase }})
+              {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})
             </span>
           </ion-item>
         </ion-col>
@@ -219,7 +236,7 @@
                   </ng-container>
                 </span>
                 <span id="fee-amount-advanced" *ngIf="!state.isAdvancedMode.value">
-                  ({{ state.fee.value | number: '1.2-6' }} {{ wallet.coinProtocol.feeSymbol | uppercase }})
+                  ({{ state.fee.value | number: '1.2-6' }} {{ wallet.protocol.feeSymbol | uppercase }})
                 </span>
               </ng-container>
               <ion-skeleton-text animated style="width: 30%" *ngIf="state.estimatingFeeDefaults"></ion-skeleton-text>

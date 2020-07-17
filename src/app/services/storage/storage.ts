@@ -1,7 +1,17 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ExchangeTransaction } from '../exchange/exchange'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { Network } from '@airgap/beacon-sdk'
+
+export type BeaconRequest = [string, any, ICoinProtocol]
+export interface SerializedBeaconRequest {
+  messageId: string
+  payload: any
+  protocolIdentifier: string
+  network: Network
+}
 
 export enum SettingsKey {
   INTRODUCTION = 'introduction',
@@ -18,11 +28,13 @@ export enum SettingsKey {
   SETTINGS_SERIALIZER_ENABLE_V2 = 'SETTINGS_SERIALIZER_ENABLE_V2',
   SETTINGS_SERIALIZER_CHUNK_TIME = 'SETTINGS_SERIALIZER_CHUNK_TIME',
   SETTINGS_SERIALIZER_CHUNK_SIZE = 'SETTINGS_SERIALIZER_CHUNK_SIZE',
-  PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS'
+  PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
+  BEACON_REQUESTS = 'BEACON_REQUESTS'
 }
 
-interface IPartialAirGapWallet {
-  protocolIdentifier: string
+interface SerializedAirGapWallet {
+  protocolIdentifier: ProtocolSymbols
+  networkIdentifier: string
   publicKey: string
   isExtendedPublicKey: boolean
   derivationPath: string
@@ -44,7 +56,7 @@ interface SettingsKeyReturnType {
   [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean
   [SettingsKey.PUSH_INTRODUCTION]: boolean
   [SettingsKey.EXCHANGE_INTEGRATION]: boolean
-  [SettingsKey.WALLET]: IPartialAirGapWallet[] | undefined
+  [SettingsKey.WALLET]: SerializedAirGapWallet[] | undefined
   [SettingsKey.SELECTED_ACCOUNT]: AirGapMarketWallet | undefined
   [SettingsKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
   [SettingsKey.USER_ID]: string | undefined
@@ -52,6 +64,7 @@ interface SettingsKeyReturnType {
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: number
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: number
   [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
+  [SettingsKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
 }
 
 type SettingsKeyReturnDefaults = { [key in SettingsKey]: SettingsKeyReturnType[key] }
@@ -71,7 +84,8 @@ const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 500,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: 100,
-  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: []
+  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: [],
+  [SettingsKey.BEACON_REQUESTS]: []
 }
 
 @Injectable({

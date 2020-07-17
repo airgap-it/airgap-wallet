@@ -1,13 +1,16 @@
+import { BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { AccountProvider } from 'src/app/services/account/account.provider'
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { BrowserService } from 'src/app/services/browser/browser.service'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 const SECOND: number = 1000
 
@@ -22,8 +25,9 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 })
 export class TransactionConfirmPage {
   public signedTransactionsSync: IACMessageDefinitionObject[]
-  private signedTxs: string[]
-  public protocols: ICoinProtocol[]
+
+  public txInfos: [string, ICoinProtocol, (hash: string) => BeaconResponseInputMessage][] = []
+  public protocols: ICoinProtocol[] = []
 
   constructor(
     private readonly loadingCtrl: LoadingController,
@@ -35,7 +39,8 @@ export class TransactionConfirmPage {
     private readonly storageProvider: StorageProvider,
     private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    private readonly accountService: AccountProvider
   ) {}
 
   public dismiss(): void {
@@ -51,8 +56,26 @@ export class TransactionConfirmPage {
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTxs = this.signedTransactionsSync.map(signedTx => (signedTx.payload as SignedTransaction).transaction)
-    this.protocols = this.signedTransactionsSync.map(signedTx => getProtocolByIdentifier(signedTx.protocol))
+    this.signedTransactionsSync.forEach(async signedTx => {
+      const protocol = getProtocolByIdentifier(signedTx.protocol)
+
+      const wallet = this.accountService.walletBySerializerAccountIdentifier(
+        (signedTx.payload as SignedTransaction).accountIdentifier,
+        signedTx.protocol
+      )
+
+      const [createResponse, savedProtocol] = await this.beaconService.getVaultRequest((signedTx.payload as SignedTransaction).transaction)
+
+      const selectedProtocol =
+        createResponse && savedProtocol && savedProtocol.identifier === protocol.identifier
+          ? savedProtocol
+          : wallet && wallet.protocol
+          ? wallet.protocol
+          : protocol
+
+      this.txInfos.push([(signedTx.payload as SignedTransaction).transaction, selectedProtocol, createResponse])
+      this.protocols.push(selectedProtocol)
+    })
   }
 
   public async broadcastTransaction() {
@@ -80,13 +103,16 @@ export class TransactionConfirmPage {
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
 
-    this.protocols.forEach((protocol, index) => {
+    this.txInfos.forEach(async ([signedTx, protocol, createResponse], index) => {
       protocol
-        .broadcastTransaction(this.signedTxs[index])
+        .broadcastTransaction(signedTx)
         .then(async txId => {
           console.log('transaction hash', txId)
 
-          this.beaconService.getVaultRequest(this.signedTxs[index], txId)
+          if (createResponse) {
+            const response = createResponse(txId)
+            this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+          }
 
           if (interval) {
             clearInterval(interval)
@@ -111,16 +137,19 @@ export class TransactionConfirmPage {
           this.showTransactionSuccessfulAlert(protocol, txId)
 
           // POST TX TO BACKEND
-          const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
-            .payload as SignedTransaction))[0] as any
-          // necessary for the transaction backend
-          signed.amount = signed.amount.toString()
-          signed.fee = signed.fee.toString()
-          signed.signedTx = this.signedTxs[index]
-          signed.hash = txId
+          // Only send it if we are on mainnet
+          if (protocol.options.network.type === NetworkType.MAINNET) {
+            const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
+              .payload as SignedTransaction))[0] as any
+            // necessary for the transaction backend
+            signed.amount = signed.amount.toString()
+            signed.fee = signed.fee.toString()
+            signed.signedTx = signedTx
+            signed.hash = txId
 
-          console.log('SIGNED TX', signed)
-          this.pushBackendProvider.postPendingTx(signed) // Don't await
+            console.log('SIGNED TX', signed)
+            this.pushBackendProvider.postPendingTx(signed) // Don't await
+          }
           // END POST TX TO BACKEND
         })
         .catch(error => {
@@ -142,7 +171,7 @@ export class TransactionConfirmPage {
                   // necessary for the transaction backend
                   signed.amount = signed.amount.toString()
                   signed.fee = signed.fee.toString()
-                  signed.signedTx = this.signedTxs[index]
+                  signed.signedTx = signedTx
                   this.pushBackendProvider.postPendingTx(signed) // Don't await
                   // END POST TX TO BACKEND
                 } else {

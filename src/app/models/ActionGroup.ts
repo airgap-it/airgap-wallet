@@ -6,7 +6,6 @@ import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
-import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
@@ -14,7 +13,8 @@ import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
+import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -31,22 +31,22 @@ export class ActionGroup {
 
   public async getActions(): Promise<Action<any, any>[]> {
     const actionMap: Map<string, () => Promise<Action<any, any>[]>> = new Map()
-    actionMap.set(ProtocolSymbols.XTZ, async () => {
+    actionMap.set(MainProtocolSymbols.XTZ, async () => {
       return this.getTezosActions()
     })
-    actionMap.set(ProtocolSymbols.XTZ_KT, async () => {
+    actionMap.set(SubProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
     })
-    actionMap.set(ProtocolSymbols.ETH, async () => {
+    actionMap.set(MainProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
     })
-    actionMap.set(ProtocolSymbols.COSMOS, async () => {
+    actionMap.set(MainProtocolSymbols.COSMOS, async () => {
       return this.getCosmosActions()
     })
-    actionMap.set(ProtocolSymbols.POLKADOT, async () => {
+    actionMap.set(MainProtocolSymbols.POLKADOT, async () => {
       return this.getPolkadotActions()
     })
-    actionMap.set(ProtocolSymbols.KUSAMA, async () => {
+    actionMap.set(MainProtocolSymbols.KUSAMA, async () => {
       return this.getKusamaActions()
     })
 
@@ -184,7 +184,7 @@ export class ActionGroup {
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
     let wallet = this.callerContext.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
       xtzWallet.publicKey,
-      ProtocolSymbols.XTZ_KT,
+      SubProtocolSymbols.XTZ_KT,
       index
     )
 
@@ -192,11 +192,13 @@ export class ActionGroup {
       return wallet
     }
 
+    const protocol = getProtocolByIdentifier(SubProtocolSymbols.XTZ_KT)
     wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
+      protocol,
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,
       xtzWallet.derivationPath,
+      xtzWallet.priceService,
       index
     )
     wallet.addresses = ktAddresses

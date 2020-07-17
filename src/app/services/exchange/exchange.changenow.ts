@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { MainProtocolSymbols, ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+
+import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
+
+// tslint:disable:max-classes-per-file
 
 export interface CurrencyDetailResponse {
   ticker: string
@@ -50,13 +54,13 @@ export interface ChangeNowTransactionStatus {
 }
 
 export class ChangeNowTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  status: string
+  public status: string
 
   constructor(json: ChangeNowTransactionStatus) {
     this.status = json.status
   }
 
-  isPending(): boolean {
+  public isPending(): boolean {
     switch (this.status) {
       case 'finished':
       case 'failed':
@@ -70,97 +74,103 @@ export class ChangeNowTransactionStatusResponse implements ExchangeTransactionSt
 }
 
 class ChangeNowApi {
-  private identifierExchangeToAirGapMap = new Map<string, string>()
-  private identifierAirGapToExchangeMap = new Map<string, string>()
+  private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
+  private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(public http: HttpClient, protected baseURL = 'https://changenow.io/api/v1') {
-    this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
-    this.identifierExchangeToAirGapMap.set('atom', 'cosmos')
-    this.identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
-    this.identifierAirGapToExchangeMap.set('cosmos', 'atom')
+  constructor(public http: HttpClient, protected readonly baseURL: string = 'https://changenow.io/api/v1') {
+    this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('atom', MainProtocolSymbols.COSMOS)
+    this.identifierAirGapToExchangeMap.set('eth-erc20-xchf' as ProtocolSymbols, 'xchf')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.COSMOS, 'atom')
   }
 
-  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+  public convertExchangeIdentifierToAirGapIdentifier(identifiers: ExchangeIdentifier[]): ProtocolSymbols[] {
     return identifiers
-      .map(identifier => identifier.toLowerCase())
-      .map(identifier => {
-        return this.identifierExchangeToAirGapMap.has(identifier) ? this.identifierExchangeToAirGapMap.get(identifier) : identifier
+      .map((identifier: ExchangeIdentifier) => identifier.toLowerCase())
+      .map((identifier: ExchangeIdentifier) => {
+        return this.identifierExchangeToAirGapMap.has(identifier)
+          ? this.identifierExchangeToAirGapMap.get(identifier)
+          : (identifier as ProtocolSymbols)
       })
   }
 
-  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+  public convertAirGapIdentifierToExchangeIdentifier(identifiers: ProtocolSymbols[]): ExchangeIdentifier[] {
     return identifiers
-      .map(identifier => {
+      .map((identifier: ProtocolSymbols) => {
         return this.identifierAirGapToExchangeMap.has(identifier) ? this.identifierAirGapToExchangeMap.get(identifier) : identifier
       })
-      .map(identifier => identifier.toUpperCase())
+      .map((identifier: ExchangeIdentifier) => identifier.toUpperCase())
   }
 
-  async getAvailableFromCurrencies(): Promise<string[]> {
-    const result: CurrencyDetailResponse[] = (await this.http
-      .get(`${this.baseURL}/currencies?active=true`)
-      .toPromise()) as CurrencyDetailResponse[]
-    const fromCurrencies = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
+  public async getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
+    const result: CurrencyDetailResponse[] = await this.http
+      .get<CurrencyDetailResponse[]>(`${this.baseURL}/currencies?active=true`)
+      .toPromise()
+    const fromCurrencies: ExchangeIdentifier[] = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
 
     return this.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
   }
 
-  async getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+  public async getMinAmountForCurrency(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    let result: MinAmountResponse = (await this.http
-      .get(`${this.baseURL}/min-amount/${fromCurrency}_${toCurrency}`)
-      .toPromise()) as MinAmountResponse
+    const result: MinAmountResponse = await this.http
+      .get<MinAmountResponse>(`${this.baseURL}/min-amount/${transformedFromCurrency}_${transformedToCurrency}`)
+      .toPromise()
 
     return result.minAmount.toString()
   }
 
-  async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-    const response: EstimatedAmountResponse = (await this.http
-      .get(`${this.baseURL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
-      .toPromise()) as EstimatedAmountResponse
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+
+    const response: EstimatedAmountResponse = await this.http
+      .get<EstimatedAmountResponse>(`${this.baseURL}/exchange-amount/${amount}/${transformedFromCurrency}_${transformedToCurrency}`)
+      .toPromise()
+
     return response.estimatedAmount.toString()
   }
 
-  async validateAddress(): Promise<{ result: false; message: string }> {
+  public async validateAddress(): Promise<{ result: false; message: string }> {
     return { result: false, message: '' }
   }
 
-  async createTransaction(
-    fromCurrency: string,
-    toCurrency: string,
+  public async createTransaction(
+    fromCurrency: ProtocolSymbols,
+    toCurrency: ProtocolSymbols,
     toAddress: string,
     amount: string,
     fromAddress?: string
   ): Promise<TransactionChangeNowResponse> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const apiKey = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
-    const body = {
-      from: fromCurrency,
-      to: toCurrency,
-      address: toAddress,
-      amount: amount,
-      extraId: '',
-      userId: '',
-      contactEmail: '',
-      refundAddress: fromAddress ? fromAddress : '',
-      refundExtraId: ''
-    }
+    const apiKey: string = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
 
-    const response: any = await this.http.post(`${this.baseURL}/transactions/${apiKey}`, body).toPromise()
+    const response: any = await this.http
+      .post<TransactionChangeNowResponse>(`${this.baseURL}/transactions/${apiKey}`, {
+        from: transformedFromCurrency,
+        to: transformedToCurrency,
+        address: toAddress,
+        amount,
+        extraId: '',
+        userId: '',
+        contactEmail: '',
+        refundAddress: fromAddress ? fromAddress : '',
+        refundExtraId: ''
+      })
+      .toPromise()
 
     return response
   }
 
-  async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
-    const response = (await this.http
-      .get(`${this.baseURL}/transactions/${transactionId}/changenow`)
-      .toPromise()) as ChangeNowTransactionStatus
+  public async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
+    const response: ChangeNowTransactionStatus = await this.http
+      .get<ChangeNowTransactionStatus>(`${this.baseURL}/transactions/${transactionId}/changenow`)
+      .toPromise()
+
     return new ChangeNowTransactionStatusResponse(response)
   }
 }
@@ -170,12 +180,17 @@ export class ChangeNowExchange extends ChangeNowApi implements Exchange {
     super(http)
   }
 
-  public async getAvailableToCurrenciesForCurrency(fromCurrency: string): Promise<string[]> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    const result: any = await this.http.get(`${this.baseURL}/currencies-to/${fromCurrency}`).toPromise()
-    const identifiers = result
+  public async getAvailableToCurrenciesForCurrency(fromCurrency: ProtocolSymbols): Promise<ProtocolSymbols[]> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+
+    const result: CurrencyDetailResponse[] = await this.http
+      .get<CurrencyDetailResponse[]>(`${this.baseURL}/currencies-to/${transformedFromCurrency}`)
+      .toPromise()
+
+    const identifiers: ExchangeIdentifier[] = result
       .filter((currency: CurrencyDetailResponse) => currency.isAvailable)
       .map((currency: CurrencyDetailResponse) => currency.ticker)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(identifiers)
   }
 }
