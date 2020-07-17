@@ -67,7 +67,13 @@ export class DelegationDetailPage {
   private get isAirGapDelegatee(): boolean {
     return supportsAirGapDelegation(this.wallet.protocol)
       ? this.wallet.protocol.airGapDelegatee() && this.delegateeAddress$.value === this.wallet.protocol.airGapDelegatee()
-      : true
+      : false
+  }
+
+  private get hideAirGapOverflow(): boolean {
+    return supportsAirGapDelegation(this.wallet.protocol)
+      ? !this.wallet.protocol.airGapDelegatee() || this.isAirGapDelegatee
+      : this.isAirGapDelegatee
   }
 
   private readonly delegateeAddress$: BehaviorSubject<string | null> = new BehaviorSubject(null)
@@ -111,7 +117,7 @@ export class DelegationDetailPage {
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
       component: DelegateActionPopoverComponent,
       componentProps: {
-        hideAirGap: this.isAirGapDelegatee,
+        hideAirGap: this.hideAirGapOverflow,
         delegateeLabel: this.delegateeLabel,
         secondaryDelegatorActions: secondaryActions
       },
