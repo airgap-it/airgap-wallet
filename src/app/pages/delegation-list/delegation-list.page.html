@@ -93,7 +93,7 @@
           <widget-account-summary [widget]="delegatee"></widget-account-summary>
         </div>
       </ion-list>
-      <p *ngIf="knownDelegatees.length === 0">
+      <p class="ion-padding-horizontal" *ngIf="knownDelegatees.length === 0">
         {{ "delegation-list.not-supported_text" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
       </p>
 
