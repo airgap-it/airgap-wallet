@@ -347,6 +347,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
           maxDelegation: maxValueFormatted
         })
+      case SubstrateStakingActionType.NOMINATE:
+        return this.translateService.instant('delegatino-detail-substrate.delegate.nominate_text', {
+          bonded: bondedFormatted
+        })
       case SubstrateStakingActionType.BOND_EXTRA:
         return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
           bonded: bondedFormatted,
