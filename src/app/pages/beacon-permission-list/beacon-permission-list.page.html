@@ -25,7 +25,6 @@
         <ion-label>
           <h3>
             <strong>{{ permission.appMetadata.name }}</strong>
-            <small>{{ permission.website }}</small>
           </h3>
           <div class="d-flex ion-align-items-center">
             <identicon [address]="permission.address"></identicon>
@@ -34,6 +33,15 @@
           <ion-badge color="light">
             {{ permission.scopes }}
           </ion-badge>
+          <div>
+            <ion-badge class="badge__margin" color="danger">
+              {{ permission.network.type }}
+            </ion-badge>
+
+            <ion-badge class="badge__margin" *ngIf="permission.network.rpcUrl">
+              {{ permission.network.rpcUrl }}
+            </ion-badge>
+          </div>
         </ion-label>
         <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission)">
           {{ 'beacon-permission-list.remove_label' | translate }}

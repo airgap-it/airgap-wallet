@@ -85,7 +85,7 @@ describe('TransactionPrepare Page', () => {
 
   //   component.setWallet(ethWallet)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
 
   //   fixture.detectChanges()
@@ -97,7 +97,7 @@ describe('TransactionPrepare Page', () => {
   //   // check if fee changes if set to medium
   //   component.transactionForm.controls['feeLevel'].setValue(1)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
   //   expect(feeAmount.textContent.trim()).toEqual('$0.021')
   //   expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
@@ -105,7 +105,7 @@ describe('TransactionPrepare Page', () => {
   //   // check if fee changes if set to high
   //   component.transactionForm.controls['feeLevel'].setValue(2)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
   //   expect(feeAmount.textContent.trim()).toEqual('$0.021')
   //   expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')

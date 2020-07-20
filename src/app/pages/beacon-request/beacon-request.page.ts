@@ -1,6 +1,7 @@
 import {
   BeaconMessageType,
   BroadcastRequestOutput,
+  NetworkType as BeaconNetworkType,
   OperationRequestOutput,
   PermissionRequestOutput,
   PermissionResponseInput,
@@ -10,12 +11,20 @@ import {
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, IAirGapTransaction, TezosProtocol } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  IAirGapTransaction,
+  ICoinProtocol,
+  TezosProtocol
+} from 'airgap-coin-lib'
 import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
+import { NetworkType, ProtocolNetwork } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
@@ -40,8 +49,11 @@ interface CheckboxInput {
   styleUrls: ['./beacon-request.page.scss']
 })
 export class BeaconRequestPage implements OnInit {
+  public readonly networkType: typeof NetworkType = NetworkType
+
   public title: string = ''
   public request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  public network: ProtocolNetwork | undefined
   public requesterName: string = ''
   public address: string = ''
   public inputs: CheckboxInput[] = []
@@ -61,6 +73,7 @@ export class BeaconRequestPage implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     this.requesterName = this.request.appMetadata.name
+    this.network = await this.getNetworkFromRequest(this.request)
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
       this.title = 'beacon-request.title.permission-request'
       await this.permissionRequest(this.request)
@@ -80,6 +93,17 @@ export class BeaconRequestPage implements OnInit {
       this.title = 'beacon-request.title.broadcast-request'
       await this.broadcastRequest(this.request)
     }
+  }
+
+  public async getNetworkFromRequest(
+    request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  ): Promise<ProtocolNetwork | undefined> {
+    if (!request || request.type === BeaconMessageType.SignPayloadRequest) {
+      return undefined
+    }
+    const protocol: ICoinProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
+
+    return protocol.options.network
   }
 
   public async dismiss(): Promise<void> {
@@ -110,11 +134,11 @@ export class BeaconRequestPage implements OnInit {
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
-    this.address = await selectedWallet.coinProtocol.getAddressFromPublicKey(selectedWallet.publicKey)
+    this.address = await selectedWallet.protocol.getAddressFromPublicKey(selectedWallet.publicKey)
 
     this.inputs = [
       {
@@ -169,19 +193,19 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
 
-    await this.beaconService.addVaultRequest(request.id, request.payload)
+    await this.beaconService.addVaultRequest(request.id, request.payload, tezosProtocol)
 
     this.responseHandler = async () => {
       const transaction = { binaryTransaction: request.payload }
       const serializedChunks = await this.serializerService.serialize([
         {
-          protocol: selectedWallet.coinProtocol.identifier,
+          protocol: selectedWallet.protocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: selectedWallet.publicKey,
@@ -202,14 +226,18 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async operationRequest(request: OperationRequestOutput): Promise<void> {
-    const tezosProtocol: TezosProtocol = new TezosProtocol()
+    let tezosProtocol: TezosProtocol = new TezosProtocol()
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.coinProtocol.identifier === ProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
 
     if (!selectedWallet) {
       throw new Error('no wallet found!')
+    }
+
+    if (request.network.type !== BeaconNetworkType.MAINNET) {
+      tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
     let transaction: TezosWrappedOperation | undefined
@@ -220,7 +248,7 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    await this.beaconService.addVaultRequest(request.id, forgedTransaction)
+    await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
 
     this.transactions = tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
@@ -230,7 +258,7 @@ export class BeaconRequestPage implements OnInit {
     this.responseHandler = async () => {
       const serializedChunks = await this.serializerService.serialize([
         {
-          protocol: selectedWallet.coinProtocol.identifier,
+          protocol: selectedWallet.protocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: selectedWallet.publicKey,
@@ -251,10 +279,14 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async broadcastRequest(request: BroadcastRequestOutput): Promise<void> {
-    const tezosProtocol: TezosProtocol = new TezosProtocol()
+    let tezosProtocol: TezosProtocol = new TezosProtocol()
     const signedTx: string = request.signedTransaction
 
-    await this.beaconService.addVaultRequest(request.id, signedTx)
+    if (request.network.type !== BeaconNetworkType.MAINNET) {
+      tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
+    }
+
+    await this.beaconService.addVaultRequest(request.id, signedTx, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',
@@ -263,7 +295,7 @@ export class BeaconRequestPage implements OnInit {
 
     const signedTransactionSync: IACMessageDefinitionObject = {
       type: IACMessageType.MessageSignResponse,
-      protocol: ProtocolSymbols.XTZ,
+      protocol: MainProtocolSymbols.XTZ,
       payload: {
         accountIdentifier: '',
         transaction: signedTx // wait for SDK to correctly serialize

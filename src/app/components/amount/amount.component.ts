@@ -36,7 +36,7 @@ export class AmountComponent {
 
   public IonViewDidEnter() {
     this.delegationForm = this.formBuilder.group({
-      amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.coinProtocol.decimals)])]
+      amount: [this.amount, Validators.compose([Validators.required, DecimalValidator.validate(this.wallet.protocol.decimals)])]
     })
   }
   public toggleMaxAmount() {
@@ -49,7 +49,7 @@ export class AmountComponent {
   public onChanges(): void {
     this.delegationForm.valueChanges.subscribe((val: any) => {
       if (val && val.amount) {
-        this.amountEmitter.emit(new BigNumber(val.amount).shiftedBy(this.wallet.coinProtocol.decimals))
+        this.amountEmitter.emit(new BigNumber(val.amount).shiftedBy(this.wallet.protocol.decimals))
       }
     })
   }
@@ -57,9 +57,9 @@ export class AmountComponent {
   private setMaxAmount() {
     let amount
     if (this.capMaxAmount) {
-      amount = this.capMaxAmount.shiftedBy(-1 * this.wallet.coinProtocol.decimals).toNumber()
+      amount = this.capMaxAmount.shiftedBy(-1 * this.wallet.protocol.decimals).toNumber()
     } else {
-      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.coinProtocol.decimals).toNumber()
+      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.protocol.decimals).toNumber()
     }
     this.delegationForm.controls.amount.setValue(amount, {
       emitEvent: true

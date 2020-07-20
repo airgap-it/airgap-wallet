@@ -251,7 +251,8 @@
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
     "delete_label": "Remove",
-    "block_explorer": "Open Blockexplorer"
+    "block-explorer_label": "Open Blockexplorer",
+    "change-network_label": "Change Network"
   },
   "account-edit-popover-component": {
     "header": "Confirm Account Removal",
@@ -406,51 +407,120 @@
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
   },
-  "delegation-baker-detail": {
-    "title": "Baker Detail",
-    "accepts-delegation": "Accepts Delegation",
-    "fee": "Fee",
-    "invalid-address": "This address is invalid.",
-    "payout-schedule": "Payout Schedule",
-    "your-delegation": "Your Delegation",
-    "your-balance": "Your Balance",
-    "estimated-return": "Estimated Return per Cycle",
-    "first-payout": "First Payout",
-    "next-payout": "Next Payout",
-    "your-rewards": "Your Rewards",
-    "cycles": "{{cycles}} Cycles",
-    "delegate": "Delegate",
-    "done": "Done",
-    "unknown": "Unknown"
-  },
-  "delegation-cosmos": {
-    "title": "Validator Detail",
-    "status-active_label": "active",
-    "status-inactive_label": "inactive",
+  "delegation-detail": {
+    "title": "{{ delegateeLabel }} Detail",
+    "default-delegatee-label": "Delegation",
+    "default-delegatee-label-plural": "Delegations",
+    "change-delegatee_label": "Change {{ delegateeLabel }}",
+    "your-delegation_label": "Your Delegation",
+    "your-balance_label": "Your Balance",
     "your-rewards_label": "Your Rewards",
+    "done_button": "Done",
+    "amount_label": "Amount",
+    "max-amount_button": "MAX",
+    "invalid-value_error": "Invalid value",
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
+    "rewards": {
+      "index-col_label": "Index",
+      "amount-col_label": "Reward",
+      "payout-col_label": "Payout"
+    }
+  },
+  "delegation-list": {
+    "title": "{{ delegateeLabelPlural }} List",
+    "your-delegatees_label": "Your {{ delegateeLabelPlural }}",
+    "known-delegatees_label": "Known {{ delegateeLabelPlural }}",
+    "load-more_label": "Load more",
+    "not-supported_text": "Currently the {{ delegateeLabelPlural }} list is not yet supported but you can manually delegate to an address with \"Change Validator\" in the three-dot menu."
+  },
+  "delegation-detail-cosmos": {
+    "delegatee-label": "Validator",
+    "delegatee-label-plural": "Validators",
     "commission_label": "Commission",
     "voting-power_label": "Voting Power",
-    "withdraw_rewards_label": "Claim Rewards",
-    "your-account": {
-      "label": "Your Account",
-      "balance_label": "Current Balance",
-      "delegation_label": "Currently Delegated",
-      "rewards_label": "Unclaimed Rewards"
-    },
-    "delegation": {
-      "label": "Your Delegation",
-      "text": "Select the amount you want to delegate, you can delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>.",
-      "delegated_text": "You have currently <span class=\"style__strong color__primary\">{{delegatedAmount}}</span> delegated to this validator, you can additionally delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>."
+    "currently-delegated_label": "Currently Delegated",
+    "unbonding_label": "Unbonding",
+    "unclaimed-rewards_label": "Unclaimed Rewards",
+    "delegate": {
+      "label": "Delegate",
+      "has-delegated_text": "You have currently <span class=\"style__strong color__primary\">{{ delegated }}</span> delegated to this validator.",
+      "not-delegated_text": "Select the amount you want to delegate.",
+      "can-delegate-has-delegated_text": "You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "can-delegate-not-delegated_text": "You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees)."
     },
     "undelegate": {
-      "text": "You have currently not delegated to this validator.",
-      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{delegatedAmount}}</span>."
+      "label": "Undelegate",
+      "text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
     },
     "rewards": {
-      "text": "You currently have no rewards to claim",
-      "claim-rewards_text": "You can claim up to <span class=\"style__strong color__primary\">{{delegationReward}}</span> in rewards for this delegation."
+      "label": "Rewards",
+      "button": "Claim Rewards",
+      "text": "You can claim up to <span class=\"style__strong color__primary\">{{ rewards }}</span> in rewards for this delegation."
+    }
+  },
+  "delegation-detail-tezos": {
+    "delegatee-label": "Baker",
+    "delegatee-label-plural": "Bakers",
+    "status": {
+      "accepts-delegation": "Accepts Delegation",
+      "reached-full-capacity": "Reached Full Capacity",
+      "deactivated": "Deactivated"
+    },
+    "fee_label": "Fee",
+    "payout-schedule-every-cycle-last-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from last cycle</small>",
+    "payout-schedule-every-cycle-delayed-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from {{ payoutDelay }} cycles ago</small>",
+    "payout-schedule-every-n-cycle_text": "Every {{ payoutTime }} <small>Every {{ cycles }} cycle</small>",
+    "payout-schedule_label": "Payout Schedule",
+    "next-payout_label": "Next Payout",
+    "first-payout_label": "First Payout",
+    "return-per-cycle_label": "Estimated Return per Cycle",
+    "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",
+    "unknown": "Unknown",
+    "rewards": {
+      "index-col_label": "Cycle",
+      "amount-col_label": "Expected Reward",
+      "payout-col_label": "Earliest Payout"
+    }
+  },
+  "delegation-detail-substrate": {
+    "delegatee-label": "Validator",
+    "delegatee-label-plural": "Validators",
+    "status": {
+      "unknown": "Unknown"
+    },
+    "commission_label": "Commission",
+    "expected-reward_label": "Expected Reward",
+    "delegated_label": "Delegated",
+    "bonded_label": "Bonded",
+    "locked_label": "Locked",
+    "withdraw-ready_label": "Ready to Withdraw",
+    "becomes-active_label": "Becomes Active",
+    "next-payout_label": "Next Payout",
+    "delegate": {
+      "label": "Delegate",
+      "bond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
+      "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated."
+    },
+    "undelegate": {
+      "label": "Undelegate"
+    },
+    "unbond": {
+      "label": "Unbond"
+    },
+    "withdraw-unbonded": {
+      "label": "Withdraw Unboded",
+      "button": "Withdraw",
+      "text-full": "You can withdraw <span class=\"style__strong color__primary\">{{ unlocked }}</span> of unbonded funds.",
+      "text-short": "You can withdraw unbonded funds."
+    },
+    "rewards": {
+      "index-col_label": "Era",
+      "amount-col_label": "Reward",
+      "payout-col_label": "Payout"
     }
   },
   "introduction-push": {
@@ -481,15 +551,20 @@
     "change-vote_label": "Change Vote",
     "done_label": "Done"
   },
+  "delegate-action-popover": {
+    "delegation-settings_label": "Delegation Settings",
+    "change-to-airgap-delegatee_label": "Change to AirGap {{ delegateeLabel }}"
+  },
   "delegate-edit-popover": {
     "delegation-settings_label": "Delegation Settings",
-    "change-baker_label": "Change Baker",
-    "change-baker-to-airgap_label": "Change to tezosAirGap Baker",
-    "heading": "Enter the bakers address",
-    "text": "Enter the address provided to you by the baker.",
-    "baker-address_label": "Baker address",
-    "cancel_label": "Cancel",
-    "set-baker_label": "Set Baker"
+    "change-delegatee_label": "Change {{ delegateeLabel }}",
+    "change-alert": {
+      "text": "Enter the address provided to you by the {{ delegateeLabel }}.",
+      "placeholder_text": "{{ delegateeLabel }} address",
+      "delegatee-address_label": "Baker address",
+      "cancel_label": "Cancel",
+      "set-delegatee_label": "Set {{ delegateeLabel }}" 
+    }
   },
   "delegation-validator-list": {
     "title": "Validator List",

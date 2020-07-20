@@ -1,3 +1,5 @@
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+
 import { FeeConverterPipe } from './fee-converter.pipe'
 
 describe('FeeConverter Pipe', () => {
@@ -8,13 +10,13 @@ describe('FeeConverter Pipe', () => {
   })
 
   it('should display very small ETH number to a non-scientific string representation', () => {
-    expect(feeConverterPipe.transform('1', { protocolIdentifier: 'eth' })).toEqual('0.000000000000000001 ETH')
+    expect(feeConverterPipe.transform('1', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('0.000000000000000001 ETH')
   })
 
   it('should display a normal ETH number to a non-scientific string representation', () => {
     expect(
       feeConverterPipe.transform('1000000000000000000', {
-        protocolIdentifier: 'eth'
+        protocolIdentifier: MainProtocolSymbols.ETH
       })
     ).toEqual('1 ETH')
   })
@@ -22,17 +24,17 @@ describe('FeeConverter Pipe', () => {
   it('should display a big ETH number to a non-scientific string representation', () => {
     expect(
       feeConverterPipe.transform('10000000000000000000000000000000000', {
-        protocolIdentifier: 'eth'
+        protocolIdentifier: MainProtocolSymbols.ETH
       })
     ).toEqual('10000000000000000 ETH')
   })
 
   it('should return a valid amount if value is 0', () => {
-    expect(feeConverterPipe.transform('0', { protocolIdentifier: 'eth' })).toEqual('0 ETH')
+    expect(feeConverterPipe.transform('0', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('0 ETH')
   })
 
   it('should return an empty string for non-numeric value', () => {
-    expect(feeConverterPipe.transform('test', { protocolIdentifier: 'eth' })).toEqual('')
+    expect(feeConverterPipe.transform('test', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('')
   })
 
   it('should return an empty string when protocolIdentifier is not set', () => {
@@ -42,7 +44,7 @@ describe('FeeConverter Pipe', () => {
   it('should return an empty string when protocolIdentifier unknown', () => {
     expect(
       feeConverterPipe.transform('1', {
-        protocolIdentifier: 'FeeConverterPipe'
+        protocolIdentifier: 'FeeConverterPipe' as any
       })
     ).toEqual('')
   })
@@ -64,22 +66,22 @@ describe('FeeConverter Pipe', () => {
   }
 
   const truthyProtocolIdentifiers = [
-    { value: '1', protocolIdentifier: 'btc', expected: '0.00000001 BTC' },
+    { value: '1', protocolIdentifier: MainProtocolSymbols.BTC, expected: '0.00000001 BTC' },
     {
       value: '1',
-      protocolIdentifier: 'eth',
+      protocolIdentifier: MainProtocolSymbols.ETH,
       expected: '0.000000000000000001 ETH'
     }
   ]
   makeTests(truthyProtocolIdentifiers)
 
   const falsyValues = [
-    { value: false, protocolIdentifier: 'eth', expected: '' },
-    { value: 0, protocolIdentifier: 'eth', expected: '0 ETH' },
-    { value: '', protocolIdentifier: 'eth', expected: '' },
-    { value: null, protocolIdentifier: 'eth', expected: '' },
-    { value: undefined, protocolIdentifier: 'eth', expected: '' },
-    { value: NaN, protocolIdentifier: 'eth', expected: '' }
+    { value: false, protocolIdentifier: MainProtocolSymbols.ETH, expected: '' },
+    { value: 0, protocolIdentifier: MainProtocolSymbols.ETH, expected: '0 ETH' },
+    { value: '', protocolIdentifier: MainProtocolSymbols.ETH, expected: '' },
+    { value: null, protocolIdentifier: MainProtocolSymbols.ETH, expected: '' },
+    { value: undefined, protocolIdentifier: MainProtocolSymbols.ETH, expected: '' },
+    { value: NaN, protocolIdentifier: MainProtocolSymbols.ETH, expected: '' }
   ]
   makeTests(falsyValues)
 

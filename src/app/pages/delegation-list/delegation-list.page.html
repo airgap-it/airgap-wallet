@@ -4,7 +4,12 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ delegateeLabel }} List</ion-title>
+      <ion-title>{{ "delegation-list.title" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="presentPopover($event)" color="secondary">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
     </ion-toolbar>
     <ion-toolbar>
       <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
@@ -14,16 +19,110 @@
 
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="filteredDelegatees && filteredDelegatees.length > 0; else loadingTemplate">
-      <ion-list lines="none">
-        <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of filteredDelegatees">
+    <ng-container *ngIf="currentDelegatees; else currentLoadingTemplate">
+      <ion-list lines="none" *ngIf="currentDelegatees.length > 0">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: ((areMultipleDelegationsSupported ?
+              delegateeLabelPlural : delegateeLabel) | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
+        <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of currentDelegatees">
           <widget-account-summary [widget]="delegatee"></widget-account-summary>
         </div>
       </ion-list>
     </ng-container>
 
-    <ng-template #loadingTemplate>
+    <ng-template #currentLoadingTemplate>
       <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.your-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-avatar slot="start">
+            <identicon></identicon>
+          </ion-avatar>
+          <ion-label>
+            <ion-text>
+              <ion-row class="ion-no-padding">
+                <ion-col size="9" class="ion-no-padding">
+                  <h2>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h2>
+                </ion-col>
+                <ion-col size="3" class="ion-no-padding">
+                  <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                </ion-col>
+              </ion-row>
+            </ion-text>
+            <ion-row class="ion-no-padding">
+              <ion-col size="4" class="ion-no-padding">
+                <ion-text>
+                  <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </ion-text>
+              </ion-col>
+              <ion-col size="8" class="ion-no-padding">
+                <ion-text>
+                  <p class="ion-no-margin">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                  </p>
+                </ion-text>
+              </ion-col>
+            </ion-row>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+
+    <ng-container *ngIf="displayedDelegatees; else filteredLoadingTemplate">
+      <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.known-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
+        <div class="ion-padding-horizontal" (click)="navigateToDetails(delegatee.address)" *ngFor="let delegatee of displayedDelegatees">
+          <widget-account-summary [widget]="delegatee"></widget-account-summary>
+        </div>
+      </ion-list>
+      <p class="ion-padding-horizontal" *ngIf="knownDelegatees.length === 0">
+        {{ "delegation-list.not-supported_text" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+      </p>
+
+      <ion-infinite-scroll
+        *ngIf="!isDesktop"
+        [disabled]="displayedDelegatees.length >= filteredDelegatees.length"
+        (ionInfinite)="loadMoreItems()"
+      >
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+      <ion-button
+        fill="outline"
+        expand="block"
+        *ngIf="isDesktop && displayedDelegatees.length < filteredDelegatees.length"
+        (click)="loadMoreItems()"
+      >
+        {{ "delegation-list.load-more_label" | translate }}
+      </ion-button>
+    </ng-container>
+
+    <ng-template #filteredLoadingTemplate>
+      <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>
+            <ion-text color="primary" class="font--weight__bold ion-ion-text">
+              {{ "delegation-list.known-delegatees_label" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+            </ion-text>
+          </ion-label>
+        </ion-list-header>
         <ion-item>
           <ion-avatar slot="start">
             <identicon></identicon>

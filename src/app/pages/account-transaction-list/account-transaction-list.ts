@@ -15,15 +15,15 @@ import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateActio
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolSymbols } from '../../services/protocols/protocols'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { StorageProvider } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000
@@ -34,6 +34,9 @@ export const refreshRate = 3000
   styleUrls: ['./account-transaction-list.scss']
 })
 export class AccountTransactionListPage {
+  public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
+  public subProtocolSymbols: typeof SubProtocolSymbols = SubProtocolSymbols
+
   private timer$ = timer(0, refreshRate)
   private subscription: Subscription = new Subscription()
 
@@ -98,26 +101,27 @@ export class AccountTransactionListPage {
 
     this.updateExtendedDetails()
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
+      this.loadInitialTransactions(true)
       this.updateExtendedDetails()
     })
 
     this.subscription = this.timer$.subscribe(async () => {
       if (this.formattedExchangeTransactions.length > 0) {
         this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-          this.wallet.protocolIdentifier,
+          this.wallet.protocol.identifier,
           this.wallet.addresses[0]
         )
         this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
       }
     })
 
-    this.protocolIdentifier = this.wallet.coinProtocol.identifier
+    this.protocolIdentifier = this.wallet.protocol.identifier
 
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       this.mainWallet = info.mainWallet
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ) {
+    if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
       this.getKtAddresses().catch(handleErrorSentry(ErrorCategory.COINLIB))
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
@@ -126,25 +130,6 @@ export class AccountTransactionListPage {
     this.actionGroup.getActions().then(actions => {
       this.actions = actions
     })
-
-    this.init()
-  }
-
-  public async init(): Promise<void> {
-    const lastTx: {
-      protocol: string
-      accountIdentifier: string
-      date: number
-    } = await this.storageProvider.get(SettingsKey.LAST_TX_BROADCAST)
-
-    if (
-      lastTx &&
-      lastTx.protocol === this.wallet.protocolIdentifier &&
-      lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
-      lastTx.date > new Date().getTime() - 5 * 60 * 1000
-    ) {
-      this.hasPendingTransactions = true
-    }
   }
 
   public showNoTransactionScreen(): boolean {
@@ -157,7 +142,7 @@ export class AccountTransactionListPage {
 
   public openPreparePage() {
     let info
-    if (this.protocolIdentifier === ProtocolSymbols.XTZ_KT) {
+    if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
         mainWallet: this.mainWallet,
@@ -168,7 +153,7 @@ export class AccountTransactionListPage {
       })
       action.start()
       return
-    } else if (this.protocolIdentifier === ProtocolSymbols.TZBTC) {
+    } else if (this.protocolIdentifier === SubProtocolSymbols.XTZ_BTC) {
       info = {
         wallet: this.wallet,
         address: '',
@@ -195,13 +180,13 @@ export class AccountTransactionListPage {
   }
 
   public async openBlockexplorer(): Promise<void> {
-    const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    const blockexplorer = await this.wallet.protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.browserService.openUrl(blockexplorer)
   }
 
   public doRefresh(event: any = null): void {
-    if (supportsDelegation(this.wallet.coinProtocol)) {
+    if (supportsDelegation(this.wallet.protocol)) {
       this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
 
@@ -234,7 +219,7 @@ export class AccountTransactionListPage {
     event.target.complete()
   }
 
-  public async loadInitialTransactions(): Promise<void> {
+  public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
@@ -248,7 +233,7 @@ export class AccountTransactionListPage {
       return []
     })
 
-    this.transactions = this.mergeTransactions(this.transactions, transactions)
+    this.transactions = this.mergeTransactions(forceRefresh ? [] : this.transactions, transactions)
 
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
@@ -258,7 +243,7 @@ export class AccountTransactionListPage {
     this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
 
     this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-      this.wallet.protocolIdentifier,
+      this.wallet.protocol.identifier,
       this.wallet.addresses[0]
     )
     this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
@@ -281,7 +266,9 @@ export class AccountTransactionListPage {
       this.hasPendingTransactions = false
     }
 
-    this.accountProvider.triggerWalletChanged()
+    if (!forceRefresh) {
+      this.accountProvider.triggerWalletChanged()
+    }
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
@@ -303,13 +290,21 @@ export class AccountTransactionListPage {
     if (!oldTransactions) {
       return newTransactions
     }
+
     const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
       oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
     )
 
+    const transactionCountBefore: number = transactionMap.size
+
     newTransactions.forEach(tx => {
       transactionMap.set(tx.hash, tx)
     })
+
+    if (transactionCountBefore === transactionMap.size) {
+      // We did not add any elements, so the list does not have to be changed
+      return oldTransactions
+    }
 
     return Array.from(transactionMap.values()).sort((a, b) =>
       a.timestamp !== undefined && b.timestamp !== undefined
@@ -323,7 +318,8 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        importAccountAction: this.wallet.protocolIdentifier === 'xtz' ? this.actionGroup.getImportAccountsAction() : undefined,
+        importAccountAction:
+          this.wallet.protocol.identifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }
@@ -338,7 +334,7 @@ export class AccountTransactionListPage {
   // Tezos
   public async isDelegated(): Promise<void> {
     const isDelegated = await this.operationsProvider.checkDelegated(
-      this.wallet.coinProtocol as ICoinDelegateProtocol,
+      this.wallet.protocol as ICoinDelegateProtocol,
       this.wallet.receivingPublicAddress
     )
     this.isKtDelegated = isDelegated
@@ -378,7 +374,7 @@ export class AccountTransactionListPage {
   }
 
   private updateExtendedDetails() {
-    if (supportsDelegation(this.wallet.coinProtocol) && this.wallet.receivingPublicAddress !== undefined) {
+    if (supportsDelegation(this.wallet.protocol) && this.wallet.receivingPublicAddress !== undefined) {
       this.extensionsService.loadDelegationExtensions().then(async () => {
         this.accountExtendedDetails = await this.operationsProvider.getAccountExtendedDetails(this.wallet)
       })

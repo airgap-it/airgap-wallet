@@ -84,7 +84,7 @@ export class PushProvider {
 
       const pushRegisterRequests = wallets.map(wallet => ({
         address: wallet.receivingPublicAddress,
-        identifier: wallet.protocolIdentifier,
+        identifier: wallet.protocol.identifier,
         pushToken: registrationId,
         languageCode
       }))
@@ -116,7 +116,7 @@ export class PushProvider {
     }
 
     this.pushBackendProvider
-      .unregisterPush(wallet.protocolIdentifier, wallet.receivingPublicAddress, registrationId)
+      .unregisterPush(wallet.protocol.identifier, wallet.receivingPublicAddress, registrationId)
       .catch(handleErrorSentry(ErrorCategory.PUSH))
   }
 

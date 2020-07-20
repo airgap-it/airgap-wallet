@@ -1,38 +1,32 @@
-import { SubstrateProtocol, SubstratePayee } from 'airgap-coin-lib'
-import {
-  AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegationDetails,
-  AirGapDelegatorAction
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import BigNumber from 'bignumber.js'
-import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
-import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
-import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, Validators } from '@angular/forms'
+import { TranslateService } from '@ngx-translate/core'
+import { SubstratePayee, SubstrateProtocol } from 'airgap-coin-lib'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import * as moment from 'moment'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { SubstrateStakingActionType } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { SubstrateValidatorDetails } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
+import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegationDetails,
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
+import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
+import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
-const supportedActions = [
-  SubstrateStakingActionType.BOND_NOMINATE,
-  SubstrateStakingActionType.NOMINATE,
-  SubstrateStakingActionType.BOND_EXTRA,
-  SubstrateStakingActionType.UNBOND,
-  SubstrateStakingActionType.CANCEL_NOMINATION,
-  SubstrateStakingActionType.CHANGE_NOMINATION,
-  SubstrateStakingActionType.WITHDRAW_UNBONDED
-]
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 // sorted by priority
 const delegateActions = [
@@ -44,6 +38,8 @@ const delegateActions = [
 
 // sorted by priority
 const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION, SubstrateStakingActionType.UNBOND]
+
+const supportedActions = [...delegateActions, ...undelegateActions, SubstrateStakingActionType.WITHDRAW_UNBONDED]
 
 enum ArgumentName {
   TARGETS = 'targets',
@@ -58,33 +54,47 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
-    amountConverterPipe: AmountConverterPipe
+    amountConverterPipe: AmountConverterPipe,
+    shortenStringPipe: ShortenStringPipe,
+    translateService: TranslateService
   ): SubstrateDelegationExtensions {
     if (!SubstrateDelegationExtensions.instance) {
-      SubstrateDelegationExtensions.instance = new SubstrateDelegationExtensions(formBuilder, decimalPipe, amountConverterPipe)
+      SubstrateDelegationExtensions.instance = new SubstrateDelegationExtensions(
+        formBuilder,
+        decimalPipe,
+        amountConverterPipe,
+        shortenStringPipe,
+        translateService
+      )
     }
 
     return SubstrateDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = undefined
-  public delegateeLabel: string = 'Validator'
+  public airGapDelegatee(_protocol: SubstrateProtocol): string | undefined {
+    return undefined
+  }
+
+  public delegateeLabel: string = 'delegation-detail-substrate.delegatee-label'
+  public delegateeLabelPlural: string = 'delegation-detail-substrate.delegatee-label-plural'
+  public supportsMultipleDelegations: boolean = true
 
   private constructor(
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverterPipe: AmountConverterPipe
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private readonly translateService: TranslateService
   ) {
     super()
   }
 
-  // TODO: add translations
   public async getExtraDelegationDetailsFromAddress(
     protocol: SubstrateProtocol,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
 
     const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
     const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, nominatorDetails, extraNominatorDetails)
@@ -102,9 +112,27 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegator: string,
     delegatees: string[]
   ): Promise<UIRewardList | undefined> {
-    const nominatorDetails = await protocol.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
 
     return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
+  }
+
+  public async createDelegateesSummary(protocol: SubstrateProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const delegateesDetails: SubstrateValidatorDetails[] = await Promise.all(
+      delegatees.map(delegatee => protocol.options.accountController.getValidatorDetails(delegatee))
+    )
+
+    return delegateesDetails.map(
+      (details: SubstrateValidatorDetails) =>
+        new UIAccountSummary({
+          address: details.address,
+          header: [
+            details.name,
+            details.commission ? `${this.decimalPipe.transform(new BigNumber(details.commission).times(100).toString())}%` : ''
+          ],
+          description: [this.shortenStringPipe.transform(details.address), '']
+        })
+    )
   }
 
   private async getExtraValidatorsDetails(
@@ -115,7 +143,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
       validators.map(async validator => {
-        const validatorDetails = await protocol.accountController.getValidatorDetails(validator)
+        const validatorDetails = await protocol.options.accountController.getValidatorDetails(validator)
 
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
@@ -125,7 +153,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         return {
           ...validatorDetails,
           name: validatorDetails.name || '',
-          status: validatorDetails.status || 'unknown',
+          status: validatorDetails.status || 'delegation-detail-substrate.status.unknown',
           usageDetails: {
             usage: ownStash.dividedBy(totalStakingBalance),
             current: ownStash,
@@ -152,7 +180,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       new UIIconText({
         iconName: 'logo-usd',
         text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
-        description: 'Commission'
+        description: 'delegation-detail-substrate.commission_label'
       })
     )
 
@@ -183,7 +211,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const expectedRewardWidget = new UIIconText({
         iconName: 'logo-usd',
         text: getExpectedReward(bonded),
-        description: 'Expected reward'
+        description: 'delegation-detail-substrate.expected-reward_label'
       })
 
       delegateAction.form.valueChanges.subscribe(value => {
@@ -248,7 +276,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const results = await Promise.all([
       protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
-      protocol.nodeClient.getExistentialDeposit()
+      protocol.options.nodeClient.getExistentialDeposit()
     ])
 
     const maxValue = new BigNumber(results[0])
@@ -289,7 +317,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
       return {
         type: action.type,
-        label: 'Delegate',
+        label: 'delegation-detail-substrate.delegate.label',
         description,
         form,
         args: argWidgets
@@ -316,13 +344,22 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
-        return `Select the amount you want to delegate. You can delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
+        return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
+          maxDelegation: maxValueFormatted
+        })
       case SubstrateStakingActionType.NOMINATE:
-        return `Delegate to this validator. You have currenly <span class="style__strong color__primary">${bondedFormatted}</span> bonded.`
+        return this.translateService.instant('delegatino-detail-substrate.delegate.nominate_text', {
+          bonded: bondedFormatted
+        })
       case SubstrateStakingActionType.BOND_EXTRA:
-        return `You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated. You can additionally delegate up to <span class="style__strong color__primary">${maxValueFormatted}</span> (after transaction fees).`
+        return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
+          bonded: bondedFormatted,
+          maxDelegation: maxValueFormatted
+        })
       case SubstrateStakingActionType.CHANGE_NOMINATION:
-        return `Change your delegation. You have currently <span class="style__strong color__primary">${bondedFormatted}</span> delegated.`
+        return this.translateService.instant('delegation-detail-substrate.delegate.change-nomination_text', {
+          bonded: bondedFormatted
+        })
       default:
         return undefined
     }
@@ -359,9 +396,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   private createUndelegateActionLabel(actionType: SubstrateStakingActionType): string | undefined {
     switch (actionType) {
       case SubstrateStakingActionType.CANCEL_NOMINATION:
-        return 'Undelegate'
+        return 'delegation-detail-substrate.undelegate.label'
       case SubstrateStakingActionType.UNBOND:
-        return 'Unbond'
+        return 'delegation-detail-substrate.unbond.label'
       default:
         return undefined
     }
@@ -389,11 +426,13 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
                 })
               : undefined
 
-            label = 'Withdraw Unbonded'
-            confirmLabel = 'Withdraw'
+            label = 'delegation-detail-substrate.withdraw-unbonded.label'
+            confirmLabel = 'delegation-detail-substrate.withdraw-unbonded.button'
             description = totalUnlockedFormatted
-              ? `You can withdraw <span class="style__strong color__primary">${totalUnlockedFormatted}</span> of unbonded funds.`
-              : `You can withdraw unbonded funds.`
+              ? this.translateService.instant('delegation-detail-substrate.withdraw-unbonded.text-full', {
+                  unlocked: totalUnlockedFormatted
+                })
+              : 'delegation-detail-substrate.withdraw-unbonded.text-short'
 
             break
         }
@@ -452,9 +491,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         }),
         timestamp: reward.timestamp
       })),
-      indexColLabel: 'Era',
-      amountColLabel: 'Reward',
-      payoutColLabel: 'Payout'
+      indexColLabel: 'delegation-detail-substrate.rewards.index-col_label',
+      amountColLabel: 'delegation-detail-substrate.rewards.amount-col_label',
+      payoutColLabel: 'delegation-detail-substrate.rewards.payout-col_label'
     })
   }
 
@@ -473,7 +512,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
           }),
-          description: stakingDetails.status === 'nominating' ? 'Delegated' : 'Bonded'
+          description:
+            stakingDetails.status === 'nominating'
+              ? 'delegation-detail-substrate.delegated_label'
+              : 'delegation-detail-substrate.bonded_label'
         })
       )
     } else if (stakingDetails.locked.length > 0) {
@@ -489,12 +531,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
           }),
-          description: 'Locked'
+          description: 'delegation-detail-substrate.locked_label'
         }),
         new UIIconText({
           iconName: 'alarm-outline',
           text: `${moment(unlockingDate).fromNow()} (${moment(unlockingDate).format('LLL')})`,
-          description: 'Ready to withdraw'
+          description: 'delegation-detail-substrate.withdraw-ready_label'
         })
       )
     } else if (totalUnlocked.gt(0)) {
@@ -505,7 +547,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
             protocolIdentifier: protocol.identifier,
             maxDigits: 10
           }),
-          description: 'Ready to withdraw'
+          description: 'delegation-detail-substrate.withdraw-ready_label'
         })
       )
     }
@@ -521,7 +563,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       new UIIconText({
         iconName: 'sync-outline',
         text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
-        description: stakingDetails.status === 'nominating_inactive' ? 'Becomes active' : 'Next payout'
+        description:
+          stakingDetails.status === 'nominating_inactive'
+            ? 'delegation-detail-substrate.becomes-active_label'
+            : 'delegation-detail-substrate.next-payout_label'
       })
     )
 

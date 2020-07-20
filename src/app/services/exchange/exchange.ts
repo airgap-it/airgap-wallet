@@ -1,12 +1,15 @@
-import { BigNumber } from 'bignumber.js'
-import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
-import { BehaviorSubject } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { Injectable } from '@angular/core'
+import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { BigNumber } from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+
+import { SettingsKey, StorageProvider } from '../storage/storage'
+
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { Injectable } from '@angular/core'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 
 export enum ExchangeEnum {
   CHANGELLY = 'Changelly',
@@ -26,8 +29,8 @@ export enum TransactionStatus {
 export interface ExchangeTransaction {
   receivingAddress: string
   sendingAddress: string
-  fromCurrency: string
-  toCurrency: string
+  fromCurrency: ProtocolSymbols
+  toCurrency: ProtocolSymbols
   amountExpectedFrom: BigNumber
   amountExpectedTo: string
   fee: string
@@ -63,11 +66,11 @@ export class ExchangeProvider implements Exchange {
     })
   }
 
-  public getAvailableFromCurrencies(): Promise<string[]> {
+  public getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableFromCurrencies()
   }
 
-  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
+  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableToCurrenciesForCurrency(selectedFrom)
   }
 
@@ -138,7 +141,7 @@ export class ExchangeProvider implements Exchange {
     this.persist()
   }
 
-  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): IAirGapTransaction[] {
+  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: ProtocolSymbols): IAirGapTransaction[] {
     const protocol = getProtocolByIdentifier(protocolIdentifier)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
@@ -151,6 +154,7 @@ export class ExchangeProvider implements Exchange {
         fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
         timestamp: tx.timestamp,
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
+        network: protocol.options.network,
         extra: tx.status
       }
     })
@@ -174,7 +178,7 @@ export class ExchangeProvider implements Exchange {
     return
   }
 
-  public async getExchangeTransactionsByProtocol(protocolidentifier: string, address: string): Promise<IAirGapTransaction[]> {
+  public async getExchangeTransactionsByProtocol(protocolidentifier: ProtocolSymbols, address: string): Promise<IAirGapTransaction[]> {
     const filteredByProtocol = this.pendingTransactions.filter(
       tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier
     )

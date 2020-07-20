@@ -94,14 +94,14 @@ export class DeepLinkProvider {
     console.log('identifier', identifier)
 
     const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
-    const airGapTxs: IAirGapTransaction[] = await wallet.coinProtocol.getTransactionDetails({
+    const airGapTxs: IAirGapTransaction[] = await wallet.protocol.getTransactionDetails({
       publicKey: wallet.publicKey,
       transaction: rawUnsignedTx
     })
 
     const serializedTx: string[] = await this.serializerService.serialize([
       {
-        protocol: wallet.coinProtocol.identifier,
+        protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
