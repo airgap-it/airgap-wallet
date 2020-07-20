@@ -150,6 +150,10 @@ const routes: Routes = [
   {
     path: 'error',
     loadChildren: () => import('./pages/error/error.module').then(m => m.ErrorPageModule)
+  },
+  {
+    path: 'walletconnect',
+    loadChildren: () => import('./pages/walletconnect/walletconnect.module').then(m => m.WalletconnectPageModule)
   }
 ]
 @NgModule({

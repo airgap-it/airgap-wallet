@@ -18,6 +18,7 @@ import { BeaconService } from '../beacon/beacon.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletconnectService } from '../walletconnect/walletconnect.service'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -42,7 +43,8 @@ export class SchemeRoutingProvider {
     private readonly serializerService: SerializerService,
     private readonly beaconService: BeaconService,
     private readonly storageProvider: StorageProvider,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    private readonly walletConnectService: WalletconnectService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -119,6 +121,12 @@ export class SchemeRoutingProvider {
       }
     } catch (e) {
       //
+    }
+
+    // Check if it's a walletconnect request
+    if (Array.isArray(data) && typeof data[0] === 'string' && data[0].startsWith('wc')) {
+      console.log('WalletConnect QR scanned', data[0])
+      await this.walletConnectService.connect(data[0])
     }
 
     const [error, deserializedSync]: [Error, IACMessageDefinitionObject[]] = await to(this.serializerService.deserialize(data))
