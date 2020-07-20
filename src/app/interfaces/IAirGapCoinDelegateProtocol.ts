@@ -44,7 +44,7 @@ export interface AirGapDelegationDetails {
 }
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
-  airGapDelegatee?: string
+  airGapDelegatee(): string | undefined
 
   delegateeLabel: string
   delegateeLabelPlural: string

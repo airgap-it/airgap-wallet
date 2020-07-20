@@ -17,17 +17,6 @@
         </div>
       </ng-container>
 
-      <ng-container
-        *ngIf="transaction.transactionDetails && transaction.transactionDetails.type && transaction.transactionDetails.type !== 'TRANSFER'"
-      >
-        <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.type_label' | translate }}</ion-label>
-        <div class="ion-padding-bottom">
-          <span class="typography--mono">
-            {{ transaction.transactionDetails.type }}
-          </span>
-        </div>
-      </ng-container>
-
       <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="ion-padding-bottom">
         <span class="typography--mono ion-padding-bottom">
@@ -74,6 +63,24 @@
   </ion-row>
 
   <address-row *ngFor="let address of transaction.to" [address]="address" label="{{ 'from-to.to_label' | translate }}"></address-row>
+
+  <ion-row class="ion-align-items-center ion-padding-top">
+    <ion-col size="9" offset="3">
+      <ion-row>
+        <ng-container
+          *ngIf="transaction.network && transaction.network.type !== networkType.MAINNET"
+          class="ion-no-padding"
+          lines="none"
+          slot="start"
+        >
+          <ion-badge class="badge__margin" color="danger">{{ transaction.network.name }}</ion-badge>
+          <ion-badge *ngIf="transaction.network.type === networkType.CUSTOM" class="badge__margin">
+            {{transaction.network.rpcUrl}}
+          </ion-badge>
+        </ng-container>
+      </ion-row>
+    </ion-col>
+  </ion-row>
 
   <ion-row class="rawdata--container" *ngIf="transaction.transactionDetails">
     <ion-col class="ion-no-padding">

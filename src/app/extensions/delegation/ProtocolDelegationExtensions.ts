@@ -8,8 +8,8 @@ import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UII
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
   private static readonly extensionProperitesWithType: [keyof IAirGapCoinDelegateProtocol, 'property' | 'function'][] = [
-    ['airGapDelegatee', 'property'],
     ['delegateeLabel', 'property'],
+    ['airGapDelegatee', 'function'],
     ['delegateeLabelPlural', 'property'],
     ['supportsMultipleDelegations', 'property'],
     ['getExtraDelegationDetailsFromAddress', 'function'],
@@ -70,8 +70,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     }
   }
 
-  public abstract airGapDelegatee?: string
-
+  public abstract airGapDelegatee(protocol: T): string | undefined
   public abstract delegateeLabel: string
   public abstract delegateeLabelPlural: string
   public abstract supportsMultipleDelegations: boolean

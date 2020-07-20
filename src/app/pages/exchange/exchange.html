@@ -91,7 +91,7 @@
           amount?.isNaN() ||
           amount?.isZero() ||
           amount?.isLessThan(minExchangeAmount) ||
-          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.coinProtocol.decimals))
+          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals))
         "
           (click)="startExchange()"
           shape="round"

@@ -1,9 +1,10 @@
 import { Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
+import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AppPlugin, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle, AppUrlOpen } from '@capacitor/core'
 
+import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
 import { DataService, DataServiceKey } from './services/data/data.service'
@@ -15,14 +16,13 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { SettingsKey, StorageProvider } from './services/storage/storage'
 import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
-import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
 })
 export class AppComponent {
-  public isMobile = false
+  public isMobile: boolean = false
 
   constructor(
     private readonly platform: Platform,
@@ -51,9 +51,8 @@ export class AppComponent {
     const supportedLanguages = ['en', 'de', 'zh-cn']
 
     this.loadLanguages(supportedLanguages)
-    this.protocolsProvider.addProtocols()
 
-    await this.platform.ready()
+    await Promise.all([this.platform.ready(), this.protocolsProvider.isReady])
 
     if (this.platform.is('hybrid')) {
       this.statusBar.setStyle({ style: StatusBarStyle.Light })

@@ -1,8 +1,8 @@
-import { PermissionInfo } from '@airgap/beacon-sdk'
+import { NetworkType, PermissionInfo } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { AlertController } from '@ionic/angular'
-import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { TranslateService } from '@ngx-translate/core'
+import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
 @Component({
   selector: 'app-beacon-permission-list',
@@ -10,6 +10,8 @@ import { TranslateService } from '@ngx-translate/core'
   styleUrls: ['./beacon-permission-list.page.scss']
 })
 export class BeaconPermissionListPage {
+  public networkType: typeof NetworkType = NetworkType
+
   public permissions: PermissionInfo[] = []
 
   constructor(

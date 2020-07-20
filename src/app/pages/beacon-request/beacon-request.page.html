@@ -28,6 +28,7 @@
           </ion-item>
         </ion-card>
       </ng-container>
+
       <div *ngIf="request.type === 'permission_request'" class="request--container">
         <ion-row>
           <ion-col class="ion-text-center" size="3">
@@ -59,6 +60,19 @@
           </ion-col>
         </ion-row>
       </div>
+
+      <ion-row class="ion-align-items-center ion-padding-top">
+        <ion-col size="12">
+          <ion-row>
+            <ng-container *ngIf="network && network.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
+              <ion-badge class="badge__margin" color="danger">{{ network.name }}</ion-badge>
+              <ion-badge *ngIf="network.type === networkType.CUSTOM" class="badge__margin">
+                {{network.rpcUrl}}
+              </ion-badge>
+            </ng-container>
+          </ion-row>
+        </ion-col>
+      </ion-row>
 
       <ng-container *ngIf="request.type === 'permission_request'">
         <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>

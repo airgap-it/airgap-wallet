@@ -39,7 +39,7 @@ window.addEventListener('message', function(event) {
     chrome.storage.local.get('wallets', async function(result) {
       const wallets = await result.wallets
       wallets.forEach(wallet => {
-        if (wallet.publicKey === selectedAccount.publicKey && wallet.protocolIdentifier === selectedAccount.protocolIdentifier) {
+        if (wallet.publicKey === selectedAccount.publicKey && wallet.protocol.identifier === selectedAccount.protocolIdentifier) {
           const responseAddress = wallet.addresses[0]
           ;(event.source as any).postMessage({ type: Transactions.ADDRESSES_RESPONSE, addresses: responseAddress }, event.origin)
         }
