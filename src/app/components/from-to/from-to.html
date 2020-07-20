@@ -17,17 +17,6 @@
         </div>
       </ng-container>
 
-      <ng-container
-        *ngIf="transaction.transactionDetails && transaction.transactionDetails.type && transaction.transactionDetails.type !== 'TRANSFER'"
-      >
-        <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.type_label' | translate }}</ion-label>
-        <div class="ion-padding-bottom">
-          <span class="typography--mono">
-            {{ transaction.transactionDetails.type }}
-          </span>
-        </div>
-      </ng-container>
-
       <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="ion-padding-bottom">
         <span class="typography--mono ion-padding-bottom">

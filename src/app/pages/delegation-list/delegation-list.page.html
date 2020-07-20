@@ -81,7 +81,7 @@
     </ng-template>
 
     <ng-container *ngIf="displayedDelegatees; else filteredLoadingTemplate">
-      <ion-list lines="none" *ngIf="displayedDelegatees.length > 0">
+      <ion-list lines="none">
         <ion-list-header>
           <ion-label>
             <ion-text color="primary" class="font--weight__bold ion-ion-text">
@@ -93,6 +93,9 @@
           <widget-account-summary [widget]="delegatee"></widget-account-summary>
         </div>
       </ion-list>
+      <p class="ion-padding-horizontal" *ngIf="knownDelegatees.length === 0">
+        {{ "delegation-list.not-supported_text" | translate: { delegateeLabelPlural: (delegateeLabelPlural | translate) } }}
+      </p>
 
       <ion-infinite-scroll
         *ngIf="!isDesktop"

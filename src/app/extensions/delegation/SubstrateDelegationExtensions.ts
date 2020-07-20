@@ -25,6 +25,8 @@ import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-conve
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
 // sorted by priority
 const delegateActions = [
@@ -53,6 +55,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
+    shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService
   ): SubstrateDelegationExtensions {
     if (!SubstrateDelegationExtensions.instance) {
@@ -60,6 +63,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         formBuilder,
         decimalPipe,
         amountConverterPipe,
+        shortenStringPipe,
         translateService
       )
     }
@@ -79,6 +83,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService
   ) {
     super()
@@ -110,6 +115,24 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
 
     return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
+  }
+
+  public async createDelegateesSummary(protocol: SubstrateProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const delegateesDetails: SubstrateValidatorDetails[] = await Promise.all(
+      delegatees.map(delegatee => protocol.options.accountController.getValidatorDetails(delegatee))
+    )
+
+    return delegateesDetails.map(
+      (details: SubstrateValidatorDetails) =>
+        new UIAccountSummary({
+          address: details.address,
+          header: [
+            details.name,
+            details.commission ? `${this.decimalPipe.transform(new BigNumber(details.commission).times(100).toString())}%` : ''
+          ],
+          description: [this.shortenStringPipe.transform(details.address), '']
+        })
+    )
   }
 
   private async getExtraValidatorsDetails(
@@ -323,6 +346,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       case SubstrateStakingActionType.BOND_NOMINATE:
         return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
           maxDelegation: maxValueFormatted
+        })
+      case SubstrateStakingActionType.NOMINATE:
+        return this.translateService.instant('delegatino-detail-substrate.delegate.nominate_text', {
+          bonded: bondedFormatted
         })
       case SubstrateStakingActionType.BOND_EXTRA:
         return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {

@@ -220,9 +220,6 @@ export class AccountTransactionListPage {
   }
 
   public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
-    if (forceRefresh) {
-      this.transactions = []
-    }
     if (this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
@@ -236,7 +233,7 @@ export class AccountTransactionListPage {
       return []
     })
 
-    this.transactions = this.mergeTransactions(this.transactions, transactions)
+    this.transactions = this.mergeTransactions(forceRefresh ? [] : this.transactions, transactions)
 
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
@@ -293,13 +290,21 @@ export class AccountTransactionListPage {
     if (!oldTransactions) {
       return newTransactions
     }
+
     const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
       oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
     )
 
+    const transactionCountBefore: number = transactionMap.size
+
     newTransactions.forEach(tx => {
       transactionMap.set(tx.hash, tx)
     })
+
+    if (transactionCountBefore === transactionMap.size) {
+      // We did not add any elements, so the list does not have to be changed
+      return oldTransactions
+    }
 
     return Array.from(transactionMap.values()).sort((a, b) =>
       a.timestamp !== undefined && b.timestamp !== undefined

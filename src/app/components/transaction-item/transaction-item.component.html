@@ -23,12 +23,20 @@
       </ion-badge>
       <ng-container *ngIf="!tx.status || tx.status === 'applied'">
         <h3 class="typography--mono" *ngIf="transactionType !== 'exchangeTransaction'">
-          <ng-container *ngIf="tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
-          <ng-container *ngIf="!tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
+          <ng-container *ngIf="tx.isInbound">
+            {{ tx.from[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
+          </ng-container>
+          <ng-container *ngIf="!tx.isInbound">
+            {{ tx.to[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
+          </ng-container>
         </h3>
         <h3 class="typography--mono" *ngIf="transactionType === 'exchangeTransaction'">
-          <ng-container *ngIf="tx.isInbound">{{ tx.to[0] | shortenString }}</ng-container>
-          <ng-container *ngIf="!tx.isInbound">{{ tx.from[0] | shortenString }}</ng-container>
+          <ng-container *ngIf="tx.isInbound">
+            {{ tx.to[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
+          </ng-container>
+          <ng-container *ngIf="!tx.isInbound">
+            {{ tx.from[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
+          </ng-container>
         </h3>
       </ng-container>
     </ion-text>
