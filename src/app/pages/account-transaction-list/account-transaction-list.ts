@@ -220,9 +220,6 @@ export class AccountTransactionListPage {
   }
 
   public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
-    if (forceRefresh) {
-      this.transactions = []
-    }
     if (this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
@@ -236,7 +233,7 @@ export class AccountTransactionListPage {
       return []
     })
 
-    this.transactions = this.mergeTransactions(this.transactions, transactions)
+    this.transactions = this.mergeTransactions(forceRefresh ? [] : this.transactions, transactions)
 
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
