@@ -179,8 +179,20 @@ export class OperationsProvider {
     delegateeArgKeywords: string[]
   ): AirGapDelegatorAction[] | undefined {
     return [
-      this.createDefaultDelegateAction(availableActions, delegatees, delegateActionTypeKeywords, delegateeArgKeywords, 'Delegate'),
-      this.createDefaultDelegateAction(availableActions, delegatees, undelegateActionTypeKeywords, delegateeArgKeywords, 'Undelegate'),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        delegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.delegate_label'
+      ),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        undelegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.undelegate_label'
+      ),
       ...this.createDefaultExtraActions(availableActions, [...delegateActionTypeKeywords, ...undelegateActionTypeKeywords])
     ].filter(action => !!action)
   }

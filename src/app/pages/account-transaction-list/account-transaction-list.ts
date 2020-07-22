@@ -1,8 +1,9 @@
-import { Component, ViewChild } from '@angular/core'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, PopoverController, ToastController, NavController, LoadingController, IonInfiniteScroll } from '@ionic/angular'
+import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
@@ -17,7 +18,7 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { StorageProvider } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
@@ -25,7 +26,6 @@ import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccou
 
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BrowserService } from 'src/app/services/browser/browser.service'
-import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 
 export const refreshRate = 3000
 
@@ -131,25 +131,6 @@ export class AccountTransactionListPage {
     this.actionGroup.getActions().then(actions => {
       this.actions = actions
     })
-
-    this.init()
-  }
-
-  public async init(): Promise<void> {
-    const lastTx: {
-      protocol: string
-      accountIdentifier: string
-      date: number
-    } = await this.storageProvider.get(SettingsKey.LAST_TX_BROADCAST)
-
-    if (
-      lastTx &&
-      lastTx.protocol === this.wallet.protocol.identifier &&
-      lastTx.accountIdentifier === this.wallet.publicKey.substr(-6) &&
-      lastTx.date > new Date().getTime() - 5 * 60 * 1000
-    ) {
-      this.hasPendingTransactions = true
-    }
   }
 
   public showNoTransactionScreen(): boolean {

@@ -1,4 +1,5 @@
 import { FormGroup } from '@angular/forms'
+import { SafeUrl } from '@angular/platform-browser'
 import { ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { DelegateeDetails, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import BigNumber from 'bignumber.js'
@@ -26,6 +27,7 @@ export interface AirGapDelegatorAction {
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {
+  logo?: string | SafeUrl
   usageDetails?: AirGapDelegateeUsageDetails
   displayDetails?: UIWidget[]
 }
@@ -42,8 +44,12 @@ export interface AirGapDelegationDetails {
 }
 
 export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
-  delegateeLabel: string
   airGapDelegatee(): string | undefined
+
+  delegateeLabel: string
+  delegateeLabelPlural: string
+  supportsMultipleDelegations: boolean
+
   getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<UIRewardList | undefined>
   getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
   createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>

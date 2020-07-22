@@ -10,6 +10,8 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   private static readonly extensionProperitesWithType: [keyof IAirGapCoinDelegateProtocol, 'property' | 'function'][] = [
     ['delegateeLabel', 'property'],
     ['airGapDelegatee', 'function'],
+    ['delegateeLabelPlural', 'property'],
+    ['supportsMultipleDelegations', 'property'],
     ['getExtraDelegationDetailsFromAddress', 'function'],
     ['createDelegateesSummary', 'function'],
     ['getRewardDisplayDetails', 'function'],
@@ -70,6 +72,8 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
 
   public abstract airGapDelegatee(protocol: T): string | undefined
   public abstract delegateeLabel: string
+  public abstract delegateeLabelPlural: string
+  public abstract supportsMultipleDelegations: boolean
 
   public abstract getExtraDelegationDetailsFromAddress(
     protocol: T,
@@ -104,12 +108,12 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     return new UIInputText({
       id,
       inputType: 'number',
-      label: 'Amount',
+      label: 'delegation-detail.amount_label',
       placeholder: '0.00',
       defaultValue: maxValue,
-      toggleFixedValueButton: 'Max',
+      toggleFixedValueButton: 'delegation-detail.max-amount_button',
       fixedValue: maxValue,
-      errorLabel: 'Invalid value',
+      errorLabel: 'delegation-detail.invalid-value_error',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
           const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
