@@ -187,8 +187,6 @@ export class AccountTransactionListPage {
   }
 
   public doRefresh(event: any = null): void {
-    console.log('doRefresh')
-
     if (supportsDelegation(this.wallet.protocol)) {
       this.operationsProvider.refreshAllDelegationStatuses([this.wallet])
     }
