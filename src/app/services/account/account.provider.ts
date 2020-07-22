@@ -57,12 +57,9 @@ export const getProtocolByIdentifierAndNetworkIdentifier = (
 })
 export class AccountProvider {
   private readonly walletList: AirGapMarketWallet[] = []
-  public activeAccountSubject: ReplaySubject<AirGapMarketWallet> = new ReplaySubject(1)
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
 
   public refreshPageSubject: Subject<void> = new Subject()
-
-  private activeAccount: AirGapMarketWallet
 
   public wallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -93,7 +90,6 @@ export class AccountProvider {
         this.walletsHaveLoaded.next(true)
       })
       .catch(console.error)
-    this.loadActiveAccountFromStorage().catch(console.error)
     this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets)
     this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
 
@@ -275,11 +271,6 @@ export class AccountProvider {
       throw new Error('wallet already exists')
     }
 
-    // WebExtension: Add as active wallet if it's the first wallet
-    if (this.walletList.length === 0) {
-      this.changeActiveAccount(wallet)
-    }
-
     // Register address with push backend
     this.pushProvider.setupPush()
     this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
@@ -296,13 +287,6 @@ export class AccountProvider {
     const index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
     if (index > -1) {
       this.walletList.splice(index, 1)
-    }
-    if (this.isSameWallet(walletToRemove, this.getActiveAccount())) {
-      if (this.walletList.length > 0) {
-        this.changeActiveAccount(this.walletList[0])
-      } else if (this.walletList.length === 0) {
-        this.resetActiveAccount()
-      }
     }
 
     // Unregister address from push backend
@@ -399,41 +383,5 @@ export class AccountProvider {
         })
       )
       .toPromise()
-  }
-
-  private async loadActiveAccountFromStorage() {
-    const wallet = await this.storageProvider.get(SettingsKey.SELECTED_ACCOUNT)
-    this.activeAccount = wallet
-    this.persistActiveAccount()
-    this.publishActiveAccount(wallet)
-  }
-
-  public changeActiveAccount(wallet: AirGapMarketWallet) {
-    this.activeAccount = wallet
-    this.persistActiveAccount()
-    this.publishActiveAccount(wallet)
-    this.refreshPage()
-  }
-
-  private publishActiveAccount(wallet: AirGapMarketWallet) {
-    this.activeAccountSubject.next(wallet)
-  }
-
-  private refreshPage() {
-    this.refreshPageSubject.next()
-  }
-
-  public getActiveAccount(): AirGapMarketWallet | undefined {
-    return this.activeAccount
-  }
-
-  public resetActiveAccount() {
-    this.activeAccount = undefined
-    this.persistActiveAccount()
-    this.refreshPage()
-  }
-
-  private async persistActiveAccount(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.SELECTED_ACCOUNT, this.activeAccount)
   }
 }
