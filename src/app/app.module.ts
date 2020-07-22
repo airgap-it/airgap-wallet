@@ -52,7 +52,6 @@ import { ScannerProvider } from './services/scanner/scanner'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
-import { WebExtensionProvider } from './services/web-extension/web-extension'
 
 import {
   APP_INFO_PLUGIN,
@@ -100,7 +99,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
+      driverOrder: ['sqlite', 'localstorage']
     }),
     PipesModule,
     ComponentsModule,
@@ -141,7 +140,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
-    WebExtensionProvider,
     AppInfoProvider,
     PushProvider,
     PushBackendProvider,
