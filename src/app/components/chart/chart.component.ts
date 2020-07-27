@@ -130,14 +130,14 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
     this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
     console.log(this.rawData)
-    this.chartDatasets[0].data = this.rawData.map((obj: BalanceAtTimestampObject) => obj.balance)
+    this.chartDatasets[0].data = this.rawData.map((obj: ValueAtTimestampObject) => obj.balance)
 
     for (let i = 0; i < this.rawData.length; i++) {
       // x-axis labeling
       this.chartLabels.push(this.rawData[i].timestamp.toString())
     }
 
-    this.percentageChange = await this.displayPercentageChange(this.rawData.map((obj: BalanceAtTimestampObject) => obj.balance))
+    this.percentageChange = await this.displayPercentageChange(this.rawData.map((obj: ValueAtTimestampObject) => obj.balance))
   }
 
   public setLabel24h(): void {
