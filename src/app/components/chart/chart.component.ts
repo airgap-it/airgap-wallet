@@ -129,7 +129,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.currentChart = timeInterval
 
     this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
-    console.log(this.rawData)
     this.chartDatasets[0].data = this.rawData.map((obj: ValueAtTimestampObject) => obj.balance)
 
     for (let i = 0; i < this.rawData.length; i++) {

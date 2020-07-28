@@ -133,7 +133,6 @@ export class MarketDataService {
         )
         const walletValues = await this.fetchValuesAtTimestampSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
         walletValues.forEach((walletValue, idx) => {
-          console.log(walletValue, idx)
           if (!Number.isNaN(walletValue.balance)) {
             if (allWalletValues[idx]) {
               if (allWalletValues[idx]['balance'] && allWalletValues[idx]['balance'] > 0) {
