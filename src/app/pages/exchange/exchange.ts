@@ -334,7 +334,7 @@ export class ExchangePage {
 
         const info = {
           fromWallet: this.fromWallet,
-          fromCurrency: this.fromWallet.protocol.identifier,
+          fromCurrency: this.fromWallet.protocol.marketSymbol,
           toWallet: this.toWallet,
           toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocol.identifier])[0],
           exchangeResult: result,
