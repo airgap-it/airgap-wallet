@@ -125,7 +125,7 @@ export class MarketDataService {
       const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
 
       const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
-      const allWalletValues = [{ balance: 0, timestamp: 0 }, { balance: 0, timestamp: 0 }]
+      const allWalletValues = [{ balance: 0, timestamp: 0 }]
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setTransactionData(
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
