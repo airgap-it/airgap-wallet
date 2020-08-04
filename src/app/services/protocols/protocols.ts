@@ -22,7 +22,12 @@ import {
   EthereumProtocolNetwork
 } from 'airgap-coin-lib/dist/protocols/ethereum/EthereumProtocolOptions'
 import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
-import { TezosBTCProtocolConfig, TezosFAProtocolOptions } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosFAProtocolOptions'
+import { TezosETH } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosETH'
+import {
+  TezosBTCProtocolConfig,
+  TezosETHProtocolConfig,
+  TezosFAProtocolOptions
+} from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosFAProtocolOptions'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
@@ -95,13 +100,15 @@ export class ProtocolsProvider {
         )
       )
 
+      addSubProtocol(carthagenetProtocol, new TezosETH(new TezosFAProtocolOptions(carthagenetNetwork, new TezosETHProtocolConfig())))
+
       this.addProtocols()
       this._isReady.resolve(true)
     } catch (e) {}
   }
 
   public getEnabledSubProtocols() {
-    return ['xtz-btc', 'eth-erc20-xchf']
+    return ['xtz-btc', 'xtz-eth', 'eth-erc20-xchf']
   }
 
   public async getNetworksForProtocol(protocolIdentifier: string) {
