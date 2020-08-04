@@ -38,8 +38,7 @@
               <ion-row>
                 <p class="font--size__large ion-no-margin">
                   <strong>
-                    {{ state.availableBalance | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits:
-                    wallet.protocol.decimals + 1 } }}
+                    {{ state.availableBalance | amountConverter: { protocol: wallet.protocol, maxDigits: wallet.protocol.decimals + 1 } }}
                   </strong>
                 </p>
               </ion-row>

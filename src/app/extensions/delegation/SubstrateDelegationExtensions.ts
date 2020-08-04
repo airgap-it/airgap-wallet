@@ -203,7 +203,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           .multipliedBy(userShare)
 
         return this.amountConverterPipe.transform(expectedReward, {
-          protocolIdentifier: protocol.identifier,
+          protocol,
           maxDigits: 10
         })
       }
@@ -334,11 +334,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     maxValue: string | number | BigNumber
   ): string | undefined {
     const bondedFormatted = this.amountConverterPipe.transform(bonded, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
     const maxValueFormatted = this.amountConverterPipe.transform(maxValue, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
 
@@ -421,7 +421,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           case SubstrateStakingActionType.WITHDRAW_UNBONDED:
             const totalUnlockedFormatted: string | undefined = stakingDetails
               ? this.amountConverterPipe.transform(stakingDetails.unlocked, {
-                  protocolIdentifier: protocol.identifier,
+                  protocol,
                   maxDigits: 10
                 })
               : undefined
@@ -486,7 +486,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       rewards: nominatorDetails.stakingDetails.rewards.slice(0, 5).map(reward => ({
         index: reward.eraIndex,
         amount: this.amountConverterPipe.transform(reward.amount, {
-          protocolIdentifier: protocol.identifier,
+          protocol,
           maxDigits: 10
         }),
         timestamp: reward.timestamp
@@ -509,7 +509,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         new UIIconText({
           iconName: 'people-outline',
           text: this.amountConverterPipe.transform(totalStaking, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description:
@@ -528,7 +528,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         new UIIconText({
           iconName: 'people-outline',
           text: this.amountConverterPipe.transform(nextUnlockingValue, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail-substrate.locked_label'
@@ -544,7 +544,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         new UIIconText({
           iconName: 'people-outline',
           text: this.amountConverterPipe.transform(totalUnlocked, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail-substrate.withdraw-ready_label'

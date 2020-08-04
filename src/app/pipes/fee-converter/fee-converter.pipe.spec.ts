@@ -10,13 +10,13 @@ describe('FeeConverter Pipe', () => {
   })
 
   it('should display very small ETH number to a non-scientific string representation', () => {
-    expect(feeConverterPipe.transform('1', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('0.000000000000000001 ETH')
+    expect(feeConverterPipe.transform('1', { protocol: MainProtocolSymbols.ETH })).toEqual('0.000000000000000001 ETH')
   })
 
   it('should display a normal ETH number to a non-scientific string representation', () => {
     expect(
       feeConverterPipe.transform('1000000000000000000', {
-        protocolIdentifier: MainProtocolSymbols.ETH
+        protocol: MainProtocolSymbols.ETH
       })
     ).toEqual('1 ETH')
   })
@@ -24,27 +24,27 @@ describe('FeeConverter Pipe', () => {
   it('should display a big ETH number to a non-scientific string representation', () => {
     expect(
       feeConverterPipe.transform('10000000000000000000000000000000000', {
-        protocolIdentifier: MainProtocolSymbols.ETH
+        protocol: MainProtocolSymbols.ETH
       })
     ).toEqual('10000000000000000 ETH')
   })
 
   it('should return a valid amount if value is 0', () => {
-    expect(feeConverterPipe.transform('0', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('0 ETH')
+    expect(feeConverterPipe.transform('0', { protocol: MainProtocolSymbols.ETH })).toEqual('0 ETH')
   })
 
   it('should return an empty string for non-numeric value', () => {
-    expect(feeConverterPipe.transform('test', { protocolIdentifier: MainProtocolSymbols.ETH })).toEqual('')
+    expect(feeConverterPipe.transform('test', { protocol: MainProtocolSymbols.ETH })).toEqual('')
   })
 
   it('should return an empty string when protocolIdentifier is not set', () => {
-    expect(feeConverterPipe.transform('1', { protocolIdentifier: undefined })).toEqual('')
+    expect(feeConverterPipe.transform('1', { protocol: undefined })).toEqual('')
   })
 
   it('should return an empty string when protocolIdentifier unknown', () => {
     expect(
       feeConverterPipe.transform('1', {
-        protocolIdentifier: 'FeeConverterPipe' as any
+        protocol: 'FeeConverterPipe' as any
       })
     ).toEqual('')
   })
@@ -53,7 +53,7 @@ describe('FeeConverter Pipe', () => {
     it('Test with: ' + JSON.stringify(args), () => {
       expect(
         feeConverterPipe.transform(args.value, {
-          protocolIdentifier: args.protocolIdentifier
+          protocol: args.protocolIdentifier
         })
       ).toEqual(args.expected)
     })

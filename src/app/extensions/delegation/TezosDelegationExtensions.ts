@@ -262,7 +262,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
         return {
           index: info.cycle,
           amount: this.amountConverter.transform(new BigNumber(info.reward), {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           collected: info.payout < new Date(),

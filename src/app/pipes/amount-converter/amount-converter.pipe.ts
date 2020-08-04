@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, ICoinProtocol, ProtocolNetwork } from 'airgap-coin-lib'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
@@ -7,16 +7,19 @@ import { BigNumber } from 'bignumber.js'
   name: 'amountConverter'
 })
 export class AmountConverterPipe implements PipeTransform {
-  public transform(value: BigNumber | string | number, args: { protocolIdentifier: ProtocolSymbols; maxDigits: number }): string {
-    let protocol
+  public transform(
+    value: BigNumber | string | number,
+    args: { protocol: ICoinProtocol | ProtocolSymbols; network?: ProtocolNetwork; maxDigits: number }
+  ): string {
+    let protocol: ICoinProtocol
 
     try {
-      protocol = getProtocolByIdentifier(args.protocolIdentifier)
+      protocol = typeof args.protocol === 'string' ? getProtocolByIdentifier(args.protocol, args.network) : args.protocol
     } catch (e) {
       return ''
     }
 
-    const amount = this.transformValueOnly(value, { protocol: protocol, maxDigits: args.maxDigits })
+    const amount = this.transformValueOnly(value, { protocol, maxDigits: args.maxDigits })
     if (amount === undefined) {
       return ''
     }

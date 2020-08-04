@@ -124,7 +124,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
             description: [
               this.shortenStringPipe.transform(details.operator_address),
               this.amountConverterPipe.transform(details.tokens, {
-                protocolIdentifier: protocol.identifier,
+                protocol,
                 maxDigits: 10
               })
             ]
@@ -142,19 +142,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[0], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[0], { protocol, maxDigits: 0 })} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.delegated_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[1], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[1], { protocol, maxDigits: 0 })} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.unbonding_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[2], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[2], { protocol, maxDigits: 0 })} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.reward_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[3], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[3], { protocol, maxDigits: 0 })} ${protocol.symbol}`
       }
     ]
     return new UIAccountExtendedDetails({
@@ -275,12 +275,12 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
     const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
 
     const maxDelegationFormatted = this.amountConverterPipe.transform(maxDelegationAmount, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
 
@@ -318,7 +318,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     delegatedAmount: BigNumber
   ): AirGapDelegatorAction | null {
     const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
@@ -426,7 +426,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     })
 
     const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
-      protocolIdentifier: protocol.identifier,
+      protocol,
       maxDigits: 10
     })
 
@@ -451,7 +451,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         new UIIconText({
           iconName: 'people-outline',
           text: this.amountConverterPipe.transform(delegatedAmount, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail-cosmos.currently-delegated_label'
@@ -464,7 +464,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         new UIIconText({
           iconName: 'people-outline',
           text: this.amountConverterPipe.transform(unbondingAmount, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail-cosmos.unbonding_label'
@@ -477,7 +477,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         new UIIconText({
           iconName: 'logo-usd',
           text: this.amountConverterPipe.transform(rewards, {
-            protocolIdentifier: protocol.identifier,
+            protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail-cosmos.unclaimed-rewards_label'

@@ -249,7 +249,7 @@ export class DelegationDetailPage {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
           text: this.amountConverter.transform(details.balance, {
-            protocolIdentifier: this.wallet.protocol.identifier,
+            protocol: this.wallet.protocol,
             maxDigits: 10
           }),
           description: 'delegation-detail.your-balance_label'

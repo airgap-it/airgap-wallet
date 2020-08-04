@@ -20,7 +20,8 @@
       <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.amount_label' | translate }}</ion-label>
       <div class="ion-padding-bottom">
         <span class="typography--mono ion-padding-bottom">
-          {{ transaction.amount | amountConverter: { protocolIdentifier: transaction.protocolIdentifier, maxDigits: 10 } }}
+          {{ transaction.amount | amountConverter: { protocol: transaction.protocolIdentifier, network: transaction.network, maxDigits: 10 }
+          }}
         </span>
       </div>
 
@@ -28,7 +29,7 @@
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'from-to.fee_label' | translate }}</ion-label>
         <div [ngClass]="transaction.timestamp || transaction.data  ? 'ion-padding-bottom' : ''">
           <span class="typography--mono">
-            {{ transaction.fee | feeConverter: { protocolIdentifier: transaction.protocolIdentifier } }}
+            {{ transaction.fee | feeConverter: { protocol: transaction.protocolIdentifier, network: transaction.network } }}
           </span>
         </div>
       </ng-container>
