@@ -5,7 +5,6 @@ import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, ICoinDelegatePr
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
@@ -30,7 +29,6 @@ import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../serializer/serializer.service'
-import { TezosETH } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosETH'
 
 @Injectable({
   providedIn: 'root'
@@ -341,35 +339,6 @@ export class OperationsProvider {
       if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_KT) {
         const tezosKtProtocol = wallet.protocol as TezosKtProtocol
         rawUnsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
-      } else if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-        const protocol = wallet.protocol as TezosBTC
-
-        rawUnsignedTx = await protocol.transfer(
-          wallet.addresses[0],
-          address,
-          amount.toString(10),
-          fee.toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
-          wallet.publicKey
-        )
-      } else if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_ETH) {
-        const protocol = wallet.protocol as TezosETH
-
-        rawUnsignedTx = await protocol.transfer(
-          [
-            {
-              from: wallet.addresses[0],
-              txs: [
-                {
-                  to: address,
-                  amount: amount.toString(10),
-                  tokenID: protocol.tokenID
-                }
-              ]
-            }
-          ],
-          fee.toString(10),
-          wallet.publicKey
-        )
       } else {
         rawUnsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
       }
