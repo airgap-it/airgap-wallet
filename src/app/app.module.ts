@@ -15,8 +15,6 @@ import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
-import { MaterialIconsModule } from 'ionic2-material-icons'
-import { LottieAnimationViewModule } from 'ng-lottie'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
@@ -85,9 +83,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     CommonModule,
     ZXingScannerModule,
     HttpClientModule,
-    MaterialIconsModule,
+
     MomentModule,
-    LottieAnimationViewModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     TranslateModule.forRoot({
