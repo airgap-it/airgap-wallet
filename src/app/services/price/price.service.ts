@@ -124,18 +124,8 @@ export class PriceService implements AirGapWalletPriceService {
                 return index % 20 === 0
               })
             }
-            const marketSample: MarketDataSample[] = filteredPrices.map((price: MarketDataSample) => {
-              return {
-                time: price.time,
-                close: price.close,
-                high: price.high,
-                low: price.low,
-                volumefrom: price.volumefrom,
-                volumeto: price.volumeto
-              }
-            })
 
-            resolve(marketSample)
+            resolve(filteredPrices)
           })
           .catch(console.error)
       }
