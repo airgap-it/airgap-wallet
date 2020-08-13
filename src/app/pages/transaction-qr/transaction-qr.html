@@ -30,15 +30,15 @@
       <ion-row class="ion-padding-bottom ion-text-center">
         <ion-col size="4" class="content--align__center-center">
           <h5>
-            {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier, maxDigits:
-            undefined } }}
+            {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocol: airGapTxs[0].protocolIdentifier, maxDigits: undefined }
+            }}
           </h5>
         </ion-col>
         <ion-col size="4" class="content--align__center-center">
           <h5>{{ aggregatedInfo.numberOfTxs }}</h5>
         </ion-col>
         <ion-col size="4" class="content--align__center-center">
-          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier } }}</h5>
+          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocol: airGapTxs[0].protocolIdentifier } }}</h5>
         </ion-col>
         <ion-col size="4">
           <small>Amount</small>
@@ -53,7 +53,7 @@
     </ng-container>
 
     <ng-container *ngIf="airGapTxs">
-      <from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></from-to>
+      <airgap-from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></airgap-from-to>
     </ng-container>
 
     <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>

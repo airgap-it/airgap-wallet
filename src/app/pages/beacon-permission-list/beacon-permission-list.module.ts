@@ -1,3 +1,4 @@
+import { AirGapCommonCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -9,7 +10,15 @@ import { BeaconPermissionListPageRoutingModule } from './beacon-permission-list-
 import { BeaconPermissionListPage } from './beacon-permission-list.page'
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, BeaconPermissionListPageRoutingModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    TranslateModule,
+    ComponentsModule,
+    BeaconPermissionListPageRoutingModule,
+    AirGapCommonCoreModule
+  ],
   declarations: [BeaconPermissionListPage]
 })
 export class BeaconPermissionListPageModule {}

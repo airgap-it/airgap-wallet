@@ -1,3 +1,4 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -9,7 +10,6 @@ import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/ut
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
@@ -469,10 +469,7 @@ export class TransactionPreparePage {
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
     const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address.value, fee)
 
-    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, {
-      protocol: this.wallet.protocol,
-      maxDigits: this.wallet.protocol.decimals + 1
-    })
+    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
     if (!maxAmount.isNaN()) {
       this.updateState({

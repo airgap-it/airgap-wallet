@@ -1,8 +1,9 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
-import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
@@ -17,7 +18,6 @@ import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -248,10 +248,7 @@ export class DelegationDetailPage {
       if (details) {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
-          text: this.amountConverter.transform(details.balance, {
-            protocolIdentifier: this.wallet.protocol.identifier,
-            maxDigits: 10
-          }),
+          text: this.amountConverter.transform(details.balance, { protocol: this.wallet.protocol }),
           description: 'delegation-detail.your-balance_label'
         })
 

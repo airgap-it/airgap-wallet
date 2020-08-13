@@ -1,3 +1,4 @@
+import { LanguageService, ProtocolService } from '@airgap/angular-core'
 import { Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
@@ -26,7 +27,9 @@ export class AppComponent {
   constructor(
     private readonly platform: Platform,
     private readonly translate: TranslateService,
+    private readonly languageService: LanguageService,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly protocolService: ProtocolService,
     private readonly protocolsProvider: ProtocolsProvider,
     private readonly storageProvider: StorageProvider,
     private readonly appInfoProvider: AppInfoProvider,
@@ -46,9 +49,12 @@ export class AppComponent {
   }
 
   public async initializeApp() {
-    const supportedLanguages = ['en', 'de', 'zh-cn']
+    await this.languageService.init({
+      supportedLanguages: ['en', 'de', 'zh-cn'],
+      defaultLanguage: 'en'
+    })
 
-    this.loadLanguages(supportedLanguages)
+    this.protocolService.init()
 
     await Promise.all([this.platform.ready(), this.protocolsProvider.isReady])
 

@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core'
   providedIn: 'root'
 })
 // Called "LanguageSerivce" instead of "TranslateService" to not cause confusion with the ngx-translate service.
-export class LanguageService {
+export class DeprecatedLanguageService {
   constructor(private readonly translateService: TranslateService) {}
 
   // TODO: add missing fields and handle empty/unused fields

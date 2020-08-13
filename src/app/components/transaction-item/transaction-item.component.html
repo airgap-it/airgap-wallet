@@ -1,19 +1,19 @@
 <ion-item>
   <ion-avatar slot="start" *ngIf="transactionType !== 'exchangeTransaction'">
-    <identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></identicon>
-    <identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></identicon>
+    <airgap-identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></airgap-identicon>
+    <airgap-identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></airgap-identicon>
   </ion-avatar>
 
   <ion-avatar slot="start" *ngIf="transactionType === 'exchangeTransaction'">
-    <identicon *ngIf="tx.isInbound" [address]="tx.to[0]"></identicon>
-    <identicon *ngIf="!tx.isInbound" [address]="tx.from[0]"></identicon>
+    <airgap-identicon *ngIf="tx.isInbound" [address]="tx.to[0]"></airgap-identicon>
+    <airgap-identicon *ngIf="!tx.isInbound" [address]="tx.from[0]"></airgap-identicon>
   </ion-avatar>
   <ion-label>
     <h2>
       <ion-icon *ngIf="tx.isInbound" src="./assets/custom-ion-icons/md-call_received.svg"></ion-icon>
       <ion-icon *ngIf="!tx.isInbound" src="./assets/custom-ion-icons/md-call_made.svg"></ion-icon>
       <span class="font--weight__bold" color="black">
-        {{ tx.amount | amountConverter: { protocolIdentifier: tx.protocolIdentifier, maxDigits: 10 } }}
+        {{ tx.amount | amountConverter: { protocol: tx.protocolIdentifier } }}
       </span>
     </h2>
 

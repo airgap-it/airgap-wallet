@@ -2,7 +2,7 @@ import { AlertController, PopoverController, ToastController, LoadingController 
 import { AlertOptions } from '@ionic/core'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
-import { LanguageService } from '../../services/language/language.service'
+import { DeprecatedLanguageService } from '../../services/language/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -21,7 +21,7 @@ export interface DelegateAlertActionContext {
   dataService: DataService
   router: Router
   popoverController: PopoverController
-  languageService: LanguageService
+  languageService: DeprecatedLanguageService
   alertController: AlertController
   alertTitle: string
   alertDescription: string

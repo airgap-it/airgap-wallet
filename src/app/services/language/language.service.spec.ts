@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-import { LanguageService } from './language.service'
+import { DeprecatedLanguageService } from './language.service'
 
 describe('LanguageService', () => {
   let unitHelper: UnitHelper
@@ -15,12 +15,12 @@ describe('LanguageService', () => {
   })
 
   it('should be created', () => {
-    const service: LanguageService = TestBed.get(LanguageService)
+    const service: DeprecatedLanguageService = TestBed.get(DeprecatedLanguageService)
     expect(service).toBeTruthy()
   })
 
   it('should translate all properties of an object', async () => {
-    const service: LanguageService = TestBed.get(LanguageService)
+    const service: DeprecatedLanguageService = TestBed.get(DeprecatedLanguageService)
     const untranslated = {
       header: 'header',
       message: 'message',

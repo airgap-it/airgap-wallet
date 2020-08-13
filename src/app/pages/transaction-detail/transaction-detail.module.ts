@@ -1,3 +1,4 @@
+import { AirGapCommonCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -16,6 +17,7 @@ import { TransactionDetailPage } from './transaction-detail'
     FormsModule,
     TranslateModule,
     ComponentsModule,
+    AirGapCommonCoreModule,
     RouterModule.forChild([{ path: '', component: TransactionDetailPage }])
   ],
   declarations: [TransactionDetailPage]

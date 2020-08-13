@@ -11,9 +11,9 @@
   <ion-row class="ion-padding-vertical">
     <ion-col size="12">
       <ion-avatar>
-        <identicon [address]="wallet.receivingPublicAddress"></identicon>
+        <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
       </ion-avatar>
-      <currency-symbol class="symbol--icon" [symbol]="wallet.protocol.symbol"></currency-symbol>
+      <airgap-currency-symbol class="symbol--icon" [symbol]="wallet.protocol.symbol"></airgap-currency-symbol>
     </ion-col>
     <ion-col size="12">
       <h2>{{ wallet.protocol.name }} {{ wallet.protocol.symbol }}</h2>

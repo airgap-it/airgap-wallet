@@ -230,17 +230,7 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-  "from-to": {
-    "type_label": "Type",
-    "amount_label": "Amount",
-    "fee_label": "Fee",
-    "time_label": "Time",
-    "data_label": "Data",
-    "status_label": "Status",
-    "from_label": "From",
-    "to_label": "To",
-    "transaction-details_label": "Display extra transaction details"
-  },
+
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },

@@ -1,10 +1,10 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { AirGapMarketWallet, getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
 import { MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 
-import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
 
@@ -58,12 +58,7 @@ export class MarketDataService {
     const txHistory: TransactionHistoryObject[] = await this.getTransactionHistory(wallet, transactions)
     const balancesByTimestamp: BalanceAtTimestampObject[] = []
 
-    let currentBalance = parseFloat(
-      this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
-        protocol: wallet.protocol,
-        maxDigits: 10
-      })
-    )
+    let currentBalance = parseFloat(this.amountConverterPipe.transformValueOnly(wallet.currentBalance, wallet.protocol, 10))
     // txHistory is sorted from most recent to oldest tx
     txHistory.forEach((transaction: TransactionHistoryObject) => {
       balancesByTimestamp.push({ timestamp: transaction.timestamp, balance: currentBalance })

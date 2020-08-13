@@ -13,7 +13,7 @@ import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
-import { LanguageService } from '../language/language.service'
+import { DeprecatedLanguageService } from '../language/language.service'
 import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
@@ -76,7 +76,7 @@ export class AccountProvider {
     private readonly pushProvider: PushProvider,
     private readonly drawChartProvider: DrawChartService,
     private readonly popoverController: PopoverController,
-    private readonly languageService: LanguageService,
+    private readonly languageService: DeprecatedLanguageService,
     private readonly alertController: AlertController,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,

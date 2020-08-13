@@ -38,8 +38,8 @@
               <ion-row>
                 <p class="font--size__large ion-no-margin">
                   <strong>
-                    {{ state.availableBalance | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits:
-                    wallet.protocol.decimals + 1 } }}
+                    {{ state.availableBalance | amountConverter: { protocol: wallet.protocol.identifier, maxDigits: wallet.protocol.decimals
+                    + 1 } }}
                   </strong>
                 </p>
               </ion-row>
@@ -70,7 +70,7 @@
         <ion-col size="2" class="ion-no-padding">
           <ion-row class="ion-justify-content-center ion-align-items-center">
             <ion-avatar>
-              <identicon [address]="wallet.receivingPublicAddress"></identicon>
+              <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
             </ion-avatar>
           </ion-row>
           <ion-row class="ion-justify-content-center ion-align-items-center">
@@ -78,7 +78,7 @@
           </ion-row>
           <ion-row class="ion-justify-content-center ion-align-items-center">
             <ion-avatar>
-              <identicon [address]="transactionForm.get('address').value"></identicon>
+              <airgap-identicon [address]="transactionForm.get('address').value"></airgap-identicon>
             </ion-avatar>
           </ion-row>
         </ion-col>
