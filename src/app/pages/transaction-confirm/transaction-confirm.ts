@@ -1,8 +1,10 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
-import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
@@ -10,7 +12,6 @@ import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 const SECOND: number = 1000
 
@@ -40,7 +41,8 @@ export class TransactionConfirmPage {
     private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService,
-    private readonly accountService: AccountProvider
+    private readonly accountService: AccountProvider,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public dismiss(): void {
@@ -57,7 +59,7 @@ export class TransactionConfirmPage {
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTransactionsSync.forEach(async signedTx => {
-      const protocol = getProtocolByIdentifier(signedTx.protocol)
+      const protocol = this.protocolService.getProtocol(signedTx.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
         (signedTx.payload as SignedTransaction).accountIdentifier,

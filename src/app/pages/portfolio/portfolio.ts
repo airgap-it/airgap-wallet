@@ -8,6 +8,7 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ProtocolService } from '@airgap/angular-core'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -32,7 +33,8 @@ export class PortfolioPage {
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly protocolService: ProtocolService
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
@@ -141,7 +143,7 @@ export class PortfolioPage {
 
   public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
     let newTotal = 0
-    const cryptoToFiatPipe = new CryptoToFiatPipe()
+    const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
 
     wallets.forEach(wallet => {
       const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {

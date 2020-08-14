@@ -1,11 +1,12 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { map } from 'rxjs/operators'
 import { PriceService } from 'src/app/services/price/price.service'
 
-import { AccountProvider, getProtocolByIdentifierAndNetworkIdentifier } from '../../services/account/account.provider'
+import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -25,14 +26,15 @@ export class SubAccountImportPage {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    private readonly protocolService: ProtocolService
   ) {
     this.subWallets = []
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
       this.networkIdentifier = info.networkIdentifier
-      this.subProtocol = getProtocolByIdentifierAndNetworkIdentifier(this.subProtocolIdentifier, this.networkIdentifier)
+      this.subProtocol = this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier)
     }
 
     this.accountProvider.wallets
@@ -41,7 +43,7 @@ export class SubAccountImportPage {
         const promises: Promise<void>[] = []
         mainAccounts.forEach(mainAccount => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
-            const protocol = getProtocolByIdentifier(this.subProtocolIdentifier)
+            const protocol = this.protocolService.getProtocol(this.subProtocolIdentifier)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
               protocol,
               mainAccount.publicKey,

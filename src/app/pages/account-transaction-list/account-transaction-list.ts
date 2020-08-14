@@ -23,6 +23,7 @@ import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
+import { ProtocolService } from '@airgap/angular-core'
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
@@ -87,6 +88,7 @@ export class AccountTransactionListPage {
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
     public readonly dataService: DataService,
+    public readonly protocolService: ProtocolService,
     private readonly route: ActivatedRoute,
     private readonly storageProvider: StorageProvider,
     private readonly pushBackendProvider: PushBackendProvider,

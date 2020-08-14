@@ -1,4 +1,4 @@
-import { AirGapCommonCoreModule } from '@airgap/angular-core'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -21,7 +21,7 @@ import { BeaconRequestPage } from './beacon-request.page'
     PipesModule,
     MomentModule,
     BeaconRequestPageRoutingModule,
-    AirGapCommonCoreModule
+    AirGapAngularCoreModule
   ],
   declarations: [BeaconRequestPage]
 })

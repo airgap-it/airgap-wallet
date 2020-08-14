@@ -1,8 +1,9 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -64,7 +65,8 @@ export class ExchangePage {
     private readonly translateService: TranslateService,
     private readonly modalController: ModalController,
     private readonly alertCtrl: AlertController,
-    private readonly operationsProvider: OperationsProvider
+    private readonly operationsProvider: OperationsProvider,
+    private readonly protocolService: ProtocolService
   ) {
     this.exchangeProvider.getActiveExchange().subscribe((exchange: string) => {
       this.activeExchange = exchange
@@ -109,7 +111,7 @@ export class ExchangePage {
     } else {
       currentFromProtocol = fromProtocols[0]
     }
-    await this.setFromProtocol(getProtocolByIdentifier(currentFromProtocol))
+    await this.setFromProtocol(this.protocolService.getProtocol(currentFromProtocol))
 
     if (this.exchangePageState === ExchangePageState.LOADING) {
       const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
@@ -208,7 +210,7 @@ export class ExchangePage {
       this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
       !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
     ) {
-      const toProtocol = getProtocolByIdentifier(this.supportedProtocolsTo[0])
+      const toProtocol = this.protocolService.getProtocol(this.supportedProtocolsTo[0])
       this.selectedToProtocol = toProtocol
       this.loadWalletsForSelectedToProtocol()
     }

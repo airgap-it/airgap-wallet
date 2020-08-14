@@ -1,4 +1,4 @@
-import { AirGapCommonCoreModule } from '@airgap/angular-core'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -71,7 +71,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     ChartsModule,
     TranslateModule,
     QRCodeModule,
-    AirGapCommonCoreModule
+    AirGapAngularCoreModule
   ],
   exports: [
     PortfolioItemComponent,

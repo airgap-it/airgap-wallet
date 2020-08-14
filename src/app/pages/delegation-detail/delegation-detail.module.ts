@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { AirGapCommonCoreModule } from '@airgap/angular-core'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { RouterModule } from '@angular/router'
 import { TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
@@ -23,7 +23,7 @@ import { DelegationDetailPage } from './delegation-detail'
     PipesModule,
     MomentModule,
     RouterModule.forChild([{ path: '', component: DelegationDetailPage }]),
-    AirGapCommonCoreModule
+    AirGapAngularCoreModule
   ],
   declarations: [DelegationDetailPage]
 })

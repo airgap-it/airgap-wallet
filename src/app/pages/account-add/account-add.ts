@@ -1,3 +1,4 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
@@ -6,7 +7,6 @@ import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -23,7 +23,7 @@ export class AccountAddPage {
 
   constructor(
     private readonly accountProvider: AccountProvider,
-    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly protocolService: ProtocolService,
     private readonly router: Router,
     private readonly dataService: DataService
   ) {
@@ -35,9 +35,7 @@ export class AccountAddPage {
       .reduce((pv, cv) => {
         if (cv.subProtocols) {
           const subProtocols = cv.subProtocols.filter(
-            subProtocol =>
-              subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-              this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
+            subProtocol => subProtocol.subProtocolType === SubProtocolType.TOKEN && this.protocolService.isProtocolActive(subProtocol)
           )
 
           return pv.concat(...subProtocols)

@@ -1,4 +1,4 @@
-import { AirGapCommonCoreModule, AirGapCommonTranslateLoader } from '@airgap/angular-core'
+import { AirGapAngularCoreModule, AirGapTranslateLoader } from '@airgap/angular-core'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -15,7 +15,6 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
-import { MaterialIconsModule } from 'ionic2-material-icons'
 import { ChartsModule } from 'ng2-charts'
 import { LottieModule } from 'ngx-lottie'
 import { MomentModule } from 'ngx-moment'
@@ -54,7 +53,6 @@ import { ExtensionsService } from './services/extensions/extensions.service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PermissionsProvider } from './services/permissions/permissions'
-import { ProtocolsProvider } from './services/protocols/protocols'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
@@ -63,8 +61,8 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 
-export function createTranslateLoader(http: HttpClient): AirGapCommonTranslateLoader {
-  return new AirGapCommonTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
+export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
+  return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
 }
 
 export async function createPlayer() {
@@ -82,9 +80,8 @@ export async function createPlayer() {
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
-    AirGapCommonCoreModule,
+    AirGapAngularCoreModule,
     ZXingScannerModule,
-    MaterialIconsModule,
     MomentModule,
     LottieModule.forRoot({ player: createPlayer }),
     IonicModule.forRoot(),
@@ -133,7 +130,6 @@ export async function createPlayer() {
     SchemeRoutingProvider,
     ClipboardService,
     PermissionsProvider,
-    ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
     ExtensionsService,

@@ -1,4 +1,4 @@
-import { AirGapCommonCoreModule } from '@airgap/angular-core'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -18,7 +18,7 @@ import { ExchangeConfirmPage } from './exchange-confirm'
     ComponentsModule,
     TranslateModule,
     RouterModule.forChild([{ path: '', component: ExchangeConfirmPage }]),
-    AirGapCommonCoreModule
+    AirGapAngularCoreModule
   ],
   declarations: [ExchangeConfirmPage]
 })

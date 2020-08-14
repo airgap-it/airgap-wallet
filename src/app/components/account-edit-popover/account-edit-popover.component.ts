@@ -1,3 +1,4 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
@@ -13,7 +14,6 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -40,19 +40,14 @@ export class AccountEditPopoverComponent implements OnInit {
     private readonly translateService: TranslateService,
     private readonly operationsProvider: OperationsProvider,
     private readonly browserService: BrowserService,
-    private readonly protocolsProvider: ProtocolsProvider,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly protocolService: ProtocolService
   ) {
     this.wallet = this.navParams.get('wallet')
     this.importAccountAction = this.navParams.get('importAccountAction')
     this.onDelete = this.navParams.get('onDelete')
     if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
-      this.protocolsProvider
-        .getNetworksForProtocol(this.wallet.protocol.identifier)
-        .then((networks: ProtocolNetwork[]) => {
-          this.networks = networks
-        })
-        .catch(console.error)
+      this.networks = this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
     }
   }
 

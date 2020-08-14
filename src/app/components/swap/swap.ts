@@ -1,12 +1,13 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Component({
   selector: 'swap',
@@ -60,7 +61,11 @@ export class SwapComponent {
   @Output()
   private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
-  constructor(public alertCtrl: AlertController, public modalController: ModalController) {}
+  constructor(
+    public alertCtrl: AlertController,
+    public modalController: ModalController,
+    private readonly protocolService: ProtocolService
+  ) {}
 
   public amountSet(amount: string): void {
     this._amount = amount
@@ -74,9 +79,9 @@ export class SwapComponent {
 
   public async doRadio(): Promise<void> {
     const protocols: ICoinProtocol[] = []
-    this.supportedProtocols.forEach(supportedProtocol => {
+    this.supportedProtocols.forEach((supportedProtocol: ProtocolSymbols) => {
       try {
-        protocols.push(getProtocolByIdentifier(supportedProtocol))
+        protocols.push(this.protocolService.getProtocol(supportedProtocol))
       } catch (error) {
         /* */
       }
@@ -94,7 +99,7 @@ export class SwapComponent {
       .onDidDismiss()
       .then((protocolIdentifier: any) => {
         if (protocolIdentifier && protocolIdentifier.data) {
-          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
+          this.protocolSetEmitter.emit(this.protocolService.getProtocol(protocolIdentifier.data))
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

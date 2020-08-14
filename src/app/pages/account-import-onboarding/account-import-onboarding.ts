@@ -1,7 +1,8 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { IonSlides, Platform } from '@ionic/angular'
-import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from 'airgap-coin-lib'
 
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -39,7 +40,12 @@ export class AccountImportOnboardingPage implements OnInit {
   public isEnd: boolean = false
   private indexEndingSlide: number
 
-  constructor(private readonly route: ActivatedRoute, public platform: Platform, private readonly deeplinkProvider: DeepLinkProvider) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    public platform: Platform,
+    private readonly deeplinkProvider: DeepLinkProvider,
+    private readonly protocolService: ProtocolService
+  ) {
     if (this.platform.is('ios')) {
       this.slide1 = 'account-import-onboarding-slide_1-ios.png'
       this.slide2 = 'account-import-onboarding-slide_2-ios.png'
@@ -51,10 +57,10 @@ export class AccountImportOnboardingPage implements OnInit {
   public ngOnInit(): void {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      this.protocol = getProtocolByIdentifier(info.mainProtocolIdentifier)
+      this.protocol = this.protocolService.getProtocol(info.mainProtocolIdentifier)
       this.indexEndingSlide = 3
       if (info.subProtocolIdentifier) {
-        this.subProtocol = getProtocolByIdentifier(info.subProtocolIdentifier)
+        this.subProtocol = this.protocolService.getProtocol(info.subProtocolIdentifier)
         this.indexEndingSlide = 4
       }
     }

@@ -1,6 +1,6 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
@@ -31,13 +31,14 @@ export class MarketDataService {
   constructor(
     public walletsProvider: AccountProvider,
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly cachingService: CachingService
+    private readonly cachingService: CachingService,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public async getTransactionHistory(wallet: AirGapMarketWallet, transactions: IAirGapTransaction[]): Promise<TransactionHistoryObject[]> {
     const txHistory: TransactionHistoryObject[] = []
     // TODO fetch more than 50 txs?
-    const protocol = getProtocolByIdentifier(wallet.protocol.identifier)
+    const protocol = this.protocolService.getProtocol(wallet.protocol.identifier)
     transactions.forEach(transaction => {
       const amount = new BigNumber(transaction.amount).shiftedBy(-1 * protocol.decimals).toNumber()
       const fee = new BigNumber(transaction.fee).shiftedBy(-1 * protocol.decimals).toNumber() //
