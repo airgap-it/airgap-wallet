@@ -243,7 +243,9 @@ export class AccountTransactionListPage {
 
     const addr: string = this.wallet.receivingPublicAddress
 
-    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    try {
+      this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    } catch (err) {}
 
     this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
       this.wallet.protocol.identifier,
@@ -272,6 +274,7 @@ export class AccountTransactionListPage {
     if (!forceRefresh) {
       this.accountProvider.triggerWalletChanged()
     }
+
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
