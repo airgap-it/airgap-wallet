@@ -1,3 +1,4 @@
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
@@ -69,7 +70,7 @@ export class AccountTransactionListPage {
   public lottieConfig: { path: string } = {
     path: './assets/animations/loading.json'
   }
-
+  private transactionResult: IAirGapTransactionResult
   private readonly TRANSACTION_LIMIT: number = 10
   private readonly actionGroup: ActionGroup
 
@@ -204,15 +205,17 @@ export class AccountTransactionListPage {
       return event.target.complete()
     }
 
-    const offset: number = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
-    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
+    const newTransactions: IAirGapTransaction[] = await this.getTransactions(
+      this.transactionResult ? this.transactionResult.cursor : undefined,
+      this.TRANSACTION_LIMIT
+    )
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
-    this.txOffset = this.transactions.length
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
+      console.log('DISABLING INFINITE SCROLLING')
       this.infiniteEnabled = false
     }
 
@@ -240,7 +243,9 @@ export class AccountTransactionListPage {
 
     const addr: string = this.wallet.receivingPublicAddress
 
-    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    try {
+      this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    } catch (err) {}
 
     this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
       this.wallet.protocol.identifier,
@@ -269,21 +274,23 @@ export class AccountTransactionListPage {
     if (!forceRefresh) {
       this.accountProvider.triggerWalletChanged()
     }
+
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
   }
 
-  public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
-    const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
-      this.wallet.fetchTransactions(limit, offset),
+  public async getTransactions(cursor?: IProtocolTransactionCursor, limit: number = 10): Promise<IAirGapTransaction[]> {
+    const [transactionResult]: [IAirGapTransactionResult, void] = await Promise.all([
+      this.transactionResult ? this.wallet.fetchTransactions(limit, cursor) : this.wallet.fetchTransactions(limit),
       this.wallet.synchronize().catch(error => {
         console.error(error)
       })
     ])
 
-    return transactions
+    this.transactionResult = transactionResult
+    return transactionResult.transactions
   }
 
   public mergeTransactions(oldTransactions: IAirGapTransaction[], newTransactions: IAirGapTransaction[]): IAirGapTransaction[] {
