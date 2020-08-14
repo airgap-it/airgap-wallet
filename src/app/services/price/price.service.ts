@@ -1,3 +1,4 @@
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ICoinProtocol } from 'airgap-coin-lib'
@@ -16,6 +17,9 @@ export class PriceService implements AirGapWalletPriceService {
   public async getCurrentMarketPrice(protocol: ICoinProtocol, baseSymbol: string): Promise<BigNumber> {
     if (protocol.marketSymbol.length === 0) {
       return new BigNumber(0)
+    }
+    if (protocol.identifier === SubProtocolSymbols.XTZ_USD) {
+      return new BigNumber(1)
     }
 
     const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[protocol.marketSymbol]
