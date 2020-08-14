@@ -50,7 +50,7 @@ export class CachingService {
     return new Promise<IAirGapTransactionResult>(async resolve => {
       const rawTransactions: StorageObject = await this.storage.get(uniqueId)
       if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000) {
-        rawTransactions.value.map(transaction => {
+        rawTransactions.value.transactions.map(transaction => {
           transaction.amount = new BigNumber(parseInt(transaction.amount, 10))
           transaction.fee = new BigNumber(parseInt(transaction.fee, 10))
         })

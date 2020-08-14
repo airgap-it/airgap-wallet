@@ -130,7 +130,7 @@ export class MarketDataService {
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setTransactionData(
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
-          transactionResultsByWallet[index].transactions
+          transactionResultsByWallet[index]
         )
         const walletValues = await this.fetchValuesAtTimestampSingleWallet(
           wallet,
