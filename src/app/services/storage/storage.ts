@@ -89,6 +89,8 @@ export class StorageProvider {
   constructor(private readonly storage: Storage) {}
 
   public async get<K extends SettingsKey>(key: K): Promise<SettingsKeyReturnType[K]> {
+    await this.storage.ready()
+
     const value: SettingsKeyReturnType[K] = (await this.storage.get(key)) || defaultValues[key]
     console.log(`[SETTINGS_SERVICE:get] ${key}, returned:`, value)
 
@@ -96,6 +98,7 @@ export class StorageProvider {
   }
 
   public async set<K extends SettingsKey>(key: K, value: SettingsKeyReturnType[K]): Promise<any> {
+    await this.storage.ready()
     console.log(`[SETTINGS_SERVICE:set] ${key}`, value)
 
     return this.storage.set(key, value)
@@ -103,6 +106,7 @@ export class StorageProvider {
 
   public async delete<K extends SettingsKey>(key: K): Promise<boolean> {
     try {
+      await this.storage.ready()
       await this.storage.remove(key)
 
       return true
@@ -112,10 +116,12 @@ export class StorageProvider {
   }
 
   public async getCache<T>(key: string): Promise<T> {
+    await this.storage.ready()
     return this.storage.get(key)
   }
 
   public async setCache<T>(key: string, value: T): Promise<T> {
+    await this.storage.ready()
     return this.storage.set(key, value)
   }
 }
