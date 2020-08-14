@@ -1,4 +1,4 @@
-import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
@@ -205,13 +205,17 @@ export class AccountTransactionListPage {
       return event.target.complete()
     }
 
-    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT)
+    const newTransactions: IAirGapTransaction[] = await this.getTransactions(
+      this.transactionResult ? this.transactionResult.cursor : undefined,
+      this.TRANSACTION_LIMIT
+    )
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
+      console.log('DISABLING INFINITE SCROLLING')
       this.infiniteEnabled = false
     }
 
@@ -274,9 +278,9 @@ export class AccountTransactionListPage {
     this.infiniteEnabled = true
   }
 
-  public async getTransactions(limit: number = 10): Promise<IAirGapTransaction[]> {
+  public async getTransactions(cursor?: IProtocolTransactionCursor, limit: number = 10): Promise<IAirGapTransaction[]> {
     const [transactionResult]: [IAirGapTransactionResult, void] = await Promise.all([
-      this.transactionResult ? this.wallet.fetchTransactions(limit, this.transactionResult.cursor) : this.wallet.fetchTransactions(limit),
+      this.transactionResult ? this.wallet.fetchTransactions(limit, cursor) : this.wallet.fetchTransactions(limit),
       this.wallet.synchronize().catch(error => {
         console.error(error)
       })
