@@ -14,7 +14,8 @@ import {
   PolkadotProtocol,
   supportedProtocols,
   TezosKtProtocol,
-  TezosProtocol
+  TezosProtocol,
+  TezosUSD
 } from 'airgap-coin-lib'
 import {
   EthereumERC20ProtocolConfig,
@@ -111,7 +112,7 @@ export class ProtocolsProvider {
   }
 
   public getEnabledSubProtocols() {
-    return ['xtz-btc', 'eth-erc20-xchf']
+    return ['xtz-btc', 'eth-erc20-xchf', 'xtz-usd']
   }
 
   public async getNetworksForProtocol(protocolIdentifier: string) {
@@ -123,6 +124,7 @@ export class ProtocolsProvider {
   public addProtocols() {
     addSubProtocol(new TezosProtocol(), new TezosKtProtocol())
     addSubProtocol(new TezosProtocol(), new TezosBTC())
+    addSubProtocol(new TezosProtocol(), new TezosUSD())
     this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         const protocol = getProtocolByIdentifier(supportedSubAccount.protocol)
