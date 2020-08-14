@@ -16,7 +16,6 @@ import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
-import { LottieModule } from 'ngx-lottie'
 import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
@@ -65,10 +64,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
 }
 
-export async function createPlayer() {
-  return import('lottie-web')
-}
-
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage, ExchangeSelectPage],
@@ -83,7 +78,6 @@ export async function createPlayer() {
     AirGapAngularCoreModule,
     ZXingScannerModule,
     MomentModule,
-    LottieModule.forRoot({ player: createPlayer }),
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
