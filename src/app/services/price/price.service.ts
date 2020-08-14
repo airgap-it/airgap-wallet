@@ -18,6 +18,7 @@ export class PriceService implements AirGapWalletPriceService {
     if (protocol.marketSymbol.length === 0) {
       return new BigNumber(0)
     }
+    // TODO change when market data is available for USDtz
     if (protocol.identifier === SubProtocolSymbols.XTZ_USD) {
       return new BigNumber(1)
     }
