@@ -15,8 +15,6 @@ import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
-import { MaterialIconsModule } from 'ionic2-material-icons'
-import { LottieAnimationViewModule } from 'ng-lottie'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
@@ -52,7 +50,6 @@ import { ScannerProvider } from './services/scanner/scanner'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
-import { WebExtensionProvider } from './services/web-extension/web-extension'
 
 import {
   APP_INFO_PLUGIN,
@@ -86,9 +83,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     CommonModule,
     ZXingScannerModule,
     HttpClientModule,
-    MaterialIconsModule,
+
     MomentModule,
-    LottieAnimationViewModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     TranslateModule.forRoot({
@@ -100,7 +96,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'webExtensionLocalStorage', 'localstorage']
+      driverOrder: ['sqlite', 'localstorage']
     }),
     PipesModule,
     ComponentsModule,
@@ -141,7 +137,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
-    WebExtensionProvider,
     AppInfoProvider,
     PushProvider,
     PushBackendProvider,

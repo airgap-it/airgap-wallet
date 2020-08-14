@@ -3,8 +3,6 @@ import { ModalController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
 import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
@@ -27,7 +25,6 @@ export class TabsPage {
   constructor(
     public modalController: ModalController,
     private readonly storageProvider: StorageProvider,
-    private readonly webExtensionProvider: WebExtensionProvider,
     private readonly plaftorm: Platform
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
@@ -35,9 +32,6 @@ export class TabsPage {
   }
 
   private async showIntroductions() {
-    if (this.webExtensionProvider.isWebExtension()) {
-      await this.showWebExtensionIntroduction()
-    }
     const alreadyOpenByDeepLink = await this.storageProvider.get(SettingsKey.DEEP_LINK)
     if (!alreadyOpenByDeepLink) {
       await this.showWalletIntroduction().catch(console.error)
@@ -46,10 +40,6 @@ export class TabsPage {
 
   private async showWalletIntroduction() {
     return this.showModal(SettingsKey.WALLET_INTRODUCTION, IntroductionPage)
-  }
-
-  private async showWebExtensionIntroduction() {
-    return this.showModal(SettingsKey.WEB_EXTENSION_DISCLAIMER, DisclaimerWebExtensionPage)
   }
 
   private async showModal(settingsKey: SettingsKey, page: any): Promise<void> {

@@ -8,7 +8,6 @@ import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-conve
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 
 @Component({
   selector: 'portfolio-item',
@@ -54,20 +53,9 @@ export class PortfolioItemComponent {
 
   private walletChanged: Subscription
 
-  constructor(
-    private readonly operationsProvider: OperationsProvider,
-    public webExtensionProvider: WebExtensionProvider,
-    public accountProvider: AccountProvider
-  ) {}
+  constructor(private readonly operationsProvider: OperationsProvider, public accountProvider: AccountProvider) {}
 
   public ngOnInit(): void {
-    if (this.webExtensionProvider.isWebExtension()) {
-      this.accountProvider.activeAccountSubject.subscribe(activeAccount => {
-        if (this.wallet && activeAccount) {
-          this.isActive = this.accountProvider.isSameWallet(this.wallet, activeAccount)
-        }
-      })
-    }
     this.updateBalance()
     this.updateDelegationStatus()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
