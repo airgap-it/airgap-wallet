@@ -1,4 +1,3 @@
-import { transition } from '@angular/animations'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
