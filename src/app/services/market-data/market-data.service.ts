@@ -119,7 +119,7 @@ export class MarketDataService {
 
   public async fetchAllValues(interval: TimeUnit): Promise<ValueAtTimestampObject[]> {
     return new Promise<ValueAtTimestampObject[]>(async resolve => {
-      const wallets = this.walletsProvider.getWalletList()
+      const wallets = this.walletsProvider.getWalletList().filter(wallet => wallet.protocol.marketSymbol !== 'USDtz')
       // TODO fetchMarketData() only once for each protocolIdentifier
       const cryptoPricePromises = wallets.map(wallet => wallet.getMarketPricesOverTime(interval, 0, new Date()))
       const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
