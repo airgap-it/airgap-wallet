@@ -1,3 +1,4 @@
+import { transition } from '@angular/animations'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
@@ -49,7 +50,7 @@ export class CachingService {
     const uniqueId = `${wallet.publicKey}_${CachingServiceKey.TRANSACTIONS}`
     return new Promise<IAirGapTransactionResult>(async resolve => {
       const rawTransactions: StorageObject = await this.storage.get(uniqueId)
-      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000) {
+      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
         rawTransactions.value.transactions.map(transaction => {
           transaction.amount = new BigNumber(parseInt(transaction.amount, 10))
           transaction.fee = new BigNumber(parseInt(transaction.fee, 10))
