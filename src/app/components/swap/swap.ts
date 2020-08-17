@@ -6,6 +6,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 @Component({
   selector: 'swap',
@@ -40,7 +41,7 @@ export class SwapComponent {
   public readonly selectedProtocol: ICoinProtocol
 
   @Input()
-  public readonly supportedProtocols: string[] = []
+  public readonly supportedProtocols: ProtocolSymbols[] = []
 
   @Input()
   public readonly minExchangeAmount: BigNumber

@@ -1,15 +1,17 @@
-import { LedgerApp } from '../LedgerApp'
 import { AirGapMarketWallet, SubstrateProtocol } from 'airgap-coin-lib'
-import { RawSubstrateTransaction } from 'airgap-coin-lib/dist/serializer/types'
-import { SubstrateTransaction } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
 import {
   SubstrateSignature,
   SubstrateSignatureType
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateSignature'
+import { SubstrateTransaction } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
 import { SubstrateTransactionPayload } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
+import { RawSubstrateTransaction } from 'airgap-coin-lib/dist/serializer/types'
+import { AirGapWalletPriceService } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { Buffer } from 'buffer'
+
+import { isType } from '../../../utils/utils'
 import { ReturnCode } from '../../ReturnCode'
-import { isType } from 'src/app/utils/utils'
+import { LedgerApp } from '../LedgerApp'
 
 enum Instruction {
   /*
@@ -66,7 +68,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     this.connection.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
   }
 
-  public async importWallet(): Promise<AirGapMarketWallet> {
+  public async importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet> {
     const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
 
     try {
@@ -86,14 +88,14 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
       const publicKey: string = response.slice(0, 32).toString('hex')
 
-      return new AirGapMarketWallet(this.protocol.identifier, publicKey, false, this.protocol.standardDerivationPath)
+      return new AirGapMarketWallet(this.protocol, publicKey, false, this.protocol.standardDerivationPath, priceService)
     } catch (error) {
       return Promise.reject(error)
     }
   }
 
   public async signTransaction(transaction: RawSubstrateTransaction): Promise<string> {
-    const txs = this.protocol.transactionController.decodeDetails(transaction.encoded)
+    const txs = this.protocol.options.transactionController.decodeDetails(transaction.encoded)
     const signed = await Promise.all(txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload)))
 
     if (signed.some(tx => tx === null)) {
@@ -102,7 +104,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
     txs.forEach((tx, index) => (tx.transaction = signed[index]))
 
-    return this.protocol.transactionController.encodeDetails(txs)
+    return this.protocol.options.transactionController.encodeDetails(txs)
   }
 
   private async signSubstrateTransaction(

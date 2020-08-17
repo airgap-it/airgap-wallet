@@ -1,5 +1,6 @@
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGapSignedTransaction'
+import { AirGapWalletPriceService } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import { LedgerConnection } from '../connection/LedgerConnection'
 
@@ -15,7 +16,7 @@ export abstract class LedgerApp {
     // by default do nothing
   }
 
-  public abstract async importWallet(): Promise<AirGapMarketWallet>
+  public abstract async importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet>
   public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
 
   protected derivationPathToBuffer(derivationPath: string): Buffer {

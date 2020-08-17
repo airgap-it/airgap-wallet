@@ -8,7 +8,11 @@
   </ion-item>
   <ion-item id="blockexplorer" button detail="false" (click)="openBlockExplorer()">
     <ion-icon name="open-outline" color="dark" slot="end"></ion-icon>
-    {{ 'wallet-edit-popover-component.block_explorer' | translate }}
+    {{ 'wallet-edit-popover-component.block-explorer_label' | translate }}
+  </ion-item>
+  <ion-item *ngIf="networks.length > 1" id="network" button detail="false" (click)="changeNetwork()">
+    <ion-icon name="globe-outline" color="dark" slot="end"></ion-icon>
+    {{ 'wallet-edit-popover-component.change-network_label' | translate }}
   </ion-item>
   <ion-item id="delete" button detail="false" (click)="delete()">
     <ion-icon name="trash-outline" color="dark" slot="end"></ion-icon>

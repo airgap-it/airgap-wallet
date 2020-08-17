@@ -1,3 +1,4 @@
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
 import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
@@ -12,7 +13,7 @@ describe('CryptoToFiatPipe', () => {
   it('should return the right price', () => {
     expect(
       cryptoToFiatPipe.transform(new BigNumber(1), {
-        protocolIdentifier: 'eth',
+        protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('0.0000000000000002')
@@ -30,7 +31,7 @@ describe('CryptoToFiatPipe', () => {
   it('should return an empty string when protocolIdentifier is invalid', () => {
     expect(
       cryptoToFiatPipe.transform(new BigNumber(1), {
-        protocolIdentifier: 'bananarama',
+        protocolIdentifier: 'bananarama' as any,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
@@ -40,7 +41,7 @@ describe('CryptoToFiatPipe', () => {
     const value: any = 'test'
     expect(
       cryptoToFiatPipe.transform(value, {
-        protocolIdentifier: 'eth',
+        protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
@@ -50,7 +51,7 @@ describe('CryptoToFiatPipe', () => {
     const value: any = 'test'
     expect(
       cryptoToFiatPipe.transform(new BigNumber(1), {
-        protocolIdentifier: 'eth',
+        protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: value
       })
     ).toEqual('')
@@ -59,7 +60,7 @@ describe('CryptoToFiatPipe', () => {
   it('should return an empty string when value is undefined', () => {
     expect(
       cryptoToFiatPipe.transform(undefined, {
-        protocolIdentifier: 'eth',
+        protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
@@ -77,7 +78,7 @@ describe('CryptoToFiatPipe', () => {
   it('should return an empty string when currentMarketPrice is undefined', () => {
     expect(
       cryptoToFiatPipe.transform(new BigNumber(1), {
-        protocolIdentifier: 'eth',
+        protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: undefined
       })
     ).toEqual('')

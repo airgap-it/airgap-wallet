@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { IACMessageDefinitionObject, Serializer } from 'airgap-coin-lib'
 import { DeserializedSyncProtocol, SyncProtocolUtils } from 'airgap-coin-lib/dist/serializer/v1/serializer'
+import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 import { parseIACUrl } from '../../utils/utils'
 import { SettingsKey, StorageProvider } from '../storage/storage'
@@ -57,7 +58,7 @@ export class SerializerService {
   }
 
   public async serialize(chunks: IACMessageDefinitionObject[]): Promise<string[]> {
-    if (!this.useV2 && !chunks.some((chunk: IACMessageDefinitionObject) => chunk.protocol === 'cosmos')) {
+    if (!this.useV2 && !chunks.some((chunk: IACMessageDefinitionObject) => chunk.protocol === MainProtocolSymbols.COSMOS)) {
       return [await this.serializeV1(chunks[0])]
     } else {
       return this.serializeV2(chunks)

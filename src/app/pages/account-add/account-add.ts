@@ -1,14 +1,15 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
+import { Platform } from '@ionic/angular'
 import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { Platform } from '@ionic/angular'
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
 @Component({
@@ -31,20 +32,24 @@ export class AccountAddPage {
     private readonly dataService: DataService,
     private readonly ledgerService: LedgerService
   ) {
-    this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
-    this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
-      if (cv.subProtocols) {
-        const subProtocols = cv.subProtocols.filter(
-          subProtocol =>
-            subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-            this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
-        )
+    this.supportedAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .map(coin => coin)
+    this.supportedSubAccountProtocols = supportedProtocols()
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .reduce((pv, cv) => {
+        if (cv.subProtocols) {
+          const subProtocols = cv.subProtocols.filter(
+            subProtocol =>
+              subProtocol.subProtocolType === SubProtocolType.TOKEN &&
+              this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
+          )
 
-        return pv.concat(...subProtocols)
-      }
+          return pv.concat(...subProtocols)
+        }
 
-      return pv
-    }, [])
+        return pv
+      }, [])
     this.filterProtocols()
   }
 
@@ -62,42 +67,54 @@ export class AccountAddPage {
     )
   }
 
-  public addAccount(protocolIdentifier: string) {
-    const isLedgerImportAvailable = this.ledgerService.getSupportedProtocols().includes(protocolIdentifier) && this.platform.is('desktop')
+  public addAccount(protocol: ICoinProtocol) {
+    const isLedgerImportAvailable = this.ledgerService.getSupportedProtocols().includes(protocol.identifier) && this.platform.is('desktop')
     if (!isLedgerImportAvailable) {
-      this.importFromVault(protocolIdentifier)
+      this.importFromVault(protocol)
     } else {
-      this.showImportInteractionSelection(protocolIdentifier)
+      this.showImportInteractionSelection(protocol)
     }
   }
 
-  public addSubAccount(subProtocolIdentifier: string) {
-    const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
-    if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
+  public addSubAccount(subProtocol: ICoinProtocol) {
+    const mainProtocolIdentifier = subProtocol.identifier.split('-')[0]
+    if (
+      this.accountProvider
+        .getWalletList()
+        .filter(
+          wallet =>
+            wallet.protocol.identifier === mainProtocolIdentifier &&
+            wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
+        ).length > 0
+    ) {
       const info = {
-        subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
       const info = {
         mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocolIdentifier
+        subProtocolIdentifier: subProtocol.identifier,
+        networkIdentifier: subProtocol.options.network.identifier
       }
+
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
-  private showImportInteractionSelection(protocolIdentifier: string) {
+  private showImportInteractionSelection(protocol: ICoinProtocol) {
     const info = {
       callback: (interactionType: AccountImportInteractionType) => {
         switch (interactionType) {
           case AccountImportInteractionType.VAULT:
-            this.importFromVault(protocolIdentifier)
+            this.importFromVault(protocol)
             break
           case AccountImportInteractionType.LEDGER:
-            this.importFromLedger(protocolIdentifier)
+            this.importFromLedger(protocol)
             break
           default:
             console.log('Unkonw import interaction type selected.')
@@ -111,9 +128,9 @@ export class AccountAddPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private async importFromLedger(protocolIdentifier: string): Promise<void> {
+  private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
     const info = {
-      protocolIdentifier
+      protocolIdentifier: protocol.identifier
     }
     this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router
@@ -121,9 +138,9 @@ export class AccountAddPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private importFromVault(protocolIdentifier: string) {
+  private importFromVault(protocol: ICoinProtocol) {
     const info = {
-      mainProtocolIdentifier: protocolIdentifier
+      mainProtocolIdentifier: protocol.identifier
     }
     this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

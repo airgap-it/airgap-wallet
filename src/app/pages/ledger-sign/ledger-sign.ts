@@ -3,11 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { LoadingController, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { AlertController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { isString } from 'util'
 
 @Component({
@@ -61,7 +61,7 @@ export class LedgerSignPage {
     await this.showLoader('Connecting device...')
 
     try {
-      await this.ledgerService.openConnection(this.wallet.protocolIdentifier)
+      await this.ledgerService.openConnection(this.wallet.protocol.identifier)
     } catch (error) {
       console.warn(error)
       this.promptError(error)
@@ -74,10 +74,10 @@ export class LedgerSignPage {
     await this.showLoader('Signing transaction...')
 
     try {
-      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.unsignedTx)
+      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocol.identifier, this.unsignedTx)
       const signedTransactionSync: IACMessageDefinitionObject = {
         type: IACMessageType.MessageSignResponse,
-        protocol: this.wallet.protocolIdentifier,
+        protocol: this.wallet.protocol.identifier,
         payload: {
           transaction: signedTx,
           accountIdentifier: this.wallet.publicKey.substr(-6)

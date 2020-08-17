@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
+import * as moment from 'moment'
 import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { BaseChartDirective } from 'ng2-charts'
 import { Subscription } from 'rxjs'
-
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
-import { MarketDataService } from './../../services/market-data/market-data.service'
+import { MarketDataService, ValueAtTimestampObject } from './../../services/market-data/market-data.service'
 
 @Component({
   selector: 'chart',
@@ -16,7 +16,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
-  public currentChart: TimeUnit | string = TimeUnit.Minutes
+  public readonly timeUnits: typeof TimeUnit = TimeUnit
+
+  public currentChart: TimeUnit = TimeUnit.Minutes
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -25,7 +27,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
 
-  public rawData: number[] = []
+  public rawData: ValueAtTimestampObject[] = []
 
   private readonly subscription: Subscription
 
@@ -78,6 +80,25 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
           tension: 0 // disables bezier curves
         }
       },
+      tooltips: {
+        mode: 'x-axis',
+        intersect: false,
+        displayColors: false, // removes color box and label
+
+        callbacks: {
+          title: function(data) {
+            return moment.unix(data[0].label).format('DD.MM.YYYY')
+          },
+          label: function(data): string {
+            if (Number(data.value) % 1 !== 0) {
+              let value = parseFloat(data.value).toFixed(2)
+              return `$${value}`
+            } else {
+              return data.value
+            }
+          }
+        }
+      },
       annotation: {
         annotations: [
           {
@@ -101,21 +122,21 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     })
   }
 
-  public async drawChart(timeInterval: TimeUnit | string): Promise<void> {
+  public async drawChart(timeInterval: TimeUnit): Promise<void> {
     this.chartLabels = []
-    this.chartDatasets = [{ data: [], label: 'Price' }]
+    this.chartDatasets = [{ data: [], label: '$' }]
 
     this.currentChart = timeInterval
 
     this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
-    this.chartDatasets[0].data = this.rawData
+    this.chartDatasets[0].data = this.rawData.map((obj: ValueAtTimestampObject) => obj.balance)
 
     for (let i = 0; i < this.rawData.length; i++) {
       // x-axis labeling
-      this.chartLabels.push(' ')
+      this.chartLabels.push(this.rawData[i].timestamp.toString())
     }
 
-    this.percentageChange = await this.displayPercentageChange(this.rawData)
+    this.percentageChange = await this.displayPercentageChange(this.rawData.map((obj: ValueAtTimestampObject) => obj.balance))
   }
 
   public setLabel24h(): void {
@@ -135,7 +156,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    this.chartDatasets = [{ data: [], label: 'Price' }]
+    this.chartDatasets = [{ data: [], label: '$' }]
     this.chartLabels = []
 
     if (this.chart) {

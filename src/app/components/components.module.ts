@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
-import { MaterialIconsModule } from 'ionic2-material-icons'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { PipesModule } from '../pipes/pipes.module'
@@ -33,6 +32,7 @@ import { WidgetAccount } from './widget-account/widget-account'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetAccountSummary } from './widget-account-summary/widget-account-summary'
 import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
+import { DelegateActionPopoverComponent } from './delegate-action-popover copy/delegate-action-popover.component'
 
 @NgModule({
   declarations: [
@@ -51,6 +51,7 @@ import { WidgetAccountExtendedDetails } from './widget-account-extended-details/
     SignedTransactionComponent,
     TezosDelegationCard,
     CurrencyItemComponent,
+    DelegateActionPopoverComponent,
     DelegateEditPopoverComponent,
 
     TransactionListComponent,
@@ -69,7 +70,7 @@ import { WidgetAccountExtendedDetails } from './widget-account-extended-details/
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialIconsModule,
+
     PipesModule,
     MomentModule,
     ChartsModule,

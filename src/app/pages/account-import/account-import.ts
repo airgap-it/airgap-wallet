@@ -1,11 +1,10 @@
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, NavController, Platform } from '@ionic/angular'
+import { LoadingController, NavController, Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
 
 @Component({
   selector: 'page-account-import',
@@ -16,9 +15,6 @@ export class AccountImportPage {
 
   public walletAlreadyExists: boolean = false
 
-  // WebExtension
-  public walletImportable: boolean = true
-
   public loading: HTMLIonLoadingElement
 
   constructor(
@@ -28,8 +24,6 @@ export class AccountImportPage {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly wallets: AccountProvider,
-    private readonly webExtensionProvider: WebExtensionProvider,
-    private readonly alertCtrl: AlertController,
     private readonly ngZone: NgZone
   ) {}
 
@@ -53,31 +47,13 @@ export class AccountImportPage {
     if (this.wallets.walletExists(this.wallet)) {
       this.wallet = this.wallets.walletByPublicKeyAndProtocolAndAddressIndex(
         this.wallet.publicKey,
-        this.wallet.protocolIdentifier,
+        this.wallet.protocol.identifier,
         this.wallet.addressIndex
       )
       this.walletAlreadyExists = true
       this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       return
-    }
-
-    // we currently only support ETH and AE for the chrome extension
-    if (this.webExtensionProvider.isWebExtension()) {
-      const whitelistedProtocols: string[] = ['eth', 'ae']
-
-      this.walletImportable = whitelistedProtocols.some(
-        (whitelistedProtocol: string) => this.wallet.coinProtocol.identifier === whitelistedProtocol
-      )
-
-      if (!this.walletImportable) {
-        const alert: HTMLIonAlertElement = await this.alertCtrl.create({
-          header: 'Account Not Supported',
-          message: 'We currently only support Ethereum and Aeternity accounts.'
-        })
-
-        alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
-      }
     }
 
     const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
@@ -96,7 +72,7 @@ export class AccountImportPage {
     }
 
     airGapWorker.postMessage({
-      protocolIdentifier: this.wallet.protocolIdentifier,
+      protocolIdentifier: this.wallet.protocol.identifier,
       publicKey: this.wallet.publicKey,
       isExtendedPublicKey: this.wallet.isExtendedPublicKey,
       derivationPath: this.wallet.derivationPath

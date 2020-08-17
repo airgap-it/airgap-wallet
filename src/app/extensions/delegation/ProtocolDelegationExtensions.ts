@@ -1,39 +1,34 @@
-import { ICoinDelegateProtocol, AirGapMarketWallet } from 'airgap-coin-lib'
-import { AirGapDelegationDetails } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIInputTextConfig, UIInputText } from 'src/app/models/widgets/input/UIInputText'
+import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { AirGapDelegationDetails, IAirGapCoinDelegateProtocol } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
+import { UIInputText, UIInputTextConfig } from 'src/app/models/widgets/input/UIInputText'
 
 export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtocol> {
-  private static readonly AIR_GAP_DELEGATEE_KEY = 'airGapDelegatee'
-  private static readonly DELEGATEE_LABEL_KEY = 'delegateeLabel'
-  private static readonly GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY = 'getExtraDelegationDetailsFromAddress'
-  private static readonly GET_REWARD_DISPLAY_DETAILS = 'getRewardDisplayDetails'
-
-  private static readonly CREATE_DELEGATEES_SUMMARY_KEY = 'createDelegateesSummary'
-  private static readonly CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY = 'createAccountExtendedDetails'
+  private static readonly extensionProperitesWithType: [keyof IAirGapCoinDelegateProtocol, 'property' | 'function'][] = [
+    ['delegateeLabel', 'property'],
+    ['airGapDelegatee', 'function'],
+    ['delegateeLabelPlural', 'property'],
+    ['supportsMultipleDelegations', 'property'],
+    ['getExtraDelegationDetailsFromAddress', 'function'],
+    ['createDelegateesSummary', 'function'],
+    ['getRewardDisplayDetails', 'function'],
+    ['createAccountExtendedDetails', 'function']
+  ]
 
   public static async load<T extends ICoinDelegateProtocol>(
     protocol: new () => T,
     extensionFactory: () => Promise<ProtocolDelegationExtensions<T>>
   ) {
-    const alreadyLoaded =
-      this.hasProperty(protocol, ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY) &&
-      this.hasProperty(protocol, ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY)
+    const alreadyLoaded = this.extensionProperitesWithType
+      .map(([propertyKey, _]) => this.hasProperty(protocol, propertyKey))
+      .some(hasProperty => hasProperty)
 
     if (!alreadyLoaded) {
       const extensions = await extensionFactory()
-      this.extend(
-        protocol,
-        extensions,
-        [ProtocolDelegationExtensions.AIR_GAP_DELEGATEE_KEY, 'property'],
-        [ProtocolDelegationExtensions.DELEGATEE_LABEL_KEY, 'property'],
-        [ProtocolDelegationExtensions.GET_EXTRA_DELEGATION_DETAILS_FROM_ADDRESS_KEY, 'function'],
-        [ProtocolDelegationExtensions.CREATE_DELEGATEES_SUMMARY_KEY, 'function'],
-        [ProtocolDelegationExtensions.GET_REWARD_DISPLAY_DETAILS, 'function'],
-        [ProtocolDelegationExtensions.CREATE_ACCOUNT_EXTENDED_DETAILS_SUMMARY_KEY, 'function']
-      )
+      this.extend(protocol, extensions, ...this.extensionProperitesWithType)
     }
   }
 
@@ -57,7 +52,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   }
 
   private static extendWithProperty(target: any, owner: any, propertyKey: string) {
-    if (delete target.prototype[propertyKey]) {
+    if (delete target.prototype[propertyKey] && owner[propertyKey] !== undefined) {
       Object.defineProperty(target.prototype, propertyKey, {
         value: owner[propertyKey],
         enumerable: false,
@@ -68,19 +63,27 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   }
 
   private static extendWithFunction(target: any, owner: any, propertyKey: string) {
-    target.prototype[propertyKey] = function(...args) {
-      return owner[propertyKey](this, ...args)
+    if (owner[propertyKey] !== undefined) {
+      target.prototype[propertyKey] = function(...args) {
+        return owner[propertyKey](this, ...args)
+      }
     }
   }
 
-  public abstract airGapDelegatee?: string
+  public abstract airGapDelegatee(protocol: T): string | undefined
   public abstract delegateeLabel: string
+  public abstract delegateeLabelPlural: string
+  public abstract supportsMultipleDelegations: boolean
 
   public abstract getExtraDelegationDetailsFromAddress(
     protocol: T,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]>
+
+  public getRewardDisplayDetails(_protocol: T, _delegator: string, _delegatees: string[]): Promise<UIRewardList | undefined> {
+    return undefined // by default display no rewards
+  }
 
   public async createDelegateesSummary(protocol: T, delegatees: string[]): Promise<UIAccountSummary[]> {
     const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
@@ -105,12 +108,12 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     return new UIInputText({
       id,
       inputType: 'number',
-      label: 'Amount',
+      label: 'delegation-detail.amount_label',
       placeholder: '0.00',
       defaultValue: maxValue,
-      toggleFixedValueButton: 'Max',
+      toggleFixedValueButton: 'delegation-detail.max-amount_button',
       fixedValue: maxValue,
-      errorLabel: 'Invalid value',
+      errorLabel: 'delegation-detail.invalid-value_error',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
           const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)

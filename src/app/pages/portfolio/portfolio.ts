@@ -53,9 +53,13 @@ export class PortfolioPage {
     const walletMap: Map<string, WalletGroup> = new Map()
 
     wallets.forEach((wallet: AirGapMarketWallet) => {
-      const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
-      if (walletMap.has(wallet.publicKey)) {
-        const group: WalletGroup = walletMap.get(wallet.publicKey)
+      const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
+      const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
+
+      const walletKey: string = `${wallet.publicKey}_${identifier}`
+
+      if (walletMap.has(walletKey)) {
+        const group: WalletGroup = walletMap.get(walletKey)
         if (isSubProtocol) {
           group.subWallets.push(wallet)
         } else {
@@ -63,9 +67,9 @@ export class PortfolioPage {
         }
       } else {
         if (isSubProtocol) {
-          walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
+          walletMap.set(walletKey, { mainWallet: undefined, subWallets: [wallet] })
         } else {
-          walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
+          walletMap.set(walletKey, { mainWallet: wallet, subWallets: [] })
         }
       }
     })
@@ -76,7 +80,7 @@ export class PortfolioPage {
 
     groups.sort((group1: WalletGroup, group2: WalletGroup) => {
       if (group1.mainWallet && group2.mainWallet) {
-        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        return group1.mainWallet.protocol.symbol.localeCompare(group2.mainWallet.protocol.symbol)
       } else if (group1.mainWallet) {
         return -1
       } else if (group2.mainWallet) {
@@ -141,7 +145,7 @@ export class PortfolioPage {
 
     wallets.forEach(wallet => {
       const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
-        protocolIdentifier: wallet.protocolIdentifier,
+        protocolIdentifier: wallet.protocol.identifier,
         currentMarketPrice: wallet.currentMarketPrice
       })
       newTotal += Number(fiatValue)

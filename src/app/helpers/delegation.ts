@@ -1,12 +1,12 @@
 import { ICoinProtocol, ICoinDelegateProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { IAirGapCoinDelegateProtocol } from '../interfaces/IAirGapCoinDelegateProtocol'
-import { ProtocolSymbols } from '../services/protocols/protocols'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export function supportsDelegation(protocol: ICoinProtocol): protocol is ICoinDelegateProtocol {
   const delegateProtocol = protocol as ICoinDelegateProtocol
 
   // temporary until Tezos subprotocols stop inherit TezosProtocol and implement ICoinDelegateProtocol
-  const supportingTezosProtocols: string[] = [ProtocolSymbols.XTZ, ProtocolSymbols.XTZ_KT]
+  const supportingTezosProtocols: string[] = [MainProtocolSymbols.XTZ, SubProtocolSymbols.XTZ_KT]
   if (delegateProtocol instanceof TezosProtocol && !supportingTezosProtocols.includes(delegateProtocol.identifier)) {
     return false
   }
@@ -28,8 +28,12 @@ export function supportsAirGapDelegation(protocol: ICoinProtocol): protocol is I
   const delegateProtocol = protocol as IAirGapCoinDelegateProtocol
   return (
     delegateProtocol.delegateeLabel !== undefined &&
+    delegateProtocol.delegateeLabelPlural !== undefined &&
+    delegateProtocol.supportsMultipleDelegations !== undefined &&
     !!delegateProtocol.getExtraDelegationDetailsFromAddress &&
+    !!delegateProtocol.getRewardDisplayDetails &&
     !!delegateProtocol.createDelegateesSummary &&
-    !!delegateProtocol.createAccountExtendedDetails
+    !!delegateProtocol.createAccountExtendedDetails &&
+    !!delegateProtocol.getRewardDisplayDetails
   )
 }
