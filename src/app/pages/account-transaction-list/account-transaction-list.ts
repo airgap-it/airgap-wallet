@@ -215,7 +215,6 @@ export class AccountTransactionListPage {
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
     if (newTransactions.length < this.TRANSACTION_LIMIT) {
-      console.log('DISABLING INFINITE SCROLLING')
       this.infiniteEnabled = false
     }
 
@@ -230,7 +229,8 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(error => {
+      console.error(error)
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
       return []
@@ -299,13 +299,18 @@ export class AccountTransactionListPage {
     }
 
     const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
+      oldTransactions.map(
+        (tx: IAirGapTransaction): [string, IAirGapTransaction] => {
+          const key = this.mergeKeyForTransaction(tx)
+          return [key, tx]
+        }
+      )
     )
 
     const transactionCountBefore: number = transactionMap.size
-
     newTransactions.forEach(tx => {
-      transactionMap.set(tx.hash, tx)
+      const key = this.mergeKeyForTransaction(tx)
+      transactionMap.set(key, tx)
     })
 
     if (transactionCountBefore === transactionMap.size) {
@@ -318,6 +323,13 @@ export class AccountTransactionListPage {
         ? b.timestamp - a.timestamp
         : new BigNumber(b.blockHeight).minus(new BigNumber(a.blockHeight)).toNumber()
     )
+  }
+
+  private mergeKeyForTransaction(transaction: IAirGapTransaction): string {
+    return `${transaction.hash ? transaction.hash : ''}${transaction.from.reduce((a, b) => a + b, '')}${transaction.to.reduce(
+      (a, b) => a + b,
+      ''
+    )}${transaction.amount}${transaction.fee}${transaction.timestamp ? transaction.timestamp : ''}`
   }
 
   public async presentEditPopover(event): Promise<void> {
