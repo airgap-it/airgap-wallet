@@ -19,7 +19,10 @@
       "output": "build",
       "buildResources": "resources"
     },
-    "artifactName": "${name}-${version}.${ext}"
+    "artifactName": "${name}-${version}.${ext}",
+    "mac": {
+      "entitlements": "resources/entitlements.mac.plist"
+    }
   },
   "dependencies": {
     "@capacitor/electron": "^2.0.1",
