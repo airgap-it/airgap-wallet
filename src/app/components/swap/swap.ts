@@ -78,14 +78,11 @@ export class SwapComponent {
   }
 
   public async doRadio(): Promise<void> {
-    const protocols: ICoinProtocol[] = []
-    this.supportedProtocols.forEach((supportedProtocol: ProtocolSymbols) => {
-      try {
-        protocols.push(this.protocolService.getProtocol(supportedProtocol))
-      } catch (error) {
-        /* */
-      }
-    })
+    const protocols: ICoinProtocol[] = (await Promise.all(
+      this.supportedProtocols.map(async (supportedProtocol: ProtocolSymbols) =>
+        this.protocolService.getProtocol(supportedProtocol).catch(() => undefined)
+      )
+    )).filter((protocol: ICoinProtocol | undefined) => protocol !== undefined)
 
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: ProtocolSelectPage,
@@ -97,9 +94,9 @@ export class SwapComponent {
 
     modal
       .onDidDismiss()
-      .then((protocolIdentifier: any) => {
+      .then(async (protocolIdentifier: any) => {
         if (protocolIdentifier && protocolIdentifier.data) {
-          this.protocolSetEmitter.emit(this.protocolService.getProtocol(protocolIdentifier.data))
+          this.protocolSetEmitter.emit(await this.protocolService.getProtocol(protocolIdentifier.data))
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

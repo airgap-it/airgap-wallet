@@ -37,9 +37,9 @@
             <ion-col class="balance__container ion-no-padding">
               <ion-row>
                 <p class="font--size__large ion-no-margin">
-                  <strong>
+                  <strong *ngIf="state.availableBalance !== null">
                     {{ state.availableBalance | amountConverter: { protocol: wallet.protocol.identifier, maxDigits: wallet.protocol.decimals
-                    + 1 } }}
+                    + 1 } | async }}
                   </strong>
                 </p>
               </ion-row>
@@ -47,7 +47,7 @@
                 <ion-text color="blackLight">
                   <p class="ion-no-margin">
                     ${{ state.availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
-                    wallet.currentMarketPrice } | number: '1.2-2' }}
+                    wallet.currentMarketPrice } | async | number: '1.2-2' }}
                   </p>
                 </ion-text>
               </ion-row>

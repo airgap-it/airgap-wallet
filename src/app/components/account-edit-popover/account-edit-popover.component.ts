@@ -46,9 +46,8 @@ export class AccountEditPopoverComponent implements OnInit {
     this.wallet = this.navParams.get('wallet')
     this.importAccountAction = this.navParams.get('importAccountAction')
     this.onDelete = this.navParams.get('onDelete')
-    if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
-      this.networks = this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
-    }
+
+    this.initNetworks()
   }
 
   public async copyAddressToClipboard(): Promise<void> {
@@ -146,5 +145,11 @@ export class AccountEditPopoverComponent implements OnInit {
 
   public dismissPopover(): Promise<boolean | void> {
     return this.viewCtrl.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async initNetworks(): Promise<void> {
+    if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
+      this.networks = await this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
+    }
   }
 }

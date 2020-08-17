@@ -59,7 +59,7 @@ export class TransactionConfirmPage {
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTransactionsSync.forEach(async signedTx => {
-      const protocol = this.protocolService.getProtocol(signedTx.protocol)
+      const protocol = await this.protocolService.getProtocol(signedTx.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
         (signedTx.payload as SignedTransaction).accountIdentifier,

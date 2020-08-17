@@ -112,23 +112,25 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
 
-    return [...knownValidators, ...unkownValidators]
-      .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
-      .map(
-        (details: ValidatorDetails) =>
-          new UIAccountSummary({
-            address: details.operator_address,
-            logo: details.logo,
-            header: [
-              details.description.moniker,
-              `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
-            ],
-            description: [
-              this.shortenStringPipe.transform(details.operator_address),
-              this.amountConverterPipe.transform(details.tokens, { protocol })
-            ]
-          })
-      )
+    return Promise.all(
+      [...knownValidators, ...unkownValidators]
+        .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
+        .map(
+          async (details: ValidatorDetails) =>
+            new UIAccountSummary({
+              address: details.operator_address,
+              logo: details.logo,
+              header: [
+                details.description.moniker,
+                `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
+              ],
+              description: [
+                this.shortenStringPipe.transform(details.operator_address),
+                await this.amountConverterPipe.transform(details.tokens, { protocol })
+              ]
+            })
+        )
+    )
   }
 
   public async createAccountExtendedDetails(protocol: CosmosProtocol, address: string): Promise<UIAccountExtendedDetails> {
@@ -255,7 +257,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
-    const displayDetails = this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
+    const displayDetails = await this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
 
     return {
       ...delegatorDetails,
@@ -431,19 +433,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDisplayDetails(
+  private async createDisplayDetails(
     protocol: CosmosProtocol,
     delegatedAmount: BigNumber,
     unbondingAmount: BigNumber,
     rewards: BigNumber
-  ): UIWidget[] {
+  ): Promise<UIWidget[]> {
     const details = []
 
     if (delegatedAmount.gt(0)) {
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(delegatedAmount, {
+          text: await this.amountConverterPipe.transform(delegatedAmount, {
             protocol
           }),
           description: 'delegation-detail-cosmos.currently-delegated_label'
@@ -455,7 +457,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(unbondingAmount, {
+          text: await this.amountConverterPipe.transform(unbondingAmount, {
             protocol
           }),
           description: 'delegation-detail-cosmos.unbonding_label'
@@ -467,7 +469,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       details.push(
         new UIIconText({
           iconName: 'logo-usd',
-          text: this.amountConverterPipe.transform(rewards, {
+          text: await this.amountConverterPipe.transform(rewards, {
             protocol
           }),
           description: 'delegation-detail-cosmos.unclaimed-rewards_label'

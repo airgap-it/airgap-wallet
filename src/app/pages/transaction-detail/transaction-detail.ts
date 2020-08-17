@@ -30,7 +30,7 @@ export class TransactionDetailPage {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = this.protocolService.getProtocol(
+    const protocol: ICoinProtocol = await this.protocolService.getProtocol(
       this.transaction.protocolIdentifier,
       this.transaction.network.identifier
     )

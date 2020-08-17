@@ -167,22 +167,24 @@ export class AccountProvider {
 
     const walletInitPromises: Promise<void>[] = []
 
-    wallets.forEach(wallet => {
-      const protocol = this.protocolService.getProtocol(wallet.protocolIdentifier, wallet.networkIdentifier)
+    await Promise.all(
+      wallets.map(async wallet => {
+        const protocol = await this.protocolService.getProtocol(wallet.protocolIdentifier, wallet.networkIdentifier)
 
-      const airGapWallet = new AirGapMarketWallet(
-        protocol,
-        wallet.publicKey,
-        wallet.isExtendedPublicKey,
-        wallet.derivationPath,
-        this.priceService,
-        wallet.addressIndex
-      )
-      // add derived addresses
-      airGapWallet.addresses = wallet.addresses
-      walletInitPromises.push(this.initializeWallet(airGapWallet))
-      this.walletList.push(airGapWallet)
-    })
+        const airGapWallet = new AirGapMarketWallet(
+          protocol,
+          wallet.publicKey,
+          wallet.isExtendedPublicKey,
+          wallet.derivationPath,
+          this.priceService,
+          wallet.addressIndex
+        )
+        // add derived addresses
+        airGapWallet.addresses = wallet.addresses
+        walletInitPromises.push(this.initializeWallet(airGapWallet))
+        this.walletList.push(airGapWallet)
+      })
+    )
 
     Promise.all(walletInitPromises).then(() => {
       this.triggerWalletChanged()

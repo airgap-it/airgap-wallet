@@ -146,8 +146,11 @@ export class ExchangeProvider implements Exchange {
     this.persist()
   }
 
-  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: ProtocolSymbols): IAirGapTransaction[] {
-    const protocol = this.protocolService.getProtocol(protocolIdentifier)
+  public async formatExchangeTxs(
+    pendingExchangeTxs: ExchangeTransaction[],
+    protocolIdentifier: ProtocolSymbols
+  ): Promise<IAirGapTransaction[]> {
+    const protocol = await this.protocolService.getProtocol(protocolIdentifier)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
       const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()

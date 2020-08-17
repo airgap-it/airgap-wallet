@@ -47,7 +47,7 @@
     <ng-container *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
       <p class="ion-text-right font--weight__bold porfolio-item__margin" *ngIf="wallet.currentMarketPrice.toNumber() > 0">
         ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
-        wallet.currentMarketPrice } | number: '1.2-2' }}
+        wallet.currentMarketPrice } | async | number: '1.2-2' }}
       </p>
     </ng-container>
     <ng-template #syncingBalance>

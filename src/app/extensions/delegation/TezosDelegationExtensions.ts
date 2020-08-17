@@ -257,17 +257,20 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       return undefined
     }
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
+
     return new UIRewardList({
-      rewards: rewardInfo.map(info => {
-        return {
-          index: info.cycle,
-          amount: this.amountConverterPipe.transform(new BigNumber(info.reward), {
-            protocol
-          }),
-          collected: info.payout < new Date(),
-          timestamp: info.payout.getTime()
-        }
-      }),
+      rewards: await Promise.all(
+        rewardInfo.map(async info => {
+          return {
+            index: info.cycle,
+            amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
+              protocol
+            }),
+            collected: info.payout < new Date(),
+            timestamp: info.payout.getTime()
+          }
+        })
+      ),
       indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
       amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
       payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'

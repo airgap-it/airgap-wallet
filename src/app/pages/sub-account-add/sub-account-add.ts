@@ -50,33 +50,11 @@ export class SubAccountAddPage {
     }
 
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
-      this.typeLabel = 'add-sub-account.accounts_label'
+      this.initWithAccountSubProtocol()
     } else if (this.subProtocolType === SubProtocolType.TOKEN) {
-      this.typeLabel = 'add-sub-account.tokens_label'
+      this.initWithTokenSubProtocol()
     } else {
       assertNever(this.subProtocolType)
-    }
-    if (this.subProtocolType === SubProtocolType.TOKEN) {
-      const subProtocols: ICoinSubProtocol[] = this.protocolService.getSubProtocols(this.wallet.protocol)
-      subProtocols.forEach((subProtocol: ICoinSubProtocol) => {
-        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-          subProtocol,
-          this.wallet.publicKey,
-          this.wallet.isExtendedPublicKey,
-          this.wallet.derivationPath,
-          this.priceService
-        )
-        const exists: boolean = this.accountProvider.walletExists(wallet)
-        if (!exists) {
-          wallet.addresses = this.wallet.addresses
-          wallet
-            .synchronize()
-            .then(() => {
-              this.subAccounts.push({ selected: false, wallet })
-            })
-            .catch(handleErrorSentry(ErrorCategory.COINLIB))
-        }
-      })
     }
   }
 
@@ -86,5 +64,34 @@ export class SubAccountAddPage {
 
   public addSubAccounts(): void {
     this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider, location: this.navController })
+  }
+
+  private initWithAccountSubProtocol(): void {
+    this.typeLabel = 'add-sub-account.accounts_label'
+  }
+
+  private async initWithTokenSubProtocol(): Promise<void> {
+    this.typeLabel = 'add-sub-account.tokens_label'
+
+    const subProtocols: ICoinSubProtocol[] = await this.protocolService.getSubProtocols(this.wallet.protocol)
+    subProtocols.forEach((subProtocol: ICoinSubProtocol) => {
+      const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+        subProtocol,
+        this.wallet.publicKey,
+        this.wallet.isExtendedPublicKey,
+        this.wallet.derivationPath,
+        this.priceService
+      )
+      const exists: boolean = this.accountProvider.walletExists(wallet)
+      if (!exists) {
+        wallet.addresses = this.wallet.addresses
+        wallet
+          .synchronize()
+          .then(() => {
+            this.subAccounts.push({ selected: false, wallet })
+          })
+          .catch(handleErrorSentry(ErrorCategory.COINLIB))
+      }
+    })
   }
 }

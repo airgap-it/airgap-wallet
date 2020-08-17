@@ -1,4 +1,4 @@
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
@@ -192,7 +192,8 @@ export class ActionGroup {
       return wallet
     }
 
-    const protocol = this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
+    const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
+
     wallet = new AirGapMarketWallet(
       protocol,
       xtzWallet.publicKey,

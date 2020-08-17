@@ -111,7 +111,7 @@ export class ExchangePage {
     } else {
       currentFromProtocol = fromProtocols[0]
     }
-    await this.setFromProtocol(this.protocolService.getProtocol(currentFromProtocol))
+    await this.setFromProtocol(await this.protocolService.getProtocol(currentFromProtocol))
 
     if (this.exchangePageState === ExchangePageState.LOADING) {
       const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
@@ -210,7 +210,7 @@ export class ExchangePage {
       this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
       !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
     ) {
-      const toProtocol = this.protocolService.getProtocol(this.supportedProtocolsTo[0])
+      const toProtocol = await this.protocolService.getProtocol(this.supportedProtocolsTo[0])
       this.selectedToProtocol = toProtocol
       this.loadWalletsForSelectedToProtocol()
     }

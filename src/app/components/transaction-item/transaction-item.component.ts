@@ -18,9 +18,9 @@ export class TransactionItemComponent implements OnInit {
 
   constructor(private readonly protocolService: ProtocolService) {}
 
-  public ngOnInit(): void {
+  public async ngOnInit(): Promise<void> {
     try {
-      this.protocol = this.protocolService.getProtocol(this.tx.protocolIdentifier)
+      this.protocol = await this.protocolService.getProtocol(this.tx.protocolIdentifier)
     } catch {}
   }
 }

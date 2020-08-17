@@ -1,4 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
@@ -34,16 +34,19 @@ export class SubAccountImportPage {
       const info = this.route.snapshot.data.special
       this.subProtocolIdentifier = info.subProtocolIdentifier
       this.networkIdentifier = info.networkIdentifier
-      this.subProtocol = this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier)
+      this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier).then((protocol: ICoinProtocol) => {
+        this.subProtocol = protocol
+      })
     }
 
     this.accountProvider.wallets
-      .pipe(map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.identifier === this.subProtocolIdentifier.split('-')[0])))
+      .pipe(
+        map(mainAccounts => mainAccounts.filter(wallet => wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier)))
+      )
       .subscribe(mainAccounts => {
-        const promises: Promise<void>[] = []
-        mainAccounts.forEach(mainAccount => {
+        const promises: Promise<void>[] = mainAccounts.map(async mainAccount => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
-            const protocol = this.protocolService.getProtocol(this.subProtocolIdentifier)
+            const protocol = await this.protocolService.getProtocol(this.subProtocolIdentifier)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
               protocol,
               mainAccount.publicKey,
@@ -52,10 +55,12 @@ export class SubAccountImportPage {
               this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses
-            promises.push(airGapMarketWallet.synchronize())
             this.subWallets.push(airGapMarketWallet)
+
+            return airGapMarketWallet.synchronize()
           }
         })
+
         Promise.all(promises)
           .then(() => this.accountProvider.triggerWalletChanged())
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
