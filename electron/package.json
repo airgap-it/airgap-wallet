@@ -21,7 +21,14 @@
     },
     "artifactName": "${name}-${version}.${ext}",
     "mac": {
+      "icon": "icons/icon.png",
       "entitlements": "resources/entitlements.mac.plist"
+    },
+    "linux": {
+      "icon": "icons/512x512.png"
+    },
+    "win": {
+      "icon": "icons/512x512.png"
     }
   },
   "dependencies": {
@@ -32,7 +39,7 @@
     "electron-is-dev": "^1.2.0"
   },
   "devDependencies": {
-    "electron": "^9.2.0",
+    "electron": "^8.0.0",
     "electron-builder": "^22.8.0",
     "electron-rebuild": "^1.11.0",
     "node-abi": "^2.18.0"
