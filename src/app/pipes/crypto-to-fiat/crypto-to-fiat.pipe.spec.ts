@@ -1,6 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolStoreService } from '@airgap/angular-core/lib/services/protocol/store/main/main-protocol-store.service'
-import { SubProtocolStoreService } from '@airgap/angular-core/lib/services/protocol/store/sub/sub-protocol-store.service'
+import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
@@ -8,9 +6,15 @@ import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 
 describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe
+  let protocolService: ProtocolService
+
+  beforeAll(() => {
+    protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    protocolService.init()
+  })
 
   beforeEach(() => {
-    cryptoToFiatPipe = new CryptoToFiatPipe(new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService()))
+    cryptoToFiatPipe = new CryptoToFiatPipe(protocolService)
   })
 
   it('should return the right price', async () => {
