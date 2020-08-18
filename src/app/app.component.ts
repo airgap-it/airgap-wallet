@@ -14,7 +14,6 @@ import { PushProvider } from './services/push/push'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from './services/storage/storage'
-import { WebExtensionProvider } from './services/web-extension/web-extension'
 import { generateGUID } from './utils/utils'
 
 @Component({
@@ -30,7 +29,6 @@ export class AppComponent {
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
     private readonly protocolsProvider: ProtocolsProvider,
     private readonly storageProvider: StorageProvider,
-    private readonly webExtensionProvider: WebExtensionProvider,
     private readonly appInfoProvider: AppInfoProvider,
     private readonly accountProvider: AccountProvider,
     private readonly deepLinkProvider: DeepLinkProvider,
@@ -67,8 +65,6 @@ export class AppComponent {
       .then(version => {
         if (this.platform.is('hybrid')) {
           setSentryRelease('app_' + version)
-        } else if (this.webExtensionProvider.isWebExtension()) {
-          setSentryRelease('ext_' + version)
         } else {
           setSentryRelease('browser_' + version) // TODO: Set version in CI once we have browser version
         }

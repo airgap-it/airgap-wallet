@@ -26,7 +26,7 @@
     <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
       {{ 'account-import.cancel_label' | translate }}
     </ion-button>
-    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists && walletImportable" (click)="import()">
+    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists" (click)="import()">
       {{ 'account-import.import_label' | translate }}
     </ion-button>
   </ion-fab>

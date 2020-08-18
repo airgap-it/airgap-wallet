@@ -4,13 +4,15 @@
     <img src="./banner.png" />
 </p>
 
-> Your old smartphone is your new ‘hardware wallet’
+> Self custody made simple and secure. Protect your crypto and store your private keys offline.
 
-[AirGap](https://airgap.it) is a crypto wallet system, that let's you secure cypto assets with one secret on an offline device. The AirGap Wallet application is installed on an everyday smartphone whereas [AirGap Vault](https://github.com/airgap-it/airgap-vault) is installed on a dedicated or old smartphone that has no connection to any network, thus it is air gapped.
+[AirGap](https://airgap.it) is a crypto wallet system that lets you secure cypto assets with one secret on an offline device. The [AirGap Vault](https://github.com/airgap-it/airgap-vault) application is installed on a dedicated device that has no connection to any network, thus it is air gapped. The AirGap Wallet is installed on your everyday smartphone.
 
 ## Description
 
-AirGap Wallet has an overview of all accounts with their respective balances and transactions and is responsible for transaction creation and for the broadcasting of signed transactions. The mobile application, AirGap Wallet is a hybrid application (using the same codebase for Android and iOS which helps with coordinated development). Created using Ionic framework and AirGap's coin-lib to interact with different protocols.
+AirGap Wallet has an overview of all accounts with their respective balances and transaction histories. AirGap Wallet never touches your secret data stored in the AirGap Vault. It is responsible for creating and broadcasting transactions. The prepared transaction is sent to the secure Vault over QR codes, where it is securely signed and sent back.
+
+AirGap Wallet is a hybrid application (using the same codebase for Android and iOS). Created using AirGap's protocol agnostic `airgap-coin-lib` library to interact with different protocols and our own secure storage implementation.
 
 <p align="left">
     <img src="./devices.png" />
@@ -23,9 +25,9 @@ AirGap Wallet has an overview of all accounts with their respective balances and
 
 ## Features
 
-- Portfolio Overview of accounts synced from AirGap Vault
+- Portfolio overview of accounts synced from AirGap Vault
 - Communication with the Vault application over QR codes if installed on a second device or app switching if installed on the same device
-- Create transactions for all supported currencies like Aeternity, Ethereum, Bitcoin etc.
+- Create transactions for all supported currencies like Aeternity, Bitcoin, Ethereum, Tezos, Cosmos, Kusama, Polkadot, Groestlcoin etc.
 - Broadcast signed transactions
 - Transaction history for each account
 
@@ -34,22 +36,28 @@ AirGap Wallet has an overview of all accounts with their respective balances and
 First follow the steps below to install the dependencies:
 
 ```bash
-$ npm install -g ionic
-$ npm install -g cordova
+$ npm install -g @capacitor/cli
 $ npm install
 ```
 
 Run locally in browser:
 
 ```bash
-$ ionic serve
+$ npm run serve
 ```
 
-Run on device:
+Build and open native project
 
 ```bash
-$ ionic cordova platform run android
-$ ionic cordova platform run ios
+$ npm run build
+$ npx cap sync
+```
+
+You can now open the native iOS or Android projects in XCode or Android Studio respectively.
+
+```bash
+$ npx cap open ios
+$ npx cap open android
 ```
 
 ## Testing
@@ -60,42 +68,22 @@ To run the unit tests:
 $ npm test
 ```
 
-## Building the Chrome Extension
-
-To build and run the chrome extension, you have to use a different `@ionic/storage` module. Change the following line in your `package.json`:
-
-```
-    "@ionic/storage": "2.2.0",
-```
-
-to
-
-```
-    "@ionic/storage": "git+https://github.com/bb4L/ionic-storage.git#1499e2d3d81626ca61793b01a66b12a9494137bf",
-```
-
-After that, you need to run
-
-```bash
-npm install
-```
-
-You can now build the extension:
-
-```bash
-npm run extension:prepare
-npm run extension:build:dev
-```
-
-**Make sure you have node 11 or later installed, otherwise it might fail during the last step.**
-
-Now you can load the unpacked extension from the `./extension/` folder.
-
-## Security
+## Disclosing Security Vulnerabilities
 
 If you discover a security vulnerability within this application, please send an e-mail to hi@airgap.it. All security vulnerabilities will be promptly addressed.
 
 ## Contributing
 
-- If you find any bugs, submit an [issue](../../issues) or open [pull-request](../../pulls), helping us catch and fix them.
+Before integrating a new feature, please quickly reach out to us in an issue so we can discuss and coordinate the change.
+
+- If you find any bugs, submit an [issue](../../issues) or open [pull-request](../../pulls).
+- If you want to integrate a new blockchain, please read the contributing guidelines in the [airgap-coin-lib](https://github.com/airgap-it/airgap-coin-lib) project.
 - Engage with other users and developers on the [AirGap Telegram](https://t.me/AirGap).
+
+## Related Projects
+
+- [AirGap Wallet](https://github.com/airgap-it/airgap-wallet)
+- [airgap-coin-lib](https://github.com/airgap-it/airgap-coin-lib)
+
+- [AirGap Linux Distribution](https://github.com/airgap-it/airgap-distro)
+- [apk-signer](https://github.com/airgap-it/airgap-raspberry-apk-signer)

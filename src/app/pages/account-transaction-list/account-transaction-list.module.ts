@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
-import { MaterialIconsModule } from 'ionic2-material-icons'
 import { MomentModule } from 'ngx-moment'
 
 import { ComponentsModule } from '../../components/components.module'
@@ -21,7 +20,6 @@ import { AccountTransactionListPage } from './account-transaction-list'
     TranslateModule,
     PipesModule,
     MomentModule,
-    MaterialIconsModule,
     RouterModule.forChild([{ path: '', component: AccountTransactionListPage }])
   ],
   declarations: [AccountTransactionListPage]
