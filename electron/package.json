@@ -25,15 +25,16 @@
     }
   },
   "dependencies": {
-    "@capacitor/electron": "^2.0.1",
-    "@ledgerhq/hw-transport": "^5.15.0",
-    "@ledgerhq/hw-transport-node-ble": "^5.15.0",
-    "@ledgerhq/hw-transport-node-hid-singleton": "^5.15.0",
-    "electron-is-dev": "^1.1.0"
+    "@capacitor/electron": "^2.4.0",
+    "@ledgerhq/hw-transport": "^5.22.0",
+    "@ledgerhq/hw-transport-node-ble": "^5.22.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "^5.22.0",
+    "electron-is-dev": "^1.2.0"
   },
   "devDependencies": {
-    "electron": "^7.0.0",
-    "electron-builder": "^22.5.1",
-    "electron-rebuild": "^1.11.0"
+    "electron": "^9.2.0",
+    "electron-builder": "^22.8.0",
+    "electron-rebuild": "^1.11.0",
+    "node-abi": "^2.18.0"
   }
 }
