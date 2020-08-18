@@ -12,8 +12,8 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('TransactionPrepare Page', () => {

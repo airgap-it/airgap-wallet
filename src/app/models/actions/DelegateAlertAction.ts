@@ -1,15 +1,15 @@
-import { AlertController, PopoverController, ToastController, LoadingController } from '@ionic/angular'
+import { LanguageService } from '@airgap/angular-core'
+import { Router } from '@angular/router'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
+import { AirGapMarketWallet, TezosDelegatorAction } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { DataService } from 'src/app/services/data/data.service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
 
-import { DeprecatedLanguageService } from '../../services/language/language.service'
 import { WalletActionInfo } from '../ActionGroup'
 
-import { OperationsProvider } from 'src/app/services/operations/operations'
 import { AirGapDelegatorAction } from './DelegatorAction'
-import { TezosDelegatorAction, AirGapMarketWallet } from 'airgap-coin-lib'
-import { DataService } from 'src/app/services/data/data.service'
-import { Router } from '@angular/router'
 
 export interface DelegateAlertActionContext {
   isAccepted?: boolean
@@ -21,7 +21,7 @@ export interface DelegateAlertActionContext {
   dataService: DataService
   router: Router
   popoverController: PopoverController
-  languageService: DeprecatedLanguageService
+  languageService: LanguageService
   alertController: AlertController
   alertTitle: string
   alertDescription: string
