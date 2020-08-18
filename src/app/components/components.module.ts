@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
-import { MaterialIconsModule } from 'ionic2-material-icons'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { PipesModule } from '../pipes/pipes.module'
@@ -71,7 +70,7 @@ import { DelegateActionPopoverComponent } from './delegate-action-popover copy/d
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialIconsModule,
+
     PipesModule,
     MomentModule,
     ChartsModule,

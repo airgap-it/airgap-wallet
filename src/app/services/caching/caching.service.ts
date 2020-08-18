@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 
 export enum CachingServiceKey {
   PRICESAMPLES = 'pricesamples',
@@ -30,6 +31,8 @@ export interface StorageObject {
   providedIn: 'root'
 })
 export class CachingService {
+  private readonly data = []
+
   constructor(private readonly storage: Storage) {}
 
   public async setTransactionData(identifier: TransactionIdentifier, value: any): Promise<any> {
@@ -37,24 +40,31 @@ export class CachingService {
     return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
-  private async getCacheId(wallet: AirGapMarketWallet, key: CachingServiceKey): Promise<string> {
-    return `${wallet.publicKey}_${wallet.protocol.options.network.identifier}_${key}`
+  public setPriceData(identifier: PriceSampleIdentifier, value: any): Promise<any> {
+    const uniqueId = `${identifier.timeUnit}_${identifier.protocolIdentifier}_${identifier.key}`
+    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
   }
 
-  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransaction[]> {
-    const uniqueId = await this.getCacheId(wallet, CachingServiceKey.TRANSACTIONS)
-
-    return new Promise<IAirGapTransaction[]>(async resolve => {
+  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
+    const uniqueId = `${wallet.publicKey}_${CachingServiceKey.TRANSACTIONS}`
+    return new Promise<IAirGapTransactionResult>(async resolve => {
       const rawTransactions: StorageObject = await this.storage.get(uniqueId)
-      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000) {
-        rawTransactions.value.map(transaction => {
+      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
+        rawTransactions.value.transactions.map(transaction => {
           transaction.amount = new BigNumber(parseInt(transaction.amount, 10))
           transaction.fee = new BigNumber(parseInt(transaction.fee, 10))
         })
         resolve(rawTransactions.value)
       } else {
-        resolve(wallet.fetchTransactions(50, 0))
+        resolve(wallet.fetchTransactions(50))
       }
     })
+  }
+
+  public getData(publicKey): unknown | undefined {
+    if (this.data[publicKey]) {
+      return this.data[publicKey]
+    }
+    return undefined
   }
 }

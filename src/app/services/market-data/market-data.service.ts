@@ -7,8 +7,14 @@ import * as cryptocompare from 'cryptocompare'
 import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 
 export interface BalanceAtTimestampObject {
+  timestamp: number
+  balance: number
+}
+
+export interface ValueAtTimestampObject {
   timestamp: number
   balance: number
 }
@@ -95,45 +101,53 @@ export class MarketDataService {
     return balancesAfterEachTransaction.find(object => object.timestamp === closestTimestamp).balance
   }
 
-  public async fetchValuesSingleWallet(
+  public async fetchValuesAtTimestampSingleWallet(
     wallet: AirGapMarketWallet,
     priceSamples: MarketDataSample[],
     transactions: IAirGapTransaction[]
-  ): Promise<number[]> {
-    const walletValues: number[] = []
+  ): Promise<ValueAtTimestampObject[]> {
+    const valuesAtTimestamp: ValueAtTimestampObject[] = []
     const balancesAfterEachTransaction: BalanceAtTimestampObject[] = await this.fetchBalanceAfterEachTransaction(wallet, transactions)
     priceSamples.forEach((priceSample: MarketDataSample) => {
       const realTimeBalance = MarketDataService.balanceAtTimestamp(priceSample.time, balancesAfterEachTransaction)
       const avgDailyPrice = (priceSample.high + priceSample.low) / 2
-      walletValues.push(realTimeBalance * avgDailyPrice)
+      valuesAtTimestamp.push({ balance: realTimeBalance * avgDailyPrice, timestamp: priceSample.time })
     })
 
-    return walletValues
+    return valuesAtTimestamp
   }
 
-  public async fetchAllValues(interval: TimeUnit): Promise<number[]> {
-    return new Promise<number[]>(async resolve => {
+  public async fetchAllValues(interval: TimeUnit): Promise<ValueAtTimestampObject[]> {
+    return new Promise<ValueAtTimestampObject[]>(async resolve => {
       const wallets = this.walletsProvider.getWalletList()
       // TODO fetchMarketData() only once for each protocolIdentifier
       const cryptoPricePromises = wallets.map(wallet => wallet.getMarketPricesOverTime(interval, 0, new Date()))
       const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
       const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
 
-      const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
-      const allWalletValues = [0, 0]
+      const transactionResultsByWallet: IAirGapTransactionResult[] = await Promise.all(transactionPromises)
+      const allWalletValues = [{ balance: 0, timestamp: 0 }]
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setTransactionData(
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
-          transactionsByWallet[index]
+          transactionResultsByWallet[index]
         )
-        const walletValues = await this.fetchValuesSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
+        const walletValues = await this.fetchValuesAtTimestampSingleWallet(
+          wallet,
+          priceSamples[index],
+          transactionResultsByWallet[index].transactions
+        )
         walletValues.forEach((walletValue, idx) => {
-          if (!Number.isNaN(walletValue)) {
-            if (allWalletValues[idx] > 0) {
-              allWalletValues[idx] += walletValue
-            } else {
-              allWalletValues[idx] = walletValue
+          if (!Number.isNaN(walletValue.balance)) {
+            if (allWalletValues[idx]) {
+              if (allWalletValues[idx]['balance'] && allWalletValues[idx]['balance'] > 0) {
+                allWalletValues[idx]['balance'] += walletValue.balance
+              } else {
+                allWalletValues[idx]['balance'] = walletValue.balance
+              }
+              allWalletValues[idx]['timestamp'] = walletValue.timestamp
             }
+            allWalletValues[idx] = { timestamp: walletValue.timestamp, balance: walletValue.balance }
           }
         })
       }

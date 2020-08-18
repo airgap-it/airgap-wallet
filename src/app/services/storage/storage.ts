@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from 'airgap-coin-lib'
 import { ExchangeTransaction } from '../exchange/exchange'
 import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { Network } from '@airgap/beacon-sdk'
@@ -18,11 +18,9 @@ export enum SettingsKey {
   WALLET_INTRODUCTION = 'walletIntroduction',
   CAMERA_PERMISSION_ASKED = 'cameraPermissionAsked',
   DEEP_LINK = 'deepLink',
-  WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
   PUSH_INTRODUCTION = 'pushIntroduction',
   EXCHANGE_INTEGRATION = 'exchangeIntroduction',
   WALLET = 'wallets',
-  SELECTED_ACCOUNT = 'selectedAccount',
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
   SETTINGS_SERIALIZER_ENABLE_V2 = 'SETTINGS_SERIALIZER_ENABLE_V2',
@@ -53,11 +51,9 @@ interface SettingsKeyReturnType {
   [SettingsKey.WALLET_INTRODUCTION]: boolean
   [SettingsKey.CAMERA_PERMISSION_ASKED]: boolean
   [SettingsKey.DEEP_LINK]: boolean
-  [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean
   [SettingsKey.PUSH_INTRODUCTION]: boolean
   [SettingsKey.EXCHANGE_INTEGRATION]: boolean
   [SettingsKey.WALLET]: SerializedAirGapWallet[] | undefined
-  [SettingsKey.SELECTED_ACCOUNT]: AirGapMarketWallet | undefined
   [SettingsKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
   [SettingsKey.USER_ID]: string | undefined
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: boolean
@@ -74,11 +70,9 @@ const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.WALLET_INTRODUCTION]: false,
   [SettingsKey.CAMERA_PERMISSION_ASKED]: false,
   [SettingsKey.DEEP_LINK]: false,
-  [SettingsKey.WEB_EXTENSION_DISCLAIMER]: false,
   [SettingsKey.PUSH_INTRODUCTION]: false,
   [SettingsKey.EXCHANGE_INTEGRATION]: false,
   [SettingsKey.WALLET]: undefined,
-  [SettingsKey.SELECTED_ACCOUNT]: undefined,
   [SettingsKey.LAST_TX_BROADCAST]: undefined,
   [SettingsKey.USER_ID]: undefined,
   [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
