@@ -61,7 +61,9 @@ process.on('message', async message => {
           break
       }
     } catch (error) {
-      data = { error }
+      data = {
+        error: error instanceof Error ? JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error))) : error
+      }
     }
 
     process.send({

@@ -102,7 +102,11 @@ export class AccountImportLedgerOnboardingPage {
   private async connectWithLedger(): Promise<void> {
     this.isLoading = true
 
-    await this.ledgerService.openConnection(this.protocol.identifier)
+    try {
+      await this.ledgerService.openConnection(this.protocol.identifier)
+    } catch (error) {
+      console.warn(error)
+    }
   }
 
   private customProgressBar(current: number, total: number): string {
