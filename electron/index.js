@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = require('electron')
 const isDevMode = require('electron-is-dev')
 const { CapacitorSplashScreen, configCapacitor } = require('@capacitor/electron')
 
@@ -15,18 +15,24 @@ let splashScreen = null
 let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
+const menuTemplate = [
+  { role: 'appMenu', submenu: [{ label: 'Quit AirGap Wallet', role: 'quit' }] },
+  { role: 'window', submenu: [{ label: 'Minimize', role: 'minimize' }] }
+]
 const menuTemplateDev = [
   {
-    label: 'Options',
+    role: 'appMenu',
     submenu: [
       {
         label: 'Open Dev Tools',
-        click() {
+        click: () => {
           mainWindow.openDevTools()
         }
-      }
+      },
+      { label: 'Quit', role: 'quit' }
     ]
-  }
+  },
+  { role: 'window', submenu: [{ label: 'Minimize', role: 'minimize' }] }
 ]
 
 async function createWindow() {
@@ -60,6 +66,18 @@ async function createWindow() {
       mainWindow.show()
     })
   }
+
+  if (!isDevMode) {
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
+  }
+
+  mainWindow.on('focus', () => {
+    globalShortcut.registerAll(['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'], () => {})
+  })
+
+  mainWindow.on('blur', () => {
+    globalShortcut.unregisterAll()
+  })
 }
 
 // This method will be called when Electron has finished
