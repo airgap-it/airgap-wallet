@@ -78,6 +78,10 @@ async function createWindow() {
   mainWindow.on('blur', () => {
     globalShortcut.unregisterAll()
   })
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
 }
 
 // This method will be called when Electron has finished
