@@ -10,7 +10,7 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
-import { promiseTimeout } from '../../helpers/promise-timeout'
+import { promiseTimeout } from '../../helpers/promise'
 import { ActionGroup } from '../../models/ActionGroup'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
