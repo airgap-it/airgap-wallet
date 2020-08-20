@@ -220,7 +220,7 @@
 
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
-    "heading": "TODO",
+    "heading": "Select the device to sign this transaction",
     "vault_label": "AirGap Vault",
     "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
     "ledger_label": "Ledger",
