@@ -16,23 +16,15 @@ let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
 const menuTemplate = [
-  { role: 'appMenu', submenu: [{ label: 'Quit AirGap Wallet', role: 'quit' }] },
-  { role: 'window', submenu: [{ label: 'Minimize', role: 'minimize' }] }
+  { role: 'appMenu', submenu: [{ role: 'quit' }] },
+  { role: 'window', submenu: [{ role: 'minimize' }] }
 ]
 const menuTemplateDev = [
   {
     role: 'appMenu',
-    submenu: [
-      {
-        label: 'Open Dev Tools',
-        click: () => {
-          mainWindow.openDevTools()
-        }
-      },
-      { label: 'Quit', role: 'quit' }
-    ]
+    submenu: [{ role: 'toggleDevTools' }, { role: 'quit' }]
   },
-  { role: 'window', submenu: [{ label: 'Minimize', role: 'minimize' }] }
+  { role: 'window', submenu: [{ role: 'minimize' }] }
 ]
 
 async function createWindow() {
