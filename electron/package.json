@@ -19,6 +19,10 @@
       "output": "build",
       "buildResources": "resources"
     },
+    "files": [
+      "**/*",
+      "resources/**/*"
+    ],
     "artifactName": "${name}-${version}.${ext}",
     "mac": {
       "icon": "icons/icon.png",
