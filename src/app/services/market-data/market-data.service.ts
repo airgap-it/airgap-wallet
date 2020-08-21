@@ -8,6 +8,7 @@ import { AmountConverterPipe } from '../../pipes/amount-converter/amount-convert
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
 import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -119,7 +120,7 @@ export class MarketDataService {
 
   public async fetchAllValues(interval: TimeUnit): Promise<ValueAtTimestampObject[]> {
     return new Promise<ValueAtTimestampObject[]>(async resolve => {
-      const wallets = this.walletsProvider.getWalletList().filter(wallet => wallet.protocol.marketSymbol !== 'USDtz')
+      const wallets = this.walletsProvider.getWalletList().filter(wallet => wallet.protocol.identifier !== SubProtocolSymbols.XTZ_USD)
       // TODO fetchMarketData() only once for each protocolIdentifier
       const cryptoPricePromises = wallets.map(wallet => wallet.getMarketPricesOverTime(interval, 0, new Date()))
       const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
