@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { MainProtocolSymbols, ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 import { LedgerApp } from '../../ledger/app/LedgerApp'
 import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'
@@ -35,6 +35,12 @@ export class LedgerService {
 
   public getSupportedProtocols(): string[] {
     return Array.from(this.supportedApps.keys())
+  }
+
+  public isProtocolSupported(protocol: ICoinProtocol | ProtocolSymbols): boolean {
+    const identifier: ProtocolSymbols = typeof protocol === 'string' ? protocol : protocol.identifier
+
+    return this.getSupportedProtocols().includes(identifier)
   }
 
   public async getConnectedDevices(protocolIdentifier: string): Promise<LedgerConnectionDetails[]> {

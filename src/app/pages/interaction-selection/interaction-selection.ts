@@ -2,12 +2,13 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 
+import { Platform } from '@ionic/angular'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { isString } from 'util'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { Platform } from '@ionic/angular'
-import { OperationsProvider } from 'src/app/services/operations/operations'
-import { isString } from 'util'
 
 @Component({
   selector: 'page-interaction-selection',
@@ -16,6 +17,7 @@ import { isString } from 'util'
 })
 export class InteractionSelectionPage {
   public isDesktop: boolean = false
+  public isLedgerSupported: boolean = false
 
   public interactionData: any
   private readonly wallet: AirGapMarketWallet
@@ -27,19 +29,20 @@ export class InteractionSelectionPage {
     private readonly route: ActivatedRoute,
     private readonly deepLinkProvider: DeepLinkProvider,
     private readonly dataService: DataService,
-    private readonly operations: OperationsProvider
+    private readonly operations: OperationsProvider,
+    private readonly ledgerService: LedgerService
   ) {
+    this.isDesktop = this.platform.is('desktop')
+
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
+
+      this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
     }
-
-    this.isDesktop = this.platform.is('desktop')
   }
-
-  public async ionViewDidEnter() {}
 
   public async offlineDeviceSign() {
     const dataQR = await this.prepareQRData()

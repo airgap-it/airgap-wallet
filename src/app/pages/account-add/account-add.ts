@@ -68,7 +68,7 @@ export class AccountAddPage {
   }
 
   public addAccount(protocol: ICoinProtocol) {
-    const isLedgerImportAvailable = this.ledgerService.getSupportedProtocols().includes(protocol.identifier) && this.platform.is('desktop')
+    const isLedgerImportAvailable = this.ledgerService.isProtocolSupported(protocol) && this.platform.is('desktop')
     if (!isLedgerImportAvailable) {
       this.importFromVault(protocol)
     } else {

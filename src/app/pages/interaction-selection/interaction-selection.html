@@ -65,7 +65,7 @@
 
         <ion-row>
           <ion-col size="12">
-            <ion-button id="online" expand="block" color="primary" (click)="ledgerSign()" shape="round">
+            <ion-button id="online" expand="block" color="primary" (click)="ledgerSign()" shape="round" [disabled]="!isLedgerSupported">
               {{ 'interaction-selection-desktop.ledger_label' | translate }}
             </ion-button>
             <p>{{ 'interaction-selection-desktop.ledger_info' | translate }}</p>
