@@ -64,7 +64,9 @@ export class DelegationListPage {
       this.callback = info.callback
 
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then((summary: UIAccountSummary[]) => {
-        this.currentDelegatees = summary.filter(summary => info.currentDelegatees.includes(summary.address))
+        this.currentDelegatees = summary.filter(
+          summary => info.currentDelegatees.includes(summary.address) && summary.address !== undefined
+        )
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
         this.filteredDelegatees = this.knownDelegatees
