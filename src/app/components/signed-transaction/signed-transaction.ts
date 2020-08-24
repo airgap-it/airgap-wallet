@@ -52,9 +52,9 @@ export class SignedTransactionComponent implements OnChanges {
       const protocol: ICoinProtocol =
         this.protocols && this.protocols[0] ? this.protocols[0] : getProtocolByIdentifier(this.signedTxs[0].protocol)
       try {
-        this.airGapTxs = (await Promise.all(
-          this.signedTxs.map(signedTx => protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction))
-        )).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+        this.airGapTxs = (
+          await Promise.all(this.signedTxs.map(signedTx => protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)))
+        ).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
 
         if (
           this.airGapTxs.length > 1 &&
