@@ -17,40 +17,9 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
-import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
-import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { ComponentsModule } from './components/components.module'
-import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
-import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
-import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
-import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
-import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
-import { PipesModule } from './pipes/pipes.module'
-import { AccountProvider } from './services/account/account.provider'
-import { AppInfoProvider } from './services/app-info/app-info'
-import { ClipboardService } from './services/clipboard/clipboard'
-import { DeepLinkProvider } from './services/deep-link/deep-link'
-import { DrawChartService } from './services/draw-chart/draw-chart.service'
-import { ExchangeProvider } from './services/exchange/exchange'
-import { MarketDataService } from './services/market-data/market-data.service'
-import { OperationsProvider } from './services/operations/operations'
-import { PermissionsProvider } from './services/permissions/permissions'
-
-import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
-import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
-import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
-import { ExtensionsService } from './services/extensions/extensions.service'
-import { PushBackendProvider } from './services/push-backend/push-backend'
-import { PushProvider } from './services/push/push'
-import { RemoteConfigProvider } from './services/remote-config/remote-config'
-import { ScannerProvider } from './services/scanner/scanner'
-import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
-import { SerializerService } from './services/serializer/serializer.service'
-import { StorageProvider } from './services/storage/storage'
-
 import {
   APP_INFO_PLUGIN,
   APP_PLUGIN,
@@ -62,7 +31,37 @@ import {
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from './capacitor-plugins/injection-tokens'
+import { ComponentsModule } from './components/components.module'
+import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
+import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
+import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
+import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
+import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
+import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
+import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
+import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
+import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
+import { PipesModule } from './pipes/pipes.module'
+import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
+import { AccountProvider } from './services/account/account.provider'
+import { AppInfoProvider } from './services/app-info/app-info'
+import { ClipboardService } from './services/clipboard/clipboard'
+import { DeepLinkProvider } from './services/deep-link/deep-link'
+import { DrawChartService } from './services/draw-chart/draw-chart.service'
+import { ExchangeProvider } from './services/exchange/exchange'
+import { ExtensionsService } from './services/extensions/extensions.service'
+import { LedgerService } from './services/ledger/ledger-service'
+import { MarketDataService } from './services/market-data/market-data.service'
+import { OperationsProvider } from './services/operations/operations'
+import { PermissionsProvider } from './services/permissions/permissions'
 import { ProtocolsProvider } from './services/protocols/protocols'
+import { PushBackendProvider } from './services/push-backend/push-backend'
+import { PushProvider } from './services/push/push'
+import { RemoteConfigProvider } from './services/remote-config/remote-config'
+import { ScannerProvider } from './services/scanner/scanner'
+import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
+import { SerializerService } from './services/serializer/serializer.service'
+import { StorageProvider } from './services/storage/storage'
 
 const { App, AppInfo, Browser, Clipboard, Permissions, PushNotifications, Share, SplashScreen, StatusBar } = Plugins
 
@@ -140,7 +139,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     AppInfoProvider,
     PushProvider,
     PushBackendProvider,
-    SerializerService
+    SerializerService,
+    LedgerService
   ],
   bootstrap: [AppComponent]
 })
