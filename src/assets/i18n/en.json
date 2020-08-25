@@ -232,6 +232,7 @@
   },
   "from-to": {
     "type_label": "Type",
+    "asset-id_label": "Asset ID",
     "amount_label": "Amount",
     "fee_label": "Fee",
     "time_label": "Time",
