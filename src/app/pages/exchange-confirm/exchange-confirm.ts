@@ -70,7 +70,7 @@ export class ExchangeConfirmPage {
     const fee = new BigNumber(this.fee).shiftedBy(wallet.protocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
+      const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         wallet,
         this.exchangeResult.payinAddress,
         amount,
@@ -80,7 +80,7 @@ export class ExchangeConfirmPage {
       const info = {
         wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)

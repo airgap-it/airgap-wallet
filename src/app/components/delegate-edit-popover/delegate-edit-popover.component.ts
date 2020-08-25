@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
-import { AlertOptions } from '@ionic/angular/node_modules/@ionic/core'
+import { AlertOptions } from '@ionic/core'
 import { TranslateService } from '@ngx-translate/core'
 
 @Component({

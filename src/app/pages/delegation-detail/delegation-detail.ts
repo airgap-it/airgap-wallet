@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
-import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
@@ -355,12 +355,12 @@ export class DelegationDetailPage {
     try {
       const form = this.delegationForms.get(actionType)
       const data = form ? form.value : undefined
-      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+      const { airGapTxs, unsignedTx } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
 
       this.dismissLoader()

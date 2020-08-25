@@ -401,16 +401,17 @@ export class TransactionPreparePage {
     const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.protocol.feeDecimals)
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.operationsProvider.prepareTransaction(
+      const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
         this._state.address.value,
         amount,
         fee
       )
+
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
