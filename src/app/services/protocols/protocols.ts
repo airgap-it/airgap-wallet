@@ -65,18 +65,8 @@ export class ProtocolsProvider {
       addSupportedProtocol(new GroestlcoinProtocol())
       addSupportedProtocol(new TezosProtocol())
       addSupportedProtocol(new CosmosProtocol())
-      // TODO: enable when we can change the symbol back to "DOT"
-      // addSupportedProtocol(new PolkadotProtocol())
+      addSupportedProtocol(new PolkadotProtocol())
       addSupportedProtocol(new KusamaProtocol())
-
-      // for a period of time after the redenomination occurs,
-      // it is recommended to use "New DOT" to clearly indicate that we have complied with the change
-      // Web3 Foundation will follow up on when to change "New DOT" to "DOT"
-      // TODO: remove when we can change the symbol to "DOT"
-      const polkadot: PolkadotProtocol = new PolkadotProtocol()
-      polkadot.symbol = 'New DOT'
-      polkadot.feeSymbol = 'New DOT'
-      addSupportedProtocol(polkadot)
 
       const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
         'Carthagenet',
