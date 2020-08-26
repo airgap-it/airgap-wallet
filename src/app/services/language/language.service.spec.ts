@@ -37,7 +37,8 @@ describe('LanguageService', () => {
 
     // TODO: Add real translations and check if it gets translated
     expect(untranslated.header).toBe(translated.header)
-    expect(untranslated.message).toBe(translated.message)
+    expect(translated.message).toEqual(jasmine.any(String))
+    expect(untranslated.message).toBe(translated.message as String)
     expect(untranslated.inputs).toBe(translated.inputs)
     expect(untranslated.buttons).toBe(translated.buttons)
   })
