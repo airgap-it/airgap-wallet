@@ -65,7 +65,7 @@ export class DelegationListPage {
 
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then((summary: UIAccountSummary[]) => {
         this.currentDelegatees = summary.filter(
-          summary => info.currentDelegatees.includes(summary.address) && summary.address !== undefined
+          summary => summary.address !== undefined && info.currentDelegatees.includes(summary.address)
         )
         this.knownDelegatees = summary.filter(summary => !info.currentDelegatees.includes(summary.address))
 
