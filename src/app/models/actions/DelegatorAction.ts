@@ -33,7 +33,7 @@ export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionCon
     await this.loader.present().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
 
     try {
-      const { airGapTxs, serializedTxChunks } = await this.context.operationsProvider.prepareDelegatorAction(
+      const { airGapTxs, unsignedTx } = await this.context.operationsProvider.prepareDelegatorAction(
         this.context.wallet,
         this.context.type,
         this.context.data
@@ -42,7 +42,7 @@ export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionCon
       const info = {
         wallet: this.context.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
 
       this.context.dataService.setData(DataServiceKey.INTERACTION, info)

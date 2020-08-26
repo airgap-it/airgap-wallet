@@ -168,15 +168,17 @@ export class ExchangePage {
     const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
     allFromProtocols.push(SubProtocolSymbols.XTZ_BTC)
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
-    const exchangeableFromProtocols = (await Promise.all(
-      supportedFromProtocols.map(async fromProtocol => {
-        if (fromProtocol === SubProtocolSymbols.XTZ_BTC) {
-          return fromProtocol
-        }
-        const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
-        return availableToCurrencies.length > 0 ? fromProtocol : undefined
-      })
-    )).filter(fromProtocol => fromProtocol !== undefined)
+    const exchangeableFromProtocols = (
+      await Promise.all(
+        supportedFromProtocols.map(async fromProtocol => {
+          if (fromProtocol === SubProtocolSymbols.XTZ_BTC) {
+            return fromProtocol
+          }
+          const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
+          return availableToCurrencies.length > 0 ? fromProtocol : undefined
+        })
+      )
+    ).filter(fromProtocol => fromProtocol !== undefined)
     return exchangeableFromProtocols
   }
 

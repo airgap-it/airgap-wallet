@@ -148,19 +148,15 @@ export class PlatformMock {
 
 export class NavControllerMock {
   public pop(): any {
-    return new Promise(
-      (resolve: Function): void => {
-        resolve()
-      }
-    )
+    return new Promise((resolve: Function): void => {
+      resolve()
+    })
   }
 
   public push(_ctrl: any, _args: any): any {
-    return new Promise(
-      (resolve: Function): void => {
-        resolve()
-      }
-    )
+    return new Promise((resolve: Function): void => {
+      resolve()
+    })
   }
 
   public getActive(): any {

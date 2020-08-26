@@ -307,7 +307,10 @@ export class AccountProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
+    return this.storageProvider.set(
+      SettingsKey.WALLET,
+      this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON())
+    )
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {
