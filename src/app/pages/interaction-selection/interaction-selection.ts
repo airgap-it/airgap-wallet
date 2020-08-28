@@ -5,7 +5,6 @@ import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { Platform } from '@ionic/angular'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
-import { isString } from 'util'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -59,7 +58,6 @@ export class InteractionSelectionPage {
   public async sameDeviceSign() {
     const dataQR = await this.prepareQRData()
 
-    console.log(dataQR)
     this.deepLinkProvider
       .sameDeviceDeeplink(dataQR)
       .then(() => {
@@ -79,13 +77,15 @@ export class InteractionSelectionPage {
   }
 
   private async prepareQRData(): Promise<string | string[]> {
-    if (isString(this.interactionData) && this.interactionData.includes('://')) {
+    if (typeof this.interactionData === 'string' && this.interactionData.includes('://')) {
       return this.interactionData
     }
 
-    return this.operations.serializeTx(this.wallet, this.interactionData).catch(error => {
+    return this.operations.serializeSignRequest(this.wallet, this.interactionData).catch(error => {
       console.warn(`Could not serialize transaction: ${error}`)
-      return ''
+      // TODO: Show error (toast)
+
+      return this.interactionData // Fallback
     })
   }
 }
