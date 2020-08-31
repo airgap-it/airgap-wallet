@@ -311,7 +311,7 @@ export class OperationsProvider {
     })
   }
 
-  public async serializeTx(wallet: AirGapMarketWallet, transaction: SerializableTx): Promise<string[]> {
+  public async serializeSignRequest(wallet: AirGapMarketWallet, transaction: SerializableTx): Promise<string[]> {
     return this.serializerService.serialize([
       {
         protocol: wallet.protocol.identifier,
