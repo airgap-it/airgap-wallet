@@ -14,7 +14,8 @@ import {
   PolkadotProtocol,
   supportedProtocols,
   TezosKtProtocol,
-  TezosProtocol
+  TezosProtocol,
+  TezosUSD
 } from 'airgap-coin-lib'
 import {
   EthereumERC20ProtocolConfig,
@@ -65,18 +66,8 @@ export class ProtocolsProvider {
       addSupportedProtocol(new GroestlcoinProtocol())
       addSupportedProtocol(new TezosProtocol())
       addSupportedProtocol(new CosmosProtocol())
-      // TODO: enable when we can change the symbol back to "DOT"
-      // addSupportedProtocol(new PolkadotProtocol())
+      addSupportedProtocol(new PolkadotProtocol())
       addSupportedProtocol(new KusamaProtocol())
-
-      // for a period of time after the redenomination occurs,
-      // it is recommended to use "New DOT" to clearly indicate that we have complied with the change
-      // Web3 Foundation will follow up on when to change "New DOT" to "DOT"
-      // TODO: remove when we can change the symbol to "DOT"
-      const polkadot: PolkadotProtocol = new PolkadotProtocol()
-      polkadot.symbol = 'New DOT'
-      polkadot.feeSymbol = 'New DOT'
-      addSupportedProtocol(polkadot)
 
       const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
         'Carthagenet',
@@ -111,7 +102,7 @@ export class ProtocolsProvider {
   }
 
   public getEnabledSubProtocols() {
-    return ['xtz-btc', 'eth-erc20-xchf']
+    return ['xtz-btc', 'eth-erc20-xchf', 'xtz-usd']
   }
 
   public async getNetworksForProtocol(protocolIdentifier: string) {
@@ -123,6 +114,7 @@ export class ProtocolsProvider {
   public addProtocols() {
     addSubProtocol(new TezosProtocol(), new TezosKtProtocol())
     addSubProtocol(new TezosProtocol(), new TezosBTC())
+    addSubProtocol(new TezosProtocol(), new TezosUSD())
     this.subProtocols.forEach(supportedSubAccount => {
       supportedSubAccount.subProtocols.forEach(subProtocol => {
         const protocol = getProtocolByIdentifier(supportedSubAccount.protocol)
