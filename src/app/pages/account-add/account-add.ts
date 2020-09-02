@@ -30,6 +30,7 @@ export class AccountAddPage {
     this.supportedAccountProtocols = supportedProtocols()
       .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
       .map(coin => coin)
+    console.log('supportedProtocols()', supportedProtocols())
     this.supportedSubAccountProtocols = supportedProtocols()
       .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
       .reduce((pv, cv) => {
@@ -43,6 +44,8 @@ export class AccountAddPage {
 
         return pv
       }, [])
+    console.log('supportedSubAccountProtocols', this.supportedSubAccountProtocols)
+
     this.filterProtocols()
   }
 
