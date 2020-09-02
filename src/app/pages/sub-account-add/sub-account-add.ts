@@ -34,7 +34,7 @@ export class SubAccountAddPage {
 
   public typeLabel: string = ''
   private subProtocols: ICoinSubProtocol[]
-  private readonly LIMIT: number = 10
+  private LIMIT: number = 10
   public infiniteEnabled: boolean = false
 
   constructor(
@@ -82,11 +82,11 @@ export class SubAccountAddPage {
   }
 
   public async doInfinite(event) {
-    console.log('doInfinite')
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
     const subAccountsLength = this.subAccounts.length
+    console.log('subAccountsLength', subAccountsLength)
 
     await this.loadSubAccounts(subAccountsLength)
     if (this.subAccounts.length - subAccountsLength < this.LIMIT) {
@@ -98,9 +98,8 @@ export class SubAccountAddPage {
 
   private async loadSubAccounts(subAccountsLength: number) {
     const subProtocols = [...this.subProtocols]
-    const arr = subProtocols.splice(subAccountsLength, this.LIMIT)
-    console.log(arr)
-    arr.forEach((subProtocol: ICoinSubProtocol) => {
+    const newSubProtocols = subProtocols.slice(subAccountsLength, subAccountsLength + this.LIMIT)
+    newSubProtocols.forEach((subProtocol: ICoinSubProtocol) => {
       const wallet: AirGapMarketWallet = new AirGapMarketWallet(
         subProtocol,
         this.wallet.publicKey,
@@ -114,6 +113,7 @@ export class SubAccountAddPage {
         wallet
           .synchronize()
           .then(() => {
+            console.log('push', wallet.protocol.identifier)
             this.subAccounts.push({ selected: false, wallet })
           })
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
