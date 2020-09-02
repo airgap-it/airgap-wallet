@@ -27,6 +27,7 @@ export class SubAccountAddPage {
 
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
+
   public actionCallback: (context: AddTokenActionContext) => void
 
   public subProtocolType: SubProtocolType
@@ -34,8 +35,11 @@ export class SubAccountAddPage {
 
   public typeLabel: string = ''
   private subProtocols: ICoinSubProtocol[]
+  private filteredSubProtocols: ICoinSubProtocol[]
+
   private LIMIT: number = 10
   private PROTOCOLS_LOADED: number = 0
+  public searchTerm: string = ''
 
   public infiniteEnabled: boolean = false
 
@@ -83,7 +87,28 @@ export class SubAccountAddPage {
     this.loadSubAccounts()
   }
 
+  public setFilteredItems(searchTerm: string): void {
+    this.subAccounts = []
+    if (searchTerm.length === 0) {
+      this.filteredSubProtocols = this.subProtocols
+      this.infiniteEnabled = true
+      this.loadSubAccounts()
+    } else {
+      this.filteredSubProtocols = this.subProtocols.filter((protocol: ICoinSubProtocol) => {
+        const searchTermLowerCase: string = searchTerm.toLowerCase()
+        const hasMatchingName: boolean = protocol.name.toLowerCase().includes(searchTermLowerCase)
+        const hasMatchingSymbol: boolean = protocol.symbol.toLowerCase().includes(searchTermLowerCase)
+
+        return hasMatchingName || hasMatchingSymbol
+      })
+      this.infiniteEnabled = false
+      this.PROTOCOLS_LOADED = 0
+      this.loadSubAccounts(true)
+    }
+  }
+
   public async doInfinite(event) {
+    console.log('doInfinite')
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
@@ -91,8 +116,8 @@ export class SubAccountAddPage {
     event.target.complete()
   }
 
-  private async loadSubAccounts() {
-    const subProtocols = [...this.subProtocols]
+  private async loadSubAccounts(filtered: boolean = false) {
+    const subProtocols = filtered ? [...this.filteredSubProtocols] : [...this.subProtocols]
     const newSubProtocols = subProtocols.slice(this.PROTOCOLS_LOADED, this.PROTOCOLS_LOADED + this.LIMIT)
     if (newSubProtocols.length < this.LIMIT) {
       this.infiniteEnabled = false
@@ -112,7 +137,6 @@ export class SubAccountAddPage {
         wallet
           .synchronize()
           .then(() => {
-            console.log('push', wallet.protocol.identifier)
             this.subAccounts.push({ selected: false, wallet })
           })
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
