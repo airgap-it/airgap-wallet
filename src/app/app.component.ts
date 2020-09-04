@@ -13,8 +13,7 @@ import {
   TezosProtocol,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
-  TezosProtocolOptions,
-  PolkadotProtocol
+  TezosProtocolOptions
 } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
