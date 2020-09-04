@@ -7,6 +7,8 @@ import * as cryptocompare from 'cryptocompare'
 
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
+import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -111,23 +113,27 @@ export class MarketDataService {
 
     return valuesAtTimestamp
   }
-  q
+
   public async fetchAllValues(interval: TimeUnit): Promise<ValueAtTimestampObject[]> {
     return new Promise<ValueAtTimestampObject[]>(async resolve => {
-      const wallets = this.walletsProvider.getWalletList()
+      const wallets = this.walletsProvider.getWalletList().filter(wallet => wallet.protocol.identifier !== SubProtocolSymbols.XTZ_USD)
       // TODO fetchMarketData() only once for each protocolIdentifier
       const cryptoPricePromises = wallets.map(wallet => wallet.getMarketPricesOverTime(interval, 0, new Date()))
       const transactionPromises = wallets.map(wallet => this.cachingService.fetchTransactions(wallet))
       const priceSamples: MarketDataSample[][] = await Promise.all(cryptoPricePromises)
 
-      const transactionsByWallet: IAirGapTransaction[][] = await Promise.all(transactionPromises)
+      const transactionResultsByWallet: IAirGapTransactionResult[] = await Promise.all(transactionPromises)
       const allWalletValues = [{ balance: 0, timestamp: 0 }]
       for (const [index, wallet] of wallets.entries()) {
         this.cachingService.setTransactionData(
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
-          transactionsByWallet[index]
+          transactionResultsByWallet[index]
         )
-        const walletValues = await this.fetchValuesAtTimestampSingleWallet(wallet, priceSamples[index], transactionsByWallet[index])
+        const walletValues = await this.fetchValuesAtTimestampSingleWallet(
+          wallet,
+          priceSamples[index],
+          transactionResultsByWallet[index].transactions
+        )
         walletValues.forEach((walletValue, idx) => {
           if (!Number.isNaN(walletValue.balance)) {
             if (allWalletValues[idx]) {

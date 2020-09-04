@@ -1,13 +1,16 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
+import { Platform } from '@ionic/angular'
 import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
 @Component({
   selector: 'page-account-add',
@@ -22,10 +25,12 @@ export class AccountAddPage {
   public filteredSubAccountProtocols: ICoinProtocol[] = []
 
   constructor(
+    private readonly platform: Platform,
     private readonly accountProvider: AccountProvider,
     private readonly protocolService: ProtocolService,
     private readonly router: Router,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly ledgerService: LedgerService
   ) {
     this.supportedAccountProtocols = supportedProtocols()
       .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
@@ -61,11 +66,12 @@ export class AccountAddPage {
   }
 
   public addAccount(protocol: ICoinProtocol) {
-    const info = {
-      mainProtocolIdentifier: protocol.identifier
+    const isLedgerImportAvailable = this.ledgerService.isProtocolSupported(protocol) && this.platform.is('desktop')
+    if (!isLedgerImportAvailable) {
+      this.importFromVault(protocol)
+    } else {
+      this.showImportInteractionSelection(protocol)
     }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
-    this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public addSubAccount(subProtocol: ICoinProtocol) {
@@ -96,5 +102,45 @@ export class AccountAddPage {
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+  }
+
+  private showImportInteractionSelection(protocol: ICoinProtocol) {
+    const info = {
+      callback: (interactionType: AccountImportInteractionType) => {
+        switch (interactionType) {
+          case AccountImportInteractionType.VAULT:
+            this.importFromVault(protocol)
+            break
+          case AccountImportInteractionType.LEDGER:
+            this.importFromLedger(protocol)
+            break
+          default:
+            console.log('Unkonw import interaction type selected.')
+        }
+      }
+    }
+
+    this.dataService.setData(DataServiceKey.INTERACTION, info)
+    this.router
+      .navigateByUrl(`/account-import-interaction-selection/${DataServiceKey.INTERACTION}`, { skipLocationChange: true })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
+    const info = {
+      protocolIdentifier: protocol.identifier
+    }
+    this.dataService.setData(DataServiceKey.PROTOCOL, info)
+    this.router
+      .navigateByUrl('/account-import-ledger-onboarding/' + DataServiceKey.PROTOCOL)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private importFromVault(protocol: ICoinProtocol) {
+    const info = {
+      mainProtocolIdentifier: protocol.identifier
+    }
+    this.dataService.setData(DataServiceKey.PROTOCOL, info)
+    this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

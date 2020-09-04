@@ -15,6 +15,8 @@ import { TransactionPreparePage } from './transaction-prepare'
 
 import { AmountConverterPipe } from '@airgap/angular-core'
 import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
@@ -53,6 +55,7 @@ describe('TransactionPrepare Page', () => {
           { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
           { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },
+          { provide: OperationsProvider, useClass: OperationsServiceMock },
           ClipboardService,
           {
             provide: ActivatedRoute,
@@ -145,12 +148,17 @@ describe('TransactionPrepare Page', () => {
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
     // TODO: Move this test to "operationsProvider"
+    spyOn((component as any).router, 'navigateByUrl').and.returnValue(Promise.resolve(true))
+
     component.transactionForm.controls.address.setValue(ethWallet.addresses[0])
     component.transactionForm.controls.amount.setValue(10)
     component.transactionForm.controls.fee.setValue(10)
 
     await component.prepareTransaction()
-    /*
+    expect((component as any).operationsProvider.prepareTransaction).toHaveBeenCalledTimes(1)
+    expect((component as any).router.navigateByUrl).toHaveBeenCalledWith(
+      '/interaction-selection/interaction'
+    ) /*
     // should create a loadingCtrl
     expect((component as any).loadingCtrl.create).toHaveBeenCalled()
 

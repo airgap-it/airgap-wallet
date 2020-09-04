@@ -1,0 +1,15 @@
+ion-slides {
+  height: calc(100% - 72px);
+  @media (min-width: 768px) {
+    .swiper-slide img {
+      width: 20vw;
+    }
+  }
+}
+.swiper-slide {
+  font-size: 1rem;
+}
+.slide-zoom {
+  height: 100%;
+  padding: 64px 0 0;
+}

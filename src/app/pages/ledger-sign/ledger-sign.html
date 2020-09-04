@@ -1,0 +1,53 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'ledger-sign.title' | translate: { title: wallet.protocol.identifier | uppercase } }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content class="ion-padding ion-margin-bottom">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-row>
+      <h5 [innerHTML]="'ledger-sign.text' | translate"></h5>
+    </ion-row>
+
+    <ng-container *ngIf="airGapTxs && airGapTxs.length > 1">
+      <ion-row class="ion-padding-bottom ion-text-center">
+        <ion-col size="4" class="content--align__center-center">
+          <h5>
+            {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier, maxDigits:
+            undefined } }}
+          </h5>
+        </ion-col>
+        <ion-col size="4" class="content--align__center-center">
+          <h5>{{ aggregatedInfo.numberOfTxs }}</h5>
+        </ion-col>
+        <ion-col size="4" class="content--align__center-center">
+          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocolIdentifier: airGapTxs[0].protocolIdentifier } }}</h5>
+        </ion-col>
+        <ion-col size="4">
+          <small>Amount</small>
+        </ion-col>
+        <ion-col size="4">
+          <small>Operations</small>
+        </ion-col>
+        <ion-col size="4">
+          <small>Fee</small>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+
+    <ng-container *ngIf="airGapTxs">
+      <from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></from-to>
+    </ng-container>
+  </ion-grid>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button id="confirm" size="default" color="primary" (click)="signTx()" shape="round">
+      {{ 'ledger-sign.confirm_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

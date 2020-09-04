@@ -1,3 +1,4 @@
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
 import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
@@ -9,7 +10,7 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
-import { promiseTimeout } from '../../helpers/promise-timeout'
+import { promiseTimeout } from '../../helpers/promise'
 import { ActionGroup } from '../../models/ActionGroup'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -70,7 +71,7 @@ export class AccountTransactionListPage {
   public lottieConfig: { path: string } = {
     path: './assets/animations/loading.json'
   }
-
+  private transactionResult: IAirGapTransactionResult
   private readonly TRANSACTION_LIMIT: number = 10
   private readonly actionGroup: ActionGroup
 
@@ -206,11 +207,12 @@ export class AccountTransactionListPage {
       return event.target.complete()
     }
 
-    const offset: number = this.txOffset - (this.txOffset % this.TRANSACTION_LIMIT)
-    const newTransactions: IAirGapTransaction[] = await this.getTransactions(this.TRANSACTION_LIMIT, offset)
+    const newTransactions: IAirGapTransaction[] = await this.getTransactions(
+      this.transactionResult ? this.transactionResult.cursor : undefined,
+      this.TRANSACTION_LIMIT
+    )
 
     this.transactions = this.mergeTransactions(this.transactions, newTransactions)
-    this.txOffset = this.transactions.length
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
@@ -229,7 +231,8 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(() => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(error => {
+      console.error(error)
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
       return []
@@ -242,7 +245,9 @@ export class AccountTransactionListPage {
 
     const addr: string = this.wallet.receivingPublicAddress
 
-    this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    try {
+      this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
+    } catch (err) {}
 
     this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
       this.wallet.protocol.identifier,
@@ -271,21 +276,23 @@ export class AccountTransactionListPage {
     if (!forceRefresh) {
       this.accountProvider.triggerWalletChanged()
     }
+
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = true
   }
 
-  public async getTransactions(limit: number = 10, offset: number = 0): Promise<IAirGapTransaction[]> {
-    const [transactions]: [IAirGapTransaction[], void] = await Promise.all([
-      this.wallet.fetchTransactions(limit, offset),
+  public async getTransactions(cursor?: IProtocolTransactionCursor, limit: number = 10): Promise<IAirGapTransaction[]> {
+    const [transactionResult]: [IAirGapTransactionResult, void] = await Promise.all([
+      this.transactionResult ? this.wallet.fetchTransactions(limit, cursor) : this.wallet.fetchTransactions(limit),
       this.wallet.synchronize().catch(error => {
         console.error(error)
       })
     ])
 
-    return transactions
+    this.transactionResult = transactionResult
+    return transactionResult.transactions
   }
 
   public mergeTransactions(oldTransactions: IAirGapTransaction[], newTransactions: IAirGapTransaction[]): IAirGapTransaction[] {
@@ -294,13 +301,18 @@ export class AccountTransactionListPage {
     }
 
     const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => [tx.hash, tx])
+      oldTransactions.map(
+        (tx: IAirGapTransaction): [string, IAirGapTransaction] => {
+          const key = this.mergeKeyForTransaction(tx)
+          return [key, tx]
+        }
+      )
     )
 
     const transactionCountBefore: number = transactionMap.size
-
     newTransactions.forEach(tx => {
-      transactionMap.set(tx.hash, tx)
+      const key = this.mergeKeyForTransaction(tx)
+      transactionMap.set(key, tx)
     })
 
     if (transactionCountBefore === transactionMap.size) {
@@ -313,6 +325,13 @@ export class AccountTransactionListPage {
         ? b.timestamp - a.timestamp
         : new BigNumber(b.blockHeight).minus(new BigNumber(a.blockHeight)).toNumber()
     )
+  }
+
+  private mergeKeyForTransaction(transaction: IAirGapTransaction): string {
+    return `${transaction.hash ? transaction.hash : ''}${transaction.from.reduce((a, b) => a + b, '')}${transaction.to.reduce(
+      (a, b) => a + b,
+      ''
+    )}${transaction.amount}${transaction.fee}${transaction.timestamp ? transaction.timestamp : ''}`
   }
 
   public async presentEditPopover(event): Promise<void> {

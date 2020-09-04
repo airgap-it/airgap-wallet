@@ -2,6 +2,9 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 
+import { Platform } from '@ionic/angular'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -12,43 +15,77 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   styleUrls: ['./interaction-selection.scss']
 })
 export class InteractionSelectionPage {
-  public preparedDataQR: string = ''
+  public isDesktop: boolean = false
+  public isLedgerSupported: boolean = false
+
+  public interactionData: any
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
 
   constructor(
+    public readonly platform: Platform,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly deepLinkProvider: DeepLinkProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly operations: OperationsProvider,
+    private readonly ledgerService: LedgerService
   ) {
+    this.isDesktop = this.platform.is('desktop')
+
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
-      this.preparedDataQR = info.data
+      this.interactionData = info.data
+
+      this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
     }
   }
 
-  public async ionViewDidEnter() {}
+  public async offlineDeviceSign() {
+    const dataQR = await this.prepareQRData()
 
-  public offlineDeviceSign() {
     const info = {
       wallet: this.wallet,
       airGapTxs: this.airGapTxs,
-      data: this.preparedDataQR
+      data: dataQR
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public sameDeviceSign() {
-    console.log(this.preparedDataQR)
+  public async sameDeviceSign() {
+    const dataQR = await this.prepareQRData()
+
     this.deepLinkProvider
-      .sameDeviceDeeplink(this.preparedDataQR)
+      .sameDeviceDeeplink(dataQR)
       .then(() => {
         this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
       .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))
+  }
+
+  public ledgerSign() {
+    const info = {
+      wallet: this.wallet,
+      airGapTxs: this.airGapTxs,
+      data: this.interactionData
+    }
+    this.dataService.setData(DataServiceKey.TRANSACTION, info)
+    this.router.navigateByUrl('/ledger-sign/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async prepareQRData(): Promise<string | string[]> {
+    if (typeof this.interactionData === 'string' && this.interactionData.includes('://')) {
+      return this.interactionData
+    }
+
+    return this.operations.serializeSignRequest(this.wallet, this.interactionData).catch(error => {
+      console.warn(`Could not serialize transaction: ${error}`)
+      // TODO: Show error (toast)
+
+      return this.interactionData // Fallback
+    })
   }
 }

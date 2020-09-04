@@ -21,7 +21,7 @@
   </ion-grid>
 </ion-header>
 
-<ion-content>
+<ion-content no-bounce has-bouncing="false" forceOverscroll="false">
   <ion-grid fixed="true" class="ion-no-padding">
     <tezos-delegation-card
       *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && wallet.currentBalance"
@@ -98,8 +98,7 @@
       [initialTransactionsLoaded]="initialTransactionsLoaded"
       [wallet]="wallet"
     ></transaction-list>
-
-    <ion-infinite-scroll [disabled]="infiniteEnabled" (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>
     </ion-infinite-scroll>
   </ion-grid>
@@ -118,7 +117,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="wallet.currentBalance?.toNumber() === 0 || wallet.protocol.identifier === mainProtocolSymbols.POLKADOT"
+          [disabled]="wallet.currentBalance?.toNumber() === 0"
           shape="round"
         >
           <ion-icon slot="start" name="send-outline"></ion-icon>

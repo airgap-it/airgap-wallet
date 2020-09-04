@@ -49,6 +49,7 @@ import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
+import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PermissionsProvider } from './services/permissions/permissions'
@@ -132,7 +133,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     AppInfoProvider,
     PushProvider,
     PushBackendProvider,
-    SerializerService
+    SerializerService,
+    LedgerService
   ],
   bootstrap: [AppComponent]
 })

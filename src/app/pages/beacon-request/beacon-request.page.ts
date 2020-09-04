@@ -26,7 +26,6 @@ import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
 import { ErrorPage } from '../error/error.page'
 
@@ -67,8 +66,7 @@ export class BeaconRequestPage implements OnInit {
     private readonly modalController: ModalController,
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
-    private readonly router: Router,
-    private readonly serializerService: SerializerService
+    private readonly router: Router
   ) {}
 
   public async ngOnInit(): Promise<void> {
@@ -203,21 +201,10 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       const transaction = { binaryTransaction: request.payload }
-      const serializedChunks = await this.serializerService.serialize([
-        {
-          protocol: selectedWallet.protocol.identifier,
-          type: IACMessageType.TransactionSignRequest,
-          payload: {
-            publicKey: selectedWallet.publicKey,
-            transaction,
-            callback: 'airgap-wallet://?d='
-          }
-        }
-      ])
       const info = {
         wallet: selectedWallet,
         airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
-        data: serializedChunks
+        data: transaction
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -256,21 +243,10 @@ export class BeaconRequestPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const serializedChunks = await this.serializerService.serialize([
-        {
-          protocol: selectedWallet.protocol.identifier,
-          type: IACMessageType.TransactionSignRequest,
-          payload: {
-            publicKey: selectedWallet.publicKey,
-            transaction: forgedTransaction,
-            callback: 'airgap-wallet://?d='
-          }
-        }
-      ])
       const info = {
         wallet: selectedWallet,
         airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction }),
-        data: serializedChunks
+        data: forgedTransaction
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
