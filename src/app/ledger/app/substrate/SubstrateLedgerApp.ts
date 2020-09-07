@@ -1,3 +1,4 @@
+import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
 import { AirGapMarketWallet, SubstrateProtocol } from 'airgap-coin-lib'
 import {
   SubstrateSignature,
@@ -9,88 +10,27 @@ import { RawSubstrateTransaction } from 'airgap-coin-lib/dist/serializer/types'
 import { AirGapWalletPriceService } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { Buffer } from 'buffer'
 
-import { isType } from '../../../utils/utils'
 import { ReturnCode } from '../../ReturnCode'
 import { LedgerApp } from '../LedgerApp'
 
-enum Instruction {
-  /*
-   * Command:
-   * 1 byte - application ID
-   * 1 byte - instruction ID
-   * 1 byte - [ignored]
-   * 1 byte - [ignored]
-   * 1 byte - bytes in payload (0)
-   */
-  GET_VERSION = 0x00,
-  /*
-   * Command:
-   * 1 byte      - application ID
-   * 1 byte      - instruction ID
-   * 1 byte      - request user confirmation (NO = 0)
-   * 1 byte      - [ignored]
-   * 1 byte      - bytes in payload
-   * 4 bytes x 5 - derivation path chunks
-   */
-  GET_ADDRESS_ED25519 = 0x01,
-  /*
-   * Command:
-   * 1 byte  - application ID
-   * 1 byte  - instruction ID
-   * 1 byte  - payload descriptor (INIT = 0, ADD = 1, LAST = 2)
-   * 1 byte  - [ignored]
-   * 1 byte  - bytes in payload
-   * ? bytes - INIT ? derivation path chunks : message
-   */
-  SIGN = 0x02
-}
-
-enum RequiresConfirmation {
-  NO = 0,
-  YES = 1
-}
-
-enum PayloadDescriptor {
-  INIT = 0,
-  ADD = 1,
-  LAST = 2
-}
-
-const MAX_PAYLOAD_SIZE = 255
-
 export abstract class SubstrateLedgerApp extends LedgerApp {
-  protected readonly appIdentifier: number = 0x99
-  protected abstract readonly scrambleKey: string
-
   protected abstract readonly protocol: SubstrateProtocol
 
-  public init(): void {
-    this.connection.transport.decorateAppAPIMethods(this, ['importWallet', 'signTransaction'], this.scrambleKey)
-  }
+  protected abstract getApp(): SubstrateApp
 
   public async importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet> {
-    const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
-
     try {
-      /*
-       * Reponse:
-       * 32 bytes - public key
-       * ? bytes  - address
-       * 2 bytes  - return code
-       */
-      const response: Buffer = await this.connection.transport.send(
-        this.appIdentifier,
-        Instruction.GET_ADDRESS_ED25519,
-        RequiresConfirmation.YES,
-        0,
-        derivationPath
-      )
+      const derivationPath: number[] = this.derivationPathToArray(this.protocol.standardDerivationPath)
+      const [account, change, addressIndex]: number[] = derivationPath.slice(2)
 
-      const publicKey: string = response.slice(0, 32).toString('hex')
+      const app: SubstrateApp = this.getApp()
+      const response: ResponseAddress = await app.getAddress(account, change, addressIndex)
 
-      return new AirGapMarketWallet(this.protocol, publicKey, false, this.protocol.standardDerivationPath, priceService)
+      return response.return_code === ReturnCode.SUCCESS
+        ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, priceService)
+        : this.rejectWithError('Could not import wallet', response)
     } catch (error) {
-      return Promise.reject(error)
+      return this.rejectWithError('Could not import wallet', error)
     }
   }
 
@@ -112,72 +52,38 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     payload: SubstrateTransactionPayload
   ): Promise<SubstrateTransaction | null> {
     try {
-      /*
-       * Reponse:
-       * 65 bytes - signature
-       * 2 bytes  - return code
-       */
-      const response = await this.signMessage(Buffer.from(payload.encode(), 'hex'))
-      const returnCode = response.readUInt16BE(response.length - 2)
+      const derivationPath: number[] = this.derivationPathToArray(this.protocol.standardDerivationPath)
+      const [account, change, addressIndex]: number[] = derivationPath.slice(2)
 
-      if (returnCode !== ReturnCode.SUCCESS) {
-        throw new Error(`Signing transaction failed with error code ${returnCode}.`)
-      }
+      const app: SubstrateApp = this.getApp()
+      const response: ResponseSign = await app.sign(account, change, addressIndex, Buffer.from(payload.encode(), 'hex'))
 
-      const signatureType = SubstrateSignatureType[SubstrateSignatureType[response.readUInt8(0)]]
-      const signatureBuffer = response.slice(1, 65)
+      if (response.return_code === ReturnCode.SUCCESS) {
+        const signatureType: SubstrateSignatureType = SubstrateSignatureType[SubstrateSignatureType[response.signature.readUInt8(0)]]
+        const signatureBuffer: Buffer = response.signature.slice(1, 65)
 
-      const signature = SubstrateSignature.create(signatureType, signatureBuffer)
+        const signature: SubstrateSignature = SubstrateSignature.create(signatureType, signatureBuffer)
 
-      return SubstrateTransaction.fromTransaction(transaction, { signature })
-    } catch (error) {
-      if (isType<{ statusCode: number }>(error, 'statusCode')) {
-        switch (error.statusCode) {
-          case ReturnCode.COMMAND_NOT_ALLOWED: // thrown when operation rejected
-            return null
-        }
-      }
-      return Promise.reject(error)
-    }
-  }
-
-  private async signMessage(message: Buffer): Promise<Buffer> {
-    const derivationPath = this.derivationPathToBuffer(this.protocol.standardDerivationPath)
-
-    const chunks = [derivationPath]
-    for (let offset = 0; offset < message.length; offset += MAX_PAYLOAD_SIZE) {
-      const end = offset + MAX_PAYLOAD_SIZE
-      chunks.push(message.slice(offset, end < message.length ? end : message.length))
-    }
-
-    function getDescriptor(index: number): PayloadDescriptor {
-      if (index === 0) {
-        return PayloadDescriptor.INIT
-      } else if (index < chunks.length - 1) {
-        return PayloadDescriptor.ADD
+        return SubstrateTransaction.fromTransaction(transaction, { signature })
+      } else if (
+        response.return_code === ReturnCode.COMMAND_NOT_ALLOWED ||
+        response.error_message.includes(ReturnCode.COMMAND_NOT_ALLOWED.toString(16)) // workaround until return codes are fixed in the substrate app lib
+      ) {
+        // thrown when sign rejected
+        return null
       } else {
-        return PayloadDescriptor.LAST
+        return this.rejectWithError('Could not sign transaction', response)
       }
+    } catch (error) {
+      return this.rejectWithError('Could not sign transaction', error)
     }
-
-    let response: Buffer
-    for (let i = 0; i < chunks.length; i++) {
-      response = await this.signSendPayloadChunk(chunks[i], getDescriptor(i))
-    }
-
-    return response
   }
 
-  private async signSendPayloadChunk(chunk: Buffer, descriptor: PayloadDescriptor): Promise<Buffer> {
-    const response = await this.connection.transport.send(this.appIdentifier, Instruction.SIGN, descriptor, 0, chunk)
-
-    const returnCode = response.slice(-2)
-    if (returnCode.readUInt16BE(0) !== ReturnCode.SUCCESS) {
-      throw new Error(
-        `Sending data to SIGN failed with error code 0x${returnCode.toString('hex')}. (descriptor: ${PayloadDescriptor[descriptor]})`
-      )
-    }
-
-    return response
+  private async rejectWithError<T>(header: string, error: string | Error | ResponseBase): Promise<T> {
+    return Promise.reject(
+      typeof error === 'string' || error instanceof Error
+        ? `${header}, ${error}`
+        : `${header}, ${error.error_message} (code 0x${error.return_code.toString(16).toLocaleUpperCase()})`
+    )
   }
 }
