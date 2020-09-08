@@ -183,3 +183,11 @@ page-scan {
   font-weight: 500;
   --color-selected: var(--ion-color-secondary);
 }
+
+/* Common Components styling */
+
+// identicon.component
+airgap-identicon {
+  height: 48px;
+  width: 48px;
+}

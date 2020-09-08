@@ -1,10 +1,10 @@
+import { LanguageService, ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol, supportedProtocols, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { TezosProtocolNetwork, TezosProtocolOptions } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 import { isType } from 'src/app/utils/utils'
@@ -13,7 +13,6 @@ import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
-import { LanguageService } from '../language/language.service'
 import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
@@ -32,24 +31,6 @@ interface CTAInfo {
   amount: string
   alertTitle: string
   alertDescription: string
-}
-
-export const getProtocolByIdentifierAndNetworkIdentifier = (
-  targetProtocolIdentifier: ProtocolSymbols,
-  networkIdentifier: string
-): ICoinProtocol => {
-  const filteredProtocol: ICoinProtocol | undefined = supportedProtocols().find(
-    (protocol: ICoinProtocol) =>
-      protocol.identifier === targetProtocolIdentifier && (!networkIdentifier || protocol.options.network.identifier === networkIdentifier)
-  )
-  if (filteredProtocol) {
-    return filteredProtocol
-  } else {
-    // TODO: Get for the right network
-    return getProtocolByIdentifier(targetProtocolIdentifier)
-  }
-
-  // throw new Error(`No protocol found ${targetProtocolIdentifier} ${networkIdentifier}`)
 }
 
 @Injectable({
@@ -83,7 +64,8 @@ export class AccountProvider {
     private readonly opertaionsProvider: OperationsProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    private readonly protocolService: ProtocolService
   ) {
     this.loadWalletsFromStorage()
       .then(() => {
@@ -184,22 +166,24 @@ export class AccountProvider {
 
     const walletInitPromises: Promise<void>[] = []
 
-    wallets.forEach(wallet => {
-      const protocol = getProtocolByIdentifierAndNetworkIdentifier(wallet.protocolIdentifier, wallet.networkIdentifier)
+    await Promise.all(
+      wallets.map(async wallet => {
+        const protocol = await this.protocolService.getProtocol(wallet.protocolIdentifier, wallet.networkIdentifier)
 
-      const airGapWallet = new AirGapMarketWallet(
-        protocol,
-        wallet.publicKey,
-        wallet.isExtendedPublicKey,
-        wallet.derivationPath,
-        this.priceService,
-        wallet.addressIndex
-      )
-      // add derived addresses
-      airGapWallet.addresses = wallet.addresses
-      walletInitPromises.push(this.initializeWallet(airGapWallet))
-      this.walletList.push(airGapWallet)
-    })
+        const airGapWallet = new AirGapMarketWallet(
+          protocol,
+          wallet.publicKey,
+          wallet.isExtendedPublicKey,
+          wallet.derivationPath,
+          this.priceService,
+          wallet.addressIndex
+        )
+        // add derived addresses
+        airGapWallet.addresses = wallet.addresses
+        walletInitPromises.push(this.initializeWallet(airGapWallet))
+        this.walletList.push(airGapWallet)
+      })
+    )
 
     Promise.all(walletInitPromises).then(() => {
       this.triggerWalletChanged()
@@ -307,10 +291,7 @@ export class AccountProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(
-      SettingsKey.WALLET,
-      this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON())
-    )
+    return this.storageProvider.set(SettingsKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {

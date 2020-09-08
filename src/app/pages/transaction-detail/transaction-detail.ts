@@ -1,7 +1,7 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
-import { getProtocolByIdentifierAndNetworkIdentifier } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 @Component({
@@ -12,7 +12,11 @@ export class TransactionDetailPage {
   public transaction: IAirGapTransaction
   public lottieConfig: any
 
-  constructor(private readonly route: ActivatedRoute, private readonly browserService: BrowserService) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly browserService: BrowserService,
+    private readonly protocolService: ProtocolService
+  ) {
     if (this.route.snapshot.data.special) {
       this.transaction = this.route.snapshot.data.special
     }
@@ -26,7 +30,7 @@ export class TransactionDetailPage {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = getProtocolByIdentifierAndNetworkIdentifier(
+    const protocol: ICoinProtocol = await this.protocolService.getProtocol(
       this.transaction.protocolIdentifier,
       this.transaction.network.identifier
     )

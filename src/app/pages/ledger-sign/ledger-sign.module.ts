@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core'
-import { IonicModule } from '@ionic/angular'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
-import { ComponentsModule } from 'src/app/components/components.module'
-import { TranslateModule } from '@ngx-translate/core'
+import { NgModule } from '@angular/core'
 import { RouterModule } from '@angular/router'
+import { IonicModule } from '@ionic/angular'
+import { TranslateModule } from '@ngx-translate/core'
+import { ComponentsModule } from 'src/app/components/components.module'
 import { PipesModule } from 'src/app/pipes/pipes.module'
 
 import { LedgerSignPage } from './ledger-sign'
@@ -15,6 +16,7 @@ import { LedgerSignPage } from './ledger-sign'
     ComponentsModule,
     TranslateModule,
     PipesModule,
+    AirGapAngularCoreModule,
     RouterModule.forChild([{ path: '', component: LedgerSignPage }])
   ],
   declarations: [LedgerSignPage]

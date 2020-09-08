@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule, AirGapTranslateLoader } from '@airgap/angular-core'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -13,7 +14,6 @@ import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
-import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
@@ -40,7 +40,6 @@ import { IntroductionPushPage } from './pages/introduction-push/introduction-pus
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
-import { AmountConverterPipe } from './pipes/amount-converter/amount-converter.pipe'
 import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
@@ -54,7 +53,6 @@ import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PermissionsProvider } from './services/permissions/permissions'
-import { ProtocolsProvider } from './services/protocols/protocols'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
@@ -63,10 +61,8 @@ import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { SerializerService } from './services/serializer/serializer.service'
 import { StorageProvider } from './services/storage/storage'
 
-const { App, AppInfo, Browser, Clipboard, Permissions, PushNotifications, Share, SplashScreen, StatusBar } = Plugins
-
-export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
+  return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
 }
 
 @NgModule({
@@ -80,12 +76,12 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
+    AirGapAngularCoreModule,
     ZXingScannerModule,
-    HttpClientModule,
-
     MomentModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    HttpClientModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -105,19 +101,18 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     IntroductionPushPageModule
   ],
   providers: [
-    { provide: APP_PLUGIN, useValue: App },
-    { provide: APP_INFO_PLUGIN, useValue: AppInfo },
-    { provide: BROWSER_PLUGIN, useValue: Browser },
-    { provide: CLIPBOARD_PLUGIN, useValue: Clipboard },
-    { provide: PERMISSIONS_PLUGIN, useValue: Permissions },
-    { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: PushNotifications },
-    { provide: SHARE_PLUGIN, useValue: Share },
-    { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
-    { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
+    { provide: APP_PLUGIN, useValue: Plugins.App },
+    { provide: APP_INFO_PLUGIN, useValue: Plugins.AppInfo },
+    { provide: BROWSER_PLUGIN, useValue: Plugins.Browser },
+    { provide: CLIPBOARD_PLUGIN, useValue: Plugins.Clipboard },
+    { provide: PERMISSIONS_PLUGIN, useValue: Plugins.Permissions },
+    { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: Plugins.PushNotifications },
+    { provide: SHARE_PLUGIN, useValue: Plugins.Share },
+    { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
+    { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },
     BarcodeScanner,
     QRScanner,
     Keyboard,
-    AmountConverterPipe,
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,
@@ -130,7 +125,6 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     SchemeRoutingProvider,
     ClipboardService,
     PermissionsProvider,
-    ProtocolsProvider,
     DeepLinkProvider,
     OperationsProvider,
     ExtensionsService,

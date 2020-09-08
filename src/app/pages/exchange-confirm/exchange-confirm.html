@@ -12,12 +12,12 @@
 <ion-content class="ion-padding-end">
   <ion-grid fixed="true" class="ion-no-padding">
     <h3 class="ion-padding-start ion-padding-bottom" [innerHTML]="'exchange-confirm.heading' | translate"></h3>
-    <address-row
+    <airgap-titled-address
       [address]="fromWallet.receivingPublicAddress"
-      label="{{ 'exchange-confirm.sell_label' | translate }}"
+      title="'exchange-confirm.sell_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
-    ></address-row>
+    ></airgap-titled-address>
 
     <ion-row class="ion-align-items-center ion-padding-vertical">
       <ion-col size="3" class="ion-no-padding">
@@ -38,12 +38,12 @@
       </ion-col>
     </ion-row>
 
-    <address-row
+    <airgap-titled-address
       [address]="exchangeResult.payinAddress"
-      label="{{ 'exchange-confirm.exchange-address_label' | translate }}"
+      title="'exchange-confirm.exchange-address_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
-    ></address-row>
+    ></airgap-titled-address>
 
     <ion-row class="ion-align-items-center ion-padding-vertical">
       <ion-col size="3" class="ion-no-padding">
@@ -57,12 +57,12 @@
       </ion-col>
     </ion-row>
 
-    <address-row
+    <airgap-titled-address
       [address]="toWallet.receivingPublicAddress"
-      label="{{ 'exchange-confirm.receiving-to_label' | translate }}"
+      title="'exchange-confirm.receiving-to_label'"
       [hasSymbol]="true"
       [symbol]="toCurrency"
-    ></address-row>
+    ></airgap-titled-address>
 
     <ion-row *ngIf="activeExchange === 'Changelly'" class="ion-padding ion-margin-vertical" (click)="changellyUrl()">
       <small [innerHTML]="'exchange-confirm.changelly_disclaimer' | translate"></small>

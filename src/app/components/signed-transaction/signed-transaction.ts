@@ -1,5 +1,6 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component, Input, OnChanges } from '@angular/core'
-import { getProtocolByIdentifier, IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -33,7 +34,7 @@ export class SignedTransactionComponent implements OnChanges {
 
   public rawTxData: SignedTransaction
 
-  constructor(private readonly serializerService: SerializerService) {
+  constructor(private readonly serializerService: SerializerService, private readonly protocolService: ProtocolService) {
     //
   }
 
@@ -50,11 +51,13 @@ export class SignedTransactionComponent implements OnChanges {
     // TODO: Handle multiple messages
     if (this.signedTxs) {
       const protocol: ICoinProtocol =
-        this.protocols && this.protocols[0] ? this.protocols[0] : getProtocolByIdentifier(this.signedTxs[0].protocol)
+        this.protocols && this.protocols[0] ? this.protocols[0] : await this.protocolService.getProtocol(this.signedTxs[0].protocol)
       try {
-        this.airGapTxs = (
-          await Promise.all(this.signedTxs.map(signedTx => protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)))
-        ).reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+        this.airGapTxs = (await Promise.all(
+          this.signedTxs.map((signedTx: IACMessageDefinitionObject) =>
+            protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)
+          )
+        )).reduce((flatten: IAirGapTransaction[], toFlatten: IAirGapTransaction[]) => flatten.concat(toFlatten), [])
 
         if (
           this.airGapTxs.length > 1 &&

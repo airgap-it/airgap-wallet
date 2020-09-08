@@ -36,4 +36,8 @@ export class StorageMock {
       resolve()
     })
   }
+
+  public ready(): Promise<void> {
+    return Promise.resolve()
+  }
 }
