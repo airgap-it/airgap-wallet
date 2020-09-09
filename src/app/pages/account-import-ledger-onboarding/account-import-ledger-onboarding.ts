@@ -1,18 +1,20 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core'
+import { ProtocolService } from '@airgap/angular-core'
+import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { IonSlides } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { promiseRetry } from 'src/app/helpers/promise'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+
+import { promiseRetry } from '../../helpers/promise'
+import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { LedgerService } from '../../services/ledger/ledger-service'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-account-import-ledger-onboarding',
   templateUrl: 'account-import-ledger-onboarding.html',
   styleUrls: ['./account-import-ledger-onboarding.scss']
 })
-export class AccountImportLedgerOnboardingPage implements AfterViewInit {
+export class AccountImportLedgerOnboardingPage {
   public slideAssets: [string, string][] = []
 
   @ViewChild(IonSlides, { static: true })
@@ -29,7 +31,7 @@ export class AccountImportLedgerOnboardingPage implements AfterViewInit {
     }
   }
 
-  public readonly protocol: ICoinProtocol
+  public protocol: ICoinProtocol
 
   public canSlidePrev: boolean = false
   public canSlideNext: boolean = true
@@ -44,23 +46,11 @@ export class AccountImportLedgerOnboardingPage implements AfterViewInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly protocolService: ProtocolService,
     private readonly dataService: DataService,
     private readonly ledgerService: LedgerService
   ) {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      this.protocol = getProtocolByIdentifier(info.protocolIdentifier)
-
-      this.slideAssets = [
-        ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
-        [`ledger_app_${this.protocol.identifier}.svg`, 'account-import-ledger-onboarding.slides.slide-2'],
-        ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
-      ]
-    }
-  }
-
-  public ngAfterViewInit(): void {
-    this.importFromLedger()
+    this.init()
   }
 
   public async showPrevSlide(): Promise<void> {
@@ -110,8 +100,23 @@ export class AccountImportLedgerOnboardingPage implements AfterViewInit {
     return progressBarContainer
   }
 
+  private async init(): Promise<void> {
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
+      this.protocol = await this.protocolService.getProtocol(info.protocolIdentifier)
+
+      this.slideAssets = [
+        ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
+        [`ledger_app_${this.protocol.identifier}.svg`, 'account-import-ledger-onboarding.slides.slide-2'],
+        ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
+      ]
+    }
+
+    this.importFromLedger()
+  }
+
   private async importFromLedger(): Promise<void> {
-    if (this.isSuccess) {
+    if (this.isSuccess || !this.protocol) {
       return
     }
 
@@ -145,7 +150,7 @@ export class AccountImportLedgerOnboardingPage implements AfterViewInit {
   }
 
   private async connectWithLedger(): Promise<void> {
-    if (this.isConnected) {
+    if (this.isConnected || !this.protocol) {
       return
     }
 
