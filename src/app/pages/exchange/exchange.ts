@@ -15,6 +15,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 enum ExchangePageState {
   LOADING,
@@ -249,7 +250,12 @@ export class ExchangePage {
   private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
     return this.accountProvider
       .getWalletList()
-      .filter(wallet => wallet.protocol.identifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
+      .filter(
+        wallet =>
+          wallet.protocol.identifier === protocol &&
+          wallet.protocol.options.network.type === NetworkType.MAINNET &&
+          (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0))
+      )
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
