@@ -7,7 +7,9 @@
 </ion-header>
 <ion-content fullscreen="true">
   <ion-grid fixed="true" class="ion-no-padding">
-    <chart [total]="total"></chart>
+    <ng-container *ngIf="wallets | async as walletsArray">
+      <chart *ngIf="walletsArray.length > 0" [total]="total"></chart>
+    </ng-container>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
@@ -31,16 +33,18 @@
         </ion-list>
       </ng-container>
       <ng-template #noItems>
-        <ion-row class="container__empty" class="ion-padding ion-justify-content-center">
-          <ng-container *ngIf="isDesktop">
-            <img width="50%" height="50%" src="./assets/img/signer-vault-ledger-desktop.svg" />
-            <p [innerHTML]="'portfolio.empty-state_desktop_text' | translate"></p>
-          </ng-container>
-          <ng-container *ngIf="!isDesktop">
-            <img width="50%" height="50%" src="./assets/img/sync_wallet_onboarding_1.svg" />
-            <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
-          </ng-container>
-        </ion-row>
+        <empty-state
+          *ngIf="isDesktop"
+          [text]="'portfolio.empty-state_desktop_text' | translate"
+          [imageName]="'signer-vault-ledger-desktop.svg'"
+          [fullHeight]="true"
+        ></empty-state>
+        <empty-state
+          *ngIf="!isDesktop"
+          [text]="'portfolio.empty-state_text' | translate"
+          [imageName]="'sync_wallet_onboarding_1.svg'"
+          [fullHeight]="true"
+        ></empty-state>
       </ng-template>
     </ng-container>
     <ng-template #loading>
