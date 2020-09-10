@@ -157,6 +157,8 @@ export class AccountImportLedgerOnboardingPage {
 
     this.isLoading = true
 
-    return promiseRetry(this.ledgerService.openConnection(this.protocol.identifier))
+    return this.ledgerService.openConnection(this.protocol.identifier).then(() => {
+      this.isConnected = true
+    })
   }
 }
