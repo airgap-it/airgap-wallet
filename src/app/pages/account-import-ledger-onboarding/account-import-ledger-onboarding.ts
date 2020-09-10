@@ -59,7 +59,6 @@ export class AccountImportLedgerOnboardingPage {
 
   public async showNextSlide(): Promise<void> {
     await this.slides.slideNext()
-    this.importFromLedger()
   }
 
   public ionSlideDidChange(): void {
@@ -71,6 +70,8 @@ export class AccountImportLedgerOnboardingPage {
         this.canSlidePrev = val > 0
         this.canSlideNext = !isEnd
         this.canFinish = isEnd
+
+        this.importFromLedger()
       })
       .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
