@@ -1,6 +1,7 @@
 import {
   AirGapAngularCoreModule,
   AirGapTranslateLoader,
+  APP_CONFIG,
   APP_INFO_PLUGIN,
   APP_PLUGIN,
   CLIPBOARD_PLUGIN,
@@ -33,6 +34,7 @@ import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { BROWSER_PLUGIN, PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
+import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
 import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
@@ -49,6 +51,7 @@ import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
+import { IACService } from './services/iac/iac.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
@@ -56,7 +59,6 @@ import { PermissionsProvider } from './services/permissions/permissions'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
-import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { WalletStorageService } from './services/storage/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
@@ -108,6 +110,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SHARE_PLUGIN, useValue: Plugins.Share },
     { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },
+    { provide: APP_CONFIG, useValue: appConfig },
     BarcodeScanner,
     QRScanner,
     Keyboard,
@@ -120,7 +123,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     Diagnostic,
     AccountProvider,
     WalletStorageService,
-    SchemeRoutingProvider,
+    IACService,
     ClipboardService,
     PermissionsProvider,
     DeepLinkProvider,

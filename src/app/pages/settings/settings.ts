@@ -1,4 +1,4 @@
-import { ClipboardService, SerializerService } from '@airgap/angular-core'
+import { ClipboardService, SerializerService, IACMessageTransport } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { SharePlugin } from '@capacitor/core'
@@ -6,8 +6,8 @@ import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { IACService } from 'src/app/services/iac/iac.service'
 
-import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
 
@@ -24,7 +24,7 @@ export class SettingsPage {
     private readonly modalController: ModalController,
     private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly iacService: IACService,
     private readonly browserService: BrowserService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
@@ -154,7 +154,7 @@ export class SettingsPage {
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
-        this.schemeRoutingProvider.handleNewSyncRequest(this.router, text).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
       },
       (err: string) => {
         console.error('Error: ' + err)

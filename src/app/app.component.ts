@@ -1,4 +1,11 @@
-import { APP_PLUGIN, LanguageService, ProtocolService, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
+import {
+  APP_PLUGIN,
+  LanguageService,
+  ProtocolService,
+  SPLASH_SCREEN_PLUGIN,
+  STATUS_BAR_PLUGIN,
+  IACMessageTransport
+} from '@airgap/angular-core'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
@@ -23,8 +30,8 @@ import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { DeepLinkProvider } from './services/deep-link/deep-link'
+import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
-import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
@@ -41,7 +48,7 @@ export class AppComponent implements AfterViewInit {
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly languageService: LanguageService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly iacService: IACService,
     private readonly protocolService: ProtocolService,
     private readonly storageProvider: WalletStorageService,
     private readonly appInfoProvider: AppInfoProvider,
@@ -122,7 +129,7 @@ export class AppComponent implements AfterViewInit {
           if (data.url.startsWith('airgap-wallet://')) {
             // tslint:disable-next-line: no-console
             console.log('Successfully matched route', JSON.stringify(data.url))
-            this.schemeRoutingProvider.handleNewSyncRequest(this.router, data.url).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+            this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
           } else {
             handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)(`route not matched: ${JSON.stringify(data.url)}`)
           }
