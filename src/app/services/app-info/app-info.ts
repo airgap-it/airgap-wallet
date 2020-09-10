@@ -1,6 +1,6 @@
-import { Injectable, Inject } from '@angular/core'
+import { APP_INFO_PLUGIN } from '@airgap/angular-core'
+import { Inject, Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { APP_INFO_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { AppInfoPlugin } from 'src/app/capacitor-plugins/definitions'
 
 @Injectable({

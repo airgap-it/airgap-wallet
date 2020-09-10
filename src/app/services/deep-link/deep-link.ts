@@ -1,7 +1,8 @@
-import { Injectable, Inject } from '@angular/core'
+import { APP_PLUGIN } from '@airgap/angular-core'
+import { Inject, Injectable } from '@angular/core'
+import { AppPlugin } from '@capacitor/core'
 import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AppPlugin } from '@capacitor/core'
 import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { serializedDataToUrlString } from '../../utils/utils'
@@ -9,9 +10,6 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 import { SerializerService } from '../serializer/serializer.service'
 
 import { AccountProvider } from './../account/account.provider'
-import { isString } from 'util'
-
-import { APP_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +24,7 @@ export class DeepLinkProvider {
   ) {}
 
   public sameDeviceDeeplink(url: string | string[] = 'airgap-vault://'): Promise<void> {
-    const deeplinkUrl: string = isString(url) && url.includes('://') ? url : serializedDataToUrlString(url)
+    const deeplinkUrl: string = typeof url === 'string' && url.includes('://') ? url : serializedDataToUrlString(url)
 
     return new Promise((resolve, reject) => {
       this.app

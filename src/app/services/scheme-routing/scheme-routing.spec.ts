@@ -1,9 +1,14 @@
-import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
+import {
+  MainProtocolStoreService,
+  ProtocolService,
+  SPLASH_SCREEN_PLUGIN,
+  STATUS_BAR_PLUGIN,
+  SubProtocolStoreService
+} from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
 import { PlatformMock } from '../../../../test-config/mocks-ionic'

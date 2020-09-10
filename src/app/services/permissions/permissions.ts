@@ -1,11 +1,11 @@
-import { Injectable, Inject } from '@angular/core'
+import { Inject, Injectable } from '@angular/core'
+import { PermissionsPlugin, PermissionType } from '@capacitor/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { AlertController, Platform } from '@ionic/angular'
+import { PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PermissionsPlugin, PermissionType } from '@capacitor/core'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { SettingsKey, StorageProvider } from '../storage/storage'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',

@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@angular/core'
 import { ToastController } from '@ionic/angular'
 
-import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { CLIPBOARD_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { CLIPBOARD_PLUGIN } from '@airgap/angular-core'
 import { ClipboardPlugin } from '@capacitor/core'
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
   providedIn: 'root'

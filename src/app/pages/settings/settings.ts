@@ -1,17 +1,16 @@
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
+import { SharePlugin } from '@capacitor/core'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { SharePlugin } from '@capacitor/core'
+import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { ClipboardService } from '../../services/clipboard/clipboard'
 import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { SerializerService } from '../../services/serializer/serializer.service'
 import { IntroductionPage } from '../introduction/introduction'
-import { BrowserService } from 'src/app/services/browser/browser.service'
-
-import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 @Component({
   selector: 'page-settings',

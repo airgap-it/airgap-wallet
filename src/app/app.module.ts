@@ -1,4 +1,12 @@
-import { AirGapAngularCoreModule, AirGapTranslateLoader } from '@airgap/angular-core'
+import {
+  AirGapAngularCoreModule,
+  AirGapTranslateLoader,
+  APP_INFO_PLUGIN,
+  APP_PLUGIN,
+  CLIPBOARD_PLUGIN,
+  SPLASH_SCREEN_PLUGIN,
+  STATUS_BAR_PLUGIN
+} from '@airgap/angular-core'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -20,17 +28,7 @@ import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import {
-  APP_INFO_PLUGIN,
-  APP_PLUGIN,
-  BROWSER_PLUGIN,
-  CLIPBOARD_PLUGIN,
-  PERMISSIONS_PLUGIN,
-  PUSH_NOTIFICATIONS_PLUGIN,
-  SHARE_PLUGIN,
-  SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN
-} from './capacitor-plugins/injection-tokens'
+import { BROWSER_PLUGIN, PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
 import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'

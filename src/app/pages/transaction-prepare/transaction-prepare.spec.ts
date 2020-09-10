@@ -1,22 +1,20 @@
+import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
 import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
-import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
-
-import { AmountConverterPipe } from '@airgap/angular-core'
-import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { OperationsProvider } from 'src/app/services/operations/operations'
-import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
