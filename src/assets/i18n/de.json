@@ -30,6 +30,7 @@
   "introduction-download.install-distro_text": "Installieren Sie AirGap Vault auf einem dedizierten Computer um Transaktionen offline zu signieren.",
   "introduction-download.go_label": "Loslegen",
   "portfolio.empty-state_text": "Fügen Sie neue Währungen zu AirGap Wallet hinzu, Sie benötigen dazu die <strong>AirGap Vault</strong> Applikation, welche für Ihren Geheimschlüssel zuständig ist.",
+  "portfolio.empty-state_desktop_text": "Fügen Sie neue Währungen zu AirGap Wallet hinzu, Sie benötigen dazu die <strong>AirGap Vault</strong> Applikation oder für ausgewählte Währungen eine <span class=\"style__strong color__primary\">Ledger Hardware Wallet</span>.",
   "portfolio.add-coins_label": "Währungen hinzufügen",
   "scan.title": "QR Code einlesen",
   "scan.text": "Lesen Sie einen Synchronisierungs QR Code ein um ein Konto hinzuzufügen, oder lesen Sie einen Transaktions QR Code ein um eine Transaktion zu bestätigen.",

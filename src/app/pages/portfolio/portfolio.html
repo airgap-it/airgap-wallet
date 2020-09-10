@@ -32,9 +32,14 @@
       </ng-container>
       <ng-template #noItems>
         <ion-row class="container__empty" class="ion-padding ion-justify-content-center">
-          <img *ngIf="isDesktop" width="50%" height="50%" src="./assets/img/signer-vault-ledger-desktop.svg" />
-          <img *ngIf="!isDesktop" width="50%" height="50%" src="./assets/img/sync_wallet_onboarding_1.svg" />
-          <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
+          <ng-container *ngIf="isDesktop">
+            <img width="50%" height="50%" src="./assets/img/signer-vault-ledger-desktop.svg" />
+            <p [innerHTML]="'portfolio.empty-state_desktop_text' | translate"></p>
+          </ng-container>
+          <ng-container *ngIf="!isDesktop">
+            <img width="50%" height="50%" src="./assets/img/sync_wallet_onboarding_1.svg" />
+            <p [innerHTML]="'portfolio.empty-state_text' | translate"></p>
+          </ng-container>
         </ion-row>
       </ng-template>
     </ng-container>
