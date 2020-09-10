@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content class="ion-padding" forceOverflow="false">
-  <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isBrowser" value="highest">
+  <ion-segment [(ngModel)]="security" color="secondary" *ngIf="!isDesktop" value="highest">
     <ion-segment-button value="highest">
       <ion-label>{{ 'introduction.highest.label' | translate }}</ion-label>
     </ion-segment-button>
@@ -21,32 +21,44 @@
 
   <ng-container *ngIf="security === 'highest'">
     <ion-row>
-      <p [innerHTML]="'introduction.highest.text' | translate"></p>
+      <p [innerHTML]="'introduction.highest.text' | translate" *ngIf="!isDesktop"></p>
+      <p [innerHTML]="'introduction.highest.desktop_text' | translate" *ngIf="isDesktop"></p>
     </ion-row>
 
     <ion-row class="ion-padding-top ion-align-items-center">
-      <ion-col size="5" *ngIf="isBrowser"><img src="./assets/img/airgap_onboarding_wallet-notebook.svg" /></ion-col>
-      <ion-col size="5" *ngIf="!isBrowser"><img src="./assets/img/airgap_onboarding_wallet.svg" /></ion-col>
+      <ion-col size="5" *ngIf="isDesktop"><img src="./assets/img/airgap_onboarding_wallet-notebook.svg" /></ion-col>
+      <ion-col size="5" *ngIf="!isDesktop"><img src="./assets/img/airgap_onboarding_wallet.svg" /></ion-col>
       <ion-col size="7">
         <h5>{{ 'introduction.wallet.heading' | translate }}</h5>
         <p [innerHTML]="'introduction.wallet.text' | translate"></p>
       </ion-col>
     </ion-row>
 
-    <ion-row class="ion-padding-vertical ion-align-items-center">
-      <ion-col size="5" class="ion-text-center"><img class="connector--img" src="./assets/img/qrcode.svg" /></ion-col>
-      <ion-col size="7">
-        <strong>{{ 'introduction.communication.highest_text' | translate }}</strong>
-      </ion-col>
-    </ion-row>
+    <ng-container *ngIf="!isDesktop">
+      <ion-row class="ion-padding-vertical ion-align-items-center">
+        <ion-col size="5" class="ion-text-center"><img class="connector--img" src="./assets/img/qrcode.svg" /></ion-col>
+        <ion-col size="7">
+          <strong>{{ 'introduction.communication.highest_text' | translate }}</strong>
+        </ion-col>
+      </ion-row>
 
-    <ion-row class="ion-align-items-center">
-      <ion-col size="5"><img src="./assets/img/airgap_onboarding_vault.svg" /></ion-col>
-      <ion-col size="7">
-        <h5>{{ 'introduction.vault.heading' | translate }}</h5>
-        <p [innerHTML]="'introduction.vault.text' | translate"></p>
-      </ion-col>
-    </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col size="5"><img src="./assets/img/airgap_onboarding_vault.svg" /></ion-col>
+        <ion-col size="7">
+          <h5>{{ 'introduction.vault.heading' | translate }}</h5>
+          <p [innerHTML]="'introduction.vault.text' | translate"></p>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+    <ng-container *ngIf="isDesktop">
+      <ion-row class="ion-align-items-center">
+        <ion-col size="5"><img src="./assets/img/signer-vault-ledger-desktop.svg" /></ion-col>
+        <ion-col size="7">
+          <h5>{{ 'introduction.vault.desktop_heading' | translate }}</h5>
+          <p [innerHTML]="'introduction.vault.desktop_text' | translate"></p>
+        </ion-col>
+      </ion-row>
+    </ng-container>
   </ng-container>
 
   <ng-container *ngIf="security === 'medium'">

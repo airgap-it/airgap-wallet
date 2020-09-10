@@ -48,10 +48,11 @@
     "reward_label": "Unclaimed Rewards"
   },
   "introduction": {
-    "title": "The New Crypto Wallet Standard",
+    "title": "Self custody made simple and secure",
     "highest": {
       "label": "Highest Security",
-      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.</p>"
+      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.",
+      "desktop_text": "AirGap has a <b>two device approach</b> where the secret is stored either in <b>AirGap Vault</b> or for selected coins on a <b>Ledger hardware wallet</b>."
     },
     "medium": {
       "label": "Medium Security",
@@ -59,7 +60,9 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>"
+      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>",
+      "desktop_heading": "AirGap Vault & Ledger",
+      "desktop_text": "The private key is generated and securely stored on another device with the AirGap Vault app or on a Ledger hardware wallet. <br><b>Install AirGap Vault on a mobile device or connect a Ledger to use AirGap Wallet</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
