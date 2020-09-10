@@ -14,7 +14,7 @@
     <h3 class="ion-padding-start ion-padding-bottom" [innerHTML]="'exchange-confirm.heading' | translate"></h3>
     <airgap-titled-address
       [address]="fromWallet.receivingPublicAddress"
-      title="'exchange-confirm.sell_label'"
+      [title]="'exchange-confirm.sell_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
     ></airgap-titled-address>
@@ -40,7 +40,7 @@
 
     <airgap-titled-address
       [address]="exchangeResult.payinAddress"
-      title="'exchange-confirm.exchange-address_label'"
+      [title]="'exchange-confirm.exchange-address_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
     ></airgap-titled-address>
@@ -59,7 +59,7 @@
 
     <airgap-titled-address
       [address]="toWallet.receivingPublicAddress"
-      title="'exchange-confirm.receiving-to_label'"
+      [title]="'exchange-confirm.receiving-to_label'"
       [hasSymbol]="true"
       [symbol]="toCurrency"
     ></airgap-titled-address>
