@@ -5,7 +5,7 @@ import { AlertController, Platform } from '@ionic/angular'
 import { PERMISSIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 export enum PermissionStatus {
   GRANTED = 'GRANTED',
@@ -26,7 +26,7 @@ export class PermissionsProvider {
     private readonly platform: Platform,
     private readonly diagnostic: Diagnostic,
     private readonly alertCtrl: AlertController,
-    private readonly storage: StorageProvider,
+    private readonly storage: WalletStorageService,
     @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin
   ) {}
 
@@ -43,13 +43,13 @@ export class PermissionsProvider {
       const permissionsToRequest: string[] = []
       if (permissions.indexOf(PermissionTypes.CAMERA) >= 0) {
         permissionsToRequest.push(this.diagnostic.permission.CAMERA)
-        await this.storage.set(SettingsKey.CAMERA_PERMISSION_ASKED, true)
+        await this.storage.set(WalletStorageKey.CAMERA_PERMISSION_ASKED, true)
       }
       await this.diagnostic.requestRuntimePermissions(permissionsToRequest)
     } else if (this.platform.is('ios')) {
       if (permissions.indexOf(PermissionTypes.CAMERA) >= 0) {
         await this.diagnostic.requestCameraAuthorization(false)
-        await this.storage.set(SettingsKey.CAMERA_PERMISSION_ASKED, true)
+        await this.storage.set(WalletStorageKey.CAMERA_PERMISSION_ASKED, true)
       }
     } else {
       console.warn('requesting permission in browser')
@@ -83,7 +83,7 @@ export class PermissionsProvider {
     if (permission === PermissionTypes.CAMERA) {
       const permissionStatus: PermissionStatus = await this.hasCameraPermission()
       canAskForPermission =
-        !(await this.storage.get(SettingsKey.CAMERA_PERMISSION_ASKED)) || !(permissionStatus === PermissionStatus.DENIED)
+        !(await this.storage.get(WalletStorageKey.CAMERA_PERMISSION_ASKED)) || !(permissionStatus === PermissionStatus.DENIED)
     }
 
     return canAskForPermission

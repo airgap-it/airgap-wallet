@@ -17,7 +17,7 @@ import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 enum NotificationKind {
   CTA_Tip = 'cta_tip',
@@ -53,7 +53,7 @@ export class AccountProvider {
   }
 
   constructor(
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly pushProvider: PushProvider,
     private readonly drawChartProvider: DrawChartService,
     private readonly popoverController: PopoverController,
@@ -146,7 +146,7 @@ export class AccountProvider {
   }
 
   private async loadWalletsFromStorage() {
-    const rawWallets = await this.storageProvider.get(SettingsKey.WALLET)
+    const rawWallets = await this.storageProvider.get(WalletStorageKey.WALLET)
 
     let wallets = rawWallets || []
 
@@ -291,7 +291,7 @@ export class AccountProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
+    return this.storageProvider.set(WalletStorageKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {

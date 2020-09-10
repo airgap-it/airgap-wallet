@@ -4,6 +4,9 @@ import {
   APP_INFO_PLUGIN,
   APP_PLUGIN,
   CLIPBOARD_PLUGIN,
+  ClipboardService,
+  QrScannerService,
+  SerializerService,
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
@@ -42,7 +45,6 @@ import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
 import { AppInfoProvider } from './services/app-info/app-info'
-import { ClipboardService } from './services/clipboard/clipboard'
 import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
@@ -54,10 +56,8 @@ import { PermissionsProvider } from './services/permissions/permissions'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
-import { ScannerProvider } from './services/scanner/scanner'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
-import { SerializerService } from './services/serializer/serializer.service'
-import { StorageProvider } from './services/storage/storage'
+import { WalletStorageService } from './services/storage/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -116,10 +116,10 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     MarketDataService,
     DrawChartService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    ScannerProvider,
+    QrScannerService,
     Diagnostic,
     AccountProvider,
-    StorageProvider,
+    WalletStorageService,
     SchemeRoutingProvider,
     ClipboardService,
     PermissionsProvider,

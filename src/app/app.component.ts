@@ -26,7 +26,7 @@ import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { PushProvider } from './services/push/push'
 import { SchemeRoutingProvider } from './services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from './services/storage/storage'
+import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
 
 @Component({
@@ -43,7 +43,7 @@ export class AppComponent implements AfterViewInit {
     private readonly languageService: LanguageService,
     private readonly schemeRoutingProvider: SchemeRoutingProvider,
     private readonly protocolService: ProtocolService,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly appInfoProvider: AppInfoProvider,
     private readonly accountProvider: AccountProvider,
     private readonly deepLinkProvider: DeepLinkProvider,
@@ -87,10 +87,10 @@ export class AppComponent implements AfterViewInit {
       })
       .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
 
-    let userId: string = await this.storageProvider.get(SettingsKey.USER_ID)
+    let userId: string = await this.storageProvider.get(WalletStorageKey.USER_ID)
     if (!userId) {
       userId = generateGUID()
-      this.storageProvider.set(SettingsKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
+      this.storageProvider.set(WalletStorageKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
     }
     setSentryUser(userId)
 

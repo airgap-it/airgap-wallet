@@ -1,4 +1,4 @@
-import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
+import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ClipboardService } from '@airgap/angular-core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
@@ -12,7 +12,6 @@ import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
 

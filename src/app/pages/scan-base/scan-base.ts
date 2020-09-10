@@ -1,8 +1,8 @@
+import { QrScannerService } from '@airgap/angular-core'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
 import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
 
 export class ScanBasePage {
   public zxingScanner?: ZXingScannerComponent
@@ -17,7 +17,7 @@ export class ScanBasePage {
   public readonly isElectron: boolean
   public readonly isBrowser: boolean
 
-  constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {
+  constructor(protected platform: Platform, protected scanner: QrScannerService, protected permissionsProvider: PermissionsProvider) {
     this.isMobile = this.platform.is('hybrid')
     this.isElectron = this.platform.is('electron')
     this.isBrowser = !(this.isMobile || this.isElectron)

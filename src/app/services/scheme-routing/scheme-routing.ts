@@ -1,17 +1,16 @@
+import { ProtocolService, SerializerService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
 import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, supportedProtocols } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { SerializerService } from '../../services/serializer/serializer.service'
 import { partition, to } from '../../utils/utils'
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
-import { ProtocolService } from '@airgap/angular-core'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -35,7 +34,7 @@ export class SchemeRoutingProvider {
     private readonly dataService: DataService,
     private readonly serializerService: SerializerService,
     private readonly beaconService: BeaconService,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly priceService: PriceService,
     private readonly protocolService: ProtocolService
   ) {
@@ -147,7 +146,7 @@ export class SchemeRoutingProvider {
   }
 
   public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
-    this.storageProvider.set(SettingsKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    this.storageProvider.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse

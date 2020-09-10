@@ -1,8 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core'
 
-import { ClipboardService } from '../../services/clipboard/clipboard'
-import { SerializerService } from '../../services/serializer/serializer.service'
 import { serializedDataToUrlString } from '../../utils/utils'
+import { ClipboardService, SerializerService } from '@airgap/angular-core'
 
 @Component({
   selector: 'qr-clipboard',

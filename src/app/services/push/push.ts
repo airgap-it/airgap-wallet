@@ -8,7 +8,7 @@ import { PushNotificationsPlugin, PushNotification, PushNotificationToken } from
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
 
@@ -26,7 +26,7 @@ export class PushProvider {
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
     private readonly permissionsProvider: PermissionsProvider,
@@ -58,9 +58,9 @@ export class PushProvider {
       this.register()
     } else if (this.platform.is('ios')) {
       // On iOS, show a modal why we need permissions
-      const hasShownPushModal = await this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
+      const hasShownPushModal = await this.storageProvider.get(WalletStorageKey.PUSH_INTRODUCTION)
       if (!hasShownPushModal) {
-        await this.storageProvider.set(SettingsKey.PUSH_INTRODUCTION, true)
+        await this.storageProvider.set(WalletStorageKey.PUSH_INTRODUCTION, true)
         const modal = await this.modalController.create({
           component: IntroductionPushPage
         })

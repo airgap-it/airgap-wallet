@@ -12,7 +12,7 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ExchangeEnum, ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
 
@@ -58,7 +58,7 @@ export class ExchangePage {
   constructor(
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly loadingController: LoadingController,
@@ -114,7 +114,7 @@ export class ExchangePage {
     await this.setFromProtocol(await this.protocolService.getProtocol(currentFromProtocol))
 
     if (this.exchangePageState === ExchangePageState.LOADING) {
-      const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
+      const hasShownOnboarding = await this.storageProvider.get(WalletStorageKey.EXCHANGE_INTEGRATION)
       if (!hasShownOnboarding) {
         this.exchangePageState = ExchangePageState.ONBOARDING
         return
@@ -394,7 +394,7 @@ export class ExchangePage {
 
   dismissExchangeOnboarding() {
     this.setup()
-    this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    this.storageProvider.set(WalletStorageKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
   goToAddCoinPage() {

@@ -1,10 +1,10 @@
+import { QrScannerService } from '@airgap/angular-core'
 import { Component, NgZone, ViewChild } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
 import { PermissionsProvider } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
 import { IACResult, SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
@@ -28,7 +28,7 @@ export class ScanPage extends ScanBasePage {
 
   constructor(
     protected platform: Platform,
-    protected scanner: ScannerProvider,
+    protected scanner: QrScannerService,
     protected permissionsProvider: PermissionsProvider,
     private readonly schemeRouting: SchemeRoutingProvider,
     private readonly router: Router,

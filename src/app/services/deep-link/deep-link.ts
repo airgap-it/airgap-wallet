@@ -1,4 +1,4 @@
-import { APP_PLUGIN } from '@airgap/angular-core'
+import { APP_PLUGIN, SerializerService } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
 import { AppPlugin } from '@capacitor/core'
 import { AlertController } from '@ionic/angular'
@@ -7,7 +7,6 @@ import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-c
 
 import { serializedDataToUrlString } from '../../utils/utils'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SerializerService } from '../serializer/serializer.service'
 
 import { AccountProvider } from './../account/account.provider'
 
