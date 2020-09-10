@@ -1,4 +1,4 @@
-import { LanguageService, ProtocolService } from '@airgap/angular-core'
+import { ProtocolService, UiEventService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
@@ -57,7 +57,7 @@ export class AccountProvider {
     private readonly pushProvider: PushProvider,
     private readonly drawChartProvider: DrawChartService,
     private readonly popoverController: PopoverController,
-    private readonly languageService: LanguageService,
+    private readonly uiEventService: UiEventService,
     private readonly alertController: AlertController,
     private readonly toastController: ToastController,
     private readonly loadingController: LoadingController,
@@ -81,7 +81,7 @@ export class AccountProvider {
       const env = {
         popoverController: this.popoverController,
         loadingController: this.loadingController,
-        languageService: this.languageService,
+        uiEventService: this.uiEventService,
         alertController: this.alertController,
         toastController: this.toastController,
         operationsProvider: this.opertaionsProvider,

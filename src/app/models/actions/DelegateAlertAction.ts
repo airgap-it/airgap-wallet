@@ -1,7 +1,6 @@
-import { LanguageService } from '@airgap/angular-core'
+import { UiEventService } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AlertOptions } from '@ionic/core'
 import { AirGapMarketWallet, TezosDelegatorAction } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { DataService } from 'src/app/services/data/data.service'
@@ -21,7 +20,7 @@ export interface DelegateAlertActionContext {
   dataService: DataService
   router: Router
   popoverController: PopoverController
-  languageService: LanguageService
+  uiEventService: UiEventService
   alertController: AlertController
   alertTitle: string
   alertDescription: string
@@ -57,11 +56,10 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
 
   private async showAlert(): Promise<void> {
     return new Promise<void>(async resolve => {
-      const translatedAlert: AlertOptions = await this.context.languageService.getTranslatedAlert(
-        'action-alert-delegation.heading',
-        'action-alert-delegation.text',
-        [],
-        [
+      await this.context.uiEventService.showTranslatedAlert({
+        header: this.context.alertTitle ? this.context.alertTitle : 'action-alert-delegation.heading',
+        message: this.context.alertDescription ? this.context.alertDescription : 'action-alert-delegation.text',
+        buttons: [
           {
             text: 'action-alert-delegation.cancel_label',
             role: 'cancel',
@@ -79,17 +77,7 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
             }
           }
         ]
-      )
-      if (this.context.alertTitle) {
-        translatedAlert.header = this.context.alertTitle
-      }
-      if (this.context.alertDescription) {
-        translatedAlert.message = this.context.alertDescription
-      }
-
-      const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
-
-      await alert.present()
+      })
     })
   }
 }
