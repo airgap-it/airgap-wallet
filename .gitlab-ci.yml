@@ -89,7 +89,7 @@ build_mac:
     - nvm use 14
     - npm install
     - npm --prefix electron/ install
-    - npm run build:electron
+    - npm run build:electron:prod
     - npx cap sync electron
     - npm --prefix electron/ run build:mac
   artifacts:

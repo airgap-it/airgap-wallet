@@ -10,6 +10,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:electron": "ng build --base-href=./",
+    "build:electron:prod": "ng build --base-href=./",
     "build:stats": "ng build --stats-json",
     "build:analyze": "npm run build:stats && webpack-bundle-analyzer ./www/stats.json",
     "lint": "ng lint",
