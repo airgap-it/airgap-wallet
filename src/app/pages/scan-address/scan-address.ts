@@ -44,7 +44,7 @@ export class ScanAddressPage extends ScanBasePage {
       console.log('scan callback', text)
       this.callbackCalled = true
       if (this.platform.is('hybrid')) {
-        this.scanner.stopScan()
+        this.scanner.destroy()
       } else if (this.zxingScanner) {
         this.zxingScanner.codeReader.reset()
       }
