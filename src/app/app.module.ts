@@ -7,6 +7,8 @@ import {
   CLIPBOARD_PLUGIN,
   ClipboardService,
   DeeplinkService,
+  PERMISSIONS_PLUGIN,
+  PermissionsService,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
@@ -33,7 +35,7 @@ import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { BROWSER_PLUGIN, PERMISSIONS_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
@@ -54,7 +56,6 @@ import { IACService } from './services/iac/iac.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
-import { PermissionsProvider } from './services/permissions/permissions'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
@@ -124,7 +125,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     WalletStorageService,
     IACService,
     ClipboardService,
-    PermissionsProvider,
+    PermissionsService,
     DeeplinkService,
     OperationsProvider,
     ExtensionsService,

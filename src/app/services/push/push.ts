@@ -1,19 +1,18 @@
-import { Injectable, Inject } from '@angular/core'
+import { PermissionsService, PermissionStatus } from '@airgap/angular-core'
+import { Inject, Injectable } from '@angular/core'
+import { PushNotification, PushNotificationsPlugin, PushNotificationToken } from '@capacitor/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
-import { PushNotificationsPlugin, PushNotification, PushNotificationToken } from '@capacitor/core'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
-
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PermissionsProvider, PermissionStatus } from '../permissions/permissions'
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +28,7 @@ export class PushProvider {
     private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    private readonly permissionsProvider: PermissionsProvider,
+    private readonly permissionsProvider: PermissionsService,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()

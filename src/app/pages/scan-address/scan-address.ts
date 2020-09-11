@@ -1,10 +1,9 @@
-import { QrScannerService } from '@airgap/angular-core'
+import { PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController, Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
-import { PermissionsProvider } from '../../services/permissions/permissions'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
 
@@ -23,7 +22,7 @@ export class ScanAddressPage extends ScanBasePage {
   constructor(
     protected readonly platform: Platform,
     protected readonly scanner: QrScannerService,
-    protected readonly permissionsProvider: PermissionsProvider,
+    protected readonly permissionsProvider: PermissionsService,
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute
   ) {

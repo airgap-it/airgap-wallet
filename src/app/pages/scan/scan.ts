@@ -1,10 +1,9 @@
-import { IACHanderStatus, IACMessageTransport, QrScannerService } from '@airgap/angular-core'
+import { IACHanderStatus, IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, NgZone, ViewChild } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { IACService } from 'src/app/services/iac/iac.service'
 
-import { PermissionsProvider } from '../../services/permissions/permissions'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
 
@@ -28,7 +27,7 @@ export class ScanPage extends ScanBasePage {
   constructor(
     protected platform: Platform,
     protected scanner: QrScannerService,
-    protected permissionsProvider: PermissionsProvider,
+    protected permissionsProvider: PermissionsService,
     private readonly iacService: IACService,
     private readonly ngZone: NgZone
   ) {
