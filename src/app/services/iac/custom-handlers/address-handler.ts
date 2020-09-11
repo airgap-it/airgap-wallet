@@ -8,9 +8,7 @@ import { DataService, DataServiceKey } from '../../data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../sentry-error-handler/sentry-error-handler'
 
 /**
- * Handles addresses
- *
- * TODO
+ * Handles addresses and bitcoin style payment requests
  */
 export class AddressHandler extends IACMessageHandler {
   public readonly name: string = 'AddressHandler'
@@ -46,13 +44,11 @@ export class AddressHandler extends IACMessageHandler {
             this.dataService.setData(DataServiceKey.WALLET, info)
             this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-            console.log('addressHandler true')
             return true
           }
         }
       }
 
-      console.log('addressHandler false')
       return false
     } else {
       const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(str)
@@ -65,10 +61,8 @@ export class AddressHandler extends IACMessageHandler {
         this.dataService.setData(DataServiceKey.WALLET, info)
         this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        console.log('addressHandler true')
         return true
       } else {
-        console.log('addressHandler false')
         return false
       }
     }

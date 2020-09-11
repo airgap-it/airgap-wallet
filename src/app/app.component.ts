@@ -1,10 +1,13 @@
 import {
+  APP_INFO_PLUGIN,
   APP_PLUGIN,
+  AppInfoPlugin,
+  IACMessageTransport,
   LanguageService,
   ProtocolService,
+  SerializerService,
   SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN,
-  IACMessageTransport
+  STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
@@ -12,6 +15,9 @@ import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarSt
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import {
+  AirGapMarketWallet,
+  IACMessageType,
+  IAirGapTransaction,
   TezblockBlockExplorer,
   TezosBTC,
   TezosBTCProtocolConfig,
@@ -27,9 +33,7 @@ import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
-import { AppInfoProvider } from './services/app-info/app-info'
 import { DataService, DataServiceKey } from './services/data/data.service'
-import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
@@ -51,15 +55,15 @@ export class AppComponent implements AfterViewInit {
     private readonly iacService: IACService,
     private readonly protocolService: ProtocolService,
     private readonly storageProvider: WalletStorageService,
-    private readonly appInfoProvider: AppInfoProvider,
     private readonly accountProvider: AccountProvider,
-    private readonly deepLinkProvider: DeepLinkProvider,
+    private readonly serializerService: SerializerService,
     private readonly pushProvider: PushProvider,
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
     private readonly ngZone: NgZone,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
+    @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
     @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
   ) {
@@ -83,13 +87,13 @@ export class AppComponent implements AfterViewInit {
       ])
     }
 
-    this.appInfoProvider
-      .getVersionNumber()
-      .then((version: string) => {
+    this.appInfo
+      .get()
+      .then((appInfo: { appName: string; packageName: string; versionName: string; versionCode: number }) => {
         if (this.platform.is('hybrid')) {
-          setSentryRelease(`app_${version}`)
+          setSentryRelease(`app_${appInfo.versionName}`)
         } else {
-          setSentryRelease(`browser_${version}`) // TODO: Set version in CI once we have browser version
+          setSentryRelease(`browser_${appInfo.versionName}`) // TODO: Set version in CI once we have browser version
         }
       })
       .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
@@ -140,11 +144,36 @@ export class AppComponent implements AfterViewInit {
 
   // TODO: Move to provider
   public async walletDeeplink(): Promise<void> {
-    const deeplinkInfo = await this.deepLinkProvider.walletDeepLink()
+    const url: URL = new URL(location.href)
+    const publicKey: string = url.searchParams.get('publicKey')
+    const rawUnsignedTx: unknown = JSON.parse(url.searchParams.get('rawUnsignedTx'))
+    const identifier: string = url.searchParams.get('identifier')
+    console.log('publicKey', publicKey)
+    console.log('rawUnsignedTx', rawUnsignedTx)
+    console.log('identifier', identifier)
+
+    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
+    const airGapTxs: IAirGapTransaction[] = await wallet.protocol.getTransactionDetails({
+      publicKey: wallet.publicKey,
+      transaction: rawUnsignedTx
+    })
+
+    const serializedTx: string[] = await this.serializerService.serialize([
+      {
+        protocol: wallet.protocol.identifier,
+        type: IACMessageType.TransactionSignRequest,
+        payload: {
+          publicKey: wallet.publicKey,
+          transaction: rawUnsignedTx as any,
+          callback: 'airgap-wallet://?d='
+        }
+      }
+    ])
+
     const info = {
-      wallet: deeplinkInfo.wallet,
-      airGapTxs: deeplinkInfo.airGapTxs,
-      data: deeplinkInfo.serializedTx
+      wallet,
+      airGapTxs,
+      data: serializedTx
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
     this.router.navigateByUrl(`/transaction-qr/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

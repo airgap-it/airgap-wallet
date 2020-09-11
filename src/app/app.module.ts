@@ -6,6 +6,7 @@ import {
   APP_PLUGIN,
   CLIPBOARD_PLUGIN,
   ClipboardService,
+  DeeplinkService,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
@@ -46,8 +47,6 @@ import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-selec
 import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
-import { AppInfoProvider } from './services/app-info/app-info'
-import { DeepLinkProvider } from './services/deep-link/deep-link'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
@@ -126,12 +125,11 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     IACService,
     ClipboardService,
     PermissionsProvider,
-    DeepLinkProvider,
+    DeeplinkService,
     OperationsProvider,
     ExtensionsService,
     ExchangeProvider,
     RemoteConfigProvider,
-    AppInfoProvider,
     PushProvider,
     PushBackendProvider,
     SerializerService,

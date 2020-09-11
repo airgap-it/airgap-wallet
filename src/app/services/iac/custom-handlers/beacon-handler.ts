@@ -38,7 +38,7 @@ export class BeaconHandler extends IACMessageHandler {
 
       return true
     }
-    console.log('beaconHandler', false)
+
     return false
   }
 }

@@ -342,18 +342,6 @@
     "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
     "import-all_label": "Import All"
   },
-  "deep-link": {
-    "not-supported-alert": {
-      "title": "Oops",
-      "message": "Deeplinking is only supported on mobile devices.",
-      "ok": "Ok"
-    },
-    "app-not-found": {
-      "title": "Oops",
-      "message": "It looks like you don't have {{otherAppName}} installed on this device.",
-      "ok": "Ok"
-    }
-  },
   "exchange": {
     "title": "Exchange",
     "exchange_label": "Exchange",
