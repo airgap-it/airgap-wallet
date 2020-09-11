@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -7,6 +8,9 @@ import { AlertController, IonicModule, LoadingController, NavController, Platfor
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { appConfig } from 'src/app/config/app-config'
+import { PermissionsProvider } from 'src/app/services/permissions/permissions'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
@@ -21,11 +25,9 @@ import {
   PlatformMock,
   ToastControllerMock
 } from './mocks-ionic'
-import { StorageMock } from './storage-mock'
-import { AppMock, AppInfoMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PermissionsProvider } from 'src/app/services/permissions/permissions'
+import { AppInfoMock, AppMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
 import { PermissionsProviderMock } from './service-mock'
+import { StorageMock } from './storage-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {
@@ -70,6 +72,7 @@ export class UnitHelper {
       { provide: Platform, useValue: this.mockRefs.platform },
       { provide: PermissionsProvider, useValue: this.mockRefs.permissionsProvider },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
+      { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
       { provide: LoadingController, useValue: this.mockRefs.loadingController }
