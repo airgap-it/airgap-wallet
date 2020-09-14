@@ -38,12 +38,7 @@ export class ScanBasePage {
   }
 
   public async checkCameraPermissionsAndActivate(): Promise<void> {
-    let permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
-
-    if (permission === PermissionStatus.NOT_REQUESTED || permission === PermissionStatus.UNKNOWN) {
-      await this.permissionsProvider.requestPermissions([PermissionTypes.CAMERA])
-      permission = await this.permissionsProvider.hasCameraPermission()
-    }
+    const permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
 
     if (permission === PermissionStatus.GRANTED) {
       this.hasCameraPermission = true
