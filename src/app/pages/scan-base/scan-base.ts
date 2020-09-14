@@ -75,7 +75,6 @@ export class ScanBasePage {
   }
 
   private startScanMobile() {
-    this.scanner.show()
     this.scanner.scan(
       text => {
         this.checkScan(text)
