@@ -1,6 +1,13 @@
-import { PermissionsService, PermissionStatus } from '@airgap/angular-core'
+import { PERMISSIONS_PLUGIN, PermissionStatus } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
-import { PushNotification, PushNotificationsPlugin, PushNotificationToken } from '@capacitor/core'
+import {
+  PermissionResult,
+  PermissionsPlugin,
+  PermissionType,
+  PushNotification,
+  PushNotificationsPlugin,
+  PushNotificationToken
+} from '@capacitor/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
@@ -28,7 +35,7 @@ export class PushProvider {
     private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    private readonly permissionsProvider: PermissionsService,
+    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
@@ -43,7 +50,7 @@ export class PushProvider {
       return
     }
 
-    const permissionStatus = await this.permissionsProvider.hasNotificationsPermission()
+    const permissionStatus: PermissionStatus = await this.checkPermission(PermissionType.Notifications)
 
     if (permissionStatus === PermissionStatus.GRANTED) {
       await this.register()
@@ -160,5 +167,21 @@ export class PushProvider {
     })
 
     await this.pushNotifications.register()
+  }
+
+  private async checkPermission(type: PermissionType): Promise<PermissionStatus> {
+    const permission: PermissionResult = await this.permissions.query({ name: type })
+
+    switch (permission.state) {
+      case 'granted':
+        return PermissionStatus.GRANTED
+      case 'denied':
+        return PermissionStatus.DENIED
+      case 'prompt':
+        return PermissionStatus.UNKNOWN
+
+      default:
+        throw new Error('Unknown permission type')
+    }
   }
 }
