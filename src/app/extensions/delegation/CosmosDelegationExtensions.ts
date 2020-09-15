@@ -253,7 +253,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
       .reduce((sum, next) => sum.plus(next.balance), new BigNumber(0))
 
-    const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
+    const delegateAction = await this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
     const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
@@ -266,19 +266,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDelegateAction(
+  private async createDelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     availableBalance: BigNumber,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
+  ): Promise<AirGapDelegatorAction | null> {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
-    const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, { protocol })
+    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
 
-    const maxDelegationFormatted = this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
+    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
 
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
@@ -421,7 +421,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       [ArgumentName.VALIDATOR]: validator
     })
 
-    const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
+    const rewardsFormatted = await this.amountConverterPipe.transform(rewards, {
       protocol
     })
 

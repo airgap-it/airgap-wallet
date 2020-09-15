@@ -305,7 +305,6 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const maxValue = new BigNumber(results[0])
     const minValue = new BigNumber(results[1])
-
     const hasSufficientFunds = maxValue.gt(minValue)
 
     if (action && hasSufficientFunds) {
@@ -337,7 +336,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         )
       }
 
-      const description = this.createDelegateActionDescription(protocol, action.type, stakingDetails ? stakingDetails.active : 0, maxValue)
+      const description = await this.createDelegateActionDescription(
+        protocol,
+        action.type,
+        stakingDetails ? stakingDetails.active : 0,
+        maxValue
+      )
 
       return {
         type: action.type,
@@ -351,16 +355,16 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return null
   }
 
-  private createDelegateActionDescription(
+  private async createDelegateActionDescription(
     protocol: SubstrateProtocol,
     actionType: SubstrateStakingActionType,
     bonded: string | number | BigNumber,
     maxValue: string | number | BigNumber
-  ): string | undefined {
-    const bondedFormatted = this.amountConverterPipe.transform(bonded, {
+  ): Promise<string | undefined> {
+    const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
       protocol
     })
-    const maxValueFormatted = this.amountConverterPipe.transform(maxValue, {
+    const maxValueFormatted = await this.amountConverterPipe.transform(maxValue, {
       protocol
     })
 
