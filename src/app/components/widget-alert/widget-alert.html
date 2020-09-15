@@ -1,0 +1,13 @@
+<ion-item
+  lines="none"
+  [detail]="widget.detail"
+  class="ion-margin-vertical"
+  [color]="widget.color"
+  (click)="widget.onClick ? widget.onClick() : undefined"
+>
+  <ion-icon [name]="widget.icon" slot="start" color="dark"></ion-icon>
+  <ion-label color="dark" class="ion-text-wrap">
+    <h3><strong>{{ widget.title | translate }}</strong></h3>
+    <p>{{ widget.description | translate }}</p>
+  </ion-label>
+</ion-item>
