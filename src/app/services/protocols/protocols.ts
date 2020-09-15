@@ -1,4 +1,4 @@
-import { ExposedPromise } from '@airgap/beacon-sdk/dist/utils/exposed-promise'
+import { ExposedPromise } from '@airgap/beacon-sdk/dist/cjs/utils/exposed-promise'
 import { Injectable } from '@angular/core'
 import {
   addSubProtocol,

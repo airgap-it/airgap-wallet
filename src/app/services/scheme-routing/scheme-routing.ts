@@ -115,7 +115,12 @@ export class SchemeRoutingProvider {
       const json = JSON.parse(typeof data === 'string' ? data : data[0])
       if (json.publicKey && json.relayServer) {
         console.log('Beacon Pairing QR scanned', json)
-        await this.beaconService.addPeer({ name: json.name, publicKey: json.publicKey, relayServer: json.relayServer })
+        await this.beaconService.addPeer({
+          name: json.name,
+          publicKey: json.publicKey,
+          relayServer: json.relayServer,
+          version: json.version
+        })
       }
     } catch (e) {
       //
