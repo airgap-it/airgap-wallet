@@ -1,10 +1,10 @@
+import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 
-import { AmountConverterPipe } from '../../pipes/amount-converter/amount-converter.pipe'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
 import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
@@ -33,13 +33,14 @@ export class MarketDataService {
   constructor(
     public walletsProvider: AccountProvider,
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly cachingService: CachingService
+    private readonly cachingService: CachingService,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public async getTransactionHistory(wallet: AirGapMarketWallet, transactions: IAirGapTransaction[]): Promise<TransactionHistoryObject[]> {
     const txHistory: TransactionHistoryObject[] = []
     // TODO fetch more than 50 txs?
-    const protocol = getProtocolByIdentifier(wallet.protocol.identifier)
+    const protocol = await this.protocolService.getProtocol(wallet.protocol.identifier)
     transactions.forEach(transaction => {
       const amount = new BigNumber(transaction.amount).shiftedBy(-1 * protocol.decimals).toNumber()
       const fee = new BigNumber(transaction.fee).shiftedBy(-1 * protocol.decimals).toNumber() //
@@ -60,12 +61,7 @@ export class MarketDataService {
     const txHistory: TransactionHistoryObject[] = await this.getTransactionHistory(wallet, transactions)
     const balancesByTimestamp: BalanceAtTimestampObject[] = []
 
-    let currentBalance = parseFloat(
-      this.amountConverterPipe.transformValueOnly(wallet.currentBalance, {
-        protocol: wallet.protocol,
-        maxDigits: 10
-      })
-    )
+    let currentBalance = parseFloat(this.amountConverterPipe.transformValueOnly(wallet.currentBalance, wallet.protocol, 10))
     // txHistory is sorted from most recent to oldest tx
     txHistory.forEach((transaction: TransactionHistoryObject) => {
       balancesByTimestamp.push({ timestamp: transaction.timestamp, balance: currentBalance })

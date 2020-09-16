@@ -1,8 +1,9 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
-import { getProtocolByIdentifier, IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -40,7 +41,8 @@ export class TransactionConfirmPage {
     private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService,
-    private readonly accountService: AccountProvider
+    private readonly accountService: AccountProvider,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public dismiss(): void {
@@ -57,7 +59,7 @@ export class TransactionConfirmPage {
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
     this.signedTransactionsSync.forEach(async signedTx => {
-      const protocol = getProtocolByIdentifier(signedTx.protocol)
+      const protocol = await this.protocolService.getProtocol(signedTx.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
         (signedTx.payload as SignedTransaction).accountIdentifier,
@@ -139,9 +141,8 @@ export class TransactionConfirmPage {
           // POST TX TO BACKEND
           // Only send it if we are on mainnet
           if (protocol.options.network.type === NetworkType.MAINNET) {
-            const signed = (
-              await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index].payload as SignedTransaction)
-            )[0] as any
+            const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
+              .payload as SignedTransaction))[0] as any
             // necessary for the transaction backend
             signed.amount = signed.amount.toString()
             signed.fee = signed.fee.toString()

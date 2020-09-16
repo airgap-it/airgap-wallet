@@ -16,7 +16,7 @@
         <ion-card>
           <ion-item lines="none">
             <ion-avatar slot="start">
-              <identicon [address]="requesterName"></identicon>
+              <airgap-identicon [address]="requesterName"></airgap-identicon>
             </ion-avatar>
             <ion-label class="ion-margin-start">
               <p>
@@ -33,7 +33,7 @@
         <ion-row>
           <ion-col class="ion-text-center" size="3">
             <ion-avatar>
-              <identicon [address]="requesterName"></identicon>
+              <airgap-identicon [address]="requesterName"></airgap-identicon>
             </ion-avatar>
           </ion-col>
           <ion-col>
@@ -47,7 +47,7 @@
           </ion-col>
           <ion-col class="ion-text-center" size="3">
             <ion-avatar>
-              <identicon [address]="address"></identicon>
+              <airgap-identicon [address]="address"></airgap-identicon>
             </ion-avatar>
           </ion-col>
         </ion-row>
@@ -92,19 +92,19 @@
 
       <ion-row *ngIf="request.type === 'broadcast_request'">
         <ng-container *ngFor="let transaction of transactions">
-          <from-to [transaction]="transaction"></from-to>
+          <airgap-from-to [transaction]="transaction"></airgap-from-to>
         </ng-container>
       </ion-row>
 
       <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
         <ng-container *ngFor="let transaction of transactions">
-          <from-to [transaction]="transaction"></from-to>
+          <airgap-from-to [transaction]="transaction"></airgap-from-to>
         </ng-container>
       </div>
 
       <div *ngIf="request.type === 'operation_request'" class="request--container">
         <ng-container *ngFor="let transaction of transactions">
-          <from-to [transaction]="transaction"></from-to>
+          <airgap-from-to [transaction]="transaction"></airgap-from-to>
         </ng-container>
       </div>
     </ng-container>

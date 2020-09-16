@@ -1,23 +1,31 @@
+import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
 import { PlatformMock } from '../../../../test-config/mocks-ionic'
-import { SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { SchemeRoutingProvider } from './scheme-routing'
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('SchemeRoutingProvider Provider', () => {
   let schemeRoutingProvider: SchemeRoutingProvider
   // let storageProvider: Storage
   // let navController: NavController
   let router: Router
+  let protocolService: ProtocolService
 
   let unitHelper: UnitHelper
+
+  beforeAll(() => {
+    protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    protocolService.init()
+  })
+
   beforeEach(() => {
     unitHelper = new UnitHelper()
 
@@ -28,7 +36,8 @@ describe('SchemeRoutingProvider Provider', () => {
           { provide: Storage, useClass: StorageMock },
           { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
           { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
-          { provide: Platform, useClass: PlatformMock }
+          { provide: Platform, useClass: PlatformMock },
+          { provide: ProtocolService, useValue: protocolService }
         ]
       })
     )

@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -16,7 +17,8 @@ import { SubAccountAddPage } from './sub-account-add'
     FormsModule,
     ComponentsModule,
     TranslateModule,
-    RouterModule.forChild([{ path: '', component: SubAccountAddPage }])
+    RouterModule.forChild([{ path: '', component: SubAccountAddPage }]),
+    AirGapAngularCoreModule
   ],
   declarations: [SubAccountAddPage]
 })

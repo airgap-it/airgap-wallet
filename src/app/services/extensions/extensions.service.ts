@@ -1,17 +1,16 @@
-import { Injectable } from '@angular/core'
-import { ICoinDelegateProtocol, KusamaProtocol, PolkadotProtocol, TezosProtocol, CosmosProtocol } from 'airgap-coin-lib'
-
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
+import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
-import { RemoteConfigProvider } from '../remote-config/remote-config'
-
+import { TranslateService } from '@ngx-translate/core'
+import { CosmosProtocol, ICoinDelegateProtocol, KusamaProtocol, PolkadotProtocol, TezosProtocol } from 'airgap-coin-lib'
+import { CosmosDelegationExtensions } from 'src/app/extensions/delegation/CosmosDelegationExtensions'
 import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/ProtocolDelegationExtensions'
 import { SubstrateDelegationExtensions } from 'src/app/extensions/delegation/SubstrateDelegationExtensions'
 import { TezosDelegationExtensions } from 'src/app/extensions/delegation/TezosDelegationExtensions'
-import { CosmosDelegationExtensions } from 'src/app/extensions/delegation/CosmosDelegationExtensions'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { TranslateService } from '@ngx-translate/core'
+
+import { RemoteConfigProvider } from '../remote-config/remote-config'
 
 @Injectable({
   providedIn: 'root'

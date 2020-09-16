@@ -8,6 +8,8 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ProtocolService } from '@airgap/angular-core'
+import BigNumber from 'bignumber.js'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -32,7 +34,8 @@ export class PortfolioPage {
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly protocolService: ProtocolService
   ) {
     this.wallets = this.walletsProvider.wallets.asObservable()
 
@@ -136,26 +139,27 @@ export class PortfolioPage {
       })
     ])
 
-    this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    await this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
   }
 
-  public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
-    let newTotal = 0
-    const cryptoToFiatPipe = new CryptoToFiatPipe()
+  public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
+    const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
 
-    wallets.forEach(wallet => {
-      const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
-        protocolIdentifier: wallet.protocol.identifier,
-        currentMarketPrice: wallet.currentMarketPrice
-      })
-      newTotal += Number(fiatValue)
-    })
+    this.total = (await Promise.all(
+      wallets.map(wallet =>
+        cryptoToFiatPipe.transform(wallet.currentBalance, {
+          protocolIdentifier: wallet.protocol.identifier,
+          currentMarketPrice: wallet.currentMarketPrice
+        })
+      )
+    ))
+      .reduce((sum: BigNumber, next: string) => sum.plus(next), new BigNumber(0))
+      .toNumber()
 
     if (refresher) {
       refresher.complete()
     }
 
-    this.total = newTotal
     this.isVisible = 'visible'
   }
 }

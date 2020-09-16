@@ -7,14 +7,14 @@
       'account-transaction-list.not-delegated_card.text'
         | translate
           : {
-              amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 }
+              amount: delegateAmount | amountConverter: { protocol: wallet.protocol, maxDigits: 3 } | async
             }
     "
     [heading]="
       'account-transaction-list.not-delegated_card.heading'
         | translate
           : {
-              amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 }
+              amount: delegateAmount | amountConverter: { protocol: wallet.protocol, maxDigits: 3 } | async
             }
     "
     tappable
@@ -29,14 +29,14 @@
       'account-transaction-list.has-delegated_card.text'
         | translate
           : {
-              amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 }
+              amount: delegateAmount | amountConverter: { protocol: wallet.protocol, maxDigits: 3 } | async
             }
     "
     [heading]="
       'account-transaction-list.has-delegated_card.heading'
         | translate
           : {
-              amount: delegateAmount | amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 }
+              amount: delegateAmount | amountConverter: { protocol: wallet.protocol, maxDigits: 3 } | async
             }
     "
     tappable

@@ -1,3 +1,4 @@
+import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { BigNumber } from 'bignumber.js'
 
@@ -5,79 +6,85 @@ import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 
 describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe
+  let protocolService: ProtocolService
 
-  beforeEach(() => {
-    cryptoToFiatPipe = new CryptoToFiatPipe()
+  beforeAll(() => {
+    protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    protocolService.init()
   })
 
-  it('should return the right price', () => {
+  beforeEach(() => {
+    cryptoToFiatPipe = new CryptoToFiatPipe(protocolService)
+  })
+
+  it('should return the right price', async () => {
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('0.0000000000000002')
   })
 
-  it('should return an empty string when protocolIdentifier is not set', () => {
+  it('should return an empty string when protocolIdentifier is not set', async () => {
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: undefined,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when protocolIdentifier is invalid', () => {
+  it('should return an empty string when protocolIdentifier is invalid', async () => {
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: 'bananarama' as any,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when value is not a BigNumber', () => {
+  it('should return an empty string when value is not a BigNumber', async () => {
     const value: any = 'test'
     expect(
-      cryptoToFiatPipe.transform(value, {
+      await cryptoToFiatPipe.transform(value, {
         protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when price is not a BigNumber', () => {
+  it('should return an empty string when price is not a BigNumber', async () => {
     const value: any = 'test'
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: value
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when value is undefined', () => {
+  it('should return an empty string when value is undefined', async () => {
     expect(
-      cryptoToFiatPipe.transform(undefined, {
+      await cryptoToFiatPipe.transform(undefined, {
         protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when protocolIdentifier is undefined', () => {
+  it('should return an empty string when protocolIdentifier is undefined', async () => {
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: undefined,
         currentMarketPrice: new BigNumber(200)
       })
     ).toEqual('')
   })
 
-  it('should return an empty string when currentMarketPrice is undefined', () => {
+  it('should return an empty string when currentMarketPrice is undefined', async () => {
     expect(
-      cryptoToFiatPipe.transform(new BigNumber(1), {
+      await cryptoToFiatPipe.transform(new BigNumber(1), {
         protocolIdentifier: MainProtocolSymbols.ETH,
         currentMarketPrice: undefined
       })
