@@ -298,10 +298,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const action = actions[0]
 
-    const results = await Promise.all([
-      protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
-      protocol.options.nodeClient.getExistentialDeposit()
-    ])
+    const results = await Promise.all([protocol.estimateMaxDelegationValueFromAddress(nominatorAddress), 0])
 
     const maxValue = new BigNumber(results[0])
     const minValue = new BigNumber(results[1])
