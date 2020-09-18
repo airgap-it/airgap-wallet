@@ -23,7 +23,7 @@ export class PriceService implements AirGapWalletPriceService {
       return pendingRequest
     }
 
-    const promise: Promise<BigNumber> = new Promise((resolve, reject) => {
+    const promise: Promise<BigNumber> = new Promise(resolve => {
       cryptocompare
         .price(protocol.marketSymbol.toUpperCase(), baseSymbol)
         .then(async prices => {
