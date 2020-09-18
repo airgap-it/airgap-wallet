@@ -94,6 +94,10 @@
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
     "add-coins_label": "Add Coins"
   },
+  "account-add": {
+    "featured": "Featured",
+    "others": "Others"
+  },
   "scan": {
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",

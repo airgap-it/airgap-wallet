@@ -19,7 +19,7 @@
     <p
       [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }"
       class="ion-padding-horizontal"
-      *ngIf="!subProtocol"
+      *ngIf="!subProtocol && protocol"
     ></p>
     <p
       [innerHTML]="'account-import-onboarding.sub-protocol_text' | translate: { subProtocol: subProtocol.name !== protocol.name ? subProtocol.name : subProtocol.identifier, protocol: protocol.name }"
@@ -81,7 +81,7 @@
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
         </div>
       </ion-slide>
-      <ion-slide class="ion-padding-horizontal">
+      <ion-slide *ngIf="protocol" class="ion-padding-horizontal">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide4" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
