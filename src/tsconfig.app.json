@@ -1,8 +1,12 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "skipLibCheck": true, // because of @zondax/ledger-polkadot invalid type declarations
     "outDir": "../out-tsc/app",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@ionic/*": ["../node-modules/@ionic/*"]
+    }
   },
   "files": ["main.ts", "polyfills.ts"],
   "include": ["src/**/*.d.ts"]

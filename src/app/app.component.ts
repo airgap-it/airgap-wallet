@@ -13,8 +13,7 @@ import {
   TezosProtocol,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
-  TezosProtocolOptions,
-  PolkadotProtocol
+  TezosProtocolOptions
 } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
@@ -37,6 +36,7 @@ import { generateGUID } from './utils/utils'
 })
 export class AppComponent implements AfterViewInit {
   public isMobile: boolean = false
+  public isElectron: boolean = false
 
   constructor(
     private readonly platform: Platform,
@@ -59,6 +59,7 @@ export class AppComponent implements AfterViewInit {
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('mobile')
+    this.isElectron = this.platform.is('electron')
   }
 
   public async initializeApp(): Promise<void> {
@@ -165,16 +166,8 @@ export class AppComponent implements AfterViewInit {
     )
     const carthagenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(carthagenetNetwork))
 
-    // for a period of time after the redenomination occurs,
-    // it is recommended to use "New DOT" to clearly indicate that we have complied with the change
-    // Web3 Foundation will follow up on when to change "New DOT" to "DOT"
-    // TODO: remove when we can change the symbol to "DOT"
-    const polkadot: PolkadotProtocol = new PolkadotProtocol()
-    polkadot.symbol = 'New DOT'
-    polkadot.feeSymbol = 'New DOT'
-
     this.protocolService.init({
-      extraActiveProtocols: [carthagenetProtocol, polkadot],
+      extraActiveProtocols: [carthagenetProtocol],
       extraPassiveSubProtocols: [
         [carthagenetProtocol, new TezosKtProtocol(new TezosProtocolOptions(carthagenetNetwork))],
         [

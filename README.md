@@ -43,7 +43,7 @@ $ npm install
 Run locally in browser:
 
 ```bash
-$ npm run serve
+$ npm run start
 ```
 
 Build and open native project

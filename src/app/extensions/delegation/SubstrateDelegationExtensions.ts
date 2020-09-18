@@ -5,6 +5,10 @@ import { TranslateService } from '@ngx-translate/core'
 import { SubstratePayee, SubstrateProtocol } from 'airgap-coin-lib'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
 import {
+  SubstrateElectionStatus,
+  SubstrateEraElectionStatus
+} from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
+import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
 } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
@@ -19,6 +23,7 @@ import {
   AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
@@ -99,8 +104,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
     const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, nominatorDetails, extraNominatorDetails)
 
+    const alerts = await this.getAlerts(protocol)
+
     return [
       {
+        alerts,
         delegator: extraNominatorDetails,
         delegatees: extraValidatorsDetails
       }
@@ -163,6 +171,23 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         }
       })
     )
+  }
+
+  private async getAlerts(protocol: SubstrateProtocol): Promise<UIAlert[] | undefined> {
+    const isElectionOpen: boolean = await protocol.options.nodeClient
+      .getElectionStatus()
+      .then((eraElectionStatus: SubstrateEraElectionStatus) => eraElectionStatus.status.value === SubstrateElectionStatus.OPEN)
+
+    return isElectionOpen
+      ? [
+          new UIAlert({
+            title: 'delegation-detail-substrate.alert.election-open.title',
+            description: 'delegation-detail-substrate.alert.election-open.description',
+            icon: 'alert-circle-outline',
+            color: 'warning'
+          })
+        ]
+      : undefined
   }
 
   private async createDelegateeDisplayDetails(
@@ -345,7 +370,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           maxDelegation: maxValueFormatted
         })
       case SubstrateStakingActionType.NOMINATE:
-        return this.translateService.instant('delegatino-detail-substrate.delegate.nominate_text', {
+        return this.translateService.instant('delegation-detail-substrate.delegate.nominate_text', {
           bonded: bondedFormatted
         })
       case SubstrateStakingActionType.BOND_EXTRA:
