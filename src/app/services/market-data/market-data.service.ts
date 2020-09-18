@@ -137,8 +137,9 @@ export class MarketDataService {
                 allWalletValues[idx]['balance'] = walletValue.balance
               }
               allWalletValues[idx]['timestamp'] = walletValue.timestamp
+            } else {
+              allWalletValues[idx] = { timestamp: walletValue.timestamp, balance: walletValue.balance }
             }
-            allWalletValues[idx] = { timestamp: walletValue.timestamp, balance: walletValue.balance }
           }
         })
       }
