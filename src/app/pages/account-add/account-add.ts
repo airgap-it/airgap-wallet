@@ -1,4 +1,4 @@
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, FeaturedSubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
@@ -10,14 +10,6 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
-
-export enum FeaturedSubProtocolSymbols {
-  XTZ_KT = 'xtz-kt',
-  XTZ_BTC = 'xtz-btc',
-  XTZ_USD = 'xtz-usd',
-  XTZ_STKR = 'xtz-stkr',
-  XCHF = 'eth-erc20-xchf'
-}
 
 @Component({
   selector: 'page-account-add',
