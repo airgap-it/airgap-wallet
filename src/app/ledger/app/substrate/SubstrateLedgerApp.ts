@@ -24,7 +24,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       const [account, change, addressIndex]: number[] = derivationPath.slice(2)
 
       const app: SubstrateApp = this.getApp()
-      const response: ResponseAddress = await app.getAddress(account, change, addressIndex)
+      const response: ResponseAddress = await app.getAddress(account, change, addressIndex, true)
 
       return response.return_code === ReturnCode.SUCCESS
         ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, priceService)
