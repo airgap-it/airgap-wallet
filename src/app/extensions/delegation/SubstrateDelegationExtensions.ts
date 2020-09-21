@@ -299,26 +299,34 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const action = actions[0]
 
-    const [maxValue, minValue] = await Promise.all([
+    const [maxValue, minValue]: [BigNumber | undefined, BigNumber | undefined] = await Promise.all([
       this.getMaxDelegationValue(protocol, action.type, nominatorAddress),
       this.getMinDelegationValue(protocol, action.type)
     ])
-    const hasSufficientFunds = maxValue.gt(minValue)
+    const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gt(minValue)
 
     if (action && hasSufficientFunds) {
-      const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
+      const maxValueFormatted: string | undefined =
+        maxValue !== undefined ? this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10) : undefined
+      const minValueFormatted: string | undefined =
+        minValue !== undefined ? this.amountConverterPipe.formatBigNumber(minValue.shiftedBy(-protocol.decimals), 10) : undefined
+
+      const extraValidators = []
+      if (minValueFormatted !== undefined) {
+        extraValidators.push(Validators.min(new BigNumber(minValueFormatted).toNumber()))
+      }
+      if (maxValueFormatted !== undefined) {
+        extraValidators.push(Validators.max(new BigNumber(maxValueFormatted).toNumber()))
+      }
 
       const form = this.formBuilder.group({
         [ArgumentName.TARGETS]: [validators],
-        [ArgumentName.VALUE]: [action.args.includes(ArgumentName.VALUE) ? maxValue.toString() : stakingDetails.active],
+        [ArgumentName.VALUE]: [
+          action.args.includes(ArgumentName.VALUE) && maxValue !== undefined ? maxValue.toString() : stakingDetails.active
+        ],
         [ArgumentName.VALUE_CONTROL]: [
-          maxValueFormatted,
-          Validators.compose([
-            Validators.required,
-            Validators.min(minValue.shiftedBy(-protocol.decimals).toNumber()),
-            Validators.max(new BigNumber(maxValueFormatted).toNumber()),
-            DecimalValidator.validate(protocol.decimals)
-          ])
+          maxValueFormatted || minValueFormatted,
+          Validators.compose([Validators.required, DecimalValidator.validate(protocol.decimals), ...extraValidators])
         ],
         [ArgumentName.PAYEE]: [SubstratePayee.STASH]
       })
@@ -326,7 +334,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const argWidgets = []
       if (action.args.includes(ArgumentName.VALUE)) {
         argWidgets.push(
-          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, {
+          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, minValueFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             }
@@ -357,21 +365,23 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     protocol: SubstrateProtocol,
     actionType: SubstrateStakingActionType,
     nominatorAddress: string
-  ): Promise<BigNumber> {
+  ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.REBOND_NOMINATE:
         const [unlocking, maxDelegation] = await Promise.all([
           protocol.options.accountController.getUnlockingBalance(nominatorAddress),
-          protocol.estimateMaxDelegationValueFromAddress(nominatorAddress)
+          protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
         ])
 
-        return new BigNumber(maxDelegation).plus(unlocking)
+        return maxDelegation !== undefined ? new BigNumber(maxDelegation).plus(unlocking) : undefined
       default:
-        return new BigNumber(await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress))
+        const maxValue = await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
+
+        return maxValue !== undefined ? new BigNumber(maxValue) : undefined
     }
   }
 
-  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber> {
+  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
         return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
@@ -384,33 +394,44 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     protocol: SubstrateProtocol,
     actionType: SubstrateStakingActionType,
     bonded: string | number | BigNumber,
-    maxValue: string | number | BigNumber
+    maxValue?: string | number | BigNumber | undefined
   ): Promise<string | undefined> {
     const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
       protocol
     })
-    const maxValueFormatted = await this.amountConverterPipe.transform(maxValue, {
-      protocol
-    })
+    const maxValueFormatted =
+      maxValue !== undefined
+        ? await this.amountConverterPipe.transform(maxValue, {
+            protocol
+          })
+        : undefined
 
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
-        return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
-          maxDelegation: maxValueFormatted
-        })
+        return maxValueFormatted
+          ? this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
+              maxDelegation: maxValueFormatted
+            })
+          : this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate-no-max_text')
       case SubstrateStakingActionType.REBOND_NOMINATE:
-        return this.translateService.instant('delegation-detail-substrate.delegate.rebond-nominate_text', {
-          maxDelegation: maxValueFormatted
-        })
+        return maxValueFormatted
+          ? this.translateService.instant('delegation-detail-substrate.delegate.rebond-nominate_text', {
+              maxDelegation: maxValueFormatted
+            })
+          : this.translateService.instant('delegation-detail-substrate.delegate.rebond-nominate-no-max_text')
       case SubstrateStakingActionType.NOMINATE:
         return this.translateService.instant('delegation-detail-substrate.delegate.nominate_text', {
           bonded: bondedFormatted
         })
       case SubstrateStakingActionType.BOND_EXTRA:
-        return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
-          bonded: bondedFormatted,
-          maxDelegation: maxValueFormatted
-        })
+        return maxValueFormatted
+          ? this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
+              bonded: bondedFormatted,
+              maxDelegation: maxValueFormatted
+            })
+          : this.translateService.instant('delegation-detail-substrate.delegate.bond-extra-no-max_text', {
+              bonded: bondedFormatted
+            })
       case SubstrateStakingActionType.CHANGE_NOMINATION:
         return this.translateService.instant('delegation-detail-substrate.delegate.change-nomination_text', {
           bonded: bondedFormatted

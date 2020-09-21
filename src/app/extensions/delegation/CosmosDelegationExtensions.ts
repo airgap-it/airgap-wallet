@@ -348,6 +348,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         10
       )
 
+      const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
+        minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
+        10
+      )
+
       const form = this.formBuilder.group({
         [ArgumentName.VALIDATOR]: validator,
         [ArgumentName.AMOUNT]: maxAmount.toString(),
@@ -355,7 +360,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           maxAmountFormatted,
           Validators.compose([
             Validators.required,
-            Validators.min(new BigNumber(minAmount).shiftedBy(-protocol.decimals).toNumber()),
+            Validators.min(new BigNumber(minAmountFormatted).toNumber()),
             Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
             DecimalValidator.validate(protocol.decimals)
           ])
@@ -368,7 +373,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         label,
         description,
         args: [
-          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, {
+          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, minAmountFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.AMOUNT]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             }
