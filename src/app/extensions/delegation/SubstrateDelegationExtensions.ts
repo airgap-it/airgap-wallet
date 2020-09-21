@@ -36,6 +36,7 @@ import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 // sorted by priority
 const delegateActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.REBOND_NOMINATE,
   SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.CHANGE_NOMINATION,
   SubstrateStakingActionType.BOND_EXTRA
@@ -298,10 +299,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const action = actions[0]
 
-    const results = await Promise.all([protocol.estimateMaxDelegationValueFromAddress(nominatorAddress), 0])
-
-    const maxValue = new BigNumber(results[0])
-    const minValue = new BigNumber(results[1])
+    const [maxValue, minValue] = await Promise.all([
+      this.getMaxDelegationValue(protocol, action.type, nominatorAddress),
+      this.getMinDelegationValue(protocol, action.type)
+    ])
     const hasSufficientFunds = maxValue.gt(minValue)
 
     if (action && hasSufficientFunds) {
@@ -352,6 +353,33 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return null
   }
 
+  private async getMaxDelegationValue(
+    protocol: SubstrateProtocol,
+    actionType: SubstrateStakingActionType,
+    nominatorAddress: string
+  ): Promise<BigNumber> {
+    switch (actionType) {
+      case SubstrateStakingActionType.REBOND_NOMINATE:
+        const [unlocking, maxDelegation] = await Promise.all([
+          protocol.options.accountController.getUnlockingBalance(nominatorAddress),
+          protocol.estimateMaxDelegationValueFromAddress(nominatorAddress)
+        ])
+
+        return new BigNumber(maxDelegation).plus(unlocking)
+      default:
+        return new BigNumber(await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress))
+    }
+  }
+
+  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber> {
+    switch (actionType) {
+      case SubstrateStakingActionType.BOND_NOMINATE:
+        return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
+      default:
+        return new BigNumber(1)
+    }
+  }
+
   private async createDelegateActionDescription(
     protocol: SubstrateProtocol,
     actionType: SubstrateStakingActionType,
@@ -368,6 +396,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
         return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
+          maxDelegation: maxValueFormatted
+        })
+      case SubstrateStakingActionType.REBOND_NOMINATE:
+        return this.translateService.instant('delegation-detail-substrate.delegate.rebond-nominate_text', {
           maxDelegation: maxValueFormatted
         })
       case SubstrateStakingActionType.NOMINATE:
