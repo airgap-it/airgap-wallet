@@ -2,11 +2,12 @@ import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } fr
 import { TestBed } from '@angular/core/testing'
 import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol } from 'airgap-coin-lib'
 import { take } from 'rxjs/operators'
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { APP_INFO_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { PriceServiceMock } from 'test-config/wallet-mock'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { AccountProvider } from '../../services/account/account.provider'
+import { AppInfoProvider } from '../app-info/app-info'
 import { PermissionsProvider } from '../permissions/permissions'
 
 describe('AccountProvider', () => {
@@ -26,6 +27,8 @@ describe('AccountProvider', () => {
       unitHelper.testBed({
         providers: [
           { provide: PermissionsProvider, useValue: unitHelper.mockRefs.permissionsProvider },
+          { provide: AppInfoProvider },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
           { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
           { provide: ProtocolService, useValue: protocolService }
         ]
