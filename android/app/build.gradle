@@ -18,6 +18,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "repository"
+    productFlavors {
+        playstore {
+            dimension "repository"
+            isDefault true
+
+            buildConfigField("String", "PRODUCT_FLAVOR", '"playstore"')
+        }
+
+        fdroid {
+            dimension "repository"
+
+            buildConfigField("String", "PRODUCT_FLAVOR", '"fdroid"')
+        }
+    }
     lintOptions{
         disable 'MissingDefaultResource'
     }
@@ -32,6 +48,7 @@ repositories {
     }
     mavenCentral()
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
