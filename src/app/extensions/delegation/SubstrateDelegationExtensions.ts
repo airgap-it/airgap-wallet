@@ -368,12 +368,19 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.REBOND_NOMINATE:
-        const [unlocking, maxDelegation] = await Promise.all([
-          protocol.options.accountController.getUnlockingBalance(nominatorAddress),
-          protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
+        const [unlocking, maxUnlocked]: [BigNumber, BigNumber] = await Promise.all([
+          protocol.options.accountController.getUnlockingBalance(nominatorAddress).then(unlocking => new BigNumber(unlocking)),
+          protocol
+            .estimateMaxDelegationValueFromAddress(nominatorAddress)
+            .then((max: string) => new BigNumber(max))
+            .catch(() => undefined)
         ])
 
-        return maxDelegation !== undefined ? new BigNumber(maxDelegation).plus(unlocking) : undefined
+        if (maxUnlocked === undefined) {
+          return undefined
+        }
+
+        return maxUnlocked.gt(0) ? maxUnlocked.plus(unlocking) : new BigNumber(0)
       default:
         const maxValue = await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
 
