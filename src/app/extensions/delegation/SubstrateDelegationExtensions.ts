@@ -300,8 +300,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const action = actions[0]
 
     const [maxValue, minValue]: [BigNumber | undefined, BigNumber | undefined] = await Promise.all([
-      this.getMaxDelegationValue(protocol, action.type, nominatorAddress),
-      this.getMinDelegationValue(protocol, action.type)
+      this.getMaxDelegationValue(protocol, nominatorAddress, action ? action.type : undefined),
+      this.getMinDelegationValue(protocol, action ? action.type : undefined)
     ])
     const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gt(minValue)
 
@@ -363,8 +363,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private async getMaxDelegationValue(
     protocol: SubstrateProtocol,
-    actionType: SubstrateStakingActionType,
-    nominatorAddress: string
+    nominatorAddress: string,
+    actionType: SubstrateStakingActionType | undefined
   ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.REBOND_NOMINATE:
@@ -388,7 +388,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     }
   }
 
-  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber | undefined> {
+  private async getMinDelegationValue(
+    protocol: SubstrateProtocol,
+    actionType: SubstrateStakingActionType | undefined
+  ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
         return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
