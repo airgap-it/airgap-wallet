@@ -353,6 +353,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
       const description = await this.createDelegateActionDescription(
         protocol,
+        nominatorAddress,
         action.type,
         stakingDetails ? stakingDetails.active : 0,
         hasSufficientFunds,
@@ -413,13 +414,20 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private async createDelegateActionDescription(
     protocol: SubstrateProtocol,
+    address: string,
     actionType: SubstrateStakingActionType,
     bonded: string | number | BigNumber,
     hasSufficientFunds: boolean,
     maxValue?: string | number | BigNumber | undefined
   ): Promise<string | undefined> {
     if (!hasSufficientFunds) {
-      return this.translateService.instant('delegation-detail-substrate.delegate.unsufficient-funds_text')
+      const futureTransactions = await protocol.getFutureRequiredTransactions(address, 'delegate')
+      const feeEstimation = await protocol.options.transactionController.estimateTransactionFees(address, futureTransactions)
+      const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation, { protocol })
+
+      return this.translateService.instant('delegation-detail-substrate.delegate.unsufficient-funds_text', {
+        extra: feeEstimationFormatted
+      })
     }
 
     const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
