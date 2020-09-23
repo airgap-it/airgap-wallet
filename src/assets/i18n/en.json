@@ -521,7 +521,7 @@
     "expected-reward_label": "Expected Reward",
     "delegated_label": "Delegated",
     "bonded_label": "Bonded",
-    "locked_label": "Locked",
+    "locked_label": "Unbonding",
     "withdraw-ready_label": "Ready to Withdraw",
     "becomes-active_label": "Becomes Active",
     "next-payout_label": "Next Payout",
@@ -534,7 +534,10 @@
       "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
       "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
       "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional funds.",
-      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated."
+      "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional funds.",
+      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
+      "unsufficient-funds_text": "You don't have enough DOTs to cover the transaction fees."
     },
     "undelegate": {
       "label": "Undelegate"
