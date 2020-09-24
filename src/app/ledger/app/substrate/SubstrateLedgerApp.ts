@@ -24,7 +24,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       const [account, change, addressIndex]: number[] = derivationPath.slice(2)
 
       const app: SubstrateApp = this.getApp()
-      const response: ResponseAddress = await app.getAddress(account, change, addressIndex)
+      const response: ResponseAddress = await app.getAddress(account, change, addressIndex, true)
 
       return response.return_code === ReturnCode.SUCCESS
         ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, priceService)
@@ -36,13 +36,17 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
 
   public async signTransaction(transaction: RawSubstrateTransaction): Promise<string> {
     const txs = this.protocol.options.transactionController.decodeDetails(transaction.encoded)
-    const signed = await Promise.all(txs.map(tx => this.signSubstrateTransaction(tx.transaction, tx.payload)))
 
-    if (signed.some(tx => tx === null)) {
+    const signedTxs: (SubstrateTransaction | null)[] = []
+    for (const tx of txs) {
+      signedTxs.push(await this.signSubstrateTransaction(tx.transaction, tx.payload))
+    }
+
+    if (signedTxs.some(tx => tx === null)) {
       return Promise.reject('Rejected')
     }
 
-    txs.forEach((tx, index) => (tx.transaction = signed[index]))
+    txs.forEach((tx, index) => (tx.transaction = signedTxs[index]))
 
     return this.protocol.options.transactionController.encodeDetails(txs)
   }

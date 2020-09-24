@@ -16,7 +16,7 @@ export class SerializerService {
   private readonly v1Tov2Mapping: Map<number, number> = new Map<number, number>()
   private readonly v2Tov1Mapping: Map<number, number> = new Map<number, number>()
 
-  private _useV2: boolean = false
+  private _useV2: boolean = true
   private _chunkSize: number = 100
   private _displayTimePerChunk: number = 500
 
@@ -58,7 +58,15 @@ export class SerializerService {
   }
 
   public async serialize(chunks: IACMessageDefinitionObject[]): Promise<string[]> {
-    if (!this.useV2 && !chunks.some((chunk: IACMessageDefinitionObject) => chunk.protocol === MainProtocolSymbols.COSMOS)) {
+    if (
+      !this.useV2 &&
+      !chunks.some(
+        (chunk: IACMessageDefinitionObject) =>
+          chunk.protocol === MainProtocolSymbols.COSMOS ||
+          chunk.protocol === MainProtocolSymbols.KUSAMA ||
+          chunk.protocol === MainProtocolSymbols.POLKADOT
+      )
+    ) {
       return [await this.serializeV1(chunks[0])]
     } else {
       return this.serializeV2(chunks)

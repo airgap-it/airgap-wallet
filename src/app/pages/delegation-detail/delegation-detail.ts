@@ -166,7 +166,8 @@ export class DelegationDetailPage {
       : null
 
     this.activeDelegatorAction = activeDelegatorAction
-    this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel || activeAction.label : null
+    this.activeDelegatorActionConfirmButton =
+      activeAction && !activeAction.disabled ? activeAction.confirmLabel || activeAction.label : null
   }
 
   public showDelegateesList() {
@@ -335,6 +336,11 @@ export class DelegationDetailPage {
   private callAction(actions: AirGapDelegatorAction[], type: string) {
     const action = actions.find(action => action.type.toString() === type)
     const actionType = action ? action.type : undefined
+
+    if (action.disabled) {
+      this.navController.back()
+      return
+    }
 
     if (actionType) {
       this.prepareDelegationAction(actionType)

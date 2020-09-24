@@ -24,7 +24,7 @@ RUN npm --prefix electron/ install
 RUN npm run browserify-coinlib
 
 # build Ionic project
-RUN npm run build:electron
+RUN npm run build:electron:prod
 
 # copy files
 RUN npx cap sync electron

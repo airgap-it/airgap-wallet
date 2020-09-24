@@ -65,7 +65,7 @@ build_ios:
     - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
-    - nvm use v10.13.0
+    - nvm use 14
     - npm install
     - npm run disable-pure-getters
     - npm run configure-mangle
@@ -86,9 +86,10 @@ build_mac:
   when: manual
   script:
     - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
+    - nvm use 14
     - npm install
     - npm --prefix electron/ install
-    - npm run build:electron
+    - npm run build:electron:prod
     - npx cap sync electron
     - npm --prefix electron/ run build:mac
   artifacts:

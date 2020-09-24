@@ -75,7 +75,7 @@ const defaultValues: SettingsKeyReturnDefaults = {
   [SettingsKey.WALLET]: undefined,
   [SettingsKey.LAST_TX_BROADCAST]: undefined,
   [SettingsKey.USER_ID]: undefined,
-  [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
+  [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: true,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 500,
   [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: 100,
   [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: [],

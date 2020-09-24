@@ -48,10 +48,11 @@
     "reward_label": "Unclaimed Rewards"
   },
   "introduction": {
-    "title": "The New Crypto Wallet Standard",
+    "title": "Self custody made simple and secure",
     "highest": {
       "label": "Highest Security",
-      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.</p>"
+      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.",
+      "desktop_text": "AirGap has a <b>two device approach</b> where the secret is stored either in <b>AirGap Vault</b> or for selected coins on a <b>Ledger hardware wallet</b>."
     },
     "medium": {
       "label": "Medium Security",
@@ -59,7 +60,9 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>"
+      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>",
+      "desktop_heading": "AirGap Vault & Ledger",
+      "desktop_text": "The private key is generated and securely stored on another device with the AirGap Vault app or on a Ledger hardware wallet. <br><b>Install AirGap Vault on a mobile device or connect a Ledger to use AirGap Wallet</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
@@ -91,7 +94,8 @@
     "go_label": "Let's Go"
   },
   "portfolio": {
-    "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
+    "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the <span class=\"style__strong color__primary\">AirGap Vault</span> application where your secret is securely stored.",
+    "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
     "add-coins_label": "Add Coins"
   },
   "scan": {
@@ -517,16 +521,23 @@
     "expected-reward_label": "Expected Reward",
     "delegated_label": "Delegated",
     "bonded_label": "Bonded",
-    "locked_label": "Locked",
+    "locked_label": "Unbonding",
     "withdraw-ready_label": "Ready to Withdraw",
     "becomes-active_label": "Becomes Active",
     "next-payout_label": "Next Payout",
     "delegate": {
       "label": "Delegate",
       "bond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "bond-nominate-no-max_text": "Select the amount you want to delegate.",
+      "rebond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "rebond-nominate-no-max_text": "Select the amount you want to delegate.",
       "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
       "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
-      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated."
+      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
+      "unsufficient-funds_text": "You don't have enough DOT to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
     },
     "undelegate": {
       "label": "Undelegate"
