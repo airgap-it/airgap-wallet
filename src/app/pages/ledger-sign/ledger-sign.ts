@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { isString } from 'util'
 
 @Component({
   selector: 'page-ledger-sign',
@@ -98,7 +97,7 @@ export class LedgerSignPage {
 
   private async promptError(error: unknown) {
     let message: string
-    if (isString(error)) {
+    if (typeof error === 'string') {
       if (error === 'Rejected') {
         return
       }

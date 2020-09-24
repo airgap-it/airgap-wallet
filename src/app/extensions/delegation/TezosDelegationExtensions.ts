@@ -1,3 +1,4 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -16,7 +17,6 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { RemoteConfigProvider, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
 
@@ -64,7 +64,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private constructor(
     private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverter: AmountConverterPipe,
+    private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly formBuilder: FormBuilder
@@ -257,18 +257,20 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       return undefined
     }
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
+
     return new UIRewardList({
-      rewards: rewardInfo.map(info => {
-        return {
-          index: info.cycle,
-          amount: this.amountConverter.transform(new BigNumber(info.reward), {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
-          }),
-          collected: info.payout < new Date(),
-          timestamp: info.payout.getTime()
-        }
-      }),
+      rewards: await Promise.all(
+        rewardInfo.map(async info => {
+          return {
+            index: info.cycle,
+            amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
+              protocol
+            }),
+            collected: info.payout < new Date(),
+            timestamp: info.payout.getTime()
+          }
+        })
+      ),
       indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
       amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
       payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'

@@ -1,15 +1,15 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { SubProtocolType, ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
 import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 export interface IAccountWrapper {
@@ -38,8 +38,8 @@ export class SubAccountAddPage {
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
-    private readonly protocolsProvider: ProtocolsProvider,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    private readonly protocolService: ProtocolService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -50,36 +50,11 @@ export class SubAccountAddPage {
     }
 
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
-      this.typeLabel = 'add-sub-account.accounts_label'
+      this.initWithAccountSubProtocol()
     } else if (this.subProtocolType === SubProtocolType.TOKEN) {
-      this.typeLabel = 'add-sub-account.tokens_label'
+      this.initWithTokenSubProtocol()
     } else {
       assertNever(this.subProtocolType)
-    }
-    if (this.subProtocolType === SubProtocolType.TOKEN) {
-      this.wallet.protocol.subProtocols.forEach(subProtocol => {
-        console.log('checking sub protocol', subProtocol)
-        if (this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0) {
-          const protocol = getProtocolByIdentifier(subProtocol.identifier, this.wallet.protocol.options.network)
-          const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-            protocol,
-            this.wallet.publicKey,
-            this.wallet.isExtendedPublicKey,
-            this.wallet.derivationPath,
-            this.priceService
-          )
-          const exists: boolean = this.accountProvider.walletExists(wallet)
-          if (!exists) {
-            wallet.addresses = this.wallet.addresses
-            wallet
-              .synchronize()
-              .then(() => {
-                this.subAccounts.push({ selected: false, wallet })
-              })
-              .catch(handleErrorSentry(ErrorCategory.COINLIB))
-          }
-        }
-      })
     }
   }
 
@@ -89,5 +64,34 @@ export class SubAccountAddPage {
 
   public addSubAccounts(): void {
     this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider, location: this.navController })
+  }
+
+  private initWithAccountSubProtocol(): void {
+    this.typeLabel = 'add-sub-account.accounts_label'
+  }
+
+  private async initWithTokenSubProtocol(): Promise<void> {
+    this.typeLabel = 'add-sub-account.tokens_label'
+
+    const subProtocols: ICoinSubProtocol[] = await this.protocolService.getSubProtocols(this.wallet.protocol)
+    subProtocols.forEach((subProtocol: ICoinSubProtocol) => {
+      const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+        subProtocol,
+        this.wallet.publicKey,
+        this.wallet.isExtendedPublicKey,
+        this.wallet.derivationPath,
+        this.priceService
+      )
+      const exists: boolean = this.accountProvider.walletExists(wallet)
+      if (!exists) {
+        wallet.addresses = this.wallet.addresses
+        wallet
+          .synchronize()
+          .then(() => {
+            this.subAccounts.push({ selected: false, wallet })
+          })
+          .catch(handleErrorSentry(ErrorCategory.COINLIB))
+      }
+    })
   }
 }

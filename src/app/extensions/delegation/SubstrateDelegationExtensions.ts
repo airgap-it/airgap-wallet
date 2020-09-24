@@ -1,8 +1,13 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { SubstratePayee, SubstrateProtocol } from 'airgap-coin-lib'
 import { DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import {
+  SubstrateElectionStatus,
+  SubstrateEraElectionStatus
+} from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
@@ -17,28 +22,25 @@ import {
   AirGapDelegatorAction,
   AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
-import {
-  SubstrateElectionStatus,
-  SubstrateEraElectionStatus
-} from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
-import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 // sorted by priority
 const delegateActions = [
   SubstrateStakingActionType.BOND_NOMINATE,
+  SubstrateStakingActionType.REBOND_NOMINATE,
   SubstrateStakingActionType.NOMINATE,
   SubstrateStakingActionType.CHANGE_NOMINATION,
-  SubstrateStakingActionType.BOND_EXTRA
+  SubstrateStakingActionType.BOND_EXTRA,
+  SubstrateStakingActionType.REBOND_EXTRA
 ]
 
 // sorted by priority
@@ -156,7 +158,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
 
-        const displayDetails = this.createDelegateeDisplayDetails(protocol, validatorDetails, nominatorDetails, extraNominatorDetials)
+        const displayDetails = await this.createDelegateeDisplayDetails(protocol, validatorDetails, nominatorDetails, extraNominatorDetials)
 
         return {
           ...validatorDetails,
@@ -190,12 +192,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       : undefined
   }
 
-  private createDelegateeDisplayDetails(
+  private async createDelegateeDisplayDetails(
     protocol: SubstrateProtocol,
     validatorDetails: SubstrateValidatorDetails,
     nominatorDetails: SubstrateNominatorDetails,
     extraNominatorDetails: AirGapDelegatorDetails
-  ): UIWidget[] {
+  ): Promise<UIWidget[]> {
     const details = []
 
     const commission = validatorDetails.commission ? new BigNumber(validatorDetails.commission) : null
@@ -219,7 +221,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     if (showExpectedRewardWidget) {
       const bonded = nominatorDetails.stakingDetails ? new BigNumber(nominatorDetails.stakingDetails.total) : new BigNumber(0)
 
-      const getExpectedReward = (userStake: BigNumber) => {
+      const getExpectedReward = async (userStake: BigNumber) => {
         const totalStake = new BigNumber(validatorDetails.totalStakingBalance).plus(userStake)
         const userShare = userStake.dividedBy(totalStake)
         const expectedReward = new BigNumber(1)
@@ -228,23 +230,22 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           .multipliedBy(userShare)
 
         return this.amountConverterPipe.transform(expectedReward, {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
+          protocol
         })
       }
 
       const expectedRewardWidget = new UIIconText({
         iconName: 'logo-usd',
-        text: getExpectedReward(bonded),
+        text: await getExpectedReward(bonded),
         description: 'delegation-detail-substrate.expected-reward_label'
       })
 
       delegateAction.form.valueChanges.subscribe(value => {
         expectedRewardWidget.doAfterReached(
           WidgetState.INIT,
-          () => {
+          async () => {
             const userStake = bonded.plus(value[ArgumentName.VALUE] || 0)
-            expectedRewardWidget.text = getExpectedReward(userStake)
+            expectedRewardWidget.text = await getExpectedReward(userStake)
           },
           true
         )
@@ -271,12 +272,12 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
 
     const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
-    const extraActions: AirGapDelegatorAction[] = this.createDelegatorExtraActions(
+    const extraActions: AirGapDelegatorAction[] = await this.createDelegatorExtraActions(
       protocol,
       nominatorDetails.stakingDetails,
       availableActions
     )
-    const displayDetails: UIWidget[] = this.createDelegatorDisplayDetails(protocol, nominatorDetails)
+    const displayDetails: UIWidget[] = await this.createDelegatorDisplayDetails(protocol, nominatorDetails)
 
     return {
       ...nominatorDetails,
@@ -299,95 +300,202 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const action = actions[0]
 
-    const results = await Promise.all([
-      protocol.estimateMaxDelegationValueFromAddress(nominatorAddress),
-      protocol.options.nodeClient.getExistentialDeposit()
+    const [maxValue, minValue]: [BigNumber | undefined, BigNumber | undefined] = await Promise.all([
+      action ? this.getMaxDelegationValue(protocol, action.type, nominatorAddress) : undefined,
+      action ? this.getMinDelegationValue(protocol, action.type) : undefined
     ])
 
-    const maxValue = new BigNumber(results[0])
-    const minValue = new BigNumber(results[1])
+    if (action) {
+      const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gte(minValue)
 
-    const hasSufficientFunds = maxValue.gt(minValue)
+      const maxValueFormatted: string | undefined =
+        maxValue !== undefined ? this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10) : undefined
+      const minValueFormatted: string | undefined =
+        minValue !== undefined ? this.amountConverterPipe.formatBigNumber(minValue.shiftedBy(-protocol.decimals), 10) : undefined
 
-    if (action && hasSufficientFunds) {
-      const maxValueFormatted = this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10)
+      const extraValidators = []
+      if (minValueFormatted !== undefined) {
+        extraValidators.push(Validators.min(new BigNumber(minValueFormatted).toNumber()))
+      }
+      if (maxValueFormatted !== undefined) {
+        extraValidators.push(Validators.max(new BigNumber(maxValueFormatted).toNumber()))
+      }
 
       const form = this.formBuilder.group({
         [ArgumentName.TARGETS]: [validators],
-        [ArgumentName.VALUE]: [action.args.includes(ArgumentName.VALUE) ? maxValue.toString() : stakingDetails.active],
+        [ArgumentName.VALUE]: [
+          action.args.includes(ArgumentName.VALUE) && maxValue !== undefined ? maxValue.toString() : stakingDetails.active
+        ],
         [ArgumentName.VALUE_CONTROL]: [
-          maxValueFormatted,
-          Validators.compose([
-            Validators.required,
-            Validators.min(minValue.shiftedBy(-protocol.decimals).toNumber()),
-            Validators.max(new BigNumber(maxValueFormatted).toNumber()),
-            DecimalValidator.validate(protocol.decimals)
-          ])
+          maxValueFormatted || minValueFormatted,
+          Validators.compose([Validators.required, DecimalValidator.validate(protocol.decimals), ...extraValidators])
         ],
         [ArgumentName.PAYEE]: [SubstratePayee.STASH]
       })
 
+      if (!hasSufficientFunds) {
+        form.get(ArgumentName.VALUE_CONTROL).disable()
+      }
+
       const argWidgets = []
       if (action.args.includes(ArgumentName.VALUE)) {
         argWidgets.push(
-          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, {
+          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, minValueFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
-            }
+            },
+            toggleFixedValueButton:
+              maxValueFormatted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
+            fixedValue: maxValueFormatted && hasSufficientFunds ? maxValueFormatted : undefined
           })
         )
       }
 
-      const description = this.createDelegateActionDescription(protocol, action.type, stakingDetails ? stakingDetails.active : 0, maxValue)
+      const description = await this.createDelegateActionDescription(
+        protocol,
+        nominatorAddress,
+        action.type,
+        stakingDetails ? stakingDetails.active : 0,
+        hasSufficientFunds,
+        maxValue
+      )
 
       return {
         type: action.type,
         label: 'delegation-detail-substrate.delegate.label',
         description,
         form,
-        args: argWidgets
+        args: argWidgets,
+        disabled: !hasSufficientFunds
       }
     }
 
     return null
   }
 
-  private createDelegateActionDescription(
+  private async getMaxDelegationValue(
     protocol: SubstrateProtocol,
     actionType: SubstrateStakingActionType,
-    bonded: string | number | BigNumber,
-    maxValue: string | number | BigNumber
-  ): string | undefined {
-    const bondedFormatted = this.amountConverterPipe.transform(bonded, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
-    })
-    const maxValueFormatted = this.amountConverterPipe.transform(maxValue, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
-    })
+    nominatorAddress: string
+  ): Promise<BigNumber | undefined> {
+    switch (actionType) {
+      case SubstrateStakingActionType.REBOND_NOMINATE:
+      case SubstrateStakingActionType.REBOND_EXTRA:
+        const [unlocking, maxUnlocked]: [BigNumber, BigNumber] = await Promise.all([
+          protocol.options.accountController.getUnlockingBalance(nominatorAddress).then(unlocking => new BigNumber(unlocking)),
+          protocol
+            .estimateMaxDelegationValueFromAddress(nominatorAddress)
+            .then((max: string) => new BigNumber(max))
+            .catch(() => undefined)
+        ])
 
+        if (maxUnlocked === undefined) {
+          return undefined
+        }
+
+        return maxUnlocked.gt(0) ? maxUnlocked.plus(unlocking) : new BigNumber(0)
+      default:
+        const maxValue = await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
+
+        return maxValue !== undefined ? new BigNumber(maxValue) : undefined
+    }
+  }
+
+  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
-        return this.translateService.instant('delegation-detail-substrate.delegate.bond-nominate_text', {
-          maxDelegation: maxValueFormatted
-        })
+        return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
       case SubstrateStakingActionType.NOMINATE:
-        return this.translateService.instant('delegation-detail-substrate.delegate.nominate_text', {
-          bonded: bondedFormatted
-        })
+        return new BigNumber(0)
+      default:
+        return new BigNumber(1)
+    }
+  }
+
+  private async createDelegateActionDescription(
+    protocol: SubstrateProtocol,
+    address: string,
+    actionType: SubstrateStakingActionType,
+    bonded: string | number | BigNumber,
+    hasSufficientFunds: boolean,
+    maxValue?: string | number | BigNumber | undefined
+  ): Promise<string | undefined> {
+    if (!hasSufficientFunds) {
+      const futureTransactions = await protocol.getFutureRequiredTransactions(address, 'delegate')
+      const feeEstimation = await protocol.options.transactionController.estimateTransactionFees(address, futureTransactions)
+      const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation, { protocol })
+
+      return this.translateService.instant('delegation-detail-substrate.delegate.unsufficient-funds_text', {
+        extra: feeEstimationFormatted
+      })
+    }
+
+    const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
+      protocol
+    })
+    const maxValueFormatted =
+      maxValue !== undefined
+        ? await this.amountConverterPipe.transform(maxValue, {
+            protocol
+          })
+        : undefined
+
+    let translationKey: string
+    let translationArgs: any = {}
+    switch (actionType) {
+      case SubstrateStakingActionType.BOND_NOMINATE:
+        if (maxValueFormatted) {
+          translationKey = 'delegation-detail-substrate.delegate.bond-nominate_text'
+          translationArgs = { maxDelegation: maxValueFormatted }
+        } else {
+          translationKey = 'delegation-detail-substrate.delegate.bond-nominate-no-max_text'
+        }
+        break
+      case SubstrateStakingActionType.REBOND_NOMINATE:
+        if (maxValueFormatted) {
+          translationKey = 'delegation-detail-substrate.delegate.rebond-nominate_text'
+          translationArgs = { maxDelegation: maxValueFormatted }
+        } else {
+          translationKey = 'delegation-detail-substrate.delegate.rebond-nominate-no-max_text'
+        }
+        break
+      case SubstrateStakingActionType.NOMINATE:
+        translationKey = 'delegation-detail-substrate.delegate.nominate_text'
+        translationArgs = { bonded: bondedFormatted }
+        break
       case SubstrateStakingActionType.BOND_EXTRA:
-        return this.translateService.instant('delegation-detail-substrate.delegate.bond-extra_text', {
-          bonded: bondedFormatted,
-          maxDelegation: maxValueFormatted
-        })
+        if (maxValueFormatted) {
+          translationKey = 'delegation-detail-substrate.delegate.bond-extra_text'
+          translationArgs = {
+            bonded: bondedFormatted,
+            maxDelegation: maxValueFormatted
+          }
+        } else {
+          translationKey = 'delegation-detail-substrate.delegate.bond-extra-no-max_text'
+          translationArgs = { bonded: bondedFormatted }
+        }
+        break
+      case SubstrateStakingActionType.REBOND_EXTRA:
+        if (maxValueFormatted) {
+          translationKey = 'delegation-detail-substrate.delegate.rebond-extra_text'
+          translationArgs = {
+            bonded: bondedFormatted,
+            maxDelegation: maxValueFormatted
+          }
+        } else {
+          translationKey = 'delegation-detail-substrate.delegate.rebond-extra-no-max_text'
+          translationArgs = { bonded: bondedFormatted }
+        }
+        break
       case SubstrateStakingActionType.CHANGE_NOMINATION:
-        return this.translateService.instant('delegation-detail-substrate.delegate.change-nomination_text', {
-          bonded: bondedFormatted
-        })
+        translationKey = 'delegation-detail-substrate.delegate.change-nomination_text'
+        translationArgs = { bonded: bondedFormatted }
+        break
       default:
         return undefined
     }
+
+    return this.translateService.instant(translationKey, translationArgs)
   }
 
   private createUndelegateAction(
@@ -429,68 +537,73 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     }
   }
 
-  private createDelegatorExtraActions(
+  private async createDelegatorExtraActions(
     protocol: SubstrateProtocol,
     stakingDetails: SubstrateStakingDetails | undefined,
     availableActions: DelegatorAction[]
-  ): AirGapDelegatorAction[] {
-    return availableActions
-      .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
-      .map(action => {
-        let label: string
-        let confirmLabel: string
-        let description: string
-        let args: UIInputWidget<any>[]
+  ): Promise<AirGapDelegatorAction[]> {
+    return Promise.all(
+      availableActions
+        .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
+        .map(async action => {
+          let label: string
+          let confirmLabel: string
+          let description: string
+          let args: UIInputWidget<any>[]
 
-        switch (action.type) {
-          case SubstrateStakingActionType.WITHDRAW_UNBONDED:
-            const totalUnlockedFormatted: string | undefined = stakingDetails
-              ? this.amountConverterPipe.transform(stakingDetails.unlocked, {
-                  protocolIdentifier: protocol.identifier,
-                  maxDigits: 10
-                })
-              : undefined
+          // tslint:disable-next-line: switch-default
+          switch (action.type) {
+            case SubstrateStakingActionType.WITHDRAW_UNBONDED:
+              const totalUnlockedFormatted: string | undefined = stakingDetails
+                ? await this.amountConverterPipe.transform(stakingDetails.unlocked, {
+                    protocol
+                  })
+                : undefined
 
-            label = 'delegation-detail-substrate.withdraw-unbonded.label'
-            confirmLabel = 'delegation-detail-substrate.withdraw-unbonded.button'
-            description = totalUnlockedFormatted
-              ? this.translateService.instant('delegation-detail-substrate.withdraw-unbonded.text-full', {
-                  unlocked: totalUnlockedFormatted
-                })
-              : 'delegation-detail-substrate.withdraw-unbonded.text-short'
+              label = 'delegation-detail-substrate.withdraw-unbonded.label'
+              confirmLabel = 'delegation-detail-substrate.withdraw-unbonded.button'
+              description = totalUnlockedFormatted
+                ? this.translateService.instant('delegation-detail-substrate.withdraw-unbonded.text-full', {
+                    unlocked: totalUnlockedFormatted
+                  })
+                : 'delegation-detail-substrate.withdraw-unbonded.text-short'
 
-            break
-        }
+              break
+          }
 
-        return {
-          type: action.type,
-          label,
-          description,
-          confirmLabel,
-          args
-        }
-      })
+          return {
+            type: action.type,
+            label,
+            description,
+            confirmLabel,
+            args
+          }
+        })
+    )
   }
 
-  private createDelegatorDisplayDetails(protocol: SubstrateProtocol, nominatorDetails: SubstrateNominatorDetails): UIWidget[] {
+  private async createDelegatorDisplayDetails(
+    protocol: SubstrateProtocol,
+    nominatorDetails: SubstrateNominatorDetails
+  ): Promise<UIWidget[]> {
     const displayDetails = []
     const isDelegating = nominatorDetails.delegatees.length > 0
 
     if (nominatorDetails.stakingDetails) {
-      displayDetails.push(...this.createStakingDetailsWidgets(protocol, isDelegating, nominatorDetails.stakingDetails))
+      displayDetails.push(...(await this.createStakingDetailsWidgets(protocol, isDelegating, nominatorDetails.stakingDetails)))
     }
 
     return displayDetails
   }
 
-  private createStakingDetailsWidgets(
+  private async createStakingDetailsWidgets(
     protocol: SubstrateProtocol,
     isNominating: boolean,
     stakingDetails: SubstrateStakingDetails
-  ): UIWidget[] {
+  ): Promise<UIWidget[]> {
     const details = []
 
-    details.push(...this.createBondedDetails(protocol, stakingDetails))
+    details.push(...(await this.createBondedDetails(protocol, stakingDetails)))
 
     if (isNominating) {
       details.push(...this.createNominationDetails(protocol, stakingDetails))
@@ -499,43 +612,42 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return details
   }
 
-  private createDelegatorDisplayRewards(
+  private async createDelegatorDisplayRewards(
     protocol: SubstrateProtocol,
     nominatorDetails: SubstrateNominatorDetails
-  ): UIRewardList | undefined {
+  ): Promise<UIRewardList | undefined> {
     if (nominatorDetails.delegatees.length === 0 || nominatorDetails.stakingDetails.rewards.length === 0) {
       return undefined
     }
 
     return new UIRewardList({
-      rewards: nominatorDetails.stakingDetails.rewards.slice(0, 5).map(reward => ({
-        index: reward.eraIndex,
-        amount: this.amountConverterPipe.transform(reward.amount, {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
-        }),
-        timestamp: reward.timestamp
-      })),
+      rewards: await Promise.all(
+        nominatorDetails.stakingDetails.rewards.slice(0, 5).map(async reward => ({
+          index: reward.eraIndex,
+          amount: await this.amountConverterPipe.transform(reward.amount, {
+            protocol
+          }),
+          timestamp: reward.timestamp
+        }))
+      ),
       indexColLabel: 'delegation-detail-substrate.rewards.index-col_label',
       amountColLabel: 'delegation-detail-substrate.rewards.amount-col_label',
       payoutColLabel: 'delegation-detail-substrate.rewards.payout-col_label'
     })
   }
 
-  private createBondedDetails(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): UIWidget[] {
+  private async createBondedDetails(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): Promise<UIWidget[]> {
     const details = []
 
-    const totalStaking = new BigNumber(stakingDetails.total)
     const activeStaking = new BigNumber(stakingDetails.active)
     const totalUnlocked = new BigNumber(stakingDetails.unlocked)
 
-    if (totalStaking.eq(activeStaking)) {
+    if (activeStaking.gt(0)) {
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(totalStaking, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(activeStaking, {
+            protocol
           }),
           description:
             stakingDetails.status === 'nominating'
@@ -543,7 +655,9 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
               : 'delegation-detail-substrate.bonded_label'
         })
       )
-    } else if (stakingDetails.locked.length > 0) {
+    }
+
+    if (stakingDetails.locked.length > 0) {
       const nextUnlocking = stakingDetails.locked.sort((a, b) => a.expectedUnlock - b.expectedUnlock)[0]
       const unlockingDate = new Date(nextUnlocking.expectedUnlock)
 
@@ -552,9 +666,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(nextUnlockingValue, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(nextUnlockingValue, {
+            protocol
           }),
           description: 'delegation-detail-substrate.locked_label'
         }),
@@ -568,14 +681,14 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(totalUnlocked, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(totalUnlocked, {
+            protocol
           }),
           description: 'delegation-detail-substrate.withdraw-ready_label'
         })
       )
     }
+
     return details
   }
 

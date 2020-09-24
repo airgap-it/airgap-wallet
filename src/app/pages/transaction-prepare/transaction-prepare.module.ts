@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -19,7 +20,8 @@ import { TransactionPreparePage } from './transaction-prepare'
     TranslateModule,
     ComponentsModule,
     PipesModule,
-    RouterModule.forChild([{ path: '', component: TransactionPreparePage }])
+    RouterModule.forChild([{ path: '', component: TransactionPreparePage }]),
+    AirGapAngularCoreModule
   ],
   declarations: [TransactionPreparePage]
 })

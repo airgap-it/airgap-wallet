@@ -1,26 +1,27 @@
-import { CosmosProtocol } from 'airgap-coin-lib'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
-import {
-  AirGapDelegationDetails,
-  AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
-  AirGapDelegatorAction
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import { DelegateeDetails, DelegatorDetails, DelegatorAction } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import BigNumber from 'bignumber.js'
-import { CosmosValidator, CosmosUnbondingDelegation } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
-import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { FormBuilder, Validators } from '@angular/forms'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
-import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
-import { RemoteConfigProvider, CosmosValidatorDetails } from 'src/app/services/remote-config/remote-config'
 import { TranslateService } from '@ngx-translate/core'
+import { CosmosProtocol } from 'airgap-coin-lib'
+import { CosmosUnbondingDelegation, CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
+import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import BigNumber from 'bignumber.js'
+import {
+  AirGapDelegateeDetails,
+  AirGapDelegationDetails,
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
+} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
+import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
+import { CosmosValidatorDetails, RemoteConfigProvider } from 'src/app/services/remote-config/remote-config'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 enum ArgumentName {
   VALIDATOR = 'validator',
@@ -83,6 +84,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const delegationsDetails = await Promise.all(
       delegatees.map(validator => protocol.getDelegationDetailsFromAddress(delegator, [validator]))
     )
+
     return Promise.all(
       delegationsDetails.map(async details => {
         const [delegator, validator] = await Promise.all([
@@ -110,26 +112,25 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
 
-    return [...knownValidators, ...unkownValidators]
-      .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
-      .map(
-        (details: ValidatorDetails) =>
-          new UIAccountSummary({
-            address: details.operator_address,
-            logo: details.logo,
-            header: [
-              details.description.moniker,
-              `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
-            ],
-            description: [
-              this.shortenStringPipe.transform(details.operator_address),
-              this.amountConverterPipe.transform(details.tokens, {
-                protocolIdentifier: protocol.identifier,
-                maxDigits: 10
-              })
-            ]
-          })
-      )
+    return Promise.all(
+      [...knownValidators, ...unkownValidators]
+        .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
+        .map(
+          async (details: ValidatorDetails) =>
+            new UIAccountSummary({
+              address: details.operator_address,
+              logo: details.logo,
+              header: [
+                details.description.moniker,
+                `${this.decimalPipe.transform(new BigNumber(details.commission.commission_rates.rate).times(100).toString())}%`
+              ],
+              description: [
+                this.shortenStringPipe.transform(details.operator_address),
+                await this.amountConverterPipe.transform(details.tokens, { protocol })
+              ]
+            })
+        )
+    )
   }
 
   public async createAccountExtendedDetails(protocol: CosmosProtocol, address: string): Promise<UIAccountExtendedDetails> {
@@ -142,23 +143,24 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[0], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[0], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.delegated_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[1], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[1], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.unbonding_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[2], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[2], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.reward_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[3], { protocol: protocol, maxDigits: 0 })} ${protocol.symbol}`
+        text: `${this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
       }
     ]
+
     return new UIAccountExtendedDetails({
-      items: items
+      items
     })
   }
 
@@ -251,11 +253,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
       .reduce((sum, next) => sum.plus(next.balance), new BigNumber(0))
 
-    const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
-    const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
+    const delegateAction = await this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
+    const undelegateAction = await this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
-    const displayDetails = this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
+    const displayDetails = await this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
 
     return {
       ...delegatorDetails,
@@ -264,25 +266,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDelegateAction(
+  private async createDelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     availableBalance: BigNumber,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
+  ): Promise<AirGapDelegatorAction | null> {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
-    const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
-    })
+    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
 
-    const maxDelegationFormatted = this.amountConverterPipe.transform(maxDelegationAmount, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
-    })
+    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
 
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
@@ -311,15 +307,14 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private createUndelegateAction(
+  private async createUndelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
-    const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
+  ): Promise<AirGapDelegatorAction | null> {
+    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
+      protocol
     })
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
 
@@ -353,6 +348,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         10
       )
 
+      const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
+        minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
+        10
+      )
+
       const form = this.formBuilder.group({
         [ArgumentName.VALIDATOR]: validator,
         [ArgumentName.AMOUNT]: maxAmount.toString(),
@@ -360,7 +360,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           maxAmountFormatted,
           Validators.compose([
             Validators.required,
-            Validators.min(new BigNumber(minAmount).shiftedBy(-protocol.decimals).toNumber()),
+            Validators.min(new BigNumber(minAmountFormatted).toNumber()),
             Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
             DecimalValidator.validate(protocol.decimals)
           ])
@@ -373,7 +373,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         label,
         description,
         args: [
-          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, {
+          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, minAmountFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.AMOUNT]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             }
@@ -393,6 +393,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   ): Promise<AirGapDelegatorAction[]> {
     const mainActionTypes = [CosmosDelegationActionType.DELEGATE, CosmosDelegationActionType.UNDELEGATE]
     const excludedActionTypes = [CosmosDelegationActionType.WITHDRAW_ALL_REWARDS]
+
     return Promise.all(
       availableActions
         .filter(action => !mainActionTypes.includes(action.type) && !excludedActionTypes.includes(action.type))
@@ -404,8 +405,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
               break
             default:
               partial = {}
-              break
           }
+
           return {
             type: action.type,
             label: action.type,
@@ -425,9 +426,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       [ArgumentName.VALIDATOR]: validator
     })
 
-    const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
-      protocolIdentifier: protocol.identifier,
-      maxDigits: 10
+    const rewardsFormatted = await this.amountConverterPipe.transform(rewards, {
+      protocol
     })
 
     return {
@@ -438,21 +438,20 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDisplayDetails(
+  private async createDisplayDetails(
     protocol: CosmosProtocol,
     delegatedAmount: BigNumber,
     unbondingAmount: BigNumber,
     rewards: BigNumber
-  ): UIWidget[] {
+  ): Promise<UIWidget[]> {
     const details = []
 
     if (delegatedAmount.gt(0)) {
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(delegatedAmount, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(delegatedAmount, {
+            protocol
           }),
           description: 'delegation-detail-cosmos.currently-delegated_label'
         })
@@ -463,9 +462,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: this.amountConverterPipe.transform(unbondingAmount, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(unbondingAmount, {
+            protocol
           }),
           description: 'delegation-detail-cosmos.unbonding_label'
         })
@@ -476,9 +474,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       details.push(
         new UIIconText({
           iconName: 'logo-usd',
-          text: this.amountConverterPipe.transform(rewards, {
-            protocolIdentifier: protocol.identifier,
-            maxDigits: 10
+          text: await this.amountConverterPipe.transform(rewards, {
+            protocol
           }),
           description: 'delegation-detail-cosmos.unclaimed-rewards_label'
         })

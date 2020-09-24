@@ -4,12 +4,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { DelegationDetailPage } from './delegation-detail'
-import { ComponentsModule } from 'src/app/components/components.module'
-import { TranslateModule } from '@ngx-translate/core'
-import { PipesModule } from 'src/app/pipes/pipes.module'
-import { MomentModule } from 'ngx-moment'
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { RouterModule } from '@angular/router'
+import { TranslateModule } from '@ngx-translate/core'
+import { MomentModule } from 'ngx-moment'
+import { ComponentsModule } from 'src/app/components/components.module'
+import { PipesModule } from 'src/app/pipes/pipes.module'
+import { DelegationDetailPage } from './delegation-detail'
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { RouterModule } from '@angular/router'
     TranslateModule,
     PipesModule,
     MomentModule,
-    RouterModule.forChild([{ path: '', component: DelegationDetailPage }])
+    RouterModule.forChild([{ path: '', component: DelegationDetailPage }]),
+    AirGapAngularCoreModule
   ],
   declarations: [DelegationDetailPage]
 })

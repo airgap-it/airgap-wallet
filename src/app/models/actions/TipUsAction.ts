@@ -1,3 +1,4 @@
+import { LanguageService } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
@@ -5,7 +6,6 @@ import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { LanguageService } from '../../services/language/language.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletActionInfo } from '../ActionGroup'
 

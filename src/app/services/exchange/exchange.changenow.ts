@@ -80,8 +80,12 @@ class ChangeNowApi {
   constructor(public http: HttpClient, protected readonly baseURL: string = 'https://changenow.io/api/v1') {
     this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('atom', MainProtocolSymbols.COSMOS)
+    this.identifierExchangeToAirGapMap.set('dot', MainProtocolSymbols.POLKADOT)
+    this.identifierExchangeToAirGapMap.set('ksm', MainProtocolSymbols.KUSAMA)
     this.identifierAirGapToExchangeMap.set('eth-erc20-xchf' as ProtocolSymbols, 'xchf')
     this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.COSMOS, 'atom')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.POLKADOT, 'dot')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.KUSAMA, 'ksm')
   }
 
   public convertExchangeIdentifierToAirGapIdentifier(identifiers: ExchangeIdentifier[]): ProtocolSymbols[] {

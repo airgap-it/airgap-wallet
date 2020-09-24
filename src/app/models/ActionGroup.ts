@@ -1,8 +1,11 @@
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
 import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
 import { SimpleAction } from 'airgap-coin-lib/dist/actions/SimpleAction'
+import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
 import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
@@ -10,11 +13,8 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
-import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
-import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { AirGapMarketWallet, getProtocolByIdentifier } from 'airgap-coin-lib'
-import { SubProtocolSymbols, MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -192,7 +192,8 @@ export class ActionGroup {
       return wallet
     }
 
-    const protocol = getProtocolByIdentifier(SubProtocolSymbols.XTZ_KT)
+    const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
+
     wallet = new AirGapMarketWallet(
       protocol,
       xtzWallet.publicKey,

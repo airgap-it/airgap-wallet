@@ -1,8 +1,8 @@
 <ion-item *ngIf="wallet; else skeletonWallet" lines="none">
   <ion-avatar slot="start">
-    <identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></identicon>
-    <currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="isToken"></currency-symbol>
-    <currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="!isToken" class="symbol--icon"></currency-symbol>
+    <airgap-identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></airgap-identicon>
+    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="isToken"></airgap-currency-symbol>
+    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="!isToken" class="symbol--icon"></airgap-currency-symbol>
   </ion-avatar>
   <ion-label>
     <h2
@@ -47,7 +47,7 @@
     <ng-container *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
       <p class="ion-text-right font--weight__bold porfolio-item__margin" *ngIf="wallet.currentMarketPrice.toNumber() > 0">
         ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
-        wallet.currentMarketPrice } | number: '1.2-2' }}
+        wallet.currentMarketPrice } | async | number: '1.2-2' }}
       </p>
     </ng-container>
     <ng-template #syncingBalance>

@@ -1,14 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController } from '@ionic/angular'
-import {
-  AccountShareResponse,
-  AirGapMarketWallet,
-  getProtocolByIdentifier,
-  IACMessageDefinitionObject,
-  IACMessageType,
-  supportedProtocols
-} from 'airgap-coin-lib'
+import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType, supportedProtocols } from 'airgap-coin-lib'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { SerializerService } from '../../services/serializer/serializer.service'
@@ -18,6 +11,7 @@ import { BeaconService } from '../beacon/beacon.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
+import { ProtocolService } from '@airgap/angular-core'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -42,7 +36,8 @@ export class SchemeRoutingProvider {
     private readonly serializerService: SerializerService,
     private readonly beaconService: BeaconService,
     private readonly storageProvider: StorageProvider,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    private readonly protocolService: ProtocolService
   ) {
     this.syncSchemeHandlers = {
       [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
@@ -156,7 +151,7 @@ export class SchemeRoutingProvider {
 
     // TODO: handle multiple messages
     const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
-    const protocol = getProtocolByIdentifier(deserializedSyncs[0].protocol)
+    const protocol = await this.protocolService.getProtocol(deserializedSyncs[0].protocol)
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       protocol,
       walletSync.publicKey,

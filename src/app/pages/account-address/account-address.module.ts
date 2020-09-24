@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -16,7 +17,8 @@ import { AccountAddressPage } from './account-address'
     FormsModule,
     ComponentsModule,
     TranslateModule,
-    RouterModule.forChild([{ path: '', component: AccountAddressPage }])
+    RouterModule.forChild([{ path: '', component: AccountAddressPage }]),
+    AirGapAngularCoreModule
   ],
   declarations: [AccountAddressPage]
 })

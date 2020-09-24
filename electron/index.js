@@ -15,10 +15,7 @@ let splashScreen = null
 let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
-const menuTemplate = [
-  { role: 'appMenu', submenu: [{ role: 'quit' }] },
-  { role: 'window', submenu: [{ role: 'minimize' }] }
-]
+const menuTemplate = [{ role: 'appMenu', submenu: [{ role: 'quit' }] }, { role: 'window', submenu: [{ role: 'minimize' }] }]
 const menuTemplateDev = [
   {
     role: 'appMenu',
