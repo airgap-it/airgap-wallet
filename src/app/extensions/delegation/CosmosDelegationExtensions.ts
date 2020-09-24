@@ -254,7 +254,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       .reduce((sum, next) => sum.plus(next.balance), new BigNumber(0))
 
     const delegateAction = await this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
-    const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
+    const undelegateAction = await this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
     const displayDetails = await this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
@@ -307,13 +307,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private createUndelegateAction(
+  private async createUndelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
-    const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
+  ): Promise<AirGapDelegatorAction | null> {
+    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
       protocol
     })
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
