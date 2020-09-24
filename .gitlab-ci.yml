@@ -43,7 +43,7 @@ build_android:
   tags:
     - docker
   variables:
-    LOCAL_ANDROID: "android-$CI_PIPELINE_ID"
+    LOCAL_ANDROID: 'android-$CI_PIPELINE_ID'
   script:
     - sed -i -e "s/versionName \"0.0.0\"/versionName \"$VERSION\"/g" android/app/build.gradle
     - docker build -f build/android/Dockerfile -t $GOOGLE_TAG_ANDROID_CURRENT --build-arg BUILD_NR="$CI_PIPELINE_ID" --build-arg VERSION="$VERSION" .
@@ -70,7 +70,7 @@ build_ios:
     - npm run disable-pure-getters
     - npm run configure-mangle
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
-    - ionic build --prod
+    - npx ionic build --prod
     - npx cap sync ios
     - xcodebuild -workspace ios/App/App.xcworkspace -scheme "App" -destination generic/platform=iOS -configuration Release archive -archivePath ios/AirGap\ Wallet.xcarchive MARKETING_VERSION=$VERSION CURRENT_PROJECT_VERSION=1.0.$CI_PIPELINE_ID -allowProvisioningUpdates
     - xcodebuild -exportArchive -archivePath ios/AirGap\ Wallet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ios/ -allowProvisioningUpdates
@@ -107,7 +107,7 @@ build_linux:
   tags:
     - docker
   variables:
-    LOCAL_LINUX: "linux-$CI_PIPELINE_ID"
+    LOCAL_LINUX: 'linux-$CI_PIPELINE_ID'
   script:
     - docker build -f build/electron/linux/Dockerfile -t $GOOGLE_TAG_ELECTRON_LINUX_CURRENT --build-arg VERSION="$VERSION" .
     - docker run --name $LOCAL_LINUX $GOOGLE_TAG_ELECTRON_LINUX_CURRENT echo "container ran."
@@ -125,7 +125,7 @@ build_windows:
   tags:
     - docker
   variables:
-    LOCAL_WINDOWS: "windows-$CI_PIPELINE_ID"
+    LOCAL_WINDOWS: 'windows-$CI_PIPELINE_ID'
   script:
     - docker build -f build/electron/windows/Dockerfile -t $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT --build-arg VERSION="$VERSION" .
     - docker run --name $LOCAL_WINDOWS $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT echo "container ran."
