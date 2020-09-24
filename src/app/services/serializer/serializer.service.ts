@@ -58,7 +58,15 @@ export class SerializerService {
   }
 
   public async serialize(chunks: IACMessageDefinitionObject[]): Promise<string[]> {
-    if (!this.useV2 && !chunks.some((chunk: IACMessageDefinitionObject) => chunk.protocol === MainProtocolSymbols.COSMOS)) {
+    if (
+      !this.useV2 &&
+      !chunks.some(
+        (chunk: IACMessageDefinitionObject) =>
+          chunk.protocol === MainProtocolSymbols.COSMOS ||
+          chunk.protocol === MainProtocolSymbols.KUSAMA ||
+          chunk.protocol === MainProtocolSymbols.POLKADOT
+      )
+    ) {
       return [await this.serializeV1(chunks[0])]
     } else {
       return this.serializeV2(chunks)
