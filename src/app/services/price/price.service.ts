@@ -184,13 +184,10 @@ export class PriceService implements AirGapWalletPriceService {
     }
 
     const marketSymbol = protocol.marketSymbol
-    console.log('cache', 'fetchMarketData', timeUnit, marketSymbol)
     // const uniqueId = `${timeUnit}_${marketSymbol}_${CachingServiceKey.PRICESAMPLES}`
 
     const pendingRequest = this.pendingMarketPriceOverTimeRequests[marketSymbol]
     if (pendingRequest) {
-      console.log('RETURNING PENDING PROMISE OVER TIME')
-
       return pendingRequest
     }
 

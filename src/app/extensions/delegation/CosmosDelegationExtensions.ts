@@ -253,8 +253,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
       .reduce((sum, next) => sum.plus(next.balance), new BigNumber(0))
 
-    const delegateAction = this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
-    const undelegateAction = this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
+    const delegateAction = await this.createDelegateAction(protocol, delegatorDetails, validator, availableBalance, delegatedAmount)
+    const undelegateAction = await this.createUndelegateAction(protocol, delegatorDetails, validator, delegatedAmount)
     const extraActions = await this.createExtraActions(protocol, delegatorDetails.availableActions, validator, rewards)
 
     const displayDetails = await this.createDisplayDetails(protocol, delegatedAmount, unbondingAmount, rewards)
@@ -266,19 +266,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     }
   }
 
-  private createDelegateAction(
+  private async createDelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     availableBalance: BigNumber,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
+  ): Promise<AirGapDelegatorAction | null> {
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
-    const delegatedFormatted = this.amountConverterPipe.transform(delegatedAmount, { protocol })
+    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
 
-    const maxDelegationFormatted = this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
+    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
 
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
@@ -307,13 +307,13 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     )
   }
 
-  private createUndelegateAction(
+  private async createUndelegateAction(
     protocol: CosmosProtocol,
     delegatorDetails: DelegatorDetails,
     validator: string,
     delegatedAmount: BigNumber
-  ): AirGapDelegatorAction | null {
-    const delegatedAmountFormatted = this.amountConverterPipe.transform(delegatedAmount, {
+  ): Promise<AirGapDelegatorAction | null> {
+    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
       protocol
     })
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
@@ -348,6 +348,11 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         10
       )
 
+      const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
+        minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
+        10
+      )
+
       const form = this.formBuilder.group({
         [ArgumentName.VALIDATOR]: validator,
         [ArgumentName.AMOUNT]: maxAmount.toString(),
@@ -355,7 +360,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
           maxAmountFormatted,
           Validators.compose([
             Validators.required,
-            Validators.min(new BigNumber(minAmount).shiftedBy(-protocol.decimals).toNumber()),
+            Validators.min(new BigNumber(minAmountFormatted).toNumber()),
             Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
             DecimalValidator.validate(protocol.decimals)
           ])
@@ -368,7 +373,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         label,
         description,
         args: [
-          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, {
+          this.createAmountWidget(ArgumentName.AMOUNT_CONTROL, maxAmountFormatted, minAmountFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.AMOUNT]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             }
@@ -421,7 +426,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       [ArgumentName.VALIDATOR]: validator
     })
 
-    const rewardsFormatted = this.amountConverterPipe.transform(rewards, {
+    const rewardsFormatted = await this.amountConverterPipe.transform(rewards, {
       protocol
     })
 

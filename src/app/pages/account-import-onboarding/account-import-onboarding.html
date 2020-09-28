@@ -19,16 +19,16 @@
     <p
       [innerHTML]="'account-import-onboarding.text' | translate: { protocolName: protocol.name }"
       class="ion-padding-horizontal"
-      *ngIf="!subProtocol && protocol"
+      *ngIf="protocol && !subProtocol"
     ></p>
     <p
       [innerHTML]="'account-import-onboarding.sub-protocol_text' | translate: { subProtocol: subProtocol.name !== protocol.name ? subProtocol.name : subProtocol.identifier, protocol: protocol.name }"
       class="ion-padding-horizontal"
-      *ngIf="subProtocol"
+      *ngIf="protocol && subProtocol"
     ></p>
 
     <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
-      <ion-slide class="ion-padding-horizontal" *ngIf="subProtocol">
+      <ion-slide class="ion-padding-horizontal" *ngIf="protocol && subProtocol">
         <div class="slide-zoom">
           <ion-row class="ion-align-items-center on-padding-bottom ion-margin-bottom sub-protocol__container">
             <ion-col size="5">
@@ -81,7 +81,7 @@
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
         </div>
       </ion-slide>
-      <ion-slide *ngIf="protocol" class="ion-padding-horizontal">
+      <ion-slide class="ion-padding-horizontal" *ngIf="protocol">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide4" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>

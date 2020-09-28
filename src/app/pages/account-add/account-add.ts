@@ -4,10 +4,12 @@ import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
@@ -105,6 +107,17 @@ export class AccountAddPage {
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+  }
+
+  private async init(): Promise<void> {
+    this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols())
+      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .map(coin => coin)
+
+    this.supportedSubAccountProtocols = Object.values(await this.protocolService.getActiveSubProtocols())
+      .map(entry => Object.values(entry))
+      .reduce((flatten: ICoinSubProtocol[], next: ICoinSubProtocol[]) => flatten.concat(next), [])
+      .filter((protocol: ICoinSubProtocol) => protocol.options.network.type === NetworkType.MAINNET)
   }
 
   private showImportInteractionSelection(protocol: ICoinProtocol) {
