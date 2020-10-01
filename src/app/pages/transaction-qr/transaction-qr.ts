@@ -44,7 +44,10 @@ export class TransactionQrPage {
       ) {
         this.aggregatedInfo = {
           numberOfTxs: this.airGapTxs.length,
-          totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+          totalAmount: this.airGapTxs
+            .map((tx: IAirGapTransaction) => new BigNumber(tx.amount))
+            .filter((amount: BigNumber) => !amount.isNaN())
+            .reduce((pv: BigNumber, cv: BigNumber) => pv.plus(cv), new BigNumber(0)),
           totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
         }
       }

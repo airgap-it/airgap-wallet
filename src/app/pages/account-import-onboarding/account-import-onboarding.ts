@@ -32,7 +32,7 @@ export class AccountImportOnboardingPage implements OnInit {
       }
     }
   }
-  public protocol: ICoinProtocol
+  public protocol: ICoinProtocol | undefined
   public subProtocol: ICoinProtocol | undefined
 
   public isBegin: boolean = true

@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
 import { Observable, ReplaySubject } from 'rxjs'
+import { Platform } from '@ionic/angular'
 
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -29,14 +30,18 @@ export class PortfolioPage {
 
   public wallets: Observable<AirGapMarketWallet[]>
   public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
+  public isDesktop: boolean = false
 
   constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    public platform: Platform
   ) {
+    this.isDesktop = !this.platform.is('hybrid')
+
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values

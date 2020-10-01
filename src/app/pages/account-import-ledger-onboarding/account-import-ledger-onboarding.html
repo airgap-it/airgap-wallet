@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
       </ion-buttons>
-      <ion-title>
+      <ion-title *ngIf="protocol">
         <span [innerHTML]="'account-import-ledger-onboarding.title' | translate: { protocolName: protocol.name }"></span>
       </ion-title>
     </ion-toolbar>
@@ -16,6 +16,7 @@
     <p
       [innerHTML]="'account-import-ledger-onboarding.text' | translate: { protocolName: protocol.name }"
       class="ion-padding-horizontal"
+      *ngIf="protocol"
     ></p>
     <ion-card class="ion-margin">
       <ion-card-content>
@@ -26,7 +27,7 @@
               <h3>{{ 'account-import-ledger-onboarding.status-card.connecting' | translate }}</h3>
             </ion-label>
           </ng-container>
-          <ng-container *ngIf="!isLoading && isSuccess !== undefined && !isSuccess">
+          <ng-container *ngIf="protocol && !isLoading && isSuccess !== undefined && !isSuccess">
             <ion-icon name="alert-circle-outline" slot="start" size="large" color="warning"></ion-icon>
             <ion-label class="ion-text-wrap">
               <h3>
@@ -50,14 +51,16 @@
       </ion-card-content>
     </ion-card>
     <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
-      <ion-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
-        <div class="slide-zoom">
-          <img [src]="'./assets/img/' + slide[0]" />
-          <ion-text>
-            <p class="ion-text-left" [innerHTML]="slide[1] | translate: { protocolName: protocol.name }"></p>
-          </ion-text>
-        </div>
-      </ion-slide>
+      <ng-container *ngIf="protocol">
+        <ion-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
+          <div class="slide-zoom">
+            <img [src]="'./assets/img/' + slide[0]" />
+            <ion-text>
+              <p class="ion-text-left" [innerHTML]="slide[1] | translate: { protocolName: protocol.name }"></p>
+            </ion-text>
+          </div>
+        </ion-slide>
+      </ng-container>
     </ion-slides>
   </ion-grid>
 </ion-content>

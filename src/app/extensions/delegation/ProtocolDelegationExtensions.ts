@@ -104,14 +104,14 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
     })
   }
 
-  protected createAmountWidget(id: string, maxValue: string, config: Partial<UIInputTextConfig> = {}): UIInputText {
+  protected createAmountWidget(id: string, maxValue?: string, minValue?: string, config: Partial<UIInputTextConfig> = {}): UIInputText {
     return new UIInputText({
       id,
       inputType: 'number',
       label: 'delegation-detail.amount_label',
       placeholder: '0.00',
-      defaultValue: maxValue,
-      toggleFixedValueButton: 'delegation-detail.max-amount_button',
+      defaultValue: maxValue || minValue,
+      toggleFixedValueButton: maxValue !== undefined ? 'delegation-detail.max-amount_button' : undefined,
       fixedValue: maxValue,
       errorLabel: 'delegation-detail.invalid-value_error',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {

@@ -25,6 +25,7 @@ export interface AirGapDelegatorAction {
   iconName?: string
   args?: UIInputWidget<any>[]
   description?: string
+  disabled?: boolean
 }
 
 export interface AirGapDelegateeDetails extends DelegateeDetails {
