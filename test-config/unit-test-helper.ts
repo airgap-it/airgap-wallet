@@ -1,4 +1,4 @@
-import { APP_CONFIG, PermissionsService } from '@airgap/angular-core'
+import { APP_CONFIG, PermissionsService, PERMISSIONS_PLUGIN } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -24,7 +24,15 @@ import {
   PlatformMock,
   ToastControllerMock
 } from './mocks-ionic'
-import { AppInfoMock, AppMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
+import {
+  AppInfoMock,
+  AppMock,
+  PermissionsMock,
+  PermissionsPluginMock,
+  PushNotificationsMock,
+  SplashScreenMock,
+  StatusBarMock
+} from './plugins-mock'
 import { PermissionsServiceMock } from './service-mock'
 import { StorageMock } from './storage-mock'
 
@@ -34,6 +42,7 @@ export class UnitHelper {
     appInfo: new AppInfoMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
+    permissionsPlugin: new PermissionsPluginMock(),
     permissionsProvider: new PermissionsServiceMock(),
     pushNotifications: new PushNotificationsMock(),
     statusBar: new StatusBarMock(),
@@ -70,6 +79,7 @@ export class UnitHelper {
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
       { provide: PermissionsService, useValue: this.mockRefs.permissionsProvider },
+      { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissionsPlugin },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },

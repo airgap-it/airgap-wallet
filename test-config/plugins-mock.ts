@@ -39,3 +39,6 @@ export class StatusBarMock {
   public setStyle: jasmine.Spy = newSpy('setStyle', Promise.resolve())
   public setBackgroundColor: jasmine.Spy = newSpy('setBackgroundColor', Promise.resolve())
 }
+export class PermissionsPluginMock {
+  public query: jasmine.Spy = newSpy('query', Promise.resolve())
+}
