@@ -77,7 +77,7 @@ RUN /app/android/gradlew --project-dir /app/android clean
 RUN /app/android/gradlew --project-dir /app/android build
 
 # copy release-apk
-RUN cp /app/android/app/build/outputs/apk/release/app-release-unsigned.apk android-release-unsigned.apk
+RUN cp /app/android/app/build/outputs/apk/playstore/release/app-playstore-release-unsigned.apk android-release-unsigned.apk
 
 RUN cp android-release-unsigned.apk android-debug.apk
 
