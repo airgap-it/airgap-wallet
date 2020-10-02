@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { MainProtocolSymbols, ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, ProtocolSymbols } from 'airgap-coin-lib'
 
 import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
 

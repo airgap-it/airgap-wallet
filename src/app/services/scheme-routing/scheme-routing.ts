@@ -40,8 +40,6 @@ export class SchemeRoutingProvider {
     private readonly protocolService: ProtocolService
   ) {
     this.syncSchemeHandlers = {
-      [IACMessageType.MetadataRequest]: this.syncTypeNotSupportedAlert.bind(this),
-      [IACMessageType.MetadataResponse]: this.syncTypeNotSupportedAlert.bind(this),
       [IACMessageType.AccountShareRequest]: this.syncTypeNotSupportedAlert.bind(this),
       [IACMessageType.AccountShareResponse]: this.handleWalletSync.bind(this),
       [IACMessageType.TransactionSignRequest]: this.syncTypeNotSupportedAlert.bind(this),
