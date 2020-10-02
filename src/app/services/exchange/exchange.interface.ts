@@ -1,4 +1,4 @@
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ProtocolSymbols } from 'airgap-coin-lib'
 
 export type ExchangeIdentifier = string
 

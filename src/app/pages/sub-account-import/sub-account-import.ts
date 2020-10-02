@@ -2,7 +2,7 @@ import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ProtocolSymbols } from 'airgap-coin-lib'
 import { map } from 'rxjs/operators'
 import { PriceService } from 'src/app/services/price/price.service'
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { ExchangeTransaction } from '../exchange/exchange'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ProtocolSymbols } from 'airgap-coin-lib'
 import { Network } from '@airgap/beacon-sdk'
 
 export type BeaconRequest = [string, any, ICoinProtocol]
