@@ -1,11 +1,9 @@
-import { MainProtocolSymbols, FeaturedSubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
-import { ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -27,6 +25,14 @@ export class AccountAddPage {
   public filteredFeaturedSubAccountProtocols: ICoinProtocol[] = []
   public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
 
+  private featuredSubProtocols: SubProtocolSymbols[] = [
+    SubProtocolSymbols.XTZ_KT,
+    SubProtocolSymbols.XTZ_BTC,
+    SubProtocolSymbols.XTZ_USD,
+    SubProtocolSymbols.XTZ_STKR,
+    SubProtocolSymbols.ETH_ERC20_XCHF
+  ]
+
   constructor(
     private readonly platform: Platform,
     private readonly accountProvider: AccountProvider,
@@ -44,10 +50,11 @@ export class AccountAddPage {
     )
 
     this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(protocol =>
-      Object.values(FeaturedSubProtocolSymbols).includes(protocol.identifier.toLowerCase() as FeaturedSubProtocolSymbols)
+      this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
     )
+
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
-      protocol => !Object.values(FeaturedSubProtocolSymbols).includes(protocol.identifier.toLowerCase() as FeaturedSubProtocolSymbols)
+      protocol => !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
     )
     this.filterProtocols()
   }
@@ -107,17 +114,6 @@ export class AccountAddPage {
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
       this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
-  }
-
-  private async init(): Promise<void> {
-    this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols())
-      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
-      .map(coin => coin)
-
-    this.supportedSubAccountProtocols = Object.values(await this.protocolService.getActiveSubProtocols())
-      .map(entry => Object.values(entry))
-      .reduce((flatten: ICoinSubProtocol[], next: ICoinSubProtocol[]) => flatten.concat(next), [])
-      .filter((protocol: ICoinSubProtocol) => protocol.options.network.type === NetworkType.MAINNET)
   }
 
   private showImportInteractionSelection(protocol: ICoinProtocol) {

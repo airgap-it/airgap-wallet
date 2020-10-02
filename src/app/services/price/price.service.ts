@@ -163,7 +163,8 @@ export class PriceService implements AirGapWalletPriceService {
           .get<{ data: { usd: string }[] }>(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`)
           .toPromise()
           .then(({ data }: { data: { usd: string }[] }) => {
-            resolve(new BigNumber(data[id].usd))
+            const price = data !== undefined ? new BigNumber(data[id].usd) : new BigNumber(0)
+            resolve(price)
           })
           .catch(coinGeckoError => {
             console.error(coinGeckoError)

@@ -55,7 +55,6 @@ export class SubAccountAddPage {
       this.actionCallback = info.actionCallback
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
-      console.log('info', info)
     }
 
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
@@ -108,7 +107,6 @@ export class SubAccountAddPage {
   }
 
   public async doInfinite(event) {
-    console.log('doInfinite')
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
@@ -121,7 +119,6 @@ export class SubAccountAddPage {
     const newSubProtocols = subProtocols.slice(this.PROTOCOLS_LOADED, this.PROTOCOLS_LOADED + this.LIMIT)
     if (newSubProtocols.length < this.LIMIT) {
       this.infiniteEnabled = false
-      console.log('INFINITE DISABLED')
     }
     newSubProtocols.forEach((subProtocol: ICoinSubProtocol) => {
       const wallet: AirGapMarketWallet = new AirGapMarketWallet(
