@@ -1,4 +1,4 @@
-import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { SubProtocolSymbols } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ICoinProtocol } from 'airgap-coin-lib'

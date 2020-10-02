@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core'
 import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AppPlugin } from '@capacitor/core'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, generateId, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { serializedDataToUrlString } from '../../utils/utils'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
@@ -102,12 +102,13 @@ export class DeepLinkProvider {
 
     const serializedTx: string[] = await this.serializerService.serialize([
       {
+        id: generateId(10),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
           transaction: rawUnsignedTx as any,
-          callback: 'airgap-wallet://?d='
+          callbackURL: 'airgap-wallet://?d='
         }
       }
     ])

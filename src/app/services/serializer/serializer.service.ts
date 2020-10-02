@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { IACMessageDefinitionObject, Serializer } from 'airgap-coin-lib'
+import { generateId, IACMessageDefinitionObject, Serializer } from 'airgap-coin-lib'
 import { DeserializedSyncProtocol, SyncProtocolUtils } from 'airgap-coin-lib/dist/serializer/v1/serializer'
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols } from 'airgap-coin-lib'
 
 import { parseIACUrl } from '../../utils/utils'
 import { SettingsKey, StorageProvider } from '../storage/storage'
@@ -104,6 +104,7 @@ export class SerializerService {
     const deserialized: DeserializedSyncProtocol = await this.syncProtocolUtils.deserialize(chunk)
 
     const iacMessage: IACMessageDefinitionObject = {
+      id: generateId(10),
       type: this.v1Tov2Mapping.get(deserialized.type),
       protocol: deserialized.protocol,
       payload: deserialized.payload as any
