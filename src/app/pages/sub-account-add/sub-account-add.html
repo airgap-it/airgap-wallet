@@ -6,6 +6,9 @@
       </ion-buttons>
       <ion-title>{{ 'add-sub-account.title' | translate: { typeLabel: typeLabel | translate } }}</ion-title>
     </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar [(ngModel)]="searchTerm" (ionChange)="setFilteredItems(searchTerm)"></ion-searchbar>
+    </ion-toolbar>
   </ion-grid>
 </ion-header>
 <ion-content class="ion-padding">
@@ -37,6 +40,9 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button shape="round" (click)="addSubAccounts()" color="secondary" [disabled]="!subAccounts.length">

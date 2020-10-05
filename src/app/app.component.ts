@@ -16,6 +16,7 @@ import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import {
   AirGapMarketWallet,
+  generateId,
   IACMessageType,
   IAirGapTransaction,
   TezblockBlockExplorer,
@@ -160,12 +161,13 @@ export class AppComponent implements AfterViewInit {
 
     const serializedTx: string[] = await this.serializerService.serialize([
       {
+        id: generateId(10),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
           transaction: rawUnsignedTx as any,
-          callback: 'airgap-wallet://?d='
+          callbackURL: 'airgap-wallet://?d='
         }
       }
     ])

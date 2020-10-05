@@ -98,6 +98,10 @@
     "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
     "add-coins_label": "Add Coins"
   },
+  "account-add": {
+    "featured": "Featured",
+    "others": "Others"
+  },
   "scan": {
     "title": "Scan QR",
     "text": "Scan a sync QR to add an account or scan a transaction QR to confirm and send it.",

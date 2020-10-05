@@ -1,4 +1,4 @@
-import { PERMISSIONS_PLUGIN, PermissionStatus } from '@airgap/angular-core'
+import { PERMISSIONS_PLUGIN, PermissionStatus, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
 import {
   PermissionResult,
@@ -36,6 +36,7 @@ export class PushProvider {
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
     @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
+    @Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
@@ -45,8 +46,9 @@ export class PushProvider {
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
+    const isSupported = await this.isSupported()
 
-    if (!this.platform.is('hybrid')) {
+    if (!isSupported) {
       return
     }
 
@@ -59,6 +61,11 @@ export class PushProvider {
 
   public async setupPush() {
     await this.platform.ready()
+    const isSupported = await this.isSupported()
+
+    if (!isSupported) {
+      return
+    }
 
     if (this.platform.is('android')) {
       this.register()
@@ -183,5 +190,10 @@ export class PushProvider {
       default:
         throw new Error('Unknown permission type')
     }
+  }
+
+  private async isSupported(): Promise<boolean> {
+    const info = await this.appInfoPlugin.get()
+    return this.platform.is('ios') || (this.platform.is('android') && info.productFlavor !== 'fdroid')
   }
 }

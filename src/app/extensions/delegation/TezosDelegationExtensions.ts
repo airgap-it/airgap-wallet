@@ -126,8 +126,11 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   private async getExtraBakerDetails(protocol: TezosProtocol, bakerDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
-    const [bakerInfo, knownBakers] = await Promise.all([protocol.bakerInfo(bakerDetails.address), this.getKnownBakers()])
-
+    const [bakerInfo, delegateeDetails, knownBakers] = await Promise.all([
+      protocol.bakerInfo(bakerDetails.address),
+      protocol.getDelegateeDetails(bakerDetails.address),
+      this.getKnownBakers()
+    ])
     const knownBaker = knownBakers[bakerDetails.address]
     const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
 
@@ -140,9 +143,9 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
 
     let status: string
-    if (bakerInfo.bakingActive && bakerUsage.lt(1)) {
+    if (delegateeDetails.status && bakerUsage.lt(1)) {
       status = 'delegation-detail-tezos.status.accepts-delegation'
-    } else if (bakerInfo.bakingActive) {
+    } else if (delegateeDetails.status === 'Active') {
       status = 'delegation-detail-tezos.status.reached-full-capacity'
     } else {
       status = 'delegation-detail-tezos.status.deactivated'
@@ -178,15 +181,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
   }
 
-  public async getRewardDisplayDetails(
-    protocol: TezosProtocol,
-    delegator: string,
-    delegatees: string[]
-  ): Promise<UIRewardList | undefined> {
-    const delegationDetails = await protocol.getDelegationDetailsFromAddress(delegator, delegatees)
-    const delegatorExtraInfo = await protocol.getDelegationInfo(delegationDetails.delegator.address)
+  public async getRewardDisplayDetails(protocol: TezosProtocol, delegator: string): Promise<UIRewardList | undefined> {
+    const delegatorExtraInfo = await protocol.getDelegationInfo(delegator)
 
-    return this.createDelegatorDisplayRewards(protocol, delegationDetails.delegator.address, delegatorExtraInfo).catch(() => undefined)
+    return this.createDelegatorDisplayRewards(protocol, delegator, delegatorExtraInfo).catch(() => undefined)
   }
 
   private createDelegateeDisplayDetails(protocol: TezosProtocol, baker?: TezosBakerDetails): UIWidget[] {

@@ -25,7 +25,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000

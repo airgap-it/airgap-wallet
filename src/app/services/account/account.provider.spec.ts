@@ -1,4 +1,10 @@
-import { MainProtocolStoreService, PermissionsService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
+import {
+  APP_INFO_PLUGIN,
+  MainProtocolStoreService,
+  PermissionsService,
+  ProtocolService,
+  SubProtocolStoreService
+} from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol } from 'airgap-coin-lib'
 import { take } from 'rxjs/operators'
@@ -25,6 +31,7 @@ describe('AccountProvider', () => {
       unitHelper.testBed({
         providers: [
           { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
           { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
           { provide: ProtocolService, useValue: protocolService }
         ]
