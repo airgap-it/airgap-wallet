@@ -19,7 +19,9 @@
     <h3 class="ion-padding-bottom ion-no-margin" [innerHTML]="'interaction-selection.heading' | translate"></h3>
     <ion-row class="ion-no-padding">
       <ion-col size="12" size-md="6">
-        <ion-row class="ion-justify-content-center"><img src="./assets/img/sign-one-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center">
+          <img src="./assets/img/sign-one-device.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">
@@ -30,7 +32,9 @@
           </ion-col>
         </ion-row>
 
-        <ion-row class="ion-justify-content-center ion-padding-top"><img src="./assets/img/sign-two-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center ion-padding-top">
+          <img src="./assets/img/sign-two-device.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">
@@ -50,7 +54,10 @@
     <h3 class="ion-padding-bottom ion-no-margin" [innerHTML]="'interaction-selection-desktop.heading' | translate"></h3>
     <ion-row class="ion-no-padding">
       <ion-col size="12" size-md="6">
-        <ion-row class="ion-justify-content-center ion-padding-top"><img src="./assets/img/sign-two-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center ion-padding-top">
+          <img *ngIf="!isDesktop" src="./assets/img/sign-two-device.svg" />
+          <img *ngIf="isDesktop" src="./assets/img/signer-vault-desktop.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">

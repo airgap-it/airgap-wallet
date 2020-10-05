@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
 import { AlertController, LoadingController } from '@ionic/angular'
@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { isString } from 'util'
 
 @Component({
   selector: 'page-ledger-sign',
@@ -76,6 +75,7 @@ export class LedgerSignPage {
     try {
       const signedTx = await this.ledgerService.signTransaction(this.wallet.protocol.identifier, this.unsignedTx)
       const signedTransactionSync: IACMessageDefinitionObject = {
+        id: generateId(10),
         type: IACMessageType.MessageSignResponse,
         protocol: this.wallet.protocol.identifier,
         payload: {
@@ -98,7 +98,7 @@ export class LedgerSignPage {
 
   private async promptError(error: unknown) {
     let message: string
-    if (isString(error)) {
+    if (typeof error === 'string') {
       if (error === 'Rejected') {
         return
       }

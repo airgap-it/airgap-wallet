@@ -4,7 +4,7 @@ import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -15,6 +15,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { SettingsKey, StorageProvider } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 enum ExchangePageState {
   LOADING,
@@ -249,7 +250,12 @@ export class ExchangePage {
   private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
     return this.accountProvider
       .getWalletList()
-      .filter(wallet => wallet.protocol.identifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
+      .filter(
+        wallet =>
+          wallet.protocol.identifier === protocol &&
+          wallet.protocol.options.network.type === NetworkType.MAINNET &&
+          (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0))
+      )
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {

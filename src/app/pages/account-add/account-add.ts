@@ -1,14 +1,13 @@
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { ICoinProtocol } from 'airgap-coin-lib'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
@@ -20,34 +19,43 @@ import { AccountImportInteractionType } from '../account-import-interaction-sele
 export class AccountAddPage {
   public searchTerm: string = ''
   public supportedAccountProtocols: ICoinProtocol[] = []
-  public supportedSubAccountProtocols: ICoinProtocol[] = []
+  public featuredSubAccountProtocols: ICoinProtocol[] = []
+  public otherSubAccountProtocols: ICoinProtocol[] = []
   public filteredAccountProtocols: ICoinProtocol[] = []
-  public filteredSubAccountProtocols: ICoinProtocol[] = []
+  public filteredFeaturedSubAccountProtocols: ICoinProtocol[] = []
+  public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
+
+  private featuredSubProtocols: SubProtocolSymbols[] = [
+    SubProtocolSymbols.XTZ_KT,
+    SubProtocolSymbols.XTZ_BTC,
+    SubProtocolSymbols.XTZ_USD,
+    SubProtocolSymbols.XTZ_STKR,
+    SubProtocolSymbols.ETH_ERC20_XCHF
+  ]
 
   constructor(
     private readonly platform: Platform,
     private readonly accountProvider: AccountProvider,
     private readonly protocolService: ProtocolService,
     private readonly router: Router,
-    private readonly dataService: DataService,
-    private readonly ledgerService: LedgerService
-  ) {
-    this.supportedAccountProtocols = supportedProtocols()
-      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
-      .map(coin => coin)
-    this.supportedSubAccountProtocols = supportedProtocols()
-      .filter((protocol: ICoinProtocol) => protocol.options.network.type === NetworkType.MAINNET)
-      .reduce((pv, cv) => {
-        if (cv.subProtocols) {
-          const subProtocols = cv.subProtocols.filter(
-            subProtocol => subProtocol.subProtocolType === SubProtocolType.TOKEN && this.protocolService.isProtocolActive(subProtocol)
-          )
+    private readonly ledgerService: LedgerService,
+    private readonly dataService: DataService
+  ) {}
 
-          return pv.concat(...subProtocols)
-        }
+  public async ionViewWillEnter() {
+    this.supportedAccountProtocols = await this.protocolService.getActiveProtocols()
+    const supportedSubAccountProtocols = Array.prototype.concat.apply(
+      [],
+      await Promise.all(Object.values(MainProtocolSymbols).map(protocol => this.protocolService.getSubProtocols(protocol)))
+    )
 
-        return pv
-      }, [])
+    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(protocol =>
+      this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+    )
+
+    this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
+      protocol => !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+    )
     this.filterProtocols()
   }
 
@@ -57,10 +65,14 @@ export class AccountAddPage {
 
   public filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
+
     this.filteredAccountProtocols = this.supportedAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
-    this.filteredSubAccountProtocols = this.supportedSubAccountProtocols.filter(
+    this.filteredFeaturedSubAccountProtocols = this.featuredSubAccountProtocols.filter(
+      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+    )
+    this.filteredOtherSubAccountProtocols = this.otherSubAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
   }
@@ -91,7 +103,7 @@ export class AccountAddPage {
       }
 
       this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(err => console.error(err))
     } else {
       const info = {
         mainProtocolIdentifier: mainProtocolIdentifier,

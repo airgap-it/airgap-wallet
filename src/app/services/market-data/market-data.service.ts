@@ -8,7 +8,7 @@ import * as cryptocompare from 'cryptocompare'
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
 import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
-import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { SubProtocolSymbols } from 'airgap-coin-lib'
 
 export interface BalanceAtTimestampObject {
   timestamp: number
@@ -143,8 +143,9 @@ export class MarketDataService {
                 allWalletValues[idx]['balance'] = walletValue.balance
               }
               allWalletValues[idx]['timestamp'] = walletValue.timestamp
+            } else {
+              allWalletValues[idx] = { timestamp: walletValue.timestamp, balance: walletValue.balance }
             }
-            allWalletValues[idx] = { timestamp: walletValue.timestamp, balance: walletValue.balance }
           }
         })
       }

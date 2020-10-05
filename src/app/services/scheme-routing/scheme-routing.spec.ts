@@ -3,12 +3,13 @@ import { TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { APP_INFO_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
 import { PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { AppInfoProvider } from '../app-info/app-info'
 
 import { SchemeRoutingProvider } from './scheme-routing'
 
@@ -34,6 +35,8 @@ describe('SchemeRoutingProvider Provider', () => {
         providers: [
           SchemeRoutingProvider,
           { provide: Storage, useClass: StorageMock },
+          { provide: AppInfoProvider },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
           { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
           { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },

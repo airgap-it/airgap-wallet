@@ -1,16 +1,18 @@
-import { Injectable, Inject } from '@angular/core'
+import { Inject, Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
+import { AndroidFlavor, AppInfoPlugin } from 'src/app/capacitor-plugins/definitions'
 import { APP_INFO_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { AppInfoPlugin } from 'src/app/capacitor-plugins/definitions'
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppInfoProvider {
-  public appName = 'APP_NAME'
-  public packageName = 'PACKAGE_NAME'
-  public versionNumber = 'VERSION_NUMBER'
+  public appName: string = 'APP_NAME'
+  public packageName: string = 'PACKAGE_NAME'
+  public versionNumber: string = 'VERSION_NUMBER'
   public versionCode: string | number = 'VERSION_CODE'
+
+  public androidFlavor: AndroidFlavor | undefined
 
   private isInitialized: boolean = false
 
@@ -25,33 +27,40 @@ export class AppInfoProvider {
       this.packageName = appInfo.packageName
       this.versionNumber = appInfo.versionName
       this.versionCode = appInfo.versionCode
+      this.androidFlavor = appInfo.productFlavor
     }
 
     this.isInitialized = true
   }
 
-  public async getAppName() {
+  public async getAppName(): Promise<string> {
     await this.init()
 
     return this.appName
   }
 
-  public async getPackageName() {
+  public async getPackageName(): Promise<string> {
     await this.init()
 
     return this.packageName
   }
 
-  public async getVersionNumber() {
+  public async getVersionNumber(): Promise<string> {
     await this.init()
 
     return this.versionNumber
   }
 
-  public async getVersionCode() {
+  public async getVersionCode(): Promise<string | number> {
     await this.init()
 
     return this.versionCode
+  }
+
+  public async getAndroidFlavor(): Promise<AndroidFlavor | undefined> {
+    await this.init()
+
+    return this.androidFlavor
   }
 
   private async init(): Promise<void> {

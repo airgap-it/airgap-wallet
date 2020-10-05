@@ -5,7 +5,7 @@ import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubProtocolType, ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
 import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols } from 'airgap-coin-lib'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
@@ -27,12 +27,21 @@ export class SubAccountAddPage {
 
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
+
   public actionCallback: (context: AddTokenActionContext) => void
 
   public subProtocolType: SubProtocolType
   public subProtocolTypes: typeof SubProtocolType = SubProtocolType
 
   public typeLabel: string = ''
+  private subProtocols: ICoinSubProtocol[]
+  private filteredSubProtocols: ICoinSubProtocol[]
+
+  private LIMIT: number = 10
+  private PROTOCOLS_LOADED: number = 0
+  public searchTerm: string = ''
+
+  public infiniteEnabled: boolean = false
 
   constructor(
     private readonly navController: NavController,
@@ -46,7 +55,6 @@ export class SubAccountAddPage {
       this.actionCallback = info.actionCallback
       this.subProtocolType = info.subProtocolType
       this.wallet = info.wallet
-      console.log('info', info)
     }
 
     if (this.subProtocolType === SubProtocolType.ACCOUNT) {
@@ -73,8 +81,46 @@ export class SubAccountAddPage {
   private async initWithTokenSubProtocol(): Promise<void> {
     this.typeLabel = 'add-sub-account.tokens_label'
 
-    const subProtocols: ICoinSubProtocol[] = await this.protocolService.getSubProtocols(this.wallet.protocol)
-    subProtocols.forEach((subProtocol: ICoinSubProtocol) => {
+    this.subProtocols = await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)
+    this.infiniteEnabled = true
+    this.loadSubAccounts()
+  }
+
+  public setFilteredItems(searchTerm: string): void {
+    this.subAccounts = []
+    if (searchTerm.length === 0) {
+      this.filteredSubProtocols = this.subProtocols
+      this.infiniteEnabled = true
+      this.loadSubAccounts()
+    } else {
+      this.filteredSubProtocols = this.subProtocols.filter((protocol: ICoinSubProtocol) => {
+        const searchTermLowerCase: string = searchTerm.toLowerCase()
+        const hasMatchingName: boolean = protocol.name.toLowerCase().includes(searchTermLowerCase)
+        const hasMatchingSymbol: boolean = protocol.symbol.toLowerCase().includes(searchTermLowerCase)
+
+        return hasMatchingName || hasMatchingSymbol
+      })
+      this.infiniteEnabled = false
+      this.PROTOCOLS_LOADED = 0
+      this.loadSubAccounts(true)
+    }
+  }
+
+  public async doInfinite(event) {
+    if (!this.infiniteEnabled) {
+      return event.target.complete()
+    }
+    await this.loadSubAccounts()
+    event.target.complete()
+  }
+
+  private async loadSubAccounts(filtered: boolean = false) {
+    const subProtocols = filtered ? [...this.filteredSubProtocols] : [...this.subProtocols]
+    const newSubProtocols = subProtocols.slice(this.PROTOCOLS_LOADED, this.PROTOCOLS_LOADED + this.LIMIT)
+    if (newSubProtocols.length < this.LIMIT) {
+      this.infiniteEnabled = false
+    }
+    newSubProtocols.forEach((subProtocol: ICoinSubProtocol) => {
       const wallet: AirGapMarketWallet = new AirGapMarketWallet(
         subProtocol,
         this.wallet.publicKey,
@@ -93,5 +139,6 @@ export class SubAccountAddPage {
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
       }
     })
+    this.PROTOCOLS_LOADED += this.LIMIT
   }
 }
