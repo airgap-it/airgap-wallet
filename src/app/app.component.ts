@@ -86,18 +86,14 @@ export class AppComponent implements AfterViewInit {
 
         this.pushProvider.initPush()
       ])
-    }
 
-    this.appInfo
-      .get()
-      .then((appInfo: { appName: string; packageName: string; versionName: string; versionCode: number }) => {
-        if (this.platform.is('hybrid')) {
+      this.appInfo
+        .get()
+        .then((appInfo: { appName: string; packageName: string; versionName: string; versionCode: number }) => {
           setSentryRelease(`app_${appInfo.versionName}`)
-        } else {
-          setSentryRelease(`browser_${appInfo.versionName}`) // TODO: Set version in CI once we have browser version
-        }
-      })
-      .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
+        })
+        .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
+    }
 
     let userId: string = await this.storageProvider.get(WalletStorageKey.USER_ID)
     if (!userId) {

@@ -193,7 +193,11 @@ export class PushProvider {
   }
 
   private async isSupported(): Promise<boolean> {
-    const info = await this.appInfoPlugin.get()
-    return this.platform.is('ios') || (this.platform.is('android') && info.productFlavor !== 'fdroid')
+    if (this.platform.is('hybrid')) {
+      const info = await this.appInfoPlugin.get()
+      return this.platform.is('ios') || (this.platform.is('android') && info.productFlavor !== 'fdroid')
+    } else {
+      return false
+    }
   }
 }

@@ -129,6 +129,9 @@ export class MarketDataService {
           { publicKey: wallet.publicKey, key: CachingServiceKey.TRANSACTIONS },
           transactionResultsByWallet[index]
         )
+        if (wallet.currentBalance === undefined) {
+          await wallet.synchronize()
+        }
         const walletValues = await this.fetchValuesAtTimestampSingleWallet(
           wallet,
           priceSamples[index],
