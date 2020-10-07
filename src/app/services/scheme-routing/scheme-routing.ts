@@ -12,6 +12,7 @@ import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { SettingsKey, StorageProvider } from '../storage/storage'
 import { ProtocolService } from '@airgap/angular-core'
+import { Serializer } from '@airgap/beacon-sdk'
 
 export enum IACResult {
   SUCCESS = 0,
@@ -103,9 +104,7 @@ export class SchemeRoutingProvider {
   ): Promise<IACResult> {
     this.router = router
 
-    // Check if it's a beacon request
-    try {
-      const json = JSON.parse(typeof data === 'string' ? data : data[0])
+    const tryHandleBeacon = async (json: any) => {
       if (json.publicKey && json.relayServer) {
         console.log('Beacon Pairing QR scanned', json)
         await this.beaconService.addPeer({
@@ -115,7 +114,28 @@ export class SchemeRoutingProvider {
           version: json.version
         })
       }
+    }
+    // Check if it's a beacon request
+    try {
+      const json = JSON.parse(typeof data === 'string' ? data : data[0])
+      await tryHandleBeacon(json)
+
+      return IACResult.SUCCESS
     } catch (e) {
+      try {
+        const payload = typeof data === 'string' ? data : data[0]
+        if (payload.includes('tezos://')) {
+          const params = new URL(payload).searchParams
+          if (params && params.get('type') === 'tzip10') {
+            const json = await new Serializer().deserialize(params.get('data'))
+            await tryHandleBeacon(json)
+
+            return IACResult.SUCCESS
+          }
+        }
+      } catch (err) {
+        //
+      }
       //
     }
 
