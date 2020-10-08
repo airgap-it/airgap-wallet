@@ -1,4 +1,4 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -12,7 +12,6 @@ import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { PriceService } from 'src/app/services/price/price.service'
 
-import { ClipboardService } from '../../services/clipboard/clipboard'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

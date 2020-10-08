@@ -1,4 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { ClipboardService, ProtocolService } from '@airgap/angular-core'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
@@ -12,7 +12,6 @@ import { ButtonAction } from 'src/app/models/actions/ButtonAction'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
-import { ClipboardService } from '../../services/clipboard/clipboard'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 

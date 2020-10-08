@@ -6,7 +6,7 @@ import { ProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
@@ -53,7 +53,7 @@ export class ExchangeProvider implements Exchange {
 
   constructor(
     public http: HttpClient,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageService: WalletStorageService,
     private readonly protocolService: ProtocolService
   ) {
     this.loadPendingTranscationsFromStorage()
@@ -177,11 +177,11 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
+    return this.storageService.set(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
+    const pendingTransactions = (await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }
