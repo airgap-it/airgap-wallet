@@ -1,7 +1,8 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = require('electron')
 const isDevMode = require('electron-is-dev')
 const { CapacitorSplashScreen, configCapacitor } = require('@capacitor/electron')
 
+const childProcess = require('child_process')
 const path = require('path')
 
 // Place holders for our windows so they don't get garbage collected.
@@ -14,18 +15,13 @@ let splashScreen = null
 let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
+const menuTemplate = [{ role: 'appMenu', submenu: [{ role: 'quit' }] }, { role: 'window', submenu: [{ role: 'minimize' }] }]
 const menuTemplateDev = [
   {
-    label: 'Options',
-    submenu: [
-      {
-        label: 'Open Dev Tools',
-        click() {
-          mainWindow.openDevTools()
-        }
-      }
-    ]
-  }
+    role: 'appMenu',
+    submenu: [{ role: 'toggleDevTools' }, { role: 'quit' }]
+  },
+  { role: 'window', submenu: [{ role: 'minimize' }] }
 ]
 
 async function createWindow() {
@@ -59,6 +55,22 @@ async function createWindow() {
       mainWindow.show()
     })
   }
+
+  if (!isDevMode) {
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
+  }
+
+  mainWindow.on('focus', () => {
+    globalShortcut.registerAll(['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'], () => {})
+  })
+
+  mainWindow.on('blur', () => {
+    globalShortcut.unregisterAll()
+  })
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
 }
 
 // This method will be called when Electron has finished
@@ -71,6 +83,10 @@ app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    for (const [_, child] of childProcesses) {
+      child.kill()
+    }
+
     app.quit()
   }
 })
@@ -84,3 +100,58 @@ app.on('activate', function() {
 })
 
 // Define any IPC or other custom functionality below here
+const processPaths = new Map([['ledger', path.join(__dirname, 'ledger-transport.js')]])
+
+const childProcesses = new Map()
+const callbacks = new Map()
+
+ipcMain.on('spawn-process', function(event, requestId, name) {
+  const child = childProcesses.get(name)
+  const reply = child ? child.pid : spawnProcess(name)
+
+  event.reply('spawn-process-reply', requestId, reply)
+})
+
+ipcMain.on('send-to-child', function(event, requestId, name, type, data) {
+  const child = childProcesses.get(name)
+  if (!child) {
+    event.reply('send-to-child-reply', requestId, { error: 'Process is not running.' })
+  } else {
+    callbacks.set(requestId, message => {
+      event.reply('send-to-child-reply', message.requestId, message.data)
+    })
+
+    child.send({
+      requestId,
+      type,
+      data
+    })
+  }
+})
+
+function spawnProcess(name) {
+  const params = []
+  const options = {
+    stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+  }
+
+  const path = processPaths.get(name)
+
+  if (path) {
+    const child = childProcess.fork(path, params, options)
+    child.on('message', message => {
+      const callback = callbacks.get(message.requestId)
+
+      if (callback) {
+        callback(message)
+        callbacks.delete(message.requestId)
+      }
+    })
+
+    childProcesses.set(name, child)
+
+    return child.pid
+  } else {
+    return { error: 'Unknown process name.' }
+  }
+}

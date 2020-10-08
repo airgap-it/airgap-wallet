@@ -1,8 +1,9 @@
+import { APP_PLUGIN } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
 import { AppPlugin, BrowserPlugin } from '@capacitor/core'
 import { Platform } from '@ionic/angular'
 
-import { APP_PLUGIN, BROWSER_PLUGIN } from '../../capacitor-plugins/injection-tokens'
+import { BROWSER_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'

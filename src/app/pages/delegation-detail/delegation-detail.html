@@ -6,8 +6,8 @@
       </ion-buttons>
       <ion-title>{{ "delegation-detail.title" | translate: { delegateeLabel: (delegateeLabel | translate) } }}</ion-title>
       <ion-buttons slot="end">
-        <ion-button (click)="presentEditPopover($event)" color="secondary">
-          <ion-icon *ngIf="showOverflowMenu" name="ellipsis-vertical-outline"></ion-icon>
+        <ion-button *ngIf="showOverflowMenu" (click)="presentEditPopover($event)" color="secondary">
+          <ion-icon name="ellipsis-vertical-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
@@ -77,9 +77,9 @@
           <ion-col size="6" class="ion-no-padding ion-text-right">
             <small *ngIf="(delegateeDetails$ | async); else delegateeUsageDetailsSkeleton">
               <span *ngIf="(delegateeDetails$ | async).usageDetails">
-                {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocolIdentifier:
-                wallet.protocol.identifier, maxDigits: 3 } }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() |
-                amountConverter: { protocolIdentifier: wallet.protocol.identifier, maxDigits: 3 } }}
+                {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocol: wallet.protocol, maxDigits: 3 }
+                | async }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() | amountConverter: { protocol: wallet.protocol,
+                maxDigits: 3 } | async }}
               </span>
             </small>
             <ng-template #delegateeUsageDetailsSkeleton>
@@ -120,6 +120,12 @@
             </ion-item>
           </ion-card>
         </ng-template>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-padding-horizontal" *ngIf="delegationAlertWidgets">
+      <ion-col size="12">
+        <widget-alert *ngFor="let widget of delegationAlertWidgets" [widget]="widget"></widget-alert>
       </ion-col>
     </ion-row>
 

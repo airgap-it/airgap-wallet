@@ -1,11 +1,12 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
-import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { IAirGapTransaction } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
@@ -50,7 +51,11 @@ export class ExchangeProvider implements Exchange {
 
   private pendingTransactions: ExchangeTransaction[] = []
 
-  constructor(public http: HttpClient, private readonly storageProvider: StorageProvider) {
+  constructor(
+    public http: HttpClient,
+    private readonly storageService: WalletStorageService,
+    private readonly protocolService: ProtocolService
+  ) {
     this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
@@ -141,8 +146,11 @@ export class ExchangeProvider implements Exchange {
     this.persist()
   }
 
-  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: ProtocolSymbols): IAirGapTransaction[] {
-    const protocol = getProtocolByIdentifier(protocolIdentifier)
+  public async formatExchangeTxs(
+    pendingExchangeTxs: ExchangeTransaction[],
+    protocolIdentifier: ProtocolSymbols
+  ): Promise<IAirGapTransaction[]> {
+    const protocol = await this.protocolService.getProtocol(protocolIdentifier)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
       const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()
@@ -169,11 +177,11 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
+    return this.storageService.set(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
+    const pendingTransactions = (await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }

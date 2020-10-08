@@ -1,11 +1,11 @@
+import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { Component, Input } from '@angular/core'
 import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import BigNumber from 'bignumber.js'
 import { Observable, Subscription } from 'rxjs'
-import { supportsDelegation } from 'src/app/helpers/delegation'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
+import { supportsDelegation } from '../../helpers/delegation'
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
 
@@ -53,7 +53,11 @@ export class PortfolioItemComponent {
 
   private walletChanged: Subscription
 
-  constructor(private readonly operationsProvider: OperationsProvider, public accountProvider: AccountProvider) {}
+  constructor(
+    private readonly operationsProvider: OperationsProvider,
+    public accountProvider: AccountProvider,
+    private readonly protocolService: ProtocolService
+  ) {}
 
   public ngOnInit(): void {
     this.updateBalance()
@@ -79,12 +83,9 @@ export class PortfolioItemComponent {
 
   private updateBalance() {
     if (this.wallet !== undefined && this.wallet.currentBalance !== undefined) {
-      const converter = new AmountConverterPipe()
+      const converter = new AmountConverterPipe(this.protocolService)
       const currentBalance: BigNumber = this.wallet.currentBalance
-      const balanceFormatted = converter.transformValueOnly(currentBalance, {
-        protocol: this.wallet.protocol,
-        maxDigits: this.digits()
-      })
+      const balanceFormatted = converter.transformValueOnly(currentBalance, this.wallet.protocol, this.digits())
       this.balance = `${balanceFormatted} ${this.wallet.protocol.symbol}`
       const balanceSplit = balanceFormatted.split('.')
       if (balanceSplit.length == 2) {

@@ -11,12 +11,32 @@ const routes: Routes = [
     loadChildren: () => import('./pages/account-add/account-add.module').then(m => m.AccountAddPageModule)
   },
   {
+    path: 'account-import-interaction-selection/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/account-import-interaction-selection/account-import-interaction-selection.module').then(
+        m => m.AccountImportInteractionSelectionPageModule
+      )
+  },
+  {
     path: 'account-import-onboarding/:id',
     resolve: {
       special: DataResolverService
     },
     loadChildren: () =>
       import('./pages/account-import-onboarding/account-import-onboarding.module').then(m => m.AccountImportOnboardingPageModule)
+  },
+  {
+    path: 'account-import-ledger-onboarding/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/account-import-ledger-onboarding/account-import-ledger-onboarding.module').then(
+        m => m.AccountImportLedgerOnboardingPageModule
+      )
   },
   {
     path: 'select-wallet/:id',
@@ -142,6 +162,13 @@ const routes: Routes = [
   {
     path: 'exchange-custom',
     loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then(m => m.ExchangeCustomPageModule)
+  },
+  {
+    path: 'ledger-sign/:id',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/ledger-sign/ledger-sign.module').then(m => m.LedgerSignPageModule)
   },
   {
     path: 'beacon-permission-list',

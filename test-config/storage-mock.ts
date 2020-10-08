@@ -1,4 +1,4 @@
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols } from 'airgap-coin-lib'
 
 export class StorageMock {
   private readonly data: any = {
@@ -35,5 +35,9 @@ export class StorageMock {
       delete this.data[key]
       resolve()
     })
+  }
+
+  public ready(): Promise<void> {
+    return Promise.resolve()
   }
 }

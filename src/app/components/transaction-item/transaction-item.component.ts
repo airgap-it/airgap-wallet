@@ -1,5 +1,6 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component, Input, OnInit } from '@angular/core'
-import { IAirGapTransaction, ICoinProtocol, getProtocolByIdentifier } from 'airgap-coin-lib'
+import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
 
 @Component({
   selector: 'transaction-item',
@@ -15,9 +16,11 @@ export class TransactionItemComponent implements OnInit {
 
   public protocol: ICoinProtocol | undefined
 
-  public ngOnInit(): void {
+  constructor(private readonly protocolService: ProtocolService) {}
+
+  public async ngOnInit(): Promise<void> {
     try {
-      this.protocol = getProtocolByIdentifier(this.tx.protocolIdentifier)
+      this.protocol = await this.protocolService.getProtocol(this.tx.protocolIdentifier)
     } catch {}
   }
 }

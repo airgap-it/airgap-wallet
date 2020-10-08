@@ -1,3 +1,4 @@
+import { SubProtocolSymbols } from 'airgap-coin-lib'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ICoinProtocol } from 'airgap-coin-lib'
@@ -17,39 +18,30 @@ export class PriceService implements AirGapWalletPriceService {
     if (protocol.marketSymbol.length === 0) {
       return new BigNumber(0)
     }
+    // TODO change when market data is available for USDtz
+    if (protocol.identifier === SubProtocolSymbols.XTZ_USD) {
+      return new BigNumber(1)
+    }
 
     const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[protocol.marketSymbol]
     if (pendingRequest) {
       return pendingRequest
     }
 
-    const promise: Promise<BigNumber> = new Promise((resolve, reject) => {
+    const promise: Promise<BigNumber> = new Promise(resolve => {
       cryptocompare
         .price(protocol.marketSymbol.toUpperCase(), baseSymbol)
-        .then(prices => {
-          resolve(new BigNumber(prices.USD))
+        .then(async prices => {
+          if (prices.USD) {
+            resolve(new BigNumber(prices.USD))
+          } else {
+            const price = await this.fetchFromCoinGecko(protocol)
+            resolve(price)
+          }
         })
-        .catch(cryptocompareError => {
-          // TODO: Remove once cryptocompare supports xchf
-          const symbolMapping = {
-            xchf: 'cryptofranc'
-          }
-
-          console.error('cryptocompare', cryptocompareError)
-
-          const id = symbolMapping[protocol.marketSymbol.toLowerCase()]
-          if (id) {
-            this.http
-              .get<{ data: { usd: string }[] }>(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`)
-              .toPromise()
-              .then(({ data }: { data: { usd: string }[] }) => {
-                resolve(new BigNumber(data[id].usd))
-              })
-              .catch(coinGeckoError => {
-                console.error(coinGeckoError)
-                reject(coinGeckoError)
-              })
-          }
+        .catch(async () => {
+          const price = await this.fetchFromCoinGecko(protocol)
+          resolve(price)
         })
     })
 
@@ -63,6 +55,124 @@ export class PriceService implements AirGapWalletPriceService {
 
     return promise
   }
+
+  public async fetchFromCoinGecko(protocol: ICoinProtocol): Promise<BigNumber> {
+    return new Promise((resolve, reject) => {
+      // TODO: Remove once cryptocompare supports xchf
+      const symbolMapping = {
+        zrx: '0x',
+        elf: 'aelf',
+        aion: 'aion',
+        akro: 'akropolis',
+        ampl: 'ampleforth',
+        ankr: 'ankr',
+        ant: 'aragon',
+        aoa: 'aurora',
+        brc: 'baer-chain',
+        bal: 'balancer',
+        bnt: 'bancor',
+        band: 'band-protocol',
+        bat: 'basic-attention-token',
+        bnb: 'binancecoin',
+        busd: 'binance-usd',
+        btm: 'bytom',
+        bzrx: 'bzx-protocol',
+        cel: 'celsius-degree-token',
+        cennz: 'centrality',
+        link: 'chainlink',
+        chz: 'chiliz',
+        czrx: 'compound-0x',
+        comp: 'compound-coin',
+        cusdc: 'compound-usd-coin',
+        cvt: 'cybervein',
+        cro: 'crypto-com-chain',
+        crv: 'curve-dao-token',
+        dai: 'dai',
+        mana: 'decentraland',
+        dgtx: 'digitex-futures-exchange',
+        dx: 'dxchain',
+        eng: 'enigma',
+        enj: 'enjincoin',
+        lend: 'ethlend',
+        ftm: 'fantom',
+        fet: 'firstenergy-token',
+        gnt: 'golem',
+        one: 'one',
+        snx: 'havven',
+        hedg: 'hedgetrade',
+        hot: 'hydro-protocol',
+        ht: 'huobi-token',
+        husd: 'husd',
+        rlc: 'iexec-rlc',
+        xin: 'mixin',
+        ino: 'ino-coin',
+        inb: 'insight-chain',
+        ins: 'insolar-old',
+        iost: 'iostoken',
+        iotx: 'iotex',
+        pnk: 'kleros',
+        kcs: 'kucoin-shares',
+        knc: 'kyber-network',
+        leo: 'leo-token',
+        lpt: 'livepeer',
+        lrc: 'loopring',
+        mkr: 'maker',
+        matic: 'matic-network',
+        mln: 'melon',
+        mco: 'monaco',
+        mxc: 'mxc',
+        nec: 'nectar-token',
+        nexo: 'nexo',
+        nmr: 'numeraire',
+        nxm: 'nxm',
+        wnxm: 'wrapped-nxm',
+        ocean: 'ocean-protocol',
+        okb: 'okb',
+        omg: 'omisego',
+        ogn: 'origin-protocol',
+        trac: 'origintrail',
+        pax: 'payperex',
+        qnt: 'quant-network',
+        ren: 'republic-protocol',
+        rsr: 'reserve-rights-token',
+        sai: 'sai',
+        srm: 'serum',
+        agi: 'singularitynet',
+        storj: 'storj',
+        sxp: 'swipe',
+        chsb: 'swissborg',
+        trb: 'tellor',
+        usdt: 'tether',
+        theta: 'theta-token',
+        tusd: 'true-usd',
+        uma: 'uma',
+        ubt: 'unibright',
+        usdc: 'usd-coin',
+        utk: 'utrust',
+        wbtc: 'wrapped-bitcoin',
+        stake: 'xdai-stake',
+        yfi: 'yearn-finance',
+        zb: 'zb-token',
+        zil: 'zilliqa',
+        xchf: 'cryptofranc'
+      }
+
+      const id = symbolMapping[protocol.marketSymbol.toLowerCase()]
+      if (id) {
+        this.http
+          .get<{ data: { usd: string }[] }>(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`)
+          .toPromise()
+          .then(({ data }: { data: { usd: string }[] }) => {
+            const price = data !== undefined ? new BigNumber(data[id].usd) : new BigNumber(0)
+            resolve(price)
+          })
+          .catch(coinGeckoError => {
+            console.error(coinGeckoError)
+            reject(coinGeckoError)
+          })
+      }
+    })
+  }
   public async getMarketPricesOverTime(
     protocol: ICoinProtocol,
     timeUnit: TimeUnit,
@@ -75,13 +185,10 @@ export class PriceService implements AirGapWalletPriceService {
     }
 
     const marketSymbol = protocol.marketSymbol
-    console.log('cache', 'fetchMarketData', timeUnit, marketSymbol)
     // const uniqueId = `${timeUnit}_${marketSymbol}_${CachingServiceKey.PRICESAMPLES}`
 
     const pendingRequest = this.pendingMarketPriceOverTimeRequests[marketSymbol]
     if (pendingRequest) {
-      console.log('RETURNING PENDING PROMISE OVER TIME')
-
       return pendingRequest
     }
 

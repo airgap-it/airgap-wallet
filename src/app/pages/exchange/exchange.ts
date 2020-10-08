@@ -1,9 +1,10 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -11,9 +12,10 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ExchangeEnum, ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 enum ExchangePageState {
   LOADING,
@@ -57,14 +59,15 @@ export class ExchangePage {
   constructor(
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService,
     private readonly modalController: ModalController,
     private readonly alertCtrl: AlertController,
-    private readonly operationsProvider: OperationsProvider
+    private readonly operationsProvider: OperationsProvider,
+    private readonly protocolService: ProtocolService
   ) {
     this.exchangeProvider.getActiveExchange().subscribe((exchange: string) => {
       this.activeExchange = exchange
@@ -109,10 +112,10 @@ export class ExchangePage {
     } else {
       currentFromProtocol = fromProtocols[0]
     }
-    await this.setFromProtocol(getProtocolByIdentifier(currentFromProtocol))
+    await this.setFromProtocol(await this.protocolService.getProtocol(currentFromProtocol))
 
     if (this.exchangePageState === ExchangePageState.LOADING) {
-      const hasShownOnboarding = await this.storageProvider.get(SettingsKey.EXCHANGE_INTEGRATION)
+      const hasShownOnboarding = await this.storageProvider.get(WalletStorageKey.EXCHANGE_INTEGRATION)
       if (!hasShownOnboarding) {
         this.exchangePageState = ExchangePageState.ONBOARDING
         return
@@ -208,7 +211,7 @@ export class ExchangePage {
       this.selectedFromProtocol.identifier === this.selectedToProtocol.identifier ||
       !this.supportedProtocolsTo.includes(this.selectedToProtocol.identifier)
     ) {
-      const toProtocol = getProtocolByIdentifier(this.supportedProtocolsTo[0])
+      const toProtocol = await this.protocolService.getProtocol(this.supportedProtocolsTo[0])
       this.selectedToProtocol = toProtocol
       this.loadWalletsForSelectedToProtocol()
     }
@@ -247,7 +250,12 @@ export class ExchangePage {
   private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
     return this.accountProvider
       .getWalletList()
-      .filter(wallet => wallet.protocol.identifier === protocol && (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0)))
+      .filter(
+        wallet =>
+          wallet.protocol.identifier === protocol &&
+          wallet.protocol.options.network.type === NetworkType.MAINNET &&
+          (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0))
+      )
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
@@ -392,7 +400,7 @@ export class ExchangePage {
 
   dismissExchangeOnboarding() {
     this.setup()
-    this.storageProvider.set(SettingsKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    this.storageProvider.set(WalletStorageKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
   goToAddCoinPage() {

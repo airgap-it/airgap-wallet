@@ -18,7 +18,8 @@ class AppInfo : Plugin() {
                 Key.APP_NAME to applicationInfo.loadLabel(packageManager),
                 Key.PACKAGE_NAME to BuildConfig.APPLICATION_ID,
                 Key.VERSION_NAME to BuildConfig.VERSION_NAME,
-                Key.VERSION_CODE to BuildConfig.VERSION_CODE
+                Key.VERSION_CODE to BuildConfig.VERSION_CODE,
+                Key.PRODUCT_FLAVOR to BuildConfig.PRODUCT_FLAVOR
             )
         }
     }
@@ -28,5 +29,6 @@ class AppInfo : Plugin() {
         const val PACKAGE_NAME = "packageName"
         const val VERSION_NAME = "versionName"
         const val VERSION_CODE = "versionCode"
+        const val PRODUCT_FLAVOR = "productFlavor"
     }
 }

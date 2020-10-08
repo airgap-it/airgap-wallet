@@ -1,8 +1,9 @@
+import { AmountConverterPipe } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
-import { OverlayEventDetail } from '@ionic/angular/node_modules/@ionic/core'
+import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { BehaviorSubject } from 'rxjs'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
@@ -14,10 +15,10 @@ import {
   AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
 import { UIAccount } from 'src/app/models/widgets/display/UIAccount'
+import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -32,7 +33,10 @@ import { isType } from 'src/app/utils/utils'
 export class DelegationDetailPage {
   public wallet: AirGapMarketWallet
 
+  public showOverflowMenu: boolean
+
   public delegationForms: Map<string, FormGroup> = new Map()
+  public delegationAlertWidgets: UIAlert[] | undefined
 
   public delegateeLabel: string
   public delegateeLabelPlural: string
@@ -49,14 +53,6 @@ export class DelegationDetailPage {
 
   public canProceed: boolean = true
   public hasRewardDetails: boolean | undefined = undefined
-
-  public get showOverflowMenu(): boolean {
-    const delegatorDetails = this.delegatorDetails$.value
-
-    return (
-      !this.isAirGapDelegatee || (delegatorDetails && delegatorDetails.secondaryActions && delegatorDetails.secondaryActions.length > 0)
-    )
-  }
 
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
@@ -170,7 +166,8 @@ export class DelegationDetailPage {
       : null
 
     this.activeDelegatorAction = activeDelegatorAction
-    this.activeDelegatorActionConfirmButton = activeAction ? activeAction.confirmLabel || activeAction.label : null
+    this.activeDelegatorActionConfirmButton =
+      activeAction && !activeAction.disabled ? activeAction.confirmLabel || activeAction.label : null
   }
 
   public showDelegateesList() {
@@ -245,13 +242,13 @@ export class DelegationDetailPage {
     })
 
     this.delegatorDetails$.subscribe(async details => {
+      this.showOverflowMenu =
+        !(this.isAirGapDelegatee || this.hideAirGapOverflow) || (details && details.secondaryActions && details.secondaryActions.length > 0)
+
       if (details) {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
-          text: this.amountConverter.transform(details.balance, {
-            protocolIdentifier: this.wallet.protocol.identifier,
-            maxDigits: 10
-          }),
+          text: await this.amountConverter.transform(details.balance, { protocol: this.wallet.protocol }),
           description: 'delegation-detail.your-balance_label'
         })
 
@@ -322,6 +319,8 @@ export class DelegationDetailPage {
 
   private updateDisplayedDetails(details: AirGapDelegationDetails[] | null) {
     // TODO: support multiple cases
+    this.delegationAlertWidgets = details ? details[0].alerts : undefined
+
     this.delegateeDetails$.next(details ? details[0].delegatees[0] : null)
     this.delegatorDetails$.next(details ? details[0].delegator : null)
   }
@@ -337,6 +336,11 @@ export class DelegationDetailPage {
   private callAction(actions: AirGapDelegatorAction[], type: string) {
     const action = actions.find(action => action.type.toString() === type)
     const actionType = action ? action.type : undefined
+
+    if (action.disabled) {
+      this.navController.back()
+      return
+    }
 
     if (actionType) {
       this.prepareDelegationAction(actionType)
@@ -355,12 +359,12 @@ export class DelegationDetailPage {
     try {
       const form = this.delegationForms.get(actionType)
       const data = form ? form.value : undefined
-      const { airGapTxs, serializedTxChunks } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
+      const { airGapTxs, unsignedTx } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: serializedTxChunks
+        data: unsignedTx
       }
 
       this.dismissLoader()

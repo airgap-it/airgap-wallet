@@ -10,7 +10,7 @@ import { Action } from 'airgap-coin-lib/dist/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
-import { promiseTimeout } from '../../helpers/promise-timeout'
+import { promiseTimeout } from '../../helpers/promise'
 import { ActionGroup } from '../../models/ActionGroup'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -18,13 +18,14 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { StorageProvider } from '../../services/storage/storage'
+import { WalletStorageService } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ProtocolService } from '@airgap/angular-core'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000
@@ -88,8 +89,9 @@ export class AccountTransactionListPage {
     public readonly accountProvider: AccountProvider,
     public readonly http: HttpClient,
     public readonly dataService: DataService,
+    public readonly protocolService: ProtocolService,
     private readonly route: ActivatedRoute,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,

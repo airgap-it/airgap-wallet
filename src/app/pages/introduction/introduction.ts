@@ -11,10 +11,10 @@ import { IntroductionDownloadPage } from '../introduction-download/introduction-
 })
 export class IntroductionPage {
   public security: string = 'highest'
-  public isBrowser: boolean = false
+  public isDesktop: boolean = false
 
   constructor(public platform: Platform, public modalController: ModalController) {
-    this.isBrowser = !this.platform.is('hybrid')
+    this.isDesktop = !this.platform.is('hybrid')
   }
 
   public dismiss() {
