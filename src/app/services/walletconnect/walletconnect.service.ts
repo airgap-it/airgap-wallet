@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
-import { WalletconnectPage } from 'src/app/pages/walletconnect/walletconnect.page'
+
+import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
 export function getCachedSession(): any {
   const local = localStorage ? localStorage.getItem('walletconnect') : null
