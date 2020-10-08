@@ -31,7 +31,7 @@ describe('AccountProvider', () => {
       unitHelper.testBed({
         providers: [
           { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
-          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
           { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
           { provide: ProtocolService, useValue: protocolService }
         ]

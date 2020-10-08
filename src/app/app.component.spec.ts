@@ -14,7 +14,7 @@ describe('AppComponent', () => {
       unitHelper.testBed({
         providers: [
           { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
-          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen }
         ],

@@ -1,4 +1,4 @@
-import { APP_CONFIG, PermissionsService, PERMISSIONS_PLUGIN } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, PermissionsService, PERMISSIONS_PLUGIN } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -25,7 +25,7 @@ import {
   ToastControllerMock
 } from './mocks-ionic'
 import {
-  AppInfoMock,
+  AppInfoPluginMock,
   AppMock,
   PermissionsMock,
   PermissionsPluginMock,
@@ -39,7 +39,7 @@ import { StorageMock } from './storage-mock'
 export class UnitHelper {
   public readonly mockRefs = {
     app: new AppMock(),
-    appInfo: new AppInfoMock(),
+    appInfoPlugin: new AppInfoPluginMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
     permissionsPlugin: new PermissionsPluginMock(),
@@ -81,6 +81,7 @@ export class UnitHelper {
       { provide: PermissionsService, useValue: this.mockRefs.permissionsProvider },
       { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissionsPlugin },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
+      { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfoPlugin },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
