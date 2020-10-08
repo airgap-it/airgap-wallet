@@ -46,3 +46,5 @@ screenshots/
 reports/
 
 electron/build/
+
+*.xcarchive
