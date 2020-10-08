@@ -9,9 +9,11 @@ import { DataService, DataServiceKey } from '../data/data.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
+import { WalletconnectService } from '../walletconnect/walletconnect.service'
 
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
+import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +24,7 @@ export class IACService extends BaseIACService {
     serializerService: SerializerService,
     beaconService: BeaconService,
     accountProvider: AccountProvider,
+    walletConnectService: WalletconnectService,
     private readonly dataService: DataService,
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
@@ -30,7 +33,8 @@ export class IACService extends BaseIACService {
   ) {
     super(uiEventElementsService, serializerService, Promise.resolve(), [
       new BeaconHandler(beaconService),
-      new AddressHandler(accountProvider, dataService, router)
+      new AddressHandler(accountProvider, dataService, router),
+      new WalletConnectHandler(walletConnectService)
     ])
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
