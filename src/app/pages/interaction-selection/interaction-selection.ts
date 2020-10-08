@@ -1,12 +1,12 @@
+import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
-
 import { Platform } from '@ionic/angular'
+import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
+
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -26,7 +26,7 @@ export class InteractionSelectionPage {
     public readonly platform: Platform,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly deepLinkProvider: DeepLinkProvider,
+    private readonly deeplinkService: DeeplinkService,
     private readonly dataService: DataService,
     private readonly operations: OperationsProvider,
     private readonly ledgerService: LedgerService
@@ -58,8 +58,8 @@ export class InteractionSelectionPage {
   public async sameDeviceSign() {
     const dataQR = await this.prepareQRData()
 
-    this.deepLinkProvider
-      .sameDeviceDeeplink(dataQR)
+    this.deeplinkService
+      .sameDeviceDeeplink(Array.isArray(dataQR) ? dataQR.join(',') : dataQR)
       .then(() => {
         this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })

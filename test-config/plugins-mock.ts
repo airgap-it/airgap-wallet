@@ -5,9 +5,9 @@ export class AppMock {
   public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
-export class AppInfoMock {
+export class AppInfoPluginMock {
   public get: jasmine.Spy = newSpy(
-    'set',
+    'get',
     Promise.resolve({
       appName: 'AirGap.UnitTest',
       packageName: 'AirGap',
@@ -38,4 +38,7 @@ export class SplashScreenMock {
 export class StatusBarMock {
   public setStyle: jasmine.Spy = newSpy('setStyle', Promise.resolve())
   public setBackgroundColor: jasmine.Spy = newSpy('setBackgroundColor', Promise.resolve())
+}
+export class PermissionsPluginMock {
+  public query: jasmine.Spy = newSpy('query', Promise.resolve())
 }

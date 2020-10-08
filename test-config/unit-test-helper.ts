@@ -1,3 +1,4 @@
+import { APP_CONFIG, APP_INFO_PLUGIN, PermissionsService, PERMISSIONS_PLUGIN } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -7,6 +8,8 @@ import { AlertController, IonicModule, LoadingController, NavController, Platfor
 import { IonicStorageModule, Storage } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { appConfig } from 'src/app/config/app-config'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
@@ -21,19 +24,26 @@ import {
   PlatformMock,
   ToastControllerMock
 } from './mocks-ionic'
+import {
+  AppInfoPluginMock,
+  AppMock,
+  PermissionsMock,
+  PermissionsPluginMock,
+  PushNotificationsMock,
+  SplashScreenMock,
+  StatusBarMock
+} from './plugins-mock'
+import { PermissionsServiceMock } from './service-mock'
 import { StorageMock } from './storage-mock'
-import { AppMock, AppInfoMock, PermissionsMock, PushNotificationsMock, SplashScreenMock, StatusBarMock } from './plugins-mock'
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PermissionsProvider } from 'src/app/services/permissions/permissions'
-import { PermissionsProviderMock } from './service-mock'
 
 export class UnitHelper {
   public readonly mockRefs = {
     app: new AppMock(),
-    appInfo: new AppInfoMock(),
+    appInfoPlugin: new AppInfoPluginMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
-    permissionsProvider: new PermissionsProviderMock(),
+    permissionsPlugin: new PermissionsPluginMock(),
+    permissionsProvider: new PermissionsServiceMock(),
     pushNotifications: new PushNotificationsMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
@@ -68,8 +78,11 @@ export class UnitHelper {
       { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
-      { provide: PermissionsProvider, useValue: this.mockRefs.permissionsProvider },
+      { provide: PermissionsService, useValue: this.mockRefs.permissionsProvider },
+      { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissionsPlugin },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
+      { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfoPlugin },
+      { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
       { provide: LoadingController, useValue: this.mockRefs.loadingController }

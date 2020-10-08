@@ -30,7 +30,7 @@ import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SerializerService } from '../serializer/serializer.service'
+import { SerializerService } from '@airgap/angular-core'
 
 export type SerializableTx =
   | RawTezosTransaction

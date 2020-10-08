@@ -92,7 +92,7 @@ ion-list-header {
   }
 }
 
-qr-clipboard {
+airgap-qr {
   padding: 20px;
   background-color: white;
 }
@@ -127,7 +127,7 @@ page-transaction-qr {
   .sc-ion-card-md-h,
   .sc-ion-card-ios-h,
   ion-card,
-  qr-clipboard {
+  airgap-qr {
     box-shadow: 0 10px 20px 0 rgba(49, 27, 88, 0.12);
     border: 1px solid rgba(0, 232, 204, 0.08);
     border-radius: 0;

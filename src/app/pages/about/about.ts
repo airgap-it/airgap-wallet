@@ -1,6 +1,6 @@
-import { Component } from '@angular/core'
+import { APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
+import { Component, Inject } from '@angular/core'
 
-import { AppInfoProvider } from '../../services/app-info/app-info'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -8,19 +8,21 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   templateUrl: 'about.html'
 })
 export class AboutPage {
-  public appName = ''
-  public packageName = ''
-  public versionNumber = ''
-  public versionCode: string | number = ''
+  public appName: string = 'APP_NAME'
+  public packageName: string = 'PACKAGE_NAME'
+  public versionName: string = 'VERSION_NUMBER'
+  public versionCode: string | number = 'VERSION_CODE'
 
-  constructor(private readonly appInfoProvider: AppInfoProvider) {
-    this.updateVersions().catch(handleErrorSentry(ErrorCategory.OTHER))
+  constructor(@Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin) {
+    this.updateVersions().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
   }
 
-  public async updateVersions() {
-    this.appName = await this.appInfoProvider.getAppName()
-    this.packageName = await this.appInfoProvider.getPackageName()
-    this.versionNumber = await this.appInfoProvider.getVersionNumber()
-    this.versionCode = await this.appInfoProvider.getVersionCode()
+  public async updateVersions(): Promise<void> {
+    const appInfo = await this.appInfo.get()
+
+    this.appName = appInfo.appName
+    this.packageName = appInfo.packageName
+    this.versionName = appInfo.versionName
+    this.versionCode = appInfo.versionCode
   }
 }

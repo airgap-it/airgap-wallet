@@ -1,10 +1,10 @@
+import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 
-import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -29,7 +29,7 @@ export class TransactionQrPage {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly platform: Platform,
-    private readonly deeplinkProvider: DeepLinkProvider
+    private readonly deeplinkService: DeeplinkService
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -60,6 +60,6 @@ export class TransactionQrPage {
   }
 
   public sameDeviceSign() {
-    this.deeplinkProvider.sameDeviceDeeplink(this.preparedDataQR)
+    this.deeplinkService.sameDeviceDeeplink(this.preparedDataQR)
   }
 }

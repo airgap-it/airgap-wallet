@@ -1,8 +1,6 @@
+import { PermissionsService, PermissionStatus, PermissionTypes, QrScannerService } from '@airgap/angular-core'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
-
-import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
 
 export class ScanBasePage {
   public zxingScanner?: ZXingScannerComponent
@@ -17,7 +15,7 @@ export class ScanBasePage {
   public readonly isElectron: boolean
   public readonly isBrowser: boolean
 
-  constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {
+  constructor(protected platform: Platform, protected scanner: QrScannerService, protected permissionsProvider: PermissionsService) {
     this.isMobile = this.platform.is('hybrid')
     this.isElectron = this.platform.is('electron')
     this.isBrowser = !(this.isMobile || this.isElectron)
@@ -41,6 +39,7 @@ export class ScanBasePage {
 
   public async checkCameraPermissionsAndActivate(): Promise<void> {
     const permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
+
     if (permission === PermissionStatus.GRANTED) {
       this.hasCameraPermission = true
       this.startScan()
@@ -76,7 +75,6 @@ export class ScanBasePage {
   }
 
   private startScanMobile() {
-    this.scanner.show()
     this.scanner.scan(
       text => {
         this.checkScan(text)

@@ -1,11 +1,9 @@
+import { IACHanderStatus, IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, NgZone, ViewChild } from '@angular/core'
-import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+import { IACService } from 'src/app/services/iac/iac.service'
 
-import { PermissionsProvider } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
-import { IACResult, SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
 
@@ -28,10 +26,9 @@ export class ScanPage extends ScanBasePage {
 
   constructor(
     protected platform: Platform,
-    protected scanner: ScannerProvider,
-    protected permissionsProvider: PermissionsProvider,
-    private readonly schemeRouting: SchemeRoutingProvider,
-    private readonly router: Router,
+    protected scanner: QrScannerService,
+    protected permissionsProvider: PermissionsService,
+    private readonly iacService: IACService,
     private readonly ngZone: NgZone
   ) {
     super(platform, scanner, permissionsProvider)
@@ -61,18 +58,25 @@ export class ScanPage extends ScanBasePage {
 
     console.log(`[SCAN:checkScan]: Trying to decode string ${resultString}`)
     this.ngZone.run(() => {
-      this.schemeRouting
-        .handleNewSyncRequest(this.router, Array.from(this.parts), (scanResult: { availablePages: number[]; totalPages: number }) => {
-          if (scanResult && scanResult.availablePages) {
-            this.isMultiQr = true
-            this.numberOfQrsScanned = scanResult.availablePages.length
-            this.numberOfQrsTotal = scanResult.totalPages
-            this.percentageScanned = Math.max(0, Math.min(1, scanResult.availablePages.length / scanResult.totalPages))
+      this.iacService
+        .handleRequest(
+          Array.from(this.parts),
+          IACMessageTransport.QR_SCANNER,
+          (scanResult?: Error | { currentPage: number; totalPageNumber: number }) => {
+            console.log('scan result', scanResult)
+
+            const typedScanResult = (scanResult as any) as { availablePages: number[]; totalPages: number }
+            if (scanResult && typedScanResult.availablePages) {
+              this.isMultiQr = true
+              this.numberOfQrsScanned = typedScanResult.availablePages.length
+              this.numberOfQrsTotal = typedScanResult.totalPages
+              this.percentageScanned = Math.max(0, Math.min(1, typedScanResult.availablePages.length / typedScanResult.totalPages))
+            }
+            this.startScan()
           }
-          this.startScan()
-        })
-        .then((result: IACResult) => {
-          if (result === IACResult.SUCCESS) {
+        )
+        .then((result: IACHanderStatus) => {
+          if (result === IACHanderStatus.SUCCESS) {
             this.resetScannerPage()
           }
         })

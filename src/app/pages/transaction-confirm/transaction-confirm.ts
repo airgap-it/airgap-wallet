@@ -11,7 +11,7 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 const SECOND: number = 1000
 
@@ -37,7 +37,7 @@ export class TransactionConfirmPage {
     private readonly route: ActivatedRoute,
     private readonly alertCtrl: AlertController,
     private readonly platform: Platform,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly beaconService: BeaconService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService,
@@ -132,7 +132,7 @@ export class TransactionConfirmPage {
             accountIdentifier: signedTxWrapper.accountIdentifier,
             date: new Date().getTime()
           }
-          this.storageProvider.set(SettingsKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
+          this.storageProvider.set(WalletStorageKey.LAST_TX_BROADCAST, lastTx).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 

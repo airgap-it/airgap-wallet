@@ -1,5 +1,13 @@
+import { PERMISSIONS_PLUGIN, PermissionStatus, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
-import { PushNotification, PushNotificationsPlugin, PushNotificationToken } from '@capacitor/core'
+import {
+  PermissionResult,
+  PermissionsPlugin,
+  PermissionType,
+  PushNotification,
+  PushNotificationsPlugin,
+  PushNotificationToken
+} from '@capacitor/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
@@ -8,10 +16,8 @@ import { take } from 'rxjs/operators'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
-import { AppInfoProvider } from '../app-info/app-info'
-import { PermissionsProvider, PermissionStatus } from '../permissions/permissions'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
 
@@ -26,11 +32,11 @@ export class PushProvider {
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    private readonly permissionsProvider: PermissionsProvider,
-    private readonly appInfoProvider: AppInfoProvider,
+    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
+    @Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
@@ -46,7 +52,7 @@ export class PushProvider {
       return
     }
 
-    const permissionStatus = await this.permissionsProvider.hasNotificationsPermission()
+    const permissionStatus: PermissionStatus = await this.checkPermission(PermissionType.Notifications)
 
     if (permissionStatus === PermissionStatus.GRANTED) {
       await this.register()
@@ -65,9 +71,9 @@ export class PushProvider {
       this.register()
     } else if (this.platform.is('ios')) {
       // On iOS, show a modal why we need permissions
-      const hasShownPushModal = await this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
+      const hasShownPushModal = await this.storageProvider.get(WalletStorageKey.PUSH_INTRODUCTION)
       if (!hasShownPushModal) {
-        await this.storageProvider.set(SettingsKey.PUSH_INTRODUCTION, true)
+        await this.storageProvider.set(WalletStorageKey.PUSH_INTRODUCTION, true)
         const modal = await this.modalController.create({
           component: IntroductionPushPage
         })
@@ -170,7 +176,28 @@ export class PushProvider {
     await this.pushNotifications.register()
   }
 
+  private async checkPermission(type: PermissionType): Promise<PermissionStatus> {
+    const permission: PermissionResult = await this.permissions.query({ name: type })
+
+    switch (permission.state) {
+      case 'granted':
+        return PermissionStatus.GRANTED
+      case 'denied':
+        return PermissionStatus.DENIED
+      case 'prompt':
+        return PermissionStatus.UNKNOWN
+
+      default:
+        throw new Error('Unknown permission type')
+    }
+  }
+
   private async isSupported(): Promise<boolean> {
-    return this.platform.is('ios') || (this.platform.is('android') && (await this.appInfoProvider.getAndroidFlavor()) !== 'fdroid')
+    if (this.platform.is('hybrid')) {
+      const info = await this.appInfoPlugin.get()
+      return this.platform.is('ios') || (this.platform.is('android') && info.productFlavor !== 'fdroid')
+    } else {
+      return false
+    }
   }
 }
