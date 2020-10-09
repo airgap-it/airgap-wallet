@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -98,7 +99,10 @@ export class AccountAddPage {
     this.supportedSubAccountProtocols = Object.values(await this.protocolService.getActiveSubProtocols())
       .map(entry => Object.values(entry))
       .reduce((flatten: ICoinSubProtocol[], next: ICoinSubProtocol[]) => flatten.concat(next), [])
-      .filter((protocol: ICoinSubProtocol) => protocol.options.network.type === NetworkType.MAINNET)
+      .filter(
+        (protocol: ICoinSubProtocol) =>
+          protocol.options.network.type === NetworkType.MAINNET && protocol.identifier !== SubProtocolSymbols.XTZ_KT
+      )
   }
 
   private showImportInteractionSelection(protocol: ICoinProtocol) {

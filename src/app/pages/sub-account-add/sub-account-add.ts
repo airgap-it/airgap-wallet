@@ -73,7 +73,9 @@ export class SubAccountAddPage {
   private async initWithTokenSubProtocol(): Promise<void> {
     this.typeLabel = 'add-sub-account.tokens_label'
 
-    const subProtocols: ICoinSubProtocol[] = await this.protocolService.getSubProtocols(this.wallet.protocol)
+    const subProtocols: ICoinSubProtocol[] = (await this.protocolService.getSubProtocols(this.wallet.protocol)).filter(
+      protocol => protocol.subProtocolType === SubProtocolType.TOKEN
+    )
     subProtocols.forEach((subProtocol: ICoinSubProtocol) => {
       const wallet: AirGapMarketWallet = new AirGapMarketWallet(
         subProtocol,
