@@ -17,7 +17,7 @@
     </ion-list>
     <empty-state
       *ngIf="subWallets.length === 0"
-      [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol.name }"
+      [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol?.name }"
       [imageName]="'no-imports.svg'"
     ></empty-state>
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">

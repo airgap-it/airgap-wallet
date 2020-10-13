@@ -81,7 +81,7 @@ export class SubAccountAddPage {
   private async initWithTokenSubProtocol(): Promise<void> {
     this.typeLabel = 'add-sub-account.tokens_label'
 
-    this.subProtocols = await (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
+    this.subProtocols = (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
       protocol => protocol.subProtocolType === SubProtocolType.TOKEN
     )
     this.infiniteEnabled = true

@@ -1,9 +1,10 @@
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
+import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -43,18 +44,24 @@ export class AccountAddPage {
   ) {}
 
   public async ionViewWillEnter() {
-    this.supportedAccountProtocols = await this.protocolService.getActiveProtocols()
+    this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
+      protocol => protocol.options.network.type === NetworkType.MAINNET
+    )
     const supportedSubAccountProtocols = Array.prototype.concat.apply(
       [],
       await Promise.all(Object.values(MainProtocolSymbols).map(protocol => this.protocolService.getSubProtocols(protocol)))
     )
 
-    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(protocol =>
-      this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
+      protocol =>
+        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) && protocol.options.network.type === NetworkType.MAINNET
     )
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
-      protocol => !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+      protocol =>
+        !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
     this.filterProtocols()
   }
