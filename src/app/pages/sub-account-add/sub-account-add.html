@@ -11,9 +11,9 @@
     </ion-toolbar>
   </ion-grid>
 </ion-header>
-<ion-content class="ion-padding">
+<ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
-    <ion-row>
+    <ion-row class="ion-padding">
       <ion-text class="font--weight__bold" color="primary">
         <span>{{ typeLabel | translate }}</span>
       </ion-text>
@@ -26,7 +26,7 @@
       [fullHeight]="wallet.protocol.identifier === mainProtocolSymbols.XTZ ? false : true"
     ></empty-state>
 
-    <ion-row class="ion-no-padding" *ngFor="let subAccount of subAccounts; let i = index">
+    <ion-row class="ion-no-padding" *ngFor="let subAccount of displayedSubAccounts">
       <ion-col size="10" class="ion-no-padding">
         <portfolio-item
           [isToken]="subProtocolType === subProtocolTypes.TOKEN"

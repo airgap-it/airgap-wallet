@@ -10,7 +10,7 @@ import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import BigNumber from 'bignumber.js'
 
 export interface IAccountWrapper {
   selected: boolean
@@ -27,6 +27,8 @@ export class SubAccountAddPage {
 
   public wallet: AirGapMarketWallet
   public subAccounts: IAccountWrapper[] = []
+  public filteredSubAccounts: IAccountWrapper[] = []
+  public displayedSubAccounts: IAccountWrapper[] = []
 
   public actionCallback: (context: AddTokenActionContext) => void
 
@@ -34,14 +36,12 @@ export class SubAccountAddPage {
   public subProtocolTypes: typeof SubProtocolType = SubProtocolType
 
   public typeLabel: string = ''
-  private subProtocols: ICoinSubProtocol[]
-  private filteredSubProtocols: ICoinSubProtocol[]
 
-  private LIMIT: number = 10
-  private PROTOCOLS_LOADED: number = 0
   public searchTerm: string = ''
 
   public infiniteEnabled: boolean = false
+  private readonly limit: number = 10
+  private loaded: number = 0
 
   constructor(
     private readonly navController: NavController,
@@ -81,66 +81,81 @@ export class SubAccountAddPage {
   private async initWithTokenSubProtocol(): Promise<void> {
     this.typeLabel = 'add-sub-account.tokens_label'
 
-    this.subProtocols = (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
+    const subProtocols = (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
       protocol => protocol.subProtocolType === SubProtocolType.TOKEN
     )
     this.infiniteEnabled = true
-    this.loadSubAccounts()
+    this.subAccounts = await this.loadSubAccounts(subProtocols)
+    await this.loadDisplayedAccounts()
+  }
+
+  private async loadSubAccounts(subProtocols: ICoinSubProtocol[]) {
+    const balances = await this.wallet.protocol.getBalanceOfPublicKeyForSubProtocols(this.wallet.publicKey, subProtocols)
+
+    const accounts: IAccountWrapper[] = balances
+      .map((balance, index) => {
+        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+          subProtocols[index],
+          this.wallet.publicKey,
+          this.wallet.isExtendedPublicKey,
+          this.wallet.derivationPath,
+          this.priceService
+        )
+        if (this.accountProvider.walletExists(wallet)) {
+          return undefined
+        }
+        wallet.addresses = this.wallet.addresses
+        wallet.currentBalance = new BigNumber(balance)
+
+        return { wallet, selected: false }
+      })
+      .filter(account => account !== undefined)
+      .sort((a, b) => a.wallet.currentBalance.minus(b.wallet.currentBalance).toNumber() * -1)
+
+    return accounts
   }
 
   public setFilteredItems(searchTerm: string): void {
     this.subAccounts = []
+    this.loaded = 0
     if (searchTerm.length === 0) {
-      this.filteredSubProtocols = this.subProtocols
+      this.displayedSubAccounts = this.subAccounts
       this.infiniteEnabled = true
-      this.loadSubAccounts()
+      this.loadDisplayedAccounts()
     } else {
-      this.filteredSubProtocols = this.subProtocols.filter((protocol: ICoinSubProtocol) => {
-        const searchTermLowerCase: string = searchTerm.toLowerCase()
-        const hasMatchingName: boolean = protocol.name.toLowerCase().includes(searchTermLowerCase)
-        const hasMatchingSymbol: boolean = protocol.symbol.toLowerCase().includes(searchTermLowerCase)
+      const searchTermLowerCase: string = searchTerm.toLowerCase()
+      this.displayedSubAccounts = this.subAccounts.filter(account => {
+        const hasMatchingName: boolean = account.wallet.protocol.name.toLowerCase().includes(searchTermLowerCase)
+        const hasMatchingSymbol: boolean = account.wallet.protocol.symbol.toLowerCase().includes(searchTermLowerCase)
 
         return hasMatchingName || hasMatchingSymbol
       })
       this.infiniteEnabled = false
-      this.PROTOCOLS_LOADED = 0
-      this.loadSubAccounts(true)
+      this.loadDisplayedAccounts(true)
     }
+  }
+
+  private async loadDisplayedAccounts(filtered: boolean = false): Promise<void> {
+    const newSubAccount = (filtered ? this.filteredSubAccounts : this.subAccounts).slice(this.loaded, this.loaded + this.limit)
+    if (newSubAccount.length < this.limit) {
+      this.infiniteEnabled = false
+    }
+
+    newSubAccount.forEach(account => {
+      if (account.wallet.currentMarketPrice === undefined) {
+        account.wallet.fetchCurrentMarketPrice()
+      }
+      this.displayedSubAccounts.push(account)
+    })
+
+    this.loaded += newSubAccount.length
   }
 
   public async doInfinite(event) {
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
-    await this.loadSubAccounts()
+    await this.loadDisplayedAccounts()
     event.target.complete()
-  }
-
-  private async loadSubAccounts(filtered: boolean = false) {
-    const subProtocols = filtered ? [...this.filteredSubProtocols] : [...this.subProtocols]
-    const newSubProtocols = subProtocols.slice(this.PROTOCOLS_LOADED, this.PROTOCOLS_LOADED + this.LIMIT)
-    if (newSubProtocols.length < this.LIMIT) {
-      this.infiniteEnabled = false
-    }
-    newSubProtocols.forEach((subProtocol: ICoinSubProtocol) => {
-      const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-        subProtocol,
-        this.wallet.publicKey,
-        this.wallet.isExtendedPublicKey,
-        this.wallet.derivationPath,
-        this.priceService
-      )
-      const exists: boolean = this.accountProvider.walletExists(wallet)
-      if (!exists) {
-        wallet.addresses = this.wallet.addresses
-        wallet
-          .synchronize()
-          .then(() => {
-            this.subAccounts.push({ selected: false, wallet })
-          })
-          .catch(handleErrorSentry(ErrorCategory.COINLIB))
-      }
-    })
-    this.PROTOCOLS_LOADED += this.LIMIT
   }
 }
