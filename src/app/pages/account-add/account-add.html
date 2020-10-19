@@ -16,7 +16,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-list lines="none">
       <ion-text color="primary" *ngIf="filteredAccountProtocols.length > 0 || filteredFeaturedSubAccountProtocols.length > 0">
-        <p class="font--weight__bold ion-padding-horizontal">
+        <p class="font--weight__bold">
           {{ 'account-add.featured' | translate }}
         </p>
       </ion-text>
@@ -28,7 +28,7 @@
       ></currency-item>
 
       <ion-text color="primary" *ngIf="filteredOtherSubAccountProtocols.length > 0">
-        <p class="font--weight__bold ion-padding-horizontal">
+        <p class="font--weight__bold">
           {{ 'account-add.others' | translate }}
         </p>
       </ion-text>
