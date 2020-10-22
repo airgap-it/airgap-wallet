@@ -40,8 +40,11 @@ export class TransactionListComponent {
     this.browserService.openUrl(blockexplorer)
   }
 
-  public openTransactionDetailPage(transaction: IAirGapTransaction): void {
+  public async openTransactionDetailPage(transaction: IAirGapTransaction): Promise<void> {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
-    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.dataService.set(transaction.hash as DataServiceKey, transaction)
+    this.router
+      .navigateByUrl(`/transaction-detail/${DataServiceKey.DETAIL}/${transaction.hash}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

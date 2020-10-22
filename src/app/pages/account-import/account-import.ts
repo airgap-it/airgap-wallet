@@ -25,7 +25,13 @@ export class AccountImportPage {
     private readonly router: Router,
     private readonly wallets: AccountProvider,
     private readonly ngZone: NgZone
-  ) {}
+  ) {
+    if (!this.route.snapshot.data.special) {
+      this.router.navigateByUrl('/')
+      window.alert("The address you're trying to access is invalid.")
+      throw new Error()
+    }
+  }
 
   public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {

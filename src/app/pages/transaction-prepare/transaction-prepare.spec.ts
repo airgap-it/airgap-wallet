@@ -11,6 +11,7 @@ import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
+import { AccountProviderMock } from '../../../../test-config/accountProvider-mock'
 import { AccountProvider } from '../../services/account/account.provider'
 
 import { TransactionPreparePage } from './transaction-prepare'
@@ -38,6 +39,12 @@ describe('TransactionPrepare Page', () => {
             transaction: ethTransaction,
             wallet: ethWallet
           }
+        },
+        params: {
+          publicKey: ethWallet.publicKey,
+          protocolID: ethWallet.protocol.identifier,
+          addressIndex: ethWallet.addressIndex,
+          mainProtocolID: ethWallet.protocol.identifier
         }
       }
     }
@@ -45,7 +52,7 @@ describe('TransactionPrepare Page', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          AccountProvider,
+          { provide: AccountProvider, useClass: AccountProviderMock },
           { provide: Storage, useClass: StorageMock },
           { provide: NavParams, useClass: NavParamsMock },
           { provide: CLIPBOARD_PLUGIN, useClass: ClipboardMock },

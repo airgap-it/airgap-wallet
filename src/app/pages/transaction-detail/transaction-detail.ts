@@ -1,19 +1,21 @@
+import { Component, OnInit } from '@angular/core'
 import { ProtocolService } from '@airgap/angular-core'
-import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { DataService } from 'src/app/services/data/data.service'
 
 @Component({
   selector: 'page-transaction-detail',
   templateUrl: 'transaction-detail.html'
 })
-export class TransactionDetailPage {
+export class TransactionDetailPage implements OnInit {
   public transaction: IAirGapTransaction
   public lottieConfig: any
 
   constructor(
     private readonly route: ActivatedRoute,
+    public readonly dataService: DataService,
     private readonly browserService: BrowserService,
     private readonly protocolService: ProtocolService
   ) {
@@ -23,6 +25,12 @@ export class TransactionDetailPage {
 
     this.lottieConfig = {
       path: './assets/animations/pending.json'
+    }
+  }
+  public async ngOnInit(): Promise<void> {
+    if (!this.route.snapshot.data.special) {
+      const hash = this.route.snapshot.params.hash
+      this.transaction = await this.dataService.get(hash)
     }
   }
 

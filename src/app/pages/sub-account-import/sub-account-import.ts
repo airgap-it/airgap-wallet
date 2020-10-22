@@ -32,15 +32,19 @@ export class SubAccountImportPage {
   ) {
     this.subWallets = []
     let info: any
-    if (this.route.snapshot.data.special) {
-      info = this.route.snapshot.data.special
-    } else {
-      info = dataService.getData(DataServiceKey.PROTOCOL)
-    }
+
+    info = dataService.getData(DataServiceKey.PROTOCOL)
 
     if (info !== undefined) {
       this.subProtocolIdentifier = info.subProtocolIdentifier
       this.networkIdentifier = info.networkIdentifier
+      this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier).then((protocol: ICoinProtocol) => {
+        this.subProtocol = protocol
+      })
+    } else {
+      this.subProtocolIdentifier = this.route.snapshot.params.protocolID
+      this.networkIdentifier = this.route.snapshot.params.networkID
+
       this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier).then((protocol: ICoinProtocol) => {
         this.subProtocol = protocol
       })

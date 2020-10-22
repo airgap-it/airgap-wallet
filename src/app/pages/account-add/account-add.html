@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'add-account.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -40,3 +40,8 @@
     </ion-list>
   </ion-grid>
 </ion-content>
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button id="add-more-coins-button" color="secondary" (click)="navigateToScan()">
+    <ion-icon name="barcode-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
