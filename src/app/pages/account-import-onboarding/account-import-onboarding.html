@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/account-add"></ion-back-button>
       </ion-buttons>
       <ion-title *ngIf="protocol && !subProtocol">
         <span [innerHTML]="'account-import-onboarding.title' | translate: { protocolName: protocol.name }"></span>

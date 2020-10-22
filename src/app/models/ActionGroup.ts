@@ -58,6 +58,7 @@ export class ActionGroup {
   private getTezosActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
+    //TODO: Move logic to sub-account-add.ts
     const addTokenButtonAction = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
       () => {
@@ -70,7 +71,11 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                  info.wallet.addressIndex
+                }/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -218,7 +223,11 @@ export class ActionGroup {
           }
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
-            .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
+            .navigateByUrl(
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
+                this.callerContext.wallet.protocol.identifier
+              }/${this.callerContext.wallet.addressIndex}`
+            )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
           resolve()

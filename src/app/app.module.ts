@@ -59,6 +59,9 @@ import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { RemoteConfigProvider } from './services/remote-config/remote-config'
+import { ProtocolGuard } from './services/guard/protocol.guard'
+import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
+import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { WalletStorageService } from './services/storage/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
@@ -134,7 +137,10 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     PushProvider,
     PushBackendProvider,
     SerializerService,
-    LedgerService
+    LedgerService,
+    ProtocolGuard,
+    ServiceKeyGuard,
+    TransactionHashGuard
   ],
   bootstrap: [AppComponent]
 })

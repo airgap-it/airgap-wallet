@@ -43,6 +43,10 @@ export class SubAccountAddPage {
   private readonly limit: number = 10
   private loaded: number = 0
 
+  public publicKey: string
+  public protocolID: string
+  public addressIndex: undefined
+
   constructor(
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
@@ -50,6 +54,16 @@ export class SubAccountAddPage {
     private readonly priceService: PriceService,
     private readonly protocolService: ProtocolService
   ) {
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+    this.subProtocolType = this.route.snapshot.params.subProtocolType
+
+    if (this.addressIndex === 'undefined') {
+      this.addressIndex = undefined
+    }
+    this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
+
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.actionCallback = info.actionCallback

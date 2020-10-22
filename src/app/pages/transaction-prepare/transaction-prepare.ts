@@ -17,6 +17,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 interface TransactionFormState<T> {
   value: T
@@ -62,6 +63,13 @@ export class TransactionPreparePage {
   private _state: TransactionPrepareState
   private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
 
+  private publicKey: string
+  private protocolID: string
+  private addressIndex
+  private address: string
+  private amount
+  private forced
+
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
@@ -72,38 +80,49 @@ export class TransactionPreparePage {
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    public readonly accountProvider: AccountProvider
   ) {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      const address: string = info.address || ''
-      const amount: number = info.amount || 0
-      const wallet: AirGapMarketWallet = info.wallet
-      const forceMigration: boolean = info.forceMigration || false
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+    this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
 
-      this.transactionForm = this.formBuilder.group({
-        address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
-        amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
-        feeLevel: [0, [Validators.required]],
-        fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
-        isAdvancedMode: [false, []]
+    this.address = this.route.snapshot.params.address
+    this.amount = Number(this.route.snapshot.params.amount)
+    this.forced = this.route.snapshot.params.forceMigration
+
+    const address: string = this.address === 'false' ? '' : this.address || ''
+    const amount: number = this.amount || 0
+    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
+      this.publicKey,
+      this.protocolID,
+      this.addressIndex
+    )
+    const forceMigration: boolean = this.forced === 'forced' || false
+
+    this.transactionForm = this.formBuilder.group({
+      address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
+      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
+      feeLevel: [0, [Validators.required]],
+      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
+      isAdvancedMode: [false, []]
+    })
+
+    this.wallet = wallet
+
+    this.isSubstrate =
+      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+
+    this.initState()
+      .then(async () => {
+        if (forceMigration) {
+          await this.forceMigration()
+        }
+        this.onChanges()
+        this.updateFeeEstimate()
       })
-
-      this.wallet = wallet
-
-      this.isSubstrate =
-        wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
-
-      this.initState()
-        .then(async () => {
-          if (forceMigration) {
-            await this.forceMigration()
-          }
-          this.onChanges()
-          this.updateFeeEstimate()
-        })
-        .catch(handleErrorSentry(ErrorCategory.OTHER))
-    }
+      .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
   public onChanges(): void {

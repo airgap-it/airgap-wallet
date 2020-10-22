@@ -54,14 +54,19 @@ export class AccountImportOnboardingPage implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      this.protocol = await this.protocolService.getProtocol(info.mainProtocolIdentifier)
-      this.indexEndingSlide = 3
-      if (info.subProtocolIdentifier) {
-        this.subProtocol = await this.protocolService.getProtocol(info.subProtocolIdentifier)
-        this.indexEndingSlide = 4
-      }
+    const protocolID = this.route.snapshot.params.protocolID
+    let mainProtocolIdentifier
+    let subprotocolID
+
+    if (protocolID.search('-') !== -1) {
+      mainProtocolIdentifier = `${protocolID}`.split('-')[0]
+      subprotocolID = protocolID
+    }
+    this.protocol = await this.protocolService.getProtocol(mainProtocolIdentifier ? mainProtocolIdentifier : protocolID)
+    this.indexEndingSlide = 3
+    if (subprotocolID !== undefined) {
+      this.subProtocol = await this.protocolService.getProtocol(subprotocolID)
+      this.indexEndingSlide = 4
     }
   }
 

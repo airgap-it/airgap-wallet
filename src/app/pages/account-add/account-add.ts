@@ -104,22 +104,13 @@ export class AccountAddPage {
             wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
         ).length > 0
     ) {
-      const info = {
-        subProtocolIdentifier: subProtocol.identifier,
-        networkIdentifier: subProtocol.options.network.identifier
-      }
-
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(err => console.error(err))
+      this.router
+        .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
+        .catch(err => console.error(err))
     } else {
-      const info = {
-        mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocol.identifier,
-        networkIdentifier: subProtocol.options.network.identifier
-      }
-
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router
+        .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}`)
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
@@ -146,20 +137,18 @@ export class AccountAddPage {
   }
 
   private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
-    const info = {
-      protocolIdentifier: protocol.identifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router
-      .navigateByUrl('/account-import-ledger-onboarding/' + DataServiceKey.PROTOCOL)
+      .navigateByUrl(`/account-import-ledger-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private importFromVault(protocol: ICoinProtocol) {
-    const info = {
-      mainProtocolIdentifier: protocol.identifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
-    this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public navigateToScan() {
+    this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }
