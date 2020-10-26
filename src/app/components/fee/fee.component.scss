@@ -1,0 +1,17 @@
+.fee-amount__help {
+  padding-top: 12px;
+}
+.fee--amount__label {
+  padding-top: 8px;
+  .item-inner {
+    padding: 0 !important;
+  }
+  ion-label {
+    font-size: 14px;
+  }
+}
+.input--placeholder {
+  position: relative;
+  right: 0;
+  top: 10px;
+}

@@ -18,6 +18,7 @@ import { CurrencyItemComponent } from './currency-item/currency-item'
 import { DelegateActionPopoverComponent } from './delegate-action-popover copy/delegate-action-popover.component'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
+import { FeeComponent } from './fee/fee.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
@@ -50,6 +51,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
 
     TransactionListComponent,
     TransactionItemComponent,
+    FeeComponent,
 
     WidgetSelector,
     WidgetAccount,
@@ -88,6 +90,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
 
     TransactionListComponent,
     TransactionItemComponent,
+    FeeComponent,
 
     WidgetSelector,
     WidgetAccount,
