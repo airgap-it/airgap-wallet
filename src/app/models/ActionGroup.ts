@@ -72,9 +72,7 @@ export class ActionGroup {
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-                  info.wallet.addressIndex
-                }/${info.subProtocolType}`
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
               )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
@@ -158,7 +156,9 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -224,9 +224,7 @@ export class ActionGroup {
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
             .navigateByUrl(
-              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
-                this.callerContext.wallet.protocol.identifier
-              }/${this.callerContext.wallet.addressIndex}`
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${this.callerContext.wallet.protocol.identifier}/${this.callerContext.wallet.addressIndex}`
             )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
