@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, EthereumProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
@@ -339,6 +339,16 @@ export class TransactionPreparePage {
         'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
         false,
         'm/44h/1729h/0h/0h',
+        this.priceService
+      )
+      await newWallet.synchronize()
+      return newWallet.currentMarketPrice.toNumber()
+    } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+      const newWallet = new AirGapMarketWallet(
+        new EthereumProtocol(),
+        '02e3188bc0c05ccfd6938cb3f5474a70927b5580ffb2ca5ac425ed6a9b2a9e9932',
+        false,
+        `m/44'/60'/0'/0/0`,
         this.priceService
       )
       await newWallet.synchronize()
