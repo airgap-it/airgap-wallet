@@ -187,7 +187,22 @@ page-scan {
 /* Common Components styling */
 
 // identicon.component
-airgap-identicon {
-  height: 48px;
-  width: 48px;
+portfolio-item,
+transaction-item {
+  airgap-identicon {
+    height: 48px;
+    width: 48px;
+  }
+}
+airgap-currency-symbol {
+  img {
+    border-radius: 50%;
+  }
+}
+page-sub-account-add {
+  airgap-currency-symbol {
+    img {
+      width: 100%;
+    }
+  }
 }

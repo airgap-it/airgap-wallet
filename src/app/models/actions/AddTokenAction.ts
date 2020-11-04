@@ -25,7 +25,7 @@ export class AddTokenAction extends Action<void, AddTokenActionContext> {
     this.context.subAccounts
       .filter((account: IAccountWrapper) => account.selected)
       .map((account: IAccountWrapper) => account.wallet)
-      .forEach((wallet: AirGapMarketWallet) => {
+      .forEach(async (wallet: AirGapMarketWallet) => {
         this.context.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
   }

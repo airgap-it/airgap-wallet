@@ -1,5 +1,5 @@
 import { SubProtocolSymbols } from 'airgap-coin-lib'
-import { HttpClient } from '@angular/common/http'
+import axios from '../../../../node_modules/axios'
 import { Injectable } from '@angular/core'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
@@ -12,7 +12,7 @@ import * as cryptocompare from 'cryptocompare'
 export class PriceService implements AirGapWalletPriceService {
   private readonly pendingMarketPriceRequests: { [key: string]: Promise<BigNumber> } = {}
   private readonly pendingMarketPriceOverTimeRequests: { [key: string]: Promise<MarketDataSample[]> } = {}
-  constructor(private readonly http: HttpClient) {}
+  constructor() {}
 
   public async getCurrentMarketPrice(protocol: ICoinProtocol, baseSymbol: string): Promise<BigNumber> {
     if (protocol.marketSymbol.length === 0) {
@@ -57,7 +57,7 @@ export class PriceService implements AirGapWalletPriceService {
   }
 
   public async fetchFromCoinGecko(protocol: ICoinProtocol): Promise<BigNumber> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       // TODO: Remove once cryptocompare supports xchf
       const symbolMapping = {
         zrx: '0x',
@@ -159,17 +159,17 @@ export class PriceService implements AirGapWalletPriceService {
 
       const id = symbolMapping[protocol.marketSymbol.toLowerCase()]
       if (id) {
-        this.http
-          .get<{ data: { usd: string }[] }>(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`)
-          .toPromise()
-          .then(({ data }: { data: { usd: string }[] }) => {
-            const price = data !== undefined ? new BigNumber(data[id].usd) : new BigNumber(0)
-            resolve(price)
-          })
-          .catch(coinGeckoError => {
-            console.error(coinGeckoError)
-            reject(coinGeckoError)
-          })
+        try {
+          const response = await axios.get<{ data: { usd: string }[] }>(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`
+          )
+          const price = response.data !== undefined ? new BigNumber(response.data[id].usd) : new BigNumber(0)
+          resolve(price)
+        } catch (error) {
+          reject(error)
+        }
+      } else {
+        resolve(new BigNumber(0))
       }
     })
   }
