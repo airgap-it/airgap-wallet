@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'sub-account-import.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -10,14 +10,14 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid fixed="true" class="ion-no-padding">
-    <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: subProtocol?.name }" class="ion-padding-horizontal"></p>
+  <ion-grid fixed="true" *ngIf="subProtocol" class="ion-no-padding">
+    <p [innerHTML]="'sub-account-import.text' | translate: { subProtocolName: subProtocol.name }" class="ion-padding-horizontal"></p>
     <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of subWallets">
       <portfolio-item [wallet]="wallet" tappable (click)="importWallet(wallet)"></portfolio-item>
     </ion-list>
     <empty-state
       *ngIf="subWallets.length === 0"
-      [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol?.name }"
+      [text]="'sub-account-import.empty_text' | translate: { tokenName: subProtocol.name }"
       [imageName]="'no-imports.svg'"
     ></empty-state>
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">

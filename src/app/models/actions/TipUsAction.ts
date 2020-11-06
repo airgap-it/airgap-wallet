@@ -1,7 +1,6 @@
-import { LanguageService } from '@airgap/angular-core'
+import { UiEventService } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AlertOptions } from '@ionic/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { Action } from 'airgap-coin-lib/dist/actions/Action'
 
@@ -18,7 +17,7 @@ export interface TipUsActionContext {
   isAccepted?: boolean
   popoverController: PopoverController
   loadingController: LoadingController
-  languageService: LanguageService
+  uiEventService: UiEventService
   alertController: AlertController
   toastController: ToastController
   dataService: DataService
@@ -42,7 +41,13 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
         amount: this.context.amount
       })
 
-      this.context.router.navigateByUrl(`/transaction-prepare/${DataServiceKey.DETAIL}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.context.router
+        .navigateByUrl(
+          `/transaction-prepare/${DataServiceKey.DETAIL}/${this.context.wallet.publicKey}/${this.context.wallet.protocol.identifier}/${
+            this.context.wallet.addressIndex
+          }/${this.context.tipAddress}/${this.context.amount}/${'not_forced'}`
+        )
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
       // Do nothing
     }
@@ -50,11 +55,10 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
 
   private async showAlert(): Promise<void> {
     return new Promise<void>(async resolve => {
-      const translatedAlert: AlertOptions = await this.context.languageService.getTranslatedAlert(
-        'action-alert-tip.heading',
-        'action-alert-tip.text',
-        [],
-        [
+      await this.context.uiEventService.showTranslatedAlert({
+        header: this.context.alertTitle ? this.context.alertTitle : 'action-alert-tip.heading',
+        message: this.context.alertDescription ? this.context.alertDescription : 'action-alert-tip.text',
+        buttons: [
           {
             text: 'action-alert-tip.cancel_label',
             role: 'cancel',
@@ -72,18 +76,7 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
             }
           }
         ]
-      )
-
-      if (this.context.alertTitle) {
-        translatedAlert.header = this.context.alertTitle
-      }
-      if (this.context.alertDescription) {
-        translatedAlert.message = this.context.alertDescription
-      }
-
-      const alert: HTMLIonAlertElement = await this.context.alertController.create(translatedAlert)
-
-      await alert.present()
+      })
     })
   }
 }

@@ -1,9 +1,10 @@
+import { ClipboardService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 
-import { ClipboardService } from '../../services/clipboard/clipboard'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'page-account-address',
@@ -12,15 +13,24 @@ import { ClipboardService } from '../../services/clipboard/clipboard'
 })
 export class AccountAddressPage {
   public wallet: AirGapMarketWallet
+  public publicKey: string
+  public protocolID: string
+  public addressIndex: undefined
 
   constructor(
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
-    private readonly clipboardProvider: ClipboardService
+
+    private readonly clipboardProvider: ClipboardService,
+    public readonly accountProvider: AccountProvider
   ) {
-    if (this.route.snapshot.data.special) {
-      this.wallet = this.route.snapshot.data.special
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+    if (this.addressIndex === 'undefined') {
+      this.addressIndex = undefined
     }
+    this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
   }
 
   public async copyAddressToClipboard(): Promise<void> {

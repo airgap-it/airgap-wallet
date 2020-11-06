@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>
         {{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}
@@ -18,7 +18,7 @@
     </ion-row>
 
     <ion-row class="ion-justify-content-center ion-padding-vertical">
-      <qr-clipboard id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></qr-clipboard>
+      <airgap-qr id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></airgap-qr>
       <ion-text>
         <h1 *ngIf="qrDataTooBig">
           {{ 'transaction-qr.qr-data-too-big_warning' | translate }}

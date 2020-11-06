@@ -1,19 +1,25 @@
-import { Injectable, Inject } from '@angular/core'
+import { PERMISSIONS_PLUGIN, PermissionStatus, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
+import { Inject, Injectable } from '@angular/core'
+import {
+  PermissionResult,
+  PermissionsPlugin,
+  PermissionType,
+  PushNotification,
+  PushNotificationsPlugin,
+  PushNotificationToken
+} from '@capacitor/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
-import { PushNotificationsPlugin, PushNotification, PushNotificationToken } from '@capacitor/core'
+import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { IntroductionPushPage } from '../../pages/introduction-push/introduction-push'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { PushBackendProvider } from './../push-backend/push-backend'
-
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PermissionsProvider, PermissionStatus } from '../permissions/permissions'
 
 @Injectable({
   providedIn: 'root'
@@ -26,10 +32,11 @@ export class PushProvider {
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    private readonly permissionsProvider: PermissionsProvider,
+    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
+    @Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
@@ -39,12 +46,13 @@ export class PushProvider {
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
+    const isSupported = await this.isSupported()
 
-    if (!this.platform.is('hybrid')) {
+    if (!isSupported) {
       return
     }
 
-    const permissionStatus = await this.permissionsProvider.hasNotificationsPermission()
+    const permissionStatus: PermissionStatus = await this.checkPermission(PermissionType.Notifications)
 
     if (permissionStatus === PermissionStatus.GRANTED) {
       await this.register()
@@ -53,14 +61,19 @@ export class PushProvider {
 
   public async setupPush() {
     await this.platform.ready()
+    const isSupported = await this.isSupported()
+
+    if (!isSupported) {
+      return
+    }
 
     if (this.platform.is('android')) {
       this.register()
     } else if (this.platform.is('ios')) {
       // On iOS, show a modal why we need permissions
-      const hasShownPushModal = await this.storageProvider.get(SettingsKey.PUSH_INTRODUCTION)
+      const hasShownPushModal = await this.storageProvider.get(WalletStorageKey.PUSH_INTRODUCTION)
       if (!hasShownPushModal) {
-        await this.storageProvider.set(SettingsKey.PUSH_INTRODUCTION, true)
+        await this.storageProvider.set(WalletStorageKey.PUSH_INTRODUCTION, true)
         const modal = await this.modalController.create({
           component: IntroductionPushPage
         })
@@ -161,5 +174,30 @@ export class PushProvider {
     })
 
     await this.pushNotifications.register()
+  }
+
+  private async checkPermission(type: PermissionType): Promise<PermissionStatus> {
+    const permission: PermissionResult = await this.permissions.query({ name: type })
+
+    switch (permission.state) {
+      case 'granted':
+        return PermissionStatus.GRANTED
+      case 'denied':
+        return PermissionStatus.DENIED
+      case 'prompt':
+        return PermissionStatus.UNKNOWN
+
+      default:
+        throw new Error('Unknown permission type')
+    }
+  }
+
+  private async isSupported(): Promise<boolean> {
+    if (this.platform.is('hybrid')) {
+      const info = await this.appInfoPlugin.get()
+      return this.platform.is('ios') || (this.platform.is('android') && info.productFlavor !== 'fdroid')
+    } else {
+      return false
+    }
   }
 }

@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'about.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -10,10 +10,8 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-grid fixed="true" class="ion-no-padding">
-    <ion-item>{{ appName }}</ion-item>
-    <ion-item>{{ packageName }}</ion-item>
-    <ion-item>{{ versionCode }}</ion-item>
-    <ion-item>{{ versionNumber }}</ion-item>
-  </ion-grid>
+  <ion-item>{{ appName }}</ion-item>
+  <ion-item>{{ packageName }}</ion-item>
+  <ion-item>{{ versionCode }}</ion-item>
+  <ion-item>{{ versionName }}</ion-item>
 </ion-content>

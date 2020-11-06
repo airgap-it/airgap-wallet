@@ -1,23 +1,23 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, EthereumProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { PriceService } from 'src/app/services/price/price.service'
 
-import { ClipboardService } from '../../services/clipboard/clipboard'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 interface TransactionFormState<T> {
   value: T
@@ -63,6 +63,13 @@ export class TransactionPreparePage {
   private _state: TransactionPrepareState
   private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
 
+  private publicKey: string
+  private protocolID: string
+  private addressIndex
+  private address: string
+  private amount
+  private forced
+
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
@@ -73,38 +80,49 @@ export class TransactionPreparePage {
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly priceService: PriceService
+    private readonly priceService: PriceService,
+    public readonly accountProvider: AccountProvider
   ) {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      const address: string = info.address || ''
-      const amount: number = info.amount || 0
-      const wallet: AirGapMarketWallet = info.wallet
-      const forceMigration: boolean = info.forceMigration || false
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+    this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
 
-      this.transactionForm = this.formBuilder.group({
-        address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
-        amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
-        feeLevel: [0, [Validators.required]],
-        fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
-        isAdvancedMode: [false, []]
+    this.address = this.route.snapshot.params.address
+    this.amount = Number(this.route.snapshot.params.amount)
+    this.forced = this.route.snapshot.params.forceMigration
+
+    const address: string = this.address === 'false' ? '' : this.address || ''
+    const amount: number = this.amount || 0
+    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
+      this.publicKey,
+      this.protocolID,
+      this.addressIndex
+    )
+    const forceMigration: boolean = this.forced === 'forced' || false
+
+    this.transactionForm = this.formBuilder.group({
+      address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
+      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
+      feeLevel: [0, [Validators.required]],
+      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
+      isAdvancedMode: [false, []]
+    })
+
+    this.wallet = wallet
+
+    this.isSubstrate =
+      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+
+    this.initState()
+      .then(async () => {
+        if (forceMigration) {
+          await this.forceMigration()
+        }
+        this.onChanges()
+        this.updateFeeEstimate()
       })
-
-      this.wallet = wallet
-
-      this.isSubstrate =
-        wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
-
-      this.initState()
-        .then(async () => {
-          if (forceMigration) {
-            await this.forceMigration()
-          }
-          this.onChanges()
-          this.updateFeeEstimate()
-        })
-        .catch(handleErrorSentry(ErrorCategory.OTHER))
-    }
+      .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
   public onChanges(): void {
@@ -316,15 +334,9 @@ export class TransactionPreparePage {
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
     if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-      const newWallet = new AirGapMarketWallet(
-        new TezosProtocol(),
-        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
-        false,
-        'm/44h/1729h/0h/0h',
-        this.priceService
-      )
-      await newWallet.synchronize()
-      return newWallet.currentMarketPrice.toNumber()
+      return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+    } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+      return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.currentMarketPrice.toNumber()
     }

@@ -1,10 +1,9 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { DeeplinkService, ProtocolService } from '@airgap/angular-core'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { IonSlides, Platform } from '@ionic/angular'
 import { ICoinProtocol } from 'airgap-coin-lib'
 
-import { DeepLinkProvider } from '../../services/deep-link/deep-link'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 const DEEPLINK_VAULT_ADD_ACCOUNT: string = `airgap-vault://add-account/`
@@ -43,7 +42,7 @@ export class AccountImportOnboardingPage implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     public platform: Platform,
-    private readonly deeplinkProvider: DeepLinkProvider,
+    private readonly deeplinkService: DeeplinkService,
     private readonly protocolService: ProtocolService
   ) {
     if (this.platform.is('ios')) {
@@ -55,14 +54,19 @@ export class AccountImportOnboardingPage implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      this.protocol = await this.protocolService.getProtocol(info.mainProtocolIdentifier)
-      this.indexEndingSlide = 3
-      if (info.subProtocolIdentifier) {
-        this.subProtocol = await this.protocolService.getProtocol(info.subProtocolIdentifier)
-        this.indexEndingSlide = 4
-      }
+    const protocolID = this.route.snapshot.params.protocolID
+    let mainProtocolIdentifier
+    let subprotocolID
+
+    if (protocolID.search('-') !== -1) {
+      mainProtocolIdentifier = `${protocolID}`.split('-')[0]
+      subprotocolID = protocolID
+    }
+    this.protocol = await this.protocolService.getProtocol(mainProtocolIdentifier ? mainProtocolIdentifier : protocolID)
+    this.indexEndingSlide = 3
+    if (subprotocolID !== undefined) {
+      this.subProtocol = await this.protocolService.getProtocol(subprotocolID)
+      this.indexEndingSlide = 4
     }
   }
 
@@ -77,7 +81,7 @@ export class AccountImportOnboardingPage implements OnInit {
   }
 
   public openVault(): void {
-    this.deeplinkProvider
+    this.deeplinkService
       .sameDeviceDeeplink(`${DEEPLINK_VAULT_ADD_ACCOUNT}${this.protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))
   }

@@ -2,8 +2,8 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { IonSlides } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-
+import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { ProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { promiseRetry } from '../../helpers/promise'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
@@ -50,6 +50,8 @@ export class AccountImportLedgerOnboardingPage {
     private readonly dataService: DataService,
     private readonly ledgerService: LedgerService
   ) {
+    const protocolID: ProtocolSymbols = this.route.snapshot.params.protocolID
+    this.protocol = getProtocolByIdentifier(protocolID)
     this.init()
   }
 
@@ -102,16 +104,14 @@ export class AccountImportLedgerOnboardingPage {
   }
 
   private async init(): Promise<void> {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      this.protocol = await this.protocolService.getProtocol(info.protocolIdentifier)
+    const protocolID: ProtocolSymbols = this.route.snapshot.params.protocolID
+    this.protocol = await this.protocolService.getProtocol(protocolID)
 
-      this.slideAssets = [
-        ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
-        [`ledger_app_${this.protocol.identifier}.svg`, 'account-import-ledger-onboarding.slides.slide-2'],
-        ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
-      ]
-    }
+    this.slideAssets = [
+      ['ledger_app_connected.svg', 'account-import-ledger-onboarding.slides.slide-1'],
+      [`ledger_app_${this.protocol.identifier}.svg`, 'account-import-ledger-onboarding.slides.slide-2'],
+      ['ledger_app_confirm.svg', 'account-import-ledger-onboarding.slides.slide-3']
+    ]
 
     this.importFromLedger()
   }

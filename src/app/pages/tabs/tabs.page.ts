@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ModalController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
@@ -24,7 +24,7 @@ export class TabsPage {
 
   constructor(
     public modalController: ModalController,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly plaftorm: Platform
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
@@ -32,17 +32,17 @@ export class TabsPage {
   }
 
   private async showIntroductions() {
-    const alreadyOpenByDeepLink = await this.storageProvider.get(SettingsKey.DEEP_LINK)
+    const alreadyOpenByDeepLink = await this.storageProvider.get(WalletStorageKey.DEEP_LINK)
     if (!alreadyOpenByDeepLink) {
       await this.showWalletIntroduction().catch(console.error)
     }
   }
 
   private async showWalletIntroduction() {
-    return this.showModal(SettingsKey.WALLET_INTRODUCTION, IntroductionPage)
+    return this.showModal(WalletStorageKey.WALLET_INTRODUCTION, IntroductionPage)
   }
 
-  private async showModal(settingsKey: SettingsKey, page: any): Promise<void> {
+  private async showModal(settingsKey: WalletStorageKey, page: any): Promise<void> {
     const introduction = await this.storageProvider.get(settingsKey)
     if (!introduction) {
       return new Promise<void>(async resolve => {

@@ -18,14 +18,14 @@ import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { StorageProvider } from '../../services/storage/storage'
+import { WalletStorageService } from '../../services/storage/storage'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { timer, Subscription } from 'rxjs'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000
@@ -77,6 +77,10 @@ export class AccountTransactionListPage {
 
   private readonly walletChanged: Subscription
 
+  private publicKey: string
+  private protocolID: string
+  private addressIndex
+
   constructor(
     public readonly alertCtrl: AlertController,
     public readonly navController: NavController,
@@ -91,16 +95,23 @@ export class AccountTransactionListPage {
     public readonly dataService: DataService,
     public readonly protocolService: ProtocolService,
     private readonly route: ActivatedRoute,
-    private readonly storageProvider: StorageProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService
   ) {
-    const info = this.route.snapshot.data.special
-    if (this.route.snapshot.data.special) {
-      this.wallet = info.wallet
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+
+    if (this.addressIndex === 'undefined') {
+      this.addressIndex = undefined
+    } else {
+      this.addressIndex = Number(this.addressIndex)
     }
+
+    this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
 
     this.updateExtendedDetails()
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
@@ -121,7 +132,10 @@ export class AccountTransactionListPage {
     this.protocolIdentifier = this.wallet.protocol.identifier
 
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
-      this.mainWallet = info.mainWallet
+      const mainProtocolID = this.route.snapshot.params.mainProtocolID
+      if (mainProtocolID !== 'undefined') {
+        this.mainWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, mainProtocolID)
+      }
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
@@ -168,18 +182,25 @@ export class AccountTransactionListPage {
         address: ''
       }
     }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(
+        `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${info.address !==
+          ''}/${0}/${'not_forced'}`
+      )
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage(): void {
-    this.dataService.setData(DataServiceKey.DETAIL, this.wallet)
-    this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openTransactionDetailPage(transaction: IAirGapTransaction): void {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
-    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/transaction-detail/${DataServiceKey.DETAIL}/${transaction.hash}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async openBlockexplorer(): Promise<void> {
@@ -202,7 +223,7 @@ export class AccountTransactionListPage {
     this.loadInitialTransactions().catch(handleErrorSentry())
   }
 
-  public async doInfinite(event): Promise<void> {
+  public async doInfinite(event: { target: { complete: () => void | PromiseLike<void> } }): Promise<void> {
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
@@ -334,7 +355,7 @@ export class AccountTransactionListPage {
     )}${transaction.amount}${transaction.fee}${transaction.timestamp ? transaction.timestamp : ''}`
   }
 
-  public async presentEditPopover(event): Promise<void> {
+  public async presentEditPopover(event: any): Promise<void> {
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {

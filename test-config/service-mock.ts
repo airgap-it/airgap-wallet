@@ -1,7 +1,7 @@
-import { newSpy } from './unit-test-helper'
-import { PermissionStatus } from 'src/app/services/permissions/permissions'
+import { PermissionStatus } from '@airgap/angular-core'
 
-export class PermissionsProviderMock {
+import { newSpy } from './unit-test-helper'
+
+export class PermissionsServiceMock {
   public hasCameraPermission = newSpy('hasCameraPermission', Promise.resolve(PermissionStatus.GRANTED))
-  public hasNotificationsPermission = newSpy('hasNotificationsPermission', Promise.resolve(PermissionStatus.GRANTED))
 }

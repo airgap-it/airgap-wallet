@@ -49,7 +49,11 @@ export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateAct
                 }
                 this.context.dataService.setData(DataServiceKey.DETAIL, info)
                 this.context.router
-                  .navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL)
+                  .navigateByUrl(
+                    `/transaction-prepare/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                      info.wallet.addressIndex
+                    }/${info.address}/${0}/${info.forceMigration ? 'forced' : 'not_forced'}`
+                  )
                   .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
                 resolve()
               }

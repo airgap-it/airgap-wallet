@@ -3,7 +3,7 @@
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'scan.title' | translate }}</ion-title>
       <ion-title slot="end" *ngIf="isMultiQr">{{ numberOfQrsScanned }}/{{ numberOfQrsTotal }}</ion-title>
@@ -33,9 +33,9 @@
     </ion-row>
 
     <ion-row
+      class="row--height__100 ion-justify-content-center ion-align-items-center"
       [hidden]="hasCameraPermission"
       (click)="requestPermission()"
-      class="row--height__100 ion-justify-content-center ion-align-items-center "
     >
       <ion-col class="ion-text-center">
         <img src="./assets/img/permission_onboarding_camera.svg" />

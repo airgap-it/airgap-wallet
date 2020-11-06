@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/tabs/portfolio"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ wallet.protocol.symbol }} {{ 'wallet-address.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -32,7 +32,7 @@
     </ion-row>
 
     <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <qr-clipboard [qrdata]="wallet.receivingPublicAddress" [shouldPrefixSingleQrWithUrl]="false" [size]="240"></qr-clipboard>
+      <airgap-qr [qrdata]="wallet.receivingPublicAddress" [shouldPrefixSingleQrWithUrl]="false" [size]="240"></airgap-qr>
     </ion-row>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

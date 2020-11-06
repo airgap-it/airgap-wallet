@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'add-account.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -15,12 +15,33 @@
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-list lines="none">
+      <ion-text color="primary" *ngIf="filteredAccountProtocols.length > 0 || filteredFeaturedSubAccountProtocols.length > 0">
+        <p class="font--weight__bold">
+          {{ 'account-add.featured' | translate }}
+        </p>
+      </ion-text>
       <currency-item (click)="addAccount(protocol)" *ngFor="let protocol of filteredAccountProtocols" [protocol]="protocol"></currency-item>
       <currency-item
         (click)="addSubAccount(subProtocol)"
-        *ngFor="let subProtocol of filteredSubAccountProtocols"
+        *ngFor="let subProtocol of filteredFeaturedSubAccountProtocols"
+        [protocol]="subProtocol"
+      ></currency-item>
+
+      <ion-text color="primary" *ngIf="filteredOtherSubAccountProtocols.length > 0">
+        <p class="font--weight__bold">
+          {{ 'account-add.others' | translate }}
+        </p>
+      </ion-text>
+      <currency-item
+        (click)="addSubAccount(subProtocol)"
+        *ngFor="let subProtocol of filteredOtherSubAccountProtocols"
         [protocol]="subProtocol"
       ></currency-item>
     </ion-list>
   </ion-grid>
 </ion-content>
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button id="add-more-coins-button" color="secondary" (click)="navigateToScan()">
+    <ion-icon name="barcode-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

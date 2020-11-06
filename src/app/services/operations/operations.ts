@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, ICoinDelegateProtocol, TezosKtProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, generateId, IACMessageType, IAirGapTransaction, ICoinDelegateProtocol, TezosKtProtocol } from 'airgap-coin-lib'
 import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
+import { FeeDefaults } from 'airgap-coin-lib'
+import { TezosBTC } from 'airgap-coin-lib'
 import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
@@ -13,7 +13,7 @@ import {
   RawTezosTransaction,
   RawSubstrateTransaction
 } from 'airgap-coin-lib/dist/serializer/types'
-import { SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { SubProtocolSymbols } from 'airgap-coin-lib'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -30,7 +30,7 @@ import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SerializerService } from '../serializer/serializer.service'
+import { SerializerService } from '@airgap/angular-core'
 
 export type SerializableTx =
   | RawTezosTransaction
@@ -314,12 +314,13 @@ export class OperationsProvider {
   public async serializeSignRequest(wallet: AirGapMarketWallet, transaction: SerializableTx): Promise<string[]> {
     return this.serializerService.serialize([
       {
+        id: generateId(10),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
           publicKey: wallet.publicKey,
           transaction: transaction as any, // TODO: Type
-          callback: 'airgap-wallet://?d='
+          callbackURL: 'airgap-wallet://?d='
         }
       }
     ])

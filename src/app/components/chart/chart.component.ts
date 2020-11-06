@@ -27,8 +27,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
 
-  public rawData: ValueAtTimestampObject[] = []
-
   private readonly subscription: Subscription
 
   constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {
@@ -118,7 +116,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     }
 
     this.subscription = this.drawChartProvider.getChartObservable().subscribe(async data => {
-      await this.drawChart(data)
+      this.drawChart(data)
     })
   }
 
@@ -128,22 +126,23 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
     this.currentChart = timeInterval
 
-    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
-    this.chartDatasets[0].data = this.rawData.map((obj: ValueAtTimestampObject) => obj.balance)
+    this.marketDataProvider.fetchAllValues(this.currentChart).then(async rawData => {
+      this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestampObject) => obj.balance)
 
-    for (let i = 0; i < this.rawData.length; i++) {
-      // x-axis labeling
-      this.chartLabels.push(this.rawData[i].timestamp.toString())
-    }
+      for (const value of rawData) {
+        // x-axis labeling
+        this.chartLabels.push(value.timestamp.toString())
+      }
 
-    this.percentageChange = await this.displayPercentageChange(this.rawData.map((obj: ValueAtTimestampObject) => obj.balance))
+      this.percentageChange = this.displayPercentageChange(rawData.map((obj: ValueAtTimestampObject) => obj.balance))
+    })
   }
 
   public setLabel24h(): void {
     this.currentChart = TimeUnit.Minutes
   }
 
-  public async displayPercentageChange(rawData: number[]): Promise<number> {
+  public displayPercentageChange(rawData: number[]): number {
     const firstValue: number = rawData.find(value => value > 0)
     if (firstValue !== undefined) {
       const lastValue: number = rawData.slice(-1)[0]

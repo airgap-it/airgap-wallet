@@ -16,7 +16,7 @@ import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 
-import { BeaconRequest, SerializedBeaconRequest, SettingsKey, StorageProvider } from '../storage/storage'
+import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorageService } from '../storage/storage'
 import {
   TezosProtocolNetwork,
   TezblockBlockExplorer,
@@ -35,7 +35,7 @@ export class BeaconService {
   constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
-    private readonly storage: StorageProvider
+    private readonly storage: WalletStorageService
   ) {
     this.init()
   }
@@ -65,7 +65,7 @@ export class BeaconService {
   }
 
   public async getRequestsFromStorage(): Promise<BeaconRequest[]> {
-    const requests: SerializedBeaconRequest[] = await this.storage.get(SettingsKey.BEACON_REQUESTS)
+    const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
 
     return await Promise.all(
       requests.map(
@@ -164,7 +164,7 @@ export class BeaconService {
       }
     }))
 
-    return this.storage.set(SettingsKey.BEACON_REQUESTS, requests)
+    return this.storage.set(WalletStorageKey.BEACON_REQUESTS, requests)
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {

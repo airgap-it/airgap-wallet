@@ -1,0 +1,78 @@
+<form [formGroup]="form">
+  <ion-row class="fee--amount__label ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-item lines="none" class="ion-no-padding">
+        <ion-text class="ion-no-margin" color="blackLight">
+          <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})</ion-label>
+        </ion-text>
+        <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [attr.disabled]="state.disableAdvancedMode"></ion-toggle>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row nowrap class="ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-item class="ion-no-padding" lines="none">
+        <ion-range
+          [attr.disabled]="state.forceMigration || state.disableFeeSlider"
+          min="0"
+          max="2"
+          step="1"
+          snaps="true"
+          formControlName="feeLevel"
+          id="feeLevel-input"
+          class="range-slider ion-no-padding"
+        >
+          <ion-icon slot="start" color="black" name="hourglass-outline"></ion-icon>
+          <ion-icon slot="end" color="black" name="rocket-outline"></ion-icon>
+        </ion-range>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="6" class="ion-no-padding">
+      <small>{{ 'transaction-prepare.fee.slow_label' | translate }}</small>
+    </ion-col>
+    <ion-col size="6" class="ion-no-padding ion-text-right">
+      <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal" *ngIf="state.isAdvancedMode.value">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-item class="advanced-item" class="ion-no-padding">
+        <ion-label position="stacked"></ion-label>
+        <ion-input
+          [attr.disabled]="state.forceMigration || state.disableAdvancedMode"
+          id="fee-input"
+          formControlName="fee"
+          type="string"
+          class="ion-no-padding"
+        ></ion-input>
+        <span slot="end" class="input--placeholder">
+          {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})
+        </span>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row class="fee-amount__help ion-padding-horizontal">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-text color="blackLight">
+        <p class="ion-no-margin">
+          <ng-container *ngIf="!state.estimatingFeeDefaults">
+            <span id="fee-amount">
+              <ng-container *ngIf="form.controls['fee'].invalid" color="primary">
+                {{ 'transaction-prepare.amount_label' | translate }}
+              </ng-container>
+              <ng-container *ngIf="form.controls['fee'].valid" color="primary">
+                ${{ form.get('fee').value * state.feeCurrentMarketPrice | number: '1.2-4' }}
+              </ng-container>
+            </span>
+            <span id="fee-amount-advanced" *ngIf="state">
+              ({{ state.fee.value | number: '1.2-6' }} {{ wallet.protocol.feeSymbol | uppercase }})
+            </span>
+          </ng-container>
+          <ion-skeleton-text animated style="width: 30%" *ngIf="state.estimatingFeeDefaults"></ion-skeleton-text>
+        </p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+</form>
