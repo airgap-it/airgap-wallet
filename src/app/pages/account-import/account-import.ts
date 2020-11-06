@@ -2,6 +2,7 @@ import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { DataService } from 'src/app/services/data/data.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -24,6 +25,7 @@ export class AccountImportPage {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly wallets: AccountProvider,
+    private readonly dataService: DataService,
     private readonly ngZone: NgZone
   ) {
     if (!this.route.snapshot.data.special) {
@@ -35,7 +37,10 @@ export class AccountImportPage {
 
   public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {
-      this.wallet = this.route.snapshot.data.special
+      this.dataService.getImportWallet().subscribe(wallet => {
+        this.wallet = wallet
+        this.ionViewDidEnter()
+      })
     }
 
     await this.platform.ready()

@@ -125,6 +125,7 @@ export class PortfolioPage {
       : {
           wallet: mainWallet
         }
+
     this.router
       .navigateByUrl(
         `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
