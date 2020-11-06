@@ -1,9 +1,9 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, FeeDefaults, ICoinProtocol } from 'airgap-coin-lib'
 import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -16,6 +16,26 @@ import { WalletStorageKey, WalletStorageService } from '../../services/storage/s
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { BehaviorSubject } from 'rxjs'
+import { PriceService } from 'src/app/services/price/price.service'
+import { debounceTime } from 'rxjs/operators'
+
+interface ExchangeFormState<T> {
+  value: T
+  dirty: boolean
+}
+interface ExchangeState {
+  feeDefaults: FeeDefaults
+  feeCurrentMarketPrice: number | null
+  disableFeeSlider: boolean
+  disableExchangeButton: boolean
+  disableAdvancedMode: boolean
+  estimatingFeeDefaults: boolean
+  fee: ExchangeFormState<string>
+  feeLevel: ExchangeFormState<number>
+  isAdvancedMode: ExchangeFormState<boolean>
+}
 
 enum ExchangePageState {
   LOADING,
@@ -30,6 +50,7 @@ enum ExchangePageState {
   styleUrls: ['./exchange.scss']
 })
 export class ExchangePage {
+  // TODO remove unused properties
   public selectedFromProtocol: ICoinProtocol
   public selectedToProtocol: ICoinProtocol
   public supportedProtocolsFrom: ProtocolSymbols[] = []
@@ -38,11 +59,13 @@ export class ExchangePage {
   public supportedFromWallets: AirGapMarketWallet[]
   public toWallet: AirGapMarketWallet
   public supportedToWallets: AirGapMarketWallet[]
-  public amount: BigNumber = new BigNumber(0)
   public minExchangeAmount: BigNumber = new BigNumber(0)
+  public amount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
   public activeExchange: string
   public disableExchangeSelection: boolean = false
+
+  public exchangeForm: FormGroup
 
   get isTZBTCExchange(): boolean {
     return (
@@ -51,12 +74,20 @@ export class ExchangePage {
     )
   }
 
+  // temporary field until we figure out how to handle Substrate fee/tip model
+  private isSubstrate: boolean = false
+
   public exchangePageStates: typeof ExchangePageState = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
 
   public loading: HTMLIonLoadingElement
 
+  public state: ExchangeState
+  private _state: ExchangeState | undefined = undefined
+  private readonly state$: BehaviorSubject<ExchangeState> = new BehaviorSubject(this._state)
+
   constructor(
+    public formBuilder: FormBuilder,
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly storageProvider: WalletStorageService,
@@ -66,16 +97,186 @@ export class ExchangePage {
     private readonly translateService: TranslateService,
     private readonly modalController: ModalController,
     private readonly alertCtrl: AlertController,
+    private readonly priceService: PriceService,
     private readonly operationsProvider: OperationsProvider,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly _ngZone: NgZone
   ) {
     this.exchangeProvider.getActiveExchange().subscribe((exchange: string) => {
       this.activeExchange = exchange
     })
+
+    this.exchangeForm = this.formBuilder.group({
+      feeLevel: [0, [Validators.required]],
+      fee: [0, Validators.compose([Validators.required])],
+      isAdvancedMode: [false, []]
+    })
+    this.setup()
+      .then(() => {
+        this.initState()
+          .then(async () => {
+            this.onChanges()
+            this.updateFeeEstimate()
+          })
+          .catch(err => console.error(err))
+      })
+      .catch(() => this.showLoadingErrorAlert())
   }
 
-  public async ionViewWillEnter(): Promise<void> {
-    this.setup().catch(() => this.showLoadingErrorAlert())
+  private async initState(): Promise<void> {
+    this._state = {
+      feeDefaults: this.selectedFromProtocol.feeDefaults,
+      disableAdvancedMode: this.isSubstrate,
+      feeCurrentMarketPrice: null,
+      disableFeeSlider: true,
+      disableExchangeButton: true,
+      estimatingFeeDefaults: false,
+      feeLevel: {
+        value: this.exchangeForm.controls.feeLevel.value,
+        dirty: false
+      },
+      fee: {
+        value: this.exchangeForm.controls.fee.value,
+        dirty: false
+      },
+      isAdvancedMode: {
+        value: this.exchangeForm.controls.isAdvancedMode.value,
+        dirty: false
+      }
+    }
+    this.state = this._state
+  }
+
+  private updateTransactionForm(formState: { [key: string]: ExchangeFormState<any> }) {
+    const formValues = this.exchangeForm.value
+    const updated = {}
+
+    Object.keys(formValues).forEach((key: string) => {
+      if (key in formState && !formState[key].dirty && formState[key].value !== formValues[key]) {
+        updated[key] = formState[key].value
+      }
+    })
+
+    this._ngZone.run(() => {
+      this.exchangeForm.patchValue(updated, { emitEvent: false })
+      Object.keys(updated).forEach((key: string) => {
+        this.exchangeForm.controls[key].markAsDirty()
+      })
+    })
+  }
+
+  private onStateUpdated(newState: ExchangeState): void {
+    this.state = newState
+
+    this.updateTransactionForm({
+      fee: this.state.fee,
+      feeLevel: this.state.feeLevel,
+      isAdvancedMode: this.state.isAdvancedMode
+    })
+  }
+
+  public onChanges(): void {
+    this.state$.pipe(debounceTime(200)).subscribe((state: ExchangeState) => {
+      this.onStateUpdated(state)
+    })
+
+    this.exchangeForm
+      .get('fee')
+      .valueChanges.pipe(debounceTime(500))
+      .subscribe((value: string) => {
+        const fee = new BigNumber(value)
+        this.updateState({
+          fee: {
+            value: fee.isNaN() ? '' : fee.toFixed(),
+            dirty: true
+          }
+        })
+      })
+
+    this.exchangeForm.get('feeLevel').valueChanges.subscribe((value: number) => {
+      const fee = new BigNumber(this.getFeeFromLevel(value))
+      this.updateState(
+        {
+          fee: {
+            value: fee.toFixed(),
+            dirty: false
+          },
+          feeLevel: {
+            value,
+            dirty: true
+          },
+          disableExchangeButton: this.exchangeForm.invalid || this.amount.lte(0)
+        },
+        false
+      )
+    })
+
+    this.exchangeForm.get('isAdvancedMode').valueChanges.subscribe((value: boolean) => {
+      this.updateState(
+        {
+          isAdvancedMode: {
+            value,
+            dirty: true
+          },
+          disableExchangeButton: this.exchangeForm.invalid || new BigNumber(this.amount).lte(0)
+        },
+        false
+      )
+    })
+  }
+
+  private async updateFeeEstimate(): Promise<void> {
+    if (this._state) {
+      const feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()
+
+      this.updateState({
+        feeCurrentMarketPrice
+      })
+      this.updateState({
+        estimatingFeeDefaults: true,
+        disableFeeSlider: true,
+        disableExchangeButton: true
+      })
+
+      const feeDefaults: FeeDefaults = await this.estimateFees().catch(() => undefined)
+
+      const feeLevel: number = feeDefaults && !this.isSubstrate ? 1 : this._state.feeLevel.value
+
+      this.updateState({
+        estimatingFeeDefaults: false,
+        feeDefaults,
+        fee: {
+          value: new BigNumber(this.getFeeFromLevel(feeLevel, feeDefaults)).toFixed(),
+          dirty: false
+        },
+        feeLevel: {
+          value: feeLevel,
+          dirty: false
+        },
+        disableFeeSlider: !feeDefaults,
+        disableExchangeButton: !feeDefaults || this.exchangeForm.invalid || this.amount.lte(0)
+      })
+    }
+  }
+
+  private async estimateFees(): Promise<FeeDefaults | undefined> {
+    const amount = this.amount.shiftedBy(this.selectedFromProtocol.decimals)
+    const isAmountValid = !amount.isNaN() && amount.gt(0)
+    return isAmountValid ? this.operationsProvider.estimateFees(this.fromWallet, this.fromWallet.addresses[0], amount) : undefined
+  }
+
+  private getFeeFromLevel(feeLevel: number, feeDefaults?: FeeDefaults): string {
+    const defaults = feeDefaults || this._state.feeDefaults
+    switch (feeLevel) {
+      case 0:
+        return defaults.low
+      case 1:
+        return defaults.medium
+      case 2:
+        return defaults.high
+      default:
+        return defaults.medium
+    }
   }
 
   private async filterSupportedProtocols(protocols: ProtocolSymbols[], filterZeroBalance: boolean = true): Promise<ProtocolSymbols[]> {
@@ -220,6 +421,7 @@ export class ExchangePage {
     this.loadDataFromExchange()
     // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
     this.accountProvider.triggerWalletChanged()
+    this.updateFeeEstimate()
   }
 
   async setToProtocol(protocol: ICoinProtocol): Promise<void> {
@@ -268,6 +470,9 @@ export class ExchangePage {
 
   async setFromWallet(wallet: AirGapMarketWallet) {
     this.fromWallet = wallet
+    this.isSubstrate =
+      this.fromWallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
+      this.selectedFromProtocol.identifier === MainProtocolSymbols.POLKADOT
     this.loadDataFromExchange()
     // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
     this.accountProvider.triggerWalletChanged()
@@ -282,7 +487,7 @@ export class ExchangePage {
 
   async amountSet(amount: string) {
     this.amount = new BigNumber(amount)
-
+    this.updateFeeEstimate()
     this.loadDataFromExchange()
   }
 
@@ -348,7 +553,7 @@ export class ExchangePage {
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
           amountExpectedTo: amountExpectedTo,
-          fee: feeEstimation.medium
+          fee: this.state.fee.value
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
@@ -419,5 +624,35 @@ export class ExchangePage {
 
   private hideLoader(loader: HTMLIonLoadingElement) {
     loader.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
+  }
+
+  private updateState(newState: Partial<ExchangeState>, debounce: boolean = true): void {
+    this._state = this.reduceState(this._state, newState)
+
+    if (debounce) {
+      this.state$.next(this._state)
+    } else {
+      this.onStateUpdated(this._state)
+    }
+  }
+
+  private reduceState(currentState: ExchangeState, newState: Partial<ExchangeState>): ExchangeState {
+    return {
+      feeDefaults: newState.feeDefaults || currentState.feeDefaults,
+      feeCurrentMarketPrice:
+        newState.feeCurrentMarketPrice !== undefined ? newState.feeCurrentMarketPrice : currentState.feeCurrentMarketPrice,
+
+      disableAdvancedMode:
+        this.isSubstrate || (newState.disableAdvancedMode !== undefined ? newState.disableAdvancedMode : currentState.disableAdvancedMode),
+      disableFeeSlider:
+        this.isSubstrate || (newState.disableFeeSlider !== undefined ? newState.disableFeeSlider : currentState.disableFeeSlider),
+      disableExchangeButton:
+        newState.disableExchangeButton !== undefined ? newState.disableExchangeButton : currentState.disableExchangeButton,
+      estimatingFeeDefaults:
+        newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
+      feeLevel: newState.feeLevel || currentState.feeLevel,
+      fee: newState.fee || currentState.fee,
+      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
+    }
   }
 }

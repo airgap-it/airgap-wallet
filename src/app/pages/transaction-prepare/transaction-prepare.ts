@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, EthereumProtocol, TezosProtocol } from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
@@ -334,15 +334,9 @@ export class TransactionPreparePage {
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
     if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-      const newWallet = new AirGapMarketWallet(
-        new TezosProtocol(),
-        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
-        false,
-        'm/44h/1729h/0h/0h',
-        this.priceService
-      )
-      await newWallet.synchronize()
-      return newWallet.currentMarketPrice.toNumber()
+      return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+    } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+      return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.currentMarketPrice.toNumber()
     }
