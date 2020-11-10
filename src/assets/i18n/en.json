@@ -650,7 +650,7 @@
     },
     "connect_label": "Connect",
     "continue_label": "Continue",
-    "done_label": "Done",
+    "cancel_label": "Cancel",
     "request-by-dapp_label": "Beacon request by DApp",
     "title": {
       "permission-request": "Permission Request",
