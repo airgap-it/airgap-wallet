@@ -47,17 +47,7 @@ export class BeaconService {
 
     return this.client.connect(async message => {
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
-        const responseType: BeaconMessageType =
-          message.type === BeaconMessageType.PermissionRequest
-            ? BeaconMessageType.PermissionResponse
-            : message.type === BeaconMessageType.OperationRequest
-            ? BeaconMessageType.OperationResponse
-            : message.type === BeaconMessageType.BroadcastRequest
-            ? BeaconMessageType.BroadcastResponse
-            : BeaconMessageType.BroadcastResponse
-        // TODO: Add function to sdk that gets corresponding response type for request type
-
-        return this.sendNetworkNotSupportedError(message.id, responseType)
+        return this.sendNetworkNotSupportedError(message.id)
       } else {
         await this.presentModal(message)
       }
@@ -214,15 +204,30 @@ export class BeaconService {
     return modal.present()
   }
 
-  private async sendNetworkNotSupportedError(id: string, type: BeaconMessageType): Promise<void> {
+  public async sendAbortedError(id: string): Promise<void> {
     const responseInput = {
       id,
-      type,
+      type: BeaconMessageType.Error,
+      errorType: BeaconErrorType.ABORTED_ERROR
+    } as any
+
+    const response: BeaconResponseInputMessage = {
+      senderId: await this.client.beaconId,
+      version: BEACON_VERSION,
+      ...responseInput
+    }
+    await this.respond(response)
+  }
+
+  public async sendNetworkNotSupportedError(id: string): Promise<void> {
+    const responseInput = {
+      id,
+      type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NETWORK_NOT_SUPPORTED
     } as any
 
     const response: BeaconResponseInputMessage = {
-      beaconId: await this.client.beaconId,
+      senderId: await this.client.beaconId,
       version: BEACON_VERSION,
       ...responseInput
     }

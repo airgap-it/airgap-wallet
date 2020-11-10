@@ -38,16 +38,18 @@ export class BeaconHandler extends IACMessageHandler {
       }
     }
 
+    const stringData: string = typeof data === 'string' ? data : data[0]
+
     // Check if it's a beacon request
     try {
-      const json: Record<string, unknown> = JSON.parse(typeof data === 'string' ? data : data[0])
+      const json: Record<string, unknown> = JSON.parse(stringData)
       await tryHandleBeacon(json)
 
       return true
     } catch (e) {
       try {
-        const payload: string = typeof data === 'string' ? data : data[0]
-        if (payload.includes('tezos://')) {
+        const payload: string = stringData
+        if (payload.startsWith('tezos://') || payload.startsWith('airgap-wallet://')) {
           const params: URLSearchParams = new URL(payload).searchParams
           if (params && params.get('type') === 'tzip10') {
             const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any
@@ -55,6 +57,11 @@ export class BeaconHandler extends IACMessageHandler {
 
             return true
           }
+        } else {
+          const json: Record<string, unknown> = (await new Serializer().deserialize(stringData)) as any
+          await tryHandleBeacon(json)
+
+          return true
         }
       } catch (err) {
         //

@@ -106,7 +106,8 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async dismiss(): Promise<void> {
-    this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.beaconService.sendAbortedError(this.request.id)
+    await this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {
