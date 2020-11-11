@@ -126,11 +126,12 @@ export class PortfolioPage {
           wallet: mainWallet
         }
 
+    console.log(info)
     this.router
       .navigateByUrl(
         `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
-        }/${subWallet ? info.mainWallet.protocol.identifier : undefined}`
+        }/${subWallet ? (info.mainWallet ? info.mainWallet.protocol.identifier : undefined) : undefined}`
       )
       .catch(console.error)
   }
