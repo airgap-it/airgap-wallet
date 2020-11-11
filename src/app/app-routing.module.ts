@@ -94,7 +94,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/sub-account-import/sub-account-import.module').then(m => m.SubAccountImportPageModule)
   },
   {
-    path: 'account-address/:id/:publicKey/:protocolID/:addressIndex',
+    path: 'account-address/:id/:publicKey/:protocolID/:mainProtocolID/:addressIndex',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/account-address/account-address.module').then(m => m.AccountAddressPageModule)
