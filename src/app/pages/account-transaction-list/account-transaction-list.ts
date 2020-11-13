@@ -79,6 +79,7 @@ export class AccountTransactionListPage {
 
   private publicKey: string
   private protocolID: string
+  private mainProtocolID: string
   private addressIndex
 
   constructor(
@@ -103,6 +104,7 @@ export class AccountTransactionListPage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
+    this.mainProtocolID = this.route.snapshot.params.mainProtocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
 
     if (this.addressIndex === 'undefined') {
@@ -192,7 +194,9 @@ export class AccountTransactionListPage {
 
   public openReceivePage(): void {
     this.router
-      .navigateByUrl(`/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}`)
+      .navigateByUrl(
+        `/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.mainProtocolID}/${this.addressIndex}`
+      )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
