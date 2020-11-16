@@ -1,14 +1,15 @@
 import { BeaconHandler } from './beacon-handler'
 
-fdescribe('BeaconHandler', () => {
+describe('BeaconHandler', () => {
   let beaconHandler: BeaconHandler
 
   beforeEach(() => {
-    beaconHandler = new BeaconHandler({} as any)
+    const beaconServiceStub = { addPeer: jasmine.createSpy('addPeer').and.returnValue(Promise.resolve()) }
+    beaconHandler = new BeaconHandler(beaconServiceStub as any)
   })
 
   it('should have the correct name', () => {
-    expect(beaconHandler.name).toBe('BeaconHandler1')
+    expect(beaconHandler.name).toBe('BeaconHandler')
   })
 
   describe('v1 request', () => {
