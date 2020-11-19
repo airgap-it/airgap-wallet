@@ -54,7 +54,9 @@ export class AccountAddPage {
 
     this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
       protocol =>
-        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) && protocol.options.network.type === NetworkType.MAINNET
+        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
@@ -105,7 +107,11 @@ export class AccountAddPage {
         ).length > 0
     ) {
       this.router
-        .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
+        .navigateByUrl(
+          `/sub-account-import/${DataServiceKey.PROTOCOL}/${mainProtocolIdentifier}/${subProtocol.identifier}/${
+            subProtocol.options.network.identifier
+          }`
+        )
         .catch(err => console.error(err))
     } else {
       this.router
