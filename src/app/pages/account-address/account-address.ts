@@ -15,7 +15,7 @@ export class AccountAddressPage {
   public wallet: AirGapMarketWallet
   public publicKey: string
   public protocolID: string
-  public addressIndex: undefined
+  public addressIndex: number
 
   constructor(
     private readonly navController: NavController,
@@ -26,9 +26,9 @@ export class AccountAddressPage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
-    this.addressIndex = this.route.snapshot.params.addressIndex
-    if (this.addressIndex === 'undefined') {
-      this.addressIndex = undefined
+    const addressIndex = this.route.snapshot.params.addressIndex
+    if (addressIndex && addressIndex !== 'undefined') {
+      this.addressIndex = parseInt(addressIndex, 10)
     }
     this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
   }
