@@ -553,7 +553,8 @@ export class ExchangePage {
           exchangeResult: result,
           amountExpectedFrom: this.amount.toString(),
           amountExpectedTo: amountExpectedTo,
-          fee: this.state.fee.value
+          fee: this.state.fee.value,
+          memo: result.payinExtraId ? result.payinExtraId : undefined
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
