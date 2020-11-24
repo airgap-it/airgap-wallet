@@ -40,7 +40,7 @@ export class BeaconService {
     this.init()
   }
 
-  public async init(): Promise<boolean> {
+  public async init(): Promise<void> {
     this.requests = await this.getRequestsFromStorage()
     this.client = new WalletClient({ name: 'AirGap Wallet' })
     await this.client.init()
@@ -176,7 +176,7 @@ export class BeaconService {
   }
 
   public async getPeers(): Promise<P2PPairingRequest[]> {
-    return this.client.getPeers()
+    return this.client.getPeers() as any
   }
 
   public async removePeer(peer: P2PPairingRequest): Promise<void> {
@@ -259,6 +259,19 @@ export class BeaconService {
         extras: {
           network: TezosNetwork.CARTHAGENET,
           conseilUrl: 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
+          conseilNetwork: TezosNetwork.CARTHAGENET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.DELPHINET]: {
+        identifier: undefined,
+        name: network.name || 'Delphinet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.CARTHAGENET,
+          conseilUrl: 'https://tezos-delphinet-conseil-1.kubernetes.papers.tech',
           conseilNetwork: TezosNetwork.CARTHAGENET,
           conseilApiKey: 'airgap00391'
         }

@@ -29,12 +29,7 @@ export class BeaconHandler extends IACMessageHandler {
       if (isBeaconMessage(json)) {
         console.log('Beacon Pairing QR scanned', json)
 
-        await this.beaconService.addPeer({
-          name: json.name,
-          publicKey: json.publicKey,
-          relayServer: json.relayServer,
-          version: json.version
-        })
+        await this.beaconService.addPeer(json)
       }
     }
 
