@@ -26,7 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'account-import-onboarding/:id/:protocolID',
-    canActivate: [ProtocolGuard, ServiceKeyGuard],
+    canActivate: [ServiceKeyGuard],
     loadChildren: () =>
       import('./pages/account-import-onboarding/account-import-onboarding.module').then(m => m.AccountImportOnboardingPageModule)
   },
@@ -88,13 +88,13 @@ const routes: Routes = [
     loadChildren: () => import('./pages/sub-account-select/sub-account-select.module').then(m => m.SubAccountSelectPageModule)
   },
   {
-    path: 'sub-account-import/:id/:protocolID/:networkID',
+    path: 'sub-account-import/:id/:mainProtocolID/:protocolID/:networkID',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/sub-account-import/sub-account-import.module').then(m => m.SubAccountImportPageModule)
   },
   {
-    path: 'account-address/:id/:publicKey/:protocolID/:addressIndex',
+    path: 'account-address/:id/:publicKey/:protocolID/:mainProtocolID/:addressIndex',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/account-address/account-address.module').then(m => m.AccountAddressPageModule)

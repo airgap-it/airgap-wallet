@@ -79,6 +79,7 @@ export class AccountTransactionListPage {
 
   private publicKey: string
   private protocolID: string
+  private mainProtocolID: string
   private addressIndex
 
   constructor(
@@ -103,16 +104,13 @@ export class AccountTransactionListPage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
+    this.mainProtocolID = this.route.snapshot.params.mainProtocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
+
     if (this.addressIndex === 'undefined') {
       this.addressIndex = undefined
     } else {
       this.addressIndex = Number(this.addressIndex)
-    }
-    const mainProtocolID = this.route.snapshot.params.mainProtocolID
-    let mainWallet: AirGapMarketWallet
-    if (mainProtocolID !== 'undefined') {
-      mainWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, mainProtocolID, this.addressIndex)
     }
 
     this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
@@ -136,7 +134,10 @@ export class AccountTransactionListPage {
     this.protocolIdentifier = this.wallet.protocol.identifier
 
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
-      this.mainWallet = mainWallet
+      const mainProtocolID = this.route.snapshot.params.mainProtocolID
+      if (mainProtocolID !== 'undefined') {
+        this.mainWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, mainProtocolID)
+      }
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
@@ -193,7 +194,9 @@ export class AccountTransactionListPage {
 
   public openReceivePage(): void {
     this.router
-      .navigateByUrl(`/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}`)
+      .navigateByUrl(
+        `/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.mainProtocolID}/${this.addressIndex}`
+      )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 

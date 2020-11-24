@@ -334,25 +334,9 @@ export class TransactionPreparePage {
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
     if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-      const newWallet = new AirGapMarketWallet(
-        new TezosProtocol(),
-        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
-        false,
-        'm/44h/1729h/0h/0h',
-        this.priceService
-      )
-      await newWallet.synchronize()
-      return newWallet.currentMarketPrice.toNumber()
+      return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
-      const newWallet = new AirGapMarketWallet(
-        new EthereumProtocol(),
-        '02e3188bc0c05ccfd6938cb3f5474a70927b5580ffb2ca5ac425ed6a9b2a9e9932',
-        false,
-        `m/44'/60'/0'/0/0`,
-        this.priceService
-      )
-      await newWallet.synchronize()
-      return newWallet.currentMarketPrice.toNumber()
+      return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.currentMarketPrice.toNumber()
     }
