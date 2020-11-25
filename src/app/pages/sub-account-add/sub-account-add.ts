@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
 import { AirGapMarketWallet } from 'airgap-coin-lib'
 import { SubProtocolType, ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { assertNever } from 'airgap-coin-lib/dist/serializer/message'
+import { assertNever } from 'airgap-coin-lib/dist/utils/assert'
 import { MainProtocolSymbols } from 'airgap-coin-lib'
 import { PriceService } from 'src/app/services/price/price.service'
 
