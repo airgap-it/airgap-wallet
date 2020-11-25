@@ -176,11 +176,11 @@ export class BeaconService {
   }
 
   public async getPeers(): Promise<P2PPairingRequest[]> {
-    return this.client.getPeers() as any
+    return this.client.getPeers() as any // TODO: Fix types
   }
 
   public async removePeer(peer: P2PPairingRequest): Promise<void> {
-    await this.client.removePeer(peer)
+    await this.client.removePeer(peer as any) // TODO: Fix types
   }
 
   public async removeAllPeers(): Promise<void> {
