@@ -12,6 +12,17 @@ const isBeaconMessage: (obj: unknown) => obj is P2PPairingRequest = (obj: unknow
   )
 }
 
+const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promise<boolean> => {
+  try {
+    // tslint:disable-next-line: no-unused-expression
+    new URL(url)
+  } catch {
+    return false
+  }
+
+  return true
+}
+
 /**
  * Handles beacon requests
  *
@@ -25,39 +36,27 @@ export class BeaconHandler extends IACMessageHandler {
   }
 
   public async handle(data: string | string[]): Promise<boolean> {
-    const tryHandleBeacon: (json: unknown) => Promise<void> = async (json: unknown): Promise<void> => {
-      if (isBeaconMessage(json)) {
-        console.log('Beacon Pairing QR scanned', json)
-
-        await this.beaconService.client.isConnected
-        await this.beaconService.addPeer(json)
-      }
-    }
-
     const stringData: string = typeof data === 'string' ? data : data[0]
 
     // Check if it's a beacon request
     try {
       const json: Record<string, unknown> = JSON.parse(stringData)
-      await tryHandleBeacon(json)
 
-      return true
+      return await this.tryHandleBeacon(json)
     } catch (e) {
       try {
         const payload: string = stringData
-        if (payload.startsWith('tezos://') || payload.startsWith('airgap-wallet://')) {
+        if (isValidUrl(payload)) {
           const params: URLSearchParams = new URL(payload).searchParams
           if (params && params.get('type') === 'tzip10') {
             const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any
-            await tryHandleBeacon(json)
 
-            return true
+            return await this.tryHandleBeacon(json)
           }
         } else {
           const json: Record<string, unknown> = (await new Serializer().deserialize(stringData)) as any
-          await tryHandleBeacon(json)
 
-          return true
+          return await this.tryHandleBeacon(json)
         }
       } catch (err) {
         //
@@ -66,5 +65,18 @@ export class BeaconHandler extends IACMessageHandler {
     }
 
     return false
+  }
+
+  private async tryHandleBeacon(json: unknown): Promise<boolean> {
+    if (isBeaconMessage(json)) {
+      console.log('Beacon Pairing QR scanned', json)
+
+      await this.beaconService.client.isConnected
+      await this.beaconService.addPeer(json)
+
+      return true
+    } else {
+      return false
+    }
   }
 }
