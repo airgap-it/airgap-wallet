@@ -357,6 +357,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         action.type,
         stakingDetails ? stakingDetails.active : 0,
         hasSufficientFunds,
+        minValue,
         maxValue
       )
 
@@ -418,6 +419,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     actionType: SubstrateStakingActionType,
     bonded: string | number | BigNumber,
     hasSufficientFunds: boolean,
+    minValue?: string | number | BigNumber | undefined,
     maxValue?: string | number | BigNumber | undefined
   ): Promise<string | undefined> {
     if (!hasSufficientFunds) {
@@ -433,6 +435,14 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
       protocol
     })
+
+    const minValueFormatted =
+      minValue !== undefined
+        ? await this.amountConverterPipe.transform(minValue, {
+            protocol
+          })
+        : undefined
+
     const maxValueFormatted =
       maxValue !== undefined
         ? await this.amountConverterPipe.transform(maxValue, {
@@ -446,7 +456,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       case SubstrateStakingActionType.BOND_NOMINATE:
         if (maxValueFormatted) {
           translationKey = 'delegation-detail-substrate.delegate.bond-nominate_text'
-          translationArgs = { maxDelegation: maxValueFormatted }
+          translationArgs = {
+            minDelegation: minValueFormatted,
+            maxDelegation: maxValueFormatted
+          }
         } else {
           translationKey = 'delegation-detail-substrate.delegate.bond-nominate-no-max_text'
         }
