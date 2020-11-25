@@ -46,7 +46,7 @@ export class BeaconHandler extends IACMessageHandler {
     } catch (e) {
       try {
         const payload: string = stringData
-        if (isValidUrl(payload)) {
+        if (await isValidUrl(payload)) {
           const params: URLSearchParams = new URL(payload).searchParams
           if (params && params.get('type') === 'tzip10') {
             const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any

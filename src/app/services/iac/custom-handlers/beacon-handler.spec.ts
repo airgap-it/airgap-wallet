@@ -4,7 +4,12 @@ describe('BeaconHandler', () => {
   let beaconHandler: BeaconHandler
 
   beforeEach(() => {
-    const beaconServiceStub = { addPeer: jasmine.createSpy('addPeer').and.returnValue(Promise.resolve()) }
+    const beaconServiceStub = {
+      client: jasmine.createSpy('client').and.returnValue({
+        isConnected: jasmine.createSpy('isConnected').and.returnValue(Promise.resolve())
+      }),
+      addPeer: jasmine.createSpy('addPeer').and.returnValue(Promise.resolve())
+    }
     beaconHandler = new BeaconHandler(beaconServiceStub as any)
   })
 
