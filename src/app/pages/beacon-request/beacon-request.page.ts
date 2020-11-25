@@ -243,7 +243,7 @@ export class BeaconRequestPage implements OnInit {
 
     await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
 
-    this.transactions = tezosProtocol.getAirGapTxFromWrappedOperations({
+    this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
       contents: transaction.contents
     })

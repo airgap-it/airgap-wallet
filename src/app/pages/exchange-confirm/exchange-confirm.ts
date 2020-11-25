@@ -21,6 +21,7 @@ export class ExchangeConfirmPage {
   public toWallet: AirGapMarketWallet
 
   public fee: string
+  public memo: string
   public feeFiatAmount: string
 
   public amountExpectedFrom: number
@@ -50,6 +51,7 @@ export class ExchangeConfirmPage {
       this.toCurrency = info.toCurrency
       this.exchangeResult = info.exchangeResult
       this.fee = info.fee
+      this.memo = info.memo
 
       this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
       this.amountExpectedTo = this.exchangeResult.amountExpectedTo ? this.exchangeResult.amountExpectedTo : info.amountExpectedTo
@@ -74,7 +76,8 @@ export class ExchangeConfirmPage {
         wallet,
         this.exchangeResult.payinAddress,
         amount,
-        fee
+        fee,
+        this.memo
       )
 
       const info = {
