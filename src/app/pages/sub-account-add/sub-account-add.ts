@@ -130,15 +130,14 @@ export class SubAccountAddPage {
   }
 
   public setFilteredItems(searchTerm: string): void {
-    this.subAccounts = []
+    this.displayedSubAccounts = []
     this.loaded = 0
     if (searchTerm.length === 0) {
-      this.displayedSubAccounts = this.subAccounts
       this.infiniteEnabled = true
       this.loadDisplayedAccounts()
     } else {
       const searchTermLowerCase: string = searchTerm.toLowerCase()
-      this.displayedSubAccounts = this.subAccounts.filter(account => {
+      this.filteredSubAccounts = this.subAccounts.filter(account => {
         const hasMatchingName: boolean = account.wallet.protocol.name.toLowerCase().includes(searchTermLowerCase)
         const hasMatchingSymbol: boolean = account.wallet.protocol.symbol.toLowerCase().includes(searchTermLowerCase)
 
