@@ -4,6 +4,7 @@ import {
   BeaconMessageType,
   BeaconRequestOutputMessage,
   BeaconResponseInputMessage,
+  getSenderId,
   Network,
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
@@ -29,7 +30,7 @@ import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorage
   providedIn: 'root'
 })
 export class BeaconService {
-  public client: WalletClient | undefined
+  public client: WalletClient
   private requests: BeaconRequest[] = []
 
   constructor(
@@ -37,12 +38,12 @@ export class BeaconService {
     private readonly loadingController: LoadingController,
     private readonly storage: WalletStorageService
   ) {
+    this.client = new WalletClient({ name: 'AirGap Wallet' })
     this.init()
   }
 
   public async init(): Promise<void> {
     this.requests = await this.getRequestsFromStorage()
-    this.client = new WalletClient({ name: 'AirGap Wallet' })
     await this.client.init()
 
     return this.client.connect(async message => {
@@ -158,9 +159,6 @@ export class BeaconService {
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
-    if (!this.client) {
-      throw new Error('Client not ready')
-    }
     console.log('responding', message)
     await this.client.respond(message)
   }
@@ -209,10 +207,10 @@ export class BeaconService {
       id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.ABORTED_ERROR
-    } as any
+    } as any // TODO: Fix type
 
     const response: BeaconResponseInputMessage = {
-      senderId: await this.client.beaconId,
+      senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
       version: BEACON_VERSION,
       ...responseInput
     }
@@ -224,10 +222,10 @@ export class BeaconService {
       id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NETWORK_NOT_SUPPORTED
-    } as any
+    } as any // TODO: Fix type
 
     const response: BeaconResponseInputMessage = {
-      senderId: await this.client.beaconId,
+      senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
       version: BEACON_VERSION,
       ...responseInput
     }
