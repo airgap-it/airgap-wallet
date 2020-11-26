@@ -127,13 +127,9 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
-          if (data.url.startsWith('airgap-wallet://')) {
-            // tslint:disable-next-line: no-console
-            console.log('Successfully matched route', JSON.stringify(data.url))
-            this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-          } else {
-            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)(`route not matched: ${JSON.stringify(data.url)}`)
-          }
+          // tslint:disable-next-line: no-console
+          console.log('Successfully received deeplink', data.url)
+          this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
     }
