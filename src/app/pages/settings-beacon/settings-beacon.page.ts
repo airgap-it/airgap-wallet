@@ -1,4 +1,4 @@
-import { P2PPairInfo } from '@airgap/beacon-sdk'
+import { P2PPairingRequest } from '@airgap/beacon-sdk'
 import { Component, OnInit } from '@angular/core'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 
@@ -8,7 +8,7 @@ import { BeaconService } from 'src/app/services/beacon/beacon.service'
   styleUrls: ['./settings-beacon.page.scss']
 })
 export class SettingsBeaconPage implements OnInit {
-  public connectedPeers: P2PPairInfo[] = []
+  public connectedPeers: P2PPairingRequest[] = []
 
   constructor(private readonly beaconService: BeaconService) {}
 
@@ -20,7 +20,7 @@ export class SettingsBeaconPage implements OnInit {
     this.connectedPeers = await this.beaconService.getPeers()
   }
 
-  public async removePeer(peer: P2PPairInfo): Promise<void> {
+  public async removePeer(peer: P2PPairingRequest): Promise<void> {
     await this.beaconService.removePeer(peer)
     await this.loadPeers()
   }
