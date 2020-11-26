@@ -105,8 +105,13 @@ export class BeaconRequestPage implements OnInit {
     return protocol.options.network
   }
 
+  public async cancel(): Promise<void> {
+    await this.beaconService.sendAbortedError(this.request.id)
+    await this.dismiss()
+  }
+
   public async dismiss(): Promise<void> {
-    this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {
@@ -238,7 +243,7 @@ export class BeaconRequestPage implements OnInit {
 
     await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
 
-    this.transactions = tezosProtocol.getAirGapTxFromWrappedOperations({
+    this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
       contents: transaction.contents
     })

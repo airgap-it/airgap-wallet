@@ -3,5 +3,6 @@
     <string name="app_name">AirGap Wallet</string>
     <string name="title_activity_main">AirGap Wallet</string>
     <string name="package_name">it.airgap.wallet</string>
-    <string name="custom_url_scheme">airgap-wallet</string>
+    <string name="airgap_wallet_url_scheme">airgap-wallet</string>
+    <string name="tezos_url_scheme">tezos</string>
 </resources>

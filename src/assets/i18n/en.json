@@ -519,7 +519,7 @@
     "next-payout_label": "Next Payout",
     "delegate": {
       "label": "Delegate",
-      "bond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "bond-nominate_text": "Select the amount you want to delegate. You can delegate at least <span class=\"style__strong color__primary\">{{ minDelegation }}</span> up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
       "bond-nominate-no-max_text": "Select the amount you want to delegate.",
       "rebond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
       "rebond-nominate-no-max_text": "Select the amount you want to delegate.",
@@ -650,7 +650,7 @@
     },
     "connect_label": "Connect",
     "continue_label": "Continue",
-    "done_label": "Done",
+    "cancel_label": "Cancel",
     "request-by-dapp_label": "Beacon request by DApp",
     "title": {
       "permission-request": "Permission Request",
