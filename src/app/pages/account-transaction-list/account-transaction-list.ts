@@ -187,7 +187,7 @@ export class AccountTransactionListPage {
     this.router
       .navigateByUrl(
         `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${info.address !==
-          ''}/${0}/${'not_forced'}`
+          ''}/${0}/${'not_forced'}/${this.mainProtocolID}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

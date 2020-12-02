@@ -52,7 +52,7 @@ export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateAct
                   .navigateByUrl(
                     `/transaction-prepare/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
                       info.wallet.addressIndex
-                    }/${info.address}/${0}/${info.forceMigration ? 'forced' : 'not_forced'}`
+                    }/${info.address}/${0}/${info.forceMigration ? 'forced' : 'not_forced'}/${this.context.mainWallet.protocol.identifier}`
                   )
                   .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
                 resolve()
