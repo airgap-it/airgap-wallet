@@ -308,15 +308,17 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     if (action) {
       const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gte(minValue)
 
-      const maxValueShifted: BigNumber | undefined = maxValue !== undefined ? maxValue.shiftedBy(-protocol.decimals) : undefined
-      const minValueShifted: BigNumber | undefined = minValue !== undefined ? minValue.shiftedBy(-protocol.decimals) : undefined
+      const maxValueFormatted: string | undefined =
+        maxValue !== undefined ? this.amountConverterPipe.formatBigNumber(maxValue.shiftedBy(-protocol.decimals), 10) : undefined
+      const minValueFormatted: string | undefined =
+        minValue !== undefined ? this.amountConverterPipe.formatBigNumber(minValue.shiftedBy(-protocol.decimals), 10) : undefined
 
       const extraValidators = []
-      if (minValueShifted !== undefined) {
-        extraValidators.push(Validators.min(new BigNumber(minValueShifted).toNumber()))
+      if (minValueFormatted !== undefined) {
+        extraValidators.push(Validators.min(new BigNumber(minValueFormatted).toNumber()))
       }
-      if (maxValueShifted !== undefined) {
-        extraValidators.push(Validators.max(new BigNumber(maxValueShifted).toNumber()))
+      if (maxValueFormatted !== undefined) {
+        extraValidators.push(Validators.max(new BigNumber(maxValueFormatted).toNumber()))
       }
 
       const form = this.formBuilder.group({
@@ -325,7 +327,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           action.args.includes(ArgumentName.VALUE) && maxValue !== undefined ? maxValue.toString() : stakingDetails.active
         ],
         [ArgumentName.VALUE_CONTROL]: [
-          maxValueShifted || minValueShifted,
+          maxValueFormatted || minValueFormatted,
           Validators.compose([Validators.required, DecimalValidator.validate(protocol.decimals), ...extraValidators])
         ],
         [ArgumentName.PAYEE]: [SubstratePayee.STASH]
@@ -338,12 +340,13 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const argWidgets = []
       if (action.args.includes(ArgumentName.VALUE)) {
         argWidgets.push(
-          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueShifted.toString(), minValueShifted.toString(), {
+          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueFormatted, minValueFormatted, {
             onValueChanged: (value: string) => {
               form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
             },
-            toggleFixedValueButton: maxValueShifted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
-            fixedValue: maxValueShifted && hasSufficientFunds ? maxValueShifted.toString() : undefined
+            toggleFixedValueButton:
+              maxValueFormatted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
+            fixedValue: maxValueFormatted && hasSufficientFunds ? maxValueFormatted : undefined
           })
         )
       }
