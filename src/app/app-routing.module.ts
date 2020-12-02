@@ -100,7 +100,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/account-address/account-address.module').then(m => m.AccountAddressPageModule)
   },
   {
-    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:forceMigration',
+    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:forceMigration/:mainProtocolID',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/transaction-prepare/transaction-prepare.module').then(m => m.TransactionPreparePageModule)
