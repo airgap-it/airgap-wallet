@@ -8,6 +8,7 @@ import {
   Network,
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
+  SigningType,
   WalletClient
 } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
@@ -110,6 +111,7 @@ export class BeaconService {
           return {
             id: request[0],
             type: BeaconMessageType.SignPayloadResponse,
+            signingType: SigningType.RAW,
             signature: signedMessage.substr(signedMessage.length - 128)
           }
         }
