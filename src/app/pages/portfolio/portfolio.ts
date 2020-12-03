@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
-import { Observable, ReplaySubject } from 'rxjs'
+import { forkJoin, from, Observable, ReplaySubject, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
@@ -23,6 +23,8 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
+  private subscription: Subscription
+
   public isVisible = 'hidden'
 
   public total: number = 0
@@ -139,18 +141,25 @@ export class PortfolioPage {
   public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
-
   public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
     this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
-    await Promise.all([
+    const observables = [
       this.walletsProvider.getWalletList().map(wallet => {
-        return wallet.synchronize()
+        return from(wallet.synchronize())
       })
-    ])
+    ]
+    /**
+     * if we use await Promise.all() instead, then each wallet
+     * is synchronized asynchronously, leading to blocking behaviour.
+     * Instead we want to synchronize all wallets simultaneously
+     */
+    const allWalletsSynced = forkJoin([observables])
 
-    await this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    this.subscription = allWalletsSynced.subscribe(() => {
+      this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    })
   }
 
   public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
@@ -172,5 +181,9 @@ export class PortfolioPage {
     }
 
     this.isVisible = 'visible'
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }
