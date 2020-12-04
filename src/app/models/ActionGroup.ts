@@ -120,9 +120,9 @@ export class ActionGroup {
       () => {
         const action = new AirGapTezosMigrateAction({
           wallet: this.callerContext.wallet,
-          mainWallet: this.callerContext.mainWallet,
           alertCtrl: this.callerContext.alertCtrl,
           translateService: this.callerContext.translateService,
+          protocolService: this.callerContext.protocolService,
           dataService: this.callerContext.dataService,
           router: this.callerContext.router
         })
