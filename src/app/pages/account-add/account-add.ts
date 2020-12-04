@@ -107,11 +107,7 @@ export class AccountAddPage {
         ).length > 0
     ) {
       this.router
-        .navigateByUrl(
-          `/sub-account-import/${DataServiceKey.PROTOCOL}/${mainProtocolIdentifier}/${subProtocol.identifier}/${
-            subProtocol.options.network.identifier
-          }`
-        )
+        .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
         .catch(err => console.error(err))
     } else {
       this.router

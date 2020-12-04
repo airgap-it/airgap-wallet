@@ -133,7 +133,7 @@ export class PortfolioPage {
       .navigateByUrl(
         `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
-        }/${subWallet ? (info.mainWallet ? info.mainWallet.protocol.identifier : undefined) : undefined}`
+        }`
       )
       .catch(console.error)
   }

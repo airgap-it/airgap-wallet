@@ -1,21 +1,25 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
-import { ProtocolService } from '@airgap/angular-core'
 
 @Injectable()
 export class ProtocolGuard implements CanActivate {
   constructor(public readonly router: Router, private readonly protocolService: ProtocolService) {}
 
   public async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
-    const protocolID = route.params.protocolID
-    const mainProtocolID = route.params.mainProtocolID
+    const protocolID: string = route.params.protocolID
+    let mainProtocolID: string
+    const protocolIDComponents: string[] = protocolID.split('-')
+    if (protocolIDComponents.length > 1) {
+      mainProtocolID = protocolIDComponents[0]
+    }
 
-    const mainSymbols = Object.values(MainProtocolSymbols).map(p => p.toString())
-    let subSymbols = Object.values(SubProtocolSymbols).map(p => p.toString())
+    const mainSymbols: string[] = Object.values(MainProtocolSymbols).map((p: MainProtocolSymbols) => p.toString())
+    let subSymbols: string[] = Object.values(SubProtocolSymbols).map((p: SubProtocolSymbols) => p.toString())
 
-    if (mainProtocolID && mainProtocolID !== 'undefined') {
+    if (mainProtocolID !== undefined) {
       if (mainProtocolID === MainProtocolSymbols.ETH) {
         subSymbols = (await this.protocolService.getSubProtocols(mainProtocolID)).map((protocol: ICoinProtocol) =>
           protocol.identifier.toString()

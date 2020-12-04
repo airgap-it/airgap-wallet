@@ -3,13 +3,13 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, EthereumProtocol, TezosProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, EthereumProtocol, MainProtocolSymbols, SubProtocolSymbols, TezosProtocol } from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -17,7 +17,6 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
-import { AccountProvider } from 'src/app/services/account/account.provider'
 
 interface TransactionFormState<T> {
   value: T
