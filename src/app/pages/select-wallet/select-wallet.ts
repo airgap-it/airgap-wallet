@@ -32,16 +32,11 @@ export class SelectWalletPage {
       wallet,
       address: this.address
     }
-    let mainProtocolID = 'undefined'
-    const protocolIDComponents = wallet.protocol.identifier.split('-')
-    if (protocolIDComponents.length > 1) {
-      mainProtocolID = protocolIDComponents[0]
-    }
     this.router
       .navigateByUrl(
         `/transaction-prepare/${DataServiceKey.TRANSACTION}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
-        }/${info.address}/${0}/${'not_forced'}/${mainProtocolID}`
+        }/${info.address}/${0}/${'not_forced'}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
-import { DataResolverService } from './services/resolver/data-resolver.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
 import { TransactionHashGuard } from './services/guard/transactionHash.guard'
+import { DataResolverService } from './services/resolver/data-resolver.service'
 
 const routes: Routes = [
   { path: '', loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule) },
@@ -56,7 +56,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/account-import/account-import.module').then(m => m.AccountImportPageModule)
   },
   {
-    path: 'account-transaction-list/:id/:publicKey/:protocolID/:addressIndex/:mainProtocolID',
+    path: 'account-transaction-list/:id/:publicKey/:protocolID/:addressIndex',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () =>
@@ -88,19 +88,19 @@ const routes: Routes = [
     loadChildren: () => import('./pages/sub-account-select/sub-account-select.module').then(m => m.SubAccountSelectPageModule)
   },
   {
-    path: 'sub-account-import/:id/:mainProtocolID/:protocolID/:networkID',
+    path: 'sub-account-import/:id/:protocolID/:networkID',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/sub-account-import/sub-account-import.module').then(m => m.SubAccountImportPageModule)
   },
   {
-    path: 'account-address/:id/:publicKey/:protocolID/:mainProtocolID/:addressIndex',
+    path: 'account-address/:id/:publicKey/:protocolID/:addressIndex',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/account-address/account-address.module').then(m => m.AccountAddressPageModule)
   },
   {
-    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:forceMigration/:mainProtocolID',
+    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:forceMigration',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/transaction-prepare/transaction-prepare.module').then(m => m.TransactionPreparePageModule)

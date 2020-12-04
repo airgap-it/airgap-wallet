@@ -49,7 +49,6 @@ export class AccountTransactionListPage {
 
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
-  public mainWallet?: AirGapMarketWallet
 
   public transactions: IAirGapTransaction[] = []
 
@@ -79,7 +78,6 @@ export class AccountTransactionListPage {
 
   private publicKey: string
   private protocolID: string
-  private mainProtocolID: string
   private addressIndex
 
   constructor(
@@ -104,7 +102,6 @@ export class AccountTransactionListPage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
-    this.mainProtocolID = this.route.snapshot.params.mainProtocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
 
     if (this.addressIndex === 'undefined') {
@@ -134,10 +131,6 @@ export class AccountTransactionListPage {
     this.protocolIdentifier = this.wallet.protocol.identifier
 
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
-      const mainProtocolID = this.route.snapshot.params.mainProtocolID
-      if (mainProtocolID !== 'undefined') {
-        this.mainWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, mainProtocolID)
-      }
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
@@ -164,9 +157,9 @@ export class AccountTransactionListPage {
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
-        mainWallet: this.mainWallet,
         alertCtrl: this.alertCtrl,
         translateService: this.translateService,
+        protocolService: this.protocolService,
         dataService: this.dataService,
         router: this.router
       })
@@ -187,16 +180,14 @@ export class AccountTransactionListPage {
     this.router
       .navigateByUrl(
         `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${info.address !==
-          ''}/${0}/${'not_forced'}/${this.mainProtocolID}`
+          ''}/${0}/${'not_forced'}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage(): void {
     this.router
-      .navigateByUrl(
-        `/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.mainProtocolID}/${this.addressIndex}`
-      )
+      .navigateByUrl(`/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
