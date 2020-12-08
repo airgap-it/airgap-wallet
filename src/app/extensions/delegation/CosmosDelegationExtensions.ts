@@ -220,7 +220,8 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
   private async fetchVotingPower(protocol: CosmosProtocol, address: string): Promise<BigNumber> {
     const validators = await protocol.fetchValidators()
-    const validatedAmount = new BigNumber(validators.find(validator => validator.operator_address === address).delegator_shares)
+    const validator = validators.find(validator => validator.operator_address === address)
+    const validatedAmount = validator ? new BigNumber(validator.delegator_shares) : new BigNumber(0)
     const totalDelegatedAmount = new BigNumber(validators.map(validator => parseFloat(validator.delegator_shares)).reduce((a, b) => a + b))
 
     return validatedAmount.div(totalDelegatedAmount)
