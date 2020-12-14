@@ -175,7 +175,10 @@
         },
         "deploy": {
           "builder": "angular-cli-ghpages:deploy",
-          "options": {}
+          "options": {
+            "baseHref": "/airgap-wallet/",
+            "message": "Deploying latest changes"
+          }
         }
       }
     },
