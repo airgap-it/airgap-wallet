@@ -1,0 +1,8 @@
+{
+  "from-to.type_label": "Transaktionstyp",
+  "from-to.amount_label": "Betrag",
+  "from-to.fee_label": "Gebühr",
+  "from-to.time_label": "Zeit",
+  "from-to.from_label": "Von",
+  "from-to.to_label": "Zu"
+}

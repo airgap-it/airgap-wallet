@@ -1,0 +1,45 @@
+{
+  "from-to": {
+    "type_label": "Type",
+    "amount_label": "Amount",
+    "fee_label": "Fee",
+    "time_label": "Time",
+    "data_label": "Data",
+    "status_label": "Status",
+    "from_label": "From",
+    "to_label": "To",
+    "transaction-details_label": "Display extra transaction details"
+  },
+  "clipboard": {
+    "toast": {
+      "success_text": "Successfully copied to your clipboard!",
+      "ok_label": "Ok"
+    }
+  },
+  "iac": {
+    "message-unknown_alert": {
+      "header": "Incompatible code",
+      "message": "Could not parse message. Please make sure this is a valid AirGap message. You can try to handle this message in {{otherApp.name}} by using the \"Relay\" button below.",
+      "relay_label": "Relay",
+      "okay_label": "Okay"
+    },
+    "message-not-supported_alert": {
+      "header": "Operation not supported",
+      "message": "Please use {{otherApp.name}} to handle this message. You can click the \"Relay\" button below to do that.",
+      "relay_label": "Relay",
+      "okay_label": "Okay"
+    }
+  },
+  "deeplink": {
+    "not-supported-alert": {
+      "title": "Oops",
+      "message": "Deeplinking is only supported on mobile devices.",
+      "ok": "Ok"
+    },
+    "app-not-found": {
+      "title": "Oops",
+      "message": "It looks like you don't have {{otherApp.name}} installed on this device.",
+      "ok": "Ok"
+    }
+  }
+}

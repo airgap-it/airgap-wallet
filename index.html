@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AirGap Wallet</title>
+
+    <base href="/" />
+
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <link rel="icon" type="image/png" href="./assets/icon/favicon.png" />
+
+    <!-- add to homescreen for ios -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <script>
+      function getChromeVersion() {
+        var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)
+        return raw ? parseInt(raw[2], 10) : false
+      }
+      if (getChromeVersion() === 77) {
+        window.TransformStream = null
+        window.WritableStream = null
+        window.ReadableStream = null
+      }
+    </script>
+    <script src="cordova.js"></script>
+  <link rel="stylesheet" href="styles.2fa3d711d1f84b19d58f.css"></head>
+
+  <body>
+    <app-root></app-root>
+  <script src="runtime.40f293c4d2fffdf74c0f.js" defer></script><script src="polyfills-es5.d728948032b57dc43878.js" nomodule defer></script><script src="polyfills.dc0bbb76fe553b994cd7.js" defer></script><script src="main.cb3075679b440b865d98.js" defer></script></body>
+</html>
