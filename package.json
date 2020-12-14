@@ -29,13 +29,15 @@
     "e2e-update": "webdriver-manager update --standalone false --gecko false",
     "postinstall": "node patch.js && npm run browserify-coinlib && jetifier && node apply-diagnostic-modules.js",
     "browserify-coinlib": "browserify ./node_modules/airgap-coin-lib/dist/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"e2e/**/*.ts\" \"angular.json\" \"README.md\" \"test/**/*.js\"",
     "electron": "npm --prefix electron/ run start",
     "electron:install": "npm --prefix electron/ install --",
     "prepare-prod-build": "npm run disable-pure-getters && npm run configure-mangle",
     "disable-pure-getters": "replace 'pure_getters: buildOptions.buildOptimizer' 'pure_getters: false' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",
     "configure-mangle": "replace 'safari10: true' 'safari10: true, keep_fnames: true' ./node_modules/@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs/common.js ",
-    "apply-diagnostic-modules": "node apply-diagnostic-modules.js"
+    "apply-diagnostic-modules": "node apply-diagnostic-modules.js",
+    "actions:deploy": "ng deploy --name $GITHUB_ACTOR --email $GITHUB_ACTOR@users.noreply.github.com --no-silent",
+    "actions:prettier": "prettier \"src/**/*.ts\" \"src/**/*.js\" \"e2e/**/*.ts\" \"angular.json\" \"README.md\" \"test/**/*.js\" --list-different"
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
