@@ -60,7 +60,7 @@ export class TransactionPreparePage {
 
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
-  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
+  private readonly state$: BehaviorSubject<TransactionPrepareState>
 
   private publicKey: string
   private protocolID: string
@@ -86,6 +86,8 @@ export class TransactionPreparePage {
     this.protocolID = this.route.snapshot.params.protocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
     this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
+
+    this.state$ = new BehaviorSubject(this._state)
 
     this.address = this.route.snapshot.params.address
     this.amount = Number(this.route.snapshot.params.amount)
