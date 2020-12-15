@@ -151,7 +151,7 @@ export class BeaconService {
           request[2].options.network.type === NetworkType.MAINNET
             ? BeaconNetworkType.MAINNET
             : request[2].options.network.type === NetworkType.TESTNET
-            ? BeaconNetworkType.CARTHAGENET
+            ? BeaconNetworkType.DELPHINET
             : BeaconNetworkType.CUSTOM,
         rpcUrl: request[2].options.network.rpcUrl
       }
@@ -251,14 +251,15 @@ export class BeaconService {
         }
       },
       [BeaconNetworkType.CARTHAGENET]: {
+        // TODO: Remove
         identifier: undefined,
         name: network.name || 'Carthagenet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node.prod.gke.papers.tech',
         blockExplorer: new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
         extras: {
           network: TezosNetwork.CARTHAGENET,
-          conseilUrl: 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
+          conseilUrl: 'https://tezos-carthagenet-conseil.prod.gke.papers.tech',
           conseilNetwork: TezosNetwork.CARTHAGENET,
           conseilApiKey: 'airgap00391'
         }
@@ -267,12 +268,12 @@ export class BeaconService {
         identifier: undefined,
         name: network.name || 'Delphinet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
         blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
         extras: {
-          network: TezosNetwork.CARTHAGENET,
-          conseilUrl: 'https://tezos-delphinet-conseil-1.kubernetes.papers.tech',
-          conseilNetwork: TezosNetwork.CARTHAGENET,
+          network: TezosNetwork.DELPHINET,
+          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.DELPHINET,
           conseilApiKey: 'airgap00391'
         }
       },
