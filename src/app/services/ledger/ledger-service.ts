@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols, ProtocolSymbols } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 
 import { LedgerApp } from '../../ledger/app/LedgerApp'
 import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'

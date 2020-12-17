@@ -13,15 +13,15 @@ import {
 } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol } from 'airgap-coin-lib'
-import { TezosNetwork, TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
   TezosProtocolOptions
-} from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+} from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 
@@ -236,7 +236,8 @@ export class BeaconService {
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
-    const configs: { [key in BeaconNetworkType]: TezosProtocolNetwork } = {
+    // TODO: remove `Exclude`
+    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.CARTHAGENET>]: TezosProtocolNetwork } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,
@@ -248,20 +249,6 @@ export class BeaconService {
           conseilUrl: undefined,
           conseilNetwork: undefined,
           conseilApiKey: undefined
-        }
-      },
-      [BeaconNetworkType.CARTHAGENET]: {
-        // TODO: Remove
-        identifier: undefined,
-        name: network.name || 'Carthagenet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.CARTHAGENET,
-          conseilUrl: 'https://tezos-carthagenet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.CARTHAGENET,
-          conseilApiKey: 'airgap00391'
         }
       },
       [BeaconNetworkType.DELPHINET]: {

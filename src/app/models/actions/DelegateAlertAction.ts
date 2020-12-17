@@ -1,8 +1,8 @@
 import { UiEventService } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosDelegatorAction } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { AirGapMarketWallet, TezosDelegatorAction } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 import { DataService } from 'src/app/services/data/data.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 

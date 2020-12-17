@@ -1,9 +1,9 @@
 import { ToastController, LoadingController } from '@ionic/angular'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 

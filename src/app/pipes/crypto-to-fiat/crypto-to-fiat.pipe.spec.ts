@@ -1,5 +1,5 @@
 import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
-import { MainProtocolSymbols } from 'airgap-coin-lib'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 
 import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'

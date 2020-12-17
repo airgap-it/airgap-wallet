@@ -1,8 +1,8 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router'
-import { ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
 
 @Injectable()
 export class ProtocolGuard implements CanActivate {

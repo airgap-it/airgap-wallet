@@ -1,7 +1,7 @@
 import { BaseIACService, ProtocolService, SerializerService, UiEventElementsService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType } from 'airgap-coin-lib'
+import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType } from '@airgap/coinlib-core'
 
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'

@@ -1,19 +1,26 @@
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, generateId, IACMessageType, IAirGapTransaction, ICoinDelegateProtocol, TezosKtProtocol } from 'airgap-coin-lib'
-import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
-import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { FeeDefaults } from 'airgap-coin-lib'
-import { TezosBTC } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  generateId,
+  IACMessageType,
+  IAirGapTransaction,
+  ICoinDelegateProtocol,
+  TezosKtProtocol
+} from '@airgap/coinlib-core'
+import { CosmosTransaction } from '@airgap/coinlib-core/protocols/cosmos/CosmosTransaction'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { FeeDefaults } from '@airgap/coinlib-core'
+import { TezosBTC } from '@airgap/coinlib-core'
 import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
   RawEthereumTransaction,
   RawTezosTransaction,
   RawSubstrateTransaction
-} from 'airgap-coin-lib/dist/serializer/types'
-import { SubProtocolSymbols } from 'airgap-coin-lib'
+} from '@airgap/coinlib-core/serializer/types'
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'

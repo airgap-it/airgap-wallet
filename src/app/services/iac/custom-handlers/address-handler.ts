@@ -1,6 +1,6 @@
 import { IACMessageHandler } from '@airgap/angular-core'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet, supportedProtocols } from 'airgap-coin-lib'
+import { AirGapMarketWallet, supportedProtocols } from '@airgap/coinlib-core'
 
 import { partition } from '../../../utils/utils'
 import { AccountProvider } from '../../account/account.provider'
