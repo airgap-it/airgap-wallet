@@ -28,7 +28,7 @@
     "e2e-test-ci": "npm run e2e-update && protractor ./test-config/protractor-ci.conf.js",
     "e2e-update": "webdriver-manager update --standalone false --gecko false",
     "postinstall": "node patch.js && npm run browserify-coinlib && jetifier && node apply-diagnostic-modules.js",
-    "browserify-coinlib": "browserify ./node_modules/airgap-coin-lib/dist/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
+    "browserify-coinlib": "browserify ./node_modules/@airgap/coinlib-core/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"test/**/*.js\"",
     "electron": "npm --prefix electron/ run start",
     "electron:install": "npm --prefix electron/ install --",
@@ -49,8 +49,9 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.6",
+    "@airgap/angular-core": "0.0.7-beta.0",
     "@airgap/beacon-sdk": "2.0.0-beta.17",
+    "@airgap/coinlib-core": "^0.9.15-beta.1",
     "@angular/animations": "^10.0.8",
     "@angular/common": "^10.0.8",
     "@angular/core": "^10.0.8",
@@ -80,7 +81,6 @@
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
     "@zondax/ledger-polkadot": "^0.11.0",
     "@zxing/ngx-scanner": "3.0.0",
-    "airgap-coin-lib": "0.9.13",
     "angularx-qrcode": "^1.5.3",
     "axios": "^0.20.0",
     "bignumber.js": "8.0.1",
