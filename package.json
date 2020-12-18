@@ -49,7 +49,7 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.6",
+    "@airgap/angular-core": "0.0.7-beta.1",
     "@airgap/beacon-sdk": "2.0.0-beta.17",
     "@angular/animations": "^10.0.8",
     "@angular/common": "^10.0.8",
@@ -80,7 +80,7 @@
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
     "@zondax/ledger-polkadot": "^0.11.0",
     "@zxing/ngx-scanner": "3.0.0",
-    "airgap-coin-lib": "0.9.13",
+    "airgap-coin-lib": "^0.9.15-beta.0",
     "angularx-qrcode": "^1.5.3",
     "axios": "^0.20.0",
     "bignumber.js": "8.0.1",
