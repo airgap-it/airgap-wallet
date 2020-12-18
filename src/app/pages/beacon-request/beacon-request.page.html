@@ -97,9 +97,11 @@
       </ion-row>
 
       <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
-        <ng-container *ngFor="let transaction of transactions">
-          <airgap-from-to [transaction]="transaction"></airgap-from-to>
-        </ng-container>
+        <ion-row class="rawdata--container">
+          <ion-col class="ion-no-padding">
+            <pre class="ion-no-margin">{{ request | json }}</pre>
+          </ion-col>
+        </ion-row>
       </div>
 
       <div *ngIf="request.type === 'operation_request'" class="request--container">

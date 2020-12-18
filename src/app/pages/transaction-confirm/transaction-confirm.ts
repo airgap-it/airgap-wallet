@@ -1,5 +1,5 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { BeaconResponseInputMessage } from '@airgap/beacon-sdk'
+import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
@@ -25,9 +25,9 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
   styleUrls: ['./transaction-confirm.scss']
 })
 export class TransactionConfirmPage {
-  public signedTransactionsSync: IACMessageDefinitionObject[]
+  public messageDefinitionObjects: IACMessageDefinitionObject[]
 
-  public txInfos: [string, ICoinProtocol, (hash: string) => BeaconResponseInputMessage][] = []
+  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage][] = []
   public protocols: ICoinProtocol[] = []
 
   constructor(
@@ -53,29 +53,29 @@ export class TransactionConfirmPage {
     await this.platform.ready()
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      this.signedTransactionsSync = info.signedTransactionsSync
+      this.messageDefinitionObjects = info.messageDefinitionObjects
     }
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.signedTransactionsSync.forEach(async signedTx => {
-      const protocol = await this.protocolService.getProtocol(signedTx.protocol)
+    this.messageDefinitionObjects.forEach(async messageObject => {
+      const protocol = await this.protocolService.getProtocol(messageObject.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
-        (signedTx.payload as SignedTransaction).accountIdentifier,
-        signedTx.protocol
+        (messageObject.payload as SignedTransaction).accountIdentifier,
+        messageObject.protocol
       )
 
-      const [createResponse, savedProtocol] = await this.beaconService.getVaultRequest((signedTx.payload as SignedTransaction).transaction)
+      const [request, savedProtocol] = await this.beaconService.getVaultRequest(messageObject.id)
 
       const selectedProtocol =
-        createResponse && savedProtocol && savedProtocol.identifier === protocol.identifier
+        request && savedProtocol && savedProtocol.identifier === protocol.identifier
           ? savedProtocol
           : wallet && wallet.protocol
           ? wallet.protocol
           : protocol
 
-      this.txInfos.push([(signedTx.payload as SignedTransaction).transaction, selectedProtocol, createResponse])
+      this.txInfos.push([(messageObject.payload as SignedTransaction).transaction, selectedProtocol, request])
       this.protocols.push(selectedProtocol)
     })
   }
@@ -105,14 +105,18 @@ export class TransactionConfirmPage {
       this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }, TIMEOUT_TRANSACTION_QUEUED)
 
-    this.txInfos.forEach(async ([signedTx, protocol, createResponse], index) => {
+    this.txInfos.forEach(async ([signedTx, protocol, request], index) => {
       protocol
         .broadcastTransaction(signedTx)
         .then(async txId => {
           console.log('transaction hash', txId)
 
-          if (createResponse) {
-            const response = createResponse(txId)
+          if (request) {
+            const response = {
+              id: request.id,
+              type: this.beaconService.getResponseByRequestType(request.type),
+              transactionHash: txId
+            } as BeaconResponseInputMessage
             this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
           }
 
@@ -122,13 +126,13 @@ export class TransactionConfirmPage {
           // TODO: Remove once we introduce pending transaction handling
           // TODO: Multi messages
           // tslint:disable-next-line:no-unnecessary-type-assertion
-          const signedTxWrapper = this.signedTransactionsSync[index].payload as SignedTransaction
+          const signedTxWrapper = this.messageDefinitionObjects[index].payload as SignedTransaction
           const lastTx: {
             protocol: string
             accountIdentifier: string
             date: number
           } = {
-            protocol: this.signedTransactionsSync[index].protocol,
+            protocol: this.messageDefinitionObjects[index].protocol,
             accountIdentifier: signedTxWrapper.accountIdentifier,
             date: new Date().getTime()
           }
@@ -141,7 +145,7 @@ export class TransactionConfirmPage {
           // POST TX TO BACKEND
           // Only send it if we are on mainnet
           if (protocol.options.network.type === NetworkType.MAINNET) {
-            const signed = (await protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index]
+            const signed = (await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index]
               .payload as SignedTransaction))[0] as any
             // necessary for the transaction backend
             signed.amount = signed.amount.toString()
@@ -165,7 +169,7 @@ export class TransactionConfirmPage {
 
           // TODO: Remove this special error case once we remove web3 from the coin-lib
           if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
-            ;(protocol.getTransactionDetailsFromSigned(this.signedTransactionsSync[index].payload as SignedTransaction) as any).then(
+            ;(protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction) as any).then(
               signed => {
                 if (signed.hash) {
                   this.showTransactionSuccessfulAlert(protocol, signed.hash)

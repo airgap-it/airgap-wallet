@@ -3,7 +3,14 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, EthereumProtocol, MainProtocolSymbols, SubProtocolSymbols, TezosProtocol } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  EthereumProtocol,
+  MainProtocolSymbols,
+  SubProtocolSymbols,
+  IACMessageType,
+  TezosProtocol
+} from 'airgap-coin-lib'
 import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
 import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
 import { BigNumber } from 'bignumber.js'
@@ -422,7 +429,8 @@ export class TransactionPreparePage {
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
