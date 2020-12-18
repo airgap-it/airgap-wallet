@@ -114,11 +114,11 @@ export class BeaconService {
   }
 
   public async removePeer(peer: P2PPairingRequest): Promise<void> {
-    await this.client.removePeer(peer as any) // TODO: Fix types
+    await this.client.removePeer(peer as any, true) // TODO: Fix types
   }
 
   public async removeAllPeers(): Promise<void> {
-    await this.client.removeAllPeers()
+    await this.client.removeAllPeers(true)
   }
 
   private async isNetworkSupported(_network?: Network): Promise<boolean> {
