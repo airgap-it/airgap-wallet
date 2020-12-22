@@ -49,13 +49,13 @@ export class SignedTransactionComponent implements OnChanges {
 
     // TODO: Handle multiple messages
     if (this.signedTxs) {
-      const protocol: ICoinProtocol =
+      let protocol: ICoinProtocol =
         this.protocols && this.protocols[0] ? this.protocols[0] : await this.protocolService.getProtocol(this.signedTxs[0].protocol)
       try {
         this.airGapTxs = (await Promise.all(
-          this.signedTxs.map((signedTx: IACMessageDefinitionObject) =>
-            protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)
-          )
+          this.signedTxs.map((signedTx: IACMessageDefinitionObject) => {
+            return protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)
+          })
         )).reduce((flatten: IAirGapTransaction[], toFlatten: IAirGapTransaction[]) => flatten.concat(toFlatten), [])
 
         if (
