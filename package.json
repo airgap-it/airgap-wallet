@@ -51,7 +51,7 @@
   "dependencies": {
     "@airgap/angular-core": "0.0.7-beta.0",
     "@airgap/beacon-sdk": "2.0.0-beta.17",
-    "@airgap/coinlib-core": "^0.9.15-beta.1",
+    "@airgap/coinlib-core": "^0.10.0-beta.1",
     "@angular/animations": "^10.0.8",
     "@angular/common": "^10.0.8",
     "@angular/core": "^10.0.8",
