@@ -3,7 +3,14 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, EthereumProtocol, MainProtocolSymbols, SubProtocolSymbols, TezosProtocol } from '@airgap/coinlib-core'
+import {
+  AirGapMarketWallet,
+  EthereumProtocol,
+  MainProtocolSymbols,
+  SubProtocolSymbols,
+  IACMessageType,
+  TezosProtocol
+} from '@airgap/coinlib-core'
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BigNumber } from 'bignumber.js'
@@ -60,7 +67,7 @@ export class TransactionPreparePage {
 
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
-  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
+  private readonly state$: BehaviorSubject<TransactionPrepareState>
 
   private publicKey: string
   private protocolID: string
@@ -86,6 +93,8 @@ export class TransactionPreparePage {
     this.protocolID = this.route.snapshot.params.protocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
     this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
+
+    this.state$ = new BehaviorSubject(this._state)
 
     this.address = this.route.snapshot.params.address
     this.amount = Number(this.route.snapshot.params.amount)
@@ -422,7 +431,8 @@ export class TransactionPreparePage {
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
