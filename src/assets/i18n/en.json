@@ -197,9 +197,10 @@
   },
   "transaction-prepare": {
     "title": "Send {{title}}",
-    "to-address_label": "To Address",
+    "to-address_label": "Recipient",
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
+    "balance_label": "Balance:",
     "fee": {
       "label": "Fee",
       "slow_label": "slow & cheap",
