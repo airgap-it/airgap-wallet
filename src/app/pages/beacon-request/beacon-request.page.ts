@@ -57,7 +57,7 @@ export class BeaconRequestPage implements OnInit {
   public requesterName: string = ''
   public address: string = ''
   public inputs: CheckboxInput[] = []
-  public transactions: IAirGapTransaction[] | undefined
+  public transactions: IAirGapTransaction[] | undefined | any
 
   private responseHandler: (() => Promise<void>) | undefined
 
@@ -190,11 +190,6 @@ export class BeaconRequestPage implements OnInit {
 
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
     const tezosProtocol: TezosProtocol = new TezosProtocol()
-    this.transactions = await tezosProtocol.getTransactionDetails({
-      publicKey: '',
-      transaction: { binaryTransaction: request.payload }
-    })
-
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
@@ -203,14 +198,18 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
-    await this.beaconService.addVaultRequest(request.id, request.payload, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+
+    const clonedRequest = { ...request }
+    clonedRequest.id = generatedId
 
     this.responseHandler = async () => {
-      const transaction = { binaryTransaction: request.payload }
       const info = {
         wallet: selectedWallet,
-        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
-        data: transaction
+        data: clonedRequest,
+        generatedId: generatedId,
+        type: IACMessageType.MessageSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -241,7 +240,8 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
@@ -252,7 +252,9 @@ export class BeaconRequestPage implements OnInit {
       const info = {
         wallet: selectedWallet,
         airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction }),
-        data: forgedTransaction
+        data: forgedTransaction,
+        generatedId: generatedId,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -268,15 +270,16 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    await this.beaconService.addVaultRequest(request.id, signedTx, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',
       transaction: signedTx
     })
 
-    const signedTransactionSync: IACMessageDefinitionObject = {
-      id: generateId(10),
+    const messageDefinitionObject: IACMessageDefinitionObject = {
+      id: generatedId,
       type: IACMessageType.MessageSignResponse,
       protocol: MainProtocolSymbols.XTZ,
       payload: {
@@ -287,7 +290,7 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [messageDefinitionObject]
       }
 
       this.dataService.setData(DataServiceKey.TRANSACTION, info)

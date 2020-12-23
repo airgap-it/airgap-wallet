@@ -2,7 +2,7 @@ import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -21,6 +21,8 @@ export class InteractionSelectionPage {
   public interactionData: any
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
+  private readonly type: IACMessageType
+  private readonly generatedId: string
 
   constructor(
     public readonly platform: Platform,
@@ -38,21 +40,22 @@ export class InteractionSelectionPage {
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
-
+      this.type = info.type
+      this.generatedId = info.generatedId
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
     }
   }
 
   public async offlineDeviceSign() {
     const dataQR = await this.prepareQRData()
-
     const info = {
       wallet: this.wallet,
       airGapTxs: this.airGapTxs,
-      data: dataQR
+      data: dataQR,
+      interactionData: this.interactionData
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
-    this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(err => console.error(err))
   }
 
   public async sameDeviceSign() {
@@ -80,8 +83,7 @@ export class InteractionSelectionPage {
     if (typeof this.interactionData === 'string' && this.interactionData.includes('://')) {
       return this.interactionData
     }
-
-    return this.operations.serializeSignRequest(this.wallet, this.interactionData).catch(error => {
+    return this.operations.serializeSignRequest(this.wallet, this.interactionData, this.type, this.generatedId).catch(error => {
       console.warn(`Could not serialize transaction: ${error}`)
       // TODO: Show error (toast)
 

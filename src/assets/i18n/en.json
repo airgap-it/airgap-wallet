@@ -152,7 +152,8 @@
       "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
       "permission-list_label": "Beacon Permissions"
-    }
+    },
+    "qr-page": "Go to QR settings"
   },
   "select-wallet": {
     "title": "Select Account",
@@ -215,7 +216,8 @@
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
-    "done_label": "Done"
+    "done_label": "Done",
+    "details": "Display details"
   },
   "interaction-selection": {
     "title": "Vault Interaction",
@@ -225,7 +227,6 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
     "heading": "Select the device to sign this transaction",
@@ -234,7 +235,6 @@
     "ledger_label": "Ledger",
     "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
   },
-
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
@@ -248,7 +248,6 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
@@ -364,12 +363,12 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
-    }
-    ,"loading": {
+    },
+    "loading": {
       "setup": "Setting up exchange ... ",
       "header": "Loading Error",
       "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
-    } 
+    }
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
@@ -595,7 +594,7 @@
       "placeholder_text": "{{ delegateeLabel }} address",
       "delegatee-address_label": "Baker address",
       "cancel_label": "Cancel",
-      "set-delegatee_label": "Set {{ delegateeLabel }}" 
+      "set-delegatee_label": "Set {{ delegateeLabel }}"
     }
   },
   "delegation-validator-list": {
@@ -605,21 +604,18 @@
     "sort_label": "Sort Validators",
     "no_validators_found_label": "No validators matching your search have been found"
   },
-
   "action-alert-tip": {
     "heading": "Thank you for using AirGap!",
     "text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
     "cancel_label": "No",
     "ok_label": "Tip Now"
   },
-
   "action-alert-delegation": {
     "heading": "Thank you for using AirGap!",
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
     "ok_label": "Delegate Now"
   },
-
   "ledger-sign": {
     "title": "{{title}} Transaction Details",
     "text": "Connect the Ledger device and sign the transaction.",
@@ -630,7 +626,6 @@
       "confirm": "Okay"
     }
   },
-
   "account-import-interaction-selection": {
     "title": "Select Signer Option",
     "airgap-vault": {

@@ -37,7 +37,9 @@
           <h5>{{ aggregatedInfo.numberOfTxs }}</h5>
         </ion-col>
         <ion-col size="4" class="content--align__center-center">
-          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}</h5>
+          <h5>
+            {{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}
+          </h5>
         </ion-col>
         <ion-col size="4">
           <small>Amount</small>
@@ -53,6 +55,18 @@
 
     <ng-container *ngIf="airGapTxs">
       <airgap-from-to *ngFor="let airGapTx of airGapTxs" class="ion-padding-horizontal" [transaction]="airGapTx"></airgap-from-to>
+    </ng-container>
+
+    <ng-container *ngIf="interactionData">
+      <ion-row class="rawdata--container">
+        <ion-col class="ion-no-padding">
+          <ion-item class="ion-no-padding" lines="none">
+            <ion-label>{{ 'transaction-qr.details' | translate }}</ion-label>
+            <ion-toggle [checked]="displayRawData" (ionChange)="toggleDisplayRawData()" slot="end"></ion-toggle>
+          </ion-item>
+          <pre *ngIf="displayRawData" class="ion-no-margin">{{ interactionData | json }}</pre>
+        </ion-col>
+      </ion-row>
     </ng-container>
 
     <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>

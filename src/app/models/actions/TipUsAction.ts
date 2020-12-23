@@ -25,7 +25,9 @@ export interface TipUsActionContext {
 }
 
 export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
-  public readonly identifier: string = 'tip-us-action'
+  public get identifier(): string {
+    return 'tip-us-action'
+  }
   public readonly info: WalletActionInfo = {
     name: 'Tip Us',
     icon: 'logo-usd'
