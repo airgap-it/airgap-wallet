@@ -27,7 +27,9 @@ export interface DelegateAlertActionContext {
 }
 
 export class DelegateAlertAction extends Action<void, DelegateAlertActionContext> {
-  public readonly identifier: string = 'tip-us-action'
+  public get identifier(): string {
+    return 'tip-us-action'
+  }
   public readonly info: WalletActionInfo = {
     name: 'Tip Us',
     icon: 'logo-usd'

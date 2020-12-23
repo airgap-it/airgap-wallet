@@ -185,19 +185,6 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.CARTHAGENET]: {
-        identifier: undefined,
-        name: network.name || 'Custom Network',
-        type: NetworkType.CUSTOM,
-        rpcUrl: network.rpcUrl || '',
-        blockExplorer: new TezblockBlockExplorer(''),
-        extras: {
-          network: TezosNetwork.MAINNET,
-          conseilUrl: '',
-          conseilNetwork: TezosNetwork.MAINNET,
-          conseilApiKey: ''
-        }
-      },
       [BeaconNetworkType.DELPHINET]: {
         identifier: undefined,
         name: network.name || 'Delphinet',

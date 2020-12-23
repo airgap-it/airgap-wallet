@@ -8,7 +8,6 @@ export interface ButtonActionContext {
 }
 
 export class ButtonAction<Result, Context> extends RepeatableAction<Result, Context, ButtonActionContext> {
-  // @ts-ignore
   public get identifier(): string {
     return this.context.identifier
   }
