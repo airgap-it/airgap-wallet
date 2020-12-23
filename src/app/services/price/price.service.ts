@@ -1,8 +1,8 @@
-import { SubProtocolSymbols } from 'airgap-coin-lib'
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import axios from '../../../../node_modules/axios'
 import { Injectable } from '@angular/core'
-import { ICoinProtocol } from 'airgap-coin-lib'
-import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 

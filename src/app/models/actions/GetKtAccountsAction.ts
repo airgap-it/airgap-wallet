@@ -1,4 +1,4 @@
-import { ImportAccountAction } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
+import { ImportAccountAction } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 
 import { WalletActionInfo } from '../ActionGroup'
 

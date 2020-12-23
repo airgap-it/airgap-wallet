@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ProtocolService } from '@airgap/angular-core'
 import { ActivatedRoute } from '@angular/router'
-import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { DataService } from 'src/app/services/data/data.service'
 

@@ -1,13 +1,13 @@
 import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
-import { AirGapMarketWallet, SubstrateProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, SubstrateProtocol } from '@airgap/coinlib-core'
 import {
   SubstrateSignature,
   SubstrateSignatureType
-} from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateSignature'
-import { SubstrateTransaction } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
-import { SubstrateTransactionPayload } from 'airgap-coin-lib/dist/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
-import { RawSubstrateTransaction } from 'airgap-coin-lib/dist/serializer/types'
-import { AirGapWalletPriceService } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+} from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateSignature'
+import { SubstrateTransaction } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
+import { SubstrateTransactionPayload } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
+import { RawSubstrateTransaction } from '@airgap/coinlib-core/serializer/types'
+import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { Buffer } from 'buffer'
 
 import { ReturnCode } from '../../ReturnCode'

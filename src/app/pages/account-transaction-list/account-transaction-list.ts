@@ -1,12 +1,12 @@
-import { IAirGapTransactionResult, IProtocolTransactionCursor } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
@@ -25,7 +25,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000

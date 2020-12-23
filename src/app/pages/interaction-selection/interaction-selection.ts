@@ -2,7 +2,7 @@ import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 

@@ -1,14 +1,14 @@
 import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
-import { MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
+import { MarketDataSample, TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 
 import { AccountProvider } from '../account/account.provider'
 import { CachingService, CachingServiceKey } from '../caching/caching.service'
-import { IAirGapTransactionResult } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
-import { SubProtocolSymbols } from 'airgap-coin-lib'
+import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 
 export interface BalanceAtTimestampObject {
   timestamp: number

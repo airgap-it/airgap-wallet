@@ -1,8 +1,8 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { IAirGapTransaction } from 'airgap-coin-lib'
-import { ProtocolSymbols } from 'airgap-coin-lib'
+import { IAirGapTransaction } from '@airgap/coinlib-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 

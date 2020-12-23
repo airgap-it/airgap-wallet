@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 @Injectable()

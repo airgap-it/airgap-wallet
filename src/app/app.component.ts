@@ -28,9 +28,9 @@ import {
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
   TezosProtocolOptions
-} from 'airgap-coin-lib'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+} from '@airgap/coinlib-core'
+import { TezosNetwork } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
