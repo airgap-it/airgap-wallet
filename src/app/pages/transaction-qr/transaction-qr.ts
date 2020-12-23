@@ -2,7 +2,7 @@ import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

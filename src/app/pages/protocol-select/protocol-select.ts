@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ModalController, NavParams } from '@ionic/angular'
-import { ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'page-protocol-select',

@@ -1,6 +1,6 @@
-import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols } from 'airgap-coin-lib'
-import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 
 // tslint:disable:max-classes-per-file

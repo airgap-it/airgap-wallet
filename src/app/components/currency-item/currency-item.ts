@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'currency-item',

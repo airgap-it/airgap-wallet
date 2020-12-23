@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { DataService } from 'src/app/services/data/data.service'
 
 import { AccountProvider } from '../../services/account/account.provider'

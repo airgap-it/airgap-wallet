@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, IACMessageType } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'

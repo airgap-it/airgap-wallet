@@ -1,6 +1,6 @@
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { IAirGapSignedTransaction } from 'airgap-coin-lib/dist/interfaces/IAirGapSignedTransaction'
-import { AirGapWalletPriceService } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { IAirGapSignedTransaction } from '@airgap/coinlib-core/interfaces/IAirGapSignedTransaction'
+import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 
 import { LedgerConnection } from '../connection/LedgerConnection'
 

@@ -1,6 +1,6 @@
 import { ProtocolService, SerializerService } from '@airgap/angular-core'
 import { Component, Input, OnChanges } from '@angular/core'
-import { IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from 'airgap-coin-lib'
+import { IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

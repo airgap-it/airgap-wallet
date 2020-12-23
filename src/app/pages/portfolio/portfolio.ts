@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinSubProtocol } from '@airgap/coinlib-core'
 import { forkJoin, from, Observable, ReplaySubject, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
