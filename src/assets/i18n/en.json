@@ -153,7 +153,10 @@
       "about_label": "About Beacon",
       "permission-list_label": "Beacon Permissions"
     },
-    "qr-page": "Go to QR settings"
+    "qr-advanced-settings_label": "Advanced QR Settings"
+  },
+  "qr-settings-page": {
+    "title": "QR Settings"
   },
   "select-wallet": {
     "title": "Select Account",
