@@ -1,19 +1,17 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
-import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
-import { TranslateService } from '@ngx-translate/core'
 import { SubstratePayee, SubstrateProtocol } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import {
-  SubstrateElectionStatus,
-  SubstrateEraElectionStatus
-} from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
+import { SubstrateElectionStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
+import { SubstrateNominationStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateNominationStatus'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
 } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
 import { SubstrateStakingActionType } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
 import { SubstrateValidatorDetails } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, Validators } from '@angular/forms'
+import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
 import {
@@ -101,16 +99,26 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
+    const [nominatorDetails, validatorsDetails]: [SubstrateNominatorDetails, SubstrateValidatorDetails[]] = await Promise.all([
+      protocol.options.accountController.getNominatorDetails(delegator, delegatees),
+      Promise.all(delegatees.map((validator: string) => protocol.options.accountController.getValidatorDetails(validator)))
+    ])
 
-    const extraNominatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
-    const extraValidatorsDetails = await this.getExtraValidatorsDetails(protocol, delegatees, nominatorDetails, extraNominatorDetails)
+    const extraNominatorDetails: AirGapDelegatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
+    const extraValidatorsDetails: AirGapDelegateeDetails[] = await this.getExtraValidatorsDetails(
+      protocol,
+      validatorsDetails,
+      nominatorDetails,
+      extraNominatorDetails
+    )
 
-    const alerts = await this.getAlerts(protocol)
+    const alerts: UIAlert[] = (await Promise.all(
+      validatorsDetails.map((validatorDetails: SubstrateValidatorDetails) => this.getAlerts(protocol, nominatorDetails, validatorDetails))
+    )).reduce((flatten: UIAlert[], next: UIAlert[]) => flatten.concat(next), [])
 
     return [
       {
-        alerts,
+        alerts: alerts.length > 0 ? alerts : undefined,
         delegator: extraNominatorDetails,
         delegatees: extraValidatorsDetails
       }
@@ -147,18 +155,23 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   private async getExtraValidatorsDetails(
     protocol: SubstrateProtocol,
-    validators: string[],
+    validatorsDetails: SubstrateValidatorDetails[],
     nominatorDetails: SubstrateNominatorDetails,
     extraNominatorDetials: AirGapDelegatorDetails
   ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
-      validators.map(async validator => {
-        const validatorDetails = await protocol.options.accountController.getValidatorDetails(validator)
+      validatorsDetails.map(async (validatorDetails: SubstrateValidatorDetails) => {
+        const ownStash: BigNumber = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
+        const totalStakingBalance: BigNumber = new BigNumber(
+          validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0
+        )
 
-        const ownStash = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
-        const totalStakingBalance = new BigNumber(validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0)
-
-        const displayDetails = await this.createDelegateeDisplayDetails(protocol, validatorDetails, nominatorDetails, extraNominatorDetials)
+        const displayDetails: UIWidget[] = await this.createDelegateeDisplayDetails(
+          protocol,
+          validatorDetails,
+          nominatorDetails,
+          extraNominatorDetials
+        )
 
         return {
           ...validatorDetails,
@@ -175,21 +188,61 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
   }
 
-  private async getAlerts(protocol: SubstrateProtocol): Promise<UIAlert[] | undefined> {
-    const isElectionOpen: boolean = await protocol.options.nodeClient
-      .getElectionStatus()
-      .then((eraElectionStatus: SubstrateEraElectionStatus) => eraElectionStatus.status.value === SubstrateElectionStatus.OPEN)
+  private async getAlerts(
+    protocol: SubstrateProtocol,
+    nominatorDetails: SubstrateNominatorDetails,
+    validatorDetails: SubstrateValidatorDetails
+  ): Promise<UIAlert[]> {
+    const alerts: UIAlert[] = []
 
-    return isElectionOpen
-      ? [
-          new UIAlert({
-            title: 'delegation-detail-substrate.alert.election-open.title',
-            description: 'delegation-detail-substrate.alert.election-open.description',
-            icon: 'alert-circle-outline',
-            color: 'warning'
-          })
-        ]
-      : undefined
+    const results = await Promise.all([
+      protocol.options.nodeClient.getElectionStatus(),
+      protocol.options.accountController.getNominationStatus(nominatorDetails.address, validatorDetails.address)
+    ])
+    const isElectionOpen: boolean = results[0].status.value === SubstrateElectionStatus.OPEN
+    const nominationStatus: SubstrateNominationStatus | undefined = results[1]
+
+    if (isElectionOpen) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-substrate.alert.election-open.title',
+          description: 'delegation-detail-substrate.alert.election-open.description',
+          icon: 'alert-circle-outline',
+          color: 'warning'
+        })
+      )
+    }
+
+    if (nominationStatus === SubstrateNominationStatus.INACTIVE) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-substrate.alert.nomination-inactive.title',
+          description: 'delegation-detail-substrate.alert.nomination-inactive.description',
+          icon: 'alert-circle-outline',
+          color: 'warning'
+        })
+      )
+    } else if (nominationStatus === SubstrateNominationStatus.OVERSUBSCRIBED) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-substrate.alert.nomination-oversubscribed.title',
+          description: 'delegation-detail-substrate.alert.nomination-oversubscribed.description',
+          icon: 'alert-circle-outline',
+          color: 'warning'
+        })
+      )
+    } else if (nominationStatus === undefined && validatorDetails.nominators > 256) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-substrate.alert.validator-oversubscribed.title',
+          description: 'delegation-detail-substrate.alert.validator-oversubscribed.description',
+          icon: 'alert-circle-outline',
+          color: 'warning'
+        })
+      )
+    }
+
+    return alerts
   }
 
   private async createDelegateeDisplayDetails(
@@ -215,8 +268,14 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       ? extraNominatorDetails.mainActions.find(action => delegateActions.includes(action.type))
       : undefined
 
+    const isNominated = nominatorDetails.delegatees.includes(validatorDetails.address)
     const showExpectedRewardWidget =
-      !!totalPreviousReward && !!commission && validatorDetails.status === 'Active' && !!delegateAction && !!delegateAction.form
+      !!totalPreviousReward &&
+      !!commission &&
+      validatorDetails.status === 'Active' &&
+      !isNominated &&
+      !!delegateAction &&
+      !!delegateAction.form
 
     if (showExpectedRewardWidget) {
       const bonded = nominatorDetails.stakingDetails ? new BigNumber(nominatorDetails.stakingDetails.total) : new BigNumber(0)
@@ -253,6 +312,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
       details.push(expectedRewardWidget)
     }
+
     return details
   }
 
@@ -707,16 +767,30 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     const nextEraDate = new Date(stakingDetails.nextEra)
 
-    details.push(
-      new UIIconText({
-        iconName: 'sync-outline',
-        text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
-        description:
-          stakingDetails.status === 'nominating_inactive'
-            ? 'delegation-detail-substrate.becomes-active_label'
-            : 'delegation-detail-substrate.next-payout_label'
-      })
-    )
+    let nextEraLabel: string | undefined
+    switch (stakingDetails.status) {
+      case 'nominating':
+        nextEraLabel = 'delegation-detail-substrate.next-payout_label'
+        break
+      case 'nominating_waiting':
+        nextEraLabel = 'delegation-detail-substrate.becomes-active_label'
+        break
+      case 'nominating_inactive':
+        nextEraLabel = 'delegation-detail-substrate.next-era_label'
+        break
+      default:
+        nextEraLabel = undefined
+    }
+
+    if (nextEraLabel) {
+      details.push(
+        new UIIconText({
+          iconName: 'sync-outline',
+          text: `${moment(nextEraDate).fromNow()} (${moment(nextEraDate).format('LLL')})`,
+          description: nextEraLabel
+        })
+      )
+    }
 
     return details
   }

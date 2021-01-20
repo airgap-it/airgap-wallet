@@ -518,6 +518,7 @@
     "bonded_label": "Bonded",
     "locked_label": "Unbonding",
     "withdraw-ready_label": "Ready to Withdraw",
+    "next-era_label": "Next Era",
     "becomes-active_label": "Becomes Active",
     "next-payout_label": "Next Payout",
     "delegate": {
@@ -555,6 +556,18 @@
       "election-open": {
         "title": "Delegation operations currently unavailable",
         "description": "Due to the election period restrictions the delegation operations are currently unavailable."
+      },
+      "nomination-inactive": {
+        "title": "Your delegation to this validator is inactive",
+        "description": "The validator has been elected to be in the validator set, however, your nomination has not been selected to be active in this era and you won't get any rewards."
+      },
+      "nomination-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards. You won't get any rewards in this era."
+      },
+      "validator-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards."
       }
     }
   },
