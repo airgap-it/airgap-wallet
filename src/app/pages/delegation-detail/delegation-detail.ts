@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import { BehaviorSubject } from 'rxjs'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
@@ -375,7 +375,8 @@ export class DelegationDetailPage {
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dismissLoader()
