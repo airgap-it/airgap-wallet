@@ -2,7 +2,7 @@ import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -17,6 +17,9 @@ export class TransactionQrPage {
   public airGapTxs: IAirGapTransaction[] = null
   public isBrowser: boolean = false
   public qrDataTooBig: boolean = false
+  public interactionData: any
+  public displayRawData: boolean = false
+
   public aggregatedInfo:
     | {
         numberOfTxs: number
@@ -35,10 +38,12 @@ export class TransactionQrPage {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
+      this.interactionData = info.interactionData
       this.preparedDataQR = info.data
       this.qrDataTooBig = this.preparedDataQR.length > 2800
 
       if (
+        this.airGapTxs &&
         this.airGapTxs.length > 1 &&
         this.airGapTxs.every((tx: IAirGapTransaction) => tx.protocolIdentifier === this.airGapTxs[0].protocolIdentifier)
       ) {
@@ -61,5 +66,9 @@ export class TransactionQrPage {
 
   public sameDeviceSign() {
     this.deeplinkService.sameDeviceDeeplink(this.preparedDataQR)
+  }
+
+  public toggleDisplayRawData(): void {
+    this.displayRawData = !this.displayRawData
   }
 }

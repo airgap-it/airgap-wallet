@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
 import * as moment from 'moment'
-import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { BaseChartDirective } from 'ng2-charts'
 import { Subscription } from 'rxjs'
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'

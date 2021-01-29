@@ -1,11 +1,11 @@
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
-import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
-import { SimpleAction } from 'airgap-coin-lib/dist/actions/SimpleAction'
-import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
+import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
+import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
+import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
+import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
+import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
@@ -58,6 +58,7 @@ export class ActionGroup {
   private getTezosActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
+    //TODO: Move logic to sub-account-add.ts
     const addTokenButtonAction = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
       () => {
@@ -70,7 +71,11 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                  info.wallet.addressIndex
+                }/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -115,9 +120,9 @@ export class ActionGroup {
       () => {
         const action = new AirGapTezosMigrateAction({
           wallet: this.callerContext.wallet,
-          mainWallet: this.callerContext.mainWallet,
           alertCtrl: this.callerContext.alertCtrl,
           translateService: this.callerContext.translateService,
+          protocolService: this.callerContext.protocolService,
           dataService: this.callerContext.dataService,
           router: this.callerContext.router
         })
@@ -153,7 +158,11 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                  info.wallet.addressIndex
+                }/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -218,7 +227,11 @@ export class ActionGroup {
           }
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
-            .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
+            .navigateByUrl(
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
+                this.callerContext.wallet.protocol.identifier
+              }/${this.callerContext.wallet.addressIndex}`
+            )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
           resolve()

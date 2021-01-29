@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import { BehaviorSubject } from 'rxjs'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
@@ -24,6 +24,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { isType } from 'src/app/utils/utils'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'app-delegation-detail',
@@ -77,6 +78,10 @@ export class DelegationDetailPage {
 
   private loader: HTMLIonLoadingElement | undefined
 
+  private publicKey: string
+  private protocolID: string
+  private addressIndex
+
   constructor(
     private readonly router: Router,
     private readonly navController: NavController,
@@ -88,14 +93,20 @@ export class DelegationDetailPage {
     private readonly toastController: ToastController,
     private readonly route: ActivatedRoute,
     private readonly formBuilder: FormBuilder,
-    private readonly amountConverter: AmountConverterPipe
+    private readonly amountConverter: AmountConverterPipe,
+    public readonly accountProvider: AccountProvider
   ) {}
 
   ngOnInit() {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      this.wallet = info.wallet
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+    if (this.addressIndex === 'undefined') {
+      this.addressIndex = undefined
+    } else {
+      this.addressIndex = Number(this.addressIndex)
     }
+    this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
 
     this.extensionsService.loadDelegationExtensions().then(() => {
       this.initView()
@@ -364,7 +375,8 @@ export class DelegationDetailPage {
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dismissLoader()

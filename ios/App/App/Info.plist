@@ -28,6 +28,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>airgap-wallet</string>
+				<string>tezos</string>
 			</array>
 		</dict>
 	</array>

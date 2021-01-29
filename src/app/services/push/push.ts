@@ -10,7 +10,7 @@ import {
 } from '@capacitor/core'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { ReplaySubject } from 'rxjs'
 import { take } from 'rxjs/operators'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'

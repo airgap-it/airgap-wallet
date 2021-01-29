@@ -1,0 +1,1 @@
+AirGap Wallet is a secure cryptocurrency wallet for Bitcoin, Ethereum and others

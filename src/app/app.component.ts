@@ -28,9 +28,9 @@ import {
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
   TezosProtocolOptions
-} from 'airgap-coin-lib'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+} from '@airgap/coinlib-core'
+import { TezosNetwork } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
@@ -127,13 +127,9 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
-          if (data.url.startsWith('airgap-wallet://')) {
-            // tslint:disable-next-line: no-console
-            console.log('Successfully matched route', JSON.stringify(data.url))
-            this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
-          } else {
-            handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER)(`route not matched: ${JSON.stringify(data.url)}`)
-          }
+          // tslint:disable-next-line: no-console
+          console.log('Successfully received deeplink', data.url)
+          this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
     }
@@ -185,30 +181,30 @@ export class AppComponent implements AfterViewInit {
   }
 
   private initializeProtocols(): void {
-    const carthagenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Carthagenet',
+    const delphinetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Delphinet',
       NetworkType.TESTNET,
-      'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
-      new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
+      'https://tezos-delphinet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https://delphinet.tezblock.io'),
       new TezosProtocolNetworkExtras(
-        TezosNetwork.CARTHAGENET,
-        'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech',
-        TezosNetwork.CARTHAGENET,
+        TezosNetwork.DELPHINET,
+        'https://tezos-delphinet-conseil.prod.gke.papers.tech',
+        TezosNetwork.DELPHINET,
         'airgap00391'
       )
     )
-    const carthagenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(carthagenetNetwork))
+    const delphinetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(delphinetNetwork))
 
     this.protocolService.init({
-      extraActiveProtocols: [carthagenetProtocol],
+      extraActiveProtocols: [delphinetProtocol],
       extraPassiveSubProtocols: [
-        [carthagenetProtocol, new TezosKtProtocol(new TezosProtocolOptions(carthagenetNetwork))],
+        [delphinetProtocol, new TezosKtProtocol(new TezosProtocolOptions(delphinetNetwork))],
         [
-          carthagenetProtocol,
+          delphinetProtocol,
           new TezosBTC(
             new TezosFAProtocolOptions(
-              carthagenetNetwork,
-              new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1TH8YZqLy2GFe7yy2JC7oazRj8nyMtzy4W')
+              delphinetNetwork,
+              new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1WhBK8hsji4YZtS6PwTWBAMX7cDbwtC7cZ')
             )
           )
         ]

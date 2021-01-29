@@ -1,8 +1,8 @@
 import { UiEventService } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -25,7 +25,9 @@ export interface TipUsActionContext {
 }
 
 export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
-  public readonly identifier: string = 'tip-us-action'
+  public get identifier(): string {
+    return 'tip-us-action'
+  }
   public readonly info: WalletActionInfo = {
     name: 'Tip Us',
     icon: 'logo-usd'
@@ -41,7 +43,13 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
         amount: this.context.amount
       })
 
-      this.context.router.navigateByUrl(`/transaction-prepare/${DataServiceKey.DETAIL}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.context.router
+        .navigateByUrl(
+          `/transaction-prepare/${DataServiceKey.DETAIL}/${this.context.wallet.publicKey}/${this.context.wallet.protocol.identifier}/${
+            this.context.wallet.addressIndex
+          }/${this.context.tipAddress}/${this.context.amount}/${'not_forced'}`
+        )
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {
       // Do nothing
     }

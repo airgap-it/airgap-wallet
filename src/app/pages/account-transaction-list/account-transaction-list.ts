@@ -1,12 +1,12 @@
-import { IAirGapTransactionResult, IProtocolTransactionCursor } from 'airgap-coin-lib/dist/interfaces/IAirGapTransaction'
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { Component } from '@angular/core'
 import { ExchangeProvider } from './../../services/exchange/exchange'
 import { HttpClient } from '@angular/common/http'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 import { BigNumber } from 'bignumber.js'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
@@ -25,7 +25,7 @@ import { ExtensionsService } from 'src/app/services/extensions/extensions.servic
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
 import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 export const refreshRate = 3000
@@ -49,7 +49,6 @@ export class AccountTransactionListPage {
 
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
-  public mainWallet?: AirGapMarketWallet
 
   public transactions: IAirGapTransaction[] = []
 
@@ -77,6 +76,10 @@ export class AccountTransactionListPage {
 
   private readonly walletChanged: Subscription
 
+  private publicKey: string
+  private protocolID: string
+  private addressIndex
+
   constructor(
     public readonly alertCtrl: AlertController,
     public readonly navController: NavController,
@@ -97,10 +100,17 @@ export class AccountTransactionListPage {
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService
   ) {
-    const info = this.route.snapshot.data.special
-    if (this.route.snapshot.data.special) {
-      this.wallet = info.wallet
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    this.addressIndex = this.route.snapshot.params.addressIndex
+
+    if (this.addressIndex === 'undefined') {
+      this.addressIndex = undefined
+    } else {
+      this.addressIndex = Number(this.addressIndex)
     }
+
+    this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
 
     this.updateExtendedDetails()
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
@@ -121,7 +131,6 @@ export class AccountTransactionListPage {
     this.protocolIdentifier = this.wallet.protocol.identifier
 
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
-      this.mainWallet = info.mainWallet
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
     if (this.protocolIdentifier === MainProtocolSymbols.XTZ) {
@@ -148,9 +157,9 @@ export class AccountTransactionListPage {
     if (this.protocolIdentifier === SubProtocolSymbols.XTZ_KT) {
       const action = new AirGapTezosMigrateAction({
         wallet: this.wallet,
-        mainWallet: this.mainWallet,
         alertCtrl: this.alertCtrl,
         translateService: this.translateService,
+        protocolService: this.protocolService,
         dataService: this.dataService,
         router: this.router
       })
@@ -168,18 +177,25 @@ export class AccountTransactionListPage {
         address: ''
       }
     }
-    this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/transaction-prepare/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(
+        `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${info.address !==
+          ''}/${0}/${'not_forced'}`
+      )
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openReceivePage(): void {
-    this.dataService.setData(DataServiceKey.DETAIL, this.wallet)
-    this.router.navigateByUrl('/account-address/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/account-address/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public openTransactionDetailPage(transaction: IAirGapTransaction): void {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
-    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/transaction-detail/${DataServiceKey.DETAIL}/${transaction.hash}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async openBlockexplorer(): Promise<void> {
@@ -202,7 +218,7 @@ export class AccountTransactionListPage {
     this.loadInitialTransactions().catch(handleErrorSentry())
   }
 
-  public async doInfinite(event): Promise<void> {
+  public async doInfinite(event: { target: { complete: () => void | PromiseLike<void> } }): Promise<void> {
     if (!this.infiniteEnabled) {
       return event.target.complete()
     }
@@ -334,7 +350,7 @@ export class AccountTransactionListPage {
     )}${transaction.amount}${transaction.fee}${transaction.timestamp ? transaction.timestamp : ''}`
   }
 
-  public async presentEditPopover(event): Promise<void> {
+  public async presentEditPopover(event: any): Promise<void> {
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {

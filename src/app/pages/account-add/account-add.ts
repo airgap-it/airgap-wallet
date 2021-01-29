@@ -1,9 +1,10 @@
-import { MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
 import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -43,18 +44,26 @@ export class AccountAddPage {
   ) {}
 
   public async ionViewWillEnter() {
-    this.supportedAccountProtocols = await this.protocolService.getActiveProtocols()
+    this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
+      protocol => protocol.options.network.type === NetworkType.MAINNET
+    )
     const supportedSubAccountProtocols = Array.prototype.concat.apply(
       [],
       await Promise.all(Object.values(MainProtocolSymbols).map(protocol => this.protocolService.getSubProtocols(protocol)))
     )
 
-    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(protocol =>
-      this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
+      protocol =>
+        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
-      protocol => !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase())
+      protocol =>
+        !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
     this.filterProtocols()
   }
@@ -97,22 +106,13 @@ export class AccountAddPage {
             wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
         ).length > 0
     ) {
-      const info = {
-        subProtocolIdentifier: subProtocol.identifier,
-        networkIdentifier: subProtocol.options.network.identifier
-      }
-
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(err => console.error(err))
+      this.router
+        .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
+        .catch(err => console.error(err))
     } else {
-      const info = {
-        mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocol.identifier,
-        networkIdentifier: subProtocol.options.network.identifier
-      }
-
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router
+        .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}`)
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
@@ -139,20 +139,18 @@ export class AccountAddPage {
   }
 
   private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
-    const info = {
-      protocolIdentifier: protocol.identifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
     this.router
-      .navigateByUrl('/account-import-ledger-onboarding/' + DataServiceKey.PROTOCOL)
+      .navigateByUrl(`/account-import-ledger-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private importFromVault(protocol: ICoinProtocol) {
-    const info = {
-      mainProtocolIdentifier: protocol.identifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
-    this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public navigateToScan() {
+    this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

@@ -19,10 +19,10 @@ import {
   IAirGapTransaction,
   ICoinProtocol,
   TezosProtocol
-} from 'airgap-coin-lib'
-import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
-import { NetworkType, ProtocolNetwork } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { MainProtocolSymbols } from 'airgap-coin-lib'
+} from '@airgap/coinlib-core'
+import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
+import { NetworkType, ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -57,7 +57,7 @@ export class BeaconRequestPage implements OnInit {
   public requesterName: string = ''
   public address: string = ''
   public inputs: CheckboxInput[] = []
-  public transactions: IAirGapTransaction[] | undefined
+  public transactions: IAirGapTransaction[] | undefined | any
 
   private responseHandler: (() => Promise<void>) | undefined
 
@@ -105,8 +105,13 @@ export class BeaconRequestPage implements OnInit {
     return protocol.options.network
   }
 
+  public async cancel(): Promise<void> {
+    await this.beaconService.sendAbortedError(this.request.id)
+    await this.dismiss()
+  }
+
   public async dismiss(): Promise<void> {
-    this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {
@@ -185,11 +190,6 @@ export class BeaconRequestPage implements OnInit {
 
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
     const tezosProtocol: TezosProtocol = new TezosProtocol()
-    this.transactions = await tezosProtocol.getTransactionDetails({
-      publicKey: '',
-      transaction: { binaryTransaction: request.payload }
-    })
-
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
@@ -198,14 +198,18 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
-    await this.beaconService.addVaultRequest(request.id, request.payload, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+
+    const clonedRequest = { ...request }
+    clonedRequest.id = generatedId
 
     this.responseHandler = async () => {
-      const transaction = { binaryTransaction: request.payload }
       const info = {
         wallet: selectedWallet,
-        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
-        data: transaction
+        data: clonedRequest,
+        generatedId: generatedId,
+        type: IACMessageType.MessageSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -236,9 +240,10 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
-    this.transactions = tezosProtocol.getAirGapTxFromWrappedOperations({
+    this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
       contents: transaction.contents
     })
@@ -247,7 +252,9 @@ export class BeaconRequestPage implements OnInit {
       const info = {
         wallet: selectedWallet,
         airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction }),
-        data: forgedTransaction
+        data: forgedTransaction,
+        generatedId: generatedId,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -263,15 +270,16 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    await this.beaconService.addVaultRequest(request.id, signedTx, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',
       transaction: signedTx
     })
 
-    const signedTransactionSync: IACMessageDefinitionObject = {
-      id: generateId(10),
+    const messageDefinitionObject: IACMessageDefinitionObject = {
+      id: generatedId,
       type: IACMessageType.MessageSignResponse,
       protocol: MainProtocolSymbols.XTZ,
       payload: {
@@ -282,7 +290,7 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [messageDefinitionObject]
       }
 
       this.dataService.setData(DataServiceKey.TRANSACTION, info)

@@ -1,12 +1,12 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
-import { Observable, ReplaySubject } from 'rxjs'
+import { AirGapMarketWallet, ICoinSubProtocol } from '@airgap/coinlib-core'
+import { forkJoin, from, Observable, ReplaySubject, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { AccountProvider } from '../../services/account/account.provider'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ProtocolService } from '@airgap/angular-core'
@@ -23,6 +23,8 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
+  private subscription: Subscription
+
   public isVisible = 'hidden'
 
   public total: number = 0
@@ -36,7 +38,6 @@ export class PortfolioPage {
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService,
     private readonly protocolService: ProtocolService,
     public platform: Platform
   ) {
@@ -126,25 +127,39 @@ export class PortfolioPage {
       : {
           wallet: mainWallet
         }
-    this.dataService.setData(DataServiceKey.WALLET, info)
-    this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(console.error)
+
+    console.log(info)
+    this.router
+      .navigateByUrl(
+        `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+          info.wallet.addressIndex
+        }`
+      )
+      .catch(console.error)
   }
 
   public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
-
   public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
     this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
-    await Promise.all([
+    const observables = [
       this.walletsProvider.getWalletList().map(wallet => {
-        return wallet.synchronize()
+        return from(wallet.synchronize())
       })
-    ])
+    ]
+    /**
+     * if we use await Promise.all() instead, then each wallet
+     * is synchronized asynchronously, leading to blocking behaviour.
+     * Instead we want to synchronize all wallets simultaneously
+     */
+    const allWalletsSynced = forkJoin([observables])
 
-    await this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    this.subscription = allWalletsSynced.subscribe(() => {
+      this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    })
   }
 
   public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
@@ -166,5 +181,9 @@ export class PortfolioPage {
     }
 
     this.isVisible = 'visible'
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }

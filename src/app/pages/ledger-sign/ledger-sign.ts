@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { AlertController, LoadingController } from '@ionic/angular'
@@ -48,9 +48,13 @@ export class LedgerSignPage {
       ) {
         this.aggregatedInfo = {
           numberOfTxs: this.airGapTxs.length,
-          totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+          totalAmount: this.airGapTxs
+            .map((tx: IAirGapTransaction) => new BigNumber(tx.amount))
+            .filter((amount: BigNumber) => !amount.isNaN())
+            .reduce((pv: BigNumber, cv: BigNumber) => pv.plus(cv), new BigNumber(0)),
           totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
         }
+        console.log('aggregatedInfo', this.aggregatedInfo)
       }
     }
     this.connectWithLedger()

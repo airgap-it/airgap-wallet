@@ -15,13 +15,32 @@ let splashScreen = null
 let useSplashScreen = false
 
 // Create simple menu for easy devtools access, and for demo
-const menuTemplate = [{ role: 'appMenu', submenu: [{ role: 'quit' }] }, { role: 'window', submenu: [{ role: 'minimize' }] }]
+const menuTemplate = [
+  { role: 'appMenu', submenu: [{ role: 'quit' }] },
+  {
+    role: 'window',
+    submenu: [
+      { role: 'minimize' },
+      { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+      { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+      { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' }
+    ]
+  }
+]
 const menuTemplateDev = [
   {
     role: 'appMenu',
     submenu: [{ role: 'toggleDevTools' }, { role: 'quit' }]
   },
-  { role: 'window', submenu: [{ role: 'minimize' }] }
+  {
+    role: 'window',
+    submenu: [
+      { role: 'minimize' },
+      { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+      { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+      { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' }
+    ]
+  }
 ]
 
 async function createWindow() {
