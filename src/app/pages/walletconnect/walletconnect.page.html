@@ -22,7 +22,7 @@
 
     <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="request--container">
       <ng-container *ngFor="let transaction of transactions">
-        <from-to [transaction]="transaction"></from-to>
+        <airgap-from-to [transaction]="transaction"></airgap-from-to>
       </ng-container>
     </div>
   </ion-grid>

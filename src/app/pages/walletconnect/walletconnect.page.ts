@@ -1,14 +1,20 @@
+import { SerializerService } from '@airgap/angular-core'
+import {
+  AirGapMarketWallet,
+  EthereumProtocol,
+  generateId,
+  IACMessageType,
+  IAirGapTransaction,
+  MainProtocolSymbols
+} from '@airgap/coinlib-core'
+import { RawEthereumTransaction } from '@airgap/coinlib-core/serializer/types'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
-import { AirGapMarketWallet, EthereumProtocol, IACMessageType, IAirGapTransaction } from 'airgap-coin-lib'
-import { RawEthereumTransaction } from 'airgap-coin-lib/dist/serializer/types'
-import { MainProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { SerializerService } from 'src/app/services/serializer/serializer.service'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
@@ -151,13 +157,14 @@ export class WalletconnectPage implements OnInit {
 
       const serializedChunks: string[] = await this.serializerService.serialize([
         {
+          id: await generateId(10),
           protocol: selectedWallet.protocol.identifier,
           type: IACMessageType.TransactionSignRequest,
           payload: {
             publicKey: selectedWallet.publicKey,
             transaction,
             callback: 'airgap-wallet://?d='
-          }
+          } as any
         }
       ])
       const info = {
