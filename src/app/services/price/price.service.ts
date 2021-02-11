@@ -2,19 +2,48 @@ import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import axios from '../../../../node_modules/axios'
 import { Injectable } from '@angular/core'
 import { ICoinProtocol } from '@airgap/coinlib-core'
-import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { AirGapMarketWallet, AirGapWalletPriceService, TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
-import * as cryptocompare from 'cryptocompare'
+import { CachingService, StorageObject } from '../caching/caching.service'
+import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
+
+export interface CryptoPrices {
+  time: number
+  price: number
+  baseCurrencySymbol: string
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class PriceService implements AirGapWalletPriceService {
+  private readonly baseURL: string = 'https://crypto-prices-api.prod.gke.papers.tech'
   private readonly pendingMarketPriceRequests: { [key: string]: Promise<BigNumber> } = {}
-  private readonly pendingMarketPriceOverTimeRequests: { [key: string]: Promise<MarketDataSample[]> } = {}
-  constructor() {}
 
-  public async getCurrentMarketPrice(protocol: ICoinProtocol, baseSymbol: string): Promise<BigNumber> {
+  constructor(private readonly cachingService: CachingService) {}
+
+  public async fetchPriceData(marketSymbols: string[], timeInterval: TimeInterval): Promise<CryptoPrices[]> {
+    const cachedPriceData: StorageObject = await this.cachingService.getPriceData(marketSymbols, timeInterval)
+    if (
+      cachedPriceData &&
+      cachedPriceData.value &&
+      cachedPriceData.timestamp > Date.now() - 30 * 60 * 1000 &&
+      Array.isArray(cachedPriceData.value) &&
+      cachedPriceData.value.length > 0
+    ) {
+      return cachedPriceData.value
+    } else {
+      const cryptoPricesResponse = await axios.get(
+        `${this.baseURL}/api/v3/prices/history-usd?baseCurrencySymbols=${marketSymbols
+          .map(symbol => symbol.toUpperCase())
+          .join()}&timeInterval=${timeInterval}`
+      )
+      await this.cachingService.cachePriceData(marketSymbols, cryptoPricesResponse.data, timeInterval)
+      return cryptoPricesResponse.data
+    }
+  }
+
+  public async getCurrentMarketPrice(protocol: ICoinProtocol, _baseSymbol: string): Promise<BigNumber> {
     if (protocol.marketSymbol.length === 0) {
       return new BigNumber(0)
     }
@@ -29,11 +58,17 @@ export class PriceService implements AirGapWalletPriceService {
     }
 
     const promise: Promise<BigNumber> = new Promise(resolve => {
-      cryptocompare
-        .price(protocol.marketSymbol.toUpperCase(), baseSymbol)
-        .then(async prices => {
-          if (prices.USD) {
-            resolve(new BigNumber(prices.USD))
+      axios
+        .get(`${this.baseURL}/api/v3/prices/latest-usd?baseCurrencySymbols=${protocol.marketSymbol.toUpperCase()}`)
+        .then(async response => {
+          if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+            const cryptoPrices: CryptoPrices = response.data[0]
+            if (cryptoPrices.price) {
+              resolve(new BigNumber(cryptoPrices.price))
+            } else {
+              const price = await this.fetchFromCoinGecko(protocol)
+              resolve(price)
+            }
           } else {
             const price = await this.fetchFromCoinGecko(protocol)
             resolve(price)
@@ -56,9 +91,21 @@ export class PriceService implements AirGapWalletPriceService {
     return promise
   }
 
+  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
+    return new Promise<IAirGapTransactionResult>(async resolve => {
+      const rawTransactions: StorageObject = await this.cachingService.getTransactionData(wallet)
+      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
+        resolve(rawTransactions.value)
+      } else {
+        const rawTransactions = wallet.fetchTransactions(100)
+        await this.cachingService.cacheTransactionData(wallet, rawTransactions)
+        resolve(wallet.fetchTransactions(100))
+      }
+    })
+  }
+
   public async fetchFromCoinGecko(protocol: ICoinProtocol): Promise<BigNumber> {
     return new Promise(async (resolve, reject) => {
-      // TODO: Remove once cryptocompare supports xchf
       const symbolMapping = {
         zrx: '0x',
         elf: 'aelf',
@@ -134,6 +181,7 @@ export class PriceService implements AirGapWalletPriceService {
         pax: 'payperex',
         qnt: 'quant-network',
         ren: 'republic-protocol',
+        repv2: 'augur',
         rsr: 'reserve-rights-token',
         sai: 'sai',
         srm: 'serum',
@@ -172,80 +220,5 @@ export class PriceService implements AirGapWalletPriceService {
         resolve(new BigNumber(0))
       }
     })
-  }
-  public async getMarketPricesOverTime(
-    protocol: ICoinProtocol,
-    timeUnit: TimeUnit,
-    _numberOfMinutes: number,
-    _date: Date,
-    baseSymbol: string
-  ): Promise<MarketDataSample[]> {
-    if (protocol.marketSymbol.length === 0) {
-      return []
-    }
-
-    const marketSymbol = protocol.marketSymbol
-    // const uniqueId = `${timeUnit}_${marketSymbol}_${CachingServiceKey.PRICESAMPLES}`
-
-    const pendingRequest = this.pendingMarketPriceOverTimeRequests[marketSymbol]
-    if (pendingRequest) {
-      return pendingRequest
-    }
-
-    const promise: Promise<MarketDataSample[]> = new Promise<MarketDataSample[]>(async resolve => {
-      const cachedData = undefined // : StorageObject = await this.storage.get(uniqueId)
-      if (cachedData && cachedData.timestamp > Date.now() - 30 * 60 * 1000) {
-        resolve(cachedData.value)
-      } else {
-        let promise: Promise<MarketDataSample[]>
-        if (timeUnit === TimeUnit.Days) {
-          promise = cryptocompare.histoDay(marketSymbol.toUpperCase(), baseSymbol, {
-            limit: 365 - 1
-          })
-        } else if (timeUnit === TimeUnit.Hours) {
-          promise = cryptocompare.histoHour(marketSymbol.toUpperCase(), baseSymbol, {
-            limit: 7 * 24 - 1
-          })
-        } else if (timeUnit === TimeUnit.Minutes) {
-          promise = cryptocompare.histoMinute(marketSymbol.toUpperCase(), baseSymbol, {
-            limit: 24 * 60 - 1
-          })
-        } else {
-          promise = Promise.reject('Invalid time unit')
-        }
-        promise
-          .then((prices: MarketDataSample[]) => {
-            let filteredPrices: MarketDataSample[] = prices
-            if (timeUnit === 'days') {
-              filteredPrices = prices.filter((_value, index) => {
-                return index % 5 === 0
-              })
-            }
-            if (timeUnit === 'hours') {
-              filteredPrices = prices.filter((_value, index) => {
-                return index % 2 === 0
-              })
-            }
-            if (timeUnit === 'minutes') {
-              filteredPrices = prices.filter((_value, index) => {
-                return index % 20 === 0
-              })
-            }
-
-            resolve(filteredPrices)
-          })
-          .catch(console.error)
-      }
-    })
-
-    this.pendingMarketPriceOverTimeRequests[protocol.marketSymbol] = promise
-
-    promise
-      .then(() => {
-        this.pendingMarketPriceOverTimeRequests[protocol.marketSymbol] = undefined
-      })
-      .catch()
-
-    return promise
   }
 }

@@ -1,16 +1,16 @@
+import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { Injectable } from '@angular/core'
-import { TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 @Injectable()
 export class DrawChartService {
-  public chartSubject: BehaviorSubject<TimeUnit> = new BehaviorSubject<TimeUnit>(TimeUnit.Minutes)
+  public chartSubject: BehaviorSubject<TimeInterval> = new BehaviorSubject<TimeInterval>(TimeInterval.HOURS)
 
-  public getChartObservable(): Observable<TimeUnit> {
+  public getChartObservable(): Observable<TimeInterval> {
     return this.chartSubject.asObservable()
   }
 
-  public drawChart(interval?: TimeUnit): void {
-    this.chartSubject.next(interval || TimeUnit.Minutes)
+  public drawChart(interval?: TimeInterval): void {
+    this.chartSubject.next(interval || TimeInterval.HOURS)
   }
 }

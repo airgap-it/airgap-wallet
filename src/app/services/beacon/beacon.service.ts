@@ -13,7 +13,7 @@ import {
 
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol } from '@airgap/coinlib-core'
+import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
@@ -82,16 +82,17 @@ export class BeaconService {
   }
 
   public async addVaultRequest(generatedId: string, request: BeaconRequestOutputMessage, protocol: ICoinProtocol): Promise<void> {
-    this.storage.setCache(generatedId, [request, protocol.identifier])
+    this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
   }
 
   public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
-    let cachedRequest: [BeaconRequestOutputMessage, ICoinProtocol] = await this.storage.getCache(generatedId)
+    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(generatedId)
+    const result: [BeaconRequestOutputMessage, ICoinProtocol] = [cachedRequest[0], undefined]
     if (cachedRequest && cachedRequest[1]) {
-      const protocol = await this.protocolService.getProtocol(cachedRequest[1])
-      cachedRequest[1] = protocol
+      const protocol = await this.protocolService.getProtocol(cachedRequest[1], cachedRequest[2])
+      result[1] = protocol
     }
-    return cachedRequest ? cachedRequest : []
+    return result ? result : []
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
@@ -171,7 +172,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     // TODO: remove `Exclude`
-    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.CARTHAGENET>]: TezosProtocolNetwork } = {
+    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET>]: TezosProtocolNetwork } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,

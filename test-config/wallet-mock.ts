@@ -1,21 +1,12 @@
 import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
-import { AirGapWalletPriceService, MarketDataSample, TimeUnit } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 
 // tslint:disable:max-classes-per-file
 
 export class PriceServiceMock implements AirGapWalletPriceService {
   public async getCurrentMarketPrice(_protocol: ICoinProtocol, _baseSymbol: string): Promise<BigNumber> {
-    throw new Error('Method not implemented.')
-  }
-  public async getMarketPricesOverTime(
-    _protocol: ICoinProtocol,
-    _timeUnit: TimeUnit,
-    _numberOfMinutes: number,
-    _date: Date,
-    _baseSymbol: string
-  ): Promise<MarketDataSample[]> {
     throw new Error('Method not implemented.')
   }
 }

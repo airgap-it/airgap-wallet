@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
-import BigNumber from 'bignumber.js'
-import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
+import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 
 export enum CachingServiceKey {
-  PRICESAMPLES = 'pricesamples',
+  PRICEDATA = 'pricedata',
   TRANSACTIONS = 'transactions',
   VALIDATORS = 'validators',
   DELEGATIONS = 'delegations'
@@ -31,40 +30,33 @@ export interface StorageObject {
   providedIn: 'root'
 })
 export class CachingService {
-  private readonly data = []
-
   constructor(private readonly storage: Storage) {}
 
-  public async setTransactionData(identifier: TransactionIdentifier, value: any): Promise<any> {
-    const uniqueId = `${identifier.publicKey}_${identifier.key}`
-    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
+  public async cachePriceData(marketSymbols: string[], value: any, timeInterval: TimeInterval): Promise<any> {
+    const uniqueId = `${marketSymbols.sort().join()}_${timeInterval}_${CachingServiceKey.PRICEDATA}`
+    return this.set(uniqueId, { value, timestamp: Date.now() })
   }
 
-  public setPriceData(identifier: PriceSampleIdentifier, value: any): Promise<any> {
-    const uniqueId = `${identifier.timeUnit}_${identifier.protocolIdentifier}_${identifier.key}`
-    return this.storage.set(uniqueId, { value, timestamp: Date.now() })
+  public async getPriceData(marketSymbols: string[], timeInterval: TimeInterval): Promise<StorageObject> {
+    const uniqueId = `${marketSymbols.sort().join()}_${timeInterval}_${CachingServiceKey.PRICEDATA}`
+    return this.get(uniqueId)
   }
 
-  public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
-    const uniqueId = `${wallet.publicKey}_${CachingServiceKey.TRANSACTIONS}`
-    return new Promise<IAirGapTransactionResult>(async resolve => {
-      const rawTransactions: StorageObject = await this.storage.get(uniqueId)
-      if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
-        rawTransactions.value.transactions.map(transaction => {
-          transaction.amount = new BigNumber(parseInt(transaction.amount, 10))
-          transaction.fee = new BigNumber(parseInt(transaction.fee, 10))
-        })
-        resolve(rawTransactions.value)
-      } else {
-        resolve(wallet.fetchTransactions(50))
-      }
-    })
+  public async cacheTransactionData(wallet: AirGapMarketWallet, value: any): Promise<any> {
+    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${CachingServiceKey.TRANSACTIONS}`
+    return this.set(uniqueId, { value, timestamp: Date.now() })
   }
 
-  public getData(publicKey): unknown | undefined {
-    if (this.data[publicKey]) {
-      return this.data[publicKey]
-    }
-    return undefined
+  public async getTransactionData(wallet: AirGapMarketWallet): Promise<StorageObject> {
+    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${CachingServiceKey.TRANSACTIONS}`
+    return this.get(uniqueId)
+  }
+
+  public async set(key: string, value: any): Promise<any> {
+    return this.storage.set(key, value)
+  }
+
+  public async get(key: string): Promise<any> {
+    return this.storage.get(key)
   }
 }

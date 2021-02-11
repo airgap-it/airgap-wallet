@@ -30,6 +30,9 @@ export class SwapComponent {
   public expandWalletSelection: boolean = false
 
   @Input()
+  public readonly currentlyNotSupported: boolean = false
+
+  @Input()
   public readonly swapSell: boolean = true
 
   @Input()

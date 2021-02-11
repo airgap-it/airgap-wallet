@@ -71,10 +71,7 @@ export class TransactionPreparePage {
 
   private publicKey: string
   private protocolID: string
-  private addressIndex
-  private address: string
-  private amount
-  private forced
+  private addressIndex: number | undefined
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -91,23 +88,21 @@ export class TransactionPreparePage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
-    this.addressIndex = this.route.snapshot.params.addressIndex
-    this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
+    const addressIndex = this.route.snapshot.params.addressIndex
+    this.addressIndex = addressIndex === 'undefined' ? undefined : Number(addressIndex)
 
     this.state$ = new BehaviorSubject(this._state)
 
-    this.address = this.route.snapshot.params.address
-    this.amount = Number(this.route.snapshot.params.amount)
-    this.forced = this.route.snapshot.params.forceMigration
-
-    const address: string = this.address === 'false' ? '' : this.address || ''
-    const amount: number = this.amount || 0
+    const address: string = this.route.snapshot.params.address === 'false' ? '' : this.route.snapshot.params.address || ''
+    const amount: number = Number(this.route.snapshot.params.amount) || 0
     const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
       this.publicKey,
       this.protocolID,
       this.addressIndex
     )
-    const forceMigration: boolean = this.forced === 'forced' || false
+
+    const forced = this.route.snapshot.params.forceMigration
+    const forceMigration: boolean = forced === 'forced' || false
 
     this.transactionForm = this.formBuilder.group({
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
