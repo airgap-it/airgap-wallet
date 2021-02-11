@@ -49,6 +49,7 @@
         [supportedProtocols]="supportedProtocolsFrom"
         [exchangeAmount]="amount"
         [minExchangeAmount]="minExchangeAmount"
+        [currentlyNotSupported]="currentlyNotSupported"
         (protocolSetEmitter)="setFromProtocol($event)"
         (walletSetEmitter)="setFromWallet($event)"
         (amountSetEmitter)="amountSet($event)"
@@ -93,7 +94,7 @@
           amount?.isNaN() ||
           amount?.isZero() ||
           amount?.isLessThan(minExchangeAmount) ||
-          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals))
+          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
         "
           (click)="startExchange()"
           shape="round"

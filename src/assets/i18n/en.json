@@ -378,6 +378,7 @@
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
     "buy_label": "Buy",
+    "currently_not_supported": "The selected trading pair is currently not supported",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
     "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
@@ -553,6 +554,13 @@
       "payout-col_label": "Payout"
     },
     "alert": {
+      "delegation-issues": {
+        "title": "Delegations on Polkadot",
+        "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
+        "actions": {
+          "open-blogpost": "Open Blogpost"
+        }
+      },
       "election-open": {
         "title": "Delegation operations currently unavailable",
         "description": "Due to the election period restrictions the delegation operations are currently unavailable."
@@ -656,6 +664,7 @@
   },
   "beacon-request": {
     "sign-data_label": "Do you want to sign the following data?",
+    "blake2b_hash": "Ledger Blake2b hash of the message",
     "request": {
       "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
       "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."

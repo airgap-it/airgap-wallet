@@ -6,6 +6,7 @@ import {
   PermissionRequestOutput,
   PermissionResponseInput,
   PermissionScope,
+  SigningType,
   SignPayloadRequestOutput
 } from '@airgap/beacon-sdk'
 import { Component, OnInit } from '@angular/core'
@@ -18,6 +19,7 @@ import {
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
+  TezosCryptoClient,
   TezosProtocol
 } from '@airgap/coinlib-core'
 import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
@@ -59,6 +61,10 @@ export class BeaconRequestPage implements OnInit {
   public inputs: CheckboxInput[] = []
   public transactions: IAirGapTransaction[] | undefined | any
 
+  public modalRef: HTMLIonModalElement | undefined
+
+  public blake2bHash: string | undefined
+
   private responseHandler: (() => Promise<void>) | undefined
 
   private readonly beaconService: BeaconService | undefined
@@ -71,6 +77,8 @@ export class BeaconRequestPage implements OnInit {
   ) {}
 
   public async ngOnInit(): Promise<void> {
+    this.modalRef = await this.modalController.getTop()
+
     this.requesterName = this.request.appMetadata.name
     this.network = await this.getNetworkFromRequest(this.request)
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
@@ -110,8 +118,8 @@ export class BeaconRequestPage implements OnInit {
     await this.dismiss()
   }
 
-  public async dismiss(): Promise<void> {
-    await this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public async dismiss(): Promise<boolean | void> {
+    return this.modalRef.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {
@@ -122,7 +130,6 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
-    await this.dismiss()
     const modal = await this.modalController.create({
       component: ErrorPage,
       componentProps: {
@@ -132,7 +139,11 @@ export class BeaconRequestPage implements OnInit {
       }
     })
 
-    return modal.present()
+    await modal.present()
+
+    setTimeout(async () => {
+      await this.dismiss() // TODO: This causes flickering because it's "behind" the error modal.
+    }, 100)
   }
 
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
@@ -197,6 +208,26 @@ export class BeaconRequestPage implements OnInit {
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
+
+    // TODO: Move check to service
+    if (request.signingType === SigningType.OPERATION) {
+      if (!request.payload.startsWith('03')) {
+        const error = new Error('When using signing type "OPERATION", the payload must start with prefix "03"')
+        error.stack = undefined
+        return this.displayErrorPage(error)
+      }
+    } else if (request.signingType === SigningType.MICHELINE) {
+      if (!request.payload.startsWith('05')) {
+        const error = new Error('When using signing type "MICHELINE", the payload must start with prefix "05"')
+        error.stack = undefined
+        return this.displayErrorPage(error)
+      }
+    }
+
+    try {
+      const cryptoClient = new TezosCryptoClient()
+      this.blake2bHash = await cryptoClient.blake2bLedgerHash(request.payload)
+    } catch {}
 
     const generatedId = generateId(10)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)

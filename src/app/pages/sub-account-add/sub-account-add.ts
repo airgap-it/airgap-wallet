@@ -149,19 +149,19 @@ export class SubAccountAddPage {
   }
 
   private async loadDisplayedAccounts(filtered: boolean = false): Promise<void> {
-    const newSubAccount = (filtered ? this.filteredSubAccounts : this.subAccounts).slice(this.loaded, this.loaded + this.limit)
-    if (newSubAccount.length < this.limit) {
+    const newSubAccounts = (filtered ? this.filteredSubAccounts : this.subAccounts).slice(this.loaded, this.loaded + this.limit)
+    if (newSubAccounts.length < this.limit) {
       this.infiniteEnabled = false
     }
 
-    newSubAccount.forEach(account => {
+    newSubAccounts.forEach(account => {
       if (account.wallet.currentMarketPrice === undefined) {
         account.wallet.fetchCurrentMarketPrice()
       }
       this.displayedSubAccounts.push(account)
     })
 
-    this.loaded += newSubAccount.length
+    this.loaded += newSubAccounts.length
   }
 
   public async doInfinite(event) {

@@ -202,6 +202,23 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const isElectionOpen: boolean = results[0].status.value === SubstrateElectionStatus.OPEN
     const nominationStatus: SubstrateNominationStatus | undefined = results[1]
 
+    alerts.push(
+      new UIAlert({
+        title: 'delegation-detail-substrate.alert.delegation-issues.title',
+        description: 'delegation-detail-substrate.alert.delegation-issues.description',
+        icon: 'alert-circle-outline',
+        color: 'warning',
+        actions: [
+          {
+            text: 'delegation-detail-substrate.alert.delegation-issues.actions.open-blogpost',
+            action: async () => {
+              window.open('https://polkadot.network/polkadot-staking-an-update/', '_blank')
+            }
+          }
+        ]
+      })
+    )
+
     if (isElectionOpen) {
       alerts.push(
         new UIAlert({
