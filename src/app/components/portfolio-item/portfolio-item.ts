@@ -1,7 +1,7 @@
 import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { Component, Input } from '@angular/core'
-import { AirGapMarketWallet, ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { AirGapMarketWallet, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import BigNumber from 'bignumber.js'
 import { Observable, Subscription } from 'rxjs'
 

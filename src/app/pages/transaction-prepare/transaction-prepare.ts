@@ -3,9 +3,16 @@ import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet, EthereumProtocol, MainProtocolSymbols, SubProtocolSymbols, TezosProtocol } from 'airgap-coin-lib'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import {
+  AirGapMarketWallet,
+  EthereumProtocol,
+  MainProtocolSymbols,
+  SubProtocolSymbols,
+  IACMessageType,
+  TezosProtocol
+} from '@airgap/coinlib-core'
+import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
@@ -60,14 +67,11 @@ export class TransactionPreparePage {
 
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
-  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
+  private readonly state$: BehaviorSubject<TransactionPrepareState>
 
   private publicKey: string
   private protocolID: string
-  private addressIndex
-  private address: string
-  private amount
-  private forced
+  private addressIndex: number | undefined
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -84,21 +88,21 @@ export class TransactionPreparePage {
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
-    this.addressIndex = this.route.snapshot.params.addressIndex
-    this.addressIndex === 'undefined' ? (this.addressIndex = undefined) : (this.addressIndex = Number(this.addressIndex))
+    const addressIndex = this.route.snapshot.params.addressIndex
+    this.addressIndex = addressIndex === 'undefined' ? undefined : Number(addressIndex)
 
-    this.address = this.route.snapshot.params.address
-    this.amount = Number(this.route.snapshot.params.amount)
-    this.forced = this.route.snapshot.params.forceMigration
+    this.state$ = new BehaviorSubject(this._state)
 
-    const address: string = this.address === 'false' ? '' : this.address || ''
-    const amount: number = this.amount || 0
+    const address: string = this.route.snapshot.params.address === 'false' ? '' : this.route.snapshot.params.address || ''
+    const amount: number = Number(this.route.snapshot.params.amount) || 0
     const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
       this.publicKey,
       this.protocolID,
       this.addressIndex
     )
-    const forceMigration: boolean = this.forced === 'forced' || false
+
+    const forced = this.route.snapshot.params.forceMigration
+    const forceMigration: boolean = forced === 'forced' || false
 
     this.transactionForm = this.formBuilder.group({
       address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
@@ -422,7 +426,8 @@ export class TransactionPreparePage {
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

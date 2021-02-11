@@ -44,7 +44,7 @@ export class SettingsPage {
   public share(): void {
     const options = {
       title: 'Checkout airgap.it', // Set a title for any message. This will be the subject if sharing to email
-      text: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.', // Set some text to share
+      text: "Take a look at the app I found. It's the most secure way to do crypto transactions.", // Set some text to share
       url: 'https://www.airgap.it', // Set a URL to share
       dialogTitle: 'Pick an app' // Set a title for the share modal. Android only
     }
@@ -151,6 +151,10 @@ export class SettingsPage {
     this.browserService.openUrl('https://walletbeacon.io')
   }
 
+  public goToQrSettings(): void {
+    this.router.navigateByUrl('/qr-settings').catch(err => console.error(err))
+  }
+
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
@@ -160,18 +164,5 @@ export class SettingsPage {
         console.error('Error: ' + err)
       }
     )
-  }
-
-  public switchSerializerVersion(event: TouchEvent): void {
-    console.log((event.detail as any).checked)
-    this.serializerService.useV2 = (event.detail as any).checked
-  }
-  public qrMsChanged(event: TouchEvent): void {
-    console.log((event.detail as any).value)
-    this.serializerService.displayTimePerChunk = (event.detail as any).value
-  }
-  public qrBytesChanged(event: TouchEvent): void {
-    console.log((event.detail as any).value)
-    this.serializerService.chunkSize = (event.detail as any).value
   }
 }

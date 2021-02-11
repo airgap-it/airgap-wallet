@@ -97,9 +97,18 @@
       </ion-row>
 
       <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
-        <ng-container *ngFor="let transaction of transactions">
-          <airgap-from-to [transaction]="transaction"></airgap-from-to>
-        </ng-container>
+        <ion-row class="rawdata--container ion-padding-bottom" *ngIf="request && request.payload">
+          <ion-col class="ion-no-padding">
+            <p>{{ 'beacon-request.sign-data_label' | translate }}</p>
+            <pre class="ion-no-margin">{{ request.payload | json }}</pre>
+          </ion-col>
+        </ion-row>
+        <ion-row class="rawdata--container" *ngIf="blake2bHash">
+          <ion-col class="ion-no-padding">
+            <p>{{ 'beacon-request.blake2b_hash' | translate }}</p>
+            <pre class="ion-no-margin">{{ blake2bHash }}</pre>
+          </ion-col>
+        </ion-row>
       </div>
 
       <div *ngIf="request.type === 'operation_request'" class="request--container">

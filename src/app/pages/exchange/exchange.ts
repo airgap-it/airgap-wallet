@@ -3,8 +3,8 @@ import { Component, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, FeeDefaults, ICoinProtocol } from 'airgap-coin-lib'
-import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib'
+import { AirGapMarketWallet, EthereumProtocol, FeeDefaults, ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -15,7 +15,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { BehaviorSubject } from 'rxjs'
 import { PriceService } from 'src/app/services/price/price.service'
@@ -55,6 +55,7 @@ export class ExchangePage {
   public selectedToProtocol: ICoinProtocol
   public supportedProtocolsFrom: ProtocolSymbols[] = []
   public supportedProtocolsTo: ProtocolSymbols[] = []
+  public currentlyNotSupported: boolean = false
   public fromWallet: AirGapMarketWallet
   public supportedFromWallets: AirGapMarketWallet[]
   public toWallet: AirGapMarketWallet
@@ -105,7 +106,9 @@ export class ExchangePage {
     this.exchangeProvider.getActiveExchange().subscribe((exchange: string) => {
       this.activeExchange = exchange
     })
+  }
 
+  public ionViewWillEnter() {
     this.exchangeForm = this.formBuilder.group({
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required])],
@@ -145,6 +148,7 @@ export class ExchangePage {
       }
     }
     this.state = this._state
+    this.updateState(this.state)
   }
 
   private updateTransactionForm(formState: { [key: string]: ExchangeFormState<any> }) {
@@ -227,7 +231,14 @@ export class ExchangePage {
 
   private async updateFeeEstimate(): Promise<void> {
     if (this._state) {
-      const feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()
+      let feeCurrentMarketPrice
+      if (this.selectedFromProtocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+        feeCurrentMarketPrice = this.priceService
+          .getCurrentMarketPrice(new EthereumProtocol(), 'USD')
+          .then((price: BigNumber) => price.toNumber())
+      } else {
+        feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()
+      }
 
       this.updateState({
         feeCurrentMarketPrice
@@ -304,7 +315,7 @@ export class ExchangePage {
       this.selectedFromProtocol = undefined
       this.selectedToProtocol = undefined
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
-      return
+      throw new Error('could not set up exchange')
     }
     this.supportedProtocolsFrom = fromProtocols
     let currentFromProtocol: ProtocolSymbols
@@ -398,6 +409,7 @@ export class ExchangePage {
   async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
     this.selectedFromProtocol = protocol
     this.supportedProtocolsTo = await this.getSupportedToProtocols(protocol.identifier)
+
     if (this.supportedProtocolsTo.length === 0) {
       this.supportedProtocolsFrom = []
       this.supportedProtocolsTo = []
@@ -492,13 +504,18 @@ export class ExchangePage {
   }
 
   private async loadDataFromExchange() {
-    if (this.fromWallet && this.toWallet) {
-      this.minExchangeAmount = await this.getMinAmountForCurrency()
-    }
-    if (this.fromWallet && this.toWallet && this.amount.isGreaterThan(0)) {
-      this.exchangeAmount = new BigNumber(await this.getExchangeAmount())
-    } else {
-      this.exchangeAmount = new BigNumber(0)
+    this.currentlyNotSupported = false
+    try {
+      if (this.fromWallet && this.toWallet) {
+        this.minExchangeAmount = await this.getMinAmountForCurrency()
+      }
+      if (this.fromWallet && this.toWallet && this.amount.isGreaterThan(0)) {
+        this.exchangeAmount = new BigNumber(await this.getExchangeAmount())
+      } else {
+        this.exchangeAmount = new BigNumber(0)
+      }
+    } catch (error) {
+      this.currentlyNotSupported = true
     }
   }
 

@@ -152,7 +152,11 @@
       "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
       "permission-list_label": "Beacon Permissions"
-    }
+    },
+    "qr-advanced-settings_label": "Advanced QR Settings"
+  },
+  "qr-settings-page": {
+    "title": "QR Settings"
   },
   "select-wallet": {
     "title": "Select Account",
@@ -196,9 +200,10 @@
   },
   "transaction-prepare": {
     "title": "Send {{title}}",
-    "to-address_label": "To Address",
+    "to-address_label": "Recipient",
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
+    "balance_label": "Balance:",
     "fee": {
       "label": "Fee",
       "slow_label": "slow & cheap",
@@ -215,7 +220,8 @@
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
-    "done_label": "Done"
+    "done_label": "Done",
+    "details": "Display details"
   },
   "interaction-selection": {
     "title": "Vault Interaction",
@@ -225,7 +231,6 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
     "heading": "Select the device to sign this transaction",
@@ -234,7 +239,6 @@
     "ledger_label": "Ledger",
     "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
   },
-
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
@@ -248,7 +252,6 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
@@ -364,17 +367,18 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
-    }
-    ,"loading": {
+    },
+    "loading": {
       "setup": "Setting up exchange ... ",
       "header": "Loading Error",
       "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
-    } 
+    }
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
     "buy_label": "Buy",
+    "currently_not_supported": "The selected trading pair is currently not supported",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
     "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
@@ -515,6 +519,7 @@
     "bonded_label": "Bonded",
     "locked_label": "Unbonding",
     "withdraw-ready_label": "Ready to Withdraw",
+    "next-era_label": "Next Era",
     "becomes-active_label": "Becomes Active",
     "next-payout_label": "Next Payout",
     "delegate": {
@@ -549,9 +554,28 @@
       "payout-col_label": "Payout"
     },
     "alert": {
+      "delegation-issues": {
+        "title": "Delegations on Polkadot",
+        "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
+        "actions": {
+          "open-blogpost": "Open Blogpost"
+        }
+      },
       "election-open": {
         "title": "Delegation operations currently unavailable",
         "description": "Due to the election period restrictions the delegation operations are currently unavailable."
+      },
+      "nomination-inactive": {
+        "title": "Your delegation to this validator is inactive",
+        "description": "The validator has been elected to be in the validator set, however, your nomination has not been selected to be active in this era and you won't get any rewards."
+      },
+      "nomination-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards. You won't get any rewards in this era."
+      },
+      "validator-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards."
       }
     }
   },
@@ -595,7 +619,7 @@
       "placeholder_text": "{{ delegateeLabel }} address",
       "delegatee-address_label": "Baker address",
       "cancel_label": "Cancel",
-      "set-delegatee_label": "Set {{ delegateeLabel }}" 
+      "set-delegatee_label": "Set {{ delegateeLabel }}"
     }
   },
   "delegation-validator-list": {
@@ -605,21 +629,18 @@
     "sort_label": "Sort Validators",
     "no_validators_found_label": "No validators matching your search have been found"
   },
-
   "action-alert-tip": {
     "heading": "Thank you for using AirGap!",
     "text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
     "cancel_label": "No",
     "ok_label": "Tip Now"
   },
-
   "action-alert-delegation": {
     "heading": "Thank you for using AirGap!",
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
     "ok_label": "Delegate Now"
   },
-
   "ledger-sign": {
     "title": "{{title}} Transaction Details",
     "text": "Connect the Ledger device and sign the transaction.",
@@ -630,7 +651,6 @@
       "confirm": "Okay"
     }
   },
-
   "account-import-interaction-selection": {
     "title": "Select Signer Option",
     "airgap-vault": {
@@ -644,6 +664,7 @@
   },
   "beacon-request": {
     "sign-data_label": "Do you want to sign the following data?",
+    "blake2b_hash": "Ledger Blake2b hash of the message",
     "request": {
       "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
       "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."

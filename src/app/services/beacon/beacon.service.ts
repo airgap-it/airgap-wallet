@@ -8,20 +8,21 @@ import {
   Network,
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
-  SigningType,
   WalletClient
 } from '@airgap/beacon-sdk'
+
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol } from 'airgap-coin-lib'
-import { TezosNetwork, TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
   TezosProtocolOptions
-} from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
+} from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
+import { ProtocolService } from '@airgap/angular-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 
@@ -31,20 +32,19 @@ import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorage
   providedIn: 'root'
 })
 export class BeaconService {
-  public client: WalletClient
-  private requests: BeaconRequest[] = []
+  public client: WalletClient | undefined
 
   constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
-    private readonly storage: WalletStorageService
+    private readonly storage: WalletStorageService,
+    private readonly protocolService: ProtocolService
   ) {
     this.client = new WalletClient({ name: 'AirGap Wallet' })
     this.init()
   }
 
   public async init(): Promise<void> {
-    this.requests = await this.getRequestsFromStorage()
     await this.client.init()
 
     return this.client.connect(async message => {
@@ -81,88 +81,23 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(messageId: string, requestPayload: any, protocol: ICoinProtocol): Promise<void> {
-    this.requests.push([messageId, requestPayload, protocol])
-    this.persistRequests()
+  public async addVaultRequest(generatedId: string, request: BeaconRequestOutputMessage, protocol: ICoinProtocol): Promise<void> {
+    this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
   }
 
-  public async getVaultRequest(
-    signedMessage: string
-  ): Promise<[((hash: string) => BeaconResponseInputMessage | undefined) | undefined, ICoinProtocol | undefined]> {
-    // TODO: Refactor this once we have IDs in the serializer between Wallet <=> Vault
-    let createResponse: (hash: string) => BeaconResponseInputMessage | undefined
-    let protocol: ICoinProtocol | undefined
-
-    this.requests = this.requests.filter(request => {
-      if (signedMessage === request[1]) {
-        protocol = request[2]
-        createResponse = (hash: string): BeaconResponseInputMessage | undefined => {
-          return {
-            id: request[0],
-            type: BeaconMessageType.BroadcastResponse,
-            transactionHash: hash
-          }
-        }
-
-        return false
-      } else if (signedMessage.startsWith(request[1])) {
-        protocol = request[2]
-        createResponse = (_hash: string): BeaconResponseInputMessage | undefined => {
-          return {
-            id: request[0],
-            type: BeaconMessageType.SignPayloadResponse,
-            signingType: SigningType.RAW,
-            signature: signedMessage.substr(signedMessage.length - 128)
-          }
-        }
-
-        return false
-      } else if (signedMessage.startsWith(request[1].binaryTransaction)) {
-        protocol = request[2]
-        createResponse = (hash: string): BeaconResponseInputMessage | undefined => {
-          return {
-            id: request[0],
-            type: BeaconMessageType.OperationResponse,
-            transactionHash: hash
-          }
-        }
-
-        return false
-      } else {
-        console.log('NO MATCH', signedMessage, request[1].binaryTransaction)
-
-        return true
-      }
-    })
-
-    this.persistRequests()
-
-    return [createResponse, protocol]
-  }
-
-  public async persistRequests(): Promise<void> {
-    const requests: SerializedBeaconRequest[] = this.requests.map(request => ({
-      messageId: request[0],
-      payload: request[1],
-      protocolIdentifier: request[2].identifier,
-      network: {
-        name: request[2].options.network.name,
-        type:
-          request[2].options.network.type === NetworkType.MAINNET
-            ? BeaconNetworkType.MAINNET
-            : request[2].options.network.type === NetworkType.TESTNET
-            ? BeaconNetworkType.DELPHINET
-            : BeaconNetworkType.CUSTOM,
-        rpcUrl: request[2].options.network.rpcUrl
-      }
-    }))
-
-    return this.storage.set(WalletStorageKey.BEACON_REQUESTS, requests)
+  public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
+    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(generatedId)
+    const result: [BeaconRequestOutputMessage, ICoinProtocol] = [cachedRequest[0], undefined]
+    if (cachedRequest && cachedRequest[1]) {
+      const protocol = await this.protocolService.getProtocol(cachedRequest[1], cachedRequest[2])
+      result[1] = protocol
+    }
+    return result ? result : []
   }
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
     console.log('responding', message)
-    await this.client.respond(message)
+    await this.client.respond(message).catch(err => console.error(err))
   }
 
   public async addPeer(peer: P2PPairingRequest): Promise<void> {
@@ -180,11 +115,11 @@ export class BeaconService {
   }
 
   public async removePeer(peer: P2PPairingRequest): Promise<void> {
-    await this.client.removePeer(peer as any) // TODO: Fix types
+    await this.client.removePeer(peer as any, true) // TODO: Fix types
   }
 
   public async removeAllPeers(): Promise<void> {
-    await this.client.removeAllPeers()
+    await this.client.removeAllPeers(true)
   }
 
   private async isNetworkSupported(_network?: Network): Promise<boolean> {
@@ -236,7 +171,8 @@ export class BeaconService {
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
-    const configs: { [key in BeaconNetworkType]: TezosProtocolNetwork } = {
+    // TODO: remove `Exclude`
+    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET>]: TezosProtocolNetwork } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,
@@ -248,20 +184,6 @@ export class BeaconService {
           conseilUrl: undefined,
           conseilNetwork: undefined,
           conseilApiKey: undefined
-        }
-      },
-      [BeaconNetworkType.CARTHAGENET]: {
-        // TODO: Remove
-        identifier: undefined,
-        name: network.name || 'Carthagenet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-carthagenet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.CARTHAGENET,
-          conseilUrl: 'https://tezos-carthagenet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.CARTHAGENET,
-          conseilApiKey: 'airgap00391'
         }
       },
       [BeaconNetworkType.DELPHINET]: {
@@ -308,5 +230,15 @@ export class BeaconService {
         )
       )
     )
+  }
+
+  public getResponseByRequestType(requestType: BeaconMessageType) {
+    const map: Map<BeaconMessageType, BeaconMessageType> = new Map()
+    map.set(BeaconMessageType.BroadcastRequest, BeaconMessageType.BroadcastResponse)
+    map.set(BeaconMessageType.OperationRequest, BeaconMessageType.OperationResponse)
+    map.set(BeaconMessageType.PermissionRequest, BeaconMessageType.PermissionResponse)
+    map.set(BeaconMessageType.SignPayloadRequest, BeaconMessageType.SignPayloadResponse)
+
+    return map.get(requestType)
   }
 }

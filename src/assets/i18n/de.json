@@ -74,6 +74,7 @@
   "transaction-prepare.fee.max_label": "MAX",
   "transaction-prepare.paste_label": "Einfügen",
   "transaction-prepare.create-transaction": "Transaktion erstellen",
+  "transaction-prepare.balance_label": "Balance:",
   "transaction-qr.title": "{{title}} Transaktions QR",
   "transaction-qr.text": "Öffnen Sie AirGap Vault und lesen Sie diesen Transaktions QR Code ein um die Transaktion zu signieren.",
   "transaction-qr.sign-on-device_label": "gleiches-Gerät Signierung",

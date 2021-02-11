@@ -6,6 +6,7 @@ import {
   PermissionRequestOutput,
   PermissionResponseInput,
   PermissionScope,
+  SigningType,
   SignPayloadRequestOutput
 } from '@airgap/beacon-sdk'
 import { Component, OnInit } from '@angular/core'
@@ -18,11 +19,12 @@ import {
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
+  TezosCryptoClient,
   TezosProtocol
-} from 'airgap-coin-lib'
-import { TezosWrappedOperation } from 'airgap-coin-lib/dist/protocols/tezos/types/TezosWrappedOperation'
-import { NetworkType, ProtocolNetwork } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { MainProtocolSymbols } from 'airgap-coin-lib'
+} from '@airgap/coinlib-core'
+import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
+import { NetworkType, ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -57,7 +59,11 @@ export class BeaconRequestPage implements OnInit {
   public requesterName: string = ''
   public address: string = ''
   public inputs: CheckboxInput[] = []
-  public transactions: IAirGapTransaction[] | undefined
+  public transactions: IAirGapTransaction[] | undefined | any
+
+  public modalRef: HTMLIonModalElement | undefined
+
+  public blake2bHash: string | undefined
 
   private responseHandler: (() => Promise<void>) | undefined
 
@@ -71,6 +77,8 @@ export class BeaconRequestPage implements OnInit {
   ) {}
 
   public async ngOnInit(): Promise<void> {
+    this.modalRef = await this.modalController.getTop()
+
     this.requesterName = this.request.appMetadata.name
     this.network = await this.getNetworkFromRequest(this.request)
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
@@ -110,8 +118,8 @@ export class BeaconRequestPage implements OnInit {
     await this.dismiss()
   }
 
-  public async dismiss(): Promise<void> {
-    await this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public async dismiss(): Promise<boolean | void> {
+    return this.modalRef.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {
@@ -122,7 +130,6 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
-    await this.dismiss()
     const modal = await this.modalController.create({
       component: ErrorPage,
       componentProps: {
@@ -132,7 +139,11 @@ export class BeaconRequestPage implements OnInit {
       }
     })
 
-    return modal.present()
+    await modal.present()
+
+    setTimeout(async () => {
+      await this.dismiss() // TODO: This causes flickering because it's "behind" the error modal.
+    }, 100)
   }
 
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
@@ -190,11 +201,6 @@ export class BeaconRequestPage implements OnInit {
 
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
     const tezosProtocol: TezosProtocol = new TezosProtocol()
-    this.transactions = await tezosProtocol.getTransactionDetails({
-      publicKey: '',
-      transaction: { binaryTransaction: request.payload }
-    })
-
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
@@ -203,14 +209,38 @@ export class BeaconRequestPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
-    await this.beaconService.addVaultRequest(request.id, request.payload, tezosProtocol)
+    // TODO: Move check to service
+    if (request.signingType === SigningType.OPERATION) {
+      if (!request.payload.startsWith('03')) {
+        const error = new Error('When using signing type "OPERATION", the payload must start with prefix "03"')
+        error.stack = undefined
+        return this.displayErrorPage(error)
+      }
+    } else if (request.signingType === SigningType.MICHELINE) {
+      if (!request.payload.startsWith('05')) {
+        const error = new Error('When using signing type "MICHELINE", the payload must start with prefix "05"')
+        error.stack = undefined
+        return this.displayErrorPage(error)
+      }
+    }
+
+    try {
+      const cryptoClient = new TezosCryptoClient()
+      this.blake2bHash = await cryptoClient.blake2bLedgerHash(request.payload)
+    } catch {}
+
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+
+    const clonedRequest = { ...request }
+    clonedRequest.id = generatedId
 
     this.responseHandler = async () => {
-      const transaction = { binaryTransaction: request.payload }
       const info = {
         wallet: selectedWallet,
-        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
-        data: transaction
+        data: clonedRequest,
+        generatedId: generatedId,
+        type: IACMessageType.MessageSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -241,7 +271,8 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
@@ -252,7 +283,9 @@ export class BeaconRequestPage implements OnInit {
       const info = {
         wallet: selectedWallet,
         airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction }),
-        data: forgedTransaction
+        data: forgedTransaction,
+        generatedId: generatedId,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -268,15 +301,16 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    await this.beaconService.addVaultRequest(request.id, signedTx, tezosProtocol)
+    const generatedId = generateId(10)
+    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',
       transaction: signedTx
     })
 
-    const signedTransactionSync: IACMessageDefinitionObject = {
-      id: generateId(10),
+    const messageDefinitionObject: IACMessageDefinitionObject = {
+      id: generatedId,
       type: IACMessageType.MessageSignResponse,
       protocol: MainProtocolSymbols.XTZ,
       payload: {
@@ -287,7 +321,7 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [messageDefinitionObject]
       }
 
       this.dataService.setData(DataServiceKey.TRANSACTION, info)

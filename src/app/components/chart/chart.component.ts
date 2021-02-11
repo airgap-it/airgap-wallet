@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
 import * as moment from 'moment'
-import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { BaseChartDirective } from 'ng2-charts'
 import { Subscription } from 'rxjs'
+import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
-import { MarketDataService, ValueAtTimestampObject } from './../../services/market-data/market-data.service'
+import { MarketDataService, ValueAtTimestamp } from './../../services/market-data/market-data.service'
 
 @Component({
   selector: 'chart',
@@ -16,9 +16,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
-  public readonly timeUnits: typeof TimeUnit = TimeUnit
+  public readonly timeInterval: typeof TimeInterval = TimeInterval
 
-  public currentChart: TimeUnit = TimeUnit.Minutes
+  public currentChart: TimeInterval | undefined = undefined
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -120,26 +120,29 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     })
   }
 
-  public async drawChart(timeInterval: TimeUnit): Promise<void> {
+  public async drawChart(timeInterval: TimeInterval): Promise<void> {
+    if (timeInterval === this.currentChart) {
+      return
+    }
     this.chartLabels = []
     this.chartDatasets = [{ data: [], label: '$' }]
 
     this.currentChart = timeInterval
 
     this.marketDataProvider.fetchAllValues(this.currentChart).then(async rawData => {
-      this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestampObject) => obj.balance)
+      this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestamp) => obj.usdValue)
 
       for (const value of rawData) {
         // x-axis labeling
         this.chartLabels.push(value.timestamp.toString())
       }
 
-      this.percentageChange = this.displayPercentageChange(rawData.map((obj: ValueAtTimestampObject) => obj.balance))
+      this.percentageChange = this.displayPercentageChange(rawData.map((obj: ValueAtTimestamp) => obj.usdValue))
     })
   }
 
   public setLabel24h(): void {
-    this.currentChart = TimeUnit.Minutes
+    this.currentChart = TimeInterval.HOURS
   }
 
   public displayPercentageChange(rawData: number[]): number {

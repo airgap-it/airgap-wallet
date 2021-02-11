@@ -1,8 +1,8 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { IAirGapTransaction } from 'airgap-coin-lib'
-import { ProtocolSymbols } from 'airgap-coin-lib'
+import { IAirGapTransaction } from '@airgap/coinlib-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 
@@ -160,7 +160,7 @@ export class ExchangeProvider implements Exchange {
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
         fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
-        timestamp: tx.timestamp,
+        timestamp: new BigNumber(tx.timestamp).dividedToIntegerBy(1000).toNumber(),
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
         network: protocol.options.network,
         extra: tx.status
