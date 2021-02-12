@@ -87,10 +87,15 @@ export class BeaconService {
 
   public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
     let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(generatedId)
-    const result: [BeaconRequestOutputMessage, ICoinProtocol] = [cachedRequest[0], undefined]
-    if (cachedRequest && cachedRequest[1]) {
-      const protocol = await this.protocolService.getProtocol(cachedRequest[1], cachedRequest[2])
-      result[1] = protocol
+    const result: [BeaconRequestOutputMessage, ICoinProtocol] = [undefined, undefined]
+    if (cachedRequest) {
+      if (cachedRequest[0]) {
+        result[0] = cachedRequest[0]
+      }
+      if (cachedRequest[1]) {
+        const protocol = await this.protocolService.getProtocol(cachedRequest[1], cachedRequest[2])
+        result[1] = protocol
+      }
     }
     return result ? result : []
   }
