@@ -1,5 +1,5 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
-import { SubstratePayee, SubstrateProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubstratePayee, SubstrateProtocol } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import { SubstrateElectionStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
 import { SubstrateNominationStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateNominationStatus'
@@ -202,22 +202,24 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const isElectionOpen: boolean = results[0].status.value === SubstrateElectionStatus.OPEN
     const nominationStatus: SubstrateNominationStatus | undefined = results[1]
 
-    alerts.push(
-      new UIAlert({
-        title: 'delegation-detail-substrate.alert.delegation-issues.title',
-        description: 'delegation-detail-substrate.alert.delegation-issues.description',
-        icon: 'alert-circle-outline',
-        color: 'warning',
-        actions: [
-          {
-            text: 'delegation-detail-substrate.alert.delegation-issues.actions.open-blogpost',
-            action: async () => {
-              window.open('https://polkadot.network/polkadot-staking-an-update/', '_blank')
+    if (protocol.identifier === MainProtocolSymbols.POLKADOT) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-substrate.alert.polkadot.delegation-issues.title',
+          description: 'delegation-detail-substrate.alert.polkadot.delegation-issues.description',
+          icon: 'alert-circle-outline',
+          color: 'warning',
+          actions: [
+            {
+              text: 'delegation-detail-substrate.alert.polkadot.delegation-issues.actions.open-blogpost',
+              action: async () => {
+                window.open('https://polkadot.network/polkadot-staking-an-update/', '_blank')
+              }
             }
-          }
-        ]
-      })
-    )
+          ]
+        })
+      )
+    }
 
     if (isElectionOpen) {
       alerts.push(
@@ -364,6 +366,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     }
   }
 
+  // tslint:disable-next-line: cyclomatic-complexity
   private async createDelegateAction(
     protocol: SubstrateProtocol,
     stakingDetails: SubstrateStakingDetails,
@@ -385,8 +388,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     if (action) {
       const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gte(minValue)
 
-      const maxValueShifted: BigNumber | undefined = maxValue !== undefined ? maxValue.shiftedBy(-protocol.decimals) : undefined
-      const minValueShifted: BigNumber | undefined = minValue !== undefined ? minValue.shiftedBy(-protocol.decimals) : undefined
+      const maxValueShifted: BigNumber | undefined =
+        maxValue !== undefined ? maxValue.integerValue().shiftedBy(-protocol.decimals) : undefined
+      const minValueShifted: BigNumber | undefined =
+        minValue !== undefined ? minValue.integerValue().shiftedBy(-protocol.decimals) : undefined
 
       const extraValidators = []
       if (minValueShifted !== undefined) {
@@ -402,7 +407,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           action.args.includes(ArgumentName.VALUE) && maxValue !== undefined ? maxValue.toString() : stakingDetails.active
         ],
         [ArgumentName.VALUE_CONTROL]: [
-          maxValueShifted || minValueShifted,
+          maxValueShifted ? maxValueShifted.toFixed() : minValueShifted ? minValueShifted.toFixed() : '0',
           Validators.compose([Validators.required, DecimalValidator.validate(protocol.decimals), ...extraValidators])
         ],
         [ArgumentName.PAYEE]: [SubstratePayee.STASH]
@@ -415,13 +420,19 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const argWidgets = []
       if (action.args.includes(ArgumentName.VALUE)) {
         argWidgets.push(
-          this.createAmountWidget(ArgumentName.VALUE_CONTROL, maxValueShifted.toString(), minValueShifted.toString(), {
-            onValueChanged: (value: string) => {
-              form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
-            },
-            toggleFixedValueButton: maxValueShifted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
-            fixedValue: maxValueShifted && hasSufficientFunds ? maxValueShifted.toString() : undefined
-          })
+          this.createAmountWidget(
+            ArgumentName.VALUE_CONTROL,
+            maxValueShifted ? maxValueShifted.toFixed() : undefined,
+            minValueShifted ? minValueShifted.toFixed() : undefined,
+            {
+              onValueChanged: (value: string) => {
+                form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
+              },
+              toggleFixedValueButton:
+                maxValueShifted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
+              fixedValue: maxValueShifted && hasSufficientFunds ? maxValueShifted.toString() : undefined
+            }
+          )
         )
       }
 
@@ -502,7 +513,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation, { protocol })
 
       return this.translateService.instant('delegation-detail-substrate.delegate.unsufficient-funds_text', {
-        extra: feeEstimationFormatted
+        extra: feeEstimationFormatted,
+        symbol: protocol.marketSymbol.toLocaleUpperCase()
       })
     }
 
@@ -559,7 +571,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           }
         } else {
           translationKey = 'delegation-detail-substrate.delegate.bond-extra-no-max_text'
-          translationArgs = { bonded: bondedFormatted }
+          translationArgs = {
+            bonded: bondedFormatted,
+            symbol: protocol.marketSymbol.toLocaleUpperCase()
+          }
         }
         break
       case SubstrateStakingActionType.REBOND_EXTRA:
@@ -571,7 +586,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
           }
         } else {
           translationKey = 'delegation-detail-substrate.delegate.rebond-extra-no-max_text'
-          translationArgs = { bonded: bondedFormatted }
+          translationArgs = {
+            bonded: bondedFormatted,
+            symbol: protocol.marketSymbol.toLocaleUpperCase()
+          }
         }
         break
       case SubstrateStakingActionType.CHANGE_NOMINATION:
