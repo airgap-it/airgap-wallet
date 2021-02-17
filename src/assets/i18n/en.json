@@ -530,11 +530,11 @@
       "rebond-nominate-no-max_text": "Select the amount you want to delegate.",
       "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
       "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
-      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
       "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
-      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
       "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
-      "unsufficient-funds_text": "You don't have enough DOT to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
+      "unsufficient-funds_text": "You don't have enough {{ symbol }} to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
     },
     "undelegate": {
       "label": "Undelegate"
@@ -554,11 +554,13 @@
       "payout-col_label": "Payout"
     },
     "alert": {
-      "delegation-issues": {
-        "title": "Delegations on Polkadot",
-        "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
-        "actions": {
-          "open-blogpost": "Open Blogpost"
+      "polkadot": {
+        "delegation-issues": {
+          "title": "Delegations on Polkadot",
+          "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
+          "actions": {
+            "open-blogpost": "Open Blogpost"
+          }
         }
       },
       "election-open": {
