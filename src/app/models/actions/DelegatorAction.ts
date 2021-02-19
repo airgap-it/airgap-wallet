@@ -1,7 +1,7 @@
 import { ToastController, LoadingController } from '@ionic/angular'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
@@ -42,7 +42,8 @@ export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionCon
       const info = {
         wallet: this.context.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.context.dataService.setData(DataServiceKey.INTERACTION, info)

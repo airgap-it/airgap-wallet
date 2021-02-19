@@ -179,7 +179,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       (validator: CosmosValidatorDetails) => validator.operator_address === validatorDetails.address
     )
 
-    const currentUsage = new BigNumber(selfDelegation.shares)
+    const currentUsage = new BigNumber(selfDelegation.delegation.shares)
     const totalUsage = new BigNumber(allDetails.tokens)
 
     const displayDetails = await this.createValidatorDisplayDetails(protocol, allDetails)
@@ -244,7 +244,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     const delegatedAmount = new BigNumber(
       delegatorDetails.delegatees.includes(validator)
-        ? delegations.find(delegation => delegation.validator_address === validator).balance
+        ? delegations.find(delegation => delegation.delegation.validator_address === validator).balance.amount
         : 0
     )
 

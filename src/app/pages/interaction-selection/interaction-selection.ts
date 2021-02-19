@@ -83,6 +83,7 @@ export class InteractionSelectionPage {
     if (typeof this.interactionData === 'string' && this.interactionData.includes('://')) {
       return this.interactionData
     }
+
     return this.operations.serializeSignRequest(this.wallet, this.interactionData, this.type, this.generatedId).catch(error => {
       console.warn(`Could not serialize transaction: ${error}`)
       // TODO: Show error (toast)
