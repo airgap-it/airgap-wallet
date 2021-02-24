@@ -683,6 +683,10 @@
       "sign-transactions": "Sign Transactions",
       "operation-request": "Operation request",
       "threshold": "Threshold"
+    },
+    "select-account": {
+      "alert": "Select an account to pair",
+      "button": "Change Account"
     }
   },
   "beacon-permission-list": {
