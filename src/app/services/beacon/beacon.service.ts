@@ -175,6 +175,22 @@ export class BeaconService {
     await this.displayErrorPage(new Error('Network not supported!'))
   }
 
+  public async sendAccountNotFound(id: string): Promise<void> {
+    const responseInput = {
+      id,
+      type: BeaconMessageType.Error,
+      errorType: BeaconErrorType.NO_ADDRESS_ERROR
+    } as any // TODO: Fix type
+
+    const response: BeaconResponseInputMessage = {
+      senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
+      version: BEACON_VERSION,
+      ...responseInput
+    }
+    await this.respond(response)
+    await this.displayErrorPage(new Error('Account not found'))
+  }
+
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     // TODO: remove `Exclude`
     const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET>]: TezosProtocolNetwork } = {
