@@ -58,9 +58,10 @@ export class BeaconRequestPage implements OnInit {
   public request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
   public network: ProtocolNetwork | undefined
   public requesterName: string = ''
-  public address: string = ''
   public inputs: CheckboxInput[] = []
   public transactions: IAirGapTransaction[] | undefined | any
+
+  private selectedWallet: AirGapMarketWallet | undefined
 
   public modalRef: HTMLIonModalElement | undefined
 
@@ -79,6 +80,13 @@ export class BeaconRequestPage implements OnInit {
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService
   ) {}
+
+  public get address(): string {
+    if (this.selectedWallet !== undefined) {
+      return this.selectedWallet.receivingPublicAddress
+    }
+    return ''
+  }
 
   public async ngOnInit(): Promise<void> {
     this.modalRef = await this.modalController.getTop()
@@ -151,13 +159,14 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
-    const selectedWallet: AirGapMarketWallet = this.accountService
+    const wallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
-    if (!selectedWallet) {
-      throw new Error('no wallet found!')
+    this.setSelectedWallet(wallet)
+    if (!this.selectedWallet) {
+      await this.beaconService.sendAccountNotFound(request.id)
+      return
     }
-    this.address = await selectedWallet.protocol.getAddressFromPublicKey(selectedWallet.publicKey)
 
     this.inputs = [
       {
@@ -194,13 +203,17 @@ export class BeaconRequestPage implements OnInit {
       const response: PermissionResponseInput = {
         id: request.id,
         type: BeaconMessageType.PermissionResponse,
-        publicKey: selectedWallet.publicKey,
+        publicKey: this.selectedWallet.publicKey,
         network: request.network,
         scopes
       }
 
       await this.beaconService.respond(response)
     }
+  }
+
+  private setSelectedWallet(wallet: AirGapMarketWallet | undefined) {
+    this.selectedWallet = wallet
   }
 
   public async changeAccount(): Promise<void> {
@@ -215,10 +228,10 @@ export class BeaconRequestPage implements OnInit {
       const alert = await this.alertController.create({
         header: this.translateService.instant('beacon-request.select-account.alert'),
         inputs: wallets.map(wallet => ({
-          label: this.shortenStringPipe.transform(wallet.addresses[0]),
+          label: this.shortenStringPipe.transform(wallet.receivingPublicAddress),
           type: 'radio',
           value: wallet,
-          checked: wallet.addresses[0] === this.address
+          checked: wallet.receivingPublicAddress === this.address
         })),
         buttons: [
           {
@@ -231,8 +244,8 @@ export class BeaconRequestPage implements OnInit {
           },
           {
             text: 'Ok',
-            handler: async wallet => {
-              this.address = await wallet.protocol.getAddressFromPublicKey(wallet.publicKey)
+            handler: wallet => {
+              this.setSelectedWallet(wallet)
             }
           }
         ]
@@ -241,14 +254,19 @@ export class BeaconRequestPage implements OnInit {
       await alert.present()
     })
   }
+
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
     const tezosProtocol: TezosProtocol = new TezosProtocol()
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
+      .find(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
+      )
 
     if (!selectedWallet) {
-      throw new Error('no wallet found!')
+      await this.beaconService.sendAccountNotFound(request.id)
+      return
     }
 
     // TODO: Move check to service
@@ -295,10 +313,14 @@ export class BeaconRequestPage implements OnInit {
 
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ) // TODO: Add wallet selection
+      .find(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
+      )
 
     if (!selectedWallet) {
-      throw new Error('no wallet found!')
+      await this.beaconService.sendAccountNotFound(request.id)
+      return
     }
 
     if (request.network.type !== BeaconNetworkType.MAINNET) {
