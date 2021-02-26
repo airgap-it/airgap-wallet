@@ -88,7 +88,7 @@ export class LedgerSignPage {
         }
       }
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [signedTransactionSync]
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
