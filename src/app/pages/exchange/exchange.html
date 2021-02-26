@@ -86,22 +86,24 @@
       </ion-row>
 
       <fee [state]="state" [form]="exchangeForm" [wallet]="fromWallet"></fee>
-
-      <ion-fab vertical="bottom" horizontal="end">
-        <ion-button
-          color="primary"
-          [disabled]="
-          amount?.isNaN() ||
-          amount?.isZero() ||
-          amount?.isLessThan(minExchangeAmount) ||
-          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
-        "
-          (click)="startExchange()"
-          shape="round"
-        >
-          {{ 'exchange.exchange_label' | translate }}
-        </ion-button>
-      </ion-fab>
     </ng-container>
   </ion-grid>
 </ion-content>
+
+<ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-button
+      color="primary"
+      [disabled]="
+      amount?.isNaN() ||
+      amount?.isZero() ||
+      amount?.isLessThan(minExchangeAmount) ||
+      amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
+    "
+      (click)="startExchange()"
+      shape="round"
+    >
+      {{ 'exchange.exchange_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ng-container>
