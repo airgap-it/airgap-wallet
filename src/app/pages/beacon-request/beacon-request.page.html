@@ -82,7 +82,14 @@
             <airgap-identicon [address]="address"></airgap-identicon>
             <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
 
-            <ion-button (click)="changeAccount()" color="secondary" shape="round" size="small" fill="outline">
+            <ion-button
+              *ngIf="selectableWallets.length > 1"
+              (click)="changeAccount()"
+              color="secondary"
+              shape="round"
+              size="small"
+              fill="outline"
+            >
               <ion-icon name="swap-vertical-outline"></ion-icon>
               {{ 'beacon-request.select-account.button' | translate }}
             </ion-button>

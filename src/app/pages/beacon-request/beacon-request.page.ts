@@ -61,6 +61,7 @@ export class BeaconRequestPage implements OnInit {
   public inputs: CheckboxInput[] = []
   public transactions: IAirGapTransaction[] | undefined | any
 
+  public selectableWallets: AirGapMarketWallet[] = []
   private selectedWallet: AirGapMarketWallet | undefined
 
   public modalRef: HTMLIonModalElement | undefined
@@ -159,10 +160,12 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
-    const wallet = this.accountService
+    this.selectableWallets = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
-    this.setSelectedWallet(wallet)
+      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
+    if (this.selectableWallets.length > 0) {
+      this.selectedWallet = this.selectableWallets[0]
+    }
     if (!this.selectedWallet) {
       await this.beaconService.sendAccountNotFound(request.id)
       return
@@ -212,10 +215,6 @@ export class BeaconRequestPage implements OnInit {
     }
   }
 
-  private setSelectedWallet(wallet: AirGapMarketWallet | undefined) {
-    this.selectedWallet = wallet
-  }
-
   public async changeAccount(): Promise<void> {
     const wallets: AirGapMarketWallet[] = this.accountService
       .getWalletList()
@@ -245,7 +244,7 @@ export class BeaconRequestPage implements OnInit {
           {
             text: 'Ok',
             handler: wallet => {
-              this.setSelectedWallet(wallet)
+              this.selectedWallet = wallet
             }
           }
         ]
