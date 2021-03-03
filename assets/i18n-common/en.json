@@ -41,5 +41,14 @@
       "message": "It looks like you don't have {{otherApp.name}} installed on this device.",
       "ok": "Ok"
     }
+  },
+  "qr-settings": {
+    "title": "QR Settings",
+    "paste-from-clipboard_label": "Paste code from clipboard",
+    "enable-new-serializer_label": "Enable new serializer",
+    "page-time_label": "QR Page Time",
+    "single-page-size_label": "Single QR Max Size",
+    "multi-page-size_label": "Multi QR Max Size",
+    "reset": "Reset values"
   }
 }
