@@ -1,7 +1,14 @@
 import { BaseIACService, ProtocolService, SerializerService, UiEventElementsService } from '@airgap/angular-core'
+import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { AccountShareResponse, AirGapMarketWallet, IACMessageDefinitionObject, IACMessageType } from 'airgap-coin-lib'
+import {
+  AccountShareResponse,
+  AirGapMarketWallet,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  MessageSignResponse
+} from '@airgap/coinlib-core'
 
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
@@ -20,7 +27,7 @@ export class IACService extends BaseIACService {
   constructor(
     uiEventElementsService: UiEventElementsService,
     serializerService: SerializerService,
-    beaconService: BeaconService,
+    public beaconService: BeaconService,
     accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly protocolService: ProtocolService,
@@ -35,6 +42,7 @@ export class IACService extends BaseIACService {
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
     this.serializerMessageHandlers[IACMessageType.TransactionSignResponse] = this.handleSignedTransaction.bind(this)
+    this.serializerMessageHandlers[IACMessageType.MessageSignResponse] = this.handleMessageSignResponse.bind(this)
   }
 
   public async relay(data: string | string[]): Promise<void> {
@@ -68,13 +76,11 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  public async handleSignedTransaction(
-    _data: string | string[],
-    deserializedSyncTransactions: IACMessageDefinitionObject[]
-  ): Promise<boolean> {
+  public async handleSignedTransaction(_data: string | string[], messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
+    console.log('handleSignedTransaction', messageDefinitionObjects)
     if (this.router) {
       const info = {
-        signedTransactionsSync: deserializedSyncTransactions
+        messageDefinitionObjects: messageDefinitionObjects
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -82,6 +88,19 @@ export class IACService extends BaseIACService {
       return true
     }
 
+    return false
+  }
+
+  private async handleMessageSignResponse(_data: string | string[], deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+    const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
+    const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
+    const response: SignPayloadResponseInput = {
+      type: BeaconMessageType.SignPayloadResponse,
+      id: cachedRequest[0].id,
+      signature: messageSignResponse.signature,
+      signingType: SigningType.RAW
+    }
+    await this.beaconService.respond(response)
     return false
   }
 }

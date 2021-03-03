@@ -2,7 +2,7 @@ import { ClipboardService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 
 import { AccountProvider } from 'src/app/services/account/account.provider'
 

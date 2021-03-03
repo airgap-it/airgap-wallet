@@ -1,6 +1,6 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Component, Input, OnInit } from '@angular/core'
-import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'transaction-item',

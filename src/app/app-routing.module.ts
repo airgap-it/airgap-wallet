@@ -186,10 +186,14 @@ const routes: Routes = [
   {
     path: 'error',
     loadChildren: () => import('./pages/error/error.module').then(m => m.ErrorPageModule)
+  },
+  {
+    path: 'qr-settings',
+    loadChildren: () => import('./pages/qr-settings/qr-settings.module').then(m => m.QrSettingsPageModule)
   }
 ]
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules, relativeLinkResolution: 'corrected' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}

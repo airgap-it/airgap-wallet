@@ -2,8 +2,8 @@ import { ProtocolService } from '@airgap/angular-core'
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from 'airgap-coin-lib'
-import { ProtocolSymbols } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
@@ -28,6 +28,9 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 })
 export class SwapComponent {
   public expandWalletSelection: boolean = false
+
+  @Input()
+  public readonly currentlyNotSupported: boolean = false
 
   @Input()
   public readonly swapSell: boolean = true

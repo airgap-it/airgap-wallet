@@ -2,7 +2,7 @@ import { DeeplinkService, ProtocolService } from '@airgap/angular-core'
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { IonSlides, Platform } from '@ionic/angular'
-import { ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from '@airgap/coinlib-core'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 

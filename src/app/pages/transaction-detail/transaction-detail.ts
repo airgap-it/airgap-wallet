@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ProtocolService } from '@airgap/angular-core'
 import { ActivatedRoute } from '@angular/router'
-import { IAirGapTransaction, ICoinProtocol } from 'airgap-coin-lib'
+import { IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { DataService } from 'src/app/services/data/data.service'
 
@@ -38,11 +38,7 @@ export class TransactionDetailPage implements OnInit {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = await this.protocolService.getProtocol(
-      this.transaction.protocolIdentifier,
-      this.transaction.network.identifier
-    )
-
+    const protocol: ICoinProtocol = await this.protocolService.getProtocol(this.transaction.protocolIdentifier, this.transaction.network)
     let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer
 
     if (hash) {

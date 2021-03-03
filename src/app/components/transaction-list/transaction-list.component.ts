@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
+import { IAirGapTransaction, AirGapMarketWallet } from '@airgap/coinlib-core'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'

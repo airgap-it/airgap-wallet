@@ -5,7 +5,7 @@
         <ion-text class="ion-no-margin" color="blackLight">
           <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})</ion-label>
         </ion-text>
-        <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [attr.disabled]="state.disableAdvancedMode"></ion-toggle>
+        <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [attr.disabled]="state && state.disableAdvancedMode"></ion-toggle>
       </ion-item>
     </ion-col>
   </ion-row>
@@ -13,7 +13,7 @@
     <ion-col size="12" class="ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
         <ion-range
-          [attr.disabled]="state.forceMigration || state.disableFeeSlider"
+          [attr.disabled]="(state && state.forceMigration) || (state && state.disableFeeSlider)"
           min="0"
           max="2"
           step="1"
@@ -36,7 +36,7 @@
       <small>{{ 'transaction-prepare.fee.fast_label' | translate }}</small>
     </ion-col>
   </ion-row>
-  <ion-row class="ion-padding-horizontal" *ngIf="state.isAdvancedMode.value">
+  <ion-row class="ion-padding-horizontal" *ngIf="state && state.isAdvancedMode.value">
     <ion-col size="12" class="ion-no-padding">
       <ion-item class="advanced-item" class="ion-no-padding">
         <ion-label position="stacked"></ion-label>
@@ -57,7 +57,7 @@
     <ion-col size="12" class="ion-no-padding">
       <ion-text color="blackLight">
         <p class="ion-no-margin">
-          <ng-container *ngIf="!state.estimatingFeeDefaults">
+          <ng-container *ngIf="state && !state.estimatingFeeDefaults">
             <span id="fee-amount">
               <ng-container *ngIf="form.controls['fee'].invalid" color="primary">
                 {{ 'transaction-prepare.amount_label' | translate }}
@@ -70,7 +70,7 @@
               ({{ state.fee.value | number: '1.2-6' }} {{ wallet.protocol.feeSymbol | uppercase }})
             </span>
           </ng-container>
-          <ion-skeleton-text animated style="width: 30%" *ngIf="state.estimatingFeeDefaults"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 30%" *ngIf="state && state.estimatingFeeDefaults"></ion-skeleton-text>
         </p>
       </ion-text>
     </ion-col>

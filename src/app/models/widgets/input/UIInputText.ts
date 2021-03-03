@@ -1,5 +1,5 @@
 import { UIWidgetType } from '../UIWidget'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { UIInputWidgetConfig, UIInputWidget } from '../UIInputWidget'
 
 type InputType = 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url'

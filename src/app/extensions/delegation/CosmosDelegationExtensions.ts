@@ -2,10 +2,10 @@ import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import { CosmosProtocol } from 'airgap-coin-lib'
-import { CosmosUnbondingDelegation, CosmosValidator } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosNodeClient'
-import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { DelegateeDetails, DelegatorAction, DelegatorDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { CosmosProtocol } from '@airgap/coinlib-core'
+import { CosmosUnbondingDelegation, CosmosValidator } from '@airgap/coinlib-core/protocols/cosmos/CosmosNodeClient'
+import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import BigNumber from 'bignumber.js'
 import {
   AirGapDelegateeDetails,
@@ -179,7 +179,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       (validator: CosmosValidatorDetails) => validator.operator_address === validatorDetails.address
     )
 
-    const currentUsage = new BigNumber(selfDelegation.shares)
+    const currentUsage = new BigNumber(selfDelegation.delegation.shares)
     const totalUsage = new BigNumber(allDetails.tokens)
 
     const displayDetails = await this.createValidatorDisplayDetails(protocol, allDetails)
@@ -244,7 +244,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     const delegatedAmount = new BigNumber(
       delegatorDetails.delegatees.includes(validator)
-        ? delegations.find(delegation => delegation.validator_address === validator).balance
+        ? delegations.find(delegation => delegation.delegation.validator_address === validator).balance.amount
         : 0
     )
 

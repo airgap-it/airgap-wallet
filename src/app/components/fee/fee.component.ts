@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'fee',

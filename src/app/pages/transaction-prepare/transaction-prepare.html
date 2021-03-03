@@ -31,145 +31,145 @@
       </ion-col>
     </ion-row>
     <form [formGroup]="transactionForm" class="ion-padding-bottom">
-      <ion-row class="ion-padding-horizontal ion-padding-top">
-        <ion-col size="10" class="ion-no-padding">
-          <ion-row>
-            <ion-col class="balance__container ion-no-padding">
-              <ion-row>
-                <p class="font--size__large ion-no-margin">
-                  <strong *ngIf="state.availableBalance !== null">
-                    {{ state.availableBalance | amountConverter: { protocol: wallet.protocol.identifier, maxDigits: wallet.protocol.decimals
-                    + 1 } | async }}
-                  </strong>
-                </p>
-              </ion-row>
-              <ion-row>
-                <ion-text color="blackLight">
-                  <p class="ion-no-margin">
-                    ${{ state.availableBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
-                    wallet.currentMarketPrice } | async | number: '1.2-2' }}
-                  </p>
-                </ion-text>
-              </ion-row>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col size="12" class="ion-no-padding">
-              <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
-                <ion-label color="blackLight" position="stacked">{{ 'Send To' | translate }}</ion-label>
-                <ion-textarea
-                  [attr.disabled]="state.forceMigration"
-                  [placeholder]="wallet.protocol.addressPlaceholder"
-                  formControlName="address"
-                  id="address-input"
-                ></ion-textarea>
-              </ion-item>
-            </ion-col>
-          </ion-row>
-        </ion-col>
-        <ion-col size="2" class="ion-no-padding">
-          <ion-row class="ion-justify-content-center ion-align-items-center">
-            <ion-avatar>
-              <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
-            </ion-avatar>
-          </ion-row>
-          <ion-row class="ion-justify-content-center ion-align-items-center">
-            <div class="line--vertical"></div>
-          </ion-row>
-          <ion-row class="ion-justify-content-center ion-align-items-center">
-            <ion-avatar>
-              <airgap-identicon [address]="transactionForm.get('address').value"></airgap-identicon>
-            </ion-avatar>
-          </ion-row>
-        </ion-col>
-      </ion-row>
-      <ion-row
-        class="error--address ion-padding-horizontal"
-        *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
-      >
-        <ion-col size="12" class="ion-no-padding">
-          <ion-text class="ion-no-margin" color="danger">
-            <p
-              class="ion-no-margin"
-              [innerHTML]="
-              'transaction-prepare.error.address_label' | translate: { addressPlaceholder: wallet.protocol.addressPlaceholder }
-            "
-            ></p>
-          </ion-text>
-        </ion-col>
-      </ion-row>
-      <ion-row class="ion-padding-horizontal ion-padding-bottom address-to__buttons">
-        <ion-button
-          [attr.disabled]="state.forceMigration"
-          fill="outline"
-          size="small"
-          color="secondary"
-          shape="round"
-          (click)="pasteClipboard()"
-        >
-          {{ 'transaction-prepare.paste_label' | translate }}
-        </ion-button>
-        <ion-button
-          [attr.disabled]="state.forceMigration"
-          fill="outline"
-          size="small"
-          color="secondary"
-          shape="round"
-          (click)="openScanner()"
-        >
-          <ion-icon slot="start" name="barcode-outline"></ion-icon>
-          {{ 'transaction-prepare.to-address-scan_label' | translate }}
-        </ion-button>
-      </ion-row>
-      <div class="divider--line"></div>
-      <ion-row class="ion-padding-horizontal ion-padding-top ion-align-items-center amount__container">
-        <ion-col size="9" class="ion-no-padding amount--container__input">
-          <ion-item class="ion-no-padding" lines="none">
+      <ion-card>
+        <ion-row class="ion-justify-content-between">
+          <ion-col size="3">
             <ion-label color="blackLight" class="ion-no-margin" position="stacked">
               {{ 'transaction-prepare.amount_label' | translate }}
             </ion-label>
-            <ion-input
+          </ion-col>
+          <ion-col size="9" class="ion-text-end">
+            <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+              {{ 'transaction-prepare.balance_label' | translate }}
+              <ng-container *ngIf="state.availableBalance !== null">
+                {{ state.availableBalance | amountConverter: { protocol: wallet.protocol.identifier, maxDigits: wallet.protocol.decimals + 1
+                } | async }}
+              </ng-container>
+            </ion-label>
+          </ion-col>
+        </ion-row>
+        <ion-row class="amount__container">
+          <ion-col size="2" class="d-flex ion-align-items-center">
+            <ion-avatar>
+              <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
+            </ion-avatar>
+          </ion-col>
+          <ion-col size="7" class="ion-no-padding amount--container__input">
+            <ion-item class="ion-no-padding" lines="none">
+              <ion-input
+                [attr.disabled]="state.forceMigration"
+                formControlName="amount"
+                type="number"
+                id="amount-input"
+                placeholder="0.0"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="3" class="ion-no-padding d-flex ion-align-items-center">
+            <ion-toolbar>
+              <ion-buttons slot="end">
+                <ion-button
+                  shape="round"
+                  [attr.disabled]="state.disableSendMaxAmount"
+                  [fill]="state.sendMaxAmount ? 'solid' : 'outline'"
+                  size="small"
+                  color="secondary"
+                  (click)="toggleMaxAmount()"
+                >
+                  <ion-spinner name="lines-small" color="primary" *ngIf="state.estimatingMaxAmount"></ion-spinner>
+                  <span *ngIf="!state.estimatingMaxAmount">{{ 'transaction-prepare.fee.max_label' | translate }}</span>
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="10" offset="2" *ngIf="!transactionForm.controls['amount'].valid" class="ion-no-padding error--container">
+            <ion-text class="ion-no-margin" color="danger">
+              <p class="ion-no-margin">
+                {{ 'transaction-prepare.error.amount_label' | translate }}
+              </p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col offset="2" class="ion-no-padding">
+            <ion-text class="ion-no-margin" color="blackLight">
+              <p class="ion-no-margin">
+                ${{ wallet.currentMarketPrice.times(state.amount.value).toNumber() | number: '1.2-2' }}
+              </p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-card>
+      <ion-row>
+        <ion-col class="ion-text-center ion-no-padding divider--container">
+          <ion-icon name="arrow-down-outline" color="medium"></ion-icon>
+        </ion-col>
+      </ion-row>
+      <ion-card>
+        <ion-row>
+          <ion-col size="12">
+            <ion-label color="blackLight" position="stacked">{{ 'transaction-prepare.to-address_label' | translate }}</ion-label>
+          </ion-col>
+        </ion-row>
+        <ion-row class="to__container">
+          <ion-col size="2">
+            <ion-avatar class="d-flex ion-align-items-center">
+              <airgap-identicon [address]="transactionForm.get('address').value"></airgap-identicon>
+            </ion-avatar>
+          </ion-col>
+          <ion-col size="10" class="ion-no-padding">
+            <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
+              <ion-textarea
+                [attr.disabled]="state.forceMigration"
+                [placeholder]="wallet.protocol.addressPlaceholder"
+                formControlName="address"
+                id="address-input"
+              ></ion-textarea>
+            </ion-item>
+          </ion-col>
+          <ion-col
+            size="10"
+            offset="2"
+            class="ion-no-padding error--address"
+            *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
+          >
+            <ion-text class="ion-no-margin" color="danger">
+              <p
+                class="ion-no-margin"
+                [innerHTML]="
+                'transaction-prepare.error.address_label' | translate: { addressPlaceholder: wallet.protocol.addressPlaceholder }
+              "
+              ></p>
+            </ion-text>
+          </ion-col>
+          <ion-col size="10" offset="2" class="address-to__buttons">
+            <ion-button
               [attr.disabled]="state.forceMigration"
-              formControlName="amount"
-              type="number"
-              id="amount-input"
-              placeholder="0.0"
-            ></ion-input>
-          </ion-item>
-          <ion-text class="ion-no-margin" color="blackLight">
-            <p class="ion-no-margin">
-              ${{ wallet.currentMarketPrice.times(state.amount.value).toNumber() | number: '1.2-2' }}
-            </p>
-          </ion-text>
-        </ion-col>
-        <ion-col size="3" class="ion-no-padding">
-          <ion-toolbar>
-            <ion-buttons slot="end">
-              <ion-button
-                shape="round"
-                [attr.disabled]="state.disableSendMaxAmount"
-                [fill]="state.sendMaxAmount ? 'solid' : 'outline'"
-                size="small"
-                color="secondary"
-                (click)="toggleMaxAmount()"
-              >
-                <ion-spinner name="lines-small" color="primary" *ngIf="state.estimatingMaxAmount"></ion-spinner>
-                <span *ngIf="!state.estimatingMaxAmount">{{ 'transaction-prepare.fee.max_label' | translate }}</span>
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-col>
-      </ion-row>
-      <ion-row class="ion-padding-horizontal ion-padding-bottom">
-        <ion-col size="12" *ngIf="!transactionForm.controls['amount'].valid">
-          <ion-text class="ion-no-margin" color="danger">
-            <p class="ion-no-margin">
-              {{ 'transaction-prepare.error.amount_label' | translate }}
-            </p>
-          </ion-text>
-        </ion-col>
-      </ion-row>
-      <div class="divider--line"></div>
+              fill="outline"
+              size="small"
+              color="secondary"
+              shape="round"
+              (click)="pasteClipboard()"
+            >
+              {{ 'transaction-prepare.paste_label' | translate }}
+            </ion-button>
+            <ion-button
+              [attr.disabled]="state.forceMigration"
+              fill="outline"
+              size="small"
+              color="secondary"
+              shape="round"
+              (click)="openScanner()"
+            >
+              <ion-icon slot="start" name="barcode-outline"></ion-icon>
+              {{ 'transaction-prepare.to-address-scan_label' | translate }}
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-card>
+
       <fee [wallet]="wallet" [state]="state" [form]="transactionForm"></fee>
     </form>
   </ion-grid>

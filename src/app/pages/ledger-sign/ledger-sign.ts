@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { AlertController, LoadingController } from '@ionic/angular'
@@ -88,7 +88,7 @@ export class LedgerSignPage {
         }
       }
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [signedTransactionSync]
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

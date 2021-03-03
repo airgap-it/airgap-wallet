@@ -2,10 +2,10 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { SubProtocolType, ICoinSubProtocol } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
-import { assertNever } from 'airgap-coin-lib/dist/utils/assert'
-import { MainProtocolSymbols } from 'airgap-coin-lib'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { SubProtocolType, ICoinSubProtocol } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { assertNever } from '@airgap/coinlib-core/utils/assert'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
@@ -149,19 +149,19 @@ export class SubAccountAddPage {
   }
 
   private async loadDisplayedAccounts(filtered: boolean = false): Promise<void> {
-    const newSubAccount = (filtered ? this.filteredSubAccounts : this.subAccounts).slice(this.loaded, this.loaded + this.limit)
-    if (newSubAccount.length < this.limit) {
+    const newSubAccounts = (filtered ? this.filteredSubAccounts : this.subAccounts).slice(this.loaded, this.loaded + this.limit)
+    if (newSubAccounts.length < this.limit) {
       this.infiniteEnabled = false
     }
 
-    newSubAccount.forEach(account => {
+    newSubAccounts.forEach(account => {
       if (account.wallet.currentMarketPrice === undefined) {
         account.wallet.fetchCurrentMarketPrice()
       }
       this.displayedSubAccounts.push(account)
     })
 
-    this.loaded += newSubAccount.length
+    this.loaded += newSubAccounts.length
   }
 
   public async doInfinite(event) {
