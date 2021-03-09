@@ -138,7 +138,7 @@ export class WalletconnectPage implements OnInit {
     const transaction: RawEthereumTransaction | undefined = {
       nonce: eth.nonce,
       gasPrice: eth.gasPrice,
-      gasLimit: eth.gasLimit,
+      gasLimit: (300000).toString(16),
       to: eth.to,
       value: eth.value,
       chainId: 1,
@@ -149,8 +149,6 @@ export class WalletconnectPage implements OnInit {
       publicKey: selectedWallet.publicKey,
       transaction
     })
-
-    // await this.beaconService.addVaultRequest(request.id, forgedTransaction, tezosProtocol)
 
     this.responseHandler = async () => {
       console.log('transaction', transaction)
