@@ -7,7 +7,9 @@ import {
   AirGapMarketWallet,
   IACMessageDefinitionObject,
   IACMessageType,
-  MessageSignResponse
+  MainProtocolSymbols,
+  MessageSignResponse,
+  ProtocolSymbols
 } from '@airgap/coinlib-core'
 
 import { AccountProvider } from '../account/account.provider'
@@ -31,7 +33,7 @@ export class IACService extends BaseIACService {
     serializerService: SerializerService,
     public beaconService: BeaconService,
     accountProvider: AccountProvider,
-    walletConnectService: WalletconnectService,
+    public walletConnectService: WalletconnectService,
     private readonly dataService: DataService,
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
@@ -96,15 +98,21 @@ export class IACService extends BaseIACService {
   }
 
   private async handleMessageSignResponse(_data: string | string[], deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+    console.log('handleMessageSignResponse', _data, deserializedMessages)
     const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
+    const protocol: ProtocolSymbols = deserializedMessages[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
       id: cachedRequest[0].id,
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
-    await this.beaconService.respond(response)
+    if (protocol === MainProtocolSymbols.XTZ) {
+      await this.beaconService.respond(response)
+    } else if (protocol === MainProtocolSymbols.ETH) {
+      await this.walletConnectService.approveRequest(response.id, response.signature)
+    }
     return false
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
+import BigNumber from 'bignumber.js'
 
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
@@ -38,6 +39,9 @@ export class WalletconnectService {
 
   public async connect(uri: string): Promise<void> {
     console.log('connecting to uri', uri)
+    if (this.connector) {
+      return
+    }
     this.connector = new WalletConnect(
       {
         uri,
@@ -132,6 +136,12 @@ export class WalletconnectService {
     })
   }
 
+  public async approveRequest(id: string, result: string) {
+    this.connector.approveRequest({
+      id: new BigNumber(id).toNumber(),
+      result: result
+    })
+  }
   async presentModal(request: any) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,

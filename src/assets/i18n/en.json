@@ -379,6 +379,7 @@
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
     "buy_label": "Buy",
+    "currently_not_supported": "The selected trading pair is currently not supported",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
     "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
@@ -530,11 +531,11 @@
       "rebond-nominate-no-max_text": "Select the amount you want to delegate.",
       "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
       "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
-      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
       "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
-      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional DOTs.",
+      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
       "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
-      "unsufficient-funds_text": "You don't have enough DOT to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
+      "unsufficient-funds_text": "You don't have enough {{ symbol }} to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
     },
     "undelegate": {
       "label": "Undelegate"
@@ -554,6 +555,15 @@
       "payout-col_label": "Payout"
     },
     "alert": {
+      "polkadot": {
+        "delegation-issues": {
+          "title": "Delegations on Polkadot",
+          "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
+          "actions": {
+            "open-blogpost": "Open Blogpost"
+          }
+        }
+      },
       "election-open": {
         "title": "Delegation operations currently unavailable",
         "description": "Due to the election period restrictions the delegation operations are currently unavailable."
@@ -657,6 +667,7 @@
   },
   "beacon-request": {
     "sign-data_label": "Do you want to sign the following data?",
+    "blake2b_hash": "Ledger Blake2b hash of the message",
     "request": {
       "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
       "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."
@@ -675,6 +686,10 @@
       "sign-transactions": "Sign Transactions",
       "operation-request": "Operation request",
       "threshold": "Threshold"
+    },
+    "select-account": {
+      "alert": "Select an account to pair",
+      "button": "Change Account"
     }
   },
   "beacon-permission-list": {

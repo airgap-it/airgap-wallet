@@ -1,13 +1,12 @@
-import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
 import { AirGapMarketWallet, SubstrateProtocol } from '@airgap/coinlib-core'
 import {
   SubstrateSignature,
   SubstrateSignatureType
 } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateSignature'
 import { SubstrateTransaction } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
-import { SubstrateTransactionPayload } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateTransactionPayload'
 import { RawSubstrateTransaction } from '@airgap/coinlib-core/serializer/types'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
 import { Buffer } from 'buffer'
 
 import { ReturnCode } from '../../ReturnCode'
@@ -51,16 +50,13 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
     return this.protocol.options.transactionController.encodeDetails(txs)
   }
 
-  private async signSubstrateTransaction(
-    transaction: SubstrateTransaction,
-    payload: SubstrateTransactionPayload
-  ): Promise<SubstrateTransaction | null> {
+  private async signSubstrateTransaction(transaction: SubstrateTransaction, payload: string): Promise<SubstrateTransaction | null> {
     try {
       const derivationPath: number[] = this.derivationPathToArray(this.protocol.standardDerivationPath)
       const [account, change, addressIndex]: number[] = derivationPath.slice(2)
 
       const app: SubstrateApp = this.getApp()
-      const response: ResponseSign = await app.sign(account, change, addressIndex, Buffer.from(payload.encode(), 'hex'))
+      const response: ResponseSign = await app.sign(account, change, addressIndex, Buffer.from(payload, 'hex'))
 
       if (response.return_code === ReturnCode.SUCCESS) {
         const signatureType: SubstrateSignatureType = SubstrateSignatureType[SubstrateSignatureType[response.signature.readUInt8(0)]]

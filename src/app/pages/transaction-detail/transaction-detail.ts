@@ -38,11 +38,7 @@ export class TransactionDetailPage implements OnInit {
     const transaction: any = this.transaction
     const hash: string = transaction.hash
 
-    const protocol: ICoinProtocol = await this.protocolService.getProtocol(
-      this.transaction.protocolIdentifier,
-      this.transaction.network.identifier
-    )
-
+    const protocol: ICoinProtocol = await this.protocolService.getProtocol(this.transaction.protocolIdentifier, this.transaction.network)
     let blockexplorer: string = protocol.options.network.blockExplorer.blockExplorer
 
     if (hash) {

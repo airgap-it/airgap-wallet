@@ -9,5 +9,10 @@
   <ion-label color="dark" class="ion-text-wrap">
     <h3><strong>{{ widget.title | translate }}</strong></h3>
     <p>{{ widget.description | translate }}</p>
+    <div *ngIf="widget.actions">
+      <ion-button color="light" *ngFor="let action of widget.actions" (click)="action.action()">
+        {{ action.text | translate }}
+      </ion-button>
+    </div>
   </ion-label>
 </ion-item>

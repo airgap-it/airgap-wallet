@@ -13,7 +13,9 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
+import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { BeaconService } from 'src/app/services/beacon/beacon.service'
 // import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
@@ -76,6 +78,7 @@ export class WalletconnectPage implements OnInit {
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
+    private readonly beaconService: BeaconService,
     private readonly serializerService: SerializerService // private readonly beaconService: BeaconService
   ) {}
 
@@ -108,6 +111,7 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async signRequest(request: JSONRPC<string>) {
+    console.log('SIGN REQUEST', request)
     const message = request.params[0]
     const address = request.params[1]
     const selectedWallet: AirGapMarketWallet = this.accountService
@@ -117,23 +121,26 @@ export class WalletconnectPage implements OnInit {
     if (!selectedWallet) {
       throw new Error('no wallet found!')
     }
-    const generatedId = generateId(10)
 
+    const requestId = new BigNumber(request.id).toString()
     this.beaconRequest = {
       type: BeaconMessageType.SignPayloadRequest,
       signingType: 'raw' as SigningType,
       payload: message,
       sourceAddress: address,
-      id: generatedId,
-      senderId: null,
-      appMetadata: null
+      id: requestId,
+      senderId: 'walletconnect',
+      appMetadata: { senderId: 'walletconnect', name: 'Beacon Example Dapp' }
     }
+
+    const protocol = new EthereumProtocol()
+    await this.beaconService.addVaultRequest(requestId, this.beaconRequest, protocol)
 
     this.responseHandler = async () => {
       const info = {
         wallet: selectedWallet,
         data: this.beaconRequest,
-        generatedId: generatedId,
+        generatedId: requestId,
         type: IACMessageType.MessageSignRequest
       }
 
