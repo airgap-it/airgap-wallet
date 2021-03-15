@@ -195,8 +195,22 @@ export class AppComponent implements AfterViewInit {
     )
     const delphinetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(delphinetNetwork))
 
+    const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Edonet',
+      NetworkType.TESTNET,
+      'https://tezos-edonet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https://edonet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.EDONET,
+        'https://tezos-edonet-conseil.prod.gke.papers.tech',
+        TezosNetwork.EDONET,
+        'airgap00391'
+      )
+    )
+    const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
+
     this.protocolService.init({
-      extraActiveProtocols: [delphinetProtocol],
+      extraActiveProtocols: [delphinetProtocol, edonetProtocol],
       extraPassiveSubProtocols: [
         [delphinetProtocol, new TezosKtProtocol(new TezosProtocolOptions(delphinetNetwork))],
         [

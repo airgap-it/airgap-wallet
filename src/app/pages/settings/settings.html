@@ -44,6 +44,10 @@
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
         {{ 'settings.about_label' | translate }}
       </ion-item>
+      <ion-item (click)="inspectHealth()" detail="true">
+        <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+        {{ 'settings.health_label' | translate }}
+      </ion-item>
     </ion-list>
     <ion-list lines="none">
       <ion-list-header class="ion-no-margin" lines="none">

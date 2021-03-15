@@ -1,4 +1,5 @@
 import { SerializerService } from '@airgap/angular-core'
+import { BeaconMessageType, SigningType, SignPayloadRequestOutput } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
   EthereumProtocol,
@@ -13,12 +14,14 @@ import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+// import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
-  ETH_SENDTRANSACTION = 'eth_sendTransaction'
+  ETH_SENDTRANSACTION = 'eth_sendTransaction',
+  PERSONAL_SIGN_REQUEST = 'personal_sign'
 }
 
 interface JSONRPC<T = unknown> {
@@ -60,12 +63,12 @@ export class WalletconnectPage implements OnInit {
   public url: string = ''
   public icon: string = ''
   public transactions: IAirGapTransaction[] | undefined
-
+  public selectedWallet: AirGapMarketWallet
   public readonly request: JSONRPC
   public readonly requestMethod: typeof Methods = Methods
-
   private readonly connector: WalletConnect | undefined
 
+  public beaconRequest: SignPayloadRequestOutput
   private responseHandler: (() => Promise<void>) | undefined
 
   constructor(
@@ -73,7 +76,7 @@ export class WalletconnectPage implements OnInit {
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
-    private readonly serializerService: SerializerService
+    private readonly serializerService: SerializerService // private readonly beaconService: BeaconService
   ) {}
 
   public async ngOnInit(): Promise<void> {
@@ -86,6 +89,11 @@ export class WalletconnectPage implements OnInit {
       this.title = 'WalletConnect - New Transaction'
       await this.operationRequest(this.request as JSONRPC<EthTx>)
     }
+
+    if (this.request && this.request.method === Methods.PERSONAL_SIGN_REQUEST) {
+      this.title = 'WalletConnect - Sign Request'
+      await this.signRequest(this.request as JSONRPC<string>)
+    }
   }
 
   public async dismiss(): Promise<void> {
@@ -97,6 +105,41 @@ export class WalletconnectPage implements OnInit {
       await this.responseHandler()
     }
     await this.dismiss()
+  }
+
+  private async signRequest(request: JSONRPC<string>) {
+    const message = request.params[0]
+    const address = request.params[1]
+    const selectedWallet: AirGapMarketWallet = this.accountService
+      .getWalletList()
+      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
+
+    if (!selectedWallet) {
+      throw new Error('no wallet found!')
+    }
+    const generatedId = generateId(10)
+
+    this.beaconRequest = {
+      type: BeaconMessageType.SignPayloadRequest,
+      signingType: 'raw' as SigningType,
+      payload: message,
+      sourceAddress: address,
+      id: generatedId,
+      senderId: null,
+      appMetadata: null
+    }
+
+    this.responseHandler = async () => {
+      const info = {
+        wallet: selectedWallet,
+        data: this.beaconRequest,
+        generatedId: generatedId,
+        type: IACMessageType.MessageSignRequest
+      }
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
   }
 
   private async permissionRequest(request: JSONRPC<SessionRequest>): Promise<void> {

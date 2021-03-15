@@ -40,6 +40,7 @@ export class InteractionSelectionPage {
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
+      console.log('HARIBOL', this.interactionData)
       this.type = info.type
       this.generatedId = info.generatedId
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)

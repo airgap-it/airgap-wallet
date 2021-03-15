@@ -33,6 +33,10 @@ export class SettingsPage {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  public inspectHealth(): void {
+    this.router.navigateByUrl('/health').catch(err => console.error(err))
+  }
+
   public beaconPermissions(): void {
     this.router.navigateByUrl('/beacon-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
