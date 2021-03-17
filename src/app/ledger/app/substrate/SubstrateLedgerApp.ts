@@ -26,7 +26,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       const response: ResponseAddress = await app.getAddress(account, change, addressIndex, true)
 
       return response.return_code === ReturnCode.SUCCESS
-        ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, priceService)
+        ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, '', priceService)
         : this.rejectWithError('Could not import wallet', response)
     } catch (error) {
       return this.rejectWithError('Could not import wallet', error)

@@ -11,13 +11,14 @@
 
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
-    <ion-row *ngIf="!walletAlreadyExists">
-      <p>{{ 'account-import.text' | translate }}</p>
+    <ion-row>
+      <p *ngIf="!this.walletAlreadyExists">{{ 'account-import.import-text' | translate }}</p>
+      <p *ngIf="this.walletAlreadyExists">{{ 'account-import.override-text' | translate }}</p>
     </ion-row>
 
     <portfolio-item [wallet]="wallet"></portfolio-item>
 
-    <ion-item *ngIf="walletAlreadyExists" color="danger" class="ion-margin-top ion-text-wrap">
+    <ion-item *ngIf="walletAlreadyExists" color="warning" class="ion-margin-top ion-text-wrap">
       {{ 'account-import.warning' | translate }}
     </ion-item>
   </ion-grid>
@@ -26,8 +27,11 @@
     <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
       {{ 'account-import.cancel_label' | translate }}
     </ion-button>
-    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists" (click)="import()">
+    <ion-button *ngIf="!this.walletAlreadyExists" id="import" shape="round" color="primary" (click)="import()">
       {{ 'account-import.import_label' | translate }}
+    </ion-button>
+    <ion-button *ngIf="this.walletAlreadyExists" id="import" shape="round" color="primary" (click)="import()">
+      {{ 'account-import.override_label' | translate }}
     </ion-button>
   </ion-fab>
 </ion-content>

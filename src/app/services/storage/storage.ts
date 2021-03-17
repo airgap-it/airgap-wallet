@@ -2,9 +2,8 @@ import { BaseStorage } from '@airgap/angular-core'
 import { Network } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { ICoinProtocol } from '@airgap/coinlib-core'
+import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
 import { ExchangeTransaction } from '../exchange/exchange'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
 
 export type BeaconRequest = [string, any, ICoinProtocol]
 export interface SerializedBeaconRequest {
@@ -26,16 +25,6 @@ export enum WalletStorageKey {
   USER_ID = 'user_id',
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
   BEACON_REQUESTS = 'BEACON_REQUESTS'
-}
-
-interface SerializedAirGapWallet {
-  protocolIdentifier: ProtocolSymbols
-  networkIdentifier: string
-  publicKey: string
-  isExtendedPublicKey: boolean
-  derivationPath: string
-  addresses: string[]
-  addressIndex?: number
 }
 
 interface IBroadcastTransaction {

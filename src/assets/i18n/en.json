@@ -246,11 +246,13 @@
   },
   "account-import": {
     "title": "Confirm Import",
-    "text": "Would you like to import the following account?",
+    "import-text": "Would you like to import the following account?",
+    "override-text": "Would you like to override the following account?",
     "warning": "You have already added this account in AirGap.",
     "syncing_label": "Syncing...",
     "cancel_label": "Cancel",
-    "import_label": "Import"
+    "import_label": "Import",
+    "override_label": "Override"
   },
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."

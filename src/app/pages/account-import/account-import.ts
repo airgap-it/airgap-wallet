@@ -55,18 +55,7 @@ export class AccountImportPage {
   }
 
   public async ionViewDidEnter(): Promise<void> {
-    if (this.wallets.walletExists(this.wallet)) {
-      this.wallet = this.wallets.walletByPublicKeyAndProtocolAndAddressIndex(
-        this.wallet.publicKey,
-        this.wallet.protocol.identifier,
-        this.wallet.addressIndex
-      )
-      this.walletAlreadyExists = true
-      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-      return
-    }
-
+    this.walletAlreadyExists = this.wallets.walletExists(this.wallet)
     const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
 
     airGapWorker.onmessage = event => {
@@ -86,7 +75,8 @@ export class AccountImportPage {
       protocolIdentifier: this.wallet.protocol.identifier,
       publicKey: this.wallet.publicKey,
       isExtendedPublicKey: this.wallet.isExtendedPublicKey,
-      derivationPath: this.wallet.derivationPath
+      derivationPath: this.wallet.derivationPath,
+      masterFingerprint: this.wallet.masterFingerprint
     })
   }
 
@@ -95,7 +85,7 @@ export class AccountImportPage {
   }
 
   public async import(): Promise<void> {
-    await this.wallets.addWallet(this.wallet)
+    await this.wallets.addWallet(this.wallet, { override: true })
     await this.router.navigateByUrl('/tabs/portfolio', { skipLocationChange: true })
   }
 }

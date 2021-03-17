@@ -64,6 +64,7 @@ export class IACService extends BaseIACService {
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath,
+      walletSync.fingerprint || /* backwards compatibility */ '',
       this.priceService
     )
     if (this.router) {

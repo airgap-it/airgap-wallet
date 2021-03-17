@@ -208,6 +208,7 @@ export class ActionGroup {
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,
       xtzWallet.derivationPath,
+      xtzWallet.masterFingerprint,
       xtzWallet.priceService,
       index
     )

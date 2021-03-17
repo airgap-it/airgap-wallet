@@ -69,6 +69,7 @@ export class SubAccountImportPage {
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,
               mainAccount.derivationPath,
+              mainAccount.masterFingerprint,
               this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses

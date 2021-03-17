@@ -175,6 +175,7 @@ export class AccountProvider {
           wallet.publicKey,
           wallet.isExtendedPublicKey,
           wallet.derivationPath,
+          wallet.masterFingerprint || '',
           this.priceService,
           wallet.addressIndex
         )
@@ -250,16 +251,30 @@ export class AccountProvider {
     return this.walletList
   }
 
-  public async addWallet(wallet: AirGapMarketWallet): Promise<void> {
-    if (this.walletExists(wallet)) {
+  public async addWallet(walletToAdd: AirGapMarketWallet, options: { override: boolean } = { override: false }): Promise<void> {
+    const alreadyExists: boolean = this.walletExists(walletToAdd)
+    if (alreadyExists && !options.override) {
       throw new Error('wallet already exists')
+    }
+
+    if (alreadyExists) {
+      // Unregister address from push backend
+      this.pushProvider.unregisterWallets([walletToAdd]).catch(handleErrorSentry(ErrorCategory.PUSH))
     }
 
     // Register address with push backend
     this.pushProvider.setupPush()
-    this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.pushProvider.registerWallets([walletToAdd]).catch(handleErrorSentry(ErrorCategory.PUSH))
 
-    this.walletList.push(wallet)
+    const index: number = alreadyExists
+      ? this.walletList.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, walletToAdd))
+      : -1
+
+    if (index === -1) {
+      this.walletList.push(walletToAdd)
+    } else {
+      this.walletList[index] = walletToAdd
+    }
 
     this.wallets.next(this.walletList)
     this.drawChartProvider.drawChart()
