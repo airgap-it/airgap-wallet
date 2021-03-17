@@ -58,6 +58,7 @@ describe('AccountProvider', () => {
         '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
         false,
         `m/44'/60'/0'/0/0`,
+        '',
         new PriceServiceMock()
       )
     )
@@ -70,6 +71,7 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
       new PriceServiceMock()
     )
     const wallet1Same = new AirGapMarketWallet(
@@ -77,6 +79,7 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
       new PriceServiceMock()
     )
     const wallet2 = new AirGapMarketWallet(
@@ -84,6 +87,7 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
       new PriceServiceMock()
     )
     const wallet1Plain = JSON.parse(JSON.stringify(wallet1))
@@ -101,6 +105,7 @@ describe('AccountProvider', () => {
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,
+      '',
       new PriceServiceMock()
     )
     await accountProvider.removeWallet(wallet)
@@ -115,6 +120,7 @@ describe('AccountProvider', () => {
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,
+      '',
       new PriceServiceMock()
     )
 
