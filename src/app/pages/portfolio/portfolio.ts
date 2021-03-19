@@ -43,7 +43,7 @@ export class PortfolioPage {
   ) {
     this.isDesktop = !this.platform.is('hybrid')
 
-    this.wallets = this.walletsProvider.wallets.asObservable()
+    this.wallets = this.walletsProvider.wallets$.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {

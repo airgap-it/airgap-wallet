@@ -64,11 +64,15 @@ export class IACService extends BaseIACService {
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath,
-      walletSync.fingerprint || /* backwards compatibility */ '',
+      walletSync.masterFingerprint || /* backwards compatibility */ '',
       this.priceService
     )
     if (this.router) {
-      this.dataService.setData(DataServiceKey.WALLET, wallet)
+      this.dataService.setData(DataServiceKey.WALLET, {
+        wallet,
+        groupId: walletSync.groupId,
+        groupLabel: walletSync.groupLabel
+      })
       this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       return true

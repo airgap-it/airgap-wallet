@@ -592,6 +592,9 @@
   "portfolio-item": {
     "active": "active"
   },
+  "current-wallet-group": {
+    "label": "Active Group:"
+  },
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",

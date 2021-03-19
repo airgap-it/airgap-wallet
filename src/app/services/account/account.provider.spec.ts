@@ -125,7 +125,7 @@ describe('AccountProvider', () => {
     )
 
     let numOfTimesCalled: number = 0
-    accountProvider.wallets.subscribe(() => {
+    accountProvider.wallets$.subscribe(() => {
       numOfTimesCalled++
       if (numOfTimesCalled >= 3) {
         // Needs to be 3 times

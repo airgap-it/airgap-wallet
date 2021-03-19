@@ -10,6 +10,9 @@
     <ng-container *ngIf="wallets | async as walletsArray">
       <chart *ngIf="walletsArray.length > 0" [total]="total"></chart>
     </ng-container>
+    <ion-toolbar color="translucent">
+      <current-wallet-group></current-wallet-group>
+    </ion-toolbar>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">

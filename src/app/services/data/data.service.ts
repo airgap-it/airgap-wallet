@@ -39,7 +39,11 @@ function exposedPromise<T>(): ExposedPromise<T> {
 })
 export class DataService {
   private readonly data = []
-  private importWallet$: BehaviorSubject<AirGapMarketWallet | null> = new BehaviorSubject(null)
+  private importWallet$: BehaviorSubject<{
+    wallet: AirGapMarketWallet
+    groupId?: string
+    groupLabel?: string
+  } | null> = new BehaviorSubject(null)
   // private readonly communicationChannels: Map<string, Promise<any>> = new Map<string, Promise<any>>()
 
   constructor(private readonly storage: Storage) {}

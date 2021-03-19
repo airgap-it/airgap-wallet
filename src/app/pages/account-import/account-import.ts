@@ -1,10 +1,10 @@
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
-import { DataService } from 'src/app/services/data/data.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
+import { DataService } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
@@ -13,6 +13,8 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 })
 export class AccountImportPage {
   public wallet: AirGapMarketWallet
+  public groupId?: string
+  public groupLabel?: string
 
   public walletAlreadyExists: boolean = false
 
@@ -37,8 +39,10 @@ export class AccountImportPage {
 
   public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {
-      this.dataService.getImportWallet().subscribe(wallet => {
+      this.dataService.getImportWallet().subscribe(({ wallet, groupId, groupLabel }) => {
         this.wallet = wallet
+        this.groupId = groupId
+        this.groupLabel = groupLabel
         this.ionViewDidEnter()
       })
     }
@@ -85,7 +89,7 @@ export class AccountImportPage {
   }
 
   public async import(): Promise<void> {
-    await this.wallets.addWallet(this.wallet, { override: true })
+    await this.wallets.addWallet(this.wallet, this.groupId, this.groupLabel, { override: true })
     await this.router.navigateByUrl('/tabs/portfolio', { skipLocationChange: true })
   }
 }

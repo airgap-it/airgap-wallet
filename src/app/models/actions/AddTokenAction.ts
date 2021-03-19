@@ -1,5 +1,4 @@
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 
 import { IAccountWrapper } from '../../pages/sub-account-add/sub-account-add'
@@ -26,9 +25,10 @@ export class AddTokenAction extends Action<void, AddTokenActionContext> {
   protected async perform(): Promise<void> {
     this.context.subAccounts
       .filter((account: IAccountWrapper) => account.selected)
-      .map((account: IAccountWrapper) => account.wallet)
-      .forEach(async (wallet: AirGapMarketWallet) => {
-        this.context.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+      .forEach(async (account: IAccountWrapper) => {
+        this.context.accountProvider
+          .addWallet(account.wallet, account.groupId, account.groupLabel)
+          .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
   }
 }
