@@ -100,6 +100,7 @@ export class IACService extends BaseIACService {
   private async handleMessageSignResponse(_data: string | string[], deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
     console.log('handleMessageSignResponse', _data, deserializedMessages)
     const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
+    console.log('cachedRequest', cachedRequest)
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
     const protocol: ProtocolSymbols = deserializedMessages[0].protocol
     const response: SignPayloadResponseInput = {

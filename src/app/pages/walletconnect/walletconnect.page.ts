@@ -1,5 +1,4 @@
-import { SerializerService } from '@airgap/angular-core'
-import { BeaconMessageType, SigningType, SignPayloadRequestOutput } from '@airgap/beacon-sdk'
+import { BeaconMessageType, BeaconRequestOutputMessage, OperationRequestOutput, SigningType } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
   EthereumProtocol,
@@ -16,8 +15,8 @@ import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
-// import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 enum Methods {
@@ -70,7 +69,7 @@ export class WalletconnectPage implements OnInit {
   public readonly requestMethod: typeof Methods = Methods
   private readonly connector: WalletConnect | undefined
 
-  public beaconRequest: SignPayloadRequestOutput
+  public beaconRequest: any
   private responseHandler: (() => Promise<void>) | undefined
 
   constructor(
@@ -79,7 +78,7 @@ export class WalletconnectPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService,
-    private readonly serializerService: SerializerService // private readonly beaconService: BeaconService
+    private readonly operationService: OperationsProvider
   ) {}
 
   public async ngOnInit(): Promise<void> {
@@ -111,7 +110,6 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async signRequest(request: JSONRPC<string>) {
-    console.log('SIGN REQUEST', request)
     const message = request.params[0]
     const address = request.params[1]
     const selectedWallet: AirGapMarketWallet = this.accountService
@@ -123,6 +121,9 @@ export class WalletconnectPage implements OnInit {
     }
 
     const requestId = new BigNumber(request.id).toString()
+    const generatedId = generateId(10)
+    const protocol = new EthereumProtocol()
+
     this.beaconRequest = {
       type: BeaconMessageType.SignPayloadRequest,
       signingType: 'raw' as SigningType,
@@ -130,17 +131,16 @@ export class WalletconnectPage implements OnInit {
       sourceAddress: address,
       id: requestId,
       senderId: 'walletconnect',
-      appMetadata: { senderId: 'walletconnect', name: 'Beacon Example Dapp' }
-    }
+      appMetadata: { senderId: 'walletconnect', name: 'walletconnect Example Dapp' },
+      version: '2'
+    } as BeaconRequestOutputMessage
 
-    const protocol = new EthereumProtocol()
-    await this.beaconService.addVaultRequest(requestId, this.beaconRequest, protocol)
-
+    this.beaconService.addVaultRequest(generatedId, this.beaconRequest, protocol)
     this.responseHandler = async () => {
       const info = {
         wallet: selectedWallet,
         data: this.beaconRequest,
-        generatedId: requestId,
+        generatedId: generatedId,
         type: IACMessageType.MessageSignRequest
       }
 
@@ -185,36 +185,38 @@ export class WalletconnectPage implements OnInit {
 
     const eth = request.params[0]
 
-    const transaction: RawEthereumTransaction | undefined = {
+    const transaction: RawEthereumTransaction = {
       nonce: eth.nonce,
       gasPrice: eth.gasPrice,
-      gasLimit: (300000).toString(16),
+      gasLimit: `0x${(300000).toString(16)}`,
       to: eth.to,
       value: eth.value,
       chainId: 1,
       data: eth.data
     }
 
+    const walletConnectRequest = {
+      transaction: transaction,
+      id: request.id
+    }
+
+    const generatedId = await generateId(10)
+    const protocol = new EthereumProtocol()
+
+    this.beaconService.addVaultRequest(generatedId, walletConnectRequest, protocol)
     this.transactions = await ethereumProtocol.getTransactionDetails({
       publicKey: selectedWallet.publicKey,
       transaction
     })
 
     this.responseHandler = async () => {
-      console.log('transaction', transaction)
+      const serializedChunks: string[] = await this.operationService.serializeTransactionSignRequest(
+        selectedWallet,
+        transaction,
+        IACMessageType.TransactionSignRequest,
+        generatedId
+      )
 
-      const serializedChunks: string[] = await this.serializerService.serialize([
-        {
-          id: await generateId(10),
-          protocol: selectedWallet.protocol.identifier,
-          type: IACMessageType.TransactionSignRequest,
-          payload: {
-            publicKey: selectedWallet.publicKey,
-            transaction,
-            callback: 'airgap-wallet://?d='
-          } as any
-        }
-      ])
       const info = {
         wallet: selectedWallet,
         airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
@@ -240,7 +242,7 @@ export class WalletconnectPage implements OnInit {
       // }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(err => console.error(err))
     }
   }
 }

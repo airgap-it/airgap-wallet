@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
-
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
 export function getCachedSession(): any {
@@ -139,7 +138,7 @@ export class WalletconnectService {
   public async approveRequest(id: string, result: string) {
     this.connector.approveRequest({
       id: new BigNumber(id).toNumber(),
-      result: result
+      result: `0x${result}`
     })
   }
   async presentModal(request: any) {

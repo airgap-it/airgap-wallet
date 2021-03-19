@@ -13,7 +13,7 @@ import {
 
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocol, MainProtocolSymbols, RawEthereumTransaction } from '@airgap/coinlib-core'
 import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
@@ -81,7 +81,11 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(generatedId: string, request: BeaconRequestOutputMessage, protocol: ICoinProtocol): Promise<void> {
+  public async addVaultRequest(
+    generatedId: string,
+    request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
+    protocol: ICoinProtocol
+  ): Promise<void> {
     this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
   }
 

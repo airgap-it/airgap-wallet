@@ -3,7 +3,7 @@ import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
-import { IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from '@airgap/coinlib-core'
+import { IACMessageDefinitionObject, ICoinProtocol, RawEthereumTransaction, SignedTransaction } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -27,7 +27,7 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 export class TransactionConfirmPage {
   public messageDefinitionObjects: IACMessageDefinitionObject[]
 
-  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage][] = []
+  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number }][] = []
   public protocols: ICoinProtocol[] = []
 
   constructor(
