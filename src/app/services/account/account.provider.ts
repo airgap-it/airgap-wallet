@@ -148,7 +148,7 @@ export class AccountProvider {
   }
 
   public getWalletGroupsObservable(): Observable<AirGapMarketWalletGroup[]> {
-    return this.walletGroups$.asObservable()
+    return this.walletGroups$.asObservable().pipe(map((groups: AirGapMarketWalletGroup[]) => this.sortGroupsByLabel(groups)))
   }
 
   public triggerWalletChanged() {
@@ -259,7 +259,7 @@ export class AccountProvider {
       this.pushProvider.setupPush()
     }
 
-    this.setActiveGroup(Array.from(this.walletGroups.keys()).sort()[0])
+    this.setActiveGroup(this.sortGroupsByLabel(Array.from(this.walletGroups.values()))[0].id)
     this.walletGroups$.next(Array.from(this.walletGroups.values()))
     this.pushProvider.registerWallets(this.allWallets)
   }
@@ -523,5 +523,19 @@ export class AccountProvider {
         })
       )
       .toPromise()
+  }
+
+  private sortGroupsByLabel(groups: AirGapMarketWalletGroup[]): AirGapMarketWalletGroup[] {
+    const othersIndex: number = groups.findIndex((group: AirGapMarketWalletGroup) => group.id === OTHER_WALLETS)
+    const others: AirGapMarketWalletGroup | undefined = othersIndex > -1 ? groups[othersIndex] : undefined
+
+    const userDefinedGroups: AirGapMarketWalletGroup[] =
+      othersIndex > -1 ? groups.slice(0, othersIndex).concat(groups.slice(othersIndex + 1)) : groups
+
+    const sorted: AirGapMarketWalletGroup[] = userDefinedGroups.sort((a: AirGapMarketWalletGroup, b: AirGapMarketWalletGroup) =>
+      a.label.localeCompare(b.label)
+    )
+
+    return others !== undefined ? [...sorted, others] : sorted
   }
 }
