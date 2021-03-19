@@ -1,7 +1,8 @@
-import { BeaconMessageType, BeaconRequestOutputMessage, OperationRequestOutput, SigningType } from '@airgap/beacon-sdk'
+import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
   EthereumProtocol,
+  EthereumProtocolOptions,
   generateId,
   IACMessageType,
   IAirGapTransaction,
@@ -183,15 +184,19 @@ export class WalletconnectPage implements OnInit {
       throw new Error('no wallet found!')
     }
 
+    const options: EthereumProtocolOptions = new EthereumProtocolOptions()
+    const gasPrice = await options.nodeClient.getGasPrice()
+    const txCount = await options.nodeClient.fetchTransactionCount(selectedWallet.receivingPublicAddress)
+    const protocol = new EthereumProtocol()
     const eth = request.params[0]
 
     const transaction: RawEthereumTransaction = {
-      nonce: eth.nonce,
-      gasPrice: eth.gasPrice,
+      nonce: eth.nonce ? eth.nonce : `0x${new BigNumber(txCount).toString(16)}`,
+      gasPrice: eth.gasPrice ? eth.gasPrice : `0x${new BigNumber(gasPrice).toString(16)}`,
       gasLimit: `0x${(300000).toString(16)}`,
       to: eth.to,
       value: eth.value,
-      chainId: 1,
+      chainId: 0x1,
       data: eth.data
     }
 
@@ -201,7 +206,6 @@ export class WalletconnectPage implements OnInit {
     }
 
     const generatedId = await generateId(10)
-    const protocol = new EthereumProtocol()
 
     this.beaconService.addVaultRequest(generatedId, walletConnectRequest, protocol)
     this.transactions = await ethereumProtocol.getTransactionDetails({
@@ -222,24 +226,6 @@ export class WalletconnectPage implements OnInit {
         airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
         data: serializedChunks
       }
-
-      // if (payload.method === 'eth_sendTransaction') {
-      //   console.log('GOT SEND REQUEST', payload)
-      //   // Approve Call Request
-      //   this.connector.approveRequest({
-      //     id: payload.id,
-      //     result: '0x41791102999c339c844880b23950704cc43aa840f3739e365323cda4dfa89e7a'
-      //   })
-      // } else {
-      //   // Reject Call Request
-      //   this.connector.rejectRequest({
-      //     id: payload.id, // required
-      //     error: {
-      //       code: 1, // optional
-      //       message: 'Method not supported' // optional
-      //     }
-      //   })
-      // }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(err => console.error(err))

@@ -19,6 +19,11 @@ export function getCachedSession(): any {
   return session
 }
 
+export interface WalletConnectRequestApproval {
+  id: number
+  result: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,25 +46,15 @@ export class WalletconnectService {
     if (this.connector) {
       return
     }
-    this.connector = new WalletConnect(
-      {
-        uri,
-        clientMeta: {
-          description: 'AirGapped Transactions',
-          url: 'https://airgap.it',
-          icons: ['https://airgap.it/wp-content/uploads/2018/05/Airgap_Logo_sideways_color.png'],
-          name: 'AirGap'
-        }
+    this.connector = new WalletConnect({
+      uri,
+      clientMeta: {
+        description: 'AirGapped Transactions',
+        url: 'https://airgap.it',
+        icons: ['https://airgap.it/wp-content/uploads/2018/05/Airgap_Logo_sideways_color.png'],
+        name: 'AirGap'
       }
-      // {
-      //   // Optional
-      //   url: 'https://push.walletconnect.org',
-      //   type: 'fcm',
-      //   token: token,
-      //   peerMeta: true,
-      //   language: language
-      // }
-    )
+    })
 
     await this.subscribeToEvents()
   }
@@ -76,29 +71,8 @@ export class WalletconnectService {
       if (error) {
         throw error
       }
-
       console.log('session_request', payload)
-
       this.presentModal(payload)
-
-      // Handle Session Request
-
-      /* payload:
-			{
-				id: 1,
-				jsonrpc: '2.0'.
-				method: 'session_request',
-				params: [{
-					peerId: '15d8b6a3-15bd-493e-9358-111e3a4e6ee4',
-					peerMeta: {
-						name: "WalletConnect Example",
-						description: "Try out WalletConnect v1.x.x",
-						icons: ["https://example.walletconnect.org/favicon.ico"],
-						url: "https://example.walletconnect.org"
-					}
-				}]
-			}
-			*/
     })
 
     // Subscribe to call requests
@@ -108,37 +82,21 @@ export class WalletconnectService {
       }
 
       this.presentModal(payload)
-
-      // Handle Call Request
-
-      /* payload:
-			{
-				id: 1,
-				jsonrpc: '2.0'.
-				method: 'eth_sign',
-				params: [
-					"0xbc28ea04101f03ea7a94c1379bc3ab32e65e62d3",
-					"My email is john@doe.com - 1537836206101"
-				]
-			}
-			*/
     })
 
     this.connector.on('disconnect', (error, payload) => {
       if (error) {
         throw error
       }
-
       console.log('WALLETCONNECT - DISCONNECT', payload)
-
-      // Delete connector
     })
   }
 
   public async approveRequest(id: string, result: string) {
+    console.log('approveRequest', id, result)
     this.connector.approveRequest({
       id: new BigNumber(id).toNumber(),
-      result: `0x${result}`
+      result: result
     })
   }
   async presentModal(request: any) {

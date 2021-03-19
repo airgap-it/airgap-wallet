@@ -12,6 +12,7 @@ import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
+import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 const SECOND: number = 1000
 
@@ -27,7 +28,7 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 export class TransactionConfirmPage {
   public messageDefinitionObjects: IACMessageDefinitionObject[]
 
-  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number }][] = []
+  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: string }][] = []
   public protocols: ICoinProtocol[] = []
 
   constructor(
@@ -42,7 +43,8 @@ export class TransactionConfirmPage {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService,
     private readonly accountService: AccountProvider,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly walletConnectService: WalletconnectService
   ) {}
 
   public dismiss(): void {
@@ -110,14 +112,17 @@ export class TransactionConfirmPage {
         .broadcastTransaction(signedTx)
         .then(async txId => {
           console.log('transaction hash', txId)
-
           if (request) {
-            const response = {
-              id: request.id,
-              type: this.beaconService.getResponseByRequestType(request.type),
-              transactionHash: txId
-            } as BeaconResponseInputMessage
-            this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+            if (request['transaction']) {
+              this.walletConnectService.approveRequest(request.id, txId)
+            } else {
+              const response = {
+                id: request.id,
+                type: this.beaconService.getResponseByRequestType((request as BeaconRequestOutputMessage).type),
+                transactionHash: txId
+              } as BeaconResponseInputMessage
+              this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+            }
           }
 
           if (interval) {
