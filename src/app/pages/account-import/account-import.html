@@ -12,26 +12,32 @@
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-row>
-      <p *ngIf="!this.walletAlreadyExists">{{ 'account-import.import-text' | translate }}</p>
-      <p *ngIf="this.walletAlreadyExists">{{ 'account-import.override-text' | translate }}</p>
+      <p>{{ 'account-import.import-text' | translate }}</p>
     </ion-row>
 
-    <portfolio-item [wallet]="wallet"></portfolio-item>
-
-    <ion-item *ngIf="walletAlreadyExists" color="warning" class="ion-margin-top ion-text-wrap">
-      {{ 'account-import.warning' | translate }}
-    </ion-item>
+    <ion-list>
+      <ng-container *ngFor="let accountImports of accountImports | keyvalue" class="ion-margin-bottom">
+        <ion-item lines="none">
+          <ion-label>{{ accountImports.key }}</ion-label>
+        </ion-item>
+        <ion-list>
+          <ng-container *ngFor="let accountImport of accountImports.value">
+            <portfolio-item [wallet]="accountImport.wallet"></portfolio-item>
+            <ion-item *ngIf="accountImport.alreadyExists" color="warning" class="ion-margin-top ion-text-wrap">
+              {{ 'account-import.warning' | translate }}
+            </ion-item>
+          </ng-container>
+        </ion-list>
+      </ng-container>
+    </ion-list>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
       {{ 'account-import.cancel_label' | translate }}
     </ion-button>
-    <ion-button *ngIf="!this.walletAlreadyExists" id="import" shape="round" color="primary" (click)="import()">
+    <ion-button id="import" shape="round" color="primary" (click)="import()">
       {{ 'account-import.import_label' | translate }}
-    </ion-button>
-    <ion-button *ngIf="this.walletAlreadyExists" id="import" shape="round" color="primary" (click)="import()">
-      {{ 'account-import.override_label' | translate }}
     </ion-button>
   </ion-fab>
 </ion-content>

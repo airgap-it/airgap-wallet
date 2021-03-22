@@ -41,8 +41,8 @@ export class AddressHandler extends IACMessageHandler {
               compatibleWallets,
               incompatibleWallets
             }
-            this.dataService.setData(DataServiceKey.WALLET, info)
-            this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            this.dataService.setData(DataServiceKey.ACCOUNTS, info)
+            this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
             return true
           }
@@ -58,8 +58,8 @@ export class AddressHandler extends IACMessageHandler {
           compatibleWallets,
           incompatibleWallets
         }
-        this.dataService.setData(DataServiceKey.WALLET, info)
-        this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        this.dataService.setData(DataServiceKey.ACCOUNTS, info)
+        this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
         return true
       } else {

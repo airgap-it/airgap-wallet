@@ -34,7 +34,7 @@ interface CTAInfo {
   alertDescription: string
 }
 
-const OTHER_WALLETS = 'other'
+export const UNGROUPED_WALLETS = 'other'
 
 @Injectable({
   providedIn: 'root'
@@ -202,8 +202,8 @@ export class AccountProvider {
 
     if (groups.length === 0) {
       groups.push({
-        id: OTHER_WALLETS,
-        label: OTHER_WALLETS,
+        id: UNGROUPED_WALLETS,
+        label: UNGROUPED_WALLETS,
         wallets: wallets.map((wallet: SerializedAirGapWallet) => [wallet.protocolIdentifier, wallet.publicKey])
       })
     }
@@ -320,8 +320,8 @@ export class AccountProvider {
 
   public async addWallet(
     walletToAdd: AirGapMarketWallet,
-    groupId: string = OTHER_WALLETS,
-    groupLabel: string = OTHER_WALLETS,
+    groupId: string = UNGROUPED_WALLETS,
+    groupLabel: string = UNGROUPED_WALLETS,
     options: { override?: boolean; updateState?: boolean } = {}
   ): Promise<void> {
     const defaultOptions = {
@@ -526,7 +526,7 @@ export class AccountProvider {
   }
 
   private sortGroupsByLabel(groups: AirGapMarketWalletGroup[]): AirGapMarketWalletGroup[] {
-    const othersIndex: number = groups.findIndex((group: AirGapMarketWalletGroup) => group.id === OTHER_WALLETS)
+    const othersIndex: number = groups.findIndex((group: AirGapMarketWalletGroup) => group.id === UNGROUPED_WALLETS)
     const others: AirGapMarketWalletGroup | undefined = othersIndex > -1 ? groups[othersIndex] : undefined
 
     const userDefinedGroups: AirGapMarketWalletGroup[] =

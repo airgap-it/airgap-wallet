@@ -129,8 +129,8 @@ export class AccountImportLedgerOnboardingPage {
               this.isLoading = false
               this.isSuccess = true
 
-              this.dataService.setData(DataServiceKey.WALLET, wallet)
-              this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+              this.dataService.setData(DataServiceKey.ACCOUNTS, wallet)
+              this.router.navigateByUrl(`/account-import/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             }),
             { maxRetries: 1, interval: 300 }
           )

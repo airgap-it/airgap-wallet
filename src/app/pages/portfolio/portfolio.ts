@@ -131,7 +131,7 @@ export class PortfolioPage {
     console.log(info)
     this.router
       .navigateByUrl(
-        `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+        `/account-transaction-list/${DataServiceKey.ACCOUNTS}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
         }`
       )
