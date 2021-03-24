@@ -19,6 +19,7 @@ import { DelegateActionPopoverComponent } from './delegate-action-popover copy/d
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FeeComponent } from './fee/fee.component'
+import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
@@ -48,6 +49,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     CurrencyItemComponent,
     DelegateActionPopoverComponent,
     DelegateEditPopoverComponent,
+    PermissionRequestComponent,
 
     TransactionListComponent,
     TransactionItemComponent,
@@ -87,6 +89,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
+    PermissionRequestComponent,
 
     TransactionListComponent,
     TransactionItemComponent,

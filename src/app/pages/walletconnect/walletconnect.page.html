@@ -7,17 +7,13 @@
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">
-      <ion-card>
-        <ion-card-header>
-          A new DApp wants to connect
-        </ion-card-header>
-        <ion-card-content>
-          <h3>{{ name }}</h3>
-          <p>{{ description }}</p>
-          <img [src]="icon" />
-          <a [href]="url" target="_blank">Link</a>
-        </ion-card-content>
-      </ion-card>
+      <permission-request
+        [address]="address"
+        [selectableWallets]="selectableWallets"
+        [requesterName]="requesterName"
+        [targetProtocolSymbol]="'eth'"
+        (walletSetEmitter)="setWallet($event)"
+      ></permission-request>
     </ng-container>
 
     <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="request--container">

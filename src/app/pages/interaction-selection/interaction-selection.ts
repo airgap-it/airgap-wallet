@@ -40,7 +40,6 @@ export class InteractionSelectionPage {
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
-      console.log('HARIBOL', JSON.stringify(this.interactionData))
       this.type = info.type
       this.generatedId = info.generatedId
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
@@ -49,7 +48,6 @@ export class InteractionSelectionPage {
 
   public async offlineDeviceSign() {
     const dataQR = await this.prepareQRData()
-    console.log('dataQR', dataQR)
     const info = {
       wallet: this.wallet,
       airGapTxs: this.airGapTxs,

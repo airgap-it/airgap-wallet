@@ -65,10 +65,12 @@ export class WalletconnectPage implements OnInit {
   public url: string = ''
   public icon: string = ''
   public transactions: IAirGapTransaction[] | undefined
+  public selectableWallets: AirGapMarketWallet[] = []
   public selectedWallet: AirGapMarketWallet
   public readonly request: JSONRPC
   public readonly requestMethod: typeof Methods = Methods
   private readonly connector: WalletConnect | undefined
+  public requesterName: string = ''
 
   public beaconRequest: any
   private responseHandler: (() => Promise<void>) | undefined
@@ -81,6 +83,13 @@ export class WalletconnectPage implements OnInit {
     private readonly beaconService: BeaconService,
     private readonly operationService: OperationsProvider
   ) {}
+
+  public get address(): string {
+    if (this.selectedWallet !== undefined) {
+      return this.selectedWallet.receivingPublicAddress
+    }
+    return ''
+  }
 
   public async ngOnInit(): Promise<void> {
     if (this.request && this.request.method === Methods.SESSION_REQUEST) {
@@ -155,19 +164,21 @@ export class WalletconnectPage implements OnInit {
     this.description = request.params[0].peerMeta.description
     this.url = request.params[0].peerMeta.url
     this.icon = request.params[0].peerMeta.icons ? request.params[0].peerMeta.icons[0] : ''
-
-    const selectedWallet: AirGapMarketWallet = this.accountService
+    this.requesterName = request.params[0].peerMeta.name
+    this.selectableWallets = this.accountService
       .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
-    if (!selectedWallet) {
+      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH)
+    if (this.selectableWallets.length > 0) {
+      this.selectedWallet = this.selectableWallets[0]
+    }
+    if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
-    const address: string = await selectedWallet.protocol.getAddressFromPublicKey(selectedWallet.publicKey)
 
     this.responseHandler = async (): Promise<void> => {
       // Approve Session
       this.connector.approveSession({
-        accounts: [address],
+        accounts: [this.address],
         chainId: 1
       })
     }
@@ -230,5 +241,9 @@ export class WalletconnectPage implements OnInit {
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(err => console.error(err))
     }
+  }
+
+  async setWallet(wallet: AirGapMarketWallet) {
+    this.selectedWallet = wallet
   }
 }

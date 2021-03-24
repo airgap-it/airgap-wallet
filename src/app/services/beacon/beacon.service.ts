@@ -69,6 +69,7 @@ export class BeaconService {
   }
 
   async presentModal(request: BeaconRequestOutputMessage) {
+    console.log('PRESENT MODAL', JSON.stringify(request))
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
       componentProps: {
