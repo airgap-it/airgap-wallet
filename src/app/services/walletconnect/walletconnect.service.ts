@@ -40,7 +40,6 @@ export class WalletconnectService {
     try {
       getCachedSession().then(session => {
         if (session) {
-          console.log('SESSION FOUND', session)
           this.connector = new WalletConnect({ session })
           this.subscribeToEvents()
         }
@@ -49,10 +48,6 @@ export class WalletconnectService {
   }
 
   public async connect(uri: string): Promise<void> {
-    console.log('connecting to uri', uri)
-    if (this.connector) {
-      return
-    }
     this.connector = new WalletConnect({
       uri,
       clientMeta: {
