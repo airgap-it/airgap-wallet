@@ -60,7 +60,7 @@ interface SessionRequest {
 })
 export class WalletconnectPage implements OnInit {
   public title: string = ''
-  public name: string = ''
+  public requesterName: string = ''
   public description: string = ''
   public url: string = ''
   public icon: string = ''
@@ -70,7 +70,6 @@ export class WalletconnectPage implements OnInit {
   public readonly request: JSONRPC
   public readonly requestMethod: typeof Methods = Methods
   private readonly connector: WalletConnect | undefined
-  public requesterName: string = ''
 
   public beaconRequest: any
   private responseHandler: (() => Promise<void>) | undefined
@@ -160,11 +159,10 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async permissionRequest(request: JSONRPC<SessionRequest>): Promise<void> {
-    this.name = request.params[0].peerMeta.name
-    this.description = request.params[0].peerMeta.description
-    this.url = request.params[0].peerMeta.url
+    this.description = request.params[0].peerMeta.description ? request.params[0].peerMeta.description : ''
+    this.url = request.params[0].peerMeta.url ? request.params[0].peerMeta.url : ''
     this.icon = request.params[0].peerMeta.icons ? request.params[0].peerMeta.icons[0] : ''
-    this.requesterName = request.params[0].peerMeta.name
+    this.requesterName = request.params[0].peerMeta.name ? request.params[0].peerMeta.name : ''
     this.selectableWallets = this.accountService
       .getWalletList()
       .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH)
