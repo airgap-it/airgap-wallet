@@ -19,7 +19,6 @@ import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
@@ -81,7 +80,6 @@ export class WalletconnectPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService,
-    private readonly walletconnectService: WalletconnectService,
     private readonly operationService: OperationsProvider
   ) {}
 
@@ -242,7 +240,16 @@ export class WalletconnectPage implements OnInit {
 
   public async dismiss(): Promise<void> {
     this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    this.walletconnectService.rejectRequest(this.request.id)
+    this.rejectRequest(this.request.id)
+  }
+
+  public async rejectRequest(id: number) {
+    this.connector.rejectRequest({
+      id: id,
+      error: {
+        message: 'USER_REJECTION' // optional
+      }
+    })
   }
 
   async setWallet(wallet: AirGapMarketWallet) {

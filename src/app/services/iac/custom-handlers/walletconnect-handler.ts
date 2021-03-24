@@ -22,6 +22,9 @@ export class WalletConnectHandler extends IACMessageHandler {
       await this.walletConnectService.connect(payload)
 
       return true
+    } else if (typeof payload === 'string' && payload.startsWith('airgap-wallet://wc?uri=')) {
+      await this.walletConnectService.connect(payload.replace('airgap-wallet://wc?uri=', ''))
+      return true
     }
 
     return false

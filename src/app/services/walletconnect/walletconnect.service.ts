@@ -103,15 +103,6 @@ export class WalletconnectService {
     })
   }
 
-  public async rejectRequest(id: number) {
-    this.connector.rejectRequest({
-      id: id,
-      error: {
-        message: 'USER_REJECTION' // optional
-      }
-    })
-  }
-
   async presentModal(request: any) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,
