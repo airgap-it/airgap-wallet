@@ -37,11 +37,11 @@ export class SettingsPage {
     this.router.navigateByUrl('/health').catch(err => console.error(err))
   }
 
-  public beaconPermissions(): void {
-    this.router.navigateByUrl('/beacon-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public dappPermissions(): void {
+    this.router.navigateByUrl('/dapp-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public beaconSettings(): void {
+  public dappSettings(): void {
     this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 

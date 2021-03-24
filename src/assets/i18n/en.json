@@ -148,11 +148,11 @@
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
     },
-    "beacon": {
-      "label": "Beacon",
-      "settings_label": "Beacon Settings",
+    "dapp": {
+      "label": "Dapps",
+      "settings_label": "Dapp Settings",
       "about_label": "About Beacon",
-      "permission-list_label": "Beacon Permissions"
+      "permission-list_label": "Dapp Permissions"
     },
     "qr-advanced-settings_label": "Advanced QR Settings"
   },
@@ -692,8 +692,8 @@
       "button": "Change Account"
     }
   },
-  "beacon-permission-list": {
-    "title": "Beacon Permissions",
+  "dapp-permission-list": {
+    "title": "Dapp Permissions",
     "connected-dapps": "Connected DApps",
     "remove_label": "Remove",
     "no-permissions": "No permissions have been given.",

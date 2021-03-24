@@ -4,8 +4,8 @@ import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
-export function getCachedSession(): any {
-  const local = localStorage ? localStorage.getItem('walletconnect') : null
+export async function getCachedSession(): Promise<any> {
+  const local = localStorage ? await localStorage.getItem('walletconnect') : null
 
   let session = null
   if (local) {
@@ -32,12 +32,13 @@ export class WalletconnectService {
 
   constructor(private readonly modalController: ModalController) {
     try {
-      const session = getCachedSession()
-      if (session) {
-        console.log('SESSION FOUND', session)
-        this.connector = new WalletConnect({ session })
-        this.subscribeToEvents()
-      }
+      getCachedSession().then(session => {
+        if (session) {
+          console.log('SESSION FOUND', session)
+          this.connector = new WalletConnect({ session })
+          this.subscribeToEvents()
+        }
+      })
     } catch (e) {}
   }
 
@@ -83,13 +84,6 @@ export class WalletconnectService {
 
       this.presentModal(payload)
     })
-
-    this.connector.on('disconnect', (error, payload) => {
-      if (error) {
-        throw error
-      }
-      console.log('WALLETCONNECT - DISCONNECT', payload)
-    })
   }
 
   public async approveRequest(id: string, result: string) {
@@ -110,5 +104,23 @@ export class WalletconnectService {
     })
 
     return modal.present()
+  }
+
+  public async getPermission() {
+    return getCachedSession()
+  }
+
+  public async removePermission(): Promise<void> {
+    return new Promise(resolve => {
+      if (this.connector) {
+        this.connector.killSession()
+        this.connector.on('disconnect', error => {
+          if (error) {
+            throw error
+          }
+          resolve()
+        })
+      }
+    })
   }
 }
