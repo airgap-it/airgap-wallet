@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { LoadingController, ModalController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
@@ -29,8 +30,13 @@ export interface WalletConnectRequestApproval {
 })
 export class WalletconnectService {
   private connector: WalletConnect | undefined
+  private loading: HTMLIonLoadingElement
 
-  constructor(private readonly modalController: ModalController) {
+  constructor(
+    private readonly modalController: ModalController,
+    private readonly loadingController: LoadingController,
+    private readonly translateService: TranslateService
+  ) {
     try {
       getCachedSession().then(session => {
         if (session) {
@@ -56,8 +62,16 @@ export class WalletconnectService {
         name: 'AirGap'
       }
     })
-
+    this.presentLoading()
     await this.subscribeToEvents()
+  }
+
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      message: this.translateService.instant('dapps.wait_for_walletconnect'),
+      backdropDismiss: true
+    })
+    await this.loading.present()
   }
 
   public async subscribeToEvents(): Promise<void> {
@@ -73,6 +87,7 @@ export class WalletconnectService {
         throw error
       }
       console.log('session_request', payload)
+      this.loading.dismiss()
       this.presentModal(payload)
     })
 

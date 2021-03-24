@@ -709,5 +709,8 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
+  },
+  "dapps": {
+    "wait_for_walletconnect": "Waiting for WalletConnect"
   }
 }
