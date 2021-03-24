@@ -35,6 +35,9 @@ export class PermissionRequestComponent {
   public requesterName: string = ''
 
   @Input()
+  public icon: string = ''
+
+  @Input()
   public selectableWallets: AirGapMarketWallet[] = []
 
   @Input()
