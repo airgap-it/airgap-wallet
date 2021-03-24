@@ -97,12 +97,21 @@ export class WalletconnectService {
   }
 
   public async approveRequest(id: string, result: string) {
-    console.log('approveRequest', id, result)
     this.connector.approveRequest({
       id: new BigNumber(id).toNumber(),
       result: result
     })
   }
+
+  public async rejectRequest(id: number) {
+    this.connector.rejectRequest({
+      id: id,
+      error: {
+        message: 'USER_REJECTION' // optional
+      }
+    })
+  }
+
   async presentModal(request: any) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,

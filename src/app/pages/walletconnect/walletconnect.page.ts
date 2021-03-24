@@ -19,6 +19,7 @@ import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
@@ -80,6 +81,7 @@ export class WalletconnectPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService,
+    private readonly walletconnectService: WalletconnectService,
     private readonly operationService: OperationsProvider
   ) {}
 
@@ -107,10 +109,6 @@ export class WalletconnectPage implements OnInit {
     }
   }
 
-  public async dismiss(): Promise<void> {
-    this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
   public async done(): Promise<void> {
     if (this.responseHandler) {
       await this.responseHandler()
@@ -119,6 +117,7 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async signRequest(request: JSONRPC<string>) {
+    console.log('SIGN REQUEST', request)
     const message = request.params[0]
     const address = request.params[1]
     const selectedWallet: AirGapMarketWallet = this.accountService
@@ -139,8 +138,8 @@ export class WalletconnectPage implements OnInit {
       payload: message,
       sourceAddress: address,
       id: requestId,
-      senderId: 'walletconnect',
-      appMetadata: { senderId: 'walletconnect', name: 'walletconnect Example Dapp' },
+      senderId: '',
+      appMetadata: { senderId: '', name: '' },
       version: '2'
     } as BeaconRequestOutputMessage
 
@@ -239,6 +238,11 @@ export class WalletconnectPage implements OnInit {
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(err => console.error(err))
     }
+  }
+
+  public async dismiss(): Promise<void> {
+    this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.walletconnectService.rejectRequest(this.request.id)
   }
 
   async setWallet(wallet: AirGapMarketWallet) {
