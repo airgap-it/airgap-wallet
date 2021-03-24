@@ -79,7 +79,7 @@
     "@types/ledgerhq__hw-transport": "^4.21.2",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
-    "@walletconnect/client": "^1.0.16",
+    "@walletconnect/client": "1.4.0",
     "@zondax/ledger-polkadot": "^0.11.0",
     "@zxing/ngx-scanner": "3.0.0",
     "angularx-qrcode": "^1.5.3",
