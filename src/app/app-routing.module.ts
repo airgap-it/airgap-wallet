@@ -194,10 +194,6 @@ const routes: Routes = [
   {
     path: 'qr-settings',
     loadChildren: () => import('./pages/qr-settings/qr-settings.module').then(m => m.QrSettingsPageModule)
-  },
-  {
-    path: 'health',
-    loadChildren: () => import('./pages/health/health.module').then(m => m.HealthPageModule)
   }
 ]
 @NgModule({

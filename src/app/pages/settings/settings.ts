@@ -33,10 +33,6 @@ export class SettingsPage {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public inspectHealth(): void {
-    this.router.navigateByUrl('/health').catch(err => console.error(err))
-  }
-
   public dappPermissions(): void {
     this.router.navigateByUrl('/dapp-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
