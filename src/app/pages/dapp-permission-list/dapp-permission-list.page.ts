@@ -28,8 +28,6 @@ export class DappPermissionListPage {
   public async loadPermissions(): Promise<void> {
     this.beaconPermissions = await this.beaconService.client.getPermissions()
     this.walletconnectPermission = await this.walletConnectService.getPermission()
-
-    console.log('RELOADED', this.walletconnectPermission)
   }
 
   public async deletePermission(permission: PermissionInfo, isBeacon: boolean): Promise<void> {
