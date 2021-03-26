@@ -12,6 +12,7 @@ import { RawEthereumTransaction } from '@airgap/coinlib-core/serializer/types'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
@@ -80,6 +81,7 @@ export class WalletconnectPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService,
+    private readonly translateService: TranslateService,
     private readonly operationService: OperationsProvider
   ) {}
 
@@ -92,17 +94,17 @@ export class WalletconnectPage implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     if (this.request && this.request.method === Methods.SESSION_REQUEST) {
-      this.title = 'WalletConnect - Connection Request'
+      this.title = this.translateService.instant('walletconnect.connection_request')
       await this.permissionRequest(this.request as JSONRPC<SessionRequest>)
     }
 
     if (this.request && this.request.method === Methods.ETH_SENDTRANSACTION) {
-      this.title = 'WalletConnect - New Transaction'
+      this.title = this.translateService.instant('walletconnect.new_transaction')
       await this.operationRequest(this.request as JSONRPC<EthTx>)
     }
 
     if (this.request && this.request.method === Methods.PERSONAL_SIGN_REQUEST) {
-      this.title = 'WalletConnect - Sign Request'
+      this.title = this.translateService.instant('walletconnect.sign_request')
       await this.signRequest(this.request as JSONRPC<string>)
     }
   }

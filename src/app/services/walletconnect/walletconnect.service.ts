@@ -5,7 +5,7 @@ import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
-export async function getCachedSession(): Promise<any> {
+export async function getCachedSession(): Promise<WalletconnectSession> {
   const local = localStorage ? await localStorage.getItem('walletconnect') : null
 
   let session = null
@@ -18,6 +18,34 @@ export async function getCachedSession(): Promise<any> {
   }
 
   return session
+}
+
+export interface ClientMeta {
+  description: string
+  url: string
+  icons: string[]
+  name: string
+}
+
+export interface PeerMeta {
+  description: string
+  url: string
+  icons: string[]
+  name: string
+}
+
+export interface WalletconnectSession {
+  connected: boolean
+  accounts: string[]
+  chainId: number
+  bridge: string
+  key: string
+  clientId: string
+  clientMeta: ClientMeta
+  peerId: string
+  peerMeta: PeerMeta
+  handshakeId: number
+  handshakeTopic: string
 }
 
 export interface WalletConnectRequestApproval {
@@ -39,7 +67,6 @@ export class WalletconnectService {
   ) {
     try {
       getCachedSession().then(session => {
-        console.log('CACHED SESSION', JSON.stringify(session))
         if (session) {
           this.connector = new WalletConnect({ session })
           this.subscribeToEvents()
@@ -117,7 +144,7 @@ export class WalletconnectService {
     return modal.present()
   }
 
-  public async getPermission() {
+  public async getPermission(): Promise<WalletconnectSession> {
     return getCachedSession()
   }
 

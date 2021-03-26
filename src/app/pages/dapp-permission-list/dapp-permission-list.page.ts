@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
-import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
+import { WalletconnectService, WalletconnectSession } from 'src/app/services/walletconnect/walletconnect.service'
 
 @Component({
   selector: 'app-dapp-permission-list',
@@ -14,7 +14,7 @@ export class DappPermissionListPage {
   public networkType: typeof NetworkType = NetworkType
 
   public beaconPermissions: PermissionInfo[] = []
-  public walletconnectPermission: any
+  public walletconnectPermission: WalletconnectSession | undefined = undefined
 
   constructor(
     private readonly beaconService: BeaconService,
