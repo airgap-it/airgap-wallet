@@ -20,6 +20,7 @@ import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
 import { AccountSync } from 'src/app/types/AccountSync'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +68,11 @@ export class IACService extends BaseIACService {
           accountShare.isExtendedPublicKey,
           accountShare.derivationPath,
           accountShare.masterFingerprint || /* backwards compatibility */ '',
+          accountShare.isActive === undefined
+            ? /* backwards compatibility */ AirGapWalletStatus.ACTIVE
+            : accountShare.isActive
+            ? AirGapWalletStatus.ACTIVE
+            : AirGapWalletStatus.HIDDEN,
           this.priceService
         )
 

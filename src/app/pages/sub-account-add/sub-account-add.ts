@@ -118,6 +118,7 @@ export class SubAccountAddPage {
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath,
           this.wallet.masterFingerprint,
+          this.wallet.status,
           this.priceService
         )
         if (this.accountProvider.walletExists(wallet)) {

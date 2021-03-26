@@ -22,10 +22,12 @@
         </ion-item>
         <ion-list>
           <ng-container *ngFor="let accountImport of accountImports.value">
-            <portfolio-item [wallet]="accountImport.wallet"></portfolio-item>
-            <ion-item *ngIf="accountImport.alreadyExists" color="warning" class="ion-margin-top ion-text-wrap">
-              {{ 'account-import.warning' | translate }}
-            </ion-item>
+            <ng-container *ngIf="accountImport.wallet.status === AirGapWalletStatus.ACTIVE">
+              <portfolio-item [wallet]="accountImport.wallet"></portfolio-item>
+              <ion-item *ngIf="accountImport.alreadyExists" color="warning" class="ion-margin-top ion-text-wrap">
+                {{ 'account-import.warning' | translate }}
+              </ion-item>
+            </ng-container>
           </ng-container>
         </ion-list>
       </ng-container>

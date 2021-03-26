@@ -1,6 +1,7 @@
 import { ProtocolService, UiEventService } from '@airgap/angular-core'
 import { AirGapMarketWallet, ICoinProtocol, SerializedAirGapWallet, TezosProtocol } from '@airgap/coinlib-core'
 import { TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
@@ -204,6 +205,7 @@ export class AccountProvider {
       groups.push({
         id: UNGROUPED_WALLETS,
         label: UNGROUPED_WALLETS,
+        status: AirGapWalletStatus.ACTIVE,
         wallets: wallets.map((wallet: SerializedAirGapWallet) => [wallet.protocolIdentifier, wallet.publicKey])
       })
     }
@@ -225,6 +227,7 @@ export class AccountProvider {
               serializedWallet.isExtendedPublicKey,
               serializedWallet.derivationPath,
               serializedWallet.masterFingerprint || '',
+              serializedWallet.status || AirGapWalletStatus.ACTIVE,
               this.priceService,
               serializedWallet.addressIndex
             )
@@ -259,7 +262,7 @@ export class AccountProvider {
       this.pushProvider.setupPush()
     }
 
-    this.setActiveGroup(this.sortGroupsByLabel(Array.from(this.walletGroups.values()))[0].id)
+    this.setActiveGroup(this.sortGroupsByLabel(this.filterActiveGroups(Array.from(this.walletGroups.values())))[0].id)
     this.walletGroups$.next(Array.from(this.walletGroups.values()))
     this.pushProvider.registerWallets(this.allWallets)
   }
@@ -339,29 +342,33 @@ export class AccountProvider {
       throw new Error('wallet already exists')
     }
 
-    if (alreadyExists) {
-      this.removeWallet(walletToAdd, { updateState: false })
-    }
-
     if (!this.walletGroups.has(groupId)) {
       this.walletGroups.set(groupId, new AirGapMarketWalletGroup(groupId, groupLabel, []))
     }
 
     const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
 
-    // Register address with push backend
-    this.pushProvider.setupPush()
-    this.pushProvider.registerWallets([walletToAdd]).catch(handleErrorSentry(ErrorCategory.PUSH))
-
     const index: number = alreadyExists
       ? walletGroup.wallets.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, walletToAdd))
       : -1
+
+    if (alreadyExists && walletGroup.wallets[index].status === AirGapWalletStatus.ACTIVE) {
+      this.removeWallet(walletToAdd, { updateState: false })
+    }
+
+    if (walletToAdd.status === AirGapWalletStatus.ACTIVE) {
+      // Register address with push backend
+      this.pushProvider.setupPush()
+      this.pushProvider.registerWallets([walletToAdd]).catch(handleErrorSentry(ErrorCategory.PUSH))
+    }
 
     if (index === -1) {
       walletGroup.wallets.push(walletToAdd)
     } else {
       walletGroup.wallets[index] = walletToAdd
     }
+
+    walletGroup.updateStatus()
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(groupId)
@@ -388,10 +395,10 @@ export class AccountProvider {
     ]
     if (groupId !== undefined && index !== undefined) {
       const group: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
-      group.wallets.splice(index, 1)
+      group.wallets[index].status = AirGapWalletStatus.DELETED
+      group.updateStatus()
 
-      if (group.wallets.length === 0) {
-        this.walletGroups.delete(group.id)
+      if (group.status !== AirGapWalletStatus.ACTIVE) {
         groupId = Array.from(this.walletGroups.keys()).sort()[0]
       }
     }
@@ -537,5 +544,9 @@ export class AccountProvider {
     )
 
     return others !== undefined ? [...sorted, others] : sorted
+  }
+
+  private filterActiveGroups(groups: AirGapMarketWalletGroup[]): AirGapMarketWalletGroup[] {
+    return groups.filter((group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE)
   }
 }

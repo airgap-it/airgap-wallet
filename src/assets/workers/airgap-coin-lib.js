@@ -25,7 +25,8 @@ self.onmessage = function(event) {
       wallet.publicKey,
       wallet.isExtendedPublicKey,
       wallet.derivationPath,
-      wallet.masterFingerprint
+      wallet.masterFingerprint,
+      wallet.status
     );
     
     airGapWallet.deriveAddresses(50).then(addresses => {

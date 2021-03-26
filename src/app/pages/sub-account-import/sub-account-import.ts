@@ -9,6 +9,7 @@ import { PriceService } from 'src/app/services/price/price.service'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -56,6 +57,7 @@ export class SubAccountImportPage {
         map(mainAccounts =>
           mainAccounts.filter(
             wallet =>
+              wallet.status === AirGapWalletStatus.ACTIVE &&
               wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier) &&
               wallet.protocol.options.network.type === NetworkType.MAINNET
           )
@@ -72,6 +74,7 @@ export class SubAccountImportPage {
               mainAccount.isExtendedPublicKey,
               mainAccount.derivationPath,
               mainAccount.masterFingerprint,
+              mainAccount.status,
               this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses

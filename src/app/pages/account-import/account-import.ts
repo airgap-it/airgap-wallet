@@ -1,4 +1,5 @@
 import { flattened } from '@airgap/angular-core'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
@@ -23,6 +24,8 @@ export class AccountImportPage {
   }
 
   public loading: HTMLIonLoadingElement
+
+  public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
 
   constructor(
     private readonly platform: Platform,
@@ -79,6 +82,9 @@ export class AccountImportPage {
         accountImport.wallet
           .synchronize()
           .then(() => {
+            if (accountImport.wallet.currentBalance !== undefined && accountImport.wallet.currentBalance.gt(0)) {
+              accountImport.wallet.status = AirGapWalletStatus.ACTIVE
+            }
             this.ngZone.run(() => {
               this.accountProvider.triggerWalletChanged()
             })
@@ -92,7 +98,8 @@ export class AccountImportPage {
         publicKey: accountImport.wallet.publicKey,
         isExtendedPublicKey: accountImport.wallet.isExtendedPublicKey,
         derivationPath: accountImport.wallet.derivationPath,
-        masterFingerprint: accountImport.wallet.masterFingerprint
+        masterFingerprint: accountImport.wallet.masterFingerprint,
+        status: accountImport.wallet.status
       })
     })
   }

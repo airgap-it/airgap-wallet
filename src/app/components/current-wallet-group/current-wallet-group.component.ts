@@ -1,5 +1,7 @@
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component } from '@angular/core'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -14,7 +16,13 @@ export class CurrentWalletGroupComponent {
   public readonly currentGroup$: Observable<AirGapMarketWalletGroup>
 
   constructor(private readonly accountProvider: AccountProvider) {
-    this.groups$ = this.accountProvider.getWalletGroupsObservable()
+    this.groups$ = this.accountProvider
+      .getWalletGroupsObservable()
+      .pipe(
+        map((groups: AirGapMarketWalletGroup[]) =>
+          groups.filter((group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE)
+        )
+      )
     this.currentGroup$ = this.accountProvider.getActiveWalletGroupObservable()
   }
 

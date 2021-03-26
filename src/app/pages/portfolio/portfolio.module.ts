@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -17,7 +18,8 @@ import { PortfolioPage } from './portfolio'
     ReactiveFormsModule,
     ComponentsModule,
     TranslateModule,
-    RouterModule.forChild([{ path: '', component: PortfolioPage }])
+    RouterModule.forChild([{ path: '', component: PortfolioPage }]),
+    AirGapAngularCoreModule
   ],
   declarations: [PortfolioPage]
 })
