@@ -150,7 +150,7 @@
     },
     "dapp": {
       "label": "Dapps",
-      "settings_label": "Dapp Settings",
+      "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
       "permission-list_label": "Dapp Permissions"
     },
