@@ -711,5 +711,11 @@
   },
   "dapps": {
     "wait_for_walletconnect": "Waiting for WalletConnect"
+  },
+  "walletconnect": {
+    "connection_request": "WalletConnect - Connection Request",
+    "new_transaction": "WalletConnect - New Transaction",
+    "sign_request": "WalletConnect - Sign Request"
+
   }
 }
