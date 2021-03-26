@@ -54,7 +54,6 @@ export class InteractionSelectionPage {
       data: dataQR,
       interactionData: this.interactionData
     }
-    console.log('offlineDeviceSign', info)
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
     this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch(err => console.error(err))
   }

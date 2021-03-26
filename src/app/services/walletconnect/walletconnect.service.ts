@@ -39,6 +39,7 @@ export class WalletconnectService {
   ) {
     try {
       getCachedSession().then(session => {
+        console.log('CACHED SESSION', JSON.stringify(session))
         if (session) {
           this.connector = new WalletConnect({ session })
           this.subscribeToEvents()

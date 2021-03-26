@@ -115,7 +115,6 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async signRequest(request: JSONRPC<string>) {
-    console.log('SIGN REQUEST', request)
     const message = request.params[0]
     const address = request.params[1]
     const selectedWallet: AirGapMarketWallet = this.accountService
