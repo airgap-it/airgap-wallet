@@ -49,8 +49,8 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.9-beta.2",
-    "@airgap/beacon-sdk": "2.2.2",
+    "@airgap/angular-core": "0.0.8",
+    "@airgap/beacon-sdk": "2.2.1",
     "@airgap/coinlib-core": "0.10.5",
     "@angular/animations": "^11.0.4",
     "@angular/common": "^11.0.4",
@@ -79,10 +79,10 @@
     "@types/ledgerhq__hw-transport": "^4.21.2",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
-    "@walletconnect/client": "1.4.0",
+    "@walletconnect/client": "^1.4.0",
     "@zondax/ledger-polkadot": "^0.11.0",
     "@zxing/ngx-scanner": "3.0.0",
-    "angularx-qrcode": "^1.5.3",
+    "angularx-qrcode": "^11.0.0",
     "axios": "^0.20.0",
     "bignumber.js": "8.0.1",
     "chart.js": "^2.8.0",
