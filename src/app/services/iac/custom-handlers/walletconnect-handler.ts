@@ -17,8 +17,6 @@ export class WalletConnectHandler extends IACMessageHandler {
 
     const payload: string = Array.isArray(data) ? data[0] : data
     if (typeof payload === 'string' && payload.startsWith('wc')) {
-      console.log('WalletConnect QR scanned', payload)
-
       await this.walletConnectService.connect(payload)
 
       return true
