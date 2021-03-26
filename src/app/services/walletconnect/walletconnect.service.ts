@@ -98,10 +98,7 @@ export class WalletconnectService {
   }
 
   public async subscribeToEvents(): Promise<void> {
-    console.log('subscribing to walletconnect events')
     if (!this.connector) {
-      console.log('walletconnect object not ready')
-
       return
     }
 
@@ -109,7 +106,6 @@ export class WalletconnectService {
       if (error) {
         throw error
       }
-      console.log('session_request', payload)
       this.loading.dismiss()
       this.presentModal(payload)
     })

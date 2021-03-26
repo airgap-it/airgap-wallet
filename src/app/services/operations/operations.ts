@@ -358,17 +358,6 @@ export class OperationsProvider {
       message: request.payload,
       callbackURL: 'airgap-wallet://?d='
     }
-    console.log(
-      'TO BE SERIALIZED',
-      JSON.stringify([
-        {
-          id: generatedId,
-          protocol: wallet.protocol.identifier,
-          type: type,
-          payload: payload
-        }
-      ])
-    )
     return this.serializerService.serialize([
       {
         id: generatedId,
