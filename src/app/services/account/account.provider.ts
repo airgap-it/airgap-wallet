@@ -354,12 +354,15 @@ export class AccountProvider {
     }
 
     const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
+    if (walletGroup.label !== groupLabel && groupLabel !== UNGROUPED_WALLETS) {
+      walletGroup.updateLabel(groupLabel)
+    }
 
     const index: number = alreadyExists
       ? walletGroup.wallets.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, walletToAdd))
       : -1
 
-    if (alreadyExists && walletGroup.wallets[index].status === AirGapWalletStatus.ACTIVE) {
+    if (index > -1 && walletGroup.wallets[index].status === AirGapWalletStatus.ACTIVE) {
       this.removeWallet(walletToAdd, { updateState: false })
     }
 
