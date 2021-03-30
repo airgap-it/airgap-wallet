@@ -50,6 +50,7 @@ interface TransactionPrepareState {
   feeLevel: TransactionFormState<number>
   fee: TransactionFormState<string>
   isAdvancedMode: TransactionFormState<boolean>
+  memo: TransactionFormState<string>
 }
 
 @Component({
@@ -112,6 +113,7 @@ export class TransactionPreparePage {
       amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
+      memo: [undefined],
       isAdvancedMode: [false, []]
     })
 
@@ -223,6 +225,19 @@ export class TransactionPreparePage {
         false
       )
     })
+
+    this.transactionForm.get('memo').valueChanges.subscribe((value: string) => {
+      this.updateState(
+        {
+          memo: {
+            value,
+            dirty: true
+          },
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+        },
+        false
+      )
+    })
   }
 
   private async initState(): Promise<void> {
@@ -257,6 +272,10 @@ export class TransactionPreparePage {
       },
       isAdvancedMode: {
         value: this.transactionForm.controls.isAdvancedMode.value,
+        dirty: false
+      },
+      memo: {
+        value: this.transactionForm.controls.memo.value,
         dirty: false
       }
     }
@@ -311,7 +330,8 @@ export class TransactionPreparePage {
       amount: newState.amount || currentState.amount,
       feeLevel: newState.feeLevel || currentState.feeLevel,
       fee: newState.fee || currentState.fee,
-      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
+      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode,
+      memo: newState.memo || currentState.memo
     }
   }
 
@@ -425,12 +445,14 @@ export class TransactionPreparePage {
     const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
     const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.protocol.feeDecimals)
 
+    const memo = this._state.memo.value
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
         this._state.receiverAddress,
         amount,
-        fee
+        fee,
+        memo
       )
 
       const info = {

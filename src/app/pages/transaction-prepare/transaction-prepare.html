@@ -186,19 +186,6 @@
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button
-      *ngIf="!state.forceMigration"
-      id="prepare"
-      size="default"
-      color="primary"
-      (click)="prepareTransaction()"
-      [disabled]="state.disablePrepareButton"
-      shape="round"
-    >
-      <ion-icon slot="start" name="open"></ion-icon>
-      {{ 'transaction-prepare.create-transaction' | translate }}
-    </ion-button>
-    <ion-button
-      *ngIf="state.forceMigration"
       id="prepare"
       size="default"
       color="primary"
