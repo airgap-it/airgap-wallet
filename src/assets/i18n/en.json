@@ -210,6 +210,8 @@
       "fast_label": "fast & expensive",
       "max_label": "MAX"
     },
+    "advanced": "Advanced",
+    "memo": "Memo",
     "paste_label": "Paste",
     "create-transaction": "Create Transaction",
     "error": {
