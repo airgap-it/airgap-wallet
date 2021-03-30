@@ -109,14 +109,24 @@
       </ion-row>
       <ion-card>
         <ion-row>
-          <ion-col size="12">
+          <ion-col size="3">
             <ion-label color="blackLight" position="stacked">{{ 'transaction-prepare.to-address_label' | translate }}</ion-label>
+          </ion-col>
+          <ion-col size="9" class="ion-text-end">
+            <ion-label
+              *ngIf="state.receiverAddress.length > 0 && state.receiverAddress !== state.receiver.value"
+              color="blackLight"
+              class="ion-no-margin"
+              position="stacked"
+            >
+              {{ state.receiverAddress | shortenString }}
+            </ion-label>
           </ion-col>
         </ion-row>
         <ion-row class="to__container">
           <ion-col size="2">
             <ion-avatar class="d-flex ion-align-items-center">
-              <airgap-identicon [address]="transactionForm.get('address').value"></airgap-identicon>
+              <airgap-identicon [address]="state.receiverAddress"></airgap-identicon>
             </ion-avatar>
           </ion-col>
           <ion-col size="10" class="ion-no-padding">
@@ -124,8 +134,8 @@
               <ion-textarea
                 [attr.disabled]="state.forceMigration"
                 [placeholder]="wallet.protocol.addressPlaceholder"
-                formControlName="address"
-                id="address-input"
+                formControlName="receiver"
+                id="receiver-input"
               ></ion-textarea>
             </ion-item>
           </ion-col>
@@ -133,7 +143,7 @@
             size="10"
             offset="2"
             class="ion-no-padding error--address"
-            *ngIf="transactionForm.controls['address'].dirty && transactionForm.controls['address'].invalid"
+            *ngIf="transactionForm.controls['receiver'].dirty && transactionForm.controls['receiver'].invalid"
           >
             <ion-text class="ion-no-margin" color="danger">
               <p

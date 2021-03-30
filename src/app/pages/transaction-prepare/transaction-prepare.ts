@@ -1,4 +1,4 @@
-import { AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
+import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -43,7 +43,9 @@ interface TransactionPrepareState {
   estimatingMaxAmount: boolean
   estimatingFeeDefaults: boolean
 
-  address: TransactionFormState<string>
+  receiver: TransactionFormState<string>
+  receiverAddress: string
+
   amount: TransactionFormState<string>
   feeLevel: TransactionFormState<number>
   fee: TransactionFormState<string>
@@ -84,6 +86,7 @@ export class TransactionPreparePage {
     private readonly dataService: DataService,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly priceService: PriceService,
+    private readonly addressService: AddressService,
     public readonly accountProvider: AccountProvider
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
@@ -105,7 +108,7 @@ export class TransactionPreparePage {
     const forceMigration: boolean = forced === 'forced' || false
 
     this.transactionForm = this.formBuilder.group({
-      address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.protocol)])],
+      receiver: [address, Validators.required, AddressValidator.validate(wallet.protocol, this.addressService)],
       amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
@@ -134,16 +137,20 @@ export class TransactionPreparePage {
     })
 
     this.transactionForm
-      .get('address')
+      .get('receiver')
       .valueChanges.pipe(debounceTime(500))
-      .subscribe((value: string) => {
+      .subscribe(async (value: string) => {
+        const receiverAddress: string | undefined = await this.addressService.getAddress(value, this.wallet.protocol)
+
         this.updateState({
-          address: {
+          receiver: {
             value,
             dirty: true
           },
+          receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton:
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       })
@@ -231,10 +238,11 @@ export class TransactionPreparePage {
       disablePrepareButton: true,
       estimatingMaxAmount: false,
       estimatingFeeDefaults: false,
-      address: {
-        value: this.transactionForm.controls.address.value,
+      receiver: {
+        value: this.transactionForm.controls.receiver.value,
         dirty: false
       },
+      receiverAddress: this.transactionForm.controls.receiver.value,
       amount: {
         value: this.transactionForm.controls.amount.value,
         dirty: false
@@ -297,7 +305,9 @@ export class TransactionPreparePage {
       estimatingFeeDefaults:
         newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
 
-      address: newState.address || currentState.address,
+      receiver: newState.receiver || currentState.receiver,
+      receiverAddress: newState.receiverAddress !== undefined ? newState.receiverAddress : currentState.receiverAddress,
+
       amount: newState.amount || currentState.amount,
       feeLevel: newState.feeLevel || currentState.feeLevel,
       fee: newState.fee || currentState.fee,
@@ -309,7 +319,7 @@ export class TransactionPreparePage {
     this.state = newState
 
     this.updateTransactionForm({
-      address: this.state.address,
+      receiver: this.state.receiver,
       amount: this.state.amount,
       fee: this.state.fee,
       feeLevel: this.state.feeLevel,
@@ -389,11 +399,11 @@ export class TransactionPreparePage {
   private async estimateFees(): Promise<FeeDefaults | undefined> {
     const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
 
-    const isAddressValid = this.transactionForm.controls.address.valid
+    const isAddressValid = this.transactionForm.controls.receiver.valid
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
-    return isAddressValid && isAmountValid
-      ? this.operationsProvider.estimateFees(this.wallet, this._state.address.value, amount)
+    return isAddressValid && isAmountValid && this._state.receiverAddress
+      ? this.operationsProvider.estimateFees(this.wallet, this._state.receiverAddress, amount)
       : undefined
   }
 
@@ -418,7 +428,7 @@ export class TransactionPreparePage {
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
-        this._state.address.value,
+        this._state.receiverAddress,
         amount,
         fee
       )
@@ -437,12 +447,14 @@ export class TransactionPreparePage {
   }
 
   public openScanner() {
-    const callback = (address: string) => {
+    const callback = async (address: string) => {
+      const receiverAddress: string | undefined = await this.addressService.getAddress(address, this.wallet.protocol)
       this.updateState({
-        address: {
+        receiver: {
           value: address,
           dirty: false
-        }
+        },
+        receiverAddress: receiverAddress !== undefined ? receiverAddress : ''
       })
     }
     const info = {
@@ -484,7 +496,7 @@ export class TransactionPreparePage {
     })
 
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address.value, fee)
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.receiver.value, fee)
 
     const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
@@ -502,14 +514,18 @@ export class TransactionPreparePage {
 
   public pasteClipboard() {
     this.clipboardProvider.paste().then(
-      (text: string) => {
+      async (text: string) => {
+        const receiverAddress: string | undefined = await this.addressService.getAddress(text, this.wallet.protocol)
+
         this.updateState({
-          address: {
+          receiver: {
             value: text,
             dirty: false
           },
+          receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton:
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       },
