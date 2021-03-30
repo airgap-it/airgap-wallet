@@ -7,7 +7,7 @@ import * as fromRoot from '../../app.reducers'
 import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 
 import * as actions from './account-activate.actions'
-import { InactiveAccounts } from './account-activate.types'
+import { InactiveAccounts, ProtocolDetails } from './account-activate.types'
 import { createAccountId } from './account-activate.utils'
 
 /**************** State ****************/
@@ -15,7 +15,7 @@ import { createAccountId } from './account-activate.utils'
 export interface FeatureState {
   // TODO: move wallet groups to a global state
   walletGroups: UIResource<AirGapMarketWalletGroup[]>
-  protocolIdentifier: UIResource<ProtocolSymbols>
+  protocol: UIResource<ProtocolDetails>
   checkedAccounts: string[]
 }
 
@@ -30,7 +30,7 @@ export const initialState: FeatureState = {
     status: UIResourceStatus.IDLE,
     value: []
   },
-  protocolIdentifier: {
+  protocol: {
     status: UIResourceStatus.IDLE,
     value: undefined
   },
@@ -47,17 +47,17 @@ export const reducer = createReducer(
     },
     checkedAccounts: []
   })),
-  on(actions.navigationDataLoaded, (state, { protocolIdentifier }) => ({
+  on(actions.navigationDataLoaded, (state, { protocolDetails }) => ({
     ...state,
-    protocolIdentifier: {
+    protocol: {
       status: UIResourceStatus.SUCCESS,
-      value: protocolIdentifier
+      value: protocolDetails
     },
     checkedAccounts: []
   })),
   on(actions.invalidNavigationData, state => ({
     ...state,
-    protocolIdentifier: {
+    protocol: {
       status: UIResourceStatus.ERROR,
       value: undefined
     }
@@ -84,13 +84,29 @@ export const selectWalletGroups = createSelector(
   selectFeatureState,
   (state: FeatureState): UIResource<AirGapMarketWalletGroup[]> => state.walletGroups
 )
-export const selectProtocolIdentifier = createSelector(
+export const selectProtocolDetails = createSelector(
   selectFeatureState,
-  (state: FeatureState): UIResource<ProtocolSymbols> => state.protocolIdentifier
+  (state: FeatureState): UIResource<ProtocolDetails> => state.protocol
 )
 export const selectCheckedAccounts = createSelector(
   selectFeatureState,
   (state: FeatureState): string[] => state.checkedAccounts
+)
+
+export const selectProtocolIdentifier = createSelector(
+  selectFeatureState,
+  (state: FeatureState): UIResource<ProtocolSymbols> => ({
+    status: state.protocol.status,
+    value: state.protocol.value !== undefined ? state.protocol.value.identifier : undefined
+  })
+)
+
+export const selectProtocolName = createSelector(
+  selectFeatureState,
+  (state: FeatureState): UIResource<string> => ({
+    status: state.protocol.status,
+    value: state.protocol.value !== undefined ? state.protocol.value.name : undefined
+  })
 )
 
 export const selectInactiveAccounts = createSelector(

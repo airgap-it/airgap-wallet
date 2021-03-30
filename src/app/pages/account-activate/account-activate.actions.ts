@@ -3,6 +3,8 @@ import { createAction, props } from '@ngrx/store'
 
 import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 
+import { ProtocolDetails } from './account-activate.types'
+
 const featureName: string = 'Account Activate'
 
 /**************** View Lifecycle ****************/
@@ -10,10 +12,7 @@ const featureName: string = 'Account Activate'
 export const viewWillEnter = createAction(`[${featureName}] View Will Enter`, props<{ routeParams: any }>())
 export const initialDataLoaded = createAction(`[${featureName}] Initial Data Loaded`, props<{ walletGroups: AirGapMarketWalletGroup[] }>())
 
-export const navigationDataLoaded = createAction(
-  `[${featureName}] Navigation Data Loaded`,
-  props<{ protocolIdentifier: ProtocolSymbols }>()
-)
+export const navigationDataLoaded = createAction(`[${featureName}] Navigation Data Loaded`, props<{ protocolDetails: ProtocolDetails }>())
 export const invalidNavigationData = createAction(`[${featureName}] Invalid Navigation Data`)
 
 /**************** User Interaction ****************/

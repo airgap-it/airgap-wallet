@@ -17,6 +17,7 @@ import { createAccountId } from './account-activate.utils'
   styleUrls: ['./account-activate.page.scss']
 })
 export class AccountActivatePage {
+  public readonly protocolName$: Observable<UIResource<string>>
   public readonly inactiveAccounts$: Observable<UIResource<InactiveAccounts[]>>
   public readonly isChecked$: Observable<Record<string, boolean>>
 
@@ -24,6 +25,7 @@ export class AccountActivatePage {
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
   constructor(private readonly store: Store<fromAccountActivate.State>, private readonly route: ActivatedRoute) {
+    this.protocolName$ = this.store.select(fromAccountActivate.selectProtocolName)
     this.inactiveAccounts$ = this.store.select(fromAccountActivate.selectInactiveAccounts)
     this.isChecked$ = this.store.select(fromAccountActivate.selectIsAccountChecked)
   }

@@ -10,6 +10,11 @@
 </ion-header>
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
+    <ion-row class="ion-padding" *ngIf="(protocolName$ | async).status === UIResourceStatus.SUCCESS">
+      <ion-text>
+        <span [innerHtml]="'account-activate.message' | translate: { protocol: (protocolName$ | async).value }"></span>
+      </ion-text>
+    </ion-row>
     <ng-container *ngFor="let accounts of (inactiveAccounts$ | async).value">
       <ion-row class="ion-padding">
         <ion-text class="font--weight__bold" color="primary">
