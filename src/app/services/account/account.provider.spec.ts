@@ -5,13 +5,14 @@ import {
   ProtocolService,
   SubProtocolStoreService
 } from '@airgap/angular-core'
-import { TestBed } from '@angular/core/testing'
 import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { TestBed } from '@angular/core/testing'
 import { take } from 'rxjs/operators'
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-import { PriceServiceMock } from 'test-config/wallet-mock'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { PriceServiceMock } from '../../../../test-config/wallet-mock'
+import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 import { AccountProvider } from '../../services/account/account.provider'
 
 describe('AccountProvider', () => {
@@ -59,6 +60,7 @@ describe('AccountProvider', () => {
         false,
         `m/44'/60'/0'/0/0`,
         '',
+        AirGapWalletStatus.ACTIVE,
         new PriceServiceMock()
       )
     )
@@ -72,6 +74,7 @@ describe('AccountProvider', () => {
       false,
       `m/44'/60'/0'/0/0`,
       '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet1Same = new AirGapMarketWallet(
@@ -80,6 +83,7 @@ describe('AccountProvider', () => {
       false,
       `m/44'/60'/0'/0/0`,
       '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet2 = new AirGapMarketWallet(
@@ -88,6 +92,7 @@ describe('AccountProvider', () => {
       false,
       `m/44'/60'/0'/0/0`,
       '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet1Plain = JSON.parse(JSON.stringify(wallet1))
@@ -106,12 +111,13 @@ describe('AccountProvider', () => {
       true,
       `m/44'/0'/0'`,
       '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     await accountProvider.removeWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(0)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
     await accountProvider.addWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(1)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 
   it('should update wallet observalbe when adding a wallet', async done => {
@@ -121,6 +127,7 @@ describe('AccountProvider', () => {
       true,
       `m/44'/0'/0'`,
       '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
 
@@ -137,8 +144,8 @@ describe('AccountProvider', () => {
     })
 
     await accountProvider.removeWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(0)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
     await accountProvider.addWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(1)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 })

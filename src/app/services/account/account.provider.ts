@@ -500,7 +500,9 @@ export class AccountProvider {
   }
 
   public walletExists(testWallet: AirGapMarketWallet): boolean {
-    return this.allWallets.some((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, testWallet))
+    return this.allWallets.some(
+      (wallet: AirGapMarketWallet) => this.isSameWallet(wallet, testWallet) && wallet.status === testWallet.status
+    )
   }
 
   public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {

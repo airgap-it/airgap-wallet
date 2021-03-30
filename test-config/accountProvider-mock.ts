@@ -1,5 +1,7 @@
 import { AirGapMarketWallet, EthereumProtocol } from '@airgap/coinlib-core'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import BigNumber from 'bignumber.js'
+
 import { PriceServiceMock } from './wallet-mock'
 
 export class AccountProviderMock {
@@ -15,6 +17,7 @@ export class AccountProviderMock {
         false,
         "m/44'/60'/0'/0/0",
         '',
+        AirGapWalletStatus.ACTIVE,
         new PriceServiceMock()
       ),
       {

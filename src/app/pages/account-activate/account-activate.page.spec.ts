@@ -1,18 +1,31 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-import { IonicModule } from '@ionic/angular'
+import { provideMockStore } from '@ngrx/store/testing'
+
+import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { AccountActivatePage } from './account-activate.page'
+import * as fromAccountActivate from './account-activate.reducers'
 
 describe('AccountActivatePage', () => {
   let component: AccountActivatePage
   let fixture: ComponentFixture<AccountActivatePage>
 
+  let unitHelper: UnitHelper
+
+  const initialState: fromAccountActivate.State = {
+    accountActivate: fromAccountActivate.initialState
+  }
+
   beforeEach(
     waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [AccountActivatePage],
-        imports: [IonicModule.forRoot()]
-      })
+      unitHelper = new UnitHelper()
+
+      TestBed.configureTestingModule(
+        unitHelper.testBed({
+          declarations: [AccountActivatePage],
+          providers: [provideMockStore({ initialState })]
+        })
+      )
         .compileComponents()
         .catch(console.error)
 
