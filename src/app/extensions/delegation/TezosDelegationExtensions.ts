@@ -1,4 +1,4 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -31,6 +31,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     amountConverter: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService,
+    addressService: AddressService,
     formBuilder: FormBuilder
   ): Promise<TezosDelegationExtensions> {
     if (!TezosDelegationExtensions.instance) {
@@ -40,6 +41,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
         amountConverter,
         shortenStringPipe,
         translateService,
+        addressService,
         formBuilder
       )
     }
@@ -67,6 +69,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
+    private readonly addressService: AddressService,
     private readonly formBuilder: FormBuilder
   ) {
     super()
@@ -132,7 +135,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       this.getKnownBakers()
     ])
     const knownBaker = knownBakers[bakerDetails.address]
-    const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
+    const name = knownBaker
+      ? knownBaker.alias
+      : (await this.addressService.getAlias(bakerDetails.address, protocol)) ||
+        this.translateService.instant('delegation-detail-tezos.unknown')
 
     const bakerTotalUsage =
       knownBaker && knownBaker.stakingCapacity
