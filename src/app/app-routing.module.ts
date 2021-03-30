@@ -190,6 +190,10 @@ const routes: Routes = [
   {
     path: 'qr-settings',
     loadChildren: () => import('./pages/qr-settings/qr-settings.module').then(m => m.QrSettingsPageModule)
+  },
+  {
+    path: 'account-activate/:id/:protocolID',
+    loadChildren: () => import('./pages/account-activate/account-activate.module').then(m => m.AccountActivatePageModule)
   }
 ]
 @NgModule({

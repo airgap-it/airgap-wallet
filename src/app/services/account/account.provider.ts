@@ -59,11 +59,12 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
+  private get allWalletGroups(): AirGapMarketWalletGroup[] {
+    return Array.from(this.walletGroups.values())
+  }
+
   private get allWallets(): AirGapMarketWallet[] {
-    return Array.from(this.walletGroups.values()).reduce(
-      (wallets: AirGapMarketWallet[], group: AirGapMarketWalletGroup) => wallets.concat(group.wallets),
-      []
-    )
+    return this.allWalletGroups.reduce((wallets: AirGapMarketWallet[], group: AirGapMarketWalletGroup) => wallets.concat(group.wallets), [])
   }
 
   constructor(
@@ -167,6 +168,12 @@ export class AccountProvider {
     return Array.from(protocols.values())
   }
 
+  public hasInactiveWallets(protocol: ICoinProtocol): boolean {
+    return this.allWallets.some(
+      (wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier && wallet.status !== AirGapWalletStatus.ACTIVE
+    )
+  }
+
   private async loadWalletsFromStorage() {
     const [rawGroups, rawWallets]: [
       (SerializedAirGapMarketWalletGroup[] | undefined),
@@ -262,8 +269,8 @@ export class AccountProvider {
       this.pushProvider.setupPush()
     }
 
-    this.setActiveGroup(this.sortGroupsByLabel(this.filterActiveGroups(Array.from(this.walletGroups.values())))[0].id)
-    this.walletGroups$.next(Array.from(this.walletGroups.values()))
+    this.setActiveGroup(this.sortGroupsByLabel(this.filterActiveGroups(this.allWalletGroups))[0].id)
+    this.walletGroups$.next(this.allWalletGroups)
     this.pushProvider.registerWallets(this.allWallets)
   }
 
@@ -372,7 +379,41 @@ export class AccountProvider {
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(groupId)
-      this.walletGroups$.next(Array.from(this.walletGroups.values()))
+      this.walletGroups$.next(this.allWalletGroups)
+      this.drawChartProvider.drawChart()
+
+      return this.persist()
+    }
+  }
+
+  public async activateWallet(
+    walletToActivate: AirGapMarketWallet,
+    groupId: string,
+    options: { updateState?: boolean } = {}
+  ): Promise<void> {
+    const defaultOptions = {
+      updateState: true
+    }
+
+    const resolvedOptions = {
+      ...defaultOptions,
+      ...options
+    }
+
+    const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
+
+    const index: number = walletGroup.wallets.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, walletToActivate))
+    if (index === -1) {
+      return
+    }
+
+    walletGroup.wallets[index].status = AirGapWalletStatus.ACTIVE
+
+    walletGroup.updateStatus()
+
+    if (resolvedOptions.updateState) {
+      this.setActiveGroup(groupId)
+      this.walletGroups$.next(this.allWalletGroups)
       this.drawChartProvider.drawChart()
 
       return this.persist()
@@ -410,7 +451,7 @@ export class AccountProvider {
       if (groupId !== undefined) {
         this.setActiveGroup(groupId)
       }
-      this.walletGroups$.next(Array.from(this.walletGroups.values()))
+      this.walletGroups$.next(this.allWalletGroups)
       this.drawChartProvider.drawChart()
 
       return this.persist()
@@ -429,7 +470,7 @@ export class AccountProvider {
     await Promise.all([
       this.storageProvider.set(
         WalletStorageKey.WALLET_GROUPS,
-        Array.from(this.walletGroups.values()).map((group: AirGapMarketWalletGroup) => group.toJSON())
+        this.allWalletGroups.map((group: AirGapMarketWalletGroup) => group.toJSON())
       ),
       this.storageProvider.set(WalletStorageKey.WALLET, this.allWallets.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
     ])

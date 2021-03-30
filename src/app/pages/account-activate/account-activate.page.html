@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'account-activate.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+<ion-content>
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container *ngFor="let accounts of (inactiveAccounts$ | async).value">
+      <ion-row class="ion-padding">
+        <ion-text class="font--weight__bold" color="primary">
+          <span>{{ accounts.label }}</span>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-no-padding" *ngFor="let wallet of accounts.wallets">
+        <ion-col size="10" class="ion-no-padding">
+          <portfolio-item [wallet]="wallet" tappable (click)="toggleAccount(wallet)"></portfolio-item>
+        </ion-col>
+        <ion-col size="2" class="content--align__center-center ion-no-padding">
+          <ion-checkbox
+            color="primary"
+            [checked]="(isChecked$ | async)[createAccountId(wallet)]"
+            (ionChange)="toggleAccount(wallet, $event)"
+          ></ion-checkbox>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button
+      shape="round"
+      (click)="add()"
+      color="secondary"
+      [disabled]="(inactiveAccounts$ | async).status !== UIResourceStatus.SUCCESS"
+    >
+      <ion-icon slot="start" name="add"></ion-icon>
+      {{ 'account-activate.add-accounts_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

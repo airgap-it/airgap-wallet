@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@airgap/angular-core": "0.0.9-beta.16",
+    "@airgap/angular-ngrx": "0.0.9-beta.16",
     "@airgap/beacon-sdk": "2.2.1",
     "@airgap/coinlib-core": "0.10.7-beta.10",
     "@angular/animations": "^11.0.4",
@@ -73,6 +74,8 @@
     "@ionic/storage": "2.2.0",
     "@ledgerhq/hw-transport-u2f": "^5.15.0",
     "@ledgerhq/hw-transport-webusb": "^5.16.0",
+    "@ngrx/effects": "^11.0.1",
+    "@ngrx/store": "^11.0.1",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^4.0.0",
     "@sentry/browser": "5.1.3",
