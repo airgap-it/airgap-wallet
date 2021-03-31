@@ -9,7 +9,7 @@ export interface SerializedAirGapMarketWalletGroup {
 }
 
 export class AirGapMarketWalletGroup {
-  private _label: string
+  private _label: string | null
   public get label(): string {
     return this._label
   }
@@ -20,8 +20,8 @@ export class AirGapMarketWalletGroup {
   }
 
   constructor(
-    public readonly id: string,
-    label: string,
+    public readonly id: string | undefined,
+    label: string | undefined,
     public readonly wallets: AirGapMarketWallet[],
     public readonly transient: boolean = false
   ) {

@@ -1,7 +1,7 @@
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { first, map } from 'rxjs/operators'
 
 import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -27,7 +27,9 @@ export class CurrentWalletGroupComponent {
     this.currentGroup$ = this.accountProvider.getActiveWalletGroupObservable()
   }
 
-  public onChange(event: CustomEvent & { detail: { value: AirGapMarketWalletGroup | null } }): void {
-    this.accountProvider.setActiveGroup(event.detail.value)
+  public async onChange(event: CustomEvent & { detail: { value: AirGapMarketWalletGroup | null } }): Promise<void> {
+    if (event.detail.value !== (await this.currentGroup$.pipe(first()).toPromise())) {
+      this.accountProvider.setActiveGroup(event.detail.value)
+    }
   }
 }

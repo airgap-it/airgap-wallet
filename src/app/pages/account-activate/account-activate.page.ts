@@ -6,9 +6,10 @@ import { Store } from '@ngrx/store'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 
+import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
+
 import * as actions from './account-activate.actions'
 import * as fromAccountActivate from './account-activate.reducers'
-import { InactiveAccounts } from './account-activate.types'
 import { createAccountId } from './account-activate.utils'
 
 @Component({
@@ -18,7 +19,7 @@ import { createAccountId } from './account-activate.utils'
 })
 export class AccountActivatePage {
   public readonly protocolName$: Observable<UIResource<string>>
-  public readonly inactiveAccounts$: Observable<UIResource<InactiveAccounts[]>>
+  public readonly inactiveAccounts$: Observable<UIResource<AirGapMarketWalletGroup[]>>
   public readonly isChecked$: Observable<Record<string, boolean>>
 
   public readonly createAccountId: typeof createAccountId = createAccountId

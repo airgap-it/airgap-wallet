@@ -18,7 +18,7 @@
     <ng-container *ngFor="let accounts of (inactiveAccounts$ | async).value">
       <ion-row class="ion-padding">
         <ion-text class="font--weight__bold" color="primary">
-          <span>{{ accounts.label }}</span>
+          <span>{{ accounts | groupLabel | translate }}</span>
         </ion-text>
       </ion-row>
       <ion-row class="ion-no-padding" *ngFor="let wallet of accounts.wallets">

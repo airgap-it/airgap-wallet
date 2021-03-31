@@ -9,6 +9,7 @@ import { StoreModule } from '@ngrx/store'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
+import { PipesModule } from '../../pipes/pipes.module'
 
 import { AccountActivatePageRoutingModule } from './account-activate-routing.module'
 import { AccountActivateEffects } from './account-activate.effects'
@@ -22,6 +23,7 @@ import * as fromAccountActivate from './account-activate.reducers'
     IonicModule,
     TranslateModule,
     ComponentsModule,
+    PipesModule,
     AccountActivatePageRoutingModule,
     AirGapAngularCoreModule,
     AirGapAngularNgRxModule,

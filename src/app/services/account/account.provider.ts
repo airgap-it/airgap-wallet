@@ -240,7 +240,7 @@ export class AccountProvider {
         })
     )
 
-    if (ungroupedWallets.length > 0 && ungroupedWallets.length !== wallets.length) {
+    if (ungroupedWallets.length > 0) {
       const others: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(undefined, undefined, ungroupedWallets, true)
       this.walletGroups.set(others.id, others)
     }
@@ -333,15 +333,15 @@ export class AccountProvider {
     return this.allWallets
   }
 
-  public setActiveGroup(group: AirGapMarketWalletGroup | undefined | null): void {
-    if (group === undefined || group === null) {
+  public setActiveGroup(groupToSet: AirGapMarketWalletGroup | undefined | null): void {
+    if (groupToSet === undefined || groupToSet === null) {
       this.activeGroup$.next(null)
       this.wallets$.next(this.allWallets)
-    } else if (this.walletGroups.has(group.id)) {
-      const _group: AirGapMarketWalletGroup = this.walletGroups.get(group.id)
-      const wallets: AirGapMarketWallet[] = _group.wallets
+    } else if (this.walletGroups.has(groupToSet.id)) {
+      const group: AirGapMarketWalletGroup = this.walletGroups.get(groupToSet.id)
+      const wallets: AirGapMarketWallet[] = group.wallets
 
-      this.activeGroup$.next(_group)
+      this.activeGroup$.next(group)
       this.wallets$.next(wallets)
     }
   }
@@ -367,36 +367,15 @@ export class AccountProvider {
       throw new Error('wallet already exists')
     }
 
-    if (!this.walletGroups.has(groupId)) {
-      this.walletGroups.set(groupId, new AirGapMarketWalletGroup(groupId, groupLabel, []))
-    }
+    this.assertWalletGroupExists(groupId, groupLabel)
+    this.assertWalletGroupUpdated(groupId, groupLabel)
 
     const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
-    if (walletGroup.label !== groupLabel && groupLabel !== undefined) {
-      walletGroup.updateLabel(groupLabel)
+    this.addToGroup(walletGroup, walletToAdd)
+
+    if (walletToAdd.status === AirGapWalletStatus.ACTIVE && !alreadyExists) {
+      await this.registerToPushBackend(walletToAdd)
     }
-
-    const index: number = alreadyExists
-      ? walletGroup.wallets.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, walletToAdd))
-      : -1
-
-    if (index > -1 && walletGroup.wallets[index].status === AirGapWalletStatus.ACTIVE) {
-      this.removeWallet(walletToAdd, { updateState: false })
-    }
-
-    if (walletToAdd.status === AirGapWalletStatus.ACTIVE) {
-      // Register address with push backend
-      this.pushProvider.setupPush()
-      this.pushProvider.registerWallets([walletToAdd]).catch(handleErrorSentry(ErrorCategory.PUSH))
-    }
-
-    if (index === -1) {
-      walletGroup.wallets.push(walletToAdd)
-    } else {
-      walletGroup.wallets[index] = walletToAdd
-    }
-
-    walletGroup.updateStatus()
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
@@ -405,6 +384,34 @@ export class AccountProvider {
 
       return this.persist()
     }
+  }
+
+  private assertWalletGroupExists(groupId: string | undefined, groupLabel: string | undefined): void {
+    if (!this.walletGroups.has(groupId)) {
+      this.walletGroups.set(groupId, new AirGapMarketWalletGroup(groupId, groupLabel, []))
+    }
+  }
+
+  private assertWalletGroupUpdated(groupId: string | undefined, groupLabel: string | undefined): void {
+    const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
+    if (walletGroup.label !== undefined && walletGroup.label !== groupLabel && groupLabel !== undefined) {
+      walletGroup.updateLabel(groupLabel)
+    }
+  }
+
+  private addToGroup(group: AirGapMarketWalletGroup, wallet: AirGapMarketWallet): void {
+    const [oldGroupId, oldIndex]: [string | undefined, number] = this.findWalletGroupIdAndIndex(wallet)
+    if (oldGroupId !== group.id && oldIndex > -1) {
+      this.walletGroups.get(oldGroupId).wallets.splice(oldIndex, 1)
+    }
+
+    if (oldGroupId === group.id && oldIndex > -1) {
+      group.wallets[oldIndex] = wallet
+    } else {
+      group.wallets.push(wallet)
+    }
+
+    group.updateStatus()
   }
 
   public async activateWallet(
@@ -451,20 +458,15 @@ export class AccountProvider {
       ...options
     }
 
-    let [groupId, index]: [string | undefined, number | undefined] = this.findWalletGroupIdAndIndex(walletToRemove) || [
-      undefined,
-      undefined
-    ]
-
     let group: AirGapMarketWalletGroup | undefined
-    if (groupId !== undefined && index !== undefined) {
+    const [groupId, index]: [string | undefined, number] = this.findWalletGroupIdAndIndex(walletToRemove)
+    if (this.walletGroups.has(groupId) && index > -1) {
       group = this.walletGroups.get(groupId)
       group.wallets[index].status = AirGapWalletStatus.DELETED
       group.updateStatus()
     }
 
-    // Unregister address from push backend
-    this.pushProvider.unregisterWallets([walletToRemove]).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.unregisterFromPushBackend(walletToRemove)
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(group !== undefined && group.status === AirGapWalletStatus.ACTIVE ? group : undefined)
@@ -473,6 +475,15 @@ export class AccountProvider {
 
       return this.persist()
     }
+  }
+
+  private async registerToPushBackend(wallet: AirGapMarketWallet): Promise<void> {
+    await this.pushProvider.setupPush()
+    this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
+  }
+
+  private unregisterFromPushBackend(wallet: AirGapMarketWallet): void {
+    this.pushProvider.unregisterWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
   }
 
   public async setWalletNetwork(wallet: AirGapMarketWallet, network: TezosProtocolNetwork): Promise<void> {
@@ -544,7 +555,7 @@ export class AccountProvider {
     return undefined
   }
 
-  public findWalletGroupIdAndIndex(testWallet: AirGapMarketWallet): [string, number] | undefined {
+  public findWalletGroupIdAndIndex(testWallet: AirGapMarketWallet): [string | undefined, number] {
     for (const group of this.walletGroups.values()) {
       const index: number = group.wallets.findIndex((wallet: AirGapMarketWallet) => this.isSameWallet(wallet, testWallet))
       if (index !== -1) {
@@ -552,7 +563,7 @@ export class AccountProvider {
       }
     }
 
-    return undefined
+    return [undefined, -1]
   }
 
   public async getCompatibleAndIncompatibleWalletsForAddress(
