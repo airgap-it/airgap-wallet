@@ -4,7 +4,7 @@ import { Observable } from 'rxjs'
 import { first, map } from 'rxjs/operators'
 
 import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
-import { AccountProvider } from '../../services/account/account.provider'
+import { AccountProvider, ActiveWalletGroup } from '../../services/account/account.provider'
 
 @Component({
   selector: 'current-wallet-group',
@@ -12,24 +12,28 @@ import { AccountProvider } from '../../services/account/account.provider'
   styleUrls: ['./current-wallet-group.component.scss']
 })
 export class CurrentWalletGroupComponent {
-  public readonly groups$: Observable<(AirGapMarketWalletGroup | null)[]>
-  public readonly currentGroup$: Observable<AirGapMarketWalletGroup | null>
+  public readonly groups$: Observable<ActiveWalletGroup[]>
+  public readonly currentGroup$: Observable<ActiveWalletGroup>
 
   constructor(private readonly accountProvider: AccountProvider) {
-    this.groups$ = this.accountProvider
-      .getWalletGroupsObservable()
-      .pipe(
-        map((groups: AirGapMarketWalletGroup[]) => [
-          null,
-          ...groups.filter((group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE)
-        ])
-      )
+    this.groups$ = this.accountProvider.getWalletGroupsObservable().pipe(
+      map((groups: AirGapMarketWalletGroup[]) => {
+        const activeGroups: AirGapMarketWalletGroup[] = groups.filter(
+          (group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE
+        )
+
+        return activeGroups.length > 1 ? ['all', ...activeGroups] : activeGroups
+      })
+    )
     this.currentGroup$ = this.accountProvider.getActiveWalletGroupObservable()
   }
 
-  public async onChange(event: CustomEvent & { detail: { value: AirGapMarketWalletGroup | null } }): Promise<void> {
-    if (event.detail.value !== (await this.currentGroup$.pipe(first()).toPromise())) {
-      this.accountProvider.setActiveGroup(event.detail.value)
+  public async onChange(event: CustomEvent & { detail: { value: ActiveWalletGroup } }): Promise<void> {
+    const changedGroup: ActiveWalletGroup = event.detail.value
+    const currentGroup: ActiveWalletGroup = await this.currentGroup$.pipe(first()).toPromise()
+
+    if (!this.accountProvider.isSameGroup(changedGroup, currentGroup)) {
+      this.accountProvider.setActiveGroup(changedGroup)
     }
   }
 }

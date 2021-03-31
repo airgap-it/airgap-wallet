@@ -35,11 +35,14 @@ interface CTAInfo {
   alertDescription: string
 }
 
+export type ImplicitWalletGroup = 'all'
+export type ActiveWalletGroup = AirGapMarketWalletGroup | ImplicitWalletGroup
+
 @Injectable({
   providedIn: 'root'
 })
 export class AccountProvider {
-  private readonly activeGroup$: ReplaySubject<AirGapMarketWalletGroup | null> = new ReplaySubject(1)
+  private readonly activeGroup$: ReplaySubject<ActiveWalletGroup> = new ReplaySubject(1)
   private readonly walletGroups: Map<string | undefined, AirGapMarketWalletGroup> = new Map()
 
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
@@ -143,7 +146,7 @@ export class AccountProvider {
     }
   }
 
-  public getActiveWalletGroupObservable(): Observable<AirGapMarketWalletGroup | undefined> {
+  public getActiveWalletGroupObservable(): Observable<ActiveWalletGroup> {
     return this.activeGroup$.asObservable()
   }
 
@@ -262,7 +265,7 @@ export class AccountProvider {
       this.pushProvider.setupPush()
     }
 
-    this.setActiveGroup(null)
+    this.setActiveGroup(this.allWalletGroups.length > 1 ? 'all' : this.allWalletGroups[0])
     this.walletGroups$.next(this.allWalletGroups)
     this.pushProvider.registerWallets(this.allWallets)
   }
@@ -333,9 +336,9 @@ export class AccountProvider {
     return this.allWallets
   }
 
-  public setActiveGroup(groupToSet: AirGapMarketWalletGroup | undefined | null): void {
-    if (groupToSet === undefined || groupToSet === null) {
-      this.activeGroup$.next(null)
+  public setActiveGroup(groupToSet: AirGapMarketWalletGroup | ImplicitWalletGroup): void {
+    if (groupToSet === 'all') {
+      this.activeGroup$.next(groupToSet)
       this.wallets$.next(this.allWallets)
     } else if (this.walletGroups.has(groupToSet.id)) {
       const group: AirGapMarketWalletGroup = this.walletGroups.get(groupToSet.id)
@@ -469,7 +472,13 @@ export class AccountProvider {
     this.unregisterFromPushBackend(walletToRemove)
 
     if (resolvedOptions.updateState) {
-      this.setActiveGroup(group !== undefined && group.status === AirGapWalletStatus.ACTIVE ? group : undefined)
+      const activeGroup: ActiveWalletGroup =
+        group !== undefined && group.status === AirGapWalletStatus.ACTIVE
+          ? group
+          : this.allWalletGroups.length > 1
+          ? 'all'
+          : this.allWalletGroups[0]
+      this.setActiveGroup(activeGroup)
       this.walletGroups$.next(this.allWalletGroups)
       this.drawChartProvider.drawChart()
 
@@ -542,6 +551,18 @@ export class AccountProvider {
       wallet1.protocol.identifier === wallet2.protocol.identifier &&
       wallet1.addressIndex === wallet2.addressIndex
     )
+  }
+
+  public isSameGroup(group: ActiveWalletGroup, other: ActiveWalletGroup): boolean {
+    if (typeof group === 'string' && typeof other === 'string') {
+      return group === other
+    } else if (typeof group === 'string') {
+      return false
+    } else if (typeof other === 'string') {
+      return false
+    } else {
+      return group.id === other.id
+    }
   }
 
   public findWalletGroup(testWallet: AirGapMarketWallet): AirGapMarketWalletGroup | undefined {

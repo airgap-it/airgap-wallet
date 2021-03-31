@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core'
 
-import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
+import { ActiveWalletGroup } from '../../services/account/account.provider'
 
 @Pipe({
   name: 'groupLabel'
 })
 export class GroupLabelPipe implements PipeTransform {
-  public transform(group: AirGapMarketWalletGroup | undefined | null): string {
-    if (group === undefined || group === null) {
+  public transform(group: ActiveWalletGroup): string {
+    if (group === 'all') {
       return 'group-label.all'
     }
 
