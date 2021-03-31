@@ -19,7 +19,12 @@ export class AirGapMarketWalletGroup {
     return this._status
   }
 
-  constructor(public readonly id: string, label: string, public readonly wallets: AirGapMarketWallet[]) {
+  constructor(
+    public readonly id: string,
+    label: string,
+    public readonly wallets: AirGapMarketWallet[],
+    public readonly transient: boolean = false
+  ) {
     this.updateLabel(label)
     this.updateStatus()
   }

@@ -716,5 +716,9 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
+  },
+  "group-label": {
+    "all": "All",
+    "ungrouped": "Other"
   }
 }

@@ -2,8 +2,8 @@ import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component } from '@angular/core'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
+import { AirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { AccountProvider } from '../../services/account/account.provider'
 
 @Component({
@@ -12,21 +12,22 @@ import { AccountProvider } from '../../services/account/account.provider'
   styleUrls: ['./current-wallet-group.component.scss']
 })
 export class CurrentWalletGroupComponent {
-  public readonly groups$: Observable<AirGapMarketWalletGroup[]>
-  public readonly currentGroup$: Observable<AirGapMarketWalletGroup>
+  public readonly groups$: Observable<(AirGapMarketWalletGroup | null)[]>
+  public readonly currentGroup$: Observable<AirGapMarketWalletGroup | null>
 
   constructor(private readonly accountProvider: AccountProvider) {
     this.groups$ = this.accountProvider
       .getWalletGroupsObservable()
       .pipe(
-        map((groups: AirGapMarketWalletGroup[]) =>
-          groups.filter((group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE)
-        )
+        map((groups: AirGapMarketWalletGroup[]) => [
+          null,
+          ...groups.filter((group: AirGapMarketWalletGroup) => group.status === AirGapWalletStatus.ACTIVE)
+        ])
       )
     this.currentGroup$ = this.accountProvider.getActiveWalletGroupObservable()
   }
 
-  public onChange(group: AirGapMarketWalletGroup): void {
-    this.accountProvider.setActiveGroup(group.id)
+  public onChange(event: CustomEvent & { detail: { value: AirGapMarketWalletGroup | null } }): void {
+    this.accountProvider.setActiveGroup(event.detail.value)
   }
 }

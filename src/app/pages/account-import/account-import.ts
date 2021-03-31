@@ -3,11 +3,11 @@ import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component, NgZone } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
-import { AccountSync } from 'src/app/types/AccountSync'
 
-import { AccountProvider, UNGROUPED_WALLETS } from '../../services/account/account.provider'
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountSync } from '../../types/AccountSync'
 
 interface AccountImport extends AccountSync {
   alreadyExists: boolean
@@ -18,7 +18,7 @@ interface AccountImport extends AccountSync {
   templateUrl: 'account-import.html'
 })
 export class AccountImportPage {
-  public accountImports: Map<string, AccountImport[]> = new Map()
+  public accountImports: Map<string | undefined, AccountImport[]> = new Map()
   private get allAccountImports(): AccountImport[] {
     return flattened(Array.from(this.accountImports.values()))
   }
@@ -49,7 +49,7 @@ export class AccountImportPage {
     if (this.route.snapshot.data.special) {
       this.dataService.getAccountSyncs().subscribe((accountSyncs: AccountSync[]) => {
         accountSyncs.forEach((accountSync: AccountSync) => {
-          const groupLabel: string = accountSync.groupLabel || UNGROUPED_WALLETS
+          const groupLabel: string | undefined = accountSync.groupLabel
           if (!this.accountImports.has(groupLabel)) {
             this.accountImports.set(groupLabel, [])
           }
