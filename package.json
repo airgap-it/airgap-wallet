@@ -49,7 +49,7 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.9-beta.12",
+    "@airgap/angular-core": "0.0.9-beta.20",
     "@airgap/beacon-sdk": "2.2.1",
     "@airgap/coinlib-core": "0.10.7-beta.7",
     "@angular/animations": "^11.0.4",
@@ -59,6 +59,7 @@
     "@angular/platform-browser": "^11.0.4",
     "@angular/platform-browser-dynamic": "^11.0.4",
     "@angular/router": "^11.0.4",
+    "@capacitor-community/barcode-scanner": "^1.2.1",
     "@capacitor/android": "^2.4.0",
     "@capacitor/core": "2.4.0",
     "@capacitor/ios": "^2.4.0",
@@ -85,7 +86,6 @@
     "axios": "^0.20.0",
     "bignumber.js": "8.0.1",
     "chart.js": "^2.8.0",
-    "cordova-plugin-qrscanner": "3.0.1",
     "cordova-sqlite-storage": "^2.6.0",
     "cordova.plugins.diagnostic": "^4.0.12",
     "core-js": "^2.5.4",
@@ -164,7 +164,6 @@
   "description": "The Most Secure Practical Way To Do Crypto Transactions",
   "cordova": {
     "plugins": {
-      "cordova-plugin-qrscanner": {},
       "cordova-sqlite-storage": {},
       "cordova.plugins.diagnostic": {
         "ANDROID_SUPPORT_VERSION": "28.+"
