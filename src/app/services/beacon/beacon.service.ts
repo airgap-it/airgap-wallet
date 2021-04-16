@@ -12,7 +12,7 @@ import {
 } from '@airgap/beacon-sdk'
 
 import { Injectable } from '@angular/core'
-import { LoadingController, ModalController } from '@ionic/angular'
+import { LoadingController, ModalController, ToastController } from '@ionic/angular'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
@@ -34,9 +34,13 @@ import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorage
 export class BeaconService {
   public client: WalletClient | undefined
 
+  public loader: HTMLIonLoadingElement | undefined
+  public toast: HTMLIonToastElement | undefined
+
   constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
+    private readonly toastController: ToastController,
     private readonly storage: WalletStorageService,
     private readonly protocolService: ProtocolService
   ) {
@@ -48,6 +52,7 @@ export class BeaconService {
     await this.client.init()
 
     return this.client.connect(async message => {
+      this.hideToast()
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
         return this.sendNetworkNotSupportedError(message.id)
       } else {
@@ -103,16 +108,63 @@ export class BeaconService {
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
     console.log('responding', message)
     await this.client.respond(message).catch(err => console.error(err))
+    await this.showToast('response-sent')
+  }
+
+  public async showLoader(): Promise<void> {
+    if (this.loader) {
+      return
+    }
+
+    this.loader = await this.loadingController.create({
+      message: 'Connecting to Beacon Network...',
+      duration: 10000
+    })
+    await this.loader.present()
+  }
+
+  public async hideLoader(): Promise<void> {
+    if (!this.loader) {
+      return
+    }
+    await this.loader.dismiss()
+    this.loader = undefined
+  }
+
+  public async showToast(type: 'connected' | 'response-sent'): Promise<void> {
+    if (this.toast) {
+      return
+    }
+
+    const message = type === 'connected' ? 'Beacon connection successful. Waiting for request from dApp...' : 'Response sent to the dApp.'
+
+    this.toast = await this.toastController.create({
+      message,
+      position: 'top',
+      duration: 5000,
+      buttons: [
+        {
+          text: 'Close',
+          role: 'cancel'
+        }
+      ]
+    })
+    await this.toast.present()
+  }
+
+  public async hideToast(): Promise<void> {
+    if (!this.toast) {
+      return
+    }
+    await this.toast.dismiss()
+    this.toast = undefined
   }
 
   public async addPeer(peer: P2PPairingRequest): Promise<void> {
-    const loading: HTMLIonLoadingElement = await this.loadingController.create({
-      message: 'Connecting to Beacon Network...',
-      duration: 3000
-    })
-    await loading.present()
+    await this.showLoader()
     await this.client.addPeer(peer)
-    await loading.dismiss()
+    await this.hideLoader()
+    await this.showToast('connected')
   }
 
   public async getPeers(): Promise<P2PPairingRequest[]> {
@@ -189,6 +241,38 @@ export class BeaconService {
     }
     await this.respond(response)
     await this.displayErrorPage(new Error('Account not found'))
+  }
+
+  public async sendInvalidTransaction(id: string, error: any /* ErrorWithData */): Promise<void> {
+    const responseInput = {
+      id,
+      type: BeaconMessageType.Error,
+      errorType: BeaconErrorType.TRANSACTION_INVALID_ERROR,
+      errorData: error.data
+    } as any // TODO: Fix type
+
+    const response: BeaconResponseInputMessage = {
+      senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
+      version: BEACON_VERSION,
+      ...responseInput
+    }
+
+    let errorMessage = ''
+    try {
+      errorMessage =
+        error.data && Array.isArray(error.data)
+          ? `The contract returned the following error: ${error.data.find(f => f && f.with && f.with.string).with.string}`
+          : error.message
+    } catch {}
+
+    console.log('error.message', errorMessage)
+
+    await this.respond(response)
+    await this.displayErrorPage({
+      title: error.title,
+      message: errorMessage,
+      data: error.data ? error.data : error.stack
+    } as any)
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {

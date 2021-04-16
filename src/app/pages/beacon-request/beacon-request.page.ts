@@ -330,7 +330,9 @@ export class BeaconRequestPage implements OnInit {
     try {
       transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
     } catch (error) {
-      return this.displayErrorPage(error)
+      await this.dismiss()
+      this.beaconService.sendInvalidTransaction(request.id, error)
+      return
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
