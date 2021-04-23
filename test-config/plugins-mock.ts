@@ -31,6 +31,10 @@ export class PushNotificationsMock {
   public addListener: jasmine.Spy = newSpy('addListener', {})
 }
 
+export class SaplingPluginMock {
+  public isSupported: jasmine.Spy = newSpy('isSupported', Promise.resolve(false))
+}
+
 export class SplashScreenMock {
   public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }

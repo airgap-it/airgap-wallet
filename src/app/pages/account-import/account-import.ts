@@ -6,6 +6,7 @@ import { DataService } from 'src/app/services/data/data.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'page-account-import',
@@ -17,6 +18,8 @@ export class AccountImportPage {
   public walletAlreadyExists: boolean = false
 
   public loading: HTMLIonLoadingElement
+
+  private subscription: Subscription
 
   constructor(
     private readonly platform: Platform,
@@ -37,7 +40,7 @@ export class AccountImportPage {
 
   public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {
-      this.dataService.getImportWallet().subscribe(wallet => {
+      this.subscription = this.dataService.getImportWallet().subscribe(wallet => {
         this.wallet = wallet
         this.ionViewDidEnter()
       })
@@ -97,5 +100,9 @@ export class AccountImportPage {
   public async import(): Promise<void> {
     await this.wallets.addWallet(this.wallet)
     await this.router.navigateByUrl('/tabs/portfolio', { skipLocationChange: true })
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }

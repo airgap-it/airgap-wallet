@@ -68,6 +68,8 @@ export class TransactionPreparePage {
   // temporary field until we figure out how to handle Substrate fee/tip model
   private readonly isSubstrate: boolean
 
+  private readonly isSapling: boolean
+
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
   private readonly state$: BehaviorSubject<TransactionPrepareState>
@@ -121,6 +123,8 @@ export class TransactionPreparePage {
 
     this.isSubstrate =
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+
+    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
 
     this.initState()
       .then(async () => {
@@ -248,7 +252,7 @@ export class TransactionPreparePage {
       feeCurrentMarketPrice: null,
       sendMaxAmount: false,
       disableSendMaxAmount: true,
-      disableAdvancedMode: this.isSubstrate,
+      disableAdvancedMode: this.isSubstrate || this.isSapling,
       disableFeeSlider: true,
       disablePrepareButton: true,
       estimatingMaxAmount: false,
@@ -452,6 +456,7 @@ export class TransactionPreparePage {
         this._state.receiverAddress,
         amount,
         fee,
+        this.accountProvider.getWalletList(),
         memo
       )
 

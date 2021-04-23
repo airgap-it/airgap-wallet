@@ -11,14 +11,14 @@
 
 <ion-content>
   <ion-grid fixed="true" class="ion-no-padding">
-    <p [innerHTML]="'select-wallet.text' | translate" class="ion-padding-horizontal"></p>
+    <p [innerHTML]="descriptionKey | translate" class="ion-padding-horizontal"></p>
     <ion-text color="primary">
       <p class="font--weight__bold ion-padding-horizontal">
         {{ 'select-wallet.compatible_label' | translate }}
       </p>
     </ion-text>
     <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of compatibleWallets">
-      <portfolio-item [wallet]="wallet" tappable (click)="openPreparePage(wallet)"></portfolio-item>
+      <portfolio-item [wallet]="wallet" tappable (click)="onSelected(wallet)"></portfolio-item>
     </ion-list>
 
     <ion-text color="primary">
@@ -27,7 +27,7 @@
       </p>
     </ion-text>
     <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of incompatibleWallets">
-      <portfolio-item [wallet]="wallet" tappable (click)="openPreparePage(wallet)"></portfolio-item>
+      <portfolio-item [wallet]="wallet" tappable (click)="onSelected(wallet)"></portfolio-item>
     </ion-list>
   </ion-grid>
 </ion-content>

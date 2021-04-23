@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol, TezosProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, TezosProtocol } from '@airgap/coinlib-core'
 import { TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
@@ -131,6 +131,7 @@ export class AccountProvider {
   }
 
   public triggerWalletChanged() {
+    this.drawChartProvider.drawChart()
     this.walletChangedBehaviour.next()
   }
 
@@ -187,7 +188,6 @@ export class AccountProvider {
 
     Promise.all(walletInitPromises).then(() => {
       this.triggerWalletChanged()
-      this.drawChartProvider.drawChart()
     })
 
     /* Use for Testing of Skeleton
@@ -248,6 +248,12 @@ export class AccountProvider {
 
   public getWalletList(): AirGapMarketWallet[] {
     return this.walletList
+  }
+
+  public getKnownViewingKeys(): string[] {
+    return this.walletList
+      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED)
+      .map((wallet: AirGapMarketWallet) => wallet.publicKey)
   }
 
   public async addWallet(wallet: AirGapMarketWallet): Promise<void> {
