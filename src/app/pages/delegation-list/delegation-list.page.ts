@@ -83,7 +83,9 @@ export class DelegationListPage {
       component: DelegateEditPopoverComponent,
       componentProps: {
         delegateeLabel: this.delegateeLabel,
-        delegateeLabelPlural: this.delegateeLabelPlural
+        delegateeLabelPlural: this.delegateeLabelPlural,
+        protocolIdentifier: this.wallet.protocol.identifier,
+        networkIdentifier: this.wallet.protocol.options.network.identifier
       },
       event,
       translucent: true

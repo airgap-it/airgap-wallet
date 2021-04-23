@@ -1,4 +1,4 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
@@ -48,6 +48,7 @@ export class ExtensionsService {
           this.amountConverterPipe,
           this.shortenStringPipe,
           this.translateService,
+          this.addressService,
           this.formBuilder
         )
     ],
@@ -71,7 +72,8 @@ export class ExtensionsService {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
-    private readonly remoteConfigProvider: RemoteConfigProvider
+    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly addressService: AddressService
   ) {}
 
   public async loadDelegationExtensions(): Promise<void> {

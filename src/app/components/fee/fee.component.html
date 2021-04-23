@@ -2,8 +2,14 @@
   <ion-row class="fee--amount__label ion-padding-horizontal">
     <ion-col size="12" class="ion-no-padding">
       <ion-item lines="none" class="ion-no-padding">
-        <ion-text class="ion-no-margin" color="blackLight">
-          <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})</ion-label>
+        <ion-text class="ion-no-margin" color="blackLight" *ngIf="!enableMemo">
+          <ion-label>{{ 'transaction-prepare.fee.label' | translate }} ({{ _wallet.protocol.feeSymbol | uppercase }})</ion-label>
+        </ion-text>
+        <ion-text class="ion-no-margin" color="blackLight" *ngIf="enableMemo">
+          <ion-label>
+            {{ 'transaction-prepare.fee.label' | translate }} ({{ _wallet.protocol.feeSymbol | uppercase }}) /
+            {{ 'transaction-prepare.advanced' | translate }}
+          </ion-label>
         </ion-text>
         <ion-toggle slot="end" mode="md" formControlName="isAdvancedMode" [attr.disabled]="state && state.disableAdvancedMode"></ion-toggle>
       </ion-item>
@@ -48,7 +54,7 @@
           class="ion-no-padding"
         ></ion-input>
         <span slot="end" class="input--placeholder">
-          {{ 'transaction-prepare.fee.label' | translate }} ({{ wallet.protocol.feeSymbol | uppercase }})
+          {{ 'transaction-prepare.fee.label' | translate }} ({{ _wallet.protocol.feeSymbol | uppercase }})
         </span>
       </ion-item>
     </ion-col>
@@ -67,12 +73,31 @@
               </ng-container>
             </span>
             <span id="fee-amount-advanced" *ngIf="state">
-              ({{ state.fee.value | number: '1.2-6' }} {{ wallet.protocol.feeSymbol | uppercase }})
+              ({{ state.fee.value | number: '1.2-6' }} {{ _wallet.protocol.feeSymbol | uppercase }})
             </span>
           </ng-container>
           <ion-skeleton-text animated style="width: 30%" *ngIf="state && state.estimatingFeeDefaults"></ion-skeleton-text>
         </p>
       </ion-text>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-padding-horizontal" *ngIf="state && state.isAdvancedMode.value && enableMemo">
+    <ion-col size="12" class="ion-no-padding">
+      <ion-item class="advanced-item" class="ion-no-padding">
+        <ion-label position="stacked"></ion-label>
+        <ion-input
+          [attr.disabled]="state.forceMigration || state.disableAdvancedMode"
+          id="fee-input"
+          placeholder="destination tag"
+          formControlName="memo"
+          type="string"
+          class="ion-no-padding"
+        ></ion-input>
+        <span slot="end" class="input--placeholder">
+          {{ 'transaction-prepare.memo' | translate }}
+        </span>
+      </ion-item>
     </ion-col>
   </ion-row>
 </form>

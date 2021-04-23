@@ -154,7 +154,7 @@ describe('TransactionPrepare Page', () => {
     // TODO: Move this test to "operationsProvider"
     spyOn((component as any).router, 'navigateByUrl').and.returnValue(Promise.resolve(true))
 
-    component.transactionForm.controls.address.setValue(ethWallet.addresses[0])
+    component.transactionForm.controls.receiver.setValue(ethWallet.addresses[0])
     component.transactionForm.controls.amount.setValue(10)
     component.transactionForm.controls.fee.setValue(10)
 

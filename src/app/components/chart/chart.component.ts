@@ -18,7 +18,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   public readonly timeInterval: typeof TimeInterval = TimeInterval
 
-  public currentChart: TimeInterval | undefined = undefined
+  public currentTimeInterval: TimeInterval | undefined = undefined
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -27,9 +27,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
 
-  private readonly subscription: Subscription
+  private subscription: Subscription
 
-  constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {
+  constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {}
+
+  public ngOnInit(): void {
     this.chartOptions = {
       layout: {
         padding: {
@@ -121,15 +123,12 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   public async drawChart(timeInterval: TimeInterval): Promise<void> {
-    if (timeInterval === this.currentChart) {
-      return
-    }
     this.chartLabels = []
     this.chartDatasets = [{ data: [], label: '$' }]
 
-    this.currentChart = timeInterval
+    this.currentTimeInterval = timeInterval
 
-    this.marketDataProvider.fetchAllValues(this.currentChart).then(async rawData => {
+    this.marketDataProvider.fetchAllValues(this.currentTimeInterval).then(async rawData => {
       this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestamp) => obj.usdValue)
 
       for (const value of rawData) {
@@ -142,7 +141,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   public setLabel24h(): void {
-    this.currentChart = TimeInterval.HOURS
+    this.currentTimeInterval = TimeInterval.HOURS
   }
 
   public displayPercentageChange(rawData: number[]): number {
