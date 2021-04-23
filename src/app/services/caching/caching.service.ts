@@ -7,7 +7,8 @@ export enum CachingServiceKey {
   PRICEDATA = 'pricedata',
   TRANSACTIONS = 'transactions',
   VALIDATORS = 'validators',
-  DELEGATIONS = 'delegations'
+  DELEGATIONS = 'delegations',
+  BALANCE = 'balance'
 }
 
 export interface TransactionIdentifier {
@@ -42,13 +43,20 @@ export class CachingService {
     return this.get(uniqueId)
   }
 
-  public async cacheTransactionData(wallet: AirGapMarketWallet, value: any): Promise<any> {
-    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${CachingServiceKey.TRANSACTIONS}`
+  public async cacheWalletData(
+    wallet: AirGapMarketWallet,
+    value: any,
+    key: CachingServiceKey.TRANSACTIONS | CachingServiceKey.BALANCE
+  ): Promise<any> {
+    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${key}`
     return this.set(uniqueId, { value, timestamp: Date.now() })
   }
 
-  public async getTransactionData(wallet: AirGapMarketWallet): Promise<StorageObject> {
-    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${CachingServiceKey.TRANSACTIONS}`
+  public async getWalletData(
+    wallet: AirGapMarketWallet,
+    key: CachingServiceKey.TRANSACTIONS | CachingServiceKey.BALANCE
+  ): Promise<StorageObject> {
+    const uniqueId = `${wallet.publicKey}_${wallet.protocol.identifier}_${key}`
     return this.get(uniqueId)
   }
 
