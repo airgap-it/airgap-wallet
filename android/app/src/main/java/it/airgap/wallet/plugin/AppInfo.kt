@@ -13,7 +13,7 @@ class AppInfo : Plugin() {
 
     @PluginMethod
     fun get(call: PluginCall) {
-        with (applicationContext) {
+        with(applicationContext) {
             call.resolveWithData(
                 Key.APP_NAME to applicationInfo.loadLabel(packageManager),
                 Key.PACKAGE_NAME to BuildConfig.APPLICATION_ID,

@@ -35,7 +35,7 @@ import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
@@ -110,6 +110,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: CLIPBOARD_PLUGIN, useValue: Plugins.Clipboard },
     { provide: PERMISSIONS_PLUGIN, useValue: Plugins.Permissions },
     { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: Plugins.PushNotifications },
+    { provide: SAPLING_PLUGIN, useValue: Plugins.SaplingNative },
     { provide: SHARE_PLUGIN, useValue: Plugins.Share },
     { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },

@@ -8,6 +8,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { ExchangeProvider } from 'src/app/services/exchange/exchange'
 
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'page-exchange-confirm',
@@ -41,7 +42,8 @@ export class ExchangeConfirmPage {
     private readonly route: ActivatedRoute,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    private readonly accountProvider: AccountProvider
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -77,6 +79,7 @@ export class ExchangeConfirmPage {
         this.exchangeResult.payinAddress,
         amount,
         fee,
+        this.accountProvider.getWalletList(),
         this.memo
       )
 

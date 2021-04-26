@@ -1,12 +1,22 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { partition, ProtocolService } from '@airgap/angular-core'
 import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
+import {
+  AirGapMarketWallet,
+  IACMessageDefinitionObject,
+  IACMessageType,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  SignedTransaction,
+  TezosSaplingProtocol
+} from '@airgap/coinlib-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
-import { IACMessageDefinitionObject, ICoinProtocol, SignedTransaction } from '@airgap/coinlib-core'
-import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
@@ -42,7 +52,8 @@ export class TransactionConfirmPage {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly browserService: BrowserService,
     private readonly accountService: AccountProvider,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly dataService: DataService
   ) {}
 
   public dismiss(): void {
@@ -81,6 +92,12 @@ export class TransactionConfirmPage {
   }
 
   public async broadcastTransaction() {
+    if (this.protocols.length === 1 && this.protocols[0].identifier === MainProtocolSymbols.XTZ_SHIELDED) {
+      // temporary
+      await this.wrapInTezosOperation(this.protocols[0] as TezosSaplingProtocol, this.txInfos[0][0])
+      return
+    }
+
     const loading = await this.loadingCtrl.create({
       message: 'Broadcasting...'
     })
@@ -235,5 +252,52 @@ export class TransactionConfirmPage {
         alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
+  private async wrapInTezosOperation(protocol: TezosSaplingProtocol, transaction: string): Promise<void> {
+    const wallet = await this.selectTezosTzAccount(protocol)
+    const unsignedTx = await protocol.wrapSaplingTransactions(
+      wallet.publicKey,
+      transaction,
+      new BigNumber(wallet.protocol.feeDefaults.medium).shiftedBy(wallet.protocol.feeDecimals).toString(),
+      true
+    )
+
+    const airGapTxs = await protocol.getTransactionDetails(
+      {
+        publicKey: wallet.publicKey,
+        transaction: unsignedTx
+      },
+      { knownViewingKeys: this.accountService.getKnownViewingKeys() }
+    )
+
+    const info = {
+      wallet,
+      airGapTxs,
+      data: unsignedTx,
+      type: IACMessageType.TransactionSignRequest
+    }
+    this.dataService.setData(DataServiceKey.INTERACTION, info)
+    this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async selectTezosTzAccount(protocol: ICoinProtocol): Promise<AirGapMarketWallet> {
+    return new Promise<AirGapMarketWallet>(resolve => {
+      const wallets: AirGapMarketWallet[] = this.accountService.getWalletList()
+      const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
+        wallets,
+        (wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ
+      )
+
+      const info = {
+        actionType: 'broadcast',
+        targetIdentifier: protocol.identifier,
+        compatibleWallets,
+        incompatibleWallets,
+        callback: resolve
+      }
+      this.dataService.setData(DataServiceKey.WALLET, info)
+      this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    })
   }
 }

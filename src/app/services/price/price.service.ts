@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 import { AirGapMarketWallet, AirGapWalletPriceService, TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
-import { CachingService, StorageObject } from '../caching/caching.service'
+import { CachingService, CachingServiceKey, StorageObject } from '../caching/caching.service'
 import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 
 export interface CryptoPrices {
@@ -93,13 +93,26 @@ export class PriceService implements AirGapWalletPriceService {
 
   public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
     return new Promise<IAirGapTransactionResult>(async resolve => {
-      const rawTransactions: StorageObject = await this.cachingService.getTransactionData(wallet)
+      const rawTransactions: StorageObject = await this.cachingService.getWalletData(wallet, CachingServiceKey.TRANSACTIONS)
       if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
         resolve(rawTransactions.value)
       } else {
-        const rawTransactions = wallet.fetchTransactions(100)
-        await this.cachingService.cacheTransactionData(wallet, rawTransactions)
-        resolve(wallet.fetchTransactions(100))
+        const rawTransactions = await wallet.fetchTransactions(100)
+        await this.cachingService.cacheWalletData(wallet, rawTransactions, CachingServiceKey.TRANSACTIONS)
+        resolve(rawTransactions)
+      }
+    })
+  }
+
+  public async fetchBalance(wallet: AirGapMarketWallet): Promise<BigNumber> {
+    return new Promise<BigNumber>(async resolve => {
+      const rawBalance: StorageObject = await this.cachingService.getWalletData(wallet, CachingServiceKey.BALANCE)
+      if (rawBalance && rawBalance.timestamp > Date.now() - 30 * 60 * 1000 && rawBalance.value) {
+        resolve(new BigNumber(rawBalance.value))
+      } else {
+        const balance: BigNumber = await wallet.balanceOf()
+        await this.cachingService.cacheWalletData(wallet, balance, CachingServiceKey.BALANCE)
+        resolve(balance)
       }
     })
   }

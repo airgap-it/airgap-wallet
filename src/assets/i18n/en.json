@@ -10,6 +10,7 @@
     "vote_label": "Voting",
     "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
+    "fund_label": "Fund Account",
     "pending-transactions": {
       "label": "Pending Transactions",
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
@@ -160,7 +161,19 @@
   },
   "select-wallet": {
     "title": "Select Account",
-    "text": "You've scanned an address. Select one of the following accounts to send from.",
+    "scanned-address": {
+      "text": "You've scanned an address. Select one of the following accounts to send from."
+    },
+    "fund-account": {
+      "xtz_shielded": {
+        "text": "Select one of the following accounts to fund your Shielded Tez account."
+      }
+    },
+    "broadcast": {
+      "xtz_shielded": {
+        "text": "The Sapling transaction needs to be broadcast from a Tezos account. Select a Tezos account to sign the transaction in the Vault and ultimately broadcast the Sapling transaction."
+      }
+    },
     "compatible_label": "These accounts appear to be compatible",
     "incompatible_label": "These accounts appear to be incompatible"
   },

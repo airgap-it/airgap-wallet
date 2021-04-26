@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../test-config/unit-test-helper'
 
 import { AppComponent } from './app.component'
+import { SAPLING_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 describe('AppComponent', () => {
   let unitHelper: UnitHelper
@@ -15,6 +16,7 @@ describe('AppComponent', () => {
         providers: [
           { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
           { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
+          { provide: SAPLING_PLUGIN, useValue: unitHelper.mockRefs.saplingPlugin },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen }
         ],

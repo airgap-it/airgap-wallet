@@ -1,8 +1,8 @@
 import {
-  AddressService,
   AppInfoPlugin,
   APP_INFO_PLUGIN,
   APP_PLUGIN,
+  AddressService,
   ExternalAliasResolver,
   IACMessageTransport,
   LanguageService,
@@ -29,8 +29,15 @@ import {
   TezosProtocol,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
-  TezosProtocolOptions
+  TezosProtocolOptions,
+  TezosSaplingExternalMethodProvider,
+  TezosShieldedTezProtocol
 } from '@airgap/coinlib-core'
+import {
+  TezosSaplingProtocolOptions,
+  TezosShieldedTezProtocolConfig
+} from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
+import { HttpClient } from '@angular/common/http'
 import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
@@ -43,6 +50,7 @@ import { AccountProvider } from './services/account/account.provider'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
+import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
@@ -70,6 +78,8 @@ export class AppComponent implements AfterViewInit {
     private readonly dataService: DataService,
     private readonly config: Config,
     private readonly ngZone: NgZone,
+    private readonly httpClient: HttpClient,
+    private readonly saplingNativeService: SaplingNativeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
@@ -214,8 +224,19 @@ export class AppComponent implements AfterViewInit {
     )
     const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
 
+    const externalMethodProvider:
+      | TezosSaplingExternalMethodProvider
+      | undefined = await this.saplingNativeService.createExternalMethodProvider()
+
+    const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
+      new TezosSaplingProtocolOptions(
+        edonetNetwork,
+        new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
+      )
+    )
+
     this.protocolService.init({
-      extraActiveProtocols: [delphinetProtocol, edonetProtocol],
+      extraActiveProtocols: [delphinetProtocol, edonetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [
         [delphinetProtocol, new TezosKtProtocol(new TezosProtocolOptions(delphinetNetwork))],
         [edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))],
@@ -232,6 +253,20 @@ export class AppComponent implements AfterViewInit {
     })
 
     await this.initializeTezosDomains()
+    await shieldedTezProtocol.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
+  }
+
+  private async getSaplingParams(type: 'spend' | 'output'): Promise<Buffer> {
+    if (this.platform.is('hybrid')) {
+      // Sapling params are read and used in a native plugin, there's no need to read them in the Ionic part
+      return Buffer.alloc(0)
+    }
+
+    const params: ArrayBuffer = await this.httpClient
+      .get(`./assets/sapling/sapling-${type}.params`, { responseType: 'arraybuffer' })
+      .toPromise()
+
+    return Buffer.from(params)
   }
 
   private async initializeTezosDomains(): Promise<void> {
