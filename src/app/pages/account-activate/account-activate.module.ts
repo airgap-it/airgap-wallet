@@ -1,5 +1,5 @@
-import { AirGapAngularCoreModule } from '@airgap/angular-core'
-import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
+// import { AirGapAngularCoreModule } from '@airgap/angular-core'
+// import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -25,8 +25,8 @@ import * as fromAccountActivate from './account-activate.reducers'
     ComponentsModule,
     PipesModule,
     AccountActivatePageRoutingModule,
-    AirGapAngularCoreModule,
-    AirGapAngularNgRxModule,
+    // AirGapAngularCoreModule,
+    // AirGapAngularNgRxModule,
     StoreModule.forFeature('accountActivate', fromAccountActivate.reducer),
     EffectsModule.forFeature([AccountActivateEffects])
   ],

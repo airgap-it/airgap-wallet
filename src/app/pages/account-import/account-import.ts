@@ -1,8 +1,10 @@
 import { flattened } from '@airgap/angular-core'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
-import { Component, NgZone } from '@angular/core'
+import { Component, NgZone, OnDestroy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
+import { Subject } from 'rxjs'
+import { takeUntil } from 'rxjs/operators'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService } from '../../services/data/data.service'
@@ -17,15 +19,16 @@ interface AccountImport extends AccountSync {
   selector: 'page-account-import',
   templateUrl: 'account-import.html'
 })
-export class AccountImportPage {
+export class AccountImportPage implements OnDestroy {
   public accountImports: Map<string | undefined, AccountImport[]> = new Map()
   private get allAccountImports(): AccountImport[] {
     return flattened(Array.from(this.accountImports.values()))
   }
 
   public loading: HTMLIonLoadingElement
-
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
+
+  private readonly ngDestroyed$: Subject<void> = new Subject()
 
   constructor(
     private readonly platform: Platform,
@@ -47,20 +50,23 @@ export class AccountImportPage {
   public async ionViewWillEnter(): Promise<void> {
     this.accountImports.clear()
     if (this.route.snapshot.data.special) {
-      this.dataService.getAccountSyncs().subscribe((accountSyncs: AccountSync[]) => {
-        accountSyncs.forEach((accountSync: AccountSync) => {
-          const groupLabel: string | undefined = accountSync.groupLabel
-          if (!this.accountImports.has(groupLabel)) {
-            this.accountImports.set(groupLabel, [])
-          }
+      this.dataService
+        .getAccountSyncs()
+        .pipe(takeUntil(this.ngDestroyed$))
+        .subscribe((accountSyncs: AccountSync[]) => {
+          accountSyncs.forEach((accountSync: AccountSync) => {
+            const groupLabel: string | undefined = accountSync.groupLabel
+            if (!this.accountImports.has(groupLabel)) {
+              this.accountImports.set(groupLabel, [])
+            }
 
-          this.accountImports.get(groupLabel).push({
-            ...accountSync,
-            alreadyExists: false
+            this.accountImports.get(groupLabel).push({
+              ...accountSync,
+              alreadyExists: false
+            })
           })
+          this.ionViewDidEnter()
         })
-        this.ionViewDidEnter()
-      })
     }
 
     await this.platform.ready()
@@ -102,6 +108,11 @@ export class AccountImportPage {
         status: accountImport.wallet.status
       })
     })
+  }
+
+  public ngOnDestroy(): void {
+    this.ngDestroyed$.next()
+    this.ngDestroyed$.complete()
   }
 
   public async dismiss(): Promise<void> {

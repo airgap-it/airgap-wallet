@@ -25,7 +25,7 @@
 </div>
 <ion-row class="ion-padding-horizontal ion-padding-bottom ion-align-items-end ion-justify-content-center">
   <ion-button
-    [color]="currentChart !== timeInterval.HOURS && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentTimeInterval !== timeInterval.HOURS && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
     (click)="drawChart(timeInterval.HOURS)"
@@ -34,7 +34,7 @@
   </ion-button>
 
   <ion-button
-    [color]="currentChart !== timeInterval.DAYS && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentTimeInterval !== timeInterval.DAYS && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
     (click)="drawChart(timeInterval.DAYS)"
@@ -43,7 +43,7 @@
   </ion-button>
 
   <ion-button
-    [color]="currentChart !== timeInterval.MONTH && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
+    [color]="currentTimeInterval !== timeInterval.MONTH && chartDatasets[0].data.length > 0 ? 'primary' : 'secondary'"
     size="small"
     fill="clear"
     (click)="drawChart(timeInterval.MONTH)"

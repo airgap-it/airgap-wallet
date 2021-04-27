@@ -9,8 +9,9 @@ variables:
 stages:
   - build
   - test
-  - native_build
   - qa
+  - native_build
+  - publish
 
 build_ionic:
   stage: build
@@ -37,6 +38,30 @@ unit:
       - lcov.info
       - lintReport.json
 
+qa:
+  stage: qa
+  script:
+    - docker create --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X
+      -Dsonar.typescript.lcov.reportPaths=lcov.info
+      -Dsonar.typescript.tslint.reportPaths=lintReport.json
+      -Dsonar.test.inclusions=**/*.spec.ts
+      -Dsonar.tests=src/
+      -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,src/assets/libs/**
+      -Dsonar.sources=src/
+      -Dsonar.host.url=$SONAR_URL
+      -Dsonar.login=$SONAR_LOGIN
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+      -Dsonar.branch.name=$CI_BUILD_REF_NAME
+    - docker cp lcov.info qa-$CI_PIPELINE_ID:/app/lcov.info
+    - docker cp lintReport.json qa-$CI_PIPELINE_ID:/app/lintReport.json
+    - docker start -a qa-$CI_PIPELINE_ID
+  after_script:
+    - docker rm -f qa-$CI_PIPELINE_ID || true
+  tags:
+    - docker
+
 build_android:
   stage: native_build
   when: manual
@@ -62,7 +87,6 @@ build_ios:
   when: manual
   before_script:
     - echo "$IOS_BUILD_JSON" > build.json
-    - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
     - nvm use 14
@@ -72,13 +96,10 @@ build_ios:
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
     - npx ionic build --prod
     - npx cap sync ios
-    - xcodebuild -workspace ios/App/App.xcworkspace -scheme "App" -destination generic/platform=iOS -configuration Release archive -archivePath ios/App.xcarchive MARKETING_VERSION=$VERSION CURRENT_PROJECT_VERSION=$CI_PIPELINE_ID -allowProvisioningUpdates
-    - xcodebuild -exportArchive -archivePath ios/App.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ios/ -allowProvisioningUpdates
-    - xcrun altool --upload-app -f ios/App.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
+    - xcodebuild -workspace ios/App/App.xcworkspace -scheme "App" -destination generic/platform=iOS -configuration Release archive -archivePath ios/airgap-wallet-$VERSION-$CI_PIPELINE_ID.xcarchive MARKETING_VERSION=$VERSION CURRENT_PROJECT_VERSION=$CI_PIPELINE_ID -allowProvisioningUpdates
   artifacts:
     paths:
-      - ios/App.ipa
-      - ios/App.xcarchive
+      - ios/airgap-wallet-$VERSION-$CI_PIPELINE_ID.xcarchive
   tags:
     - ios
 
@@ -140,26 +161,14 @@ build_windows:
       - electron/airgap-wallet-$VERSION.exe
       - electron/airgap-wallet-$VERSION.exe.blockmap
 
-qa:
-  stage: qa
+publish_ios:
+  stage: publish
+  when: manual
+  before_script:
+    - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
-    - docker create --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X
-      -Dsonar.typescript.lcov.reportPaths=lcov.info
-      -Dsonar.typescript.tslint.reportPaths=lintReport.json
-      -Dsonar.test.inclusions=**/*.spec.ts
-      -Dsonar.tests=src/
-      -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,src/assets/libs/**
-      -Dsonar.sources=src/
-      -Dsonar.host.url=$SONAR_URL
-      -Dsonar.login=$SONAR_LOGIN
-      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
-      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
-      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
-      -Dsonar.branch.name=$CI_BUILD_REF_NAME
-    - docker cp lcov.info qa-$CI_PIPELINE_ID:/app/lcov.info
-    - docker cp lintReport.json qa-$CI_PIPELINE_ID:/app/lintReport.json
-    - docker start -a qa-$CI_PIPELINE_ID
-  after_script:
-    - docker rm -f qa-$CI_PIPELINE_ID || true
+    - export DEVELOPER_DIR=$XCODE_PATH
+    - xcodebuild -exportArchive -archivePath ios/airgap-wallet-$VERSION-$CI_PIPELINE_ID.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ios/ -allowProvisioningUpdates
+    - xcrun altool --upload-app -f ios/App.ipa -u $IOS_USERNAME -p $IOS_PASSWORD
   tags:
-    - docker
+    - ios

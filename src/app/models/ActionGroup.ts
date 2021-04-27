@@ -15,6 +15,7 @@ import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
+import { FundAccountAction } from './actions/FundAccountAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -36,6 +37,9 @@ export class ActionGroup {
     })
     actionMap.set(SubProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
+    })
+    actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
+      return this.getTezosShieldedTezActions()
     })
     actionMap.set(MainProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
@@ -72,9 +76,7 @@ export class ActionGroup {
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-                  info.wallet.addressIndex
-                }/${info.subProtocolType}`
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
               )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
@@ -133,6 +135,24 @@ export class ActionGroup {
     return [migrateAction]
   }
 
+  private getTezosShieldedTezActions(): Action<any, any>[] {
+    const fundAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
+      () => {
+        const action = new FundAccountAction({
+          wallet: this.callerContext.wallet,
+          accountProvider: this.callerContext.accountProvider,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
+        })
+
+        return action
+      }
+    )
+
+    return [fundAction]
+  }
+
   private async getCosmosActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
     const extraDelegatorButtonActions = await this.createDelegatorButtonActions({
@@ -159,9 +179,7 @@ export class ActionGroup {
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-                  info.wallet.addressIndex
-                }/${info.subProtocolType}`
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
               )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
@@ -237,9 +255,7 @@ export class ActionGroup {
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
             .navigateByUrl(
-              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
-                this.callerContext.wallet.protocol.identifier
-              }/${this.callerContext.wallet.addressIndex}`
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${this.callerContext.wallet.protocol.identifier}/${this.callerContext.wallet.addressIndex}`
             )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 

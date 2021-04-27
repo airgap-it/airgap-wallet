@@ -1,7 +1,5 @@
 import { BaseIACService, ProtocolService, SerializerService, UiEventElementsService } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
-import { Injectable } from '@angular/core'
-import { Router } from '@angular/router'
 import {
   AccountShareResponse,
   AirGapMarketWallet,
@@ -9,7 +7,11 @@ import {
   IACMessageType,
   MessageSignResponse
 } from '@airgap/coinlib-core'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
 
+import { AccountSync } from '../../types/AccountSync'
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
 import { DataService, DataServiceKey } from '../data/data.service'
@@ -19,8 +21,6 @@ import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
-import { AccountSync } from 'src/app/types/AccountSync'
-import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 
 @Injectable({
   providedIn: 'root'
@@ -85,8 +85,8 @@ export class IACService extends BaseIACService {
     )
 
     if (this.router) {
-      this.dataService.setData(DataServiceKey.ACCOUNTS, accountSyncs)
-      this.router.navigateByUrl(`/account-import/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
+      this.router.navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       return true
     }

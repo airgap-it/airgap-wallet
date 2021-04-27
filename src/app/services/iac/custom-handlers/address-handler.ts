@@ -37,6 +37,7 @@ export class AddressHandler extends IACMessageHandler {
 
           if (compatibleWallets.length > 0) {
             const info = {
+              actionType: 'scanned-address',
               address,
               compatibleWallets,
               incompatibleWallets
@@ -54,6 +55,7 @@ export class AddressHandler extends IACMessageHandler {
       const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(str)
       if (compatibleWallets.length > 0) {
         const info = {
+          actionType: 'scanned-address',
           address: data,
           compatibleWallets,
           incompatibleWallets

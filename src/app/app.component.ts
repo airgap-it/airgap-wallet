@@ -1,7 +1,9 @@
 import {
+  AppInfoPlugin,
   APP_INFO_PLUGIN,
   APP_PLUGIN,
-  AppInfoPlugin,
+  AddressService,
+  ExternalAliasResolver,
   IACMessageTransport,
   LanguageService,
   ProtocolService,
@@ -9,34 +11,46 @@ import {
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
-import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
-import { Router } from '@angular/router'
-import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
-import { Config, Platform } from '@ionic/angular'
-import { TranslateService } from '@ngx-translate/core'
 import {
   AirGapMarketWallet,
   generateId,
   IACMessageType,
   IAirGapTransaction,
+  ICoinProtocol,
+  ICoinSubProtocol,
+  MainProtocolSymbols,
+  NetworkType,
   TezblockBlockExplorer,
   TezosBTC,
   TezosBTCProtocolConfig,
   TezosFAProtocolOptions,
   TezosKtProtocol,
+  TezosNetwork,
   TezosProtocol,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
-  TezosProtocolOptions
+  TezosProtocolOptions,
+  TezosSaplingExternalMethodProvider,
+  TezosShieldedTezProtocol
 } from '@airgap/coinlib-core'
-import { TezosNetwork } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
-import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import {
+  TezosSaplingProtocolOptions,
+  TezosShieldedTezProtocolConfig
+} from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
+import { HttpClient } from '@angular/common/http'
+import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
+import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
+import { Router } from '@angular/router'
+import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
+import { Config, Platform } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
+import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
@@ -57,12 +71,15 @@ export class AppComponent implements AfterViewInit {
     private readonly protocolService: ProtocolService,
     private readonly storageProvider: WalletStorageService,
     private readonly accountProvider: AccountProvider,
+    private readonly addressService: AddressService,
     private readonly serializerService: SerializerService,
     private readonly pushProvider: PushProvider,
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
     private readonly ngZone: NgZone,
+    private readonly httpClient: HttpClient,
+    private readonly saplingNativeService: SaplingNativeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
@@ -74,9 +91,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   public async initializeApp(): Promise<void> {
-    await Promise.all([this.initializeTranslations(), this.platform.ready()])
-
-    this.initializeProtocols()
+    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols()])
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
@@ -180,7 +195,7 @@ export class AppComponent implements AfterViewInit {
     })
   }
 
-  private initializeProtocols(): void {
+  private async initializeProtocols(): Promise<void> {
     const delphinetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Delphinet',
       NetworkType.TESTNET,
@@ -195,10 +210,36 @@ export class AppComponent implements AfterViewInit {
     )
     const delphinetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(delphinetNetwork))
 
+    const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Edonet',
+      NetworkType.TESTNET,
+      'https://tezos-edonet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//edonet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.EDONET,
+        'https://conseil-edo.cryptonomic-infra.tech',
+        TezosNetwork.EDONET,
+        '8385d3cd-7157-481c-873f-17f99b910fb9'
+      )
+    )
+    const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
+
+    const externalMethodProvider:
+      | TezosSaplingExternalMethodProvider
+      | undefined = await this.saplingNativeService.createExternalMethodProvider()
+
+    const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
+      new TezosSaplingProtocolOptions(
+        edonetNetwork,
+        new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
+      )
+    )
+
     this.protocolService.init({
-      extraActiveProtocols: [delphinetProtocol],
+      extraActiveProtocols: [delphinetProtocol, edonetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [
         [delphinetProtocol, new TezosKtProtocol(new TezosProtocolOptions(delphinetNetwork))],
+        [edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))],
         [
           delphinetProtocol,
           new TezosBTC(
@@ -210,5 +251,63 @@ export class AppComponent implements AfterViewInit {
         ]
       ]
     })
+
+    await this.initializeTezosDomains()
+    await shieldedTezProtocol.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
+  }
+
+  private async getSaplingParams(type: 'spend' | 'output'): Promise<Buffer> {
+    if (this.platform.is('hybrid')) {
+      // Sapling params are read and used in a native plugin, there's no need to read them in the Ionic part
+      return Buffer.alloc(0)
+    }
+
+    const params: ArrayBuffer = await this.httpClient
+      .get(`./assets/sapling/sapling-${type}.params`, { responseType: 'arraybuffer' })
+      .toPromise()
+
+    return Buffer.from(params)
+  }
+
+  private async initializeTezosDomains(): Promise<void> {
+    const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
+      [TezosNetwork.MAINNET]: undefined,
+      [TezosNetwork.DELPHINET]: 'KT1CR6vXJ1qeY4ALDQfUaLFi3FcJJZ8WDygo',
+      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR'
+    }
+
+    const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
+      MainProtocolSymbols.XTZ
+    )) as TezosProtocolNetwork[]
+
+    const tezosDomainsWithNetwork: [TezosProtocolNetwork, TezosDomains][] = tezosNetworks
+      .map((network: TezosProtocolNetwork) => {
+        const contractAddress: string | undefined = tezosDomainsAddresses[network.extras.network]
+
+        return contractAddress !== undefined
+          ? ([network, new TezosDomains(network, contractAddress)] as [TezosProtocolNetwork, TezosDomains])
+          : undefined
+      })
+      .filter((tezosDomainsWithNetwork: [TezosProtocolNetwork, TezosDomains] | undefined) => tezosDomainsWithNetwork !== undefined)
+
+    await Promise.all(
+      tezosDomainsWithNetwork.map(async ([network, tezosDomains]: [TezosProtocolNetwork, TezosDomains]) => {
+        const externalAliasResolver: ExternalAliasResolver = {
+          validateReceiver: async (receiver: string): Promise<boolean> => (await tezosDomains.nameToAddress(receiver)) !== undefined,
+          resolveAlias: tezosDomains.nameToAddress.bind(tezosDomains),
+          getAlias: tezosDomains.addressToName.bind(tezosDomains)
+        }
+
+        const [tezosProtocol, tezosSubProtocols]: [ICoinProtocol, ICoinSubProtocol[]] = await Promise.all([
+          this.protocolService.getProtocol(MainProtocolSymbols.XTZ, network),
+          this.protocolService.getSubProtocols(MainProtocolSymbols.XTZ, network)
+        ])
+
+        this.addressService.registerExternalAliasResolver(externalAliasResolver, tezosProtocol)
+        tezosSubProtocols.forEach((subProtocol: ICoinSubProtocol) => {
+          this.addressService.registerExternalAliasResolver(externalAliasResolver, subProtocol)
+        })
+      })
+    )
   }
 }

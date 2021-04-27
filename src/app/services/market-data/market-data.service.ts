@@ -62,7 +62,7 @@ export class MarketDataService {
       return []
     }
 
-    let balance: BigNumber = await wallet.balanceOf()
+    let balance: BigNumber = await this.priceService.fetchBalance(wallet)
 
     const transactionResult = await this.priceService.fetchTransactions(wallet).catch(error => {
       console.error(error)
@@ -113,6 +113,6 @@ export class MarketDataService {
           }
         }
       })
-      .reverse()
+      .sort((a, b) => (a.timestamp > b.timestamp ? 0 : b.timestamp > a.timestamp ? -1 : 1))
   }
 }

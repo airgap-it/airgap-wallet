@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
 import { AccountSync } from 'src/app/types/AccountSync'
 
 export enum DataServiceKey {
+  SYNC_ACCOUNTS = 'sync-accounts',
   ACCOUNTS = 'accounts',
   PROTOCOL = 'protocol',
   DETAIL = 'detail',
@@ -27,7 +28,7 @@ export class DataService {
   }
 
   public setData(id, data) {
-    if (id === DataServiceKey.ACCOUNTS) {
+    if (id === DataServiceKey.SYNC_ACCOUNTS) {
       this.accountSyncs$.next(data)
     }
     this.data[id] = data
