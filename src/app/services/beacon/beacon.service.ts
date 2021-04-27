@@ -179,8 +179,13 @@ export class BeaconService {
     await this.client.removeAllPeers(true)
   }
 
-  private async isNetworkSupported(_network?: Network): Promise<boolean> {
-    return true
+  private async isNetworkSupported(network?: Network): Promise<boolean> {
+    return (
+      network.type === BeaconNetworkType.MAINNET ||
+      network.type === BeaconNetworkType.DELPHINET ||
+      network.type === BeaconNetworkType.EDONET ||
+      network.type === BeaconNetworkType.CUSTOM
+    )
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
