@@ -273,7 +273,8 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: undefined,
       [TezosNetwork.DELPHINET]: 'KT1CR6vXJ1qeY4ALDQfUaLFi3FcJJZ8WDygo',
-      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR'
+      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
+      [TezosNetwork.FLORENCENET]: undefined
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
