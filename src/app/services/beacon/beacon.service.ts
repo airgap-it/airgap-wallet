@@ -182,7 +182,6 @@ export class BeaconService {
   private async isNetworkSupported(network?: Network): Promise<boolean> {
     return (
       network.type === BeaconNetworkType.MAINNET ||
-      network.type === BeaconNetworkType.DELPHINET ||
       network.type === BeaconNetworkType.EDONET ||
       network.type === BeaconNetworkType.FLORENCENET ||
       network.type === BeaconNetworkType.CUSTOM
@@ -297,45 +296,21 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.DELPHINET]: {
-        identifier: undefined,
-        name: network.name || 'Delphinet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
-          conseilApiKey: 'airgap00391'
-        }
-      },
+
       [BeaconNetworkType.EDONET]: {
         identifier: undefined,
         name: network.name || 'Edonet',
         type: NetworkType.TESTNET,
         rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
         extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
+          network: TezosNetwork.EDONET,
+          conseilUrl: 'https://tezos-edonet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.EDONET,
           conseilApiKey: 'airgap00391'
         }
       },
-      [BeaconNetworkType.DELPHINET]: {
-        identifier: undefined,
-        name: network.name || 'Delphinet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
-          conseilApiKey: 'airgap00391'
-        }
-      },
+
       [BeaconNetworkType.FLORENCENET]: {
         identifier: undefined,
         name: network.name || 'Florencenet',
@@ -345,7 +320,7 @@ export class BeaconService {
         extras: {
           network: TezosNetwork.FLORENCENET,
           conseilUrl: '',
-          conseilNetwork: TezosNetwork.DELPHINET,
+          conseilNetwork: TezosNetwork.FLORENCENET,
           conseilApiKey: 'airgap00391'
         }
       },
