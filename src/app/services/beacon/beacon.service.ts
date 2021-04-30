@@ -301,7 +301,7 @@ export class BeaconService {
         identifier: undefined,
         name: network.name || 'Edonet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
+        rpcUrl: 'https://tezos-edonet-node.prod.gke.papers.tech',
         blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
         extras: {
           network: TezosNetwork.EDONET,
