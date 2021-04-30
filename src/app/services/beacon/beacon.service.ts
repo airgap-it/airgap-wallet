@@ -282,7 +282,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     // TODO: remove `Exclude`
-    const configs: { [key in BeaconNetworkType]: TezosProtocolNetwork } = {
+    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET>]: TezosProtocolNetwork } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,
