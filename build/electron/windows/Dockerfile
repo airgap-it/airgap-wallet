@@ -1,5 +1,6 @@
 FROM electronuserland/builder:wine
 
+RUN wget -qO - https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04/Release.key | apt-key add -
 RUN apt-get update -y
 RUN apt-get install -y libusb-1.0-0 libudev-dev
 

@@ -1,9 +1,18 @@
 import { ProtocolService, SerializerService } from '@airgap/angular-core'
 import { Component, Input, OnChanges } from '@angular/core'
-import { IACMessageDefinitionObject, IAirGapTransaction, ICoinProtocol, SignedTransaction } from '@airgap/coinlib-core'
+import {
+  IACMessageDefinitionObject,
+  IAirGapTransaction,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  ProtocolSymbols,
+  SignedTransaction,
+  TezosSaplingProtocol
+} from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'signed-transaction',
@@ -33,7 +42,11 @@ export class SignedTransactionComponent implements OnChanges {
 
   public rawTxData: SignedTransaction
 
-  constructor(private readonly serializerService: SerializerService, private readonly protocolService: ProtocolService) {
+  constructor(
+    private readonly serializerService: SerializerService,
+    private readonly protocolService: ProtocolService,
+    private readonly accountProvider: AccountProvider
+  ) {
     //
   }
 
@@ -51,10 +64,19 @@ export class SignedTransactionComponent implements OnChanges {
     if (this.signedTxs) {
       let protocol: ICoinProtocol =
         this.protocols && this.protocols[0] ? this.protocols[0] : await this.protocolService.getProtocol(this.signedTxs[0].protocol)
+
       try {
         this.airGapTxs = (await Promise.all(
-          this.signedTxs.map((signedTx: IACMessageDefinitionObject) => {
-            return protocol.getTransactionDetailsFromSigned(signedTx.payload as SignedTransaction)
+          this.signedTxs.map(async (signedTx: IACMessageDefinitionObject) => {
+            const payload: SignedTransaction = signedTx.payload as SignedTransaction
+            if (await this.checkIfSaplingTransaction(payload, signedTx.protocol)) {
+              const saplingProtocol: TezosSaplingProtocol = await this.getSaplingProtocol()
+              return saplingProtocol.getTransactionDetailsFromSigned(payload, {
+                knownViewingKeys: this.accountProvider.getKnownViewingKeys()
+              })
+            } else {
+              return protocol.getTransactionDetailsFromSigned(payload)
+            }
           })
         )).reduce((flatten: IAirGapTransaction[], toFlatten: IAirGapTransaction[]) => flatten.concat(toFlatten), [])
 
@@ -79,5 +101,25 @@ export class SignedTransactionComponent implements OnChanges {
         handleErrorSentry(ErrorCategory.COINLIB)(e)
       }
     }
+  }
+
+  private async checkIfSaplingTransaction(transaction: SignedTransaction, protocolIdentifier: ProtocolSymbols): Promise<boolean> {
+    if (protocolIdentifier === MainProtocolSymbols.XTZ) {
+      const tezosProtocol: ICoinProtocol = await this.protocolService.getProtocol(protocolIdentifier)
+      const saplingProtocol: TezosSaplingProtocol = await this.getSaplingProtocol()
+
+      const txDetails: IAirGapTransaction[] = await tezosProtocol.getTransactionDetailsFromSigned(transaction)
+      const recipients: string[] = txDetails
+        .map(details => details.to)
+        .reduce((flatten: string[], next: string[]) => flatten.concat(next), [])
+
+      return recipients.includes(saplingProtocol.options.config.contractAddress)
+    }
+
+    return protocolIdentifier === MainProtocolSymbols.XTZ_SHIELDED
+  }
+
+  private async getSaplingProtocol(): Promise<TezosSaplingProtocol> {
+    return (await this.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)) as TezosSaplingProtocol
   }
 }

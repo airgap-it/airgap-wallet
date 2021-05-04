@@ -1,13 +1,26 @@
-import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { Component } from '@angular/core'
-import { ExchangeProvider } from './../../services/exchange/exchange'
-import { HttpClient } from '@angular/common/http'
-import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, PopoverController, ToastController, NavController, LoadingController } from '@ionic/angular'
-import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { ProtocolService } from '@airgap/angular-core'
+import {
+  AirGapMarketWallet,
+  IAirGapTransaction,
+  ICoinDelegateProtocol,
+  MainProtocolSymbols,
+  SubProtocolSymbols,
+  TezosKtProtocol
+} from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
+import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
+import { TezosKtAddress } from '@airgap/coinlib-core/protocols/tezos/kt/TezosKtAddress'
+import { HttpClient } from '@angular/common/http'
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AlertController, LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
+import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
+import { Subscription, timer } from 'rxjs'
+import { supportsDelegation } from 'src/app/helpers/delegation'
+import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { BrowserService } from 'src/app/services/browser/browser.service'
+import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise'
@@ -19,14 +32,8 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageService } from '../../services/storage/storage'
-import { supportsDelegation } from 'src/app/helpers/delegation'
-import { timer, Subscription } from 'rxjs'
-import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
-import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 
-import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
-import { BrowserService } from 'src/app/services/browser/browser.service'
+import { ExchangeProvider } from './../../services/exchange/exchange'
 
 export const refreshRate = 3000
 
@@ -381,11 +388,11 @@ export class AccountTransactionListPage {
 
   public async getKtAddresses(): Promise<string[]> {
     const protocol: TezosKtProtocol = new TezosKtProtocol()
-    const ktAddresses: string[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+    const ktAddresses: TezosKtAddress[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 
-    return ktAddresses
+    return ktAddresses.map((address: TezosKtAddress) => address.getValue())
   }
 
   public async openDelegationDetails(): Promise<void> {

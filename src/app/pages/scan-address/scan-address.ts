@@ -13,7 +13,7 @@ import { ScanBasePage } from '../scan-base/scan-base'
   styleUrls: ['./scan-address.scss']
 })
 export class ScanAddressPage extends ScanBasePage {
-  private readonly callback: (address: string) => void
+  private readonly callback: ((address: string) => void) | ((address: string) => Promise<void>)
   private callbackCalled: boolean = false
 
   @ViewChild('addressScanner')
