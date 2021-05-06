@@ -47,10 +47,8 @@ ARG BUILD_NR
 RUN sed -i -e "s/versionCode 1/versionCode $BUILD_NR/g" /app/android/app/build.gradle
 
 # disable pure getters due to https://github.com/angular/angular-cli/issues/11439 
-RUN npm run disable-pure-getters
-
 # configure mangle (keep_fnames) for bitcoinjs https://github.com/bitcoinjs/bitcoinjs-lib/issues/959
-RUN npm run configure-mangle
+RUN npm run prepare-prod-build
 
 # remove unused cordova-diagnostic-plugin features
 RUN npm run apply-diagnostic-modules
