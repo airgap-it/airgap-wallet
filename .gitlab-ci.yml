@@ -91,8 +91,7 @@ build_ios:
     - export DEVELOPER_DIR=$XCODE_PATH
     - nvm use 14
     - npm install
-    - npm run disable-pure-getters
-    - npm run configure-mangle
+    - npm run prepare-prod-build
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
     - npx ionic build --prod
     - npx cap sync ios
@@ -110,6 +109,7 @@ build_mac:
     - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
     - nvm use 14
     - npm install
+    - npm run prepare-prod-build
     - npm --prefix electron/ install
     - npm run build:electron:prod
     - npx cap sync electron
