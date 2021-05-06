@@ -74,7 +74,8 @@ export class ElectronProcess {
     }
 
     if (result.error) {
-      deferred.reject(result.error)
+      const error = result.error.message ? new Error(result.error.message) : result.error
+      deferred.reject(error)
     } else {
       deferred.resolve(result)
     }

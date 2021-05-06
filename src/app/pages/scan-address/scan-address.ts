@@ -1,10 +1,9 @@
+import { PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController, Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
-import { PermissionsProvider } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ScanBasePage } from '../scan-base/scan-base'
 
@@ -14,16 +13,16 @@ import { ScanBasePage } from '../scan-base/scan-base'
   styleUrls: ['./scan-address.scss']
 })
 export class ScanAddressPage extends ScanBasePage {
-  private readonly callback: (address: string) => void
+  private readonly callback: ((address: string) => void) | ((address: string) => Promise<void>)
   private callbackCalled: boolean = false
 
-  @ViewChild('addressScanner', { static: true })
-  public zxingScanner: ZXingScannerComponent
+  @ViewChild('addressScanner')
+  public zxingScanner?: ZXingScannerComponent
 
   constructor(
     protected readonly platform: Platform,
-    protected readonly scanner: ScannerProvider,
-    protected readonly permissionsProvider: PermissionsProvider,
+    protected readonly scanner: QrScannerService,
+    protected readonly permissionsProvider: PermissionsService,
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute
   ) {
@@ -45,9 +44,9 @@ export class ScanAddressPage extends ScanBasePage {
       console.log('scan callback', text)
       this.callbackCalled = true
       if (this.platform.is('hybrid')) {
-        this.scanner.stopScan()
-      } else {
-        this.zxingScanner.resetCodeReader()
+        this.scanner.destroy()
+      } else if (this.zxingScanner) {
+        this.zxingScanner.codeReader.reset()
       }
       this.navCtrl
         .pop()

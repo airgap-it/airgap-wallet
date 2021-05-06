@@ -56,6 +56,17 @@ identicon {
 .item-md p {
   white-space: initial;
 }
+.d-flex {
+  display: flex;
+}
+pre {
+  background-color: var(--ion-color-light);
+  padding: 8px;
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
 /* Center content vertically and horizontally */
 .content--align__center-center {
   justify-content: center;
@@ -92,7 +103,7 @@ ion-list-header {
   }
 }
 
-qr-clipboard {
+airgap-qr {
   padding: 20px;
   background-color: white;
 }
@@ -121,13 +132,24 @@ page-delegation-baker-detail,
 page-delegation-polkadot-validator-detail,
 page-account-address,
 page-transaction-qr,
+page-beacon-request,
 page-exchange-custom,
 page-transaction-qr {
+  .sc-ion-card-md-h,
+  .sc-ion-card-ios-h,
   ion-card,
-  qr-clipboard {
+  airgap-qr {
     box-shadow: 0 10px 20px 0 rgba(49, 27, 88, 0.12);
     border: 1px solid rgba(0, 232, 204, 0.08);
     border-radius: 0;
+  }
+}
+
+page-beacon-request {
+  identicon,
+  identicon img {
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -171,4 +193,27 @@ page-scan {
 .active-link {
   font-weight: 500;
   --color-selected: var(--ion-color-secondary);
+}
+
+/* Common Components styling */
+
+// identicon.component
+portfolio-item,
+transaction-item {
+  airgap-identicon {
+    height: 48px;
+    width: 48px;
+  }
+}
+airgap-currency-symbol {
+  img {
+    border-radius: 50%;
+  }
+}
+page-sub-account-add {
+  airgap-currency-symbol {
+    img {
+      width: 100%;
+    }
+  }
 }

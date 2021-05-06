@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title *ngIf="!isDesktop">
         {{ 'interaction-selection.title' | translate }}
@@ -19,7 +19,9 @@
     <h3 class="ion-padding-bottom ion-no-margin" [innerHTML]="'interaction-selection.heading' | translate"></h3>
     <ion-row class="ion-no-padding">
       <ion-col size="12" size-md="6">
-        <ion-row class="ion-justify-content-center"><img src="./assets/img/sign-one-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center">
+          <img src="./assets/img/sign-one-device.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">
@@ -30,7 +32,9 @@
           </ion-col>
         </ion-row>
 
-        <ion-row class="ion-justify-content-center ion-padding-top"><img src="./assets/img/sign-two-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center ion-padding-top">
+          <img src="./assets/img/sign-two-device.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">
@@ -50,7 +54,10 @@
     <h3 class="ion-padding-bottom ion-no-margin" [innerHTML]="'interaction-selection-desktop.heading' | translate"></h3>
     <ion-row class="ion-no-padding">
       <ion-col size="12" size-md="6">
-        <ion-row class="ion-justify-content-center ion-padding-top"><img src="./assets/img/sign-two-device.svg" /></ion-row>
+        <ion-row class="ion-justify-content-center ion-padding-top">
+          <img *ngIf="!isDesktop" src="./assets/img/sign-two-device.svg" />
+          <img *ngIf="isDesktop" src="./assets/img/signer-vault-desktop.svg" />
+        </ion-row>
 
         <ion-row>
           <ion-col size="12">
@@ -65,7 +72,7 @@
 
         <ion-row>
           <ion-col size="12">
-            <ion-button id="online" expand="block" color="primary" (click)="ledgerSign()" shape="round">
+            <ion-button id="online" expand="block" color="primary" (click)="ledgerSign()" shape="round" [disabled]="!isLedgerSupported">
               {{ 'interaction-selection-desktop.ledger_label' | translate }}
             </ion-button>
             <p>{{ 'interaction-selection-desktop.ledger_info' | translate }}</p>

@@ -5,9 +5,9 @@ export class AppMock {
   public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
-export class AppInfoMock {
+export class AppInfoPluginMock {
   public get: jasmine.Spy = newSpy(
-    'set',
+    'get',
     Promise.resolve({
       appName: 'AirGap.UnitTest',
       packageName: 'AirGap',
@@ -31,6 +31,10 @@ export class PushNotificationsMock {
   public addListener: jasmine.Spy = newSpy('addListener', {})
 }
 
+export class SaplingPluginMock {
+  public isSupported: jasmine.Spy = newSpy('isSupported', Promise.resolve(false))
+}
+
 export class SplashScreenMock {
   public hide: jasmine.Spy = newSpy('hide', Promise.resolve())
 }
@@ -38,4 +42,7 @@ export class SplashScreenMock {
 export class StatusBarMock {
   public setStyle: jasmine.Spy = newSpy('setStyle', Promise.resolve())
   public setBackgroundColor: jasmine.Spy = newSpy('setBackgroundColor', Promise.resolve())
+}
+export class PermissionsPluginMock {
+  public query: jasmine.Spy = newSpy('query', Promise.resolve())
 }

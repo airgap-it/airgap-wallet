@@ -1,7 +1,9 @@
+import { AddressService } from '@airgap/angular-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { AlertOptions } from '@ionic/core'
-import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-delegate-edit-popover',
@@ -9,20 +11,28 @@ import { AirGapDelegatorAction } from 'src/app/interfaces/IAirGapCoinDelegatePro
   styleUrls: ['./delegate-edit-popover.component.scss']
 })
 export class DelegateEditPopoverComponent {
-  public readonly hideAirGap: boolean
   public readonly delegateeLabel: string
-  public readonly hasMultipleDelegatees: boolean
-  public readonly secondaryDelegatorActions: AirGapDelegatorAction[]
+  public readonly delegateeLabelPlural: string
+
+  private readonly protocolIdentifier: ProtocolSymbols
+  private readonly networkIdentifier: string
 
   constructor(
     private readonly alertController: AlertController,
     private readonly popoverController: PopoverController,
-    private readonly navParams: NavParams
+    private readonly navParams: NavParams,
+    private readonly translateService: TranslateService,
+    private readonly addressService: AddressService
   ) {
-    this.hideAirGap = this.navParams.get('hideAirGap')
-    this.delegateeLabel = this.navParams.get('delegateeLabel')
-    this.hasMultipleDelegatees = this.navParams.get('hasMultipleDelegatees')
-    this.secondaryDelegatorActions = this.navParams.get('secondaryDelegatorActions')
+    const delegateeLabel: string | undefined = this.navParams.get('delegateeLabel')
+    const delegateeLabelPlural: string | undefined = this.navParams.get('delegateeLabelPlural')
+
+    this.protocolIdentifier = this.navParams.get('protocolIdentifier')
+    this.networkIdentifier = this.navParams.get('network')
+
+    this.delegateeLabel = delegateeLabel !== undefined ? delegateeLabel : 'delegation-detail.default-delegatee-label'
+    this.delegateeLabelPlural =
+      delegateeLabelPlural !== undefined ? delegateeLabelPlural : 'delegation-detail.default-delegatee-label-plural'
   }
 
   public async changeDelegatee(): Promise<void> {
@@ -33,20 +43,23 @@ export class DelegateEditPopoverComponent {
   }
 
   private async createAlertOptions(): Promise<AlertOptions> {
-    // TODO: add translations
     return {
-      header: 'Delegation Settings',
-      message: `Enter the address provided to you by the ${this.delegateeLabel}.`,
+      header: this.translateService.instant('delegate-edit-popover.delegation-settings_label'),
+      message: this.translateService.instant('delegate-edit-popover.change-alert.text', {
+        delegateeLabel: this.translateService.instant(this.delegateeLabel)
+      }),
       inputs: [
         {
-          name: 'delegateeAddress',
-          id: 'delegatee-address',
-          placeholder: `${this.delegateeLabel} address`
+          name: 'delegatee',
+          id: 'delegatee',
+          placeholder: this.translateService.instant('delegate-edit-popover.change-alert.placeholder_text', {
+            delegateeLabel: this.translateService.instant(this.delegateeLabel)
+          })
         }
       ],
       buttons: [
         {
-          text: 'Cancel',
+          text: this.translateService.instant('delegate-edit-popover.change-alert.cancel_label'),
           role: 'cancel',
           cssClass: 'secondary',
           handler: (): void => {
@@ -54,26 +67,22 @@ export class DelegateEditPopoverComponent {
           }
         },
         {
-          text: `Set ${this.delegateeLabel}`,
-          handler: ({ delegateeAddress }: { delegateeAddress: string }): boolean => {
-            this.popoverController.dismiss({ delegateeAddress })
+          text: this.translateService.instant('delegate-edit-popover.change-alert.set-delegatee_label', {
+            delegateeLabel: this.translateService.instant(this.delegateeLabel)
+          }),
+          handler: async ({ delegatee }: { delegatee: string }): Promise<boolean> => {
+            const delegateeAddress: string | undefined = await this.addressService.getAddress(
+              delegatee,
+              this.protocolIdentifier,
+              this.networkIdentifier
+            )
+
+            this.popoverController.dismiss({ delegateeAddress: delegateeAddress ? delegateeAddress : '' })
 
             return true
           }
         }
       ]
     }
-  }
-
-  public async changeDelegateeToAirGap() {
-    this.popoverController.dismiss({ changeToAirGap: true })
-  }
-
-  public async showAllDelegatees() {
-    this.popoverController.dismiss({ showDelegateeList: true })
-  }
-
-  public async callSecondaryAction(type: string) {
-    this.popoverController.dismiss({ secondaryActionType: type })
   }
 }

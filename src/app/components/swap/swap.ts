@@ -1,7 +1,9 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
@@ -28,6 +30,9 @@ export class SwapComponent {
   public expandWalletSelection: boolean = false
 
   @Input()
+  public readonly currentlyNotSupported: boolean = false
+
+  @Input()
   public readonly swapSell: boolean = true
 
   @Input()
@@ -40,7 +45,7 @@ export class SwapComponent {
   public readonly selectedProtocol: ICoinProtocol
 
   @Input()
-  public readonly supportedProtocols: string[] = []
+  public readonly supportedProtocols: ProtocolSymbols[] = []
 
   @Input()
   public readonly minExchangeAmount: BigNumber
@@ -59,7 +64,11 @@ export class SwapComponent {
   @Output()
   private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
 
-  constructor(public alertCtrl: AlertController, public modalController: ModalController) {}
+  constructor(
+    public alertCtrl: AlertController,
+    public modalController: ModalController,
+    private readonly protocolService: ProtocolService
+  ) {}
 
   public amountSet(amount: string): void {
     this._amount = amount
@@ -72,14 +81,11 @@ export class SwapComponent {
   }
 
   public async doRadio(): Promise<void> {
-    const protocols: ICoinProtocol[] = []
-    this.supportedProtocols.forEach(supportedProtocol => {
-      try {
-        protocols.push(getProtocolByIdentifier(supportedProtocol))
-      } catch (error) {
-        /* */
-      }
-    })
+    const protocols: ICoinProtocol[] = (await Promise.all(
+      this.supportedProtocols.map(async (supportedProtocol: ProtocolSymbols) =>
+        this.protocolService.getProtocol(supportedProtocol).catch(() => undefined)
+      )
+    )).filter((protocol: ICoinProtocol | undefined) => protocol !== undefined)
 
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: ProtocolSelectPage,
@@ -91,9 +97,9 @@ export class SwapComponent {
 
     modal
       .onDidDismiss()
-      .then((protocolIdentifier: any) => {
+      .then(async (protocolIdentifier: any) => {
         if (protocolIdentifier && protocolIdentifier.data) {
-          this.protocolSetEmitter.emit(getProtocolByIdentifier(protocolIdentifier.data))
+          this.protocolSetEmitter.emit(await this.protocolService.getProtocol(protocolIdentifier.data))
         }
       })
       .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))

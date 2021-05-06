@@ -1,12 +1,16 @@
-import { BigNumber } from 'bignumber.js'
-import { getProtocolByIdentifier, IAirGapTransaction } from 'airgap-coin-lib'
-import { BehaviorSubject } from 'rxjs'
+import { ProtocolService } from '@airgap/angular-core'
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { Injectable } from '@angular/core'
+import { IAirGapTransaction } from '@airgap/coinlib-core'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { BigNumber } from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
+
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { Injectable } from '@angular/core'
-import { StorageProvider, SettingsKey } from '../storage/storage'
+import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
 
 export enum ExchangeEnum {
   CHANGELLY = 'Changelly',
@@ -26,8 +30,8 @@ export enum TransactionStatus {
 export interface ExchangeTransaction {
   receivingAddress: string
   sendingAddress: string
-  fromCurrency: string
-  toCurrency: string
+  fromCurrency: ProtocolSymbols
+  toCurrency: ProtocolSymbols
   amountExpectedFrom: BigNumber
   amountExpectedTo: string
   fee: string
@@ -47,7 +51,11 @@ export class ExchangeProvider implements Exchange {
 
   private pendingTransactions: ExchangeTransaction[] = []
 
-  constructor(public http: HttpClient, private readonly storageProvider: StorageProvider) {
+  constructor(
+    public http: HttpClient,
+    private readonly storageService: WalletStorageService,
+    private readonly protocolService: ProtocolService
+  ) {
     this.loadPendingTranscationsFromStorage()
     this.exchangeSubject.subscribe(exchange => {
       switch (exchange) {
@@ -63,11 +71,11 @@ export class ExchangeProvider implements Exchange {
     })
   }
 
-  public getAvailableFromCurrencies(): Promise<string[]> {
+  public getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableFromCurrencies()
   }
 
-  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<string[]> {
+  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableToCurrenciesForCurrency(selectedFrom)
   }
 
@@ -138,8 +146,11 @@ export class ExchangeProvider implements Exchange {
     this.persist()
   }
 
-  public formatExchangeTxs(pendingExchangeTxs: ExchangeTransaction[], protocolIdentifier: string): IAirGapTransaction[] {
-    const protocol = getProtocolByIdentifier(protocolIdentifier)
+  public async formatExchangeTxs(
+    pendingExchangeTxs: ExchangeTransaction[],
+    protocolIdentifier: ProtocolSymbols
+  ): Promise<IAirGapTransaction[]> {
+    const protocol = await this.protocolService.getProtocol(protocolIdentifier)
     return pendingExchangeTxs.map(tx => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
       const formattedAmount = rawAmount.times(10 ** protocol.decimals).toString()
@@ -149,8 +160,9 @@ export class ExchangeProvider implements Exchange {
         isInbound: protocolIdentifier === tx.toCurrency ? true : false,
         amount: formattedAmount,
         fee: new BigNumber(tx.fee).shiftedBy(protocol.decimals).toFixed(),
-        timestamp: tx.timestamp,
+        timestamp: new BigNumber(tx.timestamp).dividedToIntegerBy(1000).toNumber(),
         protocolIdentifier: protocolIdentifier === tx.toCurrency ? tx.toCurrency : tx.fromCurrency,
+        network: protocol.options.network,
         extra: tx.status
       }
     })
@@ -165,16 +177,16 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
+    return this.storageService.set(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS, this.pendingTransactions)
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageProvider.get(SettingsKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
+    const pendingTransactions = (await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }
 
-  public async getExchangeTransactionsByProtocol(protocolidentifier: string, address: string): Promise<IAirGapTransaction[]> {
+  public async getExchangeTransactionsByProtocol(protocolidentifier: ProtocolSymbols, address: string): Promise<IAirGapTransaction[]> {
     const filteredByProtocol = this.pendingTransactions.filter(
       tx => tx.fromCurrency === protocolidentifier || tx.toCurrency === protocolidentifier
     )

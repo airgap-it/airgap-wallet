@@ -1,8 +1,9 @@
-import { LedgerConnection, LedgerConnectionType, LedgerConnectionDetails } from './LedgerConnection'
 import Transport from '@ledgerhq/hw-transport'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
+
+import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from './LedgerConnection'
 
 type TransportType = typeof TransportU2F | typeof TransportWebUSB
 

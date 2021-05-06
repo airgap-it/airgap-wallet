@@ -1,19 +1,15 @@
+import { ClipboardService, SerializerService, IACMessageTransport } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
+import { SharePlugin } from '@capacitor/core'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { SharePlugin } from '@capacitor/core'
-
-import { ClipboardService } from '../../services/clipboard/clipboard'
-import { SchemeRoutingProvider } from '../../services/scheme-routing/scheme-routing'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SerializerService } from '../../services/serializer/serializer.service'
-import { IntroductionPage } from '../introduction/introduction'
-import { BrowserService } from 'src/app/services/browser/browser.service'
-
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
+import { BrowserService } from 'src/app/services/browser/browser.service'
+import { IACService } from 'src/app/services/iac/iac.service'
 
-declare var window: any
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { IntroductionPage } from '../introduction/introduction'
 
 @Component({
   selector: 'page-settings',
@@ -28,7 +24,7 @@ export class SettingsPage {
     private readonly modalController: ModalController,
     private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
-    private readonly schemeRoutingProvider: SchemeRoutingProvider,
+    private readonly iacService: IACService,
     private readonly browserService: BrowserService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
@@ -37,10 +33,18 @@ export class SettingsPage {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  public beaconPermissions(): void {
+    this.router.navigateByUrl('/beacon-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public beaconSettings(): void {
+    this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
   public share(): void {
     const options = {
       title: 'Checkout airgap.it', // Set a title for any message. This will be the subject if sharing to email
-      text: 'Take a look at the app I found. Its the most secure practical way to do crypto transactions.', // Set some text to share
+      text: "Take a look at the app I found. It's the most secure way to do crypto transactions.", // Set some text to share
       url: 'https://www.airgap.it', // Set a URL to share
       dialogTitle: 'Pick an app' // Set a title for the share modal. Android only
     }
@@ -143,27 +147,22 @@ export class SettingsPage {
     this.browserService.openUrl('https://airgap.it/#faq')
   }
 
+  public aboutBeacon(): void {
+    this.browserService.openUrl('https://walletbeacon.io')
+  }
+
+  public goToQrSettings(): void {
+    this.router.navigateByUrl('/qr-settings').catch(err => console.error(err))
+  }
+
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
-        this.schemeRoutingProvider.handleNewSyncRequest(this.router, text).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
       },
       (err: string) => {
         console.error('Error: ' + err)
       }
     )
-  }
-
-  public switchSerializerVersion(event: TouchEvent): void {
-    console.log((event.detail as any).checked)
-    this.serializerService.useV2 = (event.detail as any).checked
-  }
-  public qrMsChanged(event: TouchEvent): void {
-    console.log((event.detail as any).value)
-    this.serializerService.displayTimePerChunk = (event.detail as any).value
-  }
-  public qrBytesChanged(event: TouchEvent): void {
-    console.log((event.detail as any).value)
-    this.serializerService.chunkSize = (event.detail as any).value
   }
 }

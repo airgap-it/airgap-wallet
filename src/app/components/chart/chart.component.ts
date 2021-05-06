@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
-import { TimeUnit } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import * as moment from 'moment'
 import { BaseChartDirective } from 'ng2-charts'
 import { Subscription } from 'rxjs'
-
+import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
-import { MarketDataService } from './../../services/market-data/market-data.service'
+import { MarketDataService, ValueAtTimestamp } from './../../services/market-data/market-data.service'
 
 @Component({
   selector: 'chart',
@@ -16,7 +16,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('baseChart', { static: true }) public chart?: BaseChartDirective
 
-  public currentChart: TimeUnit | string = TimeUnit.Minutes
+  public readonly timeInterval: typeof TimeInterval = TimeInterval
+
+  public currentTimeInterval: TimeInterval | undefined = undefined
   public chartType: string = 'line'
   public chartLabels: string[] = []
   public percentageChange: number
@@ -25,11 +27,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
 
-  public rawData: number[] = []
+  private subscription: Subscription
 
-  private readonly subscription: Subscription
+  constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {}
 
-  constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {
+  public ngOnInit(): void {
     this.chartOptions = {
       layout: {
         padding: {
@@ -78,6 +80,25 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
           tension: 0 // disables bezier curves
         }
       },
+      tooltips: {
+        mode: 'x-axis',
+        intersect: false,
+        displayColors: false, // removes color box and label
+
+        callbacks: {
+          title: function(data) {
+            return moment.unix(data[0].label).format('DD.MM.YYYY')
+          },
+          label: function(data): string {
+            if (Number(data.value) % 1 !== 0) {
+              let value = parseFloat(data.value).toFixed(2)
+              return `$${value}`
+            } else {
+              return data.value
+            }
+          }
+        }
+      },
       annotation: {
         annotations: [
           {
@@ -97,32 +118,33 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     }
 
     this.subscription = this.drawChartProvider.getChartObservable().subscribe(async data => {
-      await this.drawChart(data)
+      this.drawChart(data)
     })
   }
 
-  public async drawChart(timeInterval: TimeUnit | string): Promise<void> {
+  public async drawChart(timeInterval: TimeInterval): Promise<void> {
     this.chartLabels = []
-    this.chartDatasets = [{ data: [], label: 'Price' }]
+    this.chartDatasets = [{ data: [], label: '$' }]
 
-    this.currentChart = timeInterval
+    this.currentTimeInterval = timeInterval
 
-    this.rawData = await this.marketDataProvider.fetchAllValues(this.currentChart)
-    this.chartDatasets[0].data = this.rawData
+    this.marketDataProvider.fetchAllValues(this.currentTimeInterval).then(async rawData => {
+      this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestamp) => obj.usdValue)
 
-    for (let i = 0; i < this.rawData.length; i++) {
-      // x-axis labeling
-      this.chartLabels.push(' ')
-    }
+      for (const value of rawData) {
+        // x-axis labeling
+        this.chartLabels.push(value.timestamp.toString())
+      }
 
-    this.percentageChange = await this.displayPercentageChange(this.rawData)
+      this.percentageChange = this.displayPercentageChange(rawData.map((obj: ValueAtTimestamp) => obj.usdValue))
+    })
   }
 
   public setLabel24h(): void {
-    this.currentChart = TimeUnit.Minutes
+    this.currentTimeInterval = TimeInterval.HOURS
   }
 
-  public async displayPercentageChange(rawData: number[]): Promise<number> {
+  public displayPercentageChange(rawData: number[]): number {
     const firstValue: number = rawData.find(value => value > 0)
     if (firstValue !== undefined) {
       const lastValue: number = rawData.slice(-1)[0]
@@ -135,7 +157,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    this.chartDatasets = [{ data: [], label: 'Price' }]
+    this.chartDatasets = [{ data: [], label: '$' }]
     this.chartLabels = []
 
     if (this.chart) {

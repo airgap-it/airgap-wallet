@@ -1,36 +1,47 @@
-import { TezosBTC } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosBTC'
 import { Injectable } from '@angular/core'
+import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, TezosKtProtocol, ICoinDelegateProtocol } from 'airgap-coin-lib'
-import { CosmosTransaction } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosTransaction'
+import {
+  AirGapMarketWallet,
+  IACMessageType,
+  IAirGapTransaction,
+  ICoinDelegateProtocol,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  TezosKtProtocol,
+  TezosSaplingProtocol
+} from '@airgap/coinlib-core'
+import { CosmosTransaction } from '@airgap/coinlib-core/protocols/cosmos/CosmosTransaction'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { FeeDefaults } from '@airgap/coinlib-core'
+import { TezosBTC } from '@airgap/coinlib-core'
 import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
   RawEthereumTransaction,
   RawTezosTransaction,
   RawSubstrateTransaction
-} from 'airgap-coin-lib/dist/serializer/types'
+} from '@airgap/coinlib-core/serializer/types'
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
-
-import { ProtocolSymbols } from '../protocols/protocols'
-import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { SerializerService } from '../serializer/serializer.service'
-import { supportsDelegation, supportsAirGapDelegation } from 'src/app/helpers/delegation'
+import { supportsAirGapDelegation, supportsDelegation } from 'src/app/helpers/delegation'
 import {
   AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapDelegatorAction
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
+import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
-import { FormBuilder } from '@angular/forms'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
-import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
+
+import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { ProtocolService, SerializerService } from '@airgap/angular-core'
+import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
+import { TezosSaplingAddress } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingAddress'
 
 export type SerializableTx =
   | RawTezosTransaction
@@ -50,11 +61,12 @@ export class OperationsProvider {
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
     private readonly serializerService: SerializerService,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: FormBuilder,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -75,7 +87,7 @@ export class OperationsProvider {
   }
 
   public async getAccountExtendedDetails(wallet: AirGapMarketWallet): Promise<UIAccountExtendedDetails> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -88,7 +100,7 @@ export class OperationsProvider {
   }
 
   public async getCurrentDelegatees(wallet: AirGapMarketWallet): Promise<string[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -97,15 +109,16 @@ export class OperationsProvider {
     if (current.length === 0) {
       let defaultDelegatee: string
       if (supportsAirGapDelegation(protocol)) {
-        defaultDelegatee = protocol.airGapDelegatee
+        defaultDelegatee = protocol.airGapDelegatee()
       }
+
       return [defaultDelegatee || (await protocol.getDefaultDelegatee())]
     }
     return current
   }
 
   public async getDelegatorDetails(wallet: AirGapMarketWallet): Promise<DelegatorDetails> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -114,7 +127,7 @@ export class OperationsProvider {
   }
 
   public async getDelegationDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<AirGapDelegationDetails[]> {
-    const protocol = wallet.coinProtocol
+    const protocol = wallet.protocol
     if (!supportsDelegation(protocol)) {
       return Promise.reject('Protocol does not support delegation.')
     }
@@ -122,6 +135,15 @@ export class OperationsProvider {
     return supportsAirGapDelegation(protocol)
       ? protocol.getExtraDelegationDetailsFromAddress(wallet.receivingPublicAddress, delegatees)
       : [await this.getDefaultDelegationDetails(protocol, wallet.receivingPublicAddress, delegatees)]
+  }
+
+  public async getRewardDisplayDetails(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIRewardList | undefined> {
+    const protocol = wallet.protocol
+    if (!supportsDelegation(protocol)) {
+      return Promise.reject('Protocol does not support delegation.')
+    }
+
+    return supportsAirGapDelegation(protocol) ? protocol.getRewardDisplayDetails(wallet.receivingPublicAddress, delegatees) : undefined
   }
 
   private async getDefaultDelegationDetails(
@@ -166,15 +188,7 @@ export class OperationsProvider {
             defaultUndelegateActionTypeKeywords,
             defaultMainParamNameKeywords
           )
-        : [],
-      displayRewards: delegatorDetails.rewards
-        ? new UIRewardList({
-            rewards: delegatorDetails.rewards.slice(0, 5),
-            indexColLabel: 'Index',
-            amountColLabel: 'Reward',
-            payoutColLabel: 'Payout'
-          })
-        : undefined
+        : []
     }
   }
 
@@ -186,8 +200,20 @@ export class OperationsProvider {
     delegateeArgKeywords: string[]
   ): AirGapDelegatorAction[] | undefined {
     return [
-      this.createDefaultDelegateAction(availableActions, delegatees, delegateActionTypeKeywords, delegateeArgKeywords, 'Delegate'),
-      this.createDefaultDelegateAction(availableActions, delegatees, undelegateActionTypeKeywords, delegateeArgKeywords, 'Undelegate'),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        delegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.delegate_label'
+      ),
+      this.createDefaultDelegateAction(
+        availableActions,
+        delegatees,
+        undelegateActionTypeKeywords,
+        delegateeArgKeywords,
+        'delegation-detail.undelegate_label'
+      ),
       ...this.createDefaultExtraActions(availableActions, [...delegateActionTypeKeywords, ...undelegateActionTypeKeywords])
     ].filter(action => !!action)
   }
@@ -249,10 +275,10 @@ export class OperationsProvider {
     type: any,
     data?: any
   ): Promise<{ airGapTxs: IAirGapTransaction[]; unsignedTx: any }> {
-    if (supportsDelegation(wallet.coinProtocol)) {
-      const unsignedTx = (await wallet.coinProtocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data))[0]
+    if (supportsDelegation(wallet.protocol)) {
+      const unsignedTx = (await wallet.protocol.prepareDelegatorActionFromPublicKey(wallet.publicKey, type, data))[0]
 
-      const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
+      const airGapTxs = await wallet.protocol.getTransactionDetails({
         publicKey: wallet.publicKey,
         transaction: unsignedTx
       })
@@ -288,25 +314,67 @@ export class OperationsProvider {
   public refreshAllDelegationStatuses(wallets: AirGapMarketWallet[]) {
     Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
       const address = entry[0]
-      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.coinProtocol))
+      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.protocol))
       if (wallet) {
-        this.getDelegationStatusOfAddress(wallet.coinProtocol as ICoinDelegateProtocol, address, true).catch(
+        this.getDelegationStatusOfAddress(wallet.protocol as ICoinDelegateProtocol, address, true).catch(
           handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)
         )
       }
     })
   }
 
-  public async serializeTx(wallet: AirGapMarketWallet, transaction: SerializableTx): Promise<string[]> {
+  public async serializeSignRequest(
+    wallet: AirGapMarketWallet,
+    serializableData: any,
+    type: IACMessageType,
+    generatedId: string
+  ): Promise<string[]> {
+    switch (type) {
+      case IACMessageType.MessageSignRequest:
+        return this.serializeMessageSignRequest(wallet, serializableData, type, generatedId)
+      default:
+        return this.serializeTransactionSignRequest(wallet, serializableData, type, generatedId)
+    }
+  }
+
+  public async serializeTransactionSignRequest(
+    wallet: AirGapMarketWallet,
+    transaction: SerializableTx,
+    type: IACMessageType,
+    generatedId: string
+  ): Promise<string[]> {
+    const payload = {
+      publicKey: wallet.publicKey,
+      transaction: transaction as any, // TODO: Type
+      callbackURL: 'airgap-wallet://?d='
+    }
     return this.serializerService.serialize([
       {
-        protocol: wallet.coinProtocol.identifier,
-        type: IACMessageType.TransactionSignRequest,
-        payload: {
-          publicKey: wallet.publicKey,
-          transaction: transaction as any, // TODO: Type
-          callback: 'airgap-wallet://?d='
-        }
+        id: generatedId,
+        protocol: wallet.protocol.identifier,
+        type: type,
+        payload: payload
+      }
+    ])
+  }
+
+  public async serializeMessageSignRequest(
+    wallet: AirGapMarketWallet,
+    request: SignPayloadRequestOutput,
+    type: IACMessageType,
+    generatedId: string
+  ): Promise<string[]> {
+    const payload = {
+      publicKey: wallet.publicKey,
+      message: request.payload,
+      callbackURL: 'airgap-wallet://?d='
+    }
+    return this.serializerService.serialize([
+      {
+        id: generatedId,
+        protocol: wallet.protocol.identifier,
+        type: type,
+        payload: payload
       }
     ])
   }
@@ -320,6 +388,7 @@ export class OperationsProvider {
     address: string,
     amount: BigNumber,
     fee: BigNumber,
+    knownWallets: AirGapMarketWallet[],
     data?: any
   ): Promise<{ airGapTxs: IAirGapTransaction[]; unsignedTx: any }> {
     const loader = await this.getAndShowLoader()
@@ -327,10 +396,15 @@ export class OperationsProvider {
     try {
       let unsignedTx
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
-      if (wallet.coinProtocol.identifier === ProtocolSymbols.XTZ_KT) {
+      let airGapTxs: IAirGapTransaction[]
+      if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_KT) {
         const tezosKtProtocol = new TezosKtProtocol()
         unsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
-      } else if (wallet.coinProtocol.identifier === ProtocolSymbols.TZBTC) {
+        airGapTxs = await wallet.protocol.getTransactionDetails({
+          publicKey: wallet.publicKey,
+          transaction: unsignedTx
+        })
+      } else if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
         const protocol = new TezosBTC()
 
         unsignedTx = await protocol.transfer(
@@ -340,14 +414,48 @@ export class OperationsProvider {
           fee.toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
           wallet.publicKey
         )
+
+        airGapTxs = await wallet.protocol.getTransactionDetails({
+          publicKey: wallet.publicKey,
+          transaction: unsignedTx
+        })
+      } else if (wallet.protocol.identifier === MainProtocolSymbols.XTZ && TezosSaplingAddress.isZetAddress(address)) {
+        const protocols: ICoinProtocol[] = (await this.protocolService.getProtocolsForAddress(address)).filter(
+          (protocol: ICoinProtocol) => protocol.identifier !== MainProtocolSymbols.XTZ
+        )
+
+        if (protocols.length > 1) {
+          throw new Error('More than 1 sapling protocol is supported')
+        }
+
+        const protocol: ICoinProtocol = protocols[0]
+
+        if (!(protocol instanceof TezosSaplingProtocol)) {
+          throw new Error('Invalid sapling protocol')
+        }
+
+        unsignedTx = await protocol.prepareShieldTransaction(wallet.publicKey, address, amount.toString(10), fee.toString(10), {
+          overrideFees: true
+        })
+
+        const knownViewingKeys: string[] = knownWallets
+          .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier)
+          .map((wallet: AirGapMarketWallet) => wallet.publicKey)
+
+        airGapTxs = await protocol.getTransactionDetails(
+          {
+            publicKey: wallet.publicKey,
+            transaction: unsignedTx
+          },
+          { knownViewingKeys }
+        )
       } else {
         unsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
+        airGapTxs = await wallet.protocol.getTransactionDetails({
+          publicKey: wallet.publicKey,
+          transaction: unsignedTx
+        })
       }
-
-      const airGapTxs = await wallet.coinProtocol.getTransactionDetails({
-        publicKey: wallet.publicKey,
-        transaction: unsignedTx
-      })
 
       return { airGapTxs, unsignedTx }
     } catch (error) {
@@ -378,7 +486,7 @@ export class OperationsProvider {
       return await wallet.estimateFees([address], [amount.toFixed()], data)
     } catch (error) {
       console.error(error)
-      return wallet.coinProtocol.feeDefaults
+      return wallet.protocol.feeDefaults
     }
   }
 

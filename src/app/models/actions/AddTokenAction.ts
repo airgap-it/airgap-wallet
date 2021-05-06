@@ -1,6 +1,6 @@
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
 
 import { IAccountWrapper } from '../../pages/sub-account-add/sub-account-add'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -14,7 +14,9 @@ export interface AddTokenActionContext {
 }
 
 export class AddTokenAction extends Action<void, AddTokenActionContext> {
-  public readonly identifier: string = 'add-token-action'
+  public get identifier(): string {
+    return 'add-token-action'
+  }
 
   public info: WalletActionInfo = {
     name: 'account-transaction-list.add-tokens_label',
@@ -25,7 +27,7 @@ export class AddTokenAction extends Action<void, AddTokenActionContext> {
     this.context.subAccounts
       .filter((account: IAccountWrapper) => account.selected)
       .map((account: IAccountWrapper) => account.wallet)
-      .forEach((wallet: AirGapMarketWallet) => {
+      .forEach(async (wallet: AirGapMarketWallet) => {
         this.context.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
   }

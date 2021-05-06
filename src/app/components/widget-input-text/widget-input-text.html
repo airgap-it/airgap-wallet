@@ -2,11 +2,11 @@
   <ion-row class="ion-padding-horizontal padding-top ion-align-items-center value__container">
     <ion-col size="9" class="value--container__input ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ widget.label }}</ion-label>
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ widget.label | translate }}</ion-label>
         <ion-input [type]="widget.inputType" [placeholder]="widget.placeholder" [formControlName]="widget.id"></ion-input>
       </ion-item>
       <ion-text class="ion-no-margin" color="blackLight" *ngIf="widget.extraLabel || widget.createExtraLabel">
-        <p class="ion-no-margin">{{ widget.extraLabel }}</p>
+        <p class="ion-no-margin">{{ widget.extraLabel | translate }}</p>
       </ion-text>
     </ion-col>
     <ion-col size="3" class="ion-no-padding" *ngIf="widget.fixedValue || widget.getFixedValue">
@@ -19,7 +19,7 @@
             color="secondary"
             (click)="widget.toggleValue()"
           >
-            {{ widget.toggleFixedValueButton }}
+            {{ widget.toggleFixedValueButton | translate }}
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -28,7 +28,7 @@
   <ion-row class="ion-padding-horizontal ion-padding-bottom" *ngIf="widget.formControl && widget.errorLabel">
     <ion-col size="12" *ngIf="widget.formControl.invalid">
       <ion-text class="ion-no-margin" color="danger">
-        <p class="ion-no-margin">{{ widget.errorLabel }}</p>
+        <p class="ion-no-margin">{{ widget.errorLabel | translate }}</p>
       </ion-text>
     </ion-col>
   </ion-row>

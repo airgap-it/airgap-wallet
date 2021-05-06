@@ -1,14 +1,11 @@
+import { PermissionsService, PermissionStatus, PermissionTypes, QrScannerService } from '@airgap/angular-core'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 
-import { PermissionsProvider, PermissionStatus, PermissionTypes } from '../../services/permissions/permissions'
-import { ScannerProvider } from '../../services/scanner/scanner'
-
 export class ScanBasePage {
-  public zxingScanner: ZXingScannerComponent
+  public zxingScanner?: ZXingScannerComponent
   public availableDevices: MediaDeviceInfo[]
-  public selectedDevice: MediaDeviceInfo
-  public scannerEnabled: boolean = true
+  public selectedDevice: MediaDeviceInfo | null = null
 
   public hasCameras: boolean = false
 
@@ -18,7 +15,7 @@ export class ScanBasePage {
   public readonly isElectron: boolean
   public readonly isBrowser: boolean
 
-  constructor(protected platform: Platform, protected scanner: ScannerProvider, protected permissionsProvider: PermissionsProvider) {
+  constructor(protected platform: Platform, protected scanner: QrScannerService, protected permissionsProvider: PermissionsService) {
     this.isMobile = this.platform.is('hybrid')
     this.isElectron = this.platform.is('electron')
     this.isBrowser = !(this.isMobile || this.isElectron)
@@ -42,6 +39,7 @@ export class ScanBasePage {
 
   public async checkCameraPermissionsAndActivate(): Promise<void> {
     const permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
+
     if (permission === PermissionStatus.GRANTED) {
       this.hasCameraPermission = true
       this.startScan()
@@ -58,8 +56,9 @@ export class ScanBasePage {
   public ionViewWillLeave(): void {
     if (this.isMobile) {
       this.scanner.destroy()
-    } else {
-      this.zxingScanner.resetCodeReader()
+    } else if (this.zxingScanner) {
+      this.zxingScanner.enable = false
+      this.zxingScanner.codeReader.reset()
     }
   }
 
@@ -76,7 +75,6 @@ export class ScanBasePage {
   }
 
   private startScanMobile() {
-    this.scanner.show()
     this.scanner.scan(
       text => {
         this.checkScan(text)
@@ -89,17 +87,23 @@ export class ScanBasePage {
   }
 
   private startScanBrowser() {
-    this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
-      console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
-    })
-    if (this.selectedDevice) {
-      // Not the first time that we open scanner
-      this.zxingScanner.startScan(this.selectedDevice)
+    if (this.zxingScanner) {
+      this.hasCameraPermission = true
+      this.zxingScanner.enable = true
+      this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
+        console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
+      })
+
+      if (this.selectedDevice) {
+        // Not the first time that we open scanner
+        this.zxingScanner.device = this.selectedDevice
+      }
+
+      this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
+        this.hasCameras = true
+        this.availableDevices = devices
+        this.selectedDevice = devices[0]
+      })
     }
-    this.zxingScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
-      this.hasCameras = true
-      this.availableDevices = devices
-      this.selectedDevice = devices[0]
-    })
   }
 }

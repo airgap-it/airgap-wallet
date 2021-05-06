@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+
+import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
+
+// tslint:disable:max-classes-per-file
 
 export interface CurrencyDetailResponse {
   ticker: string
@@ -50,13 +54,13 @@ export interface ChangeNowTransactionStatus {
 }
 
 export class ChangeNowTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  status: string
+  public status: string
 
   constructor(json: ChangeNowTransactionStatus) {
     this.status = json.status
   }
 
-  isPending(): boolean {
+  public isPending(): boolean {
     switch (this.status) {
       case 'finished':
       case 'failed':
@@ -70,97 +74,205 @@ export class ChangeNowTransactionStatusResponse implements ExchangeTransactionSt
 }
 
 class ChangeNowApi {
-  private identifierExchangeToAirGapMap = new Map<string, string>()
-  private identifierAirGapToExchangeMap = new Map<string, string>()
+  private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
+  private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(public http: HttpClient, protected baseURL = 'https://changenow.io/api/v1') {
-    this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf')
-    this.identifierExchangeToAirGapMap.set('atom', 'cosmos')
-    this.identifierAirGapToExchangeMap.set('eth-erc20-xchf', 'xchf')
-    this.identifierAirGapToExchangeMap.set('cosmos', 'atom')
+  constructor(public http: HttpClient, protected readonly baseURL: string = 'https://changenow.io/api/v1') {
+    this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('usdterc20', 'eth-erc20-usdt' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('bnbmainnet', 'eth-erc20-bnb' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('link', 'eth-erc20-link' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('cro', 'eth-erc20-cro' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('usdc', 'eth-erc20-usdc' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('yfi', 'eth-erc20-yfi' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('ht', 'eth-erc20-ht' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('vet', 'eth-erc20-ven' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('wbtc', 'eth-erc20-wbtc' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('dai', 'eth-erc20-dai' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('tusd', 'eth-erc20-tusd' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('mkr', 'eth-erc20-mkr' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('snx', 'eth-erc20-snx' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('theta', 'eth-erc20-theta' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('omg', 'eth-erc20-omg' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('comp', 'eth-erc20-comp' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('busd', 'eth-erc20-busd' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('bat', 'eth-erc20-bat' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('zrx', 'eth-erc20-zrx' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('lrc', 'eth-erc20-lrc' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('pax', 'eth-erc20-pax' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('knc', 'eth-erc20-knc' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('rep', 'eth-erc20-repv2' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('sushi', 'eth-erc20-sushi' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('band', 'eth-erc20-band' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('ant', 'eth-erc20-ant' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('bal', 'eth-erc20-bal' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('husd', 'eth-erc20-husd' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('enj', 'eth-erc20-enj' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('mana', 'eth-erc20-mana' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('sxp', 'eth-erc20-sxp' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('gnt', 'eth-erc20-gnt' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('iost', 'eth-erc20-iost' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('srm', 'eth-erc20-srm' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('hot', 'eth-erc20-hot' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('snt', 'eth-erc20-snt' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('rlc', 'eth-erc20-rlc' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('storj', 'eth-erc20-storj' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('utk', 'eth-erc20-utk' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('mco', 'eth-erc20-mco' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('bnt', 'eth-erc20-bnt' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('nexo', 'eth-erc20-nexo' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('elf', 'eth-erc20-elf' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('dia', 'eth-erc20-dia' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('agi', 'eth-erc20-agi' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('fet', 'eth-erc20-fet' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('waxp', 'eth-erc20-wax' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('aion', 'eth-erc20-aion' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('atom', MainProtocolSymbols.COSMOS)
+    this.identifierExchangeToAirGapMap.set('dot', MainProtocolSymbols.POLKADOT)
+    this.identifierExchangeToAirGapMap.set('ksm', MainProtocolSymbols.KUSAMA)
+
+    this.identifierAirGapToExchangeMap.set('eth-erc20-xchf' as ProtocolSymbols, 'xchf')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-usdt' as ProtocolSymbols, 'usdterc20')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-bnb' as ProtocolSymbols, 'bnbmainnet')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-link' as ProtocolSymbols, 'link')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-cro' as ProtocolSymbols, 'cro')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-usdc' as ProtocolSymbols, 'usdc')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-yfi' as ProtocolSymbols, 'yfi')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-ht' as ProtocolSymbols, 'ht')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-ven' as ProtocolSymbols, 'vet')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-wbtc' as ProtocolSymbols, 'wbtc')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-dai' as ProtocolSymbols, 'dai')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-tusd' as ProtocolSymbols, 'tusd')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-mkr' as ProtocolSymbols, 'mkr')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-snx' as ProtocolSymbols, 'snx')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-theta' as ProtocolSymbols, 'theta')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-mkr' as ProtocolSymbols, 'mkr')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-omg' as ProtocolSymbols, 'omg')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-comp' as ProtocolSymbols, 'comp')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-busd' as ProtocolSymbols, 'busd')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-bat' as ProtocolSymbols, 'bat')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-zrx' as ProtocolSymbols, 'zrx')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-lrc' as ProtocolSymbols, 'lrc')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-pax' as ProtocolSymbols, 'pax')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-knc' as ProtocolSymbols, 'knc')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-repv2' as ProtocolSymbols, 'rep')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-sushi' as ProtocolSymbols, 'sushi')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-band' as ProtocolSymbols, 'band')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-ant' as ProtocolSymbols, 'ant')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-bal' as ProtocolSymbols, 'bal')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-husd' as ProtocolSymbols, 'husd')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-enj' as ProtocolSymbols, 'enj')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-mana' as ProtocolSymbols, 'mana')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-sxp' as ProtocolSymbols, 'sxp')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-gnt' as ProtocolSymbols, 'gnt')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-iost' as ProtocolSymbols, 'iost')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-srm' as ProtocolSymbols, 'srm')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-hot' as ProtocolSymbols, 'hot')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-snt' as ProtocolSymbols, 'snt')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-rlc' as ProtocolSymbols, 'rlc')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-storj' as ProtocolSymbols, 'storj')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-utk' as ProtocolSymbols, 'utk')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-mco' as ProtocolSymbols, 'mco')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-bnt' as ProtocolSymbols, 'bnt')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-nexo' as ProtocolSymbols, 'nexo')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-elf' as ProtocolSymbols, 'elf')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-dia' as ProtocolSymbols, 'dia')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-agi' as ProtocolSymbols, 'agi')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-fet' as ProtocolSymbols, 'fet')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-wax' as ProtocolSymbols, 'waxp')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-aion' as ProtocolSymbols, 'aion')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.COSMOS, 'atom')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.POLKADOT, 'dot')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.KUSAMA, 'ksm')
   }
 
-  convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
+  public convertExchangeIdentifierToAirGapIdentifier(identifiers: ExchangeIdentifier[]): ProtocolSymbols[] {
     return identifiers
-      .map(identifier => identifier.toLowerCase())
-      .map(identifier => {
-        return this.identifierExchangeToAirGapMap.has(identifier) ? this.identifierExchangeToAirGapMap.get(identifier) : identifier
+      .map((identifier: ExchangeIdentifier) => identifier.toLowerCase())
+      .map((identifier: ExchangeIdentifier) => {
+        return this.identifierExchangeToAirGapMap.has(identifier)
+          ? this.identifierExchangeToAirGapMap.get(identifier)
+          : (identifier as ProtocolSymbols)
       })
   }
 
-  convertAirGapIdentifierToExchangeIdentifier(identifiers: string[]): string[] {
+  public convertAirGapIdentifierToExchangeIdentifier(identifiers: ProtocolSymbols[]): ExchangeIdentifier[] {
     return identifiers
-      .map(identifier => {
+      .map((identifier: ProtocolSymbols) => {
         return this.identifierAirGapToExchangeMap.has(identifier) ? this.identifierAirGapToExchangeMap.get(identifier) : identifier
       })
-      .map(identifier => identifier.toUpperCase())
+      .map((identifier: ExchangeIdentifier) => identifier.toUpperCase())
   }
 
-  async getAvailableFromCurrencies(): Promise<string[]> {
-    const result: CurrencyDetailResponse[] = (await this.http
-      .get(`${this.baseURL}/currencies?active=true`)
-      .toPromise()) as CurrencyDetailResponse[]
-    const fromCurrencies = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
+  public async getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
+    const result: CurrencyDetailResponse[] = await this.http
+      .get<CurrencyDetailResponse[]>(`${this.baseURL}/currencies?active=true`)
+      .toPromise()
+    const fromCurrencies: ExchangeIdentifier[] = result.map((identifier: CurrencyDetailResponse) => identifier.ticker)
 
     return this.convertExchangeIdentifierToAirGapIdentifier(fromCurrencies)
   }
 
-  async getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+  public async getMinAmountForCurrency(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    let result: MinAmountResponse = (await this.http
-      .get(`${this.baseURL}/min-amount/${fromCurrency}_${toCurrency}`)
-      .toPromise()) as MinAmountResponse
+    const result: MinAmountResponse = await this.http
+      .get<MinAmountResponse>(`${this.baseURL}/min-amount/${transformedFromCurrency}_${transformedToCurrency}`)
+      .toPromise()
 
     return result.minAmount.toString()
   }
 
-  async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
-    const response: EstimatedAmountResponse = (await this.http
-      .get(`${this.baseURL}/exchange-amount/${amount}/${fromCurrency}_${toCurrency}`)
-      .toPromise()) as EstimatedAmountResponse
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+
+    const response: EstimatedAmountResponse = await this.http
+      .get<EstimatedAmountResponse>(`${this.baseURL}/exchange-amount/${amount}/${transformedFromCurrency}_${transformedToCurrency}`)
+      .toPromise()
+
     return response.estimatedAmount.toString()
   }
 
-  async validateAddress(): Promise<{ result: false; message: string }> {
+  public async validateAddress(): Promise<{ result: false; message: string }> {
     return { result: false, message: '' }
   }
 
-  async createTransaction(
-    fromCurrency: string,
-    toCurrency: string,
+  public async createTransaction(
+    fromCurrency: ProtocolSymbols,
+    toCurrency: ProtocolSymbols,
     toAddress: string,
     amount: string,
     fromAddress?: string
   ): Promise<TransactionChangeNowResponse> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    toCurrency = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
-    const apiKey = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
-    const body = {
-      from: fromCurrency,
-      to: toCurrency,
-      address: toAddress,
-      amount: amount,
-      extraId: '',
-      userId: '',
-      contactEmail: '',
-      refundAddress: fromAddress ? fromAddress : '',
-      refundExtraId: ''
-    }
+    const apiKey: string = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
 
-    const response: any = await this.http.post(`${this.baseURL}/transactions/${apiKey}`, body).toPromise()
+    const response: any = await this.http
+      .post<TransactionChangeNowResponse>(`${this.baseURL}/transactions/${apiKey}`, {
+        from: transformedFromCurrency,
+        to: transformedToCurrency,
+        address: toAddress,
+        amount,
+        extraId: '',
+        userId: '',
+        contactEmail: '',
+        refundAddress: fromAddress ? fromAddress : '',
+        refundExtraId: ''
+      })
+      .toPromise()
 
     return response
   }
 
-  async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
-    const response = (await this.http
-      .get(`${this.baseURL}/transactions/${transactionId}/changenow`)
-      .toPromise()) as ChangeNowTransactionStatus
+  public async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
+    const response: ChangeNowTransactionStatus = await this.http
+      .get<ChangeNowTransactionStatus>(`${this.baseURL}/transactions/${transactionId}/changenow`)
+      .toPromise()
+
     return new ChangeNowTransactionStatusResponse(response)
   }
 }
@@ -170,12 +282,17 @@ export class ChangeNowExchange extends ChangeNowApi implements Exchange {
     super(http)
   }
 
-  public async getAvailableToCurrenciesForCurrency(fromCurrency: string): Promise<string[]> {
-    fromCurrency = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    const result: any = await this.http.get(`${this.baseURL}/currencies-to/${fromCurrency}`).toPromise()
-    const identifiers = result
+  public async getAvailableToCurrenciesForCurrency(fromCurrency: ProtocolSymbols): Promise<ProtocolSymbols[]> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
+
+    const result: CurrencyDetailResponse[] = await this.http
+      .get<CurrencyDetailResponse[]>(`${this.baseURL}/currencies-to/${transformedFromCurrency}`)
+      .toPromise()
+
+    const identifiers: ExchangeIdentifier[] = result
       .filter((currency: CurrencyDetailResponse) => currency.isAvailable)
       .map((currency: CurrencyDetailResponse) => currency.ticker)
+
     return this.convertExchangeIdentifierToAirGapIdentifier(identifiers)
   }
 }

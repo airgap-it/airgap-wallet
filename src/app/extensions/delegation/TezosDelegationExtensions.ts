@@ -1,51 +1,80 @@
-import { TezosProtocol, DelegationRewardInfo, DelegationInfo, TezosDelegatorAction } from 'airgap-coin-lib'
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
+import { DecimalPipe } from '@angular/common'
+import { FormBuilder, FormGroup } from '@angular/forms'
+import { TranslateService } from '@ngx-translate/core'
+import { DelegationInfo, TezosDelegatorAction, TezosProtocol } from '@airgap/coinlib-core'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 import {
   AirGapDelegateeDetails,
-  AirGapDelegatorDetails,
   AirGapDelegationDetails,
-  AirGapDelegatorAction
+  AirGapDelegatorAction,
+  AirGapDelegatorDetails
 } from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { RemoteConfigProvider, BakerConfig } from 'src/app/services/remote-config/remote-config'
-import { DecimalPipe } from '@angular/common'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-import BigNumber from 'bignumber.js'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { Moment } from 'moment'
-import * as moment from 'moment'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
-import { DelegatorAction, DelegatorDetails, DelegateeDetails } from 'airgap-coin-lib/dist/protocols/ICoinDelegateProtocol'
-import { FormBuilder, FormGroup } from '@angular/forms'
-import { switchMap, map } from 'rxjs/operators'
-import { from } from 'rxjs'
+import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
+import { RemoteConfigProvider, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
 
-const hoursPerCycle: number = 68
+import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
 export class TezosDelegationExtensions extends ProtocolDelegationExtensions<TezosProtocol> {
+  private static instance: TezosDelegationExtensions
+
   public static async create(
     remoteConfigProvider: RemoteConfigProvider,
     decimalPipe: DecimalPipe,
     amountConverter: AmountConverterPipe,
+    shortenStringPipe: ShortenStringPipe,
+    translateService: TranslateService,
+    addressService: AddressService,
     formBuilder: FormBuilder
   ): Promise<TezosDelegationExtensions> {
-    const bakersConfig = await remoteConfigProvider.tezosBakers()
-    return new TezosDelegationExtensions(bakersConfig[0], decimalPipe, amountConverter, formBuilder)
+    if (!TezosDelegationExtensions.instance) {
+      TezosDelegationExtensions.instance = new TezosDelegationExtensions(
+        remoteConfigProvider,
+        decimalPipe,
+        amountConverter,
+        shortenStringPipe,
+        translateService,
+        addressService,
+        formBuilder
+      )
+    }
+
+    return TezosDelegationExtensions.instance
   }
 
-  public airGapDelegatee?: string = this.airGapBakerConfig.address
-  public delegateeLabel: string = 'Baker'
+  public airGapDelegatee(protocol: TezosProtocol): string | undefined {
+    if (protocol.options.network.type !== NetworkType.MAINNET) {
+      return 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+    }
+
+    return 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
+  }
+
+  public delegateeLabel: string = 'delegation-detail-tezos.delegatee-label'
+  public delegateeLabelPlural: string = 'delegation-detail-tezos.delegatee-label-plural'
+  public supportsMultipleDelegations: boolean = false
+
+  private knownBakers?: TezosBakerCollection
 
   private constructor(
-    private readonly airGapBakerConfig: BakerConfig,
+    private readonly remoteConfigProvider: RemoteConfigProvider,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverter: AmountConverterPipe,
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private readonly translateService: TranslateService,
+    private readonly addressService: AddressService,
     private readonly formBuilder: FormBuilder
   ) {
     super()
   }
 
-  // TODO: add translations
   public async getExtraDelegationDetailsFromAddress(
     protocol: TezosProtocol,
     delegator: string,
@@ -57,13 +86,42 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return [extraDetails]
   }
 
+  public async createDelegateesSummary(_protocol: TezosProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+    const knownBakers: TezosBakerCollection = await this.getKnownBakers()
+
+    type BakerDetails = Partial<TezosBakerDetails> & Record<'address', string>
+
+    return [
+      ...Object.entries(knownBakers).map(([address, baker]: [string, TezosBakerDetails]) => ({ address, ...baker })),
+      ...delegatees.filter((baker: string) => !Object.keys(knownBakers).includes(baker)).map((baker: string) => ({ address: baker }))
+    ]
+      .sort((a: BakerDetails, b: BakerDetails) => {
+        const aAlias: string = a.alias || ''
+        const bAlias: string = b.alias || ''
+
+        return aAlias.localeCompare(bAlias)
+      })
+      .map(
+        (details: BakerDetails) =>
+          new UIAccountSummary({
+            address: details.address,
+            logo: details.logo ? details.logo : undefined,
+            header: [
+              details.alias || '',
+              details.fee ? `${this.decimalPipe.transform(new BigNumber(details.fee).times(100).toString())}%` : ''
+            ],
+            description: this.shortenStringPipe.transform(details.address)
+          })
+      )
+  }
+
   private async getExtraDelegationDetails(
     protocol: TezosProtocol,
     delegatorDetails: DelegatorDetails,
     delegateeDetails: DelegateeDetails
   ): Promise<AirGapDelegationDetails> {
     const [delegator, delegatee] = await Promise.all([
-      this.getExtraDelegatorDetails(protocol, delegatorDetails, delegateeDetails),
+      this.getExtraDelegatorDetails(delegatorDetails, delegateeDetails),
       this.getExtraBakerDetails(protocol, delegateeDetails)
     ])
 
@@ -71,29 +129,41 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   private async getExtraBakerDetails(protocol: TezosProtocol, bakerDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
-    const isAirGapBaker = bakerDetails.address === this.airGapBakerConfig.address
+    const [bakerInfo, delegateeDetails, knownBakers] = await Promise.all([
+      protocol.bakerInfo(bakerDetails.address),
+      protocol.getDelegateeDetails(bakerDetails.address),
+      this.getKnownBakers()
+    ])
+    const knownBaker = knownBakers[bakerDetails.address]
+    const name = knownBaker
+      ? knownBaker.alias
+      : (await this.addressService.getAlias(bakerDetails.address, protocol)) ||
+        this.translateService.instant('delegation-detail-tezos.unknown')
 
-    const bakerInfo = await protocol.bakerInfo(bakerDetails.address)
+    const bakerTotalUsage =
+      knownBaker && knownBaker.stakingCapacity
+        ? knownBaker.stakingCapacity.shiftedBy(protocol.decimals)
+        : new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
 
-    const bakerTotalUsage = new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
-    const bakerCurrentUsage = new BigNumber(bakerInfo.stakingBalance)
+    const bakerCurrentUsage = BigNumber.minimum(new BigNumber(bakerInfo.stakingBalance), bakerTotalUsage)
     const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
 
     let status: string
-    if (bakerInfo.bakingActive && bakerUsage.lt(1)) {
-      status = 'Accepts Delegation'
-    } else if (bakerInfo.bakingActive) {
-      status = 'Reached Full Capacity'
+    if (delegateeDetails.status && bakerUsage.lt(1)) {
+      status = 'delegation-detail-tezos.status.accepts-delegation'
+    } else if (delegateeDetails.status === 'Active') {
+      status = 'delegation-detail-tezos.status.reached-full-capacity'
     } else {
-      status = 'Deactivated'
+      status = 'delegation-detail-tezos.status.deactivated'
     }
 
-    const displayDetails = this.createDelegateeDisplayDetails(isAirGapBaker ? this.airGapBakerConfig : null)
+    const displayDetails = this.createDelegateeDisplayDetails(protocol, knownBaker)
 
     return {
-      name: isAirGapBaker ? this.airGapBakerConfig.name : 'unknown',
+      name,
       status,
       address: bakerDetails.address,
+      logo: knownBaker ? knownBaker.logo : undefined,
       usageDetails: {
         usage: bakerUsage,
         current: bakerCurrentUsage,
@@ -104,40 +174,40 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   }
 
   private async getExtraDelegatorDetails(
-    protocol: TezosProtocol,
     delegatorDetails: DelegatorDetails,
     bakerDetails: DelegateeDetails
   ): Promise<AirGapDelegatorDetails> {
-    const delegatorExtraInfo = await protocol.getDelegationInfo(delegatorDetails.address)
-
     const delegateAction = this.createDelegateAction(delegatorDetails.availableActions, bakerDetails.address)
     const undelegateAction = this.createUndelegateAction(delegatorDetails.availableActions)
-
-    const [displayDetails, displayRewards] = await Promise.all([
-      this.createDelegatorDisplayDetails(protocol, delegatorDetails, delegatorExtraInfo, bakerDetails.address),
-      this.createDelegatorDisplayRewards(protocol, delegatorDetails.address, delegatorExtraInfo)
-    ])
 
     return {
       ...delegatorDetails,
       mainActions: delegateAction ? [delegateAction] : undefined,
-      secondaryActions: undelegateAction ? [undelegateAction] : undefined,
-      displayDetails,
-      displayRewards: displayRewards
+      secondaryActions: undelegateAction ? [undelegateAction] : undefined
     }
   }
 
-  private createDelegateeDisplayDetails(bakerConfig: BakerConfig | null): UIWidget[] {
+  public async getRewardDisplayDetails(protocol: TezosProtocol, delegator: string): Promise<UIRewardList | undefined> {
+    const delegatorExtraInfo = await protocol.getDelegationInfo(delegator)
+
+    return this.createDelegatorDisplayRewards(protocol, delegator, delegatorExtraInfo).catch(() => undefined)
+  }
+
+  private createDelegateeDisplayDetails(protocol: TezosProtocol, baker?: TezosBakerDetails): UIWidget[] {
     return [
       new UIIconText({
         iconName: 'logo-usd',
-        text: bakerConfig ? `${this.decimalPipe.transform(bakerConfig.fee.multipliedBy(100).toString())}%` : 'Unknown',
-        description: 'Fee'
+        text:
+          baker && baker.fee ? `${this.decimalPipe.transform(baker.fee.multipliedBy(100).toString())}%` : 'delegation-detail-tezos.unknown',
+        description: 'delegation-detail-tezos.fee_label'
       }),
       new UIIconText({
         iconName: 'sync-outline',
-        textHTML: bakerConfig ? `${bakerConfig.payout.cycles} Cycles <small>${bakerConfig.payout.time}</small>` : 'Unknown',
-        description: 'Payout Schedule'
+        textHTML:
+          baker !== undefined && baker.payoutPeriod !== undefined && baker.payoutDelay !== undefined
+            ? this.getDetailedPayoutScheduleText(protocol, baker)
+            : 'delegation-detail-tezos.unknown',
+        description: 'delegation-detail-tezos.payout-schedule_label'
       })
     ]
   }
@@ -146,13 +216,17 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     return this.createDelegatorAction(
       availableActions,
       [TezosDelegatorAction.DELEGATE, TezosDelegatorAction.CHANGE_BAKER],
-      'Delegate',
+      'delegation-detail-tezos.delegate_label',
       this.formBuilder.group({ delegate: bakerAddress })
     )
   }
 
   private createUndelegateAction(availableActions: DelegatorAction[]): AirGapDelegatorAction | null {
-    const action = this.createDelegatorAction(availableActions, [TezosDelegatorAction.UNDELEGATE], 'Undelegate')
+    const action = this.createDelegatorAction(
+      availableActions,
+      [TezosDelegatorAction.UNDELEGATE],
+      'delegation-detail-tezos.undelegate_label'
+    )
 
     if (action) {
       action.iconName = 'close-outline'
@@ -178,67 +252,6 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       : null
   }
 
-  private async createDelegatorDisplayDetails(
-    protocol: TezosProtocol,
-    delegatorDetails: DelegatorDetails,
-    delegatorExtraInfo: DelegationInfo,
-    baker: string
-  ): Promise<UIWidget[]> {
-    const details = []
-    const bakerConfig = baker === this.airGapBakerConfig.address ? this.airGapBakerConfig : undefined
-
-    try {
-      const bakerRewards = await protocol.getDelegationRewards(baker)
-      details.push(...this.createFuturePayoutWidgets(protocol, delegatorDetails, delegatorExtraInfo, baker, bakerRewards, bakerConfig))
-    } catch (error) {
-      // Baker was never delegated
-    }
-
-    return details
-  }
-
-  private async getRewardAmountsByCycle(accountAddress: string, bakerAddress: string): Promise<Map<number, string>> {
-    const protocol = new TezosProtocol()
-    const calculatedRewardsMap = new Map<number, string>()
-
-    const currentCycle = await protocol.fetchCurrentCycle()
-    const cycles = [...Array(6).keys()].map(num => currentCycle - num)
-
-    const rewardsByCycle = await Promise.all(
-      cycles.map(async cycle => {
-        return {
-          cycle: cycle,
-          reward: await this.getRewardAmountByCycle(accountAddress, bakerAddress, cycle)
-        }
-      })
-    )
-    rewardsByCycle.forEach(rewardByCycle => {
-      calculatedRewardsMap.set(rewardByCycle.cycle, rewardByCycle.reward)
-    })
-    return calculatedRewardsMap
-  }
-
-  private async getRewardAmountByCycle(accountAddress: string, bakerAddress: string, cycle: number): Promise<string> {
-    const fee = this.airGapBakerConfig.fee
-    const protocol = new TezosProtocol()
-    return from(protocol.calculateRewards(bakerAddress, cycle))
-      .pipe(
-        switchMap(tezosRewards =>
-          from(protocol.calculatePayout(accountAddress, tezosRewards)).pipe(
-            map(payout => {
-              return payout
-                ? `~${this.amountConverter.transform(new BigNumber(payout.payout).minus(new BigNumber(payout.payout).times(fee)), {
-                    protocolIdentifier: protocol.identifier,
-                    maxDigits: 6
-                  })}`
-                : null
-            })
-          )
-        )
-      )
-      .toPromise()
-  }
-
   private async createDelegatorDisplayRewards(
     protocol: TezosProtocol,
     address: string,
@@ -247,79 +260,56 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
       return undefined
     }
-
     const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
-    const amountByCycle = await this.getRewardAmountsByCycle(address, delegatorExtraInfo.value)
+
     return new UIRewardList({
-      rewards: rewardInfo.slice(0, 5).map(reward => ({
-        index: reward.cycle,
-        amount: amountByCycle.get(reward.cycle),
-        collected: reward.payout < new Date(),
-        timestamp: reward.payout.getTime()
-      })),
-      indexColLabel: 'Cycle',
-      amountColLabel: 'Expected Reward',
-      payoutColLabel: 'Earliest Payout'
+      rewards: await Promise.all(
+        rewardInfo.map(async info => {
+          return {
+            index: info.cycle,
+            amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
+              protocol
+            }),
+            collected: info.payout < new Date(),
+            timestamp: info.payout.getTime()
+          }
+        })
+      ),
+      indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
+      amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
+      payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'
     })
   }
 
-  private createFuturePayoutWidgets(
-    protocol: TezosProtocol,
-    delegatorDetails: DelegatorDetails,
-    delegatorExtraInfo: DelegationInfo,
-    baker: string,
-    bakerRewards: DelegationRewardInfo[],
-    bakerConfig?: BakerConfig
-  ): UIWidget[] {
-    const nextPayout = this.getNextPayoutMoment(delegatorExtraInfo, bakerRewards, bakerConfig ? bakerConfig.payout.cycles : undefined)
-
-    const avgRoIPerCyclePercentage = bakerRewards
-      .map(rewardInfo => rewardInfo.totalRewards.plus(rewardInfo.totalFees).div(rewardInfo.stakingBalance))
-      .reduce((avg, value) => avg.plus(value))
-      .div(bakerRewards.length)
-
-    const avgRoIPerCycle = new BigNumber(avgRoIPerCyclePercentage).multipliedBy(delegatorDetails.balance)
-
-    return [
-      new UIIconText({
-        iconName: 'sync-outline',
-        text: nextPayout.fromNow(),
-        description: delegatorDetails.delegatees.includes(baker) ? 'Next Payout' : 'First Payout'
-      }),
-      new UIIconText({
-        iconName: 'alarm-outline',
-        text: this.amountConverter.transform(avgRoIPerCycle.toFixed(), {
-          protocolIdentifier: protocol.identifier,
-          maxDigits: 10
-        }),
-        description: 'Estimated Return per Cycle'
-      })
-    ]
-  }
-
-  private getNextPayoutMoment(
-    delegatorExtraInfo: DelegationInfo,
-    bakerRewards: DelegationRewardInfo[],
-    bakerPayoutCycles?: number
-  ): Moment {
-    let nextPayout: Moment
-    if (delegatorExtraInfo.isDelegated) {
-      const delegatedCycles = bakerRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
-      const delegatedDate = delegatorExtraInfo.delegatedDate
-
-      nextPayout = delegatedCycles.length > 0 ? moment(delegatedCycles[0].payout) : this.addPayoutDelayToMoment(moment(), bakerPayoutCycles)
-
-      if (this.addPayoutDelayToMoment(moment(delegatedDate), bakerPayoutCycles).isAfter(nextPayout)) {
-        nextPayout = this.addPayoutDelayToMoment(moment(delegatedDate), bakerPayoutCycles)
-      }
-    } else {
-      nextPayout = this.addPayoutDelayToMoment(moment(), bakerPayoutCycles)
+  private async getKnownBakers(): Promise<TezosBakerCollection> {
+    if (this.knownBakers === undefined) {
+      this.knownBakers = await this.remoteConfigProvider.getKnownTezosBakers()
     }
 
-    return nextPayout
+    return this.knownBakers
   }
 
-  private addPayoutDelayToMoment(time: Moment, payoutCycles?: number): Moment {
-    return time.add(hoursPerCycle * 7 + payoutCycles || 0, 'h')
+  private getDetailedPayoutScheduleText(protocol: TezosProtocol, baker: TezosBakerDetails): string {
+    if (baker.payoutDelay === 1 && baker.payoutPeriod === 1) {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-cycle-last-rewards_text', {
+        payoutTime: this.getFormattedCycleDuration(protocol)
+      })
+    } else if (baker.payoutPeriod === 1) {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-cycle-delayed-rewards_text', {
+        payoutTime: this.getFormattedCycleDuration(protocol),
+        payoutDelay: baker.payoutDelay
+      })
+    } else {
+      return this.translateService.instant('delegation-detail-tezos.payout-schedule-every-n-cycle_text', {
+        payoutTime: this.getFormattedCycleDuration(protocol, baker.payoutPeriod),
+        cycles: baker.payoutPeriod
+      })
+    }
+  }
+
+  private getFormattedCycleDuration(protocol: TezosProtocol, cycleNumber: number = 1): string {
+    const cycleDuration = moment.duration(cycleNumber * protocol.minCycleDuration)
+
+    return cycleDuration.locale(this.translateService.currentLang).humanize()
   }
 }

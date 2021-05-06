@@ -1,20 +1,20 @@
+import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ClipboardService } from '@airgap/angular-core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
 import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
-import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
+import { AccountProviderMock } from '../../../../test-config/accountProvider-mock'
 import { AccountProvider } from '../../services/account/account.provider'
-import { ClipboardService } from '../../services/clipboard/clipboard'
 
 import { TransactionPreparePage } from './transaction-prepare'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
-
-import { CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 describe('TransactionPrepare Page', () => {
   const ethWallet = new WalletMock().ethWallet
@@ -39,6 +39,12 @@ describe('TransactionPrepare Page', () => {
             transaction: ethTransaction,
             wallet: ethWallet
           }
+        },
+        params: {
+          publicKey: ethWallet.publicKey,
+          protocolID: ethWallet.protocol.identifier,
+          addressIndex: ethWallet.addressIndex,
+          mainProtocolID: ethWallet.protocol.identifier
         }
       }
     }
@@ -46,13 +52,14 @@ describe('TransactionPrepare Page', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          AccountProvider,
+          { provide: AccountProvider, useClass: AccountProviderMock },
           { provide: Storage, useClass: StorageMock },
           { provide: NavParams, useClass: NavParamsMock },
           { provide: CLIPBOARD_PLUGIN, useClass: ClipboardMock },
           { provide: STATUS_BAR_PLUGIN, useClass: StatusBarMock },
           { provide: SPLASH_SCREEN_PLUGIN, useClass: SplashScreenMock },
           { provide: Platform, useClass: PlatformMock },
+          { provide: OperationsProvider, useClass: OperationsServiceMock },
           ClipboardService,
           {
             provide: ActivatedRoute,
@@ -85,7 +92,7 @@ describe('TransactionPrepare Page', () => {
 
   //   component.setWallet(ethWallet)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
 
   //   fixture.detectChanges()
@@ -97,7 +104,7 @@ describe('TransactionPrepare Page', () => {
   //   // check if fee changes if set to medium
   //   component.transactionForm.controls['feeLevel'].setValue(1)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
   //   expect(feeAmount.textContent.trim()).toEqual('$0.021')
   //   expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
@@ -105,7 +112,7 @@ describe('TransactionPrepare Page', () => {
   //   // check if fee changes if set to high
   //   component.transactionForm.controls['feeLevel'].setValue(2)
   //   expect(component.transactionForm.value.fee).toEqual(
-  //     new BigNumber(ethWallet.coinProtocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.coinProtocol.feeDefaults.low).e + 1)
+  //     new BigNumber(ethWallet.protocol.feeDefaults.low).toFixed(-1 * new BigNumber(ethWallet.protocol.feeDefaults.low).e + 1)
   //   )
   //   expect(feeAmount.textContent.trim()).toEqual('$0.021')
   //   expect(feeAmountAdvanced.textContent.trim()).toEqual('(0.00021 ETH)')
@@ -145,12 +152,17 @@ describe('TransactionPrepare Page', () => {
 
   it('should create a toast "insufficient balance" if fee + amount is > wallet value', async () => {
     // TODO: Move this test to "operationsProvider"
-    component.transactionForm.controls.address.setValue(ethWallet.addresses[0])
+    spyOn((component as any).router, 'navigateByUrl').and.returnValue(Promise.resolve(true))
+
+    component.transactionForm.controls.receiver.setValue(ethWallet.addresses[0])
     component.transactionForm.controls.amount.setValue(10)
     component.transactionForm.controls.fee.setValue(10)
 
     await component.prepareTransaction()
-    /*
+    expect((component as any).operationsProvider.prepareTransaction).toHaveBeenCalledTimes(1)
+    expect((component as any).router.navigateByUrl).toHaveBeenCalledWith(
+      '/interaction-selection/interaction'
+    ) /*
     // should create a loadingCtrl
     expect((component as any).loadingCtrl.create).toHaveBeenCalled()
 

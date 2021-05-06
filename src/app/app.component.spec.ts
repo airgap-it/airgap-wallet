@@ -1,9 +1,10 @@
+import { APP_INFO_PLUGIN, APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
-import { APP_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, APP_INFO_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 import { AppComponent } from './app.component'
+import { SAPLING_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 describe('AppComponent', () => {
   let unitHelper: UnitHelper
@@ -14,7 +15,8 @@ describe('AppComponent', () => {
       unitHelper.testBed({
         providers: [
           { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
-          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
+          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
+          { provide: SAPLING_PLUGIN, useValue: unitHelper.mockRefs.saplingPlugin },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen }
         ],

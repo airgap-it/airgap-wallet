@@ -1,14 +1,13 @@
 import { Component } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IAirGapTransaction, IACMessageType, IACMessageDefinitionObject, generateId } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { LoadingController, AlertController } from '@ionic/angular'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { AlertController, LoadingController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { isString } from 'util'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { LedgerService } from 'src/app/services/ledger/ledger-service'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-ledger-sign',
@@ -49,9 +48,13 @@ export class LedgerSignPage {
       ) {
         this.aggregatedInfo = {
           numberOfTxs: this.airGapTxs.length,
-          totalAmount: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.amount), new BigNumber(0)),
+          totalAmount: this.airGapTxs
+            .map((tx: IAirGapTransaction) => new BigNumber(tx.amount))
+            .filter((amount: BigNumber) => !amount.isNaN())
+            .reduce((pv: BigNumber, cv: BigNumber) => pv.plus(cv), new BigNumber(0)),
           totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
         }
+        console.log('aggregatedInfo', this.aggregatedInfo)
       }
     }
     this.connectWithLedger()
@@ -61,7 +64,7 @@ export class LedgerSignPage {
     await this.showLoader('Connecting device...')
 
     try {
-      await this.ledgerService.openConnection(this.wallet.protocolIdentifier)
+      await this.ledgerService.openConnection(this.wallet.protocol.identifier)
     } catch (error) {
       console.warn(error)
       this.promptError(error)
@@ -74,17 +77,18 @@ export class LedgerSignPage {
     await this.showLoader('Signing transaction...')
 
     try {
-      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocolIdentifier, this.unsignedTx)
+      const signedTx = await this.ledgerService.signTransaction(this.wallet.protocol.identifier, this.unsignedTx)
       const signedTransactionSync: IACMessageDefinitionObject = {
+        id: generateId(10),
         type: IACMessageType.MessageSignResponse,
-        protocol: this.wallet.protocolIdentifier,
+        protocol: this.wallet.protocol.identifier,
         payload: {
           transaction: signedTx,
           accountIdentifier: this.wallet.publicKey.substr(-6)
         }
       }
       const info = {
-        signedTransactionsSync: [signedTransactionSync]
+        messageDefinitionObjects: [signedTransactionSync]
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -98,7 +102,7 @@ export class LedgerSignPage {
 
   private async promptError(error: unknown) {
     let message: string
-    if (isString(error)) {
+    if (typeof error === 'string') {
       if (error === 'Rejected') {
         return
       }

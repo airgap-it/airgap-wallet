@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core'
-
-import { AirGapMarketWallet } from 'airgap-coin-lib'
-
-import { ProtocolSymbols } from '../protocols/protocols'
-import { LedgerConnectionDetails, LedgerConnection, LedgerConnectionType } from 'src/app/ledger/connection/LedgerConnection'
-import { LedgerApp } from 'src/app/ledger/app/LedgerApp'
-import { KusamaLedgerApp } from 'src/app/ledger/app/substrate/KusamaLedgerApp'
-import { PolkadotLedgerApp } from 'src/app/ledger/app/substrate/PolkadotLedgerApp'
-import { isType } from 'src/app/utils/utils'
-import { ReturnCode } from 'src/app/ledger/ReturnCode'
-import { LedgerConnectionProvider } from './ledger-connection-provider'
 import { Platform } from '@ionic/angular'
+import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+
+import { LedgerApp } from '../../ledger/app/LedgerApp'
+import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'
+import { PolkadotLedgerApp } from '../../ledger/app/substrate/PolkadotLedgerApp'
+import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from '../../ledger/connection/LedgerConnection'
+import { ReturnCode } from '../../ledger/ReturnCode'
+import { isType } from '../../utils/utils'
+import { PriceService } from '../price/price.service'
+
+import { LedgerConnectionProvider } from './ledger-connection-provider'
 import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 
 const MAX_RETRIES = 1
@@ -20,18 +20,28 @@ const MAX_RETRIES = 1
 })
 export class LedgerService {
   private readonly supportedApps: Map<string, (connection: LedgerConnection) => LedgerApp> = new Map([
-    [ProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
-    [ProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
-    [ProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new TezosLedgerApp(connection)]
+    [MainProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
+    [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
+    [MainProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)]
   ] as [string, (connection: LedgerConnection) => LedgerApp][])
 
   private readonly openConnections: Map<string, LedgerConnection> = new Map()
   private readonly runningApps: Map<string, LedgerApp> = new Map()
 
-  constructor(private readonly platform: Platform, private readonly connectionProvider: LedgerConnectionProvider) {}
+  constructor(
+    private readonly platform: Platform,
+    private readonly connectionProvider: LedgerConnectionProvider,
+    private readonly priceService: PriceService
+  ) {}
 
   public getSupportedProtocols(): string[] {
     return Array.from(this.supportedApps.keys())
+  }
+
+  public isProtocolSupported(protocol: ICoinProtocol | ProtocolSymbols): boolean {
+    const identifier: ProtocolSymbols = typeof protocol === 'string' ? protocol : protocol.identifier
+
+    return this.getSupportedProtocols().includes(identifier)
   }
 
   public async getConnectedDevices(protocolIdentifier: string): Promise<LedgerConnectionDetails[]> {
@@ -56,7 +66,7 @@ export class LedgerService {
   }
 
   public async importWallet(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<AirGapMarketWallet> {
-    return this.withApp(protocolIdentifier, (app: LedgerApp) => app.importWallet(), ledgerConnection)
+    return this.withApp(protocolIdentifier, (app: LedgerApp) => app.importWallet(this.priceService), ledgerConnection)
   }
 
   public async signTransaction(protocolIdentifier: string, transaction: any, ledgerConnection?: LedgerConnectionDetails): Promise<string> {

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -8,6 +8,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { ExchangeProvider } from 'src/app/services/exchange/exchange'
 
 import { BrowserService } from 'src/app/services/browser/browser.service'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'page-exchange-confirm',
@@ -21,6 +22,7 @@ export class ExchangeConfirmPage {
   public toWallet: AirGapMarketWallet
 
   public fee: string
+  public memo: string
   public feeFiatAmount: string
 
   public amountExpectedFrom: number
@@ -40,7 +42,8 @@ export class ExchangeConfirmPage {
     private readonly route: ActivatedRoute,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    private readonly accountProvider: AccountProvider
   ) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
@@ -50,6 +53,7 @@ export class ExchangeConfirmPage {
       this.toCurrency = info.toCurrency
       this.exchangeResult = info.exchangeResult
       this.fee = info.fee
+      this.memo = info.memo
 
       this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
       this.amountExpectedTo = this.exchangeResult.amountExpectedTo ? this.exchangeResult.amountExpectedTo : info.amountExpectedTo
@@ -66,21 +70,24 @@ export class ExchangeConfirmPage {
 
   public async prepareTransaction() {
     const wallet = this.fromWallet
-    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.coinProtocol.decimals)
-    const fee = new BigNumber(this.fee).shiftedBy(wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.protocol.decimals)
+    const fee = new BigNumber(this.fee).shiftedBy(wallet.protocol.feeDecimals)
 
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         wallet,
         this.exchangeResult.payinAddress,
         amount,
-        fee
+        fee,
+        this.accountProvider.getWalletList(),
+        this.memo
       )
 
       const info = {
         wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)

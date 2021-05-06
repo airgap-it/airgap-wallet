@@ -1,20 +1,21 @@
-import { Action } from 'airgap-coin-lib/dist/actions/Action'
-import { ImportAccountAction, ImportAccoutActionContext } from 'airgap-coin-lib/dist/actions/GetKtAccountsAction'
-import { LinkedAction } from 'airgap-coin-lib/dist/actions/LinkedAction'
-import { SimpleAction } from 'airgap-coin-lib/dist/actions/SimpleAction'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { Action } from '@airgap/coinlib-core/actions/Action'
+import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
+import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
+import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
+import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
+import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
-import { ProtocolSymbols } from '../services/protocols/protocols'
 import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handler/sentry-error-handler'
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
-import { AirGapTezosMigrateAction, AirGapTezosMigrateActionContext } from './actions/TezosMigrateAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
-import { CosmosDelegationActionType } from 'airgap-coin-lib/dist/protocols/cosmos/CosmosProtocol'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
+import { FundAccountAction } from './actions/FundAccountAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -31,22 +32,25 @@ export class ActionGroup {
 
   public async getActions(): Promise<Action<any, any>[]> {
     const actionMap: Map<string, () => Promise<Action<any, any>[]>> = new Map()
-    actionMap.set(ProtocolSymbols.XTZ, async () => {
+    actionMap.set(MainProtocolSymbols.XTZ, async () => {
       return this.getTezosActions()
     })
-    actionMap.set(ProtocolSymbols.XTZ_KT, async () => {
+    actionMap.set(SubProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
     })
-    actionMap.set(ProtocolSymbols.ETH, async () => {
+    actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
+      return this.getTezosShieldedTezActions()
+    })
+    actionMap.set(MainProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
     })
-    actionMap.set(ProtocolSymbols.COSMOS, async () => {
+    actionMap.set(MainProtocolSymbols.COSMOS, async () => {
       return this.getCosmosActions()
     })
-    actionMap.set(ProtocolSymbols.POLKADOT, async () => {
+    actionMap.set(MainProtocolSymbols.POLKADOT, async () => {
       return this.getPolkadotActions()
     })
-    actionMap.set(ProtocolSymbols.KUSAMA, async () => {
+    actionMap.set(MainProtocolSymbols.KUSAMA, async () => {
       return this.getKusamaActions()
     })
 
@@ -58,6 +62,7 @@ export class ActionGroup {
   private getTezosActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
+    //TODO: Move logic to sub-account-add.ts
     const addTokenButtonAction = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
       () => {
@@ -70,7 +75,11 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                  info.wallet.addressIndex
+                }/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -110,20 +119,40 @@ export class ActionGroup {
   }
 
   private getTezosKTActions(): Action<any, any>[] {
-    const migrateAction = new ButtonAction<void, AirGapTezosMigrateActionContext>(
-      { name: 'account-transaction-list.migrate_label', icon: 'return-down-back-outline', identifier: 'migrate-action' },
+    const migrateAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.migrate_label', icon: 'return-right', identifier: 'migrate-action' },
       () => {
-        return new AirGapTezosMigrateAction({
+        const action = new AirGapTezosMigrateAction({
           wallet: this.callerContext.wallet,
-          mainWallet: this.callerContext.mainWallet,
           alertCtrl: this.callerContext.alertCtrl,
           translateService: this.callerContext.translateService,
+          protocolService: this.callerContext.protocolService,
           dataService: this.callerContext.dataService,
           router: this.callerContext.router
         })
+
+        return action
       }
     )
     return [migrateAction]
+  }
+
+  private getTezosShieldedTezActions(): Action<any, any>[] {
+    const fundAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
+      () => {
+        const action = new FundAccountAction({
+          wallet: this.callerContext.wallet,
+          accountProvider: this.callerContext.accountProvider,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
+        })
+
+        return action
+      }
+    )
+
+    return [fundAction]
   }
 
   private async getCosmosActions(): Promise<Action<any, any>[]> {
@@ -151,7 +180,11 @@ export class ActionGroup {
             }
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
-              .navigateByUrl('/sub-account-add/' + DataServiceKey.DETAIL)
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+                  info.wallet.addressIndex
+                }/${info.subProtocolType}`
+              )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
         })
@@ -182,7 +215,7 @@ export class ActionGroup {
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
     let wallet = this.callerContext.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
       xtzWallet.publicKey,
-      ProtocolSymbols.XTZ_KT,
+      SubProtocolSymbols.XTZ_KT,
       index
     )
 
@@ -190,11 +223,14 @@ export class ActionGroup {
       return wallet
     }
 
+    const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
+
     wallet = new AirGapMarketWallet(
-      ProtocolSymbols.XTZ_KT,
+      protocol,
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,
       xtzWallet.derivationPath,
+      xtzWallet.priceService,
       index
     )
     wallet.addresses = ktAddresses
@@ -213,7 +249,11 @@ export class ActionGroup {
           }
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
-            .navigateByUrl('/delegation-detail/' + DataServiceKey.DETAIL)
+            .navigateByUrl(
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
+                this.callerContext.wallet.protocol.identifier
+              }/${this.callerContext.wallet.addressIndex}`
+            )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
           resolve()

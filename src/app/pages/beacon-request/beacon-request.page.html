@@ -1,0 +1,157 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ title | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content class="ion-padding-horizontal ion-padding-bottom">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container *ngIf="request">
+      <ng-container *ngIf="request.type != 'permission_request'">
+        <ion-card>
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <airgap-identicon [address]="requesterName"></airgap-identicon>
+            </ion-avatar>
+            <ion-label class="ion-margin-start">
+              <p>
+                {{ 'beacon-request.request-by-dapp_label' | translate }}
+              </p>
+              <h3>{{requesterName}}</h3>
+            </ion-label>
+            <img src="assets/img/beacon_logo.svg" slot="end" class="by-beacon__img" />
+          </ion-item>
+        </ion-card>
+      </ng-container>
+
+      <div *ngIf="request.type === 'permission_request'" class="request--container">
+        <ion-row>
+          <ion-col class="ion-text-center" size="3">
+            <ion-avatar>
+              <airgap-identicon [address]="requesterName"></airgap-identicon>
+            </ion-avatar>
+          </ion-col>
+          <ion-col>
+            <div class="divider--line"></div>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-icon name="checkmark-circle-outline" color="secondary" size="large" class="ion-margin-top"></ion-icon>
+          </ion-col>
+          <ion-col>
+            <div class="divider--line"></div>
+          </ion-col>
+          <ion-col class="ion-text-center" size="3">
+            <ion-avatar>
+              <airgap-identicon [address]="address"></airgap-identicon>
+            </ion-avatar>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-text-left" size="4">
+            <h5 class="ion-no-margin">{{ requesterName | shortenString }}</h5>
+          </ion-col>
+          <ion-col class="ion-text-right" size="4" push="4">
+            <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <ion-row class="ion-align-items-center ion-padding-top">
+        <ion-col size="12">
+          <ion-row>
+            <ng-container *ngIf="network && network.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
+              <ion-badge class="badge__margin" color="danger">{{ network.name }}</ion-badge>
+              <ion-badge *ngIf="network.type === networkType.CUSTOM" class="badge__margin">
+                {{network.rpcUrl}}
+              </ion-badge>
+            </ng-container>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+
+      <ng-container *ngIf="request.type === 'permission_request'">
+        <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
+
+        <ion-row class="ion-text-center ion-padding-top" size="3">
+          <ion-col>
+            <airgap-identicon [address]="address"></airgap-identicon>
+            <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
+
+            <ion-button
+              *ngIf="selectableWallets.length > 1"
+              (click)="changeAccount()"
+              color="secondary"
+              shape="round"
+              size="small"
+              fill="outline"
+            >
+              <ion-icon name="swap-vertical-outline"></ion-icon>
+              {{ 'beacon-request.select-account.button' | translate }}
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
+
+        <ion-row class="ion-no-padding">
+          <ion-col class="ion-no-padding">
+            <ion-list lines="none">
+              <ion-item *ngFor="let input of inputs">
+                <ion-icon name="{{input.icon}}" slot="start"></ion-icon>
+                <ion-label>{{ input.label | translate }}</ion-label>
+                <ion-checkbox [(ngModel)]="input.checked" slot="end"></ion-checkbox>
+              </ion-item>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+
+      <ion-row *ngIf="request.type === 'broadcast_request'">
+        <ng-container *ngFor="let transaction of transactions">
+          <airgap-from-to [transaction]="transaction"></airgap-from-to>
+        </ng-container>
+      </ion-row>
+
+      <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
+        <ion-row class="rawdata--container ion-padding-bottom" *ngIf="request && request.payload">
+          <ion-col class="ion-no-padding">
+            <p>{{ 'beacon-request.sign-data_label' | translate }}</p>
+            <pre class="ion-no-margin">{{ request.payload | json }}</pre>
+          </ion-col>
+        </ion-row>
+        <ion-row class="rawdata--container" *ngIf="blake2bHash">
+          <ion-col class="ion-no-padding">
+            <p>{{ 'beacon-request.blake2b_hash' | translate }}</p>
+            <pre class="ion-no-margin">{{ blake2bHash }}</pre>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <div *ngIf="request.type === 'operation_request'" class="request--container">
+        <ng-container *ngFor="let transaction of transactions">
+          <airgap-from-to [transaction]="transaction"></airgap-from-to>
+        </ng-container>
+      </div>
+    </ng-container>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="cancel()">
+      {{ 'beacon-request.cancel_label' | translate }}
+    </ion-button>
+
+    <ion-button shape="round" color="primary" (click)="done()">
+      <ng-container *ngIf="request.type !== 'permission_request'">
+        {{ 'beacon-request.continue_label' | translate }}
+      </ng-container>
+      <ng-container *ngIf="request.type === 'permission_request'">
+        {{ 'beacon-request.connect_label' | translate }}
+      </ng-container>
+    </ion-button>
+  </ion-fab>
+</ion-content>

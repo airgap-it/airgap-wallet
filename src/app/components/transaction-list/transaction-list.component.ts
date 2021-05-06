@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { IAirGapTransaction, AirGapMarketWallet } from 'airgap-coin-lib'
+import { IAirGapTransaction, AirGapMarketWallet } from '@airgap/coinlib-core'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { Router } from '@angular/router'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
@@ -35,13 +35,16 @@ export class TransactionListComponent {
   public wallet: AirGapMarketWallet
 
   public async openBlockexplorer(): Promise<void> {
-    const blockexplorer = await this.wallet.coinProtocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
+    const blockexplorer = await this.wallet.protocol.getBlockExplorerLinkForAddress(this.wallet.addresses[0])
 
     this.browserService.openUrl(blockexplorer)
   }
 
-  public openTransactionDetailPage(transaction: IAirGapTransaction): void {
+  public async openTransactionDetailPage(transaction: IAirGapTransaction): Promise<void> {
     this.dataService.setData(DataServiceKey.DETAIL, transaction)
-    this.router.navigateByUrl('/transaction-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.dataService.set(transaction.hash as DataServiceKey, transaction)
+    this.router
+      .navigateByUrl(`/transaction-detail/${DataServiceKey.DETAIL}/${transaction.hash}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

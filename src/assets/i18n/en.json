@@ -10,6 +10,7 @@
     "vote_label": "Voting",
     "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
+    "fund_label": "Fund Account",
     "pending-transactions": {
       "label": "Pending Transactions",
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
@@ -48,10 +49,11 @@
     "reward_label": "Unclaimed Rewards"
   },
   "introduction": {
-    "title": "The New Crypto Wallet Standard",
+    "title": "Self custody made simple and secure",
     "highest": {
       "label": "Highest Security",
-      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.</p>"
+      "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.",
+      "desktop_text": "AirGap has a <b>two device approach</b> where the secret is stored either in <b>AirGap Vault</b> or for selected coins on a <b>Ledger hardware wallet</b>."
     },
     "medium": {
       "label": "Medium Security",
@@ -59,7 +61,9 @@
     },
     "vault": {
       "heading": "AirGap Vault",
-      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>"
+      "text": "The private key is generated and securely stored on another device with the AirGap Vault app. <b>You have to install AirGap Vault to use AirGap Wallet</b>",
+      "desktop_heading": "AirGap Vault & Ledger",
+      "desktop_text": "The private key is generated and securely stored on another device with the AirGap Vault app or on a Ledger hardware wallet. <br><b>Install AirGap Vault on a mobile device or connect a Ledger to use AirGap Wallet</b>"
     },
     "wallet": {
       "heading": "AirGap Wallet",
@@ -91,8 +95,13 @@
     "go_label": "Let's Go"
   },
   "portfolio": {
-    "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the AirGap Vault application where your secret is securely stored.",
+    "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the <span class=\"style__strong color__primary\">AirGap Vault</span> application where your secret is securely stored.",
+    "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
     "add-coins_label": "Add Coins"
+  },
+  "account-add": {
+    "featured": "Featured",
+    "others": "Others"
   },
   "scan": {
     "title": "Scan QR",
@@ -138,11 +147,33 @@
       "enable-new-serializer_label": "Enable new serializer",
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
-    }
+    },
+    "beacon": {
+      "label": "Beacon",
+      "settings_label": "Beacon Settings",
+      "about_label": "About Beacon",
+      "permission-list_label": "Beacon Permissions"
+    },
+    "qr-advanced-settings_label": "Advanced QR Settings"
+  },
+  "qr-settings-page": {
+    "title": "QR Settings"
   },
   "select-wallet": {
     "title": "Select Account",
-    "text": "You've scanned an address. Select one of the following accounts to send from.",
+    "scanned-address": {
+      "text": "You've scanned an address. Select one of the following accounts to send from."
+    },
+    "fund-account": {
+      "xtz_shielded": {
+        "text": "Select one of the following accounts to fund your Shielded Tez account."
+      }
+    },
+    "broadcast": {
+      "xtz_shielded": {
+        "text": "The Sapling transaction needs to be broadcast from a Tezos account. Select a Tezos account to sign the transaction in the Vault and ultimately broadcast the Sapling transaction."
+      }
+    },
     "compatible_label": "These accounts appear to be compatible",
     "incompatible_label": "These accounts appear to be incompatible"
   },
@@ -182,15 +213,18 @@
   },
   "transaction-prepare": {
     "title": "Send {{title}}",
-    "to-address_label": "To Address",
+    "to-address_label": "Recipient",
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
+    "balance_label": "Balance:",
     "fee": {
       "label": "Fee",
       "slow_label": "slow & cheap",
       "fast_label": "fast & expensive",
       "max_label": "MAX"
     },
+    "advanced": "Advanced",
+    "memo": "Memo",
     "paste_label": "Paste",
     "create-transaction": "Create Transaction",
     "error": {
@@ -201,7 +235,8 @@
   "transaction-qr": {
     "title": "{{title}} Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
-    "done_label": "Done"
+    "done_label": "Done",
+    "details": "Display details"
   },
   "interaction-selection": {
     "title": "Vault Interaction",
@@ -211,16 +246,14 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
-    "heading": "TODO",
+    "heading": "Select the device to sign this transaction",
     "vault_label": "AirGap Vault",
     "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
     "ledger_label": "Ledger",
     "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
   },
-
   "wallet-address": {
     "title": "Account Address",
     "address_label": "Address",
@@ -234,17 +267,6 @@
     "cancel_label": "Cancel",
     "import_label": "Import"
   },
-  "from-to": {
-    "type_label": "Type",
-    "amount_label": "Amount",
-    "fee_label": "Fee",
-    "time_label": "Time",
-    "data_label": "Data",
-    "status_label": "Status",
-    "from_label": "From",
-    "to_label": "To",
-    "transaction-details_label": "Display extra transaction details"
-  },
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
   },
@@ -255,7 +277,8 @@
     "settings_label": "Account Settings",
     "copy-address_label": "Copy Address",
     "delete_label": "Remove",
-    "block_explorer": "Open Blockexplorer"
+    "block-explorer_label": "Open Blockexplorer",
+    "change-network_label": "Change Network"
   },
   "account-edit-popover-component": {
     "header": "Confirm Account Removal",
@@ -345,18 +368,6 @@
     "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
     "import-all_label": "Import All"
   },
-  "deep-link": {
-    "not-supported-alert": {
-      "title": "Oops",
-      "message": "Deeplinking is only supported on mobile devices.",
-      "ok": "Ok"
-    },
-    "app-not-found": {
-      "title": "Oops",
-      "message": "It looks like you don't have {{otherAppName}} installed on this device.",
-      "ok": "Ok"
-    }
-  },
   "exchange": {
     "title": "Exchange",
     "exchange_label": "Exchange",
@@ -371,17 +382,18 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
-    }
-    ,"loading": {
+    },
+    "loading": {
       "setup": "Setting up exchange ... ",
       "header": "Loading Error",
       "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
-    } 
+    }
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
     "sell_label": "Sell",
     "buy_label": "Buy",
+    "currently_not_supported": "The selected trading pair is currently not supported",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
     "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
@@ -433,51 +445,155 @@
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
   },
-  "delegation-baker-detail": {
-    "title": "Baker Detail",
-    "accepts-delegation": "Accepts Delegation",
-    "fee": "Fee",
-    "invalid-address": "This address is invalid.",
-    "payout-schedule": "Payout Schedule",
-    "your-delegation": "Your Delegation",
-    "your-balance": "Your Balance",
-    "estimated-return": "Estimated Return per Cycle",
-    "first-payout": "First Payout",
-    "next-payout": "Next Payout",
-    "your-rewards": "Your Rewards",
-    "cycles": "{{cycles}} Cycles",
-    "delegate": "Delegate",
-    "done": "Done",
-    "unknown": "Unknown"
-  },
-  "delegation-cosmos": {
-    "title": "Validator Detail",
-    "status-active_label": "active",
-    "status-inactive_label": "inactive",
+  "delegation-detail": {
+    "title": "{{ delegateeLabel }} Detail",
+    "default-delegatee-label": "Delegation",
+    "default-delegatee-label-plural": "Delegations",
+    "change-delegatee_label": "Change {{ delegateeLabel }}",
+    "your-delegation_label": "Your Delegation",
+    "your-balance_label": "Your Balance",
     "your-rewards_label": "Your Rewards",
+    "done_button": "Done",
+    "amount_label": "Amount",
+    "max-amount_button": "MAX",
+    "invalid-value_error": "Invalid value",
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
+    "rewards": {
+      "index-col_label": "Index",
+      "amount-col_label": "Reward",
+      "payout-col_label": "Payout"
+    }
+  },
+  "delegation-list": {
+    "title": "{{ delegateeLabelPlural }} List",
+    "your-delegatees_label": "Your {{ delegateeLabelPlural }}",
+    "known-delegatees_label": "Known {{ delegateeLabelPlural }}",
+    "load-more_label": "Load more",
+    "not-supported_text": "Currently the {{ delegateeLabelPlural }} list is not yet supported but you can manually delegate to an address with \"Change Validator\" in the three-dot menu."
+  },
+  "delegation-detail-cosmos": {
+    "delegatee-label": "Validator",
+    "delegatee-label-plural": "Validators",
     "commission_label": "Commission",
     "voting-power_label": "Voting Power",
-    "withdraw_rewards_label": "Claim Rewards",
-    "your-account": {
-      "label": "Your Account",
-      "balance_label": "Current Balance",
-      "delegation_label": "Currently Delegated",
-      "rewards_label": "Unclaimed Rewards"
-    },
-    "delegation": {
-      "label": "Your Delegation",
-      "text": "Select the amount you want to delegate, you can delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>.",
-      "delegated_text": "You have currently <span class=\"style__strong color__primary\">{{delegatedAmount}}</span> delegated to this validator, you can additionally delegate up to <span class=\"style__strong color__primary\">{{delegatableBalance}}</span>."
+    "currently-delegated_label": "Currently Delegated",
+    "unbonding_label": "Unbonding",
+    "unclaimed-rewards_label": "Unclaimed Rewards",
+    "delegate": {
+      "label": "Delegate",
+      "has-delegated_text": "You have currently <span class=\"style__strong color__primary\">{{ delegated }}</span> delegated to this validator.",
+      "not-delegated_text": "Select the amount you want to delegate.",
+      "can-delegate-has-delegated_text": "You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "can-delegate-not-delegated_text": "You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees)."
     },
     "undelegate": {
-      "text": "You have currently not delegated to this validator.",
-      "undelegated_text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{delegatedAmount}}</span>."
+      "label": "Undelegate",
+      "text": "You have currently delegated to this validator, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
     },
     "rewards": {
-      "text": "You currently have no rewards to claim",
-      "claim-rewards_text": "You can claim up to <span class=\"style__strong color__primary\">{{delegationReward}}</span> in rewards for this delegation."
+      "label": "Rewards",
+      "button": "Claim Rewards",
+      "text": "You can claim up to <span class=\"style__strong color__primary\">{{ rewards }}</span> in rewards for this delegation."
+    }
+  },
+  "delegation-detail-tezos": {
+    "delegatee-label": "Baker",
+    "delegatee-label-plural": "Bakers",
+    "status": {
+      "accepts-delegation": "Accepts Delegation",
+      "reached-full-capacity": "Reached Full Capacity",
+      "deactivated": "Deactivated"
+    },
+    "fee_label": "Fee",
+    "payout-schedule-every-cycle-last-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from last cycle</small>",
+    "payout-schedule-every-cycle-delayed-rewards_text": "Every {{ payoutTime }} <small>Every cycle, rewards from {{ payoutDelay }} cycles ago</small>",
+    "payout-schedule-every-n-cycle_text": "Every {{ payoutTime }} <small>Every {{ cycles }} cycle</small>",
+    "payout-schedule_label": "Payout Schedule",
+    "next-payout_label": "Next Payout",
+    "first-payout_label": "First Payout",
+    "return-per-cycle_label": "Estimated Return per Cycle",
+    "delegate_label": "Delegate",
+    "undelegate_label": "Undelegate",
+    "unknown": "Unknown",
+    "rewards": {
+      "index-col_label": "Cycle",
+      "amount-col_label": "Expected Reward",
+      "payout-col_label": "Earliest Payout"
+    }
+  },
+  "delegation-detail-substrate": {
+    "delegatee-label": "Validator",
+    "delegatee-label-plural": "Validators",
+    "status": {
+      "unknown": "Unknown"
+    },
+    "commission_label": "Commission",
+    "expected-reward_label": "Expected Reward",
+    "delegated_label": "Delegated",
+    "bonded_label": "Bonded",
+    "locked_label": "Unbonding",
+    "withdraw-ready_label": "Ready to Withdraw",
+    "next-era_label": "Next Era",
+    "becomes-active_label": "Becomes Active",
+    "next-payout_label": "Next Payout",
+    "delegate": {
+      "label": "Delegate",
+      "bond-nominate_text": "Select the amount you want to delegate. You can delegate at least <span class=\"style__strong color__primary\">{{ minDelegation }}</span> up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "bond-nominate-no-max_text": "Select the amount you want to delegate.",
+      "rebond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "rebond-nominate-no-max_text": "Select the amount you want to delegate.",
+      "nominate_text": "Delegate to this validator. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> bonded.",
+      "bond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "bond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
+      "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
+      "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
+      "unsufficient-funds_text": "You don't have enough {{ symbol }} to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
+    },
+    "undelegate": {
+      "label": "Undelegate"
+    },
+    "unbond": {
+      "label": "Unbond"
+    },
+    "withdraw-unbonded": {
+      "label": "Withdraw Unboded",
+      "button": "Withdraw",
+      "text-full": "You can withdraw <span class=\"style__strong color__primary\">{{ unlocked }}</span> of unbonded funds.",
+      "text-short": "You can withdraw unbonded funds."
+    },
+    "rewards": {
+      "index-col_label": "Era",
+      "amount-col_label": "Reward",
+      "payout-col_label": "Payout"
+    },
+    "alert": {
+      "polkadot": {
+        "delegation-issues": {
+          "title": "Delegations on Polkadot",
+          "description": "A dynamic minimum amount of DOT is required to be eligible to receive rewards on Polkadot at this time. The amount changes every day. Please read the Polkadot blogpost for more info.",
+          "actions": {
+            "open-blogpost": "Open Blogpost"
+          }
+        }
+      },
+      "election-open": {
+        "title": "Delegation operations currently unavailable",
+        "description": "Due to the election period restrictions the delegation operations are currently unavailable."
+      },
+      "nomination-inactive": {
+        "title": "Your delegation to this validator is inactive",
+        "description": "The validator has been elected to be in the validator set, however, your nomination has not been selected to be active in this era and you won't get any rewards."
+      },
+      "nomination-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards. You won't get any rewards in this era."
+      },
+      "validator-oversubscribed": {
+        "title": "This validator is oversubscribed",
+        "description": "Validators can only pay out to 256 nominators per era. If more than 256 nominators nominate the same validator, it is \"oversubscribed\", and only the top 256 staked nominators are paid rewards."
+      }
     }
   },
   "introduction-push": {
@@ -508,15 +624,20 @@
     "change-vote_label": "Change Vote",
     "done_label": "Done"
   },
+  "delegate-action-popover": {
+    "delegation-settings_label": "Delegation Settings",
+    "change-to-airgap-delegatee_label": "Change to AirGap {{ delegateeLabel }}"
+  },
   "delegate-edit-popover": {
     "delegation-settings_label": "Delegation Settings",
-    "change-baker_label": "Change Baker",
-    "change-baker-to-airgap_label": "Change to tezosAirGap Baker",
-    "heading": "Enter the bakers address",
-    "text": "Enter the address provided to you by the baker.",
-    "baker-address_label": "Baker address",
-    "cancel_label": "Cancel",
-    "set-baker_label": "Set Baker"
+    "change-delegatee_label": "Change {{ delegateeLabel }}",
+    "change-alert": {
+      "text": "Enter the address provided to you by the {{ delegateeLabel }}.",
+      "placeholder_text": "{{ delegateeLabel }} address",
+      "delegatee-address_label": "Baker address",
+      "cancel_label": "Cancel",
+      "set-delegatee_label": "Set {{ delegateeLabel }}"
+    }
   },
   "delegation-validator-list": {
     "title": "Validator List",
@@ -525,21 +646,18 @@
     "sort_label": "Sort Validators",
     "no_validators_found_label": "No validators matching your search have been found"
   },
-
   "action-alert-tip": {
     "heading": "Thank you for using AirGap!",
     "text": "We've seen you have been using AirGap a lot recently. Would you like to support development of our app by tipping us?",
     "cancel_label": "No",
     "ok_label": "Tip Now"
   },
-
   "action-alert-delegation": {
     "heading": "Thank you for using AirGap!",
     "text": "We noticed that you have XTZ funds that are not delegated. By delegating your funds, you can earn up to 7% yearly interest! Would you like to delegate your funds now?",
     "cancel_label": "No",
     "ok_label": "Delegate Now"
   },
-
   "ledger-sign": {
     "title": "{{title}} Transaction Details",
     "text": "Connect the Ledger device and sign the transaction.",
@@ -550,16 +668,60 @@
       "confirm": "Okay"
     }
   },
-
   "account-import-interaction-selection": {
-  "title": "Select Signer Option",
-  "airgap-vault": {
-    "label": "AirGap Vault",
-    "text": "AirGap Vault can be installed on an offline smartphone or on the same device to securely sign transactions."
+    "title": "Select Signer Option",
+    "airgap-vault": {
+      "label": "AirGap Vault",
+      "text": "AirGap Vault can be installed on an offline smartphone or on the same device to securely sign transactions."
+    },
+    "ledger": {
+      "label": "Ledger",
+      "text": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
+    }
   },
-  "ledger": {
-    "label": "Ledger",
-    "text": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
-  }
+  "beacon-request": {
+    "sign-data_label": "Do you want to sign the following data?",
+    "blake2b_hash": "Ledger Blake2b hash of the message",
+    "request": {
+      "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> would like to connect to your account.",
+      "text": "This website is requesting the following permissions. Always make sure you trust the websites you interact with."
+    },
+    "connect_label": "Connect",
+    "continue_label": "Continue",
+    "cancel_label": "Cancel",
+    "request-by-dapp_label": "Beacon request by DApp",
+    "title": {
+      "permission-request": "Permission Request",
+      "sign-payload-request": "Sign Payload Request",
+      "operation-request": "Operation Request",
+      "broadcast-request": "Permission Request"
+    },
+    "permission": {
+      "sign-transactions": "Sign Transactions",
+      "operation-request": "Operation request",
+      "threshold": "Threshold"
+    },
+    "select-account": {
+      "alert": "Select an account to pair",
+      "button": "Change Account"
+    }
+  },
+  "beacon-permission-list": {
+    "title": "Beacon Permissions",
+    "connected-dapps": "Connected DApps",
+    "remove_label": "Remove",
+    "no-permissions": "No permissions have been given.",
+    "delete-permission-alert": {
+      "header": "Delete Permission?",
+      "message": "Are you sure you want to delete this permission? The DApp will not be able to perform operations anymore until new permissions are granted.",
+      "cancel_label": "Cancel",
+      "yes_label": "Yes"
+    }
+  },
+  "settings-beacon": {
+    "title": "Beacon Settings",
+    "remove-all_label": "Remove All",
+    "delete_label": "Delete",
+    "no-peers": "Not connected to any peers"
   }
 }

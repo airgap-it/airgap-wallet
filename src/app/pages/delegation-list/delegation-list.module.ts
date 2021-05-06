@@ -1,3 +1,4 @@
+import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -6,8 +7,8 @@ import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
-
 import { PipesModule } from '../../pipes/pipes.module'
+
 import { DelegationListPage } from './delegation-list.page'
 
 const routes: Routes = [
@@ -18,7 +19,16 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, TranslateModule, ComponentsModule, PipesModule, RouterModule.forChild(routes)],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    TranslateModule,
+    ComponentsModule,
+    PipesModule,
+    RouterModule.forChild(routes),
+    AirGapAngularCoreModule
+  ],
   declarations: [DelegationListPage]
 })
 export class DelegationListPageModule {}

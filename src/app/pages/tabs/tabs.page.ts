@@ -1,10 +1,8 @@
 import { Component } from '@angular/core'
-import { ModalController, Platform } from '@ionic/angular'
+import { IonTabs, ModalController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { SettingsKey, StorageProvider } from '../../services/storage/storage'
-import { WebExtensionProvider } from '../../services/web-extension/web-extension'
-import { DisclaimerWebExtensionPage } from '../disclaimer-web-extension/disclaimer-web-extension'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
@@ -17,6 +15,8 @@ import { SettingsPage } from '../settings/settings'
   styleUrls: ['tabs.page.scss']
 })
 export class TabsPage {
+  private activeTab?: HTMLElement
+
   public tab1Root = PortfolioPage
   public tab2Root = ScanPage
   public tab3Root = ExchangePage
@@ -26,8 +26,7 @@ export class TabsPage {
 
   constructor(
     public modalController: ModalController,
-    private readonly storageProvider: StorageProvider,
-    private readonly webExtensionProvider: WebExtensionProvider,
+    private readonly storageProvider: WalletStorageService,
     private readonly plaftorm: Platform
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
@@ -35,24 +34,17 @@ export class TabsPage {
   }
 
   private async showIntroductions() {
-    if (this.webExtensionProvider.isWebExtension()) {
-      await this.showWebExtensionIntroduction()
-    }
-    const alreadyOpenByDeepLink = await this.storageProvider.get(SettingsKey.DEEP_LINK)
+    const alreadyOpenByDeepLink = await this.storageProvider.get(WalletStorageKey.DEEP_LINK)
     if (!alreadyOpenByDeepLink) {
       await this.showWalletIntroduction().catch(console.error)
     }
   }
 
   private async showWalletIntroduction() {
-    return this.showModal(SettingsKey.WALLET_INTRODUCTION, IntroductionPage)
+    return this.showModal(WalletStorageKey.WALLET_INTRODUCTION, IntroductionPage)
   }
 
-  private async showWebExtensionIntroduction() {
-    return this.showModal(SettingsKey.WEB_EXTENSION_DISCLAIMER, DisclaimerWebExtensionPage)
-  }
-
-  private async showModal(settingsKey: SettingsKey, page: any): Promise<void> {
+  private async showModal(settingsKey: WalletStorageKey, page: any): Promise<void> {
     const introduction = await this.storageProvider.get(settingsKey)
     if (!introduction) {
       return new Promise<void>(async resolve => {
@@ -70,6 +62,20 @@ export class TabsPage {
       })
     } else {
       return Promise.resolve()
+    }
+  }
+
+  tabChange(tabsRef: IonTabs) {
+    this.activeTab = tabsRef.outlet.activatedView.element
+  }
+
+  ionViewWillEnter() {
+    this.propagateToActiveTab('ionViewWillEnter')
+  }
+
+  private propagateToActiveTab(eventName: string) {
+    if (this.activeTab) {
+      this.activeTab.dispatchEvent(new CustomEvent(eventName))
     }
   }
 }

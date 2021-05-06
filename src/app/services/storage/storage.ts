@@ -1,28 +1,36 @@
+import { BaseStorage } from '@airgap/angular-core'
+import { Network } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import { ICoinProtocol } from '@airgap/coinlib-core'
 import { ExchangeTransaction } from '../exchange/exchange'
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 
-export enum SettingsKey {
+export type BeaconRequest = [string, any, ICoinProtocol]
+export interface SerializedBeaconRequest {
+  messageId: string
+  payload: any
+  protocolIdentifier: string
+  network: Network
+}
+
+export enum WalletStorageKey {
   INTRODUCTION = 'introduction',
   WALLET_INTRODUCTION = 'walletIntroduction',
   CAMERA_PERMISSION_ASKED = 'cameraPermissionAsked',
   DEEP_LINK = 'deepLink',
-  WEB_EXTENSION_DISCLAIMER = 'webExtensionDisclaimer',
   PUSH_INTRODUCTION = 'pushIntroduction',
   EXCHANGE_INTEGRATION = 'exchangeIntroduction',
   WALLET = 'wallets',
-  SELECTED_ACCOUNT = 'selectedAccount',
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
-  SETTINGS_SERIALIZER_ENABLE_V2 = 'SETTINGS_SERIALIZER_ENABLE_V2',
-  SETTINGS_SERIALIZER_CHUNK_TIME = 'SETTINGS_SERIALIZER_CHUNK_TIME',
-  SETTINGS_SERIALIZER_CHUNK_SIZE = 'SETTINGS_SERIALIZER_CHUNK_SIZE',
-  PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS'
+  PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
+  BEACON_REQUESTS = 'BEACON_REQUESTS'
 }
 
-interface IPartialAirGapWallet {
-  protocolIdentifier: string
+interface SerializedAirGapWallet {
+  protocolIdentifier: ProtocolSymbols
+  networkIdentifier: string
   publicKey: string
   isExtendedPublicKey: boolean
   derivationPath: string
@@ -36,78 +44,53 @@ interface IBroadcastTransaction {
   date: number
 }
 
-interface SettingsKeyReturnType {
-  [SettingsKey.INTRODUCTION]: boolean
-  [SettingsKey.WALLET_INTRODUCTION]: boolean
-  [SettingsKey.CAMERA_PERMISSION_ASKED]: boolean
-  [SettingsKey.DEEP_LINK]: boolean
-  [SettingsKey.WEB_EXTENSION_DISCLAIMER]: boolean
-  [SettingsKey.PUSH_INTRODUCTION]: boolean
-  [SettingsKey.EXCHANGE_INTEGRATION]: boolean
-  [SettingsKey.WALLET]: IPartialAirGapWallet[] | undefined
-  [SettingsKey.SELECTED_ACCOUNT]: AirGapMarketWallet | undefined
-  [SettingsKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
-  [SettingsKey.USER_ID]: string | undefined
-  [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: boolean
-  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: number
-  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: number
-  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
+interface WalletStorageKeyReturnType {
+  [WalletStorageKey.INTRODUCTION]: boolean
+  [WalletStorageKey.WALLET_INTRODUCTION]: boolean
+  [WalletStorageKey.CAMERA_PERMISSION_ASKED]: boolean
+  [WalletStorageKey.DEEP_LINK]: boolean
+  [WalletStorageKey.PUSH_INTRODUCTION]: boolean
+  [WalletStorageKey.EXCHANGE_INTEGRATION]: boolean
+  [WalletStorageKey.WALLET]: SerializedAirGapWallet[] | undefined
+  [WalletStorageKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
+  [WalletStorageKey.USER_ID]: string | undefined
+  [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
+  [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
 }
 
-type SettingsKeyReturnDefaults = { [key in SettingsKey]: SettingsKeyReturnType[key] }
+type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
 
-const defaultValues: SettingsKeyReturnDefaults = {
-  [SettingsKey.INTRODUCTION]: false,
-  [SettingsKey.WALLET_INTRODUCTION]: false,
-  [SettingsKey.CAMERA_PERMISSION_ASKED]: false,
-  [SettingsKey.DEEP_LINK]: false,
-  [SettingsKey.WEB_EXTENSION_DISCLAIMER]: false,
-  [SettingsKey.PUSH_INTRODUCTION]: false,
-  [SettingsKey.EXCHANGE_INTEGRATION]: false,
-  [SettingsKey.WALLET]: undefined,
-  [SettingsKey.SELECTED_ACCOUNT]: undefined,
-  [SettingsKey.LAST_TX_BROADCAST]: undefined,
-  [SettingsKey.USER_ID]: undefined,
-  [SettingsKey.SETTINGS_SERIALIZER_ENABLE_V2]: false,
-  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_TIME]: 500,
-  [SettingsKey.SETTINGS_SERIALIZER_CHUNK_SIZE]: 100,
-  [SettingsKey.PENDING_EXCHANGE_TRANSACTIONS]: []
+const defaultValues: WalletStorageKeyReturnDefaults = {
+  [WalletStorageKey.INTRODUCTION]: false,
+  [WalletStorageKey.WALLET_INTRODUCTION]: false,
+  [WalletStorageKey.CAMERA_PERMISSION_ASKED]: false,
+  [WalletStorageKey.DEEP_LINK]: false,
+  [WalletStorageKey.PUSH_INTRODUCTION]: false,
+  [WalletStorageKey.EXCHANGE_INTEGRATION]: false,
+  [WalletStorageKey.WALLET]: undefined,
+  [WalletStorageKey.LAST_TX_BROADCAST]: undefined,
+  [WalletStorageKey.USER_ID]: undefined,
+  [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: [],
+  [WalletStorageKey.BEACON_REQUESTS]: []
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class StorageProvider {
-  constructor(private readonly storage: Storage) {}
-
-  public async get<K extends SettingsKey>(key: K): Promise<SettingsKeyReturnType[K]> {
-    const value: SettingsKeyReturnType[K] = (await this.storage.get(key)) || defaultValues[key]
-    console.log(`[SETTINGS_SERVICE:get] ${key}, returned: ${value}`)
-
-    return value
-  }
-
-  public async set<K extends SettingsKey>(key: K, value: SettingsKeyReturnType[K]): Promise<any> {
-    console.log(`[SETTINGS_SERVICE:set] ${key}, ${value}`)
-
-    return this.storage.set(key, value)
-  }
-
-  public async delete<K extends SettingsKey>(key: K): Promise<boolean> {
-    try {
-      await this.storage.remove(key)
-
-      return true
-    } catch (error) {
-      return false
-    }
+export class WalletStorageService extends BaseStorage<WalletStorageKey, WalletStorageKeyReturnType> {
+  constructor(storage: Storage) {
+    super(storage, defaultValues)
   }
 
   public async getCache<T>(key: string): Promise<T> {
-    return this.storage.get(key)
+    await this.storage.ready()
+
+    return this.storage.get(`cache-${key}`)
   }
 
   public async setCache<T>(key: string, value: T): Promise<T> {
-    return this.storage.set(key, value)
+    await this.storage.ready()
+
+    return this.storage.set(`cache-${key}`, value)
   }
 }

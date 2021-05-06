@@ -8,7 +8,14 @@
           [innerHTML]="'swap.min-amount_label' | translate: { minExchangeAmount: minExchangeAmount.toString() }"
         ></span>
       </ion-label>
-      <ion-input *ngIf="swapSell" type="number" id="buy-input" (input)="amountSet($event.target.value)" placeholder="0.0"></ion-input>
+      <ion-input
+        *ngIf="swapSell"
+        type="number"
+        id="buy-input"
+        (input)="amountSet($event.target.value)"
+        placeholder="0.0"
+        [disabled]="currentlyNotSupported"
+      ></ion-input>
       <ion-input
         *ngIf="!swapSell"
         [disabled]="true"
@@ -19,7 +26,9 @@
       ></ion-input>
     </ion-item>
     <ion-text color="blackLight">
-      <p class="ion-no-margin">${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}</p>
+      <p class="ion-no-margin">
+        ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
+      </p>
     </ion-text>
     <ion-row class="ion-padding-top" *ngIf="swapSell && !exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
       <ion-text no-margin color="danger">
@@ -30,16 +39,25 @@
         ></p>
       </ion-text>
     </ion-row>
+
+    <ion-row class="ion-padding-top" *ngIf="currentlyNotSupported">
+      <ion-text no-margin color="danger">
+        <p class="ion-no-margin" color="danger">
+          {{ 'swap.currently_not_supported' | translate }}
+        </p>
+      </ion-text>
+    </ion-row>
+
     <ion-row
       class="ion-padding-top"
-      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals))"
+      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals))"
     >
       <ion-text color="danger">
         <p
           class="ion-no-margin"
           [innerHTML]="
             'swap.amount-higher-than-balance-error_label'
-              | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.coinProtocol.decimals) }
+              | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals) }
           "
         ></p>
       </ion-text>
@@ -49,7 +67,7 @@
     <ion-row><img [src]="'./assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
     <ion-row>
       <h5>
-        {{ selectedProtocol?.symbol | uppercase }}
+        {{ selectedProtocol?.symbol }}
         <ion-icon name="chevron-down-outline"></ion-icon>
       </h5>
     </ion-row>

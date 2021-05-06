@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'scan-address.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -20,13 +20,7 @@
       <ion-col class="guides--container content--align__center-center">
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
-      <zxing-scanner
-        [hidden]="!isBrowser"
-        #addressScanner
-        [device]="selectedDevice"
-        [scannerEnabled]="scannerEnabled"
-        (scanSuccess)="checkScan($event)"
-      ></zxing-scanner>
+      <zxing-scanner *ngIf="isBrowser || isElectron" #addressScanner (scanSuccess)="checkScan($event)"></zxing-scanner>
     </ion-row>
 
     <ion-row

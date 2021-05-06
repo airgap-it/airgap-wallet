@@ -1,5 +1,9 @@
 FROM electronuserland/builder:wine
 
+RUN wget -qO - https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04/Release.key | apt-key add -
+RUN apt-get update -y
+RUN apt-get install -y libusb-1.0-0 libudev-dev
+
 # set cache dirs
 ENV ELECTRON_CACHE "/root/.cache/electron"
 ENV ELECTRON_BUILDER_CACHE "/root/.cache/electron-builder"
@@ -21,7 +25,7 @@ RUN npm --prefix electron/ install
 RUN npm run browserify-coinlib
 
 # build Ionic project
-RUN npm run build:electron
+RUN npm run build:electron:prod
 
 # copy files
 RUN npx cap sync electron

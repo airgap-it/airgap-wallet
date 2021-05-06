@@ -2,7 +2,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
+        <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'account-import.title' | translate }}</ion-title>
     </ion-toolbar>
@@ -26,7 +26,7 @@
     <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
       {{ 'account-import.cancel_label' | translate }}
     </ion-button>
-    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists && walletImportable" (click)="import()">
+    <ion-button id="import" shape="round" color="primary" *ngIf="!walletAlreadyExists" (click)="import()">
       {{ 'account-import.import_label' | translate }}
     </ion-button>
   </ion-fab>

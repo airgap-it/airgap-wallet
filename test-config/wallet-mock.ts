@@ -1,9 +1,25 @@
-import { AirGapMarketWallet, IAirGapTransaction } from 'airgap-coin-lib'
+import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
+
+// tslint:disable:max-classes-per-file
+
+export class PriceServiceMock implements AirGapWalletPriceService {
+  public async getCurrentMarketPrice(_protocol: ICoinProtocol, _baseSymbol: string): Promise<BigNumber> {
+    throw new Error('Method not implemented.')
+  }
+}
 
 class WalletMock {
   public ethWallet: AirGapMarketWallet = Object.assign(
-    new AirGapMarketWallet('eth', '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6', false, "m/44'/60'/0'/0/0"),
+    new AirGapMarketWallet(
+      new EthereumProtocol(),
+      '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
+      false,
+      "m/44'/60'/0'/0/0",
+      new PriceServiceMock()
+    ),
     {
       currentMarketPrice: new BigNumber('100')
     }
@@ -13,7 +29,7 @@ class WalletMock {
     to: ['0x579D75370dd53C59e09E6F51F4D935220D7EEcF8'],
     amount: '10000000000000',
     fee: '0',
-    protocolIdentifier: 'eth',
+    protocolIdentifier: MainProtocolSymbols.ETH,
     publicKey: '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
     payload: {
       none: '3',
@@ -27,17 +43,18 @@ class WalletMock {
   } as any
 
   public btcWallet: AirGapMarketWallet = new AirGapMarketWallet(
-    'btc',
+    new BitcoinProtocol(),
     'xpub6CcLgL3yuTNxguFdSikacKj93R77GMToq1488BKLdZMAQ2BfrVQrx31phHwqhx4kRUTNCeyiWiqvppaykiXM9w8RWJFbhj1etsCgBckA2bF',
     false,
-    "m/44'/0'/0'"
+    "m/44'/0'/0'",
+    new PriceServiceMock()
   )
   public btcTransaction: IAirGapTransaction = {
     from: ['1JzeZaZwb1gLxQEwexUn4XmZ3tmSfuesBo'],
     to: ['1JzeZaZwb1gLxQEwexUn4XmZ3tmSfuesBo'],
     amount: '10000000000000',
     fee: '0',
-    protocolIdentifier: 'btc',
+    protocolIdentifier: MainProtocolSymbols.BTC,
     payload: {
       ins: [
         {

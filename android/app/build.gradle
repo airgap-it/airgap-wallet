@@ -3,19 +3,42 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "it.airgap.wallet"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "0.0.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    flavorDimensions "repository"
+    productFlavors {
+        playstore {
+            dimension "repository"
+            isDefault true
+
+            buildConfigField("String", "PRODUCT_FLAVOR", '"playstore"')
+        }
+
+        fdroid {
+            dimension "repository"
+
+            buildConfigField("String", "PRODUCT_FLAVOR", '"fdroid"')
         }
     }
     lintOptions{
@@ -35,16 +58,28 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation project(':capacitor-android')
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test:core:$androidxTestCoreVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    def saplingVersion = "0.0.6"
+    implementation "com.github.airgap-it:airgap-sapling:$saplingVersion"
 }
 
 apply from: 'capacitor.build.gradle'
+
+
+configurations.each {
+  if (it.name.startsWith("fdroid")) {
+    it.exclude group: 'com.google.firebase', module: ''
+    it.exclude group: 'com.google.android.gms', module: ''
+  }
+}
 
 try {
     def servicesJSON = file('google-services.json')

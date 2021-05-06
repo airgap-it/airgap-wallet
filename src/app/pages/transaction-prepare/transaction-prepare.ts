@@ -1,21 +1,29 @@
+import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
-import { AirGapMarketWallet } from 'airgap-coin-lib'
+import {
+  AirGapMarketWallet,
+  EthereumProtocol,
+  MainProtocolSymbols,
+  SubProtocolSymbols,
+  IACMessageType,
+  TezosProtocol
+} from '@airgap/coinlib-core'
+import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BigNumber } from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
+import { AccountProvider } from 'src/app/services/account/account.provider'
+import { PriceService } from 'src/app/services/price/price.service'
 
-import { ClipboardService } from '../../services/clipboard/clipboard'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
-import { BehaviorSubject } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
-import { ProtocolSymbols } from 'src/app/services/protocols/protocols'
-import { FeeDefaults } from 'airgap-coin-lib/dist/protocols/ICoinProtocol'
-import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 
 interface TransactionFormState<T> {
   value: T
@@ -35,11 +43,14 @@ interface TransactionPrepareState {
   estimatingMaxAmount: boolean
   estimatingFeeDefaults: boolean
 
-  address: TransactionFormState<string>
+  receiver: TransactionFormState<string>
+  receiverAddress: string
+
   amount: TransactionFormState<string>
   feeLevel: TransactionFormState<number>
   fee: TransactionFormState<string>
   isAdvancedMode: TransactionFormState<boolean>
+  memo: TransactionFormState<string>
 }
 
 @Component({
@@ -48,6 +59,8 @@ interface TransactionPrepareState {
   styleUrls: ['./transaction-prepare.scss']
 })
 export class TransactionPreparePage {
+  public readonly networkType: typeof NetworkType = NetworkType
+
   public wallet: AirGapMarketWallet
   public transactionForm: FormGroup
   public amountForm: FormGroup
@@ -55,9 +68,15 @@ export class TransactionPreparePage {
   // temporary field until we figure out how to handle Substrate fee/tip model
   private readonly isSubstrate: boolean
 
+  private readonly isSapling: boolean
+
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
-  private readonly state$: BehaviorSubject<TransactionPrepareState> = new BehaviorSubject(this._state)
+  private readonly state$: BehaviorSubject<TransactionPrepareState>
+
+  private publicKey: string
+  private protocolID: string
+  private addressIndex: number | undefined
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -68,38 +87,54 @@ export class TransactionPreparePage {
     private readonly clipboardProvider: ClipboardService,
     private readonly operationsProvider: OperationsProvider,
     private readonly dataService: DataService,
-    private readonly amountConverterPipe: AmountConverterPipe
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly priceService: PriceService,
+    private readonly addressService: AddressService,
+    public readonly accountProvider: AccountProvider
   ) {
-    if (this.route.snapshot.data.special) {
-      const info = this.route.snapshot.data.special
-      const address: string = info.address || ''
-      const amount: number = info.amount || 0
-      const wallet: AirGapMarketWallet = info.wallet
-      const forceMigration: boolean = info.forceMigration || false
+    this.publicKey = this.route.snapshot.params.publicKey
+    this.protocolID = this.route.snapshot.params.protocolID
+    const addressIndex = this.route.snapshot.params.addressIndex
+    this.addressIndex = addressIndex === 'undefined' ? undefined : Number(addressIndex)
 
-      this.transactionForm = this.formBuilder.group({
-        address: [address, Validators.compose([Validators.required, AddressValidator.validate(wallet.coinProtocol)])],
-        amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.decimals)])],
-        feeLevel: [0, [Validators.required]],
-        fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.coinProtocol.feeDecimals)])],
-        isAdvancedMode: [false, []]
+    this.state$ = new BehaviorSubject(this._state)
+
+    const address: string = this.route.snapshot.params.address === 'false' ? '' : this.route.snapshot.params.address || ''
+    const amount: number = Number(this.route.snapshot.params.amount) || 0
+    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
+      this.publicKey,
+      this.protocolID,
+      this.addressIndex
+    )
+
+    const forced = this.route.snapshot.params.forceMigration
+    const forceMigration: boolean = forced === 'forced' || false
+
+    this.transactionForm = this.formBuilder.group({
+      receiver: [address, Validators.required, AddressValidator.validate(wallet.protocol, this.addressService)],
+      amount: [amount, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.decimals)])],
+      feeLevel: [0, [Validators.required]],
+      fee: [0, Validators.compose([Validators.required, DecimalValidator.validate(wallet.protocol.feeDecimals)])],
+      memo: [undefined],
+      isAdvancedMode: [false, []]
+    })
+
+    this.wallet = wallet
+
+    this.isSubstrate =
+      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+
+    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+
+    this.initState()
+      .then(async () => {
+        if (forceMigration) {
+          await this.forceMigration()
+        }
+        this.onChanges()
+        this.updateFeeEstimate()
       })
-
-      this.wallet = wallet
-
-      this.isSubstrate =
-        wallet.coinProtocol.identifier === ProtocolSymbols.KUSAMA || wallet.coinProtocol.identifier === ProtocolSymbols.POLKADOT
-
-      this.initState()
-        .then(async () => {
-          if (forceMigration) {
-            await this.forceMigration()
-          }
-          this.onChanges()
-          this.updateFeeEstimate()
-        })
-        .catch(handleErrorSentry(ErrorCategory.OTHER))
-    }
+      .catch(handleErrorSentry(ErrorCategory.OTHER))
   }
 
   public onChanges(): void {
@@ -108,16 +143,20 @@ export class TransactionPreparePage {
     })
 
     this.transactionForm
-      .get('address')
+      .get('receiver')
       .valueChanges.pipe(debounceTime(500))
-      .subscribe((value: string) => {
+      .subscribe(async (value: string) => {
+        const receiverAddress: string | undefined = await this.addressService.getAddress(value, this.wallet.protocol)
+
         this.updateState({
-          address: {
+          receiver: {
             value,
             dirty: true
           },
+          receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton:
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       })
@@ -190,25 +229,39 @@ export class TransactionPreparePage {
         false
       )
     })
+
+    this.transactionForm.get('memo').valueChanges.subscribe((value: string) => {
+      this.updateState(
+        {
+          memo: {
+            value,
+            dirty: true
+          },
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+        },
+        false
+      )
+    })
   }
 
   private async initState(): Promise<void> {
     this._state = {
       availableBalance: null,
       forceMigration: false,
-      feeDefaults: this.wallet.coinProtocol.feeDefaults,
+      feeDefaults: this.wallet.protocol.feeDefaults,
       feeCurrentMarketPrice: null,
       sendMaxAmount: false,
       disableSendMaxAmount: true,
-      disableAdvancedMode: this.isSubstrate,
+      disableAdvancedMode: this.isSubstrate || this.isSapling,
       disableFeeSlider: true,
       disablePrepareButton: true,
       estimatingMaxAmount: false,
       estimatingFeeDefaults: false,
-      address: {
-        value: this.transactionForm.controls.address.value,
+      receiver: {
+        value: this.transactionForm.controls.receiver.value,
         dirty: false
       },
+      receiverAddress: this.transactionForm.controls.receiver.value,
       amount: {
         value: this.transactionForm.controls.amount.value,
         dirty: false
@@ -223,6 +276,10 @@ export class TransactionPreparePage {
       },
       isAdvancedMode: {
         value: this.transactionForm.controls.isAdvancedMode.value,
+        dirty: false
+      },
+      memo: {
+        value: this.transactionForm.controls.memo.value,
         dirty: false
       }
     }
@@ -271,11 +328,14 @@ export class TransactionPreparePage {
       estimatingFeeDefaults:
         newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
 
-      address: newState.address || currentState.address,
+      receiver: newState.receiver || currentState.receiver,
+      receiverAddress: newState.receiverAddress !== undefined ? newState.receiverAddress : currentState.receiverAddress,
+
       amount: newState.amount || currentState.amount,
       feeLevel: newState.feeLevel || currentState.feeLevel,
       fee: newState.fee || currentState.fee,
-      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
+      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode,
+      memo: newState.memo || currentState.memo
     }
   }
 
@@ -283,7 +343,7 @@ export class TransactionPreparePage {
     this.state = newState
 
     this.updateTransactionForm({
-      address: this.state.address,
+      receiver: this.state.receiver,
       amount: this.state.amount,
       fee: this.state.fee,
       feeLevel: this.state.feeLevel,
@@ -310,15 +370,10 @@ export class TransactionPreparePage {
   }
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
-    if (wallet.protocolIdentifier === ProtocolSymbols.TZBTC) {
-      const newWallet = new AirGapMarketWallet(
-        'xtz',
-        'cdbc0c3449784bd53907c3c7a06060cf12087e492a7b937f044c6a73b522a234',
-        false,
-        'm/44h/1729h/0h/0h'
-      )
-      await newWallet.synchronize()
-      return newWallet.currentMarketPrice.toNumber()
+    if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
+      return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+    } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+      return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.currentMarketPrice.toNumber()
     }
@@ -327,11 +382,11 @@ export class TransactionPreparePage {
   private async getAvailableBalance(wallet: AirGapMarketWallet): Promise<BigNumber> {
     // TODO: refactor this so that we do not need to check for the protocols
     if (
-      wallet.protocolIdentifier === ProtocolSymbols.COSMOS ||
-      wallet.protocolIdentifier === ProtocolSymbols.KUSAMA ||
-      wallet.protocolIdentifier === ProtocolSymbols.POLKADOT
+      wallet.protocol.identifier === MainProtocolSymbols.COSMOS ||
+      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
+      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
     ) {
-      return new BigNumber(await wallet.coinProtocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
+      return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {
       return wallet.currentBalance
     }
@@ -366,13 +421,13 @@ export class TransactionPreparePage {
   }
 
   private async estimateFees(): Promise<FeeDefaults | undefined> {
-    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.coinProtocol.decimals)
+    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
 
-    const isAddressValid = this.transactionForm.controls.address.valid
+    const isAddressValid = this.transactionForm.controls.receiver.valid
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
-    return isAddressValid && isAmountValid
-      ? this.operationsProvider.estimateFees(this.wallet, this._state.address.value, amount)
+    return isAddressValid && isAmountValid && this._state.receiverAddress
+      ? this.operationsProvider.estimateFees(this.wallet, this._state.receiverAddress, amount)
       : undefined
   }
 
@@ -391,21 +446,25 @@ export class TransactionPreparePage {
   }
 
   public async prepareTransaction() {
-    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.coinProtocol.decimals)
-    const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.coinProtocol.feeDecimals)
+    const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
+    const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.protocol.feeDecimals)
 
+    const memo = this._state.memo.value
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
-        this._state.address.value,
+        this._state.receiverAddress,
         amount,
-        fee
+        fee,
+        this.accountProvider.getWalletList(),
+        memo
       )
 
       const info = {
         wallet: this.wallet,
         airGapTxs,
-        data: unsignedTx
+        data: unsignedTx,
+        type: IACMessageType.TransactionSignRequest
       }
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -415,12 +474,14 @@ export class TransactionPreparePage {
   }
 
   public openScanner() {
-    const callback = (address: string) => {
+    const callback = async (address: string) => {
+      const receiverAddress: string | undefined = await this.addressService.getAddress(address, this.wallet.protocol)
       this.updateState({
-        address: {
+        receiver: {
           value: address,
           dirty: false
-        }
+        },
+        receiverAddress: receiverAddress !== undefined ? receiverAddress : ''
       })
     }
     const info = {
@@ -461,13 +522,10 @@ export class TransactionPreparePage {
       estimatingMaxAmount: true
     })
 
-    const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.coinProtocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.address.value, fee)
+    const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.receiver.value, fee)
 
-    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, {
-      protocol: this.wallet.coinProtocol,
-      maxDigits: this.wallet.coinProtocol.decimals + 1
-    })
+    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
     if (!maxAmount.isNaN()) {
       this.updateState({
@@ -483,14 +541,18 @@ export class TransactionPreparePage {
 
   public pasteClipboard() {
     this.clipboardProvider.paste().then(
-      (text: string) => {
+      async (text: string) => {
+        const receiverAddress: string | undefined = await this.addressService.getAddress(text, this.wallet.protocol)
+
         this.updateState({
-          address: {
+          receiver: {
             value: text,
             dirty: false
           },
+          receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton:
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
         })
         this.updateFeeEstimate()
       },

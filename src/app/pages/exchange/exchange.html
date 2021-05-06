@@ -49,6 +49,7 @@
         [supportedProtocols]="supportedProtocolsFrom"
         [exchangeAmount]="amount"
         [minExchangeAmount]="minExchangeAmount"
+        [currentlyNotSupported]="currentlyNotSupported"
         (protocolSetEmitter)="setFromProtocol($event)"
         (walletSetEmitter)="setFromWallet($event)"
         (amountSetEmitter)="amountSet($event)"
@@ -84,21 +85,25 @@
         </ion-col>
       </ion-row>
 
-      <ion-fab vertical="bottom" horizontal="end">
-        <ion-button
-          color="primary"
-          [disabled]="
-          amount?.isNaN() ||
-          amount?.isZero() ||
-          amount?.isLessThan(minExchangeAmount) ||
-          amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.coinProtocol.decimals))
-        "
-          (click)="startExchange()"
-          shape="round"
-        >
-          {{ 'exchange.exchange_label' | translate }}
-        </ion-button>
-      </ion-fab>
+      <fee [state]="state" [form]="exchangeForm" [wallet]="fromWallet"></fee>
     </ng-container>
   </ion-grid>
 </ion-content>
+
+<ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-button
+      color="primary"
+      [disabled]="
+      amount?.isNaN() ||
+      amount?.isZero() ||
+      amount?.isLessThan(minExchangeAmount) ||
+      amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
+    "
+      (click)="startExchange()"
+      shape="round"
+    >
+      {{ 'exchange.exchange_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ng-container>

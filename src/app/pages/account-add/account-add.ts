@@ -1,14 +1,15 @@
+import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { ICoinProtocol, supportedProtocols } from 'airgap-coin-lib'
-import { SubProtocolType } from 'airgap-coin-lib/dist/protocols/ICoinSubProtocol'
+import { Platform } from '@ionic/angular'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ProtocolsProvider } from '../../services/protocols/protocols'
+import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { Platform } from '@ionic/angular'
-import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
 @Component({
@@ -19,32 +20,51 @@ import { AccountImportInteractionType } from '../account-import-interaction-sele
 export class AccountAddPage {
   public searchTerm: string = ''
   public supportedAccountProtocols: ICoinProtocol[] = []
-  public supportedSubAccountProtocols: ICoinProtocol[] = []
+  public featuredSubAccountProtocols: ICoinProtocol[] = []
+  public otherSubAccountProtocols: ICoinProtocol[] = []
   public filteredAccountProtocols: ICoinProtocol[] = []
-  public filteredSubAccountProtocols: ICoinProtocol[] = []
+  public filteredFeaturedSubAccountProtocols: ICoinProtocol[] = []
+  public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
+
+  private featuredSubProtocols: SubProtocolSymbols[] = [
+    SubProtocolSymbols.XTZ_KT,
+    SubProtocolSymbols.XTZ_BTC,
+    SubProtocolSymbols.XTZ_USD,
+    SubProtocolSymbols.XTZ_STKR,
+    SubProtocolSymbols.ETH_ERC20_XCHF
+  ]
 
   constructor(
     private readonly platform: Platform,
     private readonly accountProvider: AccountProvider,
-    private readonly protocolsProvider: ProtocolsProvider,
+    private readonly protocolService: ProtocolService,
     private readonly router: Router,
-    private readonly dataService: DataService,
-    private readonly ledgerService: LedgerService
-  ) {
-    this.supportedAccountProtocols = supportedProtocols().map(coin => coin)
-    this.supportedSubAccountProtocols = supportedProtocols().reduce((pv, cv) => {
-      if (cv.subProtocols) {
-        const subProtocols = cv.subProtocols.filter(
-          subProtocol =>
-            subProtocol.subProtocolType === SubProtocolType.TOKEN &&
-            this.protocolsProvider.getEnabledSubProtocols().indexOf(subProtocol.identifier) >= 0
-        )
+    private readonly ledgerService: LedgerService,
+    private readonly dataService: DataService
+  ) {}
 
-        return pv.concat(...subProtocols)
-      }
+  public async ionViewWillEnter() {
+    this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
+      protocol => protocol.options.network.type === NetworkType.MAINNET
+    )
+    const supportedSubAccountProtocols = Array.prototype.concat.apply(
+      [],
+      await Promise.all(Object.values(MainProtocolSymbols).map(protocol => this.protocolService.getSubProtocols(protocol)))
+    )
 
-      return pv
-    }, [])
+    this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
+      protocol =>
+        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
+    )
+
+    this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
+      protocol =>
+        !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        protocol.options.network.type === NetworkType.MAINNET &&
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT
+    )
     this.filterProtocols()
   }
 
@@ -54,50 +74,57 @@ export class AccountAddPage {
 
   public filterProtocols() {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
+
     this.filteredAccountProtocols = this.supportedAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
-    this.filteredSubAccountProtocols = this.supportedSubAccountProtocols.filter(
+    this.filteredFeaturedSubAccountProtocols = this.featuredSubAccountProtocols.filter(
+      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+    )
+    this.filteredOtherSubAccountProtocols = this.otherSubAccountProtocols.filter(
       protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
   }
 
-  public addAccount(protocolIdentifier: string) {
-    const isLedgerImportAvailable = this.ledgerService.getSupportedProtocols().includes(protocolIdentifier) && this.platform.is('desktop')
+  public addAccount(protocol: ICoinProtocol) {
+    const isLedgerImportAvailable = this.ledgerService.isProtocolSupported(protocol) && this.platform.is('desktop')
     if (!isLedgerImportAvailable) {
-      this.importFromVault(protocolIdentifier)
+      this.importFromVault(protocol)
     } else {
-      this.showImportInteractionSelection(protocolIdentifier)
+      this.showImportInteractionSelection(protocol)
     }
   }
 
-  public addSubAccount(subProtocolIdentifier: string) {
-    const mainProtocolIdentifier = subProtocolIdentifier.split('-')[0]
-    if (this.accountProvider.getWalletList().filter(protocol => protocol.protocolIdentifier === mainProtocolIdentifier).length > 0) {
-      const info = {
-        subProtocolIdentifier
-      }
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/sub-account-import/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public addSubAccount(subProtocol: ICoinProtocol) {
+    const mainProtocolIdentifier = subProtocol.identifier.split('-')[0]
+    if (
+      this.accountProvider
+        .getWalletList()
+        .filter(
+          wallet =>
+            wallet.protocol.identifier === mainProtocolIdentifier &&
+            wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
+        ).length > 0
+    ) {
+      this.router
+        .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
+        .catch(err => console.error(err))
     } else {
-      const info = {
-        mainProtocolIdentifier: mainProtocolIdentifier,
-        subProtocolIdentifier: subProtocolIdentifier
-      }
-      this.dataService.setData(DataServiceKey.PROTOCOL, info)
-      this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router
+        .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}`)
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
   }
 
-  private showImportInteractionSelection(protocolIdentifier: string) {
+  private showImportInteractionSelection(protocol: ICoinProtocol) {
     const info = {
       callback: (interactionType: AccountImportInteractionType) => {
         switch (interactionType) {
           case AccountImportInteractionType.VAULT:
-            this.importFromVault(protocolIdentifier)
+            this.importFromVault(protocol)
             break
           case AccountImportInteractionType.LEDGER:
-            this.importFromLedger(protocolIdentifier)
+            this.importFromLedger(protocol)
             break
           default:
             console.log('Unkonw import interaction type selected.')
@@ -111,21 +138,19 @@ export class AccountAddPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private async importFromLedger(protocolIdentifier: string): Promise<void> {
-    const info = {
-      protocolIdentifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
+  private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
     this.router
-      .navigateByUrl('/account-import-ledger-onboarding/' + DataServiceKey.PROTOCOL)
+      .navigateByUrl(`/account-import-ledger-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private importFromVault(protocolIdentifier: string) {
-    const info = {
-      mainProtocolIdentifier: protocolIdentifier
-    }
-    this.dataService.setData(DataServiceKey.PROTOCOL, info)
-    this.router.navigateByUrl('/account-import-onboarding/' + DataServiceKey.PROTOCOL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  private importFromVault(protocol: ICoinProtocol) {
+    this.router
+      .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public navigateToScan() {
+    this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

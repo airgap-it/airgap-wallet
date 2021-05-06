@@ -1,14 +1,15 @@
+// tslint:disable: max-classes-per-file
+import Transport from '@ledgerhq/hw-transport'
+
 import {
+  ExchangeMessageReply,
   GetDevicesMessageReply,
   LedgerElectronBridge,
   LedgerProcessMessageType,
   OpenMessageReply,
-  SendMessageReply,
-  ExchangeMessageReply
+  SendMessageReply
 } from './bridge/LedgerElectronBridge'
-import { LedgerConnectionDetails, LedgerConnectionType, LedgerConnection } from './LedgerConnection'
-
-import Transport from '@ledgerhq/hw-transport'
+import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from './LedgerConnection'
 
 class TransportElectron implements Transport {
   constructor(private readonly id: string, private readonly bridge: LedgerElectronBridge) {}
@@ -40,8 +41,8 @@ class TransportElectron implements Transport {
     )
   }
 
-  public decorateAppAPIMethods(self: any, methods: string[], scrambleKey: string): void {
-    this.bridge.sendToLedger(
+  public async decorateAppAPIMethods(self: any, methods: string[], scrambleKey: string): Promise<void> {
+    return this.bridge.sendToLedger(
       LedgerProcessMessageType.DECORATE_APP,
       {
         transportId: this.id,
@@ -53,8 +54,8 @@ class TransportElectron implements Transport {
     )
   }
 
-  public setScrambleKey(key: string): void {
-    this.bridge.sendToLedger(
+  public async setScrambleKey(key: string): Promise<void> {
+    return this.bridge.sendToLedger(
       LedgerProcessMessageType.SET_SCRAMBLE_KEY,
       {
         transportId: this.id,
@@ -77,8 +78,8 @@ class TransportElectron implements Transport {
     return Buffer.isBuffer(response) ? response : Buffer.from(response, 'hex')
   }
 
-  public setExchangeTimeout(exchangeTimeout: number): void {
-    this.bridge.sendToLedger(
+  public async setExchangeTimeout(exchangeTimeout: number): Promise<void> {
+    return this.bridge.sendToLedger(
       LedgerProcessMessageType.SET_EXCHANGE_TIMEOUT,
       {
         transportId: this.id,
@@ -132,6 +133,7 @@ export class LedgerConnectionElectron implements LedgerConnection {
     )
 
     const transport = new TransportElectron(transportId, LedgerConnectionElectron.bridge)
+
     return new LedgerConnectionElectron(connectionType, transport)
   }
 

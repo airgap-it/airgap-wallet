@@ -1,13 +1,16 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet, ICoinSubProtocol } from 'airgap-coin-lib'
-import { Observable, ReplaySubject } from 'rxjs'
+import { AirGapMarketWallet, ICoinSubProtocol } from '@airgap/coinlib-core'
+import { forkJoin, from, Observable, ReplaySubject, Subscription } from 'rxjs'
+import { Platform } from '@ionic/angular'
 
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
 import { AccountProvider } from '../../services/account/account.provider'
-import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { ProtocolService } from '@airgap/angular-core'
+import BigNumber from 'bignumber.js'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -20,6 +23,8 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
+  private subscription: Subscription
+
   public isVisible = 'hidden'
 
   public total: number = 0
@@ -27,13 +32,17 @@ export class PortfolioPage {
 
   public wallets: Observable<AirGapMarketWallet[]>
   public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
+  public isDesktop: boolean = false
 
   constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
-    private readonly dataService: DataService
+    private readonly protocolService: ProtocolService,
+    public platform: Platform
   ) {
+    this.isDesktop = !this.platform.is('hybrid')
+
     this.wallets = this.walletsProvider.wallets.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
@@ -53,9 +62,13 @@ export class PortfolioPage {
     const walletMap: Map<string, WalletGroup> = new Map()
 
     wallets.forEach((wallet: AirGapMarketWallet) => {
-      const isSubProtocol: boolean = ((wallet.coinProtocol as any) as ICoinSubProtocol).isSubProtocol
-      if (walletMap.has(wallet.publicKey)) {
-        const group: WalletGroup = walletMap.get(wallet.publicKey)
+      const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
+      const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
+
+      const walletKey: string = `${wallet.publicKey}_${identifier}`
+
+      if (walletMap.has(walletKey)) {
+        const group: WalletGroup = walletMap.get(walletKey)
         if (isSubProtocol) {
           group.subWallets.push(wallet)
         } else {
@@ -63,9 +76,9 @@ export class PortfolioPage {
         }
       } else {
         if (isSubProtocol) {
-          walletMap.set(wallet.publicKey, { mainWallet: undefined, subWallets: [wallet] })
+          walletMap.set(walletKey, { mainWallet: undefined, subWallets: [wallet] })
         } else {
-          walletMap.set(wallet.publicKey, { mainWallet: wallet, subWallets: [] })
+          walletMap.set(walletKey, { mainWallet: wallet, subWallets: [] })
         }
       }
     })
@@ -76,7 +89,7 @@ export class PortfolioPage {
 
     groups.sort((group1: WalletGroup, group2: WalletGroup) => {
       if (group1.mainWallet && group2.mainWallet) {
-        return group1.mainWallet.coinProtocol.symbol.localeCompare(group2.mainWallet.coinProtocol.symbol)
+        return group1.mainWallet.protocol.symbol.localeCompare(group2.mainWallet.protocol.symbol)
       } else if (group1.mainWallet) {
         return -1
       } else if (group2.mainWallet) {
@@ -114,44 +127,63 @@ export class PortfolioPage {
       : {
           wallet: mainWallet
         }
-    this.dataService.setData(DataServiceKey.WALLET, info)
-    this.router.navigateByUrl('/account-transaction-list/' + DataServiceKey.WALLET).catch(console.error)
+
+    console.log(info)
+    this.router
+      .navigateByUrl(
+        `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+          info.wallet.addressIndex
+        }`
+      )
+      .catch(console.error)
   }
 
   public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
-
   public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
     this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
-    await Promise.all([
+    const observables = [
       this.walletsProvider.getWalletList().map(wallet => {
-        return wallet.synchronize()
+        return from(wallet.synchronize())
       })
-    ])
+    ]
+    /**
+     * if we use await Promise.all() instead, then each wallet
+     * is synchronized asynchronously, leading to blocking behaviour.
+     * Instead we want to synchronize all wallets simultaneously
+     */
+    const allWalletsSynced = forkJoin([observables])
 
-    this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    this.subscription = allWalletsSynced.subscribe(() => {
+      this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    })
   }
 
-  public calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null) {
-    let newTotal = 0
-    const cryptoToFiatPipe = new CryptoToFiatPipe()
+  public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
+    const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
 
-    wallets.forEach(wallet => {
-      const fiatValue = cryptoToFiatPipe.transform(wallet.currentBalance, {
-        protocolIdentifier: wallet.protocolIdentifier,
-        currentMarketPrice: wallet.currentMarketPrice
-      })
-      newTotal += Number(fiatValue)
-    })
+    this.total = (await Promise.all(
+      wallets.map(wallet =>
+        cryptoToFiatPipe.transform(wallet.currentBalance, {
+          protocolIdentifier: wallet.protocol.identifier,
+          currentMarketPrice: wallet.currentMarketPrice
+        })
+      )
+    ))
+      .reduce((sum: BigNumber, next: string) => sum.plus(next), new BigNumber(0))
+      .toNumber()
 
     if (refresher) {
       refresher.complete()
     }
 
-    this.total = newTotal
     this.isVisible = 'visible'
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }
