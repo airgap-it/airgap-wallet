@@ -11,6 +11,7 @@ export class LedgerConnectionProvider {
   constructor(private readonly platform: Platform) {}
 
   public async getConnectedDevices(protocolIdentifier: string, connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
+    
     if (this.platform.is('electron')) {
       return LedgerConnectionElectron.getConnectedDevices(connectionType)
     }
@@ -25,7 +26,7 @@ export class LedgerConnectionProvider {
   public async open(protocolIdentifier: string, ledgerConnection?: LedgerConnectionDetails): Promise<LedgerConnection | null> {
     const connectionType: LedgerConnectionType | undefined = ledgerConnection ? ledgerConnection.type : undefined
     const descriptor: string | undefined = ledgerConnection ? ledgerConnection.descriptor : undefined
-
+debugger
     if (this.platform.is('electron')) {
       return LedgerConnectionElectron.open(connectionType, descriptor)
     }

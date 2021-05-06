@@ -2,7 +2,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { IonSlides } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
 import { promiseRetry } from '../../helpers/promise'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -50,8 +50,6 @@ export class AccountImportLedgerOnboardingPage {
     private readonly dataService: DataService,
     private readonly ledgerService: LedgerService
   ) {
-    const protocolID: ProtocolSymbols = this.route.snapshot.params.protocolID
-    this.protocol = getProtocolByIdentifier(protocolID)
     this.init()
   }
 
