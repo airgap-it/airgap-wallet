@@ -9,9 +9,7 @@ import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from 
 import { ReturnCode } from '../../ledger/ReturnCode'
 import { isType } from '../../utils/utils'
 import { PriceService } from '../price/price.service'
-
 import { LedgerConnectionProvider } from './ledger-connection-provider'
-import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 
 const MAX_RETRIES = 1
 
