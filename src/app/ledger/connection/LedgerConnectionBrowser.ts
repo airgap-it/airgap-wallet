@@ -1,3 +1,4 @@
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import Transport from '@ledgerhq/hw-transport'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
@@ -6,8 +7,13 @@ import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from 
 
 type TransportType = typeof TransportU2F | typeof TransportWebUSB
 
-function getPrioritizedUSBTransportTypes(_protocolIdentifier: string): TransportType[] {
-  return [TransportWebUSB, TransportU2F]
+function getPrioritizedUSBTransportTypes(protocolIdentifier: string): TransportType[] {
+  switch (protocolIdentifier) {
+    case MainProtocolSymbols.XTZ:
+      return [TransportU2F, TransportWebUSB]
+    default:
+      return [TransportWebUSB, TransportU2F]
+  }
 }
 
 function getPrioritizedBLETransportTypes(_protocolIdentifier: string): TransportType[] {

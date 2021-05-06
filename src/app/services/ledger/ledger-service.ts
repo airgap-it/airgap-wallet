@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
-import { MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 
 import { LedgerApp } from '../../ledger/app/LedgerApp'
 import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'
@@ -10,7 +9,6 @@ import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from 
 import { ReturnCode } from '../../ledger/ReturnCode'
 import { isType } from '../../utils/utils'
 import { PriceService } from '../price/price.service'
-
 import { LedgerConnectionProvider } from './ledger-connection-provider'
 
 const MAX_RETRIES = 1
@@ -21,7 +19,8 @@ const MAX_RETRIES = 1
 export class LedgerService {
   private readonly supportedApps: Map<string, (connection: LedgerConnection) => LedgerApp> = new Map([
     [MainProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
-    [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)]
+    [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
+    [MainProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)]
   ] as [string, (connection: LedgerConnection) => LedgerApp][])
 
   private readonly openConnections: Map<string, LedgerConnection> = new Map()
