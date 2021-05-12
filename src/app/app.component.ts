@@ -215,7 +215,7 @@ export class AppComponent implements AfterViewInit {
       NetworkType.TESTNET,
       'https://tezos-florencenet-node.prod.gke.papers.tech',
       new TezblockBlockExplorer('https://florencenet.tezblock.io'),
-      new TezosProtocolNetworkExtras(TezosNetwork.DELPHINET, '', TezosNetwork.DELPHINET, 'airgap00391') // TODO: FLORENCE
+      new TezosProtocolNetworkExtras(TezosNetwork.FLORENCENET, '', TezosNetwork.FLORENCENET, 'airgap00391') // TODO: FLORENCE
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
@@ -268,7 +268,7 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: undefined,
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.DELPHINET]: undefined // TODO: FLORENCE
+      [TezosNetwork.FLORENCENET]: undefined // TODO: FLORENCE
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

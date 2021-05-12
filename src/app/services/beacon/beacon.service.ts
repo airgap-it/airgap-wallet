@@ -325,9 +325,9 @@ export class BeaconService {
         rpcUrl: network.rpcUrl || '',
         blockExplorer: new TezblockBlockExplorer(''),
         extras: {
-          network: TezosNetwork.DELPHINET, // TODO: FLORENCE
+          network: TezosNetwork.FLORENCENET, // TODO: FLORENCE
           conseilUrl: '',
-          conseilNetwork: TezosNetwork.DELPHINET, // TODO: FLORENCE
+          conseilNetwork: TezosNetwork.FLORENCENET, // TODO: FLORENCE
           conseilApiKey: 'airgap00391'
         }
       },
