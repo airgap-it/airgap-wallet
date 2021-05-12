@@ -8,7 +8,8 @@ import {
   Network,
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
-  WalletClient
+  WalletClient,
+  StorageKey
 } from '@airgap/beacon-sdk'
 
 import { Injectable } from '@angular/core'
@@ -32,7 +33,7 @@ import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorage
   providedIn: 'root'
 })
 export class BeaconService {
-  public client: WalletClient | undefined
+  public client: WalletClient
 
   public loader: HTMLIonLoadingElement | undefined
   public toast: HTMLIonToastElement | undefined
@@ -44,7 +45,13 @@ export class BeaconService {
     private readonly storage: WalletStorageService,
     private readonly protocolService: ProtocolService
   ) {
-    this.client = new WalletClient({ name: 'AirGap Wallet' })
+    this.client = this.getClient()
+    this.init()
+  }
+
+  public async reset(): Promise<void> {
+    await this.client.destroy()
+    this.client = this.getClient()
     this.init()
   }
 
@@ -318,9 +325,9 @@ export class BeaconService {
         rpcUrl: network.rpcUrl || '',
         blockExplorer: new TezblockBlockExplorer(''),
         extras: {
-          network: TezosNetwork.FLORENCENET,
+          network: TezosNetwork.DELPHINET, // TODO: FLORENCE
           conseilUrl: '',
-          conseilNetwork: TezosNetwork.FLORENCENET,
+          conseilNetwork: TezosNetwork.DELPHINET, // TODO: FLORENCE
           conseilApiKey: 'airgap00391'
         }
       },
@@ -365,5 +372,13 @@ export class BeaconService {
     map.set(BeaconMessageType.SignPayloadRequest, BeaconMessageType.SignPayloadResponse)
 
     return map.get(requestType)
+  }
+
+  public async getConnectedServer(): Promise<string> {
+    return await (<any>this.client).storage.get(StorageKey.MATRIX_SELECTED_NODE)
+  }
+
+  private getClient(): WalletClient {
+    return new WalletClient({ name: 'AirGap Wallet' })
   }
 }

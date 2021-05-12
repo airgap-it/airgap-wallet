@@ -9,6 +9,7 @@ import { BeaconService } from 'src/app/services/beacon/beacon.service'
 })
 export class SettingsBeaconPage implements OnInit {
   public connectedPeers: P2PPairingRequest[] = []
+  public connectedServer: string = ''
 
   constructor(private readonly beaconService: BeaconService) {}
 
@@ -18,6 +19,7 @@ export class SettingsBeaconPage implements OnInit {
 
   public async loadPeers(): Promise<void> {
     this.connectedPeers = await this.beaconService.getPeers()
+    this.connectedServer = await this.beaconService.getConnectedServer()
   }
 
   public async removePeer(peer: P2PPairingRequest): Promise<void> {
@@ -27,6 +29,11 @@ export class SettingsBeaconPage implements OnInit {
 
   public async removeAllPeers(): Promise<void> {
     await this.beaconService.removeAllPeers()
+    await this.loadPeers()
+  }
+
+  public async reset(): Promise<void> {
+    await this.beaconService.reset()
     await this.loadPeers()
   }
 }
