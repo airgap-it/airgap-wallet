@@ -328,7 +328,7 @@ export class BeaconRequestPage implements OnInit {
 
     let transaction: TezosWrappedOperation | undefined
     try {
-      transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any)
+      transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any, false) // don't override parameters
     } catch (error) {
       await this.dismiss()
       this.beaconService.sendInvalidTransaction(request.id, error)
