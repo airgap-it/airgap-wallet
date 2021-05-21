@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "@airgap/angular-core": "0.0.9",
-    "@airgap/beacon-sdk": "2.2.5",
-    "@airgap/coinlib-core": "0.11.0",
+    "@airgap/beacon-sdk": "2.2.7",
+    "@airgap/coinlib-core": "0.11.1-beta.10",
     "@airgap/sapling-wasm": "0.0.6",
     "@angular/animations": "^11.0.4",
     "@angular/common": "^11.0.4",
