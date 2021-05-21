@@ -21,9 +21,6 @@ import {
   MainProtocolSymbols,
   NetworkType,
   TezblockBlockExplorer,
-  TezosBTC,
-  TezosBTCProtocolConfig,
-  TezosFAProtocolOptions,
   TezosKtProtocol,
   TezosNetwork,
   TezosProtocol,
@@ -196,20 +193,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const delphinetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Delphinet',
-      NetworkType.TESTNET,
-      'https://tezos-delphinet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https://delphinet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.DELPHINET,
-        'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-        TezosNetwork.DELPHINET,
-        'airgap00391'
-      )
-    )
-    const delphinetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(delphinetNetwork))
-
     const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Edonet',
       NetworkType.TESTNET,
@@ -217,9 +200,9 @@ export class AppComponent implements AfterViewInit {
       new TezblockBlockExplorer('https//edonet.tezblock.io'),
       new TezosProtocolNetworkExtras(
         TezosNetwork.EDONET,
-        'https://conseil-edo.cryptonomic-infra.tech',
+        'https://tezos-edonet-conseil.prod.gke.papers.tech',
         TezosNetwork.EDONET,
-        '8385d3cd-7157-481c-873f-17f99b910fb9'
+        'airgap00391'
       )
     )
     const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
@@ -236,20 +219,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [delphinetProtocol, edonetProtocol, shieldedTezProtocol],
-      extraPassiveSubProtocols: [
-        [delphinetProtocol, new TezosKtProtocol(new TezosProtocolOptions(delphinetNetwork))],
-        [edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))],
-        [
-          delphinetProtocol,
-          new TezosBTC(
-            new TezosFAProtocolOptions(
-              delphinetNetwork,
-              new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1WhBK8hsji4YZtS6PwTWBAMX7cDbwtC7cZ')
-            )
-          )
-        ]
-      ]
+      extraActiveProtocols: [edonetProtocol, shieldedTezProtocol],
+      extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
     })
 
     await this.initializeTezosDomains()
@@ -271,9 +242,9 @@ export class AppComponent implements AfterViewInit {
 
   private async initializeTezosDomains(): Promise<void> {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
-      [TezosNetwork.MAINNET]: undefined,
-      [TezosNetwork.DELPHINET]: 'KT1CR6vXJ1qeY4ALDQfUaLFi3FcJJZ8WDygo',
-      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR'
+      [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
+      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
+      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p'
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
