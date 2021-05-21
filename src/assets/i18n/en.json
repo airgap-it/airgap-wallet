@@ -45,8 +45,9 @@
   "account-transaction-detail": {
     "available_label": "Available",
     "delegated_label": "Delegated",
-    "unbonding_label": "Unbonding",
-    "reward_label": "Unclaimed Rewards"
+    "unbonding_label": "Total Unbonding",
+    "reward_label": "Unclaimed Rewards",
+    "unbonding_completion": "Unbonding Completion"
   },
   "introduction": {
     "title": "Self custody made simple and secure",
