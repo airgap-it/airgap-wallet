@@ -9,6 +9,7 @@ import com.getcapacitor.Plugin;
 import java.util.ArrayList;
 
 import it.airgap.wallet.plugin.AppInfo;
+import it.airgap.wallet.plugin.SaplingNative;
 
 public class MainActivity extends BridgeActivity {
   @Override
@@ -21,6 +22,7 @@ public class MainActivity extends BridgeActivity {
       // Ex: add(TotallyAwesomePlugin.class);
       add(AppInfo.class);
       add(BarcodeScanner.class);
+      add(SaplingNative.class);
     }});
   }
 }

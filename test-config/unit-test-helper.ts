@@ -30,6 +30,7 @@ import {
   PermissionsMock,
   PermissionsPluginMock,
   PushNotificationsMock,
+  SaplingPluginMock,
   SplashScreenMock,
   StatusBarMock
 } from './plugins-mock'
@@ -45,6 +46,7 @@ export class UnitHelper {
     permissionsPlugin: new PermissionsPluginMock(),
     permissionsProvider: new PermissionsServiceMock(),
     pushNotifications: new PushNotificationsMock(),
+    saplingPlugin: new SaplingPluginMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
     deeplink: new DeeplinkMock(),

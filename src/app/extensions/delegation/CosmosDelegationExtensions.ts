@@ -1,5 +1,6 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
+import * as moment from 'moment'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { CosmosProtocol } from '@airgap/coinlib-core'
@@ -138,8 +139,18 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       protocol.getAvailableBalanceOfAddresses([address]),
       protocol.fetchTotalDelegatedAmount(address),
       protocol.fetchTotalUnbondingAmount(address),
-      protocol.fetchTotalReward(address)
+      protocol.fetchTotalReward(address),
+      protocol.fetchUnbondingDelegations(address)
     ])
+
+    const unbondingDetails = results[4]
+      .map(unbonding => unbonding.entries)
+      .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+      .map(entry => {
+        const completionTime = moment(entry.completion_time, 'YYYY-MM-DD hh:mm:ss Z').format('hh:ss MM/DD/YYYY')
+        return { balance: entry.balance, completionTime }
+      })
+
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
@@ -158,6 +169,17 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         text: `${this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
       }
     ]
+
+    const unbondingCompletionItems = unbondingDetails.map(unbondingDetail => {
+      return {
+        label: 'account-transaction-detail.unbonding_completion',
+        text: `${this.amountConverterPipe.transformValueOnly(unbondingDetail.balance, protocol, 0)} ${protocol.symbol} - ${
+          unbondingDetail.completionTime
+        }`
+      }
+    })
+
+    items.splice(3, 0, ...unbondingCompletionItems)
 
     return new UIAccountExtendedDetails({
       items

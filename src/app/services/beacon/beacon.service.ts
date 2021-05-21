@@ -192,8 +192,9 @@ export class BeaconService {
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
-    // TODO: remove `Exclude`
-    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET>]: TezosProtocolNetwork } = {
+    const configs: {
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.GRANADANET>]: TezosProtocolNetwork
+    } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,
@@ -207,16 +208,29 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.DELPHINET]: {
+      [BeaconNetworkType.EDONET]: {
         identifier: undefined,
-        name: network.name || 'Delphinet',
+        name: network.name || 'Edonet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
         extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
+          network: TezosNetwork.EDONET,
+          conseilUrl: 'https://tezos-edonet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.EDONET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.FLORENCENET]: {
+        identifier: undefined,
+        name: network.name || 'Florencenet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-florencenet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.FLORENCENET,
+          conseilUrl: 'https://tezos-florencenet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.FLORENCENET,
           conseilApiKey: 'airgap00391'
         }
       },

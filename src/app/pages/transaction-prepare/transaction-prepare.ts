@@ -66,7 +66,10 @@ export class TransactionPreparePage {
   public amountForm: FormGroup
 
   // temporary field until we figure out how to handle Substrate fee/tip model
-  private readonly isSubstrate: boolean
+  public readonly isSubstrate: boolean
+  public excludeExistentialDeposit: boolean | undefined
+
+  private readonly isSapling: boolean
 
   public state: TransactionPrepareState
   private _state: TransactionPrepareState
@@ -121,6 +124,9 @@ export class TransactionPreparePage {
 
     this.isSubstrate =
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+    this.excludeExistentialDeposit = this.isSubstrate ? true : undefined
+
+    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
 
     this.initState()
       .then(async () => {
@@ -248,7 +254,7 @@ export class TransactionPreparePage {
       feeCurrentMarketPrice: null,
       sendMaxAmount: false,
       disableSendMaxAmount: true,
-      disableAdvancedMode: this.isSubstrate,
+      disableAdvancedMode: this.isSubstrate || this.isSapling,
       disableFeeSlider: true,
       disablePrepareButton: true,
       estimatingMaxAmount: false,
@@ -452,6 +458,7 @@ export class TransactionPreparePage {
         this._state.receiverAddress,
         amount,
         fee,
+        this.accountProvider.getWalletList(),
         memo
       )
 
@@ -518,7 +525,12 @@ export class TransactionPreparePage {
     })
 
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.receiver.value, fee)
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(
+      this.wallet,
+      this._state.receiver.value,
+      fee,
+      this.excludeExistentialDeposit
+    )
 
     const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
@@ -532,6 +544,11 @@ export class TransactionPreparePage {
         disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lte(0)
       })
     }
+  }
+
+  public toggleExcludeExistentialDeposit(): void {
+    this.excludeExistentialDeposit = !this.excludeExistentialDeposit
+    this.toggleMaxAmount()
   }
 
   public pasteClipboard() {
