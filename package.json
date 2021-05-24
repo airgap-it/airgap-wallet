@@ -92,6 +92,7 @@
     "core-js": "^3.10.1",
     "cryptocompare": "^1.0.0",
     "dotenv": "^8.2.0",
+    "electron": "^12.0.2",
     "es6-promise-plugin": "^4.2.2",
     "html-loader": "^2.1.2",
     "husky": "^6.0.0",
