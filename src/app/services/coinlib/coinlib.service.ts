@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.dev.gke.papers.tech'
+const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.prod.gke.papers.tech'
 
 export interface TezosBakerConfig {
   name: string
@@ -109,7 +109,7 @@ export class CoinlibService {
 
   public async getKnownCosmosValidators(): Promise<CosmosValidatorDetails[]> {
     const validatorsResponse: CosmosValidatorDetails[] = await this.httpClient
-      .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/cosmos/validators`)
+      .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/api/v1/cosmos/validators`)
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
@@ -131,7 +131,7 @@ export class CoinlibService {
               max_change_rate: new BigNumber(validator.commission.commission_rates.max_change_rate)
             }
           },
-          logo: `${COIN_LIB_SERVICE}/cosmos/validators/image/${validator.operator_address}`
+          logo: `${COIN_LIB_SERVICE}/api/v1/cosmos/validators/image/${validator.operator_address}`
         }
       })
     )

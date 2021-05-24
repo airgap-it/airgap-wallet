@@ -48,7 +48,7 @@ export class HealthCheckPage {
       this.generateCheckItem('Polkadot', MainProtocolSymbols.POLKADOT, ApiType.NODE),
       this.generateCheckItem('Polkadot', MainProtocolSymbols.POLKADOT, ApiType.Explorer),
       this.generateCheckItem('Kusama', MainProtocolSymbols.KUSAMA, ApiType.NODE),
-      this.generateCheckItem('Kusama', MainProtocolSymbols.KUSAMA, ApiType.NODE),
+      this.generateCheckItem('Kusama', MainProtocolSymbols.KUSAMA, ApiType.Explorer),
       this.generateCheckItem('Cosmos', MainProtocolSymbols.COSMOS, ApiType.NODE),
       this.generateCheckItem('Aeternity', MainProtocolSymbols.AE, ApiType.NODE),
       this.generateCheckItem('Groestlcoin', MainProtocolSymbols.GRS, ApiType.NODE)

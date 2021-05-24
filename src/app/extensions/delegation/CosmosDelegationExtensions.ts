@@ -113,9 +113,22 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
 
+    const isNullOrUndefined = (value: any) => value === undefined || value === null
+
     return Promise.all(
       [...knownValidators, ...unkownValidators]
-        .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
+        .sort((a: ValidatorDetails, b: ValidatorDetails) => {
+          if (!isNullOrUndefined(a.description.moniker) && !isNullOrUndefined(b.description.moniker)) {
+            return a.description.moniker.localeCompare(b.description.moniker)
+          } else if (isNullOrUndefined(a.description.moniker) && !isNullOrUndefined(b.description.moniker)) {
+            return 1
+          } else if (!isNullOrUndefined(a.description.moniker) && isNullOrUndefined(b.description.moniker)) {
+            return -1
+          } else if (isNullOrUndefined(a.description.moniker) && isNullOrUndefined(b.description.moniker)) {
+            return a.operator_address.localeCompare(b.operator_address)
+          }
+          return 0
+        })
         .map(
           async (details: ValidatorDetails) =>
             new UIAccountSummary({
