@@ -2,11 +2,11 @@ import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
-import { Storage } from '@ionic/storage'
+import { Storage } from '@ionic/storage-angular'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
-import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/plugins-mock'
 import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'

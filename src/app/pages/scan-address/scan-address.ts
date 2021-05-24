@@ -46,7 +46,7 @@ export class ScanAddressPage extends ScanBasePage {
       if (this.platform.is('hybrid')) {
         this.scanner.destroy()
       } else if (this.zxingScanner) {
-        this.zxingScanner.codeReader.reset()
+        this.zxingScanner.reset()
       }
       this.navCtrl
         .pop()
