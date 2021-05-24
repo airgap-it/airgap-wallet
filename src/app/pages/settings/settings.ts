@@ -152,7 +152,11 @@ export class SettingsPage {
   }
 
   public goToQrSettings(): void {
-    this.router.navigateByUrl('/qr-settings').catch(err => console.error(err))
+    this.router.navigateByUrl('/qr-settings').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public goToHealthCheck(): void {
+    this.router.navigateByUrl('/health-check').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public pasteClipboard(): void {

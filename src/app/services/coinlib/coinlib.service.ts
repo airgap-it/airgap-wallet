@@ -1,10 +1,11 @@
+import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
-const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.prod.gke.papers.tech/api/v1'
+const COIN_LIB_SERVICE = 'https://coin-lib-service.airgap.dev.gke.papers.tech'
 
 export interface TezosBakerConfig {
   name: string
@@ -14,6 +15,18 @@ export interface TezosBakerConfig {
   payout: {
     cycles: number
     time: string
+  }
+}
+
+export interface ApiHealth {
+  identifier: ProtocolSymbols
+  node: {
+    isHealthy: boolean
+    errorDescription?: string
+  }
+  blockExplorer?: {
+    isHealthy: boolean
+    errorDescription?: string
   }
 }
 
@@ -69,12 +82,12 @@ export interface AeFirstVote {
 @Injectable({
   providedIn: 'root'
 })
-export class RemoteConfigProvider {
+export class CoinlibService {
   constructor(private readonly httpClient: HttpClient) {}
 
   public async getKnownTezosBakers(): Promise<TezosBakerCollection> {
     const bakersResponse: TezosBakerCollection = await this.httpClient
-      .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/tz/bakers?acceptsDelegations=true`)
+      .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/api/v1/tz/bakers?acceptsDelegations=true`)
       .toPromise()
       .catch(error => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
@@ -87,7 +100,7 @@ export class RemoteConfigProvider {
         ...baker,
         stakingCapacity: baker.stakingCapacity !== undefined ? new BigNumber(baker.stakingCapacity) : undefined,
         fee: baker.fee !== undefined ? new BigNumber(baker.fee) : undefined,
-        logo: baker.hasLogo ? `${COIN_LIB_SERVICE}/tz/bakers/image/${baker.logoReference || address}` : undefined
+        logo: baker.hasLogo ? `${COIN_LIB_SERVICE}/api/v1/tz/bakers/image/${baker.logoReference || address}` : undefined
       }
     })
 
@@ -122,5 +135,16 @@ export class RemoteConfigProvider {
         }
       })
     )
+  }
+
+  public async checkApiHealth(): Promise<ApiHealth[]> {
+    const apiHealth: ApiHealth[] = await this.httpClient
+      .get<ApiHealth[]>(`${COIN_LIB_SERVICE}/api/v1/health`)
+      .toPromise()
+      .catch(error => {
+        handleErrorSentry(ErrorCategory.OTHER)(error)
+        return []
+      })
+    return apiHealth
   }
 }

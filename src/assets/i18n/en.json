@@ -155,7 +155,8 @@
       "about_label": "About Beacon",
       "permission-list_label": "Beacon Permissions"
     },
-    "qr-advanced-settings_label": "Advanced QR Settings"
+    "qr-advanced-settings_label": "Advanced QR Settings",
+    "health-check": "API Health Check"
   },
   "qr-settings-page": {
     "title": "QR Settings"
@@ -725,5 +726,9 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
+  },
+  "health-check": {
+    "title": "Health Check", 
+    "message": "Checking API Health"
   }
 }
