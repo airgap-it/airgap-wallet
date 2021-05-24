@@ -128,6 +128,8 @@ export class TransactionPreparePage {
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
 
+    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+
     this.initState()
       .then(async () => {
         if (forceMigration) {
