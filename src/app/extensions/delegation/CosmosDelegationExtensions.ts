@@ -19,7 +19,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { CosmosValidatorDetails, RemoteConfigProvider } from 'src/app/services/remote-config/remote-config'
+import { CosmosValidatorDetails, CoinlibService } from 'src/app/services/coinlib/coinlib.service'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
@@ -34,7 +34,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private static instance: CosmosDelegationExtensions
 
   public static create(
-    remoteConfigProvider: RemoteConfigProvider,
+    coinlibService: CoinlibService,
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
@@ -43,7 +43,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   ): CosmosDelegationExtensions {
     if (!CosmosDelegationExtensions.instance) {
       CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(
-        remoteConfigProvider,
+        coinlibService,
         formBuilder,
         decimalPipe,
         amountConverterPipe,
@@ -62,7 +62,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private knownValidators?: CosmosValidatorDetails[]
 
   private constructor(
-    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly coinlibService: CoinlibService,
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
@@ -510,7 +510,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
   private async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
     if (this.knownValidators === undefined) {
-      this.knownValidators = await this.remoteConfigProvider.getKnownCosmosValidators()
+      this.knownValidators = await this.coinlibService.getKnownCosmosValidators()
     }
 
     return this.knownValidators

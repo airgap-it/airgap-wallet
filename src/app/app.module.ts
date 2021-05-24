@@ -58,7 +58,7 @@ import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
-import { RemoteConfigProvider } from './services/remote-config/remote-config'
+import { CoinlibService } from './services/coinlib/coinlib.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
 import { TransactionHashGuard } from './services/guard/transactionHash.guard'
@@ -132,7 +132,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     OperationsProvider,
     ExtensionsService,
     ExchangeProvider,
-    RemoteConfigProvider,
+    CoinlibService,
     PushProvider,
     PushBackendProvider,
     SerializerService,
