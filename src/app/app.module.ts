@@ -12,7 +12,8 @@ import {
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN
+  STATUS_BAR_PLUGIN,
+  BARCODE_SCANNER_PLUGIN
 } from '@airgap/angular-core'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
@@ -22,14 +23,13 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
 import { Plugins } from '@capacitor/core'
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
-import { Keyboard } from '@ionic-native/keyboard/ngx'
-import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
-import { IonicStorageModule } from '@ionic/storage'
+import { Drivers } from '@ionic/storage'
+import { IonicStorageModule } from '@ionic/storage-angular'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 
@@ -94,7 +94,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: [CordovaSQLiteDriver._driver, Drivers.LocalStorage]
     }),
     PipesModule,
     ComponentsModule,
@@ -106,6 +106,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   providers: [
     { provide: APP_PLUGIN, useValue: Plugins.App },
     { provide: APP_INFO_PLUGIN, useValue: Plugins.AppInfo },
+    { provide: BARCODE_SCANNER_PLUGIN, useValue: Plugins.BarcodeScanner },
     { provide: BROWSER_PLUGIN, useValue: Plugins.Browser },
     { provide: CLIPBOARD_PLUGIN, useValue: Plugins.Clipboard },
     { provide: PERMISSIONS_PLUGIN, useValue: Plugins.Permissions },
@@ -115,9 +116,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
-    BarcodeScanner,
-    QRScanner,
-    Keyboard,
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,
