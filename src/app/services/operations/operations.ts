@@ -3,6 +3,7 @@ import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
+  IACMessageDefinitionObject,
   IACMessageType,
   IAirGapTransaction,
   ICoinDelegateProtocol,
@@ -39,7 +40,7 @@ import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-import { ProtocolService, SerializerService } from '@airgap/angular-core'
+import { ProtocolService } from '@airgap/angular-core'
 import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
 import { TezosSaplingAddress } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingAddress'
 
@@ -60,7 +61,6 @@ export class OperationsProvider {
   constructor(
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
-    private readonly serializerService: SerializerService,
     private readonly formBuilder: FormBuilder,
     private readonly protocolService: ProtocolService
   ) {}
@@ -328,7 +328,7 @@ export class OperationsProvider {
     serializableData: any,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string | string[]> {
+  ): Promise<IACMessageDefinitionObject> {
     switch (type) {
       case IACMessageType.MessageSignRequest:
         return this.serializeMessageSignRequest(wallet, serializableData, type, generatedId)
@@ -342,20 +342,18 @@ export class OperationsProvider {
     transaction: SerializableTx,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string | string[]> {
+  ): Promise<IACMessageDefinitionObject> {
     const payload = {
       publicKey: wallet.publicKey,
       transaction: transaction as any, // TODO: Type
       callbackURL: 'airgap-wallet://?d='
     }
-    return this.serializerService.serialize([
-      {
-        id: generatedId,
-        protocol: wallet.protocol.identifier,
-        type: type,
-        payload: payload
-      }
-    ])
+    return {
+      id: generatedId,
+      protocol: wallet.protocol.identifier,
+      type: type,
+      payload: payload
+    }
   }
 
   public async serializeMessageSignRequest(
@@ -363,20 +361,18 @@ export class OperationsProvider {
     request: SignPayloadRequestOutput,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string | string[]> {
+  ): Promise<IACMessageDefinitionObject> {
     const payload = {
       publicKey: wallet.publicKey,
       message: request.payload,
       callbackURL: 'airgap-wallet://?d='
     }
-    return this.serializerService.serialize([
-      {
-        id: generatedId,
-        protocol: wallet.protocol.identifier,
-        type: type,
-        payload: payload
-      }
-    ])
+    return {
+      id: generatedId,
+      protocol: wallet.protocol.identifier,
+      type: type,
+      payload: payload
+    }
   }
 
   public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<boolean> {

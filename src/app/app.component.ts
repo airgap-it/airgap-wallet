@@ -163,7 +163,7 @@ export class AppComponent implements AfterViewInit {
       transaction: rawUnsignedTx
     })
 
-    const serializedTx: string| string[] = await this.serializerService.serialize([
+    const serializedTx: string | string[] = await this.serializerService.serialize([
       {
         id: generateId(10),
         protocol: wallet.protocol.identifier,
@@ -207,9 +207,8 @@ export class AppComponent implements AfterViewInit {
     )
     const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
 
-    const externalMethodProvider:
-      | TezosSaplingExternalMethodProvider
-      | undefined = await this.saplingNativeService.createExternalMethodProvider()
+    const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
+      await this.saplingNativeService.createExternalMethodProvider()
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
