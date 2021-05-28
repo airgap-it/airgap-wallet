@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotification } from '@capacitor/core'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, TezosProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, MainProtocolSymbols, TezosProtocol } from '@airgap/coinlib-core'
 import { TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
 import { ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
@@ -72,8 +72,8 @@ export class AccountProvider {
         this.walletsHaveLoaded.next(true)
       })
       .catch(console.error)
-    this.wallets.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets)
-    this.wallets.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
+    this.wallets.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets)
+    this.wallets.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols)
 
     this.pushProvider.notificationCallback = (notification: PushNotification): void => {
       // We need a timeout because otherwise routing might fail
@@ -137,7 +137,7 @@ export class AccountProvider {
 
   private getProtocolsFromWallets(wallets: AirGapMarketWallet[]) {
     const protocols: Map<string, ICoinProtocol> = new Map()
-    wallets.forEach(wallet => {
+    wallets.forEach((wallet) => {
       if (!protocols.has(wallet.protocol.identifier)) {
         protocols.set(wallet.protocol.identifier, wallet.protocol)
       }
@@ -168,7 +168,7 @@ export class AccountProvider {
     const walletInitPromises: Promise<void>[] = []
 
     await Promise.all(
-      wallets.map(async wallet => {
+      wallets.map(async (wallet) => {
         const protocol = await this.protocolService.getProtocol(wallet.protocolIdentifier, wallet.networkIdentifier)
 
         const airGapWallet = new AirGapMarketWallet(
@@ -176,6 +176,8 @@ export class AccountProvider {
           wallet.publicKey,
           wallet.isExtendedPublicKey,
           wallet.derivationPath,
+          '',
+          AirGapWalletStatus.ACTIVE,
           this.priceService,
           wallet.addressIndex
         )
@@ -207,19 +209,19 @@ export class AccountProvider {
   }
 
   private async initializeWallet(airGapWallet: AirGapMarketWallet): Promise<void> {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       // if we have no addresses, derive using webworker and sync, else just sync
       if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
         const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
 
-        airGapWorker.onmessage = event => {
+        airGapWorker.onmessage = (event) => {
           airGapWallet.addresses = event.data.addresses
           airGapWallet
             .synchronize()
             .then(() => {
               resolve()
             })
-            .catch(error => {
+            .catch((error) => {
               console.error(error)
               resolve()
             })
@@ -238,7 +240,7 @@ export class AccountProvider {
           .then(() => {
             resolve()
           })
-          .catch(error => {
+          .catch((error) => {
             console.error(error)
             resolve()
           })
@@ -274,7 +276,7 @@ export class AccountProvider {
   }
 
   public removeWallet(walletToRemove: AirGapMarketWallet): Promise<void> {
-    const index = this.walletList.findIndex(wallet => this.isSameWallet(wallet, walletToRemove))
+    const index = this.walletList.findIndex((wallet) => this.isSameWallet(wallet, walletToRemove))
     if (index > -1) {
       this.walletList.splice(index, 1)
     }
@@ -297,7 +299,10 @@ export class AccountProvider {
   }
 
   private async persist(): Promise<void> {
-    return this.storageProvider.set(WalletStorageKey.WALLET, this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON()))
+    return this.storageProvider.set(
+      WalletStorageKey.WALLET,
+      this.walletList.map((wallet: AirGapMarketWallet) => wallet.toJSON())
+    )
   }
 
   public getAccountIdentifier(wallet: AirGapMarketWallet): string {
@@ -307,7 +312,9 @@ export class AccountProvider {
   }
 
   public walletBySerializerAccountIdentifier(accountIdentifier: string, protocolIdentifier: string): AirGapMarketWallet {
-    return this.walletList.find(wallet => wallet.publicKey.endsWith(accountIdentifier) && wallet.protocol.identifier === protocolIdentifier)
+    return this.walletList.find(
+      (wallet) => wallet.publicKey.endsWith(accountIdentifier) && wallet.protocol.identifier === protocolIdentifier
+    )
   }
 
   public walletByPublicKeyAndProtocolAndAddressIndex(
@@ -316,12 +323,13 @@ export class AccountProvider {
     addressIndex?: number
   ): AirGapMarketWallet {
     return this.walletList.find(
-      wallet => wallet.publicKey === publicKey && wallet.protocol.identifier === protocolIdentifier && wallet.addressIndex === addressIndex
+      (wallet) =>
+        wallet.publicKey === publicKey && wallet.protocol.identifier === protocolIdentifier && wallet.addressIndex === addressIndex
     )
   }
 
   public walletExists(testWallet: AirGapMarketWallet): boolean {
-    return this.walletList.some(wallet => this.isSameWallet(wallet, testWallet))
+    return this.walletList.some((wallet) => this.isSameWallet(wallet, testWallet))
   }
 
   public isSameWallet(wallet1: AirGapMarketWallet, wallet2: AirGapMarketWallet) {
@@ -336,19 +344,17 @@ export class AccountProvider {
     )
   }
 
-  public async getCompatibleAndIncompatibleWalletsForAddress(
-    address: string
-  ): Promise<{
+  public async getCompatibleAndIncompatibleWalletsForAddress(address: string): Promise<{
     compatibleWallets: AirGapMarketWallet[]
     incompatibleWallets: AirGapMarketWallet[]
   }> {
     return this.usedProtocols
       .pipe(
         take(1),
-        map(protocols => {
+        map((protocols) => {
           const compatibleProtocols: Map<string, ICoinProtocol> = new Map()
 
-          protocols.forEach(protocol => {
+          protocols.forEach((protocol) => {
             const match = address.match(protocol.addressValidationPattern)
             if (match && match.length > 0) {
               compatibleProtocols.set(protocol.identifier, protocol)
@@ -358,7 +364,7 @@ export class AccountProvider {
           const compatibleWallets: AirGapMarketWallet[] = []
           const incompatibleWallets: AirGapMarketWallet[] = []
 
-          this.walletList.forEach(wallet => {
+          this.walletList.forEach((wallet) => {
             if (compatibleProtocols.has(wallet.protocol.identifier)) {
               compatibleWallets.push(wallet)
             } else {

@@ -1,10 +1,11 @@
-import { BaseIACService, ProtocolService, SerializerService, UiEventElementsService } from '@airgap/angular-core'
+import { BaseIACService, ClipboardService, ProtocolService, UiEventElementsService } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import {
   AccountShareResponse,
   AirGapMarketWallet,
+  AirGapWalletStatus,
   IACMessageDefinitionObject,
   IACMessageType,
   MessageSignResponse
@@ -26,16 +27,16 @@ import { BeaconHandler } from './custom-handlers/beacon-handler'
 export class IACService extends BaseIACService {
   constructor(
     uiEventElementsService: UiEventElementsService,
-    serializerService: SerializerService,
     public beaconService: BeaconService,
     accountProvider: AccountProvider,
     private readonly dataService: DataService,
+    protected readonly clipboard: ClipboardService,
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
     private readonly router: Router
   ) {
-    super(uiEventElementsService, serializerService, Promise.resolve(), [
+    super(uiEventElementsService, clipboard, Promise.resolve(), [
       new BeaconHandler(beaconService),
       new AddressHandler(accountProvider, dataService, router)
     ])
@@ -53,7 +54,7 @@ export class IACService extends BaseIACService {
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async handleWalletSync(_data: string | string[], deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
     this.storageSerivce.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     // TODO: handle multiple messages
@@ -64,6 +65,8 @@ export class IACService extends BaseIACService {
       walletSync.publicKey,
       walletSync.isExtendedPublicKey,
       walletSync.derivationPath,
+      '',
+      AirGapWalletStatus.ACTIVE,
       this.priceService
     )
     if (this.router) {
@@ -76,7 +79,7 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  public async handleSignedTransaction(_data: string | string[], messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
     console.log('handleSignedTransaction', messageDefinitionObjects)
     if (this.router) {
       const info = {
@@ -91,7 +94,7 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  private async handleMessageSignResponse(_data: string | string[], deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+  private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
     const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
     const response: SignPayloadResponseInput = {

@@ -163,7 +163,7 @@ export class AppComponent implements AfterViewInit {
       transaction: rawUnsignedTx
     })
 
-    const serializedTx: string[] = await this.serializerService.serialize([
+    const serializedTx: string| string[] = await this.serializerService.serialize([
       {
         id: generateId(10),
         protocol: wallet.protocol.identifier,

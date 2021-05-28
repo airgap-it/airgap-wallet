@@ -6,7 +6,7 @@ import {
   SubProtocolStoreService
 } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
-import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
 import { take } from 'rxjs/operators'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
@@ -58,6 +58,8 @@ describe('AccountProvider', () => {
         '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
         false,
         `m/44'/60'/0'/0/0`,
+        '',
+        AirGapWalletStatus.ACTIVE,
         new PriceServiceMock()
       )
     )
@@ -70,6 +72,8 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet1Same = new AirGapMarketWallet(
@@ -77,6 +81,8 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet2 = new AirGapMarketWallet(
@@ -84,6 +90,8 @@ describe('AccountProvider', () => {
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     const wallet1Plain = JSON.parse(JSON.stringify(wallet1))
@@ -109,7 +117,7 @@ describe('AccountProvider', () => {
     expect(accountProvider.getWalletList().length).toEqual(1)
   })
 
-  it('should update wallet observalbe when adding a wallet', async done => {
+  it('should update wallet observalbe when adding a wallet', async (done) => {
     const wallet: AirGapMarketWallet = new AirGapMarketWallet(
       new BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',

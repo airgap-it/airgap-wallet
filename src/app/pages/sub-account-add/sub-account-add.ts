@@ -2,7 +2,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus } from '@airgap/coinlib-core'
 import { SubProtocolType, ICoinSubProtocol } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
 import { assertNever } from '@airgap/coinlib-core/utils/assert'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
@@ -96,7 +96,7 @@ export class SubAccountAddPage {
     this.typeLabel = 'add-sub-account.tokens_label'
 
     const subProtocols = (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
-      protocol => protocol.subProtocolType === SubProtocolType.TOKEN
+      (protocol) => protocol.subProtocolType === SubProtocolType.TOKEN
     )
     this.infiniteEnabled = true
     this.subAccounts = await this.loadSubAccounts(subProtocols)
@@ -113,6 +113,8 @@ export class SubAccountAddPage {
           this.wallet.publicKey,
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath,
+          '',
+          AirGapWalletStatus.ACTIVE,
           this.priceService
         )
         if (this.accountProvider.walletExists(wallet)) {
@@ -123,7 +125,7 @@ export class SubAccountAddPage {
 
         return { wallet, selected: false }
       })
-      .filter(account => account !== undefined)
+      .filter((account) => account !== undefined)
       .sort((a, b) => a.wallet.currentBalance.minus(b.wallet.currentBalance).toNumber() * -1)
 
     return accounts
@@ -137,7 +139,7 @@ export class SubAccountAddPage {
       this.loadDisplayedAccounts()
     } else {
       const searchTermLowerCase: string = searchTerm.toLowerCase()
-      this.filteredSubAccounts = this.subAccounts.filter(account => {
+      this.filteredSubAccounts = this.subAccounts.filter((account) => {
         const hasMatchingName: boolean = account.wallet.protocol.name.toLowerCase().includes(searchTermLowerCase)
         const hasMatchingSymbol: boolean = account.wallet.protocol.symbol.toLowerCase().includes(searchTermLowerCase)
 
@@ -154,7 +156,7 @@ export class SubAccountAddPage {
       this.infiniteEnabled = false
     }
 
-    newSubAccounts.forEach(account => {
+    newSubAccounts.forEach((account) => {
       if (account.wallet.currentMarketPrice === undefined) {
         account.wallet.fetchCurrentMarketPrice()
       }

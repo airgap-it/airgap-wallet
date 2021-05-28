@@ -74,9 +74,9 @@ export class OperationsProvider {
     if (supportsAirGapDelegation(protocol)) {
       return protocol.createDelegateesSummary(delegatees)
     } else {
-      const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
+      const delegateesDetails = await Promise.all(delegatees.map((delegatee) => protocol.getDelegateeDetails(delegatee)))
       return delegateesDetails.map(
-        details =>
+        (details) =>
           new UIAccountSummary({
             address: details.address,
             header: [details.name, ''],
@@ -165,7 +165,7 @@ export class OperationsProvider {
   }
 
   private async getDefaultDelegateesDetails(delegateesDetails: DelegateeDetails[]): Promise<AirGapDelegateeDetails[]> {
-    return delegateesDetails.map(details => ({
+    return delegateesDetails.map((details) => ({
       name: '',
       ...details
     }))
@@ -215,7 +215,7 @@ export class OperationsProvider {
         'delegation-detail.undelegate_label'
       ),
       ...this.createDefaultExtraActions(availableActions, [...delegateActionTypeKeywords, ...undelegateActionTypeKeywords])
-    ].filter(action => !!action)
+    ].filter((action) => !!action)
   }
 
   private createDefaultDelegateAction(
@@ -225,10 +225,10 @@ export class OperationsProvider {
     argsKeywords: string[] = [],
     label: string
   ): AirGapDelegatorAction | null {
-    const action = availableActions.find(action => typeKeywords.includes(action.type))
+    const action = availableActions.find((action) => typeKeywords.includes(action.type))
     if (action) {
-      const paramName = action.args ? action.args.find(arg => argsKeywords.includes(arg)) : undefined
-      const args = action.args ? action.args.filter(arg => arg !== paramName) : undefined
+      const paramName = action.args ? action.args.find((arg) => argsKeywords.includes(arg)) : undefined
+      const args = action.args ? action.args.filter((arg) => arg !== paramName) : undefined
 
       const form = paramName ? this.formBuilder.group({ [paramName]: delegatees }) : undefined
 
@@ -238,7 +238,7 @@ export class OperationsProvider {
         form: form,
         args: args
           ? args.map(
-              arg =>
+              (arg) =>
                 new UIInputText({
                   id: arg,
                   label: arg
@@ -252,15 +252,15 @@ export class OperationsProvider {
   }
 
   private createDefaultExtraActions(availableActions: DelegatorAction[], ignoreTypeKeywords: string[]): AirGapDelegatorAction[] {
-    const extraActions = availableActions.filter(action => !ignoreTypeKeywords.includes(action.type))
+    const extraActions = availableActions.filter((action) => !ignoreTypeKeywords.includes(action.type))
 
-    return extraActions.map(action => ({
+    return extraActions.map((action) => ({
       type: action.type,
       label: action.type.toString(),
       confirmLabel: action.type.toString(),
       args: action.args
         ? action.args.map(
-            arg =>
+            (arg) =>
               new UIInputText({
                 id: arg,
                 label: arg
@@ -308,13 +308,13 @@ export class OperationsProvider {
   public async getDelegationStatusObservableOfAddress(protocol: ICoinDelegateProtocol, address: string) {
     await this.getDelegationStatusOfAddress(protocol, address)
 
-    return this.delegationStatuses.pipe(map(delegationStatuses => delegationStatuses.get(address)))
+    return this.delegationStatuses.pipe(map((delegationStatuses) => delegationStatuses.get(address)))
   }
 
   public refreshAllDelegationStatuses(wallets: AirGapMarketWallet[]) {
-    Array.from(this.delegationStatuses.getValue().entries()).forEach(entry => {
+    Array.from(this.delegationStatuses.getValue().entries()).forEach((entry) => {
       const address = entry[0]
-      const wallet = wallets.find(wallet => wallet.receivingPublicAddress === address && supportsDelegation(wallet.protocol))
+      const wallet = wallets.find((wallet) => wallet.receivingPublicAddress === address && supportsDelegation(wallet.protocol))
       if (wallet) {
         this.getDelegationStatusOfAddress(wallet.protocol as ICoinDelegateProtocol, address, true).catch(
           handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER)
@@ -328,7 +328,7 @@ export class OperationsProvider {
     serializableData: any,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string[]> {
+  ): Promise<string | string[]> {
     switch (type) {
       case IACMessageType.MessageSignRequest:
         return this.serializeMessageSignRequest(wallet, serializableData, type, generatedId)
@@ -342,7 +342,7 @@ export class OperationsProvider {
     transaction: SerializableTx,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string[]> {
+  ): Promise<string | string[]> {
     const payload = {
       publicKey: wallet.publicKey,
       transaction: transaction as any, // TODO: Type
@@ -363,7 +363,7 @@ export class OperationsProvider {
     request: SignPayloadRequestOutput,
     type: IACMessageType,
     generatedId: string
-  ): Promise<string[]> {
+  ): Promise<string | string[]> {
     const payload = {
       publicKey: wallet.publicKey,
       message: request.payload,
@@ -467,7 +467,7 @@ export class OperationsProvider {
           duration: 3000,
           position: 'bottom'
         })
-        .then(toast => {
+        .then((toast) => {
           toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
         })
       throw error

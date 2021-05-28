@@ -1,4 +1,4 @@
-import { IACMessageHandler } from '@airgap/angular-core'
+import { IACHandlerStatus, IACMessageHandler } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, supportedProtocols } from '@airgap/coinlib-core'
 
@@ -21,7 +21,7 @@ export class AddressHandler extends IACMessageHandler {
     super()
   }
 
-  public async handle(data: string | string[]): Promise<boolean> {
+  public async receive(data: string | string[]): Promise<IACHandlerStatus> {
     const str: string = typeof data === 'string' ? data : data[0]
     const splits: string[] = str.split(':') // Handle bitcoin payment request https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
 
@@ -45,12 +45,12 @@ export class AddressHandler extends IACMessageHandler {
             this.dataService.setData(DataServiceKey.WALLET, info)
             this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-            return true
+            return IACHandlerStatus.SUCCESS
           }
         }
       }
 
-      return false
+      return IACHandlerStatus.UNSUPPORTED
     } else {
       const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(str)
       if (compatibleWallets.length > 0) {
@@ -63,10 +63,26 @@ export class AddressHandler extends IACMessageHandler {
         this.dataService.setData(DataServiceKey.WALLET, info)
         this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-        return true
+        return IACHandlerStatus.SUCCESS
       } else {
-        return false
+        return IACHandlerStatus.UNSUPPORTED
       }
     }
+  }
+
+  public async getProgress(): Promise<number> {
+    return 100
+  }
+
+  public async getResult(): Promise<undefined> {
+    return undefined
+  }
+
+  public async reset(): Promise<void> {
+    return
+  }
+
+  public async handleComplete(): Promise<boolean> {
+    return true
   }
 }

@@ -1,7 +1,7 @@
 import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, ICoinProtocol, NetworkType, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, NetworkType, ProtocolSymbols } from '@airgap/coinlib-core'
 import { map } from 'rxjs/operators'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { PriceService } from 'src/app/services/price/price.service'
@@ -52,16 +52,16 @@ export class SubAccountImportPage {
 
     this.accountProvider.wallets
       .pipe(
-        map(mainAccounts =>
+        map((mainAccounts) =>
           mainAccounts.filter(
-            wallet =>
+            (wallet) =>
               wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier) &&
               wallet.protocol.options.network.type === NetworkType.MAINNET
           )
         )
       )
-      .subscribe(mainAccounts => {
-        const promises: Promise<void>[] = mainAccounts.map(async mainAccount => {
+      .subscribe((mainAccounts) => {
+        const promises: Promise<void>[] = mainAccounts.map(async (mainAccount) => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
             const protocol = await this.protocolService.getProtocol(this.subProtocolIdentifier)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
@@ -69,6 +69,8 @@ export class SubAccountImportPage {
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,
               mainAccount.derivationPath,
+              '',
+              AirGapWalletStatus.ACTIVE,
               this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses
@@ -85,7 +87,7 @@ export class SubAccountImportPage {
   }
 
   public importWallets() {
-    this.subWallets.forEach(subWallet => {
+    this.subWallets.forEach((subWallet) => {
       this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     })
     this.popToRoot()
