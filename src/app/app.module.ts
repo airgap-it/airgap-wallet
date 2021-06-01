@@ -25,11 +25,8 @@ import { RouteReuseStrategy } from '@angular/router'
 import { Plugins } from '@capacitor/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
-import { Drivers } from '@ionic/storage'
-import { IonicStorageModule } from '@ionic/storage-angular'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
-import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 
@@ -63,6 +60,7 @@ import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
 import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { WalletStorageService } from './services/storage/storage'
+import { IonicStorageModule } from '@ionic/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -94,7 +92,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: [CordovaSQLiteDriver._driver, Drivers.LocalStorage]
+      driverOrder: ['sqlite', 'localstorage']
     }),
     PipesModule,
     ComponentsModule,

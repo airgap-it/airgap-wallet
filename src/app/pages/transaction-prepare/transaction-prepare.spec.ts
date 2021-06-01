@@ -2,7 +2,7 @@ import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
-import { Storage } from '@ionic/storage-angular'
+import { Storage } from '@ionic/storage'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
 

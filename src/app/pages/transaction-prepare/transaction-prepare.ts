@@ -525,11 +525,11 @@ export class TransactionPreparePage {
     this.updateState({
       estimatingMaxAmount: true
     })
-
+    
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
     const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(
       this.wallet,
-      this._state.receiver.value,
+      this._state.receiverAddress,
       fee,
       this.excludeExistentialDeposit
     )

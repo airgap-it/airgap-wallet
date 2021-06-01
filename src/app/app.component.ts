@@ -211,13 +211,19 @@ export class AppComponent implements AfterViewInit {
       'Florencenet',
       NetworkType.TESTNET,
       'https://tezos-florencenet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https://florencenet.tezblock.io'),
-      new TezosProtocolNetworkExtras(TezosNetwork.FLORENCENET, '', TezosNetwork.FLORENCENET, 'airgap00391') // TODO: FLORENCE
+      new TezblockBlockExplorer('https//florencenet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.FLORENCENET,
+        'https://tezos-florencenet-conseil.prod.gke.papers.tech',
+        TezosNetwork.FLORENCENET,
+        'airgap00391'
+      )
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
-    const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
-      await this.saplingNativeService.createExternalMethodProvider()
+    const externalMethodProvider:
+      | TezosSaplingExternalMethodProvider
+      | undefined = await this.saplingNativeService.createExternalMethodProvider()
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
