@@ -2,8 +2,7 @@ import { BaseStorage } from '@airgap/angular-core'
 import { Network } from '@airgap/beacon-sdk'
 import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage-angular'
-import * as cordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
+import { Storage } from '@ionic/storage'
 
 import { ExchangeTransaction } from '../exchange/exchange'
 
@@ -84,18 +83,14 @@ export class WalletStorageService extends BaseStorage<WalletStorageKey, WalletSt
     super(storage, defaultValues)
   }
 
-  protected async init(): Promise<void> {
-    await this.storage.defineDriver(cordovaSQLiteDriver)
-  }
-
   public async getCache<T>(key: string): Promise<T> {
-    await this.waitReady
+    await this.storage.ready()
 
     return this.storage.get(`cache-${key}`)
   }
 
   public async setCache<T>(key: string, value: T): Promise<T> {
-    await this.waitReady
+    await this.storage.ready()
 
     return this.storage.set(`cache-${key}`, value)
   }
