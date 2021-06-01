@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { BehaviorSubject } from 'rxjs'
+import { WalletStorageService } from '../storage/storage'
 
 export enum DataServiceKey {
   WALLET = 'wallet',
@@ -42,7 +42,7 @@ export class DataService {
   private importWallet$: BehaviorSubject<AirGapMarketWallet | null> = new BehaviorSubject(null)
   // private readonly communicationChannels: Map<string, Promise<any>> = new Map<string, Promise<any>>()
 
-  constructor(private readonly storage: Storage) {}
+  constructor(private readonly storage: WalletStorageService) {}
 
   public getImportWallet() {
     return this.importWallet$.asObservable()
@@ -60,11 +60,11 @@ export class DataService {
   }
 
   public async get<K extends DataServiceKey>(key: K): Promise<any> {
-    return this.storage.get(key)
+    return this.storage.getCache(key)
   }
 
   public async set<K extends DataServiceKey>(key: K, value: any): Promise<any> {
-    return this.storage.set(key, value)
+    return this.storage.setCache(key, value)
   }
 
   /*

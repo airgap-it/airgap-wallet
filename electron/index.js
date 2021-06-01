@@ -1,7 +1,9 @@
 const { app, BrowserWindow, Menu, ipcMain, globalShortcut } = require('electron')
 const isDevMode = require('electron-is-dev')
 const { CapacitorSplashScreen, configCapacitor } = require('@capacitor/electron')
+const electronVersion = require('electron-version')
 
+const pjson = require('./package.json')
 const childProcess = require('child_process')
 const path = require('path')
 
@@ -13,6 +15,16 @@ let splashScreen = null
 
 // Change this if you do not wish to have a splash screen
 let useSplashScreen = false
+
+ipcMain.on('AppInfo', (event, arg) => {
+  electronVersion((_err, v) => {
+    const appName = app.getName()
+    const versionName = app.getVersion()
+    const packageName = 'it.airgap.wallet'
+    const versionCode = v
+    event.returnValue = { appName: appName, versionName: versionName, packageName: packageName, versionCode: versionCode }
+  })
+})
 
 // Create simple menu for easy devtools access, and for demo
 const menuTemplate = [

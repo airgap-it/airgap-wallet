@@ -476,8 +476,13 @@ export class OperationsProvider {
     }
   }
 
-  public async estimateMaxTransferAmount(wallet: AirGapMarketWallet, destination: string, fee?: BigNumber): Promise<BigNumber> {
-    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined)
+  public async estimateMaxTransferAmount(
+    wallet: AirGapMarketWallet,
+    destination: string,
+    fee?: BigNumber,
+    excludeExistentialDeposit?: boolean
+  ): Promise<BigNumber> {
+    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined, excludeExistentialDeposit)
     return new BigNumber(maxAmount)
   }
 

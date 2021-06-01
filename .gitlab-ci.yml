@@ -26,7 +26,7 @@ unit:
   script:
     - docker run --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test-ci
     - docker run --name lint-$CI_COMMIT_SHA $GOOGLE_TAG npm run lint-ci
-    - docker cp unit-$CI_COMMIT_SHA:/app/coverage/lcov.info lcov.info
+    - docker cp unit-$CI_COMMIT_SHA:/app/src/coverage/report-lcov/lcov.info lcov.info
     - docker cp lint-$CI_COMMIT_SHA:/app/lintReport.json lintReport.json
   after_script:
     - docker rm unit-$CI_COMMIT_SHA
@@ -91,8 +91,7 @@ build_ios:
     - export DEVELOPER_DIR=$XCODE_PATH
     - nvm use 14
     - npm install
-    - npm run disable-pure-getters
-    - npm run configure-mangle
+    - npm run prepare-prod-build
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
     - npx ionic build --prod
     - npx cap sync ios
@@ -110,6 +109,7 @@ build_mac:
     - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
     - nvm use 14
     - npm install
+    - npm run prepare-prod-build
     - npm --prefix electron/ install
     - npm run build:electron:prod
     - npx cap sync electron

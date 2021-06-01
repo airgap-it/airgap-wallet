@@ -58,7 +58,7 @@ export class ScanBasePage {
       this.scanner.destroy()
     } else if (this.zxingScanner) {
       this.zxingScanner.enable = false
-      this.zxingScanner.codeReader.reset()
+      this.zxingScanner.reset()
     }
   }
 
@@ -75,15 +75,15 @@ export class ScanBasePage {
   }
 
   private startScanMobile() {
-    this.scanner.scan(
-      text => {
+    this.scanner
+      .scan()
+      .then((text: string) => {
         this.checkScan(text)
-      },
-      error => {
+      })
+      .catch((error: any) => {
         console.warn(error)
         this.startScan()
-      }
-    )
+      })
   }
 
   private startScanBrowser() {

@@ -45,8 +45,9 @@
   "account-transaction-detail": {
     "available_label": "Available",
     "delegated_label": "Delegated",
-    "unbonding_label": "Unbonding",
-    "reward_label": "Unclaimed Rewards"
+    "unbonding_label": "Total Unbonding",
+    "reward_label": "Unclaimed Rewards",
+    "unbonding_completion": "Unbonding Completion"
   },
   "introduction": {
     "title": "Self custody made simple and secure",
@@ -154,7 +155,8 @@
       "about_label": "About Beacon",
       "permission-list_label": "Beacon Permissions"
     },
-    "qr-advanced-settings_label": "Advanced QR Settings"
+    "qr-advanced-settings_label": "Advanced QR Settings",
+    "health-check": "API Health Check"
   },
   "qr-settings-page": {
     "title": "QR Settings"
@@ -226,6 +228,7 @@
     "advanced": "Advanced",
     "memo": "Memo",
     "paste_label": "Paste",
+    "existential_deposit": "Ignore existential deposit limit",
     "create-transaction": "Create Transaction",
     "error": {
       "amount_label": "Please enter a valid number",
@@ -723,5 +726,9 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
+  },
+  "health-check": {
+    "title": "Health Check", 
+    "message": "Checking API Health"
   }
 }

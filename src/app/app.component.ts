@@ -21,9 +21,6 @@ import {
   MainProtocolSymbols,
   NetworkType,
   TezblockBlockExplorer,
-  TezosBTC,
-  TezosBTCProtocolConfig,
-  TezosFAProtocolOptions,
   TezosKtProtocol,
   TezosNetwork,
   TezosProtocol,
@@ -203,9 +200,9 @@ export class AppComponent implements AfterViewInit {
       new TezblockBlockExplorer('https//edonet.tezblock.io'),
       new TezosProtocolNetworkExtras(
         TezosNetwork.EDONET,
-        'https://conseil-edo.cryptonomic-infra.tech',
+        'https://tezos-edonet-conseil.prod.gke.papers.tech',
         TezosNetwork.EDONET,
-        '8385d3cd-7157-481c-873f-17f99b910fb9'
+        'airgap00391'
       )
     )
     const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
@@ -231,20 +228,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [florencenetProtocol, edonetProtocol, shieldedTezProtocol],
-      extraPassiveSubProtocols: [
-        [florencenetProtocol, new TezosKtProtocol(new TezosProtocolOptions(florencenetNetwork))],
-        [edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))],
-        [
-          florencenetProtocol,
-          new TezosBTC(
-            new TezosFAProtocolOptions(
-              florencenetNetwork,
-              new TezosBTCProtocolConfig(undefined, undefined, undefined, undefined, 'KT1WhBK8hsji4YZtS6PwTWBAMX7cDbwtC7cZ')
-            )
-          )
-        ]
-      ]
+      extraActiveProtocols: [edonetProtocol, shieldedTezProtocol],
+      extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
     })
 
     await this.initializeTezosDomains()
@@ -266,9 +251,9 @@ export class AppComponent implements AfterViewInit {
 
   private async initializeTezosDomains(): Promise<void> {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
-      [TezosNetwork.MAINNET]: undefined,
+      [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.FLORENCENET]: undefined // TODO: FLORENCE
+      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p'
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
