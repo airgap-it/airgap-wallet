@@ -8,7 +8,8 @@ describe('BeaconHandler', () => {
       client: jasmine.createSpy('client').and.returnValue({
         isConnected: jasmine.createSpy('isConnected').and.returnValue(Promise.resolve())
       }),
-      addPeer: jasmine.createSpy('addPeer').and.returnValue(Promise.resolve())
+      addPeer: jasmine.createSpy('addPeer').and.returnValue(Promise.resolve()),
+      showLoader: jasmine.createSpy('showLoader').and.returnValue(Promise.resolve())
     }
     beaconHandler = new BeaconHandler(beaconServiceStub as any)
   })
