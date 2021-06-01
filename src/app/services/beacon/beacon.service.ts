@@ -123,7 +123,7 @@ export class BeaconService {
 
     this.loader = await this.loadingController.create({
       message: 'Connecting to Beacon Network...',
-      duration: 8000
+      duration: 10000
     })
     await this.loader.present()
   }
