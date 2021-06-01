@@ -58,7 +58,7 @@ export class BeaconService {
   public async init(): Promise<void> {
     await this.client.init()
 
-    return this.client.connect(async message => {
+    return this.client.connect(async (message) => {
       this.hideToast()
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
         return this.sendNetworkNotSupportedError(message.id)
@@ -72,11 +72,9 @@ export class BeaconService {
     const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
 
     return await Promise.all(
-      requests.map(
-        async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
-          return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
-        }
-      )
+      requests.map(async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
+        return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
+      })
     )
   }
 
@@ -114,7 +112,7 @@ export class BeaconService {
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
     console.log('responding', message)
-    await this.client.respond(message).catch(err => console.error(err))
+    await this.client.respond(message).catch((err) => console.error(err))
     await this.showToast('response-sent')
   }
 
@@ -125,7 +123,7 @@ export class BeaconService {
 
     this.loader = await this.loadingController.create({
       message: 'Connecting to Beacon Network...',
-      duration: 10000
+      duration: 8000
     })
     await this.loader.present()
   }
@@ -273,7 +271,7 @@ export class BeaconService {
     try {
       errorMessage =
         error.data && Array.isArray(error.data)
-          ? `The contract returned the following error: ${error.data.find(f => f && f.with && f.with.string).with.string}`
+          ? `The contract returned the following error: ${error.data.find((f) => f && f.with && f.with.string).with.string}`
           : error.message
     } catch {}
 
