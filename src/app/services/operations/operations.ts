@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   IAirGapTransaction,
   ICoinDelegateProtocol,
@@ -327,8 +327,8 @@ export class OperationsProvider {
     wallet: AirGapMarketWallet,
     serializableData: any,
     type: IACMessageType,
-    generatedId: string
-  ): Promise<IACMessageDefinitionObject> {
+    generatedId: number
+  ): Promise<IACMessageDefinitionObjectV3> {
     switch (type) {
       case IACMessageType.MessageSignRequest:
         return this.serializeMessageSignRequest(wallet, serializableData, type, generatedId)
@@ -341,8 +341,8 @@ export class OperationsProvider {
     wallet: AirGapMarketWallet,
     transaction: SerializableTx,
     type: IACMessageType,
-    generatedId: string
-  ): Promise<IACMessageDefinitionObject> {
+    generatedId: number
+  ): Promise<IACMessageDefinitionObjectV3> {
     const payload = {
       publicKey: wallet.publicKey,
       transaction: transaction as any, // TODO: Type
@@ -360,8 +360,8 @@ export class OperationsProvider {
     wallet: AirGapMarketWallet,
     request: SignPayloadRequestOutput,
     type: IACMessageType,
-    generatedId: string
-  ): Promise<IACMessageDefinitionObject> {
+    generatedId: number
+  ): Promise<IACMessageDefinitionObjectV3> {
     const payload = {
       publicKey: wallet.publicKey,
       message: request.payload,

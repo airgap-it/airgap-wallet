@@ -162,6 +162,7 @@ export class SettingsPage {
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
+        console.log('HANDLE REQUEST', text)
         this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch((error) => console.error(error))
       },
       (err: string) => {

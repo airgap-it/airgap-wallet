@@ -1,4 +1,4 @@
-import { BaseIACService, ClipboardService, ProtocolService, UiEventElementsService } from '@airgap/angular-core'
+import { BaseIACService, ClipboardService, DeeplinkService, ProtocolService, UiEventElementsService } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
@@ -28,6 +28,7 @@ export class IACService extends BaseIACService {
   constructor(
     uiEventElementsService: UiEventElementsService,
     public beaconService: BeaconService,
+    public readonly deeplinkService: DeeplinkService,
     accountProvider: AccountProvider,
     private readonly dataService: DataService,
     protected readonly clipboard: ClipboardService,
@@ -36,10 +37,13 @@ export class IACService extends BaseIACService {
     private readonly priceService: PriceService,
     private readonly router: Router
   ) {
-    super(uiEventElementsService, clipboard, Promise.resolve(), [
-      new BeaconHandler(beaconService),
-      new AddressHandler(accountProvider, dataService, router)
-    ])
+    super(
+      uiEventElementsService,
+      clipboard,
+      Promise.resolve(),
+      [new BeaconHandler(beaconService), new AddressHandler(accountProvider, dataService, router)],
+      deeplinkService
+    )
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
     this.serializerMessageHandlers[IACMessageType.TransactionSignResponse] = this.handleSignedTransaction.bind(this)

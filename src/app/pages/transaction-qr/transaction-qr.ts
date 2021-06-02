@@ -1,4 +1,3 @@
-import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
@@ -28,12 +27,7 @@ export class TransactionQrPage {
       }
     | undefined
 
-  constructor(
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
-    private readonly platform: Platform,
-    private readonly deeplinkService: DeeplinkService
-  ) {
+  constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly platform: Platform) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
@@ -62,10 +56,6 @@ export class TransactionQrPage {
 
   public done() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  public sameDeviceSign() {
-    this.deeplinkService.sameDeviceDeeplink(this.preparedDataQR)
   }
 
   public toggleDisplayRawData(): void {
