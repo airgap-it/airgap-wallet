@@ -49,7 +49,7 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.11",
+    "@airgap/angular-core": "0.0.12",
     "@airgap/beacon-sdk": "2.2.7",
     "@airgap/coinlib-core": "0.11.2",
     "@airgap/sapling-wasm": "0.0.6",
@@ -60,7 +60,6 @@
     "@angular/platform-browser": "^11.2.9",
     "@angular/platform-browser-dynamic": "^11.2.9",
     "@angular/router": "^11.2.9",
-    "@capacitor-community/barcode-scanner": "^1.2.1",
     "@capacitor/android": "^2.4.7",
     "@capacitor/core": "^2.4.7",
     "@capacitor/ios": "^2.4.7",
@@ -86,6 +85,7 @@
     "axios": "^0.21.1",
     "bignumber.js": "9.0.1",
     "chart.js": "^2.9.4",
+    "cordova-plugin-qrscanner": "3.0.1",
     "cordova-sqlite-storage": "^6.0.0",
     "cordova.plugins.diagnostic": "^6.0.3",
     "core-js": "^3.10.1",
