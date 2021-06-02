@@ -320,7 +320,7 @@ export class BeaconService {
         name: network.name || 'Florencenet',
         type: NetworkType.TESTNET,
         rpcUrl: network.rpcUrl || 'https://tezos-florencenet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
+        blockExplorer: new TezblockBlockExplorer('https://florencenet.tezblock.io'),
         extras: {
           network: TezosNetwork.FLORENCENET,
           conseilUrl: 'https://tezos-florencenet-conseil.prod.gke.papers.tech',
