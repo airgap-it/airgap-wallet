@@ -12,8 +12,7 @@ import {
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN,
-  BARCODE_SCANNER_PLUGIN
+  STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
@@ -104,7 +103,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   providers: [
     { provide: APP_PLUGIN, useValue: Plugins.App },
     { provide: APP_INFO_PLUGIN, useValue: Plugins.AppInfo },
-    { provide: BARCODE_SCANNER_PLUGIN, useValue: Plugins.BarcodeScanner },
     { provide: BROWSER_PLUGIN, useValue: Plugins.Browser },
     { provide: CLIPBOARD_PLUGIN, useValue: Plugins.Clipboard },
     { provide: PERMISSIONS_PLUGIN, useValue: Plugins.Permissions },
