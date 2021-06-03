@@ -228,7 +228,7 @@
     "advanced": "Advanced",
     "memo": "Memo",
     "paste_label": "Paste",
-    "existential_deposit": "Ignore existential deposit limit",
+    "existential_deposit": "Ignore existential deposit",
     "create-transaction": "Create Transaction",
     "error": {
       "amount_label": "Please enter a valid number",
