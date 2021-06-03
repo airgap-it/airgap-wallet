@@ -22,12 +22,8 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
 import { Plugins } from '@capacitor/core'
-import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
-import { Keyboard } from '@ionic-native/keyboard/ngx'
-import { QRScanner } from '@ionic-native/qr-scanner/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
-import { IonicStorageModule } from '@ionic/storage'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
@@ -58,11 +54,12 @@ import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
-import { RemoteConfigProvider } from './services/remote-config/remote-config'
+import { CoinlibService } from './services/coinlib/coinlib.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
 import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { WalletStorageService } from './services/storage/storage'
+import { IonicStorageModule } from '@ionic/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -115,9 +112,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
-    BarcodeScanner,
-    QRScanner,
-    Keyboard,
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,
@@ -134,7 +128,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     OperationsProvider,
     ExtensionsService,
     ExchangeProvider,
-    RemoteConfigProvider,
+    CoinlibService,
     PushProvider,
     PushBackendProvider,
     SerializerService,

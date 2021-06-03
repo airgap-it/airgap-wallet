@@ -10,7 +10,7 @@ import { SubstrateDelegationExtensions } from 'src/app/extensions/delegation/Sub
 import { TezosDelegationExtensions } from 'src/app/extensions/delegation/TezosDelegationExtensions'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 
-import { RemoteConfigProvider } from '../remote-config/remote-config'
+import { CoinlibService } from '../coinlib/coinlib.service'
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,7 @@ export class ExtensionsService {
       TezosProtocol,
       async () =>
         TezosDelegationExtensions.create(
-          this.remoteConfigProvider,
+          this.coinlibService,
           this.decimalPipe,
           this.amountConverterPipe,
           this.shortenStringPipe,
@@ -56,7 +56,7 @@ export class ExtensionsService {
       CosmosProtocol,
       async () =>
         CosmosDelegationExtensions.create(
-          this.remoteConfigProvider,
+          this.coinlibService,
           this.formBuilder,
           this.decimalPipe,
           this.amountConverterPipe,
@@ -72,7 +72,7 @@ export class ExtensionsService {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
-    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly coinlibService: CoinlibService,
     private readonly addressService: AddressService
   ) {}
 

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { UnitHelper } from '../../../test-config/unit-test-helper'
 
 import { DecimalValidator } from './DecimalValidator'
 

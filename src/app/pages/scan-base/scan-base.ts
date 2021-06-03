@@ -58,7 +58,7 @@ export class ScanBasePage {
       this.scanner.destroy()
     } else if (this.zxingScanner) {
       this.zxingScanner.enable = false
-      this.zxingScanner.codeReader.reset()
+      this.zxingScanner.reset()
     }
   }
 

@@ -1,8 +1,20 @@
-import { APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
+import { AndroidFlavor, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
-
+import { Capacitor } from '@capacitor/core'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { IpcRenderer } from 'electron'
 
+declare global {
+  interface Window {
+    require: (
+      module: 'electron'
+    ) => {
+      ipcRenderer: IpcRenderer
+    }
+  }
+}
+
+const { ipcRenderer } = window.require('electron')
 @Component({
   selector: 'page-about',
   templateUrl: 'about.html'
@@ -12,17 +24,28 @@ export class AboutPage {
   public packageName: string = 'PACKAGE_NAME'
   public versionName: string = 'VERSION_NUMBER'
   public versionCode: string | number = 'VERSION_CODE'
+  public appInfo: {
+    appName: string
+    packageName: string
+    versionName: string
+    versionCode: number
+    productFlavor?: AndroidFlavor
+  }
 
-  constructor(@Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin) {
+  constructor(@Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin) {
     this.updateVersions().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
   }
 
   public async updateVersions(): Promise<void> {
-    const appInfo = await this.appInfo.get()
+    if (Capacitor.getPlatform() === 'electron') {
+      this.appInfo = ipcRenderer.sendSync('AppInfo', '')
+    } else {
+      this.appInfo = await this.appInfoPlugin.get()
+    }
 
-    this.appName = appInfo.appName
-    this.packageName = appInfo.packageName
-    this.versionName = appInfo.versionName
-    this.versionCode = appInfo.versionCode
+    this.appName = this.appInfo.appName
+    this.packageName = this.appInfo.packageName
+    this.versionName = this.appInfo.versionName
+    this.versionCode = this.appInfo.versionCode
   }
 }

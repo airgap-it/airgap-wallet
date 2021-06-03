@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { WalletStorageService } from '../storage/storage'
 
 export enum CachingServiceKey {
   PRICEDATA = 'pricedata',
@@ -31,7 +31,7 @@ export interface StorageObject {
   providedIn: 'root'
 })
 export class CachingService {
-  constructor(private readonly storage: Storage) {}
+  constructor(private readonly storage: WalletStorageService) {}
 
   public async cachePriceData(marketSymbols: string[], value: any, timeInterval: TimeInterval): Promise<any> {
     const uniqueId = `${marketSymbols.sort().join()}_${timeInterval}_${CachingServiceKey.PRICEDATA}`
@@ -61,10 +61,10 @@ export class CachingService {
   }
 
   public async set(key: string, value: any): Promise<any> {
-    return this.storage.set(key, value)
+    return this.storage.setCache(key, value)
   }
 
   public async get(key: string): Promise<any> {
-    return this.storage.get(key)
+    return this.storage.getCache(key)
   }
 }

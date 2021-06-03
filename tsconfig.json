@@ -10,8 +10,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "downlevelIteration": true, // To enable [].entries()
-    "target": "es5",
+    "downlevelIteration": false, // To enable [].entries()
+    "target": "es2015",
     "typeRoots": ["node_modules/@types"],
     "lib": ["es2018", "dom"],
     /* Strict Type-Checking Options */
@@ -28,11 +28,17 @@
     "noUnusedParameters": true /* Report errors on unused parameters. */,
     "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
     "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    // "noUncheckedIndexedAccess": true,
+    // "noPropertyAccessFromIndexSignature": true,
+    // "removeComments": true
     "paths": {
       "@angular/*": ["./node_modules/@angular/*"],
       "@ionic/*": ["./node_modules/@ionic/*"],
       "@ngx-translate/*": ["./node_modules/@ngx-translate/*"]
-    }
+    },
+    // "importsNotUsedAsValues": "error",
+    "forceConsistentCasingInFileNames": true,
+    "allowUnreachableCode": false
   },
   "angularCompilerOptions": {
     "enableIvy": true,
