@@ -21,7 +21,7 @@ describe('BeaconHandler', () => {
     it('should handle plain json', async () => {
       const json =
         '{"name":"Beacon Example Dapp","publicKey":"1b3a7a1b8356cf48a3e32e167b92cd9e6865c755772bd2525f5b0db48bd85499","relayServer":"matrix.papers.tech"}'
-      const result = await beaconHandler.handle(json)
+      const result = await beaconHandler.receive(json)
       expect(result).toBeTruthy()
     })
   })
@@ -33,24 +33,24 @@ describe('BeaconHandler', () => {
     it('should handle plain json', async () => {
       const json =
         '{"name":"Beacon Example Dapp","version":"2","publicKey":"ad78256671511be0660eefa901fc279247056485f302e49f147a2d067d515d9f","relayServer":"matrix.papers.tech"}'
-      const result = await beaconHandler.handle(json)
+      const result = await beaconHandler.receive(json)
       expect(result).toBeTruthy()
     })
 
     it('should handle base58check encoded', async () => {
-      const result = await beaconHandler.handle(code)
+      const result = await beaconHandler.receive(code)
       expect(result).toBeTruthy()
     })
 
     it('should handle base58check encoded with tezos:// prefix', async () => {
       const codeWithPrefix = `tezos://?type=tzip10&data=${code}`
-      const result = await beaconHandler.handle(codeWithPrefix)
+      const result = await beaconHandler.receive(codeWithPrefix)
       expect(result).toBeTruthy()
     })
 
     it('should handle base58check encoded with airgap-wallet:// prefix', async () => {
       const codeWithPrefix = `airgap-wallet://?type=tzip10&data=${code}`
-      const result = await beaconHandler.handle(codeWithPrefix)
+      const result = await beaconHandler.receive(codeWithPrefix)
       expect(result).toBeTruthy()
     })
   })

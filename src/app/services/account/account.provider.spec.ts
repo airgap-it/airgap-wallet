@@ -109,6 +109,8 @@ describe('AccountProvider', () => {
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
     await accountProvider.removeWallet(wallet)
@@ -123,6 +125,8 @@ describe('AccountProvider', () => {
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     )
 
