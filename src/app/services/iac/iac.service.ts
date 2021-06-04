@@ -84,7 +84,6 @@ export class IACService extends BaseIACService {
   }
 
   public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
-    console.log('handleSignedTransaction', messageDefinitionObjects)
     if (this.router) {
       const info = {
         messageDefinitionObjects: messageDefinitionObjects
