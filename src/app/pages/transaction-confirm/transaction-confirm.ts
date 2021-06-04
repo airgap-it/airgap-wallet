@@ -69,7 +69,7 @@ export class TransactionConfirmPage {
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.messageDefinitionObjects.forEach(async messageObject => {
+    this.messageDefinitionObjects.forEach(async (messageObject) => {
       const protocol = await this.protocolService.getProtocol(messageObject.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
@@ -125,7 +125,7 @@ export class TransactionConfirmPage {
     this.txInfos.forEach(async ([signedTx, protocol, request], index) => {
       protocol
         .broadcastTransaction(signedTx)
-        .then(async txId => {
+        .then(async (txId) => {
           console.log('transaction hash', txId)
 
           if (request) {
@@ -162,8 +162,9 @@ export class TransactionConfirmPage {
           // POST TX TO BACKEND
           // Only send it if we are on mainnet
           if (protocol.options.network.type === NetworkType.MAINNET) {
-            const signed = (await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index]
-              .payload as SignedTransaction))[0] as any
+            const signed = (
+              await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction)
+            )[0] as any
             // necessary for the transaction backend
             signed.amount = signed.amount.toString()
             signed.fee = signed.fee.toString()
@@ -175,7 +176,7 @@ export class TransactionConfirmPage {
           }
           // END POST TX TO BACKEND
         })
-        .catch(error => {
+        .catch((error) => {
           if (interval) {
             clearInterval(interval)
           }
@@ -187,7 +188,7 @@ export class TransactionConfirmPage {
           // TODO: Remove this special error case once we remove web3 from the coin-lib
           if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
             ;(protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction) as any).then(
-              signed => {
+              (signed) => {
                 if (signed.hash) {
                   this.showTransactionSuccessfulAlert(protocol, signed.hash)
                   // POST TX TO BACKEND
@@ -215,7 +216,7 @@ export class TransactionConfirmPage {
                 ],
                 position: 'bottom'
               })
-              .then(toast => {
+              .then((toast) => {
                 toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
               })
               .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
@@ -282,7 +283,7 @@ export class TransactionConfirmPage {
   }
 
   private async selectTezosTzAccount(protocol: ICoinProtocol): Promise<AirGapMarketWallet> {
-    return new Promise<AirGapMarketWallet>(resolve => {
+    return new Promise<AirGapMarketWallet>((resolve) => {
       const wallets: AirGapMarketWallet[] = this.accountService.getWalletList()
       const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
         wallets,

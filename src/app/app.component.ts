@@ -13,7 +13,7 @@ import {
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
-  generateId,
+  generateIdV2,
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
@@ -165,7 +165,7 @@ export class AppComponent implements AfterViewInit {
 
     const serializedTx: string | string[] = await this.serializerService.serialize([
       {
-        id: generateId(10),
+        id: generateIdV2(10),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
@@ -207,6 +207,20 @@ export class AppComponent implements AfterViewInit {
     )
     const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
 
+    const florencenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Florencenet',
+      NetworkType.TESTNET,
+      'https://tezos-florencenet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//florencenet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.FLORENCENET,
+        'https://tezos-florencenet-conseil.prod.gke.papers.tech',
+        TezosNetwork.FLORENCENET,
+        'airgap00391'
+      )
+    )
+    const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
+
     const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
       await this.saplingNativeService.createExternalMethodProvider()
 
@@ -218,7 +232,7 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [edonetProtocol, shieldedTezProtocol],
+      extraActiveProtocols: [edonetProtocol, florencenetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
     })
 
