@@ -34,6 +34,7 @@ export class TransactionQrPage {
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.interactionData
       this.preparedDataQR = info.data
+      console.log('preparedDataQR', JSON.stringify(this.preparedDataQR))
       this.qrDataTooBig = this.preparedDataQR.length > 2800
 
       if (

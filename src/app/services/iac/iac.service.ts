@@ -7,6 +7,7 @@ import {
   AirGapMarketWallet,
   AirGapWalletStatus,
   IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   MessageSignResponse
 } from '@airgap/coinlib-core'
@@ -58,7 +59,7 @@ export class IACService extends BaseIACService {
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObjectV3[]): Promise<boolean> {
     this.storageSerivce.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     // TODO: handle multiple messages
@@ -83,7 +84,7 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObjectV3[]): Promise<boolean> {
     console.log('handleSignedTransaction', messageDefinitionObjects)
     if (this.router) {
       const info = {
@@ -98,7 +99,7 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+  private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObjectV3[]): Promise<boolean> {
     const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
     const response: SignPayloadResponseInput = {

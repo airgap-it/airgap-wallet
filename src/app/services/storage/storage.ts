@@ -79,7 +79,6 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   providedIn: 'root'
 })
 export class WalletStorageService extends BaseStorage<WalletStorageKey, WalletStorageKeyReturnType> {
-
   constructor(storage: Storage) {
     super(storage, defaultValues)
   }
@@ -88,15 +87,11 @@ export class WalletStorageService extends BaseStorage<WalletStorageKey, WalletSt
     await this.storage.defineDriver(cordovaSQLiteDriver)
   }
 
-  public async getCache<T>(key: string): Promise<T> {
-    await this.waitReady
-
+  public async getCache<T>(key: string | number): Promise<T> {
     return this.storage.get(`cache-${key}`)
   }
 
-  public async setCache<T>(key: string, value: T): Promise<T> {
-    await this.waitReady
-
+  public async setCache<T>(key: string | number, value: T): Promise<T> {
     return this.storage.set(`cache-${key}`, value)
   }
 }

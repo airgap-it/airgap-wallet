@@ -41,6 +41,7 @@ export class ScanPage extends ScanBasePage {
 
   private resetScannerPage(): void {
     this.parts = new Set()
+
     this.percentageScanned = 0
     this.isMultiQr = false
   }

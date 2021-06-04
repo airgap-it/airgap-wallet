@@ -2,7 +2,7 @@ import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageDefinitionObjectV3, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, generateId, IACMessageDefinitionObjectV3, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -22,7 +22,6 @@ export class InteractionSelectionPage {
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
   private readonly type: IACMessageType
-  private readonly generatedId: number
 
   constructor(
     public readonly platform: Platform,
@@ -41,7 +40,6 @@ export class InteractionSelectionPage {
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
       this.type = info.type
-      this.generatedId = info.generatedId
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
     }
   }
@@ -61,6 +59,7 @@ export class InteractionSelectionPage {
   public async sameDeviceSign() {
     const dataQR = await this.prepareQRData({} as IACMessageDefinitionObjectV3)
 
+    console.log('dataQR', dataQR)
     this.deeplinkService
       .sameDeviceDeeplink([dataQR])
       .then(() => {
@@ -80,13 +79,11 @@ export class InteractionSelectionPage {
   }
 
   private async prepareQRData<T extends string | IACMessageDefinitionObjectV3>(type: T): Promise<T> {
-    console.log('interactionData', this.interactionData)
-    console.log('generatedId', this.generatedId)
     if (typeof type === 'string' && this.interactionData.includes('://')) {
       return this.interactionData
     }
-    const generatedId = 1234567890
 
+    const generatedId = generateId(8)
     // TODO return string | IACMessageDefinitionObject
     return this.operations.serializeSignRequest(this.wallet, this.interactionData, this.type, generatedId).catch((error) => {
       console.warn(`Could not serialize transaction: ${error}`)
