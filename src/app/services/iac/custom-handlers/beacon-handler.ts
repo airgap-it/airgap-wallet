@@ -34,7 +34,8 @@ export class BeaconHandler extends IACMessageHandler {
   constructor(private readonly beaconService: BeaconService) {
     super()
   }
-  private async canHandle(json: unknown): Promise<boolean> {
+
+  public async canHandle(json: unknown): Promise<boolean> {
     if (isBeaconMessage(json)) {
       await this.beaconService.client.isConnected
       await this.beaconService.addPeer(json)

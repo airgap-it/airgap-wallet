@@ -21,6 +21,35 @@ export class AddressHandler extends IACMessageHandler {
     super()
   }
 
+  public async canHandle(data: string): Promise<boolean> {
+    const splits: string[] = data.split(':') // Handle bitcoin payment request https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
+
+    if (splits.length > 1) {
+      const wallets: AirGapMarketWallet[] = this.accountProvider.getWalletList()
+      for (const protocol of supportedProtocols()) {
+        if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
+          const [compatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
+            wallets,
+            (wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier
+          )
+
+          if (compatibleWallets.length > 0) {
+            return true
+          }
+        }
+      }
+
+      return false
+    } else {
+      const { compatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(data)
+      if (compatibleWallets.length > 0) {
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+
   public async receive(data: string | string[]): Promise<IACHandlerStatus> {
     const str: string = typeof data === 'string' ? data : data[0]
     const splits: string[] = str.split(':') // Handle bitcoin payment request https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
