@@ -3,7 +3,7 @@
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -21,7 +21,10 @@ module.exports = function(config) {
     coverageReporter: {
       // specify a common output directory
       dir: './coverage',
-      reporters: [{ type: 'lcov', subdir: 'report-lcov' }, { type: 'text', subdir: '.', file: 'text.txt' }],
+      reporters: [
+        { type: 'lcov', subdir: 'report-lcov' },
+        { type: 'text', subdir: '.', file: 'text.txt' }
+      ],
       fixWebpackSourcePaths: true
     },
     specReporter: {
