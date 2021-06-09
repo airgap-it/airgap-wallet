@@ -199,7 +199,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       protocol.options.nodeClient.getElectionStatus(),
       protocol.options.accountController.getNominationStatus(nominatorDetails.address, validatorDetails.address)
     ])
-    const isElectionOpen: boolean = results[0].status.value === SubstrateElectionStatus.OPEN
+    const isElectionOpen: boolean = results[0] && results[0].status.value === SubstrateElectionStatus.OPEN
     const nominationStatus: SubstrateNominationStatus | undefined = results[1]
 
     if (protocol.identifier === MainProtocolSymbols.POLKADOT) {

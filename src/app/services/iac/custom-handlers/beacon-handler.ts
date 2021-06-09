@@ -1,4 +1,4 @@
-import { IACMessageHandler } from '@airgap/angular-core'
+import { IACHandlerStatus, IACMessageHandler } from '@airgap/angular-core'
 import { P2PPairingRequest, Serializer } from '@airgap/beacon-sdk'
 
 import { BeaconService } from '../../beacon/beacon.service'
@@ -35,14 +35,26 @@ export class BeaconHandler extends IACMessageHandler {
     super()
   }
 
-  public async handle(data: string | string[]): Promise<boolean> {
+  public async canHandle(json: unknown): Promise<boolean> {
+    if (isBeaconMessage(json)) {
+      await this.beaconService.client.isConnected
+      await this.beaconService.addPeer(json)
+
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public async receive(data: string | string[]): Promise<IACHandlerStatus> {
     const stringData: string = typeof data === 'string' ? data : data[0]
 
     // Check if it's a beacon request
     try {
       const json: Record<string, unknown> = JSON.parse(stringData)
 
-      return await this.tryHandleBeacon(json)
+      const canHandle = await this.canHandle(json)
+      return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
     } catch (e) {
       try {
         const payload: string = stringData
@@ -51,12 +63,14 @@ export class BeaconHandler extends IACMessageHandler {
           if (params && params.get('type') === 'tzip10') {
             const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any
 
-            return await this.tryHandleBeacon(json)
+            const canHandle = await this.canHandle(json)
+            return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
           }
         } else {
           const json: Record<string, unknown> = (await new Serializer().deserialize(stringData)) as any
 
-          return await this.tryHandleBeacon(json)
+          const canHandle = await this.canHandle(json)
+          return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
         }
       } catch (err) {
         //
@@ -64,19 +78,22 @@ export class BeaconHandler extends IACMessageHandler {
       //
     }
 
-    return false
+    return IACHandlerStatus.UNSUPPORTED
   }
 
-  private async tryHandleBeacon(json: unknown): Promise<boolean> {
-    if (isBeaconMessage(json)) {
-      console.log('Beacon Pairing QR scanned', json)
+  public async getProgress(): Promise<number> {
+    return 100
+  }
 
-      await this.beaconService.client.isConnected
-      await this.beaconService.addPeer(json)
+  public async getResult(): Promise<undefined> {
+    return undefined
+  }
 
-      return true
-    } else {
-      return false
-    }
+  public async reset(): Promise<void> {
+    return
+  }
+
+  public async handleComplete(): Promise<boolean> {
+    return true
   }
 }

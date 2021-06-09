@@ -5,8 +5,8 @@ import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
-import { ClipboardMock, SplashScreenMock, StatusBarMock } from 'test-config/plugins-mock'
 
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/plugins-mock'
 import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
@@ -154,7 +154,7 @@ describe('TransactionPrepare Page', () => {
     // TODO: Move this test to "operationsProvider"
     spyOn((component as any).router, 'navigateByUrl').and.returnValue(Promise.resolve(true))
 
-    component.transactionForm.controls.address.setValue(ethWallet.addresses[0])
+    component.transactionForm.controls.receiver.setValue(ethWallet.addresses[0])
     component.transactionForm.controls.amount.setValue(10)
     component.transactionForm.controls.fee.setValue(10)
 

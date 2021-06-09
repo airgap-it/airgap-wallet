@@ -31,7 +31,7 @@ export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateAct
             -1 * this.context.wallet.protocol.decimals
           )} XTZ</span> </strong> from <span class=\"style__strong color__primary\"> ${shortenString.transform(
             this.context.wallet.receivingPublicAddress
-          )} </span> to <span class=\"style__strong color__primary\"> ${shortenString.transform(mainAddress)}</span>?`,
+          )} </span> to <span class=\"style__strong color__primary\"> ${shortenString.transform(mainAddress.getValue())}</span>?`,
           buttons: [
             {
               text: this.context.translateService.instant('account-transaction-list.migrate-alert.cancel'),
@@ -45,7 +45,7 @@ export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateAct
               handler: (): void => {
                 const info = {
                   wallet: this.context.wallet,
-                  address: mainAddress,
+                  address: mainAddress.getValue(),
                   forceMigration: true
                 }
                 this.context.dataService.setData(DataServiceKey.DETAIL, info)

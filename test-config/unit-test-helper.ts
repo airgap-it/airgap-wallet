@@ -5,7 +5,8 @@ import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { AlertController, IonicModule, LoadingController, NavController, Platform, ToastController } from '@ionic/angular'
-import { IonicStorageModule, Storage } from '@ionic/storage'
+import { Storage } from '@ionic/storage'
+import { IonicStorageModule } from '@ionic/storage'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
@@ -27,9 +28,11 @@ import {
 import {
   AppInfoPluginMock,
   AppMock,
+  ClipboardMock,
   PermissionsMock,
   PermissionsPluginMock,
   PushNotificationsMock,
+  SaplingPluginMock,
   SplashScreenMock,
   StatusBarMock
 } from './plugins-mock'
@@ -45,8 +48,10 @@ export class UnitHelper {
     permissionsPlugin: new PermissionsPluginMock(),
     permissionsProvider: new PermissionsServiceMock(),
     pushNotifications: new PushNotificationsMock(),
+    saplingPlugin: new SaplingPluginMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
+    clipboard: new ClipboardMock(),
     deeplink: new DeeplinkMock(),
     toastController: new ToastControllerMock(),
     alertController: new AlertControllerMock(),

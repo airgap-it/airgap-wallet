@@ -1,5 +1,6 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
+import * as moment from 'moment'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { CosmosProtocol } from '@airgap/coinlib-core'
@@ -18,7 +19,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { CosmosValidatorDetails, RemoteConfigProvider } from 'src/app/services/remote-config/remote-config'
+import { CosmosValidatorDetails, CoinlibService } from 'src/app/services/coinlib/coinlib.service'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
@@ -33,7 +34,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private static instance: CosmosDelegationExtensions
 
   public static create(
-    remoteConfigProvider: RemoteConfigProvider,
+    coinlibService: CoinlibService,
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
@@ -42,7 +43,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   ): CosmosDelegationExtensions {
     if (!CosmosDelegationExtensions.instance) {
       CosmosDelegationExtensions.instance = new CosmosDelegationExtensions(
-        remoteConfigProvider,
+        coinlibService,
         formBuilder,
         decimalPipe,
         amountConverterPipe,
@@ -61,7 +62,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
   private knownValidators?: CosmosValidatorDetails[]
 
   private constructor(
-    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly coinlibService: CoinlibService,
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
@@ -112,9 +113,22 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
     type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
 
+    const isNullOrUndefined = (value: any) => value === undefined || value === null
+
     return Promise.all(
       [...knownValidators, ...unkownValidators]
-        .sort((a: ValidatorDetails, b: ValidatorDetails) => a.description.moniker.localeCompare(b.description.moniker))
+        .sort((a: ValidatorDetails, b: ValidatorDetails) => {
+          if (!isNullOrUndefined(a.description.moniker) && !isNullOrUndefined(b.description.moniker)) {
+            return a.description.moniker.localeCompare(b.description.moniker)
+          } else if (isNullOrUndefined(a.description.moniker) && !isNullOrUndefined(b.description.moniker)) {
+            return 1
+          } else if (!isNullOrUndefined(a.description.moniker) && isNullOrUndefined(b.description.moniker)) {
+            return -1
+          } else if (isNullOrUndefined(a.description.moniker) && isNullOrUndefined(b.description.moniker)) {
+            return a.operator_address.localeCompare(b.operator_address)
+          }
+          return 0
+        })
         .map(
           async (details: ValidatorDetails) =>
             new UIAccountSummary({
@@ -138,8 +152,18 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
       protocol.getAvailableBalanceOfAddresses([address]),
       protocol.fetchTotalDelegatedAmount(address),
       protocol.fetchTotalUnbondingAmount(address),
-      protocol.fetchTotalReward(address)
+      protocol.fetchTotalReward(address),
+      protocol.fetchUnbondingDelegations(address)
     ])
+
+    const unbondingDetails = results[4]
+      .map(unbonding => unbonding.entries)
+      .reduce((flatten, toFlatten) => flatten.concat(toFlatten), [])
+      .map(entry => {
+        const completionTime = moment(entry.completion_time, 'YYYY-MM-DD hh:mm:ss Z').format('hh:ss MM/DD/YYYY')
+        return { balance: entry.balance, completionTime }
+      })
+
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
@@ -158,6 +182,17 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
         text: `${this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
       }
     ]
+
+    const unbondingCompletionItems = unbondingDetails.map(unbondingDetail => {
+      return {
+        label: 'account-transaction-detail.unbonding_completion',
+        text: `${this.amountConverterPipe.transformValueOnly(unbondingDetail.balance, protocol, 0)} ${protocol.symbol} - ${
+          unbondingDetail.completionTime
+        }`
+      }
+    })
+
+    items.splice(3, 0, ...unbondingCompletionItems)
 
     return new UIAccountExtendedDetails({
       items
@@ -488,7 +523,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
 
   private async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
     if (this.knownValidators === undefined) {
-      this.knownValidators = await this.remoteConfigProvider.getKnownCosmosValidators()
+      this.knownValidators = await this.coinlibService.getKnownCosmosValidators()
     }
 
     return this.knownValidators

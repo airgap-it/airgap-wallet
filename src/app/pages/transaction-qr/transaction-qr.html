@@ -4,9 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
-      <ion-title>
-        {{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}
-      </ion-title>
+      <ion-title>{{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
@@ -18,28 +16,25 @@
     </ion-row>
 
     <ion-row class="ion-justify-content-center ion-padding-vertical">
-      <airgap-qr id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></airgap-qr>
+      <!-- <airgap-qr id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></airgap-qr> -->
+
+      <airgap-iac-qr id="qr" *ngIf="!qrDataTooBig" [messageDefinitionObjects]="[preparedDataQR]" [level]="'L'" [size]="300"></airgap-iac-qr>
+
       <ion-text>
-        <h1 *ngIf="qrDataTooBig">
-          {{ 'transaction-qr.qr-data-too-big_warning' | translate }}
-        </h1>
+        <h1 *ngIf="qrDataTooBig">{{ 'transaction-qr.qr-data-too-big_warning' | translate }}</h1>
       </ion-text>
     </ion-row>
 
     <ng-container *ngIf="airGapTxs && airGapTxs.length > 1">
       <ion-row class="ion-padding-bottom ion-text-center">
         <ion-col size="4" class="content--align__center-center">
-          <h5>
-            {{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}
-          </h5>
+          <h5>{{ aggregatedInfo.totalAmount.toFixed() | amountConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}</h5>
         </ion-col>
         <ion-col size="4" class="content--align__center-center">
           <h5>{{ aggregatedInfo.numberOfTxs }}</h5>
         </ion-col>
         <ion-col size="4" class="content--align__center-center">
-          <h5>
-            {{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}
-          </h5>
+          <h5>{{ aggregatedInfo.totalFees.toFixed() | feeConverter: { protocol: airGapTxs[0].protocolIdentifier } | async }}</h5>
         </ion-col>
         <ion-col size="4">
           <small>Amount</small>

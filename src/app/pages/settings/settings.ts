@@ -51,10 +51,10 @@ export class SettingsPage {
 
     this.sharePlugin
       .share(options)
-      .then(result => {
+      .then((result) => {
         console.log(`Share completed: ${result}`)
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('Sharing failed with error: ' + error)
       })
   }
@@ -152,13 +152,17 @@ export class SettingsPage {
   }
 
   public goToQrSettings(): void {
-    this.router.navigateByUrl('/qr-settings').catch(err => console.error(err))
+    this.router.navigateByUrl('/qr-settings').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public goToHealthCheck(): void {
+    this.router.navigateByUrl('/health-check').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
-        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch((error) => console.error(error))
       },
       (err: string) => {
         console.error('Error: ' + err)

@@ -14,7 +14,7 @@ import { Router } from '@angular/router'
 import { AlertController, ModalController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  generateId,
+  generateIdV2,
   IACMessageDefinitionObject,
   IACMessageType,
   IAirGapTransaction,
@@ -22,9 +22,9 @@ import {
   TezosCryptoClient,
   TezosProtocol
 } from '@airgap/coinlib-core'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -191,7 +191,7 @@ export class BeaconRequestPage implements OnInit {
     ]
 
     this.responseHandler = async (): Promise<void> => {
-      const scopes: PermissionScope[] = this.inputs.filter(input => input.checked).map(input => input.value)
+      const scopes: PermissionScope[] = this.inputs.filter((input) => input.checked).map((input) => input.value)
 
       const response: PermissionResponseInput = {
         id: request.id,
@@ -216,7 +216,7 @@ export class BeaconRequestPage implements OnInit {
       }
       const alert = await this.alertController.create({
         header: this.translateService.instant('beacon-request.select-account.alert'),
-        inputs: wallets.map(wallet => ({
+        inputs: wallets.map((wallet) => ({
           label: this.shortenStringPipe.transform(wallet.receivingPublicAddress),
           type: 'radio',
           value: wallet,
@@ -233,7 +233,7 @@ export class BeaconRequestPage implements OnInit {
           },
           {
             text: 'Ok',
-            handler: wallet => {
+            handler: (wallet) => {
               this.selectedWallet = wallet
             }
           }
@@ -278,7 +278,7 @@ export class BeaconRequestPage implements OnInit {
       this.blake2bHash = await cryptoClient.blake2bLedgerHash(request.payload)
     } catch {}
 
-    const generatedId = generateId(10)
+    const generatedId = generateIdV2(10)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     const clonedRequest = { ...request }
@@ -324,7 +324,7 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    const generatedId = generateId(10)
+    const generatedId = generateIdV2(10)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
@@ -354,7 +354,7 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    const generatedId = generateId(10)
+    const generatedId = generateIdV2(10)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({

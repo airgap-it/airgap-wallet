@@ -10,8 +10,8 @@ android {
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
 
-    implementation "com.android.support:support-v4:28.+"
-    implementation "com.android.support:appcompat-v7:28.+"
+    implementation "androidx.legacy:legacy-support-v4:1.+"
+    implementation "androidx.appcompat:appcompat:1.+"
 }
 apply from: "../../node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle"
 

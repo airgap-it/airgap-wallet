@@ -47,7 +47,7 @@ export class BeaconService {
   public async init(): Promise<void> {
     await this.client.init()
 
-    return this.client.connect(async message => {
+    return this.client.connect(async (message) => {
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
         return this.sendNetworkNotSupportedError(message.id)
       } else {
@@ -60,11 +60,9 @@ export class BeaconService {
     const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
 
     return await Promise.all(
-      requests.map(
-        async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
-          return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
-        }
-      )
+      requests.map(async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
+        return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
+      })
     )
   }
 
@@ -106,7 +104,7 @@ export class BeaconService {
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
     console.log('responding', message)
-    await this.client.respond(message).catch(err => console.error(err))
+    await this.client.respond(message).catch((err) => console.error(err))
   }
 
   public async addPeer(peer: P2PPairingRequest): Promise<void> {
@@ -196,8 +194,9 @@ export class BeaconService {
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
-    // TODO: remove `Exclude`
-    const configs: { [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET>]: TezosProtocolNetwork } = {
+    const configs: {
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.GRANADANET>]: TezosProtocolNetwork
+    } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
         name: undefined,
@@ -211,16 +210,29 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.DELPHINET]: {
+      [BeaconNetworkType.EDONET]: {
         identifier: undefined,
-        name: network.name || 'Delphinet',
+        name: network.name || 'Edonet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
         extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
+          network: TezosNetwork.EDONET,
+          conseilUrl: 'https://tezos-edonet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.EDONET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.FLORENCENET]: {
+        identifier: undefined,
+        name: network.name || 'Florencenet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-florencenet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.FLORENCENET,
+          conseilUrl: 'https://tezos-florencenet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.FLORENCENET,
           conseilApiKey: 'airgap00391'
         }
       },

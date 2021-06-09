@@ -1,4 +1,4 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -18,7 +18,7 @@ import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { RemoteConfigProvider, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
+import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/coinlib/coinlib.service'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
@@ -26,20 +26,22 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private static instance: TezosDelegationExtensions
 
   public static async create(
-    remoteConfigProvider: RemoteConfigProvider,
+    coinlibService: CoinlibService,
     decimalPipe: DecimalPipe,
     amountConverter: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService,
+    addressService: AddressService,
     formBuilder: FormBuilder
   ): Promise<TezosDelegationExtensions> {
     if (!TezosDelegationExtensions.instance) {
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
-        remoteConfigProvider,
+        coinlibService,
         decimalPipe,
         amountConverter,
         shortenStringPipe,
         translateService,
+        addressService,
         formBuilder
       )
     }
@@ -62,11 +64,12 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private knownBakers?: TezosBakerCollection
 
   private constructor(
-    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly coinlibService: CoinlibService,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
+    private readonly addressService: AddressService,
     private readonly formBuilder: FormBuilder
   ) {
     super()
@@ -132,7 +135,10 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       this.getKnownBakers()
     ])
     const knownBaker = knownBakers[bakerDetails.address]
-    const name = knownBaker ? knownBaker.alias : this.translateService.instant('delegation-detail-tezos.unknown')
+    const name = knownBaker
+      ? knownBaker.alias
+      : (await this.addressService.getAlias(bakerDetails.address, protocol)) ||
+        this.translateService.instant('delegation-detail-tezos.unknown')
 
     const bakerTotalUsage =
       knownBaker && knownBaker.stakingCapacity
@@ -277,7 +283,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   private async getKnownBakers(): Promise<TezosBakerCollection> {
     if (this.knownBakers === undefined) {
-      this.knownBakers = await this.remoteConfigProvider.getKnownTezosBakers()
+      this.knownBakers = await this.coinlibService.getKnownTezosBakers()
     }
 
     return this.knownBakers
