@@ -58,7 +58,6 @@ export class ScanBasePage {
       this.scanner.destroy()
     } else if (this.zxingScanner) {
       this.zxingScanner.enable = false
-      this.zxingScanner.reset()
     }
   }
 
@@ -74,21 +73,12 @@ export class ScanBasePage {
     console.error(`The checkScan method needs to be overwritten. Ignoring text ${resultString}`)
   }
 
-  private startScanMobile() {
-    this.scanner.scan(
-      text => {
-        this.checkScan(text)
-      },
-      error => {
-        console.warn(error)
-        this.startScan()
-      }
-    )
+  private async startScanMobile() {
+    this.scanner.scan(() => {})
   }
 
   private startScanBrowser() {
-    if (this.zxingScanner) {
-      this.hasCameraPermission = true
+    if (this.zxingScanner && !this.zxingScanner.enabled) {
       this.zxingScanner.enable = true
       this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')
