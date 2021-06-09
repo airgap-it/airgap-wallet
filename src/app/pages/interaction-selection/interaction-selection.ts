@@ -58,8 +58,6 @@ export class InteractionSelectionPage {
 
   public async sameDeviceSign() {
     const dataQR = await this.prepareQRData({} as IACMessageDefinitionObjectV3)
-
-    console.log('dataQR', dataQR)
     this.deeplinkService
       .sameDeviceDeeplink([dataQR])
       .then(() => {
