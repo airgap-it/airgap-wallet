@@ -49,7 +49,7 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.13-beta.6",
+    "@airgap/angular-core": "0.0.13-beta.8",
     "@airgap/beacon-sdk": "2.2.7",
     "@airgap/coinlib-core": "0.11.5-beta.0",
     "@airgap/sapling-wasm": "0.0.6",
@@ -108,6 +108,7 @@
     "rxjs": "~6.6.7",
     "tslib": "^2.2.0",
     "uglify-es": "^3.3.9",
+    "uuid": "^3.4.0",
     "webpack-merge": "^5.7.3",
     "websocket": "^1.0.33",
     "zone.js": "~0.11.4"

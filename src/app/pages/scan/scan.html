@@ -6,7 +6,7 @@
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'scan.title' | translate }}</ion-title>
-      <ion-title slot="end" *ngIf="isMultiQr">{{ numberOfQrsScanned }}/{{ numberOfQrsTotal }}</ion-title>
+      <ion-title slot="end" *ngIf="isMultiQr">{{ percentageScanned * 100 }}%</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
@@ -15,21 +15,24 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-text color="secondary">
       <p class="ion-padding ion-no-margin">
-        <ng-container *ngIf="!isMultiQr">
-          {{ 'scan.text' | translate }}
-        </ng-container>
-        <ng-container *ngIf="isMultiQr">
-          {{ 'scan.multi-qr_text' | translate }}
-        </ng-container>
+        <ng-container *ngIf="!isMultiQr">{{ 'scan.text' | translate }}</ng-container>
+        <ng-container *ngIf="isMultiQr">{{ 'scan.multi-qr_text' | translate }}</ng-container>
       </p>
     </ion-text>
     <ion-progress-bar *ngIf="isMultiQr" style="height: 8px" color="secondary" [value]="percentageScanned"></ion-progress-bar>
 
-    <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center ">
+    <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center">
       <ion-col class="guides--container content--align__center-center">
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
-      <zxing-scanner *ngIf="isBrowser || isElectron" #scanner (scanSuccess)="checkScan($event)"></zxing-scanner>
+      <zxing-scanner
+        #scanner
+        [formats]="['QR_CODE']"
+        [timeBetweenScans]="0"
+        [delayBetweenScanSuccess]="0"
+        *ngIf="isBrowser || isElectron"
+        (scanSuccess)="checkScan($event)"
+      ></zxing-scanner>
     </ion-row>
 
     <ion-row
