@@ -13,7 +13,7 @@ import {
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
-  generateIdV2,
+  generateId,
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
@@ -165,7 +165,7 @@ export class AppComponent implements AfterViewInit {
 
     const serializedTx: string | string[] = await this.serializerService.serialize([
       {
-        id: generateIdV2(10),
+        id: generateId(8),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
