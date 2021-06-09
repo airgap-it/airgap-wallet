@@ -40,7 +40,7 @@ export class AccountImportPage {
 
   public async ionViewWillEnter(): Promise<void> {
     if (this.route.snapshot.data.special) {
-      this.subscription = this.dataService.getImportWallet().subscribe(wallet => {
+      this.subscription = this.dataService.getImportWallet().subscribe((wallet) => {
         this.wallet = wallet
         this.ionViewDidEnter()
       })
@@ -49,7 +49,8 @@ export class AccountImportPage {
     await this.platform.ready()
 
     this.loading = await this.loadingCtrl.create({
-      message: 'Syncing...'
+      message: 'Syncing...',
+      backdropDismiss: true
     })
 
     this.loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -65,14 +66,16 @@ export class AccountImportPage {
         this.wallet.addressIndex
       )
       this.walletAlreadyExists = true
-      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
+      if (this.loading) {
+        this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
       return
     }
 
     const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
 
-    airGapWorker.onmessage = event => {
+    airGapWorker.onmessage = (event) => {
       this.wallet.addresses = event.data.addresses
       this.wallet
         .synchronize()
@@ -82,7 +85,9 @@ export class AccountImportPage {
           })
         })
         .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      if (this.loading) {
+        this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
     }
 
     airGapWorker.postMessage({
