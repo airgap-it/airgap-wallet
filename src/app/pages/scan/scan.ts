@@ -1,6 +1,6 @@
 import { IACHandlerStatus, IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, NgZone, ViewChild } from '@angular/core'
-import { Router } from '@angular/router'
+// import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -28,8 +28,7 @@ export class ScanPage extends ScanBasePage {
     protected scanner: QrScannerService,
     protected permissionsProvider: PermissionsService,
     private readonly iacService: IACService,
-    private readonly ngZone: NgZone,
-    private readonly router: Router
+    private readonly ngZone: NgZone // private readonly router: Router
   ) {
     super(platform, scanner, permissionsProvider)
   }
@@ -44,6 +43,7 @@ export class ScanPage extends ScanBasePage {
     this.parts = new Set()
     this.percentageScanned = 0
     this.isMultiQr = false
+    this.iacService.resetHandlers()
   }
 
   public async checkScan(data: string): Promise<boolean | void> {
@@ -70,12 +70,12 @@ export class ScanPage extends ScanBasePage {
         })
         .then((result: IACHandlerStatus) => {
           if (result === IACHandlerStatus.SUCCESS) {
-            this.router
-              .navigateByUrl('/')
-              .then(() => {
-                this.resetScannerPage()
-              })
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+            // this.router
+            //   .navigateByUrl('/')
+            //   .then(() => {
+            this.resetScannerPage()
+            // })
+            // .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           }
         })
         .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
