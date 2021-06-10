@@ -39,6 +39,7 @@ export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
 
   public async processData(data: string): Promise<P2PPairingRequest | undefined> {
     let payload = data
+
     if (await isValidUrl(data)) {
       const params: URLSearchParams = new URL(data).searchParams
       if (params && params.get('type') === 'tzip10') {
@@ -46,11 +47,20 @@ export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
       }
     }
 
-    const json: Record<string, unknown> = (await new Serializer().deserialize(payload)) as any
+    try {
+      const json: Record<string, unknown> = (await new Serializer().deserialize(payload)) as any
 
-    if (isBeaconMessage(json)) {
-      return json
-    }
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
+
+    try {
+      const json = JSON.parse(data)
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
 
     return undefined
   }
