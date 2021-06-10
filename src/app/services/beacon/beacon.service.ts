@@ -80,11 +80,11 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    generatedId: string,
+    generatedId: number,
     request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
     protocol: ICoinProtocol
   ): Promise<void> {
-    this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
+    this.storage.setCache(generatedId.toString(), [request, protocol.identifier, protocol.options.network.identifier])
   }
 
   public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
+import { IAirGapTransaction } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -12,7 +12,6 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 })
 export class TransactionQrPage {
   public preparedDataQR: string = ''
-  public wallet: AirGapMarketWallet = null
   public airGapTxs: IAirGapTransaction[] = null
   public isBrowser: boolean = false
   public qrDataTooBig: boolean = false
@@ -30,7 +29,6 @@ export class TransactionQrPage {
   constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly platform: Platform) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
-      this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.interactionData
       this.preparedDataQR = info.data

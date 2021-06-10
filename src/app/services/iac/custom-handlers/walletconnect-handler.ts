@@ -1,30 +1,30 @@
-import { IACMessageHandler } from '@airgap/angular-core'
-
+import { IACSinglePartHandler } from '@airgap/angular-core'
 import { WalletconnectService } from '../../walletconnect/walletconnect.service'
 
 /**
  * Handles walletconnect requests
  */
-export class WalletConnectHandler extends IACMessageHandler {
+export class WalletConnectHandler extends IACSinglePartHandler<string> {
   public readonly name: string = 'WalletConnectHandler'
 
   constructor(private readonly walletConnectService: WalletconnectService) {
     super()
   }
 
-  public async handle(data: string | string[]): Promise<boolean> {
-    // Check if it is a walletconnect request
+  public async handleComplete(): Promise<string> {
+    await this.walletConnectService.connect(this.payload)
 
+    return this.payload
+  }
+
+  public async processData(data: string): Promise<string | undefined> {
     const payload: string = Array.isArray(data) ? data[0] : data
     if (typeof payload === 'string' && payload.startsWith('wc')) {
-      await this.walletConnectService.connect(payload)
-
-      return true
+      return payload
     } else if (typeof payload === 'string' && payload.startsWith('airgap-wallet://wc?uri=')) {
-      await this.walletConnectService.connect(payload.replace('airgap-wallet://wc?uri=', ''))
-      return true
+      return payload.replace('airgap-wallet://wc?uri=', '')
     }
 
-    return false
+    return undefined
   }
 }

@@ -236,7 +236,7 @@
     }
   },
   "transaction-qr": {
-    "title": "{{title}} Transaction QR",
+    "title": "Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
     "done_label": "Done",
     "details": "Display details"

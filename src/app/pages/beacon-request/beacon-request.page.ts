@@ -14,8 +14,7 @@ import { Router } from '@angular/router'
 import { AlertController, ModalController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  generateIdV2,
-  IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
@@ -33,6 +32,7 @@ import { ErrorPage } from '../error/error.page'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { TranslateService } from '@ngx-translate/core'
 import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
+import { generateId } from '@airgap/coinlib-core'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -278,11 +278,11 @@ export class BeaconRequestPage implements OnInit {
       this.blake2bHash = await cryptoClient.blake2bLedgerHash(request.payload)
     } catch {}
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     const clonedRequest = { ...request }
-    clonedRequest.id = generatedId
+    // clonedRequest.id = generatedId // TODO: Remove?
 
     this.responseHandler = async () => {
       const info = {
@@ -324,7 +324,7 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
@@ -354,7 +354,7 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
@@ -362,7 +362,7 @@ export class BeaconRequestPage implements OnInit {
       transaction: signedTx
     })
 
-    const messageDefinitionObject: IACMessageDefinitionObject = {
+    const messageDefinitionObject: IACMessageDefinitionObjectV3 = {
       id: generatedId,
       type: IACMessageType.MessageSignResponse,
       protocol: MainProtocolSymbols.XTZ,

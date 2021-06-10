@@ -128,7 +128,7 @@ export class WalletconnectPage implements OnInit {
     }
 
     const requestId = new BigNumber(request.id).toString()
-    const generatedId = generateId(10)
+    const generatedId = generateId(8)
     const protocol = new EthereumProtocol()
 
     this.beaconRequest = {
@@ -212,7 +212,7 @@ export class WalletconnectPage implements OnInit {
       id: request.id
     }
 
-    const generatedId = await generateId(10)
+    const generatedId = await generateId(8)
 
     this.beaconService.addVaultRequest(generatedId, walletConnectRequest, protocol)
     this.transactions = await ethereumProtocol.getTransactionDetails({
@@ -221,12 +221,12 @@ export class WalletconnectPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const serializedChunks: string[] = await this.operationService.serializeTransactionSignRequest(
+      const serializedChunks: string[] = (await this.operationService.serializeTransactionSignRequest(
         selectedWallet,
         transaction,
         IACMessageType.TransactionSignRequest,
         generatedId
-      )
+      )) as any // TODO: FIX, THIS IS NOT WORKING NOW
 
       const info = {
         wallet: selectedWallet,
@@ -235,7 +235,7 @@ export class WalletconnectPage implements OnInit {
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(err => console.error(err))
+      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch((err) => console.error(err))
     }
   }
 
