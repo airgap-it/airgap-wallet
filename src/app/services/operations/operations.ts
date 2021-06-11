@@ -323,56 +323,60 @@ export class OperationsProvider {
     })
   }
 
-  public async serializeSignRequest(
+  public async prepareSignRequest(
     wallet: AirGapMarketWallet,
     serializableData: any,
     type: IACMessageType,
     generatedId: number
-  ): Promise<IACMessageDefinitionObjectV3> {
+  ): Promise<IACMessageDefinitionObjectV3[]> {
     switch (type) {
       case IACMessageType.MessageSignRequest:
-        return this.serializeMessageSignRequest(wallet, serializableData, type, generatedId)
+        return this.prepareMessageSignRequest(wallet, serializableData, type, generatedId)
       default:
-        return this.serializeTransactionSignRequest(wallet, serializableData, type, generatedId)
+        return this.prepareTransactionSignRequest(wallet, serializableData, type, generatedId)
     }
   }
 
-  public async serializeTransactionSignRequest(
+  public async prepareTransactionSignRequest(
     wallet: AirGapMarketWallet,
     transaction: SerializableTx,
     type: IACMessageType,
     generatedId: number
-  ): Promise<IACMessageDefinitionObjectV3> {
+  ): Promise<IACMessageDefinitionObjectV3[]> {
     const payload = {
       publicKey: wallet.publicKey,
       transaction: transaction as any, // TODO: Type
       callbackURL: 'airgap-wallet://?d='
     }
-    return {
-      id: generatedId,
-      protocol: wallet.protocol.identifier,
-      type: type,
-      payload: payload
-    }
+    return [
+      {
+        id: generatedId,
+        protocol: wallet.protocol.identifier,
+        type: type,
+        payload: payload
+      }
+    ]
   }
 
-  public async serializeMessageSignRequest(
+  public async prepareMessageSignRequest(
     wallet: AirGapMarketWallet,
     request: SignPayloadRequestOutput,
     type: IACMessageType,
     generatedId: number
-  ): Promise<IACMessageDefinitionObjectV3> {
+  ): Promise<IACMessageDefinitionObjectV3[]> {
     const payload = {
       publicKey: wallet.publicKey,
       message: request.payload,
       callbackURL: 'airgap-wallet://?d='
     }
-    return {
-      id: generatedId,
-      protocol: wallet.protocol.identifier,
-      type: type,
-      payload: payload
-    }
+    return [
+      {
+        id: generatedId,
+        protocol: wallet.protocol.identifier,
+        type: type,
+        payload: payload
+      }
+    ]
   }
 
   public async checkDelegated(protocol: ICoinDelegateProtocol, address: string): Promise<boolean> {

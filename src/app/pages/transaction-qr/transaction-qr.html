@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}</ion-title>
+      <ion-title *ngIf="wallet">{{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
@@ -18,7 +18,13 @@
     <ion-row class="ion-justify-content-center ion-padding-vertical">
       <!-- <airgap-qr id="qr" *ngIf="!qrDataTooBig" [qrdata]="preparedDataQR" [size]="320"></airgap-qr> -->
 
-      <airgap-iac-qr id="qr" *ngIf="!qrDataTooBig" [messageDefinitionObjects]="[preparedDataQR]" [level]="'L'" [size]="300"></airgap-iac-qr>
+      <airgap-iac-qr
+        id="qr"
+        *ngIf="!qrDataTooBig"
+        [messageDefinitionObjects]="messageDefinitionObjects"
+        [level]="'L'"
+        [size]="300"
+      ></airgap-iac-qr>
 
       <ion-text>
         <h1 *ngIf="qrDataTooBig">{{ 'transaction-qr.qr-data-too-big_warning' | translate }}</h1>
@@ -64,7 +70,7 @@
       </ion-row>
     </ng-container>
 
-    <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction>
+    <!-- <signed-transaction *ngIf="!airGapTxs" [syncProtocolString]="preparedDataQR"></signed-transaction> -->
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">

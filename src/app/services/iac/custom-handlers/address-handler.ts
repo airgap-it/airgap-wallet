@@ -10,7 +10,7 @@ import { ErrorCategory, handleErrorSentry } from '../../sentry-error-handler/sen
 /**
  * Handles addresses and bitcoin style payment requests
  */
-export class AddressHandler extends IACMessageHandler {
+export class AddressHandler extends IACMessageHandler<boolean> {
   public readonly name: string = 'AddressHandler'
 
   constructor(

@@ -1,12 +1,21 @@
-import { BaseIACService, ClipboardService, DeeplinkService, ProtocolService, UiEventElementsService } from '@airgap/angular-core'
+import {
+  AppConfig,
+  APP_CONFIG,
+  BaseIACService,
+  ClipboardService,
+  DeeplinkService,
+  ProtocolService,
+  UiEventElementsService
+} from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
-import { Injectable } from '@angular/core'
+import { Inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import {
   AccountShareResponse,
   AirGapMarketWallet,
   AirGapWalletStatus,
   IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   MessageSignResponse
 } from '@airgap/coinlib-core'
@@ -35,14 +44,16 @@ export class IACService extends BaseIACService {
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
-    private readonly router: Router
+    private readonly router: Router,
+    @Inject(APP_CONFIG) public readonly appConfig: AppConfig
   ) {
     super(
       uiEventElementsService,
       clipboard,
       Promise.resolve(),
       [new BeaconHandler(beaconService), new AddressHandler(accountProvider, dataService, router)],
-      deeplinkService
+      deeplinkService,
+      appConfig
     )
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse as any] = this.handleWalletSync.bind(this)
@@ -50,9 +61,10 @@ export class IACService extends BaseIACService {
     this.serializerMessageHandlers[IACMessageType.MessageSignResponse as any] = this.handleMessageSignResponse.bind(this)
   }
 
-  public async relay(data: string | string[]): Promise<void> {
+  public async relay(data: { messages: IACMessageDefinitionObjectV3[] }): Promise<void> {
     const info = {
-      data
+      data: data.messages,
+      isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

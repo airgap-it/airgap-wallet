@@ -28,7 +28,7 @@ const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promi
  *
  * This request is a stringified json with the properties "publicKey", "relayServer" and "name"
  */
-export class BeaconHandler extends IACMessageHandler {
+export class BeaconHandler extends IACMessageHandler<boolean> {
   public readonly name: string = 'BeaconHandler'
 
   constructor(private readonly beaconService: BeaconService) {
