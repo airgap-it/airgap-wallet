@@ -17,7 +17,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 export class InteractionSelectionPage {
   public isDesktop: boolean = false
   public isLedgerSupported: boolean = false
-
+  public isRelay: boolean = false
   public interactionData: any
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
@@ -40,12 +40,13 @@ export class InteractionSelectionPage {
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
       this.type = info.type
+      this.isRelay = info.isRelay ?? this.isRelay
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
     }
   }
 
   public async offlineDeviceSign() {
-    const dataQR = await this.prepareQRData({} as IACMessageDefinitionObjectV3)
+    const dataQR = await this.prepareQRData()
     const info = {
       wallet: this.wallet,
       airGapTxs: this.airGapTxs,
@@ -57,9 +58,9 @@ export class InteractionSelectionPage {
   }
 
   public async sameDeviceSign() {
-    const dataQR = await this.prepareQRData({} as IACMessageDefinitionObjectV3)
+    const dataQR = await this.prepareQRData()
     this.deeplinkService
-      .sameDeviceDeeplink([dataQR])
+      .sameDeviceDeeplink(dataQR)
       .then(() => {
         this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
       })
@@ -76,14 +77,12 @@ export class InteractionSelectionPage {
     this.router.navigateByUrl('/ledger-sign/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private async prepareQRData<T extends string | IACMessageDefinitionObjectV3>(type: T): Promise<T> {
-    if (typeof type === 'string' && this.interactionData.includes('://')) {
+  private async prepareQRData(): Promise<IACMessageDefinitionObjectV3[]> {
+    if (this.isRelay) {
       return this.interactionData
     }
-
     const generatedId = generateId(8)
-    // TODO return string | IACMessageDefinitionObject
-    return this.operations.serializeSignRequest(this.wallet, this.interactionData, this.type, generatedId).catch((error) => {
+    return this.operations.prepareSignRequest(this.wallet, this.interactionData, this.type, generatedId).catch((error) => {
       console.warn(`Could not serialize transaction: ${error}`)
       // TODO: Show error (toast)
 

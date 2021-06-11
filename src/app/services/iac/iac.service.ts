@@ -72,7 +72,8 @@ export class IACService extends BaseIACService {
 
   public async relay(data: RelayMessage): Promise<void> {
     const info = {
-      data
+      data: (data as any).messages, // TODO: Fix types
+      isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

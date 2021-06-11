@@ -221,7 +221,7 @@ export class WalletconnectPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const serializedChunks: string[] = (await this.operationService.serializeTransactionSignRequest(
+      const serializedChunks: string[] = (await this.operationService.prepareTransactionSignRequest(
         selectedWallet,
         transaction,
         IACMessageType.TransactionSignRequest,
