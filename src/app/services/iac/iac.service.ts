@@ -119,12 +119,14 @@ export class IACService extends BaseIACService {
   }
 
   private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
-    const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
+    const requestId = deserializedMessages[0].id
+    const cachedRequest = await this.beaconService.getVaultRequest(requestId)
+
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
     const protocol: ProtocolSymbols = deserializedMessages[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
-      id: cachedRequest[0].id,
+      id: cachedRequest[0] ? cachedRequest[0].id : requestId,
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
