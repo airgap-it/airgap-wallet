@@ -66,7 +66,7 @@ export class WalletconnectService {
     private readonly translateService: TranslateService
   ) {
     try {
-      getCachedSession().then(session => {
+      getCachedSession().then((session) => {
         if (session) {
           this.connector = new WalletConnect({ session })
           this.subscribeToEvents()
@@ -85,7 +85,13 @@ export class WalletconnectService {
         name: 'AirGap'
       }
     })
+
+    if (!this.connector.connected) {
+      await this.connector.createSession()
+    }
+
     this.presentLoading()
+
     await this.subscribeToEvents()
   }
 
@@ -145,10 +151,10 @@ export class WalletconnectService {
   }
 
   public async removePermission(): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (this.connector) {
         this.connector.killSession()
-        this.connector.on('disconnect', error => {
+        this.connector.on('disconnect', (error) => {
           if (error) {
             throw error
           }

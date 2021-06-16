@@ -18,13 +18,13 @@ import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { OperationsProvider } from 'src/app/services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
   ETH_SENDTRANSACTION = 'eth_sendTransaction',
-  PERSONAL_SIGN_REQUEST = 'personal_sign'
+  PERSONAL_SIGN_REQUEST = 'personal_sign',
+  ETH_SIGN_TYPED_DATA = 'eth_signTypedData'
 }
 
 interface JSONRPC<T = unknown> {
@@ -81,8 +81,7 @@ export class WalletconnectPage implements OnInit {
     private readonly dataService: DataService,
     private readonly router: Router,
     private readonly beaconService: BeaconService,
-    private readonly translateService: TranslateService,
-    private readonly operationService: OperationsProvider
+    private readonly translateService: TranslateService
   ) {}
 
   public get address(): string {
@@ -107,18 +106,23 @@ export class WalletconnectPage implements OnInit {
       this.title = this.translateService.instant('walletconnect.sign_request')
       await this.signRequest(this.request as JSONRPC<string>)
     }
+
+    if (this.request && this.request.method === Methods.ETH_SIGN_TYPED_DATA) {
+      this.title = this.translateService.instant('walletconnect.sign_request')
+      await this.signRequest(this.request as JSONRPC<string>, true)
+    }
   }
 
   public async done(): Promise<void> {
     if (this.responseHandler) {
       await this.responseHandler()
     }
-    await this.dismiss()
+    await this.dismissModal()
   }
 
-  private async signRequest(request: JSONRPC<string>) {
-    const message = request.params[0]
-    const address = request.params[1]
+  private async signRequest(request: JSONRPC<string>, signTypedData: boolean = false) {
+    const message = request.params[signTypedData ? 1 : 0]
+    const address = request.params[signTypedData ? 0 : 1]
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
@@ -173,10 +177,14 @@ export class WalletconnectPage implements OnInit {
 
     this.responseHandler = async (): Promise<void> => {
       // Approve Session
-      this.connector.approveSession({
-        accounts: [this.address],
-        chainId: 1
-      })
+      const approveData = {
+        chainId: 1,
+        accounts: [this.address]
+      }
+
+      if (this.connector) {
+        this.connector.approveSession(approveData)
+      }
     }
   }
 
@@ -203,7 +211,7 @@ export class WalletconnectPage implements OnInit {
       gasLimit: `0x${(300000).toString(16)}`,
       to: eth.to,
       value: eth.value,
-      chainId: 0x1,
+      chainId: 1,
       data: eth.data
     }
 
@@ -221,17 +229,11 @@ export class WalletconnectPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const serializedChunks: string[] = (await this.operationService.prepareTransactionSignRequest(
-        selectedWallet,
-        transaction,
-        IACMessageType.TransactionSignRequest,
-        generatedId
-      )) as any // TODO: FIX, THIS IS NOT WORKING NOW
-
       const info = {
         wallet: selectedWallet,
         airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
-        data: serializedChunks
+        data: transaction,
+        type: IACMessageType.TransactionSignRequest
       }
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -239,8 +241,12 @@ export class WalletconnectPage implements OnInit {
     }
   }
 
-  public async dismiss(): Promise<void> {
+  public async dismissModal(): Promise<void> {
     this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public async dismiss(): Promise<void> {
+    this.dismissModal()
     this.rejectRequest(this.request.id)
   }
 

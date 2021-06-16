@@ -23,7 +23,10 @@
       </ng-container>
     </div>
 
-    <div *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST" class="request--container">
+    <div
+      *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST || request.method === requestMethod.ETH_SIGN_TYPED_DATA"
+      class="request--container"
+    >
       <ion-row class="rawdata--container">
         <ion-col class="ion-no-padding">
           <pre class="ion-no-margin">{{ beaconRequest | json }}</pre>
@@ -32,12 +35,8 @@
     </div>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="secondary" (click)="dismiss()">
-      Cancel
-    </ion-button>
+    <ion-button shape="round" color="secondary" (click)="dismiss()">Cancel</ion-button>
 
-    <ion-button shape="round" color="primary" (click)="done()">
-      Ok
-    </ion-button>
+    <ion-button shape="round" color="primary" (click)="done()">Ok</ion-button>
   </ion-fab>
 </ion-content>
