@@ -733,7 +733,12 @@
   "walletconnect": {
     "connection_request": "WalletConnect - Connection Request",
     "new_transaction": "WalletConnect - New Transaction",
-    "sign_request": "WalletConnect - Sign Request"
+    "sign_request": "WalletConnect - Sign Request",
+    "sign_typed_data": "WalletConnect - Sign Typed Data",
+    "alert": {
+      "title": "Not supported",
+      "message": "eth_signTypedData is currently not supported"
+    }
   },
   "health-check": {
     "title": "Health Check", 

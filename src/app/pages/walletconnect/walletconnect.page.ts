@@ -11,7 +11,7 @@ import {
 import { RawEthereumTransaction } from '@airgap/coinlib-core/serializer/types'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { ModalController } from '@ionic/angular'
+import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
@@ -80,6 +80,7 @@ export class WalletconnectPage implements OnInit {
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
+    private readonly alertCtrl: AlertController,
     private readonly beaconService: BeaconService,
     private readonly translateService: TranslateService
   ) {}
@@ -108,8 +109,8 @@ export class WalletconnectPage implements OnInit {
     }
 
     if (this.request && this.request.method === Methods.ETH_SIGN_TYPED_DATA) {
-      this.title = this.translateService.instant('walletconnect.sign_request')
-      await this.signRequest(this.request as JSONRPC<string>, true)
+      this.title = this.translateService.instant('walletconnect.sign_typed_data')
+      await this.notSupportedAlert()
     }
   }
 
@@ -120,9 +121,10 @@ export class WalletconnectPage implements OnInit {
     await this.dismissModal()
   }
 
-  private async signRequest(request: JSONRPC<string>, signTypedData: boolean = false) {
-    const message = request.params[signTypedData ? 1 : 0]
-    const address = request.params[signTypedData ? 0 : 1]
+  private async signRequest(request: JSONRPC<string>) {
+    const message = request.params[0]
+    const address = request.params[1]
+    console.log(address)
     const selectedWallet: AirGapMarketWallet = this.accountService
       .getWalletList()
       .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
@@ -257,6 +259,24 @@ export class WalletconnectPage implements OnInit {
         message: 'USER_REJECTION' // optional
       }
     })
+  }
+
+  private async notSupportedAlert() {
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('walletconnect.alert.title'),
+      message: this.translateService.instant('walletconnect.alert.message'),
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'ok',
+          role: 'cancel',
+          handler: () => {
+            this.dismiss()
+          }
+        }
+      ]
+    })
+    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
   async setWallet(wallet: AirGapMarketWallet) {
