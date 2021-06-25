@@ -6,7 +6,7 @@
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'scan.title' | translate }}</ion-title>
-      <h1 slot="end" *ngIf="isMultiQr">{{ percentageScanned | percentage }}</h1>
+      <ion-text slot="end" *ngIf="isMultiQr">{{ percentageScanned | percentage }}</ion-text>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
