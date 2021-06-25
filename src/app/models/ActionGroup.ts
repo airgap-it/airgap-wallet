@@ -1,4 +1,4 @@
-import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
@@ -219,6 +219,7 @@ export class ActionGroup {
       return wallet
     }
 
+    const xtzWalletGroup = this.callerContext.accountProvider.findWalletGroup(xtzWallet)
     const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
 
     wallet = new AirGapMarketWallet(
@@ -226,14 +227,20 @@ export class ActionGroup {
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,
       xtzWallet.derivationPath,
-      '',
-      AirGapWalletStatus.ACTIVE,
+      xtzWallet.masterFingerprint,
+      xtzWallet.status,
       xtzWallet.priceService,
       index
     )
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.callerContext.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    await this.callerContext.accountProvider
+      .addWallet(
+        wallet,
+        xtzWalletGroup !== undefined ? xtzWalletGroup.id : undefined,
+        xtzWalletGroup !== undefined ? xtzWalletGroup.label : undefined
+      )
+      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
 
     return wallet
   }

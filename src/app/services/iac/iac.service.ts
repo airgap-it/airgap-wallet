@@ -22,6 +22,7 @@ import {
   ProtocolSymbols
 } from '@airgap/coinlib-core'
 
+import { AccountSync } from '../../types/AccountSync'
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
 import { DataService, DataServiceKey } from '../data/data.service'
@@ -82,21 +83,35 @@ export class IACService extends BaseIACService {
   public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
     this.storageSerivce.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
-    // TODO: handle multiple messages
-    const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
-    const protocol = await this.protocolService.getProtocol(deserializedSyncs[0].protocol)
-    const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      protocol,
-      walletSync.publicKey,
-      walletSync.isExtendedPublicKey,
-      walletSync.derivationPath,
-      '',
-      AirGapWalletStatus.ACTIVE,
-      this.priceService
+    const accountSyncs: AccountSync[] = await Promise.all(
+      deserializedSyncs.map(async (deserializedSync: IACMessageDefinitionObject) => {
+        const accountShare: AccountShareResponse = deserializedSync.payload as AccountShareResponse
+        const protocol = await this.protocolService.getProtocol(deserializedSync.protocol)
+        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+          protocol,
+          accountShare.publicKey,
+          accountShare.isExtendedPublicKey,
+          accountShare.derivationPath,
+          accountShare.masterFingerprint || /* backwards compatibility */ '',
+          accountShare.isActive === undefined
+            ? /* backwards compatibility */ AirGapWalletStatus.ACTIVE
+            : accountShare.isActive
+            ? AirGapWalletStatus.ACTIVE
+            : AirGapWalletStatus.HIDDEN,
+          this.priceService
+        )
+
+        return {
+          wallet,
+          groupId: accountShare.groupId,
+          groupLabel: accountShare.groupLabel
+        }
+      })
     )
+
     if (this.router) {
-      this.dataService.setData(DataServiceKey.WALLET, wallet)
-      this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
+      this.router.navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       return true
     }

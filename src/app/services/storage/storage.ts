@@ -1,9 +1,10 @@
 import { BaseStorage } from '@airgap/angular-core'
 import { Network } from '@airgap/beacon-sdk'
-import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 
+import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { ExchangeTransaction } from '../exchange/exchange'
 
 export type BeaconRequest = [string, any, ICoinProtocol]
@@ -22,20 +23,11 @@ export enum WalletStorageKey {
   PUSH_INTRODUCTION = 'pushIntroduction',
   EXCHANGE_INTEGRATION = 'exchangeIntroduction',
   WALLET = 'wallets',
+  WALLET_GROUPS = 'walletGroups',
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
   BEACON_REQUESTS = 'BEACON_REQUESTS'
-}
-
-interface SerializedAirGapWallet {
-  protocolIdentifier: ProtocolSymbols
-  networkIdentifier: string
-  publicKey: string
-  isExtendedPublicKey: boolean
-  derivationPath: string
-  addresses: string[]
-  addressIndex?: number
 }
 
 interface IBroadcastTransaction {
@@ -52,6 +44,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.PUSH_INTRODUCTION]: boolean
   [WalletStorageKey.EXCHANGE_INTEGRATION]: boolean
   [WalletStorageKey.WALLET]: SerializedAirGapWallet[] | undefined
+  [WalletStorageKey.WALLET_GROUPS]: SerializedAirGapMarketWalletGroup[] | undefined
   [WalletStorageKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
   [WalletStorageKey.USER_ID]: string | undefined
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
@@ -68,6 +61,7 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.PUSH_INTRODUCTION]: false,
   [WalletStorageKey.EXCHANGE_INTEGRATION]: false,
   [WalletStorageKey.WALLET]: undefined,
+  [WalletStorageKey.WALLET_GROUPS]: undefined,
   [WalletStorageKey.LAST_TX_BROADCAST]: undefined,
   [WalletStorageKey.USER_ID]: undefined,
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: [],

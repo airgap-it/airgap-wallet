@@ -5,13 +5,12 @@ import {
   ProtocolService,
   SubProtocolStoreService
 } from '@airgap/angular-core'
-import { TestBed } from '@angular/core/testing'
 import { AirGapMarketWallet, AirGapWalletStatus, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
 import { take } from 'rxjs/operators'
-import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
-
-import { PriceServiceMock } from '../../../../test-config/wallet-mock'
+import { TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { PriceServiceMock } from '../../../../test-config/wallet-mock'
+import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 import { AccountProvider } from '../../services/account/account.provider'
 
 describe('AccountProvider', () => {
@@ -114,9 +113,9 @@ describe('AccountProvider', () => {
       new PriceServiceMock()
     )
     await accountProvider.removeWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(0)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
     await accountProvider.addWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(1)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 
   it('should update wallet observalbe when adding a wallet', async (done) => {
@@ -131,7 +130,7 @@ describe('AccountProvider', () => {
     )
 
     let numOfTimesCalled: number = 0
-    accountProvider.wallets.subscribe(() => {
+    accountProvider.wallets$.subscribe(() => {
       numOfTimesCalled++
       if (numOfTimesCalled >= 3) {
         // Needs to be 3 times
@@ -143,8 +142,8 @@ describe('AccountProvider', () => {
     })
 
     await accountProvider.removeWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(0)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
     await accountProvider.addWallet(wallet)
-    expect(accountProvider.getWalletList().length).toEqual(1)
+    expect(accountProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 })

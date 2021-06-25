@@ -4,16 +4,17 @@ import {
   APP_CONFIG,
   APP_INFO_PLUGIN,
   APP_PLUGIN,
-  CLIPBOARD_PLUGIN,
   ClipboardService,
+  CLIPBOARD_PLUGIN,
   DeeplinkService,
-  PERMISSIONS_PLUGIN,
   PermissionsService,
+  PERMISSIONS_PLUGIN,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
+import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -24,6 +25,8 @@ import { RouteReuseStrategy } from '@angular/router'
 import { Plugins } from '@capacitor/core'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
+import { EffectsModule } from '@ngrx/effects'
+import { StoreModule } from '@ngrx/store'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
@@ -31,6 +34,7 @@ import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
+import * as fromRoot from './app.reducers'
 import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
@@ -48,6 +52,9 @@ import { AccountProvider } from './services/account/account.provider'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
+import { ProtocolGuard } from './services/guard/protocol.guard'
+import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
+import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { IACService } from './services/iac/iac.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
@@ -55,9 +62,6 @@ import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { CoinlibService } from './services/coinlib/coinlib.service'
-import { ProtocolGuard } from './services/guard/protocol.guard'
-import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
-import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { WalletStorageService } from './services/storage/storage'
 import { IonicStorageModule } from '@ionic/storage'
 
@@ -77,6 +81,16 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     FormsModule,
     CommonModule,
     AirGapAngularCoreModule,
+    AirGapAngularNgRxModule,
+    StoreModule.forRoot(fromRoot.reducers, {
+      metaReducers: fromRoot.metaReducers,
+      /* temporary fix for `ERROR TypeError: Cannot freeze array buffer views with elements` */
+      runtimeChecks: {
+        strictStateImmutability: false,
+        strictActionImmutability: false
+      }
+    }),
+    EffectsModule.forRoot(),
     ZXingScannerModule,
     MomentModule,
     IonicModule.forRoot(),

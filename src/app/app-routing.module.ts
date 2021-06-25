@@ -198,6 +198,11 @@ const routes: Routes = [
   {
     path: 'health-check',
     loadChildren: () => import('./pages/health-check/health-check.module').then(m => m.HealthCheckPageModule)
+    
+  },
+  { 
+    path: 'account-activate/:id/:protocolID',
+    loadChildren: () => import('./pages/account-activate/account-activate.module').then(m => m.AccountActivatePageModule)
   }
 ]
 @NgModule({

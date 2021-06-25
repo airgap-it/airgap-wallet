@@ -11,6 +11,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
+import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -34,6 +35,8 @@ export class PortfolioPage {
   public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
   public isDesktop: boolean = false
 
+  public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
+
   constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
@@ -43,7 +46,7 @@ export class PortfolioPage {
   ) {
     this.isDesktop = !this.platform.is('hybrid')
 
-    this.wallets = this.walletsProvider.wallets.asObservable()
+    this.wallets = this.walletsProvider.wallets$.asObservable()
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
@@ -61,27 +64,29 @@ export class PortfolioPage {
 
     const walletMap: Map<string, WalletGroup> = new Map()
 
-    wallets.forEach((wallet: AirGapMarketWallet) => {
-      const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
-      const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
+    wallets
+      .filter((wallet: AirGapWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+      .forEach((wallet: AirGapMarketWallet) => {
+        const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
+        const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
 
-      const walletKey: string = `${wallet.publicKey}_${identifier}`
+        const walletKey: string = `${wallet.publicKey}_${identifier}`
 
-      if (walletMap.has(walletKey)) {
-        const group: WalletGroup = walletMap.get(walletKey)
-        if (isSubProtocol) {
-          group.subWallets.push(wallet)
+        if (walletMap.has(walletKey)) {
+          const group: WalletGroup = walletMap.get(walletKey)
+          if (isSubProtocol) {
+            group.subWallets.push(wallet)
+          } else {
+            group.mainWallet = wallet
+          }
         } else {
-          group.mainWallet = wallet
+          if (isSubProtocol) {
+            walletMap.set(walletKey, { mainWallet: undefined, subWallets: [wallet] })
+          } else {
+            walletMap.set(walletKey, { mainWallet: wallet, subWallets: [] })
+          }
         }
-      } else {
-        if (isSubProtocol) {
-          walletMap.set(walletKey, { mainWallet: undefined, subWallets: [wallet] })
-        } else {
-          walletMap.set(walletKey, { mainWallet: wallet, subWallets: [] })
-        }
-      }
-    })
+      })
 
     walletMap.forEach((value: WalletGroup) => {
       groups.push(value)
@@ -131,7 +136,7 @@ export class PortfolioPage {
     console.log(info)
     this.router
       .navigateByUrl(
-        `/account-transaction-list/${DataServiceKey.WALLET}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
+        `/account-transaction-list/${DataServiceKey.ACCOUNTS}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
         }`
       )
