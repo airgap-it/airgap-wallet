@@ -80,12 +80,29 @@ export class AccountImportPage implements OnDestroy {
   }
 
   public async ionViewDidEnter(): Promise<void> {
-    this.allAccountImports.forEach((accountImport: AccountImport) => {
-      accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
-      const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
+    const message = this.allAccountImports.map((accountImport) => {
+      return {
+        protocolIdentifier: accountImport.wallet.protocol.identifier,
+        publicKey: accountImport.wallet.publicKey,
+        isExtendedPublicKey: accountImport.wallet.isExtendedPublicKey,
+        derivationPath: accountImport.wallet.derivationPath,
+        masterFingerprint: accountImport.wallet.masterFingerprint,
+        status: accountImport.wallet.status
+      }
+    })
 
-      airGapWorker.onmessage = event => {
-        accountImport.wallet.addresses = event.data.addresses
+    const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
+
+    airGapWorker.postMessage(message)
+
+    airGapWorker.onmessage = (event) => {
+      const derivedAddressesMap = event.data
+
+      this.allAccountImports.forEach((accountImport: AccountImport) => {
+        accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
+
+        const key = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
+        accountImport.wallet.addresses = derivedAddressesMap[key]
         accountImport.wallet
           .synchronize()
           .then(() => {
@@ -98,17 +115,8 @@ export class AccountImportPage implements OnDestroy {
           })
           .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
         this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      }
-
-      airGapWorker.postMessage({
-        protocolIdentifier: accountImport.wallet.protocol.identifier,
-        publicKey: accountImport.wallet.publicKey,
-        isExtendedPublicKey: accountImport.wallet.isExtendedPublicKey,
-        derivationPath: accountImport.wallet.derivationPath,
-        masterFingerprint: accountImport.wallet.masterFingerprint,
-        status: accountImport.wallet.status
       })
-    })
+    }
   }
 
   public ngOnDestroy(): void {
