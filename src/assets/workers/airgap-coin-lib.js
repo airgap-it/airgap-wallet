@@ -17,7 +17,6 @@ self.onmessage = event => {
 
   airgapCoinLib.isCoinlibReady().then(async() => {
     const wallets = event.data;
-    const derivedAddressesMap = {}
 
     Promise.all(wallets.map(wallet => {
       const protocol = airgapCoinLib.getProtocolByIdentifier(wallet.protocolIdentifier)
@@ -32,13 +31,10 @@ self.onmessage = event => {
       );
       return airGapWallet.deriveAddresses(50).then(addresses => {
         return {addresses: addresses, key: `${wallet.protocolIdentifier}_${wallet.publicKey}`}
-
       })
     })).then(async (addressesByKeys) => {
-      addressesByKeys.forEach(addressesByKey => {
-        derivedAddressesMap[addressesByKey.key] = addressesByKey.addresses
-      })
-      self.postMessage( derivedAddressesMap );
+      const derivedAddressesMap = addressesByKeys.reduce((obj, addressesByKey) => Object.assign(obj, { [addressesByKey.key]: addressesByKey.addresses }), {})
+      self.postMessage(derivedAddressesMap);
     })
   })
 
