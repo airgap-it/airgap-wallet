@@ -2,7 +2,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet, AirGapWalletStatus } from '@airgap/coinlib-core'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { SubProtocolType, ICoinSubProtocol } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
 import { assertNever } from '@airgap/coinlib-core/utils/assert'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
@@ -11,10 +11,13 @@ import { PriceService } from 'src/app/services/price/price.service'
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import BigNumber from 'bignumber.js'
+import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 export interface IAccountWrapper {
   selected: boolean
   wallet: AirGapMarketWallet
+  groupId?: string
+  groupLabel?: string
 }
 
 @Component({
@@ -108,13 +111,14 @@ export class SubAccountAddPage {
 
     const accounts: IAccountWrapper[] = balances
       .map((balance, index) => {
+        const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
         const wallet: AirGapMarketWallet = new AirGapMarketWallet(
           subProtocols[index],
           this.wallet.publicKey,
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath,
-          '',
-          AirGapWalletStatus.ACTIVE,
+          this.wallet.masterFingerprint,
+          this.wallet.status,
           this.priceService
         )
         if (this.accountProvider.walletExists(wallet)) {
@@ -123,7 +127,12 @@ export class SubAccountAddPage {
         wallet.addresses = this.wallet.addresses
         wallet.currentBalance = new BigNumber(balance)
 
-        return { wallet, selected: false }
+        return {
+          wallet,
+          selected: false,
+          groupId: walletGroup !== undefined ? walletGroup.id : undefined,
+          groupLabel: walletGroup !== undefined ? walletGroup.label : undefined
+        }
       })
       .filter((account) => account !== undefined)
       .sort((a, b) => a.wallet.currentBalance.minus(b.wallet.currentBalance).toNumber() * -1)

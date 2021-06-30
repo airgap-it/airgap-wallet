@@ -119,7 +119,7 @@ export class AppComponent implements AfterViewInit {
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
       // TODO: Use wallet changed observable?
-      const sub: Subscription = this.accountProvider.wallets.subscribe(async () => {
+      const sub: Subscription = this.accountProvider.wallets$.subscribe(async () => {
         await this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()

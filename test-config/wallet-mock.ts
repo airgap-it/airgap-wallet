@@ -1,13 +1,14 @@
-import {
+
+import { 
   AirGapMarketWallet,
-  AirGapWalletStatus,
   BitcoinProtocol,
   EthereumProtocol,
   IAirGapTransaction,
-  ICoinProtocol
+  ICoinProtocol,
+  MainProtocolSymbols
 } from '@airgap/coinlib-core'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import BigNumber from 'bignumber.js'
 
 // tslint:disable:max-classes-per-file

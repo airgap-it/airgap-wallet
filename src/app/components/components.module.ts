@@ -15,6 +15,7 @@ import { AmountComponent } from './amount/amount.component'
 import { CardActionableComponent } from './card-actionable/card-actionable'
 import { ChartComponent } from './chart/chart.component'
 import { CurrencyItemComponent } from './currency-item/currency-item'
+import { CurrentWalletGroupComponent } from './current-wallet-group/current-wallet-group.component'
 import { DelegateActionPopoverComponent } from './delegate-action-popover copy/delegate-action-popover.component'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
@@ -48,6 +49,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     CurrencyItemComponent,
     DelegateActionPopoverComponent,
     DelegateEditPopoverComponent,
+    CurrentWalletGroupComponent,
 
     TransactionListComponent,
     TransactionItemComponent,
@@ -87,6 +89,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TezosDelegationCard,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
+    CurrentWalletGroupComponent,
 
     TransactionListComponent,
     TransactionItemComponent,

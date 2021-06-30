@@ -264,11 +264,16 @@
   },
   "account-import": {
     "title": "Confirm Import",
-    "text": "Would you like to import the following account?",
+    "import-text": "Would you like to import the following accounts?",
     "warning": "You have already added this account in AirGap.",
     "syncing_label": "Syncing...",
     "cancel_label": "Cancel",
     "import_label": "Import"
+  },
+  "account-activate": {
+    "title": "Add Accounts",
+    "message": "Select <strong>{{ protocol }}</strong> accounts to add. TODO: import more from AirGap Vault",
+    "add-accounts_label": "Add Accounts"
   },
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
@@ -608,6 +613,9 @@
   "portfolio-item": {
     "active": "active"
   },
+  "current-wallet-group": {
+    "label": "Active Group:"
+  },
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",
@@ -730,5 +738,9 @@
   "health-check": {
     "title": "Health Check", 
     "message": "Checking API Health"
+  },
+  "group-label": {
+    "all": "All",
+    "ungrouped": "Other"
   }
 }

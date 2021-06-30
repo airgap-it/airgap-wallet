@@ -8,6 +8,7 @@ import { PriceService } from 'src/app/services/price/price.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -18,7 +19,7 @@ export class SubAccountImportPage {
   private readonly networkIdentifier: string
 
   public subProtocol: ICoinProtocol
-  public subWallets: AirGapMarketWallet[]
+  public subWalletsWithGroups: [AirGapMarketWalletGroup | undefined, AirGapMarketWallet][]
 
   public typeLabel: string = ''
 
@@ -30,7 +31,7 @@ export class SubAccountImportPage {
     private readonly protocolService: ProtocolService,
     dataService: DataService
   ) {
-    this.subWallets = []
+    this.subWalletsWithGroups = []
     let info: any
 
     info = dataService.getData(DataServiceKey.PROTOCOL)
@@ -50,11 +51,12 @@ export class SubAccountImportPage {
       })
     }
 
-    this.accountProvider.wallets
+    this.accountProvider.wallets$
       .pipe(
         map((mainAccounts) =>
           mainAccounts.filter(
-            (wallet) =>
+            wallet =>
+              wallet.status === AirGapWalletStatus.ACTIVE &&
               wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier) &&
               wallet.protocol.options.network.type === NetworkType.MAINNET
           )
@@ -64,17 +66,18 @@ export class SubAccountImportPage {
         const promises: Promise<void>[] = mainAccounts.map(async (mainAccount) => {
           if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
             const protocol = await this.protocolService.getProtocol(this.subProtocolIdentifier)
+            const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(mainAccount)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
               protocol,
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,
               mainAccount.derivationPath,
-              '',
-              AirGapWalletStatus.ACTIVE,
+              mainAccount.masterFingerprint,
+              mainAccount.status,
               this.priceService
             )
             airGapMarketWallet.addresses = mainAccount.addresses
-            this.subWallets.push(airGapMarketWallet)
+            this.subWalletsWithGroups.push([walletGroup, airGapMarketWallet])
 
             return airGapMarketWallet.synchronize()
           }
@@ -87,14 +90,18 @@ export class SubAccountImportPage {
   }
 
   public importWallets() {
-    this.subWallets.forEach((subWallet) => {
-      this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    this.subWalletsWithGroups.forEach(([group, subWallet]) => {
+      this.accountProvider
+        .addWallet(subWallet, group !== undefined ? group.id : undefined, group !== undefined ? group.label : undefined)
+        .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     })
     this.popToRoot()
   }
 
-  public importWallet(subWallet: AirGapMarketWallet) {
-    this.accountProvider.addWallet(subWallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+  public importWallet(group: AirGapMarketWalletGroup | undefined, subWallet: AirGapMarketWallet) {
+    this.accountProvider
+      .addWallet(subWallet, group !== undefined ? group.id : undefined, group !== undefined ? group.label : undefined)
+      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     this.popToRoot()
   }
 
