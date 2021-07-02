@@ -202,6 +202,10 @@ const routes: Routes = [
   {
     path: 'account-activate/:id/:protocolID',
     loadChildren: () => import('./pages/account-activate/account-activate.module').then((m) => m.AccountActivatePageModule)
+  },
+  {
+    path: 'dapp-confirm',
+    loadChildren: () => import('./pages/dapp-confirm/dapp-confirm.module').then((m) => m.DappConfirmPageModule)
   }
 ]
 @NgModule({

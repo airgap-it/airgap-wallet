@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
-import BigNumber from 'bignumber.js'
+import { DappConfirmPage } from 'src/app/pages/dapp-confirm/dapp-confirm.page'
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
 
 export async function getCachedSession(): Promise<WalletconnectSession> {
@@ -127,11 +127,21 @@ export class WalletconnectService {
   }
 
   public async approveRequest(id: string, result: string) {
-    console.log('APPROVE REQUEST', id, result)
-    this.connector.approveRequest({
-      id: new BigNumber(id).toNumber(),
-      result: result
+    // console.log('APPROVE REQUEST', id, result)
+    this.presentConfirmationModal(id, result)
+  }
+
+  async presentConfirmationModal(id: string, result: string) {
+    const modal = await this.modalController.create({
+      component: DappConfirmPage,
+      componentProps: {
+        connector: this.connector,
+        id: id,
+        result: result
+      }
     })
+
+    return modal.present()
   }
 
   async presentModal(request: any) {

@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Confirm Walletconnect Request</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-row class="rawdata--container">
+    <ion-col class="ion-no-padding">
+      <pre class="ion-no-margin">
+  {{result | json}}
+      </pre>
+    </ion-col>
+  </ion-row>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="rejectRequest()">Cancel</ion-button>
+
+    <ion-button shape="round" color="primary" (click)="approveRequest()">Confirm</ion-button>
+  </ion-fab>
+</ion-content>
