@@ -19,6 +19,8 @@ export class InteractionSelectionPage {
   public isLedgerSupported: boolean = false
   public isRelay: boolean = false
   public interactionData: any
+  private generatedId: number | undefined = undefined
+
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
   private readonly type: IACMessageType
@@ -39,6 +41,7 @@ export class InteractionSelectionPage {
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
+      this.generatedId = info.generatedId
       this.type = info.type
       this.isRelay = info.isRelay ?? this.isRelay
       this.isLedgerSupported = this.isDesktop && this.ledgerService.isProtocolSupported(this.wallet.protocol)
@@ -81,7 +84,7 @@ export class InteractionSelectionPage {
     if (this.isRelay) {
       return this.interactionData
     }
-    const generatedId = generateId(8)
+    const generatedId = this.generatedId ? this.generatedId : generateId(8)
     return this.operations.prepareSignRequest(this.wallet, this.interactionData, this.type, generatedId).catch((error) => {
       console.warn(`Could not serialize transaction: ${error}`)
       // TODO: Show error (toast)

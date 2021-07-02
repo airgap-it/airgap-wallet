@@ -87,8 +87,8 @@ export class AccountProvider {
         this.walletsHaveLoaded.next(true)
       })
       .catch(console.error)
-    this.wallets$.pipe(map(wallets => wallets.filter(wallet => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
-    this.wallets$.pipe(map(wallets => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
+    this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
+    this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
 
     this.pushProvider.notificationCallback = (notification: PushNotification): void => {
       // We need a timeout because otherwise routing might fail
@@ -176,10 +176,8 @@ export class AccountProvider {
   }
 
   private async loadWalletsFromStorage() {
-    const [rawGroups, rawWallets]: [
-      SerializedAirGapMarketWalletGroup[] | undefined,
-      SerializedAirGapWallet[] | undefined
-    ] = await Promise.all([this.storageProvider.get(WalletStorageKey.WALLET_GROUPS), this.storageProvider.get(WalletStorageKey.WALLET)])
+    const [rawGroups, rawWallets]: [SerializedAirGapMarketWalletGroup[] | undefined, SerializedAirGapWallet[] | undefined] =
+      await Promise.all([this.storageProvider.get(WalletStorageKey.WALLET_GROUPS), this.storageProvider.get(WalletStorageKey.WALLET)])
 
     const groups = rawGroups || []
     let wallets = rawWallets || []
@@ -528,7 +526,9 @@ export class AccountProvider {
   }
 
   public walletBySerializerAccountIdentifier(accountIdentifier: string, protocolIdentifier: string): AirGapMarketWallet {
-    return this.allWallets.find(wallet => wallet.publicKey.endsWith(accountIdentifier) && wallet.protocol.identifier === protocolIdentifier)
+    return this.allWallets.find(
+      (wallet) => wallet.publicKey.endsWith(accountIdentifier) && wallet.protocol.identifier === protocolIdentifier
+    )
   }
 
   public walletByPublicKeyAndProtocolAndAddressIndex(
@@ -537,7 +537,8 @@ export class AccountProvider {
     addressIndex?: number
   ): AirGapMarketWallet {
     return this.allWallets.find(
-      wallet => wallet.publicKey === publicKey && wallet.protocol.identifier === protocolIdentifier && wallet.addressIndex === addressIndex
+      (wallet) =>
+        wallet.publicKey === publicKey && wallet.protocol.identifier === protocolIdentifier && wallet.addressIndex === addressIndex
     )
   }
 
@@ -599,9 +600,7 @@ export class AccountProvider {
       .map((wallet: AirGapMarketWallet) => wallet.publicKey)
   }
 
-  public async getCompatibleAndIncompatibleWalletsForAddress(
-    address: string
-  ): Promise<{
+  public async getCompatibleAndIncompatibleWalletsForAddress(address: string): Promise<{
     compatibleWallets: AirGapMarketWallet[]
     incompatibleWallets: AirGapMarketWallet[]
   }> {
@@ -621,7 +620,7 @@ export class AccountProvider {
           const compatibleWallets: AirGapMarketWallet[] = []
           const incompatibleWallets: AirGapMarketWallet[] = []
 
-          this.allWallets.forEach(wallet => {
+          this.allWallets.forEach((wallet) => {
             if (compatibleProtocols.has(wallet.protocol.identifier)) {
               compatibleWallets.push(wallet)
             } else {

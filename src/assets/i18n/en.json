@@ -149,11 +149,11 @@
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
     },
-    "beacon": {
-      "label": "Beacon",
+    "dapp": {
+      "label": "Dapps",
       "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
-      "permission-list_label": "Beacon Permissions"
+      "permission-list_label": "Dapp Permissions"
     },
     "qr-advanced-settings_label": "Advanced QR Settings",
     "health-check": "API Health Check"
@@ -236,7 +236,7 @@
     }
   },
   "transaction-qr": {
-    "title": "{{title}} Transaction QR",
+    "title": "Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
     "done_label": "Done",
     "details": "Display details"
@@ -717,8 +717,8 @@
       "button": "Change Account"
     }
   },
-  "beacon-permission-list": {
-    "title": "Beacon Permissions",
+  "dapp-permission-list": {
+    "title": "Dapp Permissions",
     "connected-dapps": "Connected DApps",
     "remove_label": "Remove",
     "no-permissions": "No permissions have been given.",
@@ -734,6 +734,19 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
+  },
+  "dapps": {
+    "wait_for_walletconnect": "Waiting for WalletConnect"
+  },
+  "walletconnect": {
+    "connection_request": "WalletConnect - Connection Request",
+    "new_transaction": "WalletConnect - New Transaction",
+    "sign_request": "WalletConnect - Sign Request",
+    "sign_typed_data": "WalletConnect - Sign Typed Data",
+    "alert": {
+      "title": "Not supported",
+      "message": "eth_signTypedData is currently not supported"
+    }
   },
   "health-check": {
     "title": "Health Check", 

@@ -11,7 +11,8 @@ export enum DataServiceKey {
   INTERACTION = 'interaction',
   EXCHANGE = 'exchange',
   TRANSACTION = 'transaction',
-  SCAN = 'scan'
+  SCAN = 'scan',
+  WALLET = 'wallet'
 }
 
 @Injectable({

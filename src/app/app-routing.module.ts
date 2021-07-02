@@ -180,12 +180,16 @@ const routes: Routes = [
     loadChildren: () => import('./pages/ledger-sign/ledger-sign.module').then((m) => m.LedgerSignPageModule)
   },
   {
-    path: 'beacon-permission-list',
-    loadChildren: () => import('./pages/beacon-permission-list/beacon-permission-list.module').then((m) => m.BeaconPermissionListPageModule)
+    path: 'dapp-permission-list',
+    loadChildren: () => import('./pages/dapp-permission-list/dapp-permission-list.module').then((m) => m.DappPermissionListPageModule)
   },
   {
     path: 'error',
     loadChildren: () => import('./pages/error/error.module').then((m) => m.ErrorPageModule)
+  },
+  {
+    path: 'walletconnect',
+    loadChildren: () => import('./pages/walletconnect/walletconnect.module').then((m) => m.WalletconnectPageModule)
   },
   {
     path: 'qr-settings',

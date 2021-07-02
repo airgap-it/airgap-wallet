@@ -5,9 +5,9 @@ import {
   ProtocolService,
   SubProtocolStoreService
 } from '@airgap/angular-core'
-import { TestBed } from '@angular/core/testing'
 import { AirGapMarketWallet, AirGapWalletStatus, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
 import { take } from 'rxjs/operators'
+import { TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { PriceServiceMock } from '../../../../test-config/wallet-mock'
 import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'

@@ -5,6 +5,7 @@ import {
   ClipboardService,
   DeeplinkService,
   ProtocolService,
+  RelayMessage,
   UiEventElementsService
 } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
@@ -14,9 +15,10 @@ import {
   AirGapMarketWallet,
   AirGapWalletStatus,
   IACMessageDefinitionObject,
-  IACMessageDefinitionObjectV3,
   IACMessageType,
-  MessageSignResponse
+  MainProtocolSymbols,
+  MessageSignResponse,
+  ProtocolSymbols
 } from '@airgap/coinlib-core'
 import { Router } from '@angular/router'
 
@@ -27,9 +29,11 @@ import { DataService, DataServiceKey } from '../data/data.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
+import { WalletconnectService } from '../walletconnect/walletconnect.service'
 
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
+import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
 
 @Injectable({
   providedIn: 'root'
@@ -40,19 +44,24 @@ export class IACService extends BaseIACService {
     public beaconService: BeaconService,
     public readonly deeplinkService: DeeplinkService,
     accountProvider: AccountProvider,
+    public walletConnectService: WalletconnectService,
     private readonly dataService: DataService,
     protected readonly clipboard: ClipboardService,
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
     private readonly router: Router,
-    @Inject(APP_CONFIG) public readonly appConfig: AppConfig
+    @Inject(APP_CONFIG) appConfig: AppConfig
   ) {
     super(
       uiEventElementsService,
       clipboard,
       Promise.resolve(),
-      [new BeaconHandler(beaconService), new AddressHandler(accountProvider, dataService, router)],
+      [
+        new BeaconHandler(beaconService),
+        new WalletConnectHandler(walletConnectService),
+        new AddressHandler(accountProvider, dataService, router) // Address handler is flexible because of regex, so it should be last.
+      ],
       deeplinkService,
       appConfig
     )
@@ -62,9 +71,9 @@ export class IACService extends BaseIACService {
     this.serializerMessageHandlers[IACMessageType.MessageSignResponse as any] = this.handleMessageSignResponse.bind(this)
   }
 
-  public async relay(data: { messages: IACMessageDefinitionObjectV3[] }): Promise<void> {
+  public async relay(data: RelayMessage): Promise<void> {
     const info = {
-      data: data.messages,
+      data: (data as any).messages, // TODO: Fix types
       isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
@@ -125,15 +134,22 @@ export class IACService extends BaseIACService {
   }
 
   private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
-    const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
+    const requestId = deserializedMessages[0].id
+    const cachedRequest = await this.beaconService.getVaultRequest(requestId)
+
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
+    const protocol: ProtocolSymbols = deserializedMessages[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
-      id: cachedRequest[0].id,
+      id: cachedRequest[0] ? cachedRequest[0].id : requestId,
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
-    await this.beaconService.respond(response)
+    if (protocol === MainProtocolSymbols.XTZ) {
+      await this.beaconService.respond(response)
+    } else if (protocol === MainProtocolSymbols.ETH) {
+      await this.walletConnectService.approveRequest(response.id, response.signature)
+    }
     return false
   }
 }

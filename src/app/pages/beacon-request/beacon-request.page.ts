@@ -14,8 +14,7 @@ import { Router } from '@angular/router'
 import { AlertController, ModalController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
-  generateIdV2,
-  IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
@@ -24,7 +23,7 @@ import {
 } from '@airgap/coinlib-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
-import { NetworkType, ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -32,18 +31,11 @@ import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-
 import { ErrorPage } from '../error/error.page'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { TranslateService } from '@ngx-translate/core'
+import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
+import { generateId } from '@airgap/coinlib-core'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
-}
-
-interface CheckboxInput {
-  name: string
-  type: 'radio' | 'checkbox'
-  label: string
-  value: PermissionScope
-  icon: string
-  checked: boolean
 }
 
 @Component({
@@ -52,8 +44,6 @@ interface CheckboxInput {
   styleUrls: ['./beacon-request.page.scss']
 })
 export class BeaconRequestPage implements OnInit {
-  public readonly networkType: typeof NetworkType = NetworkType
-
   public title: string = ''
   public request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
   public network: ProtocolNetwork | undefined
@@ -288,11 +278,11 @@ export class BeaconRequestPage implements OnInit {
       this.blake2bHash = await cryptoClient.blake2bLedgerHash(request.payload)
     } catch {}
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     const clonedRequest = { ...request }
-    clonedRequest.id = generatedId
+    // clonedRequest.id = generatedId // TODO: Remove?
 
     this.responseHandler = async () => {
       const info = {
@@ -334,7 +324,7 @@ export class BeaconRequestPage implements OnInit {
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
@@ -364,7 +354,7 @@ export class BeaconRequestPage implements OnInit {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
-    const generatedId = generateIdV2(10)
+    const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
@@ -372,7 +362,7 @@ export class BeaconRequestPage implements OnInit {
       transaction: signedTx
     })
 
-    const messageDefinitionObject: IACMessageDefinitionObject = {
+    const messageDefinitionObject: IACMessageDefinitionObjectV3 = {
       id: generatedId,
       type: IACMessageType.MessageSignResponse,
       protocol: MainProtocolSymbols.XTZ,
@@ -390,5 +380,9 @@ export class BeaconRequestPage implements OnInit {
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+  }
+
+  async setWallet(wallet: AirGapMarketWallet) {
+    this.selectedWallet = wallet
   }
 }

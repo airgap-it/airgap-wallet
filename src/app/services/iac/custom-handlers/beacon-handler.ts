@@ -1,4 +1,4 @@
-import { IACHandlerStatus, IACMessageHandler } from '@airgap/angular-core'
+import { IACSinglePartHandler } from '@airgap/angular-core'
 import { P2PPairingRequest, Serializer } from '@airgap/beacon-sdk'
 
 import { BeaconService } from '../../beacon/beacon.service'
@@ -23,77 +23,45 @@ const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promi
   return true
 }
 
-/**
- * Handles beacon requests
- *
- * This request is a stringified json with the properties "publicKey", "relayServer" and "name"
- */
-export class BeaconHandler extends IACMessageHandler<boolean> {
+export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
   public readonly name: string = 'BeaconHandler'
 
   constructor(private readonly beaconService: BeaconService) {
     super()
   }
 
-  public async canHandle(json: unknown): Promise<boolean> {
-    if (isBeaconMessage(json)) {
-      await this.beaconService.client.isConnected
-      await this.beaconService.addPeer(json)
+  public async handleComplete(): Promise<P2PPairingRequest> {
+    await this.beaconService.client.isConnected
+    await this.beaconService.addPeer(this.payload)
 
-      return true
-    } else {
-      return false
-    }
+    return this.payload
   }
 
-  public async receive(data: string | string[]): Promise<IACHandlerStatus> {
-    const stringData: string = typeof data === 'string' ? data : data[0]
+  public async processData(data: string): Promise<P2PPairingRequest | undefined> {
+    let payload = data
 
-    // Check if it's a beacon request
-    try {
-      const json: Record<string, unknown> = JSON.parse(stringData)
-
-      const canHandle = await this.canHandle(json)
-      return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
-    } catch (e) {
-      try {
-        const payload: string = stringData
-        if (await isValidUrl(payload)) {
-          const params: URLSearchParams = new URL(payload).searchParams
-          if (params && params.get('type') === 'tzip10') {
-            const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any
-
-            const canHandle = await this.canHandle(json)
-            return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
-          }
-        } else {
-          const json: Record<string, unknown> = (await new Serializer().deserialize(stringData)) as any
-
-          const canHandle = await this.canHandle(json)
-          return canHandle ? IACHandlerStatus.SUCCESS : IACHandlerStatus.UNSUPPORTED
-        }
-      } catch (err) {
-        //
+    if (await isValidUrl(data)) {
+      const params: URLSearchParams = new URL(data).searchParams
+      if (params && params.get('type') === 'tzip10') {
+        payload = params.get('data')
       }
-      //
     }
 
-    return IACHandlerStatus.UNSUPPORTED
-  }
+    try {
+      const json: Record<string, unknown> = (await new Serializer().deserialize(payload)) as any
 
-  public async getProgress(): Promise<number> {
-    return 100
-  }
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
 
-  public async getResult(): Promise<undefined> {
+    try {
+      const json = JSON.parse(data)
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
+
     return undefined
-  }
-
-  public async reset(): Promise<void> {
-    return
-  }
-
-  public async handleComplete(): Promise<boolean> {
-    return true
   }
 }
