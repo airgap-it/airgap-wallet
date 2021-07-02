@@ -7,7 +7,7 @@ import {
 } from '@airgap/angular-core'
 import { AirGapMarketWallet, AirGapWalletStatus, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
 import { take } from 'rxjs/operators'
-import { TestBed } from '@angular/core/testing'
+import { TestBed, waitForAsync } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { PriceServiceMock } from '../../../../test-config/wallet-mock'
 import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
@@ -24,26 +24,26 @@ describe('AccountProvider', () => {
     protocolService.init()
   })
 
-  beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [
-          { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
-          { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
-          { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
-          { provide: ProtocolService, useValue: protocolService }
-        ]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
+  beforeEach(
+    waitForAsync(async () => {
+      unitHelper = new UnitHelper()
+      TestBed.configureTestingModule(
+        unitHelper.testBed({
+          providers: [
+            { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
+            { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfoPlugin },
+            { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
+            { provide: ProtocolService, useValue: protocolService }
+          ]
+        })
+      )
+        .compileComponents()
+        .catch(console.error)
 
-  beforeEach(async () => {
-    accountProvider = TestBed.get(AccountProvider)
-    await accountProvider.walletChangedObservable.pipe(take(1)).toPromise() // Wait for initial load to be over
-  })
+      accountProvider = TestBed.inject(AccountProvider)
+      await accountProvider.walletChangedObservable.pipe(take(1)).toPromise() // Wait for initial load to be over
+    })
+  )
 
   it('should be created', () => {
     expect(accountProvider instanceof AccountProvider).toBe(true)
