@@ -154,7 +154,6 @@ export class AccountProvider {
   }
 
   public triggerWalletChanged() {
-    this.drawChartProvider.drawChart()
     this.walletChangedBehaviour.next()
   }
 
@@ -384,6 +383,8 @@ export class AccountProvider {
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
       this.walletGroups$.next(this.allWalletGroups)
+      console.log('DRAW CHART addWallet')
+
       this.drawChartProvider.drawChart()
 
       return this.persist()
@@ -447,6 +448,7 @@ export class AccountProvider {
       this.setActiveGroup(walletGroup)
       this.walletGroups$.next(this.allWalletGroups)
       this.drawChartProvider.drawChart()
+      console.log('DRAW CHART activateWallet')
 
       return this.persist()
     }
@@ -481,6 +483,8 @@ export class AccountProvider {
           : this.allWalletGroups[0]
       this.setActiveGroup(activeGroup)
       this.walletGroups$.next(this.allWalletGroups)
+      console.log('DRAW CHART removeWallet')
+
       this.drawChartProvider.drawChart()
 
       return this.persist()

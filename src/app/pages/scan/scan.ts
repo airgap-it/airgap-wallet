@@ -1,4 +1,4 @@
-import { IACHandlerStatus, IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
+import { IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { Component, NgZone, ViewChild } from '@angular/core'
 // import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
@@ -28,7 +28,7 @@ export class ScanPage extends ScanBasePage {
     protected scanner: QrScannerService,
     protected permissionsProvider: PermissionsService,
     private readonly iacService: IACService,
-    private readonly ngZone: NgZone // private readonly router: Router
+    private readonly ngZone: NgZone
   ) {
     super(platform, scanner, permissionsProvider)
   }
@@ -68,17 +68,10 @@ export class ScanPage extends ScanBasePage {
           this.percentageScanned = progress ?? 0
           this.startScan()
         })
-        .then((result: IACHandlerStatus) => {
-          if (result === IACHandlerStatus.SUCCESS) {
-            // this.router
-            //   .navigateByUrl('/')
-            //   .then(() => {
-            this.resetScannerPage()
-            // })
-            // .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          }
-        })
         .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
     })
+  }
+  public ionViewWillLeave() {
+    this.resetScannerPage()
   }
 }

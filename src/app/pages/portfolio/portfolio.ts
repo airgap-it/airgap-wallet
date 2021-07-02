@@ -12,6 +12,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
 import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { map } from 'rxjs/operators'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -32,6 +33,7 @@ export class PortfolioPage {
   public changePercentage: number = 0
 
   public wallets: Observable<AirGapMarketWallet[]>
+  public activeWallets: Observable<AirGapMarketWallet[]>
   public walletGroups: ReplaySubject<WalletGroup[]> = new ReplaySubject(1)
   public isDesktop: boolean = false
 
@@ -47,6 +49,7 @@ export class PortfolioPage {
     this.isDesktop = !this.platform.is('hybrid')
 
     this.wallets = this.walletsProvider.wallets$.asObservable()
+    this.activeWallets = this.wallets.pipe(map((wallets) => wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE) ?? []))
 
     // If a wallet gets added or removed, recalculate all values
     this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
@@ -67,7 +70,7 @@ export class PortfolioPage {
     wallets
       .filter((wallet: AirGapWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
       .forEach((wallet: AirGapMarketWallet) => {
-        const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
+        const isSubProtocol: boolean = (wallet.protocol as any as ICoinSubProtocol).isSubProtocol
         const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
 
         const walletKey: string = `${wallet.publicKey}_${identifier}`
@@ -136,9 +139,7 @@ export class PortfolioPage {
     console.log(info)
     this.router
       .navigateByUrl(
-        `/account-transaction-list/${DataServiceKey.ACCOUNTS}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-          info.wallet.addressIndex
-        }`
+        `/account-transaction-list/${DataServiceKey.ACCOUNTS}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}`
       )
       .catch(console.error)
   }
@@ -151,7 +152,7 @@ export class PortfolioPage {
     this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
     const observables = [
-      this.walletsProvider.getWalletList().map(wallet => {
+      this.walletsProvider.getWalletList().map((wallet) => {
         return from(wallet.synchronize())
       })
     ]
@@ -169,15 +170,17 @@ export class PortfolioPage {
 
   public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
     const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
-
-    this.total = (await Promise.all(
-      wallets.map(wallet =>
-        cryptoToFiatPipe.transform(wallet.currentBalance, {
-          protocolIdentifier: wallet.protocol.identifier,
-          currentMarketPrice: wallet.currentMarketPrice
-        })
+    wallets = wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+    this.total = (
+      await Promise.all(
+        wallets.map((wallet) =>
+          cryptoToFiatPipe.transform(wallet.currentBalance, {
+            protocolIdentifier: wallet.protocol.identifier,
+            currentMarketPrice: wallet.currentMarketPrice
+          })
+        )
       )
-    ))
+    )
       .reduce((sum: BigNumber, next: string) => sum.plus(next), new BigNumber(0))
       .toNumber()
 
