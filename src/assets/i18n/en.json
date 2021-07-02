@@ -755,5 +755,9 @@
   "group-label": {
     "all": "All",
     "ungrouped": "Other"
+  },
+  "dapp-confirm": {
+    "title": "Confirm Walletconnect Request",
+    "text": "Do you want to confirm the walletconnect request?"
   }
 }
