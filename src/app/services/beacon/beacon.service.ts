@@ -60,7 +60,7 @@ export class BeaconService {
 
     return this.client.connect(async (message) => {
       this.hideToast()
-      if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
+      if (message.type === BeaconMessageType.PermissionRequest && !(await this.isNetworkSupported(message.network))) {
         return this.sendNetworkNotSupportedError(message.id)
       } else {
         await this.presentModal(message)
@@ -190,10 +190,12 @@ export class BeaconService {
 
   private async isNetworkSupported(network?: Network): Promise<boolean> {
     return (
-      network.type === BeaconNetworkType.MAINNET ||
-      network.type === BeaconNetworkType.EDONET ||
-      network.type === BeaconNetworkType.FLORENCENET ||
-      network.type === BeaconNetworkType.CUSTOM
+      network &&
+      network.type &&
+      (network.type === BeaconNetworkType.MAINNET ||
+        network.type === BeaconNetworkType.EDONET ||
+        network.type === BeaconNetworkType.FLORENCENET ||
+        network.type === BeaconNetworkType.CUSTOM)
     )
   }
 
