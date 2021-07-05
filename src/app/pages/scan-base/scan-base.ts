@@ -58,7 +58,6 @@ export class ScanBasePage {
       this.scanner.destroy()
     } else if (this.zxingScanner) {
       this.zxingScanner.enable = false
-      this.zxingScanner.reset()
     }
   }
 
@@ -75,20 +74,19 @@ export class ScanBasePage {
   }
 
   private startScanMobile() {
-    this.scanner
-      .scan()
-      .then((text: string) => {
+    this.scanner.scan(
+      (text) => {
         this.checkScan(text)
-      })
-      .catch((error: any) => {
+      },
+      (error) => {
         console.warn(error)
         this.startScan()
-      })
+      }
+    )
   }
 
   private startScanBrowser() {
-    if (this.zxingScanner) {
-      this.hasCameraPermission = true
+    if (this.zxingScanner && !this.zxingScanner.enabled) {
       this.zxingScanner.enable = true
       this.zxingScanner.camerasNotFound.subscribe((_devices: MediaDeviceInfo[]) => {
         console.error('An error has occurred when trying to enumerate your video-stream-enabled devices.')

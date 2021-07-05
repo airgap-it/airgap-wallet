@@ -1,56 +1,36 @@
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
-import { BehaviorSubject } from 'rxjs'
 import { WalletStorageService } from '../storage/storage'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { AccountSync } from 'src/app/types/AccountSync'
 
 export enum DataServiceKey {
-  WALLET = 'wallet',
+  SYNC_ACCOUNTS = 'sync-accounts',
+  ACCOUNTS = 'accounts',
   PROTOCOL = 'protocol',
   DETAIL = 'detail',
   INTERACTION = 'interaction',
   EXCHANGE = 'exchange',
   TRANSACTION = 'transaction',
-  SCAN = 'scan'
+  SCAN = 'scan',
+  WALLET = 'wallet'
 }
-
-/*
-interface ExposedPromise<T> {
-  promise: Promise<T>
-  resolve(value?: T | PromiseLike<T>): void
-  reject(reason?: unknown): void
-}
-
-function exposedPromise<T>(): ExposedPromise<T> {
-  let resolve: (value?: T | PromiseLike<T>) => void
-  let reject: (reason?: unknown) => void
-
-  // tslint:disable-next-line:promise-must-complete
-  const promise: Promise<T> = new Promise<T>((res, rej) => {
-    resolve = res
-    reject = rej
-  })
-
-  return { promise, resolve, reject }
-}
-*/
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
   private readonly data = []
-  private importWallet$: BehaviorSubject<AirGapMarketWallet | null> = new BehaviorSubject(null)
-  // private readonly communicationChannels: Map<string, Promise<any>> = new Map<string, Promise<any>>()
+  private accountSyncs$: BehaviorSubject<AccountSync[] | null> = new BehaviorSubject(null)
 
   constructor(private readonly storage: WalletStorageService) {}
 
-  public getImportWallet() {
-    return this.importWallet$.asObservable()
+  public getAccountSyncs(): Observable<AccountSync[] | null> {
+    return this.accountSyncs$.asObservable()
   }
 
   public setData(id, data) {
-    if (id === DataServiceKey.WALLET) {
-      this.importWallet$.next(data)
+    if (id === DataServiceKey.SYNC_ACCOUNTS) {
+      this.accountSyncs$.next(data)
     }
     this.data[id] = data
   }
@@ -66,16 +46,4 @@ export class DataService {
   public async set<K extends DataServiceKey>(key: K, value: any): Promise<any> {
     return this.storage.setCache(key, value)
   }
-
-  /*
-  public openChildCommunicationChannelId(): string {
-    const id = Math.random()
-      .toString(36)
-      .substring(2, 15)
-
-    this.communicationChannels.set(id, Promise.resolve())
-
-    return id
-  }
-  */
 }

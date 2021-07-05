@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "AirGapSapling",
-        "repositoryURL": "https://github.com/airgap-it/airgap-sapling",
+        "repositoryURL": "https://github.com/airgap-it/airgap-sapling.git",
         "state": {
           "branch": null,
-          "revision": "8efa3458f19492412a956f8eab018cf4b97cce66",
-          "version": "0.0.5"
+          "revision": "c6606fce5d84cea678414681b13ef5efb3629a7e",
+          "version": "0.0.6"
         }
       }
     ]

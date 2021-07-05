@@ -1,6 +1,14 @@
-import { AirGapMarketWallet, BitcoinProtocol, EthereumProtocol, IAirGapTransaction, ICoinProtocol } from '@airgap/coinlib-core'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
+
+import { 
+  AirGapMarketWallet,
+  BitcoinProtocol,
+  EthereumProtocol,
+  IAirGapTransaction,
+  ICoinProtocol,
+  MainProtocolSymbols
+} from '@airgap/coinlib-core'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import BigNumber from 'bignumber.js'
 
 // tslint:disable:max-classes-per-file
@@ -18,6 +26,8 @@ class WalletMock {
       '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
       false,
       "m/44'/60'/0'/0/0",
+      '',
+      AirGapWalletStatus.ACTIVE,
       new PriceServiceMock()
     ),
     {
@@ -47,6 +57,8 @@ class WalletMock {
     'xpub6CcLgL3yuTNxguFdSikacKj93R77GMToq1488BKLdZMAQ2BfrVQrx31phHwqhx4kRUTNCeyiWiqvppaykiXM9w8RWJFbhj1etsCgBckA2bF',
     false,
     "m/44'/0'/0'",
+    '',
+    AirGapWalletStatus.ACTIVE,
     new PriceServiceMock()
   )
   public btcTransaction: IAirGapTransaction = {

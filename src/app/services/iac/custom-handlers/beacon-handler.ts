@@ -1,4 +1,4 @@
-import { IACMessageHandler } from '@airgap/angular-core'
+import { IACSinglePartHandler } from '@airgap/angular-core'
 import { P2PPairingRequest, Serializer } from '@airgap/beacon-sdk'
 
 import { BeaconService } from '../../beacon/beacon.service'
@@ -23,65 +23,45 @@ const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promi
   return true
 }
 
-/**
- * Handles beacon requests
- *
- * This request is a stringified json with the properties "publicKey", "relayServer" and "name"
- */
-export class BeaconHandler extends IACMessageHandler {
+export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
   public readonly name: string = 'BeaconHandler'
 
   constructor(private readonly beaconService: BeaconService) {
     super()
   }
 
-  public async handle(data: string | string[]): Promise<boolean> {
-    const stringData: string = typeof data === 'string' ? data : data[0]
+  public async handleComplete(): Promise<P2PPairingRequest> {
+    await this.beaconService.client.isConnected
+    await this.beaconService.addPeer(this.payload)
 
-    // Check if it's a beacon request
-    try {
-      const json: Record<string, unknown> = JSON.parse(stringData)
-
-      return await this.tryHandleBeacon(json)
-    } catch (e) {
-      try {
-        const payload: string = stringData
-        if (await isValidUrl(payload)) {
-          const params: URLSearchParams = new URL(payload).searchParams
-          if (params && params.get('type') === 'tzip10') {
-            const json: Record<string, unknown> = (await new Serializer().deserialize(params.get('data'))) as any
-
-            return await this.tryHandleBeacon(json)
-          }
-        } else {
-          const json: Record<string, unknown> = (await new Serializer().deserialize(stringData)) as any
-
-          return await this.tryHandleBeacon(json)
-        }
-      } catch (err) {
-        //
-      }
-      //
-    }
-
-    return false
+    return this.payload
   }
 
-  private async tryHandleBeacon(json: unknown): Promise<boolean> {
-    if (isBeaconMessage(json)) {
-      console.log('Beacon Pairing QR scanned', json)
+  public async processData(data: string): Promise<P2PPairingRequest | undefined> {
+    let payload = data
 
-      await this.beaconService.showLoader()
-      console.log('Beacon waiting connected')
-      await this.beaconService.client.isConnected
-      console.log('Beacon is connected')
-
-      await this.beaconService.addPeer(json)
-      console.log('Beacon peer added')
-
-      return true
-    } else {
-      return false
+    if (await isValidUrl(data)) {
+      const params: URLSearchParams = new URL(data).searchParams
+      if (params && params.get('type') === 'tzip10') {
+        payload = params.get('data')
+      }
     }
+
+    try {
+      const json: Record<string, unknown> = (await new Serializer().deserialize(payload)) as any
+
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
+
+    try {
+      const json = JSON.parse(data)
+      if (isBeaconMessage(json)) {
+        return json
+      }
+    } catch {}
+
+    return undefined
   }
 }

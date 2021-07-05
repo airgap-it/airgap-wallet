@@ -149,11 +149,11 @@
       "page-time_label": "QR Page Time",
       "page-size_label": "QR Max Size"
     },
-    "beacon": {
-      "label": "Beacon",
+    "dapp": {
+      "label": "Dapps",
       "settings_label": "Beacon Settings",
       "about_label": "About Beacon",
-      "permission-list_label": "Beacon Permissions"
+      "permission-list_label": "Dapp Permissions"
     },
     "qr-advanced-settings_label": "Advanced QR Settings",
     "health-check": "API Health Check"
@@ -228,7 +228,7 @@
     "advanced": "Advanced",
     "memo": "Memo",
     "paste_label": "Paste",
-    "existential_deposit": "Ignore existential deposit limit",
+    "existential_deposit": "Ignore existential deposit",
     "create-transaction": "Create Transaction",
     "error": {
       "amount_label": "Please enter a valid number",
@@ -236,7 +236,7 @@
     }
   },
   "transaction-qr": {
-    "title": "{{title}} Transaction QR",
+    "title": "Transaction QR",
     "text": "Open <span class=\"style__strong color__primary\">AirGap Vault</span> and scan this transaction in order to sign it.",
     "done_label": "Done",
     "details": "Display details"
@@ -264,11 +264,16 @@
   },
   "account-import": {
     "title": "Confirm Import",
-    "text": "Would you like to import the following account?",
+    "import-text": "Would you like to import the following accounts?",
     "warning": "You have already added this account in AirGap.",
     "syncing_label": "Syncing...",
     "cancel_label": "Cancel",
     "import_label": "Import"
+  },
+  "account-activate": {
+    "title": "Add Accounts",
+    "message": "Select <strong>{{ protocol }}</strong> accounts to add. TODO: import more from AirGap Vault",
+    "add-accounts_label": "Add Accounts"
   },
   "signed-transaction": {
     "transaction-unreadable": "We were not able to extract information from this transaction. This does not mean that the transaction is invalid - Please make sure that you know what you are doing, and you can verify that you know that this transaction contains the correct data."
@@ -608,6 +613,9 @@
   "portfolio-item": {
     "active": "active"
   },
+  "current-wallet-group": {
+    "label": "Active Group:"
+  },
   "voting": {
     "title": "Voting",
     "heading": "Block Reward Initiative (BRI)",
@@ -709,8 +717,8 @@
       "button": "Change Account"
     }
   },
-  "beacon-permission-list": {
-    "title": "Beacon Permissions",
+  "dapp-permission-list": {
+    "title": "Dapp Permissions",
     "connected-dapps": "Connected DApps",
     "remove_label": "Remove",
     "no-permissions": "No permissions have been given.",
@@ -727,8 +735,29 @@
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers"
   },
+  "dapps": {
+    "wait_for_walletconnect": "Waiting for WalletConnect"
+  },
+  "walletconnect": {
+    "connection_request": "WalletConnect - Connection Request",
+    "new_transaction": "WalletConnect - New Transaction",
+    "sign_request": "WalletConnect - Sign Request",
+    "sign_typed_data": "WalletConnect - Sign Typed Data",
+    "alert": {
+      "title": "Not supported",
+      "message": "eth_signTypedData is currently not supported"
+    }
+  },
   "health-check": {
     "title": "Health Check", 
     "message": "Checking API Health"
+  },
+  "group-label": {
+    "all": "All",
+    "ungrouped": "Other"
+  },
+  "dapp-confirm": {
+    "title": "Confirm Walletconnect Request",
+    "text": "Do you want to confirm the walletconnect request?"
   }
 }

@@ -6,8 +6,8 @@ import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { ComponentsModule } from 'src/app/components/components.module'
 
-import { BeaconPermissionListPageRoutingModule } from './beacon-permission-list-routing.module'
-import { BeaconPermissionListPage } from './beacon-permission-list.page'
+import { DappPermissionListPageRoutingModule } from './dapp-permission-list-routing.module'
+import { DappPermissionListPage } from './dapp-permission-list.page'
 
 @NgModule({
   imports: [
@@ -16,9 +16,9 @@ import { BeaconPermissionListPage } from './beacon-permission-list.page'
     IonicModule,
     TranslateModule,
     ComponentsModule,
-    BeaconPermissionListPageRoutingModule,
+    DappPermissionListPageRoutingModule,
     AirGapAngularCoreModule
   ],
-  declarations: [BeaconPermissionListPage]
+  declarations: [DappPermissionListPage]
 })
-export class BeaconPermissionListPageModule {}
+export class DappPermissionListPageModule {}

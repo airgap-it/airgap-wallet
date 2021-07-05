@@ -127,7 +127,7 @@ export class AccountAddPage {
             this.importFromLedger(protocol)
             break
           default:
-            console.log('Unkonw import interaction type selected.')
+            console.log('Unknown import interaction type selected.')
         }
       }
     }
@@ -138,16 +138,18 @@ export class AccountAddPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private async importFromLedger(protocol: ICoinProtocol): Promise<void> {
+  private importFromLedger(protocol: ICoinProtocol): void {
     this.router
       .navigateByUrl(`/account-import-ledger-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private importFromVault(protocol: ICoinProtocol) {
-    this.router
-      .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`)
-      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  private importFromVault(protocol: ICoinProtocol): void {
+    const url: string = this.accountProvider.hasInactiveWallets(protocol)
+      ? `/account-activate/${DataServiceKey.PROTOCOL}/${protocol.identifier}`
+      : `/account-import-onboarding/${DataServiceKey.PROTOCOL}/${protocol.identifier}`
+
+    this.router.navigateByUrl(url).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public navigateToScan() {

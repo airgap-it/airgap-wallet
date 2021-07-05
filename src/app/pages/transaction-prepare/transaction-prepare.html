@@ -106,7 +106,7 @@
           <ion-col class="ion-no-padding">
             <ion-item class="ion-no-padding" lines="none">
               <ion-label>{{ 'transaction-prepare.existential_deposit' | translate }}</ion-label>
-              <ion-toggle [checked]="excludeExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end"></ion-toggle>
+              <ion-toggle [checked]="ignoreExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end"></ion-toggle>
             </ion-item>
           </ion-col>
         </ion-row>

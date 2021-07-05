@@ -7,9 +7,12 @@
 </ion-header>
 <ion-content fullscreen="true">
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="wallets | async as walletsArray">
+    <ng-container *ngIf="wallets | async | walletFilter: { status: AirGapWalletStatus.ACTIVE } as walletsArray">
       <chart *ngIf="walletsArray.length > 0" [total]="total"></chart>
     </ng-container>
+    <ion-toolbar color="translucent">
+      <current-wallet-group></current-wallet-group>
+    </ion-toolbar>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
@@ -65,7 +68,7 @@
     </ng-template>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ng-container *ngIf="wallets | async as walletsArray">
+    <ng-container *ngIf="wallets | async | walletFilter: { status: AirGapWalletStatus.ACTIVE } as walletsArray">
       <ion-fab-button *ngIf="walletsArray.length > 0" id="add-more-coins-button" color="secondary" (click)="openAccountAddPage()">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
