@@ -9,7 +9,8 @@ import {
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
   WalletClient,
-  StorageKey
+  StorageKey,
+  AppMetadata
 } from '@airgap/beacon-sdk'
 
 import { Injectable } from '@angular/core'
@@ -61,7 +62,7 @@ export class BeaconService {
     return this.client.connect(async (message) => {
       this.hideToast()
       if (message.type === BeaconMessageType.PermissionRequest && !(await this.isNetworkSupported(message.network))) {
-        return this.sendNetworkNotSupportedError(message.id)
+        return this.sendNetworkNotSupportedError(message)
       } else {
         await this.presentModal(message)
       }
@@ -114,10 +115,9 @@ export class BeaconService {
     return result ? result : []
   }
 
-  public async respond(message: BeaconResponseInputMessage): Promise<void> {
-    console.log('responding', message)
-    await this.client.respond(message).catch((err) => console.error(err))
-    await this.showToast('response-sent')
+  public async respond(response: BeaconResponseInputMessage, request: BeaconRequestOutputMessage): Promise<void> {
+    await this.client.respond(response).catch((err) => console.error(err))
+    await this.showToast('response-sent', request.appMetadata)
   }
 
   public async showLoader(): Promise<void> {
@@ -140,12 +140,15 @@ export class BeaconService {
     this.loader = undefined
   }
 
-  public async showToast(type: 'connected' | 'response-sent'): Promise<void> {
+  public async showToast(type: 'connected' | 'response-sent', appMetadata?: AppMetadata): Promise<void> {
     if (this.toast) {
       return
     }
 
-    const message = type === 'connected' ? 'Beacon connection successful. Waiting for request from dApp...' : 'Response sent to the dApp.'
+    const dAppName = appMetadata && appMetadata.name ? appMetadata.name : 'the dApp'
+
+    const message =
+      type === 'connected' ? `Beacon connection successful. Waiting for request from ${dAppName}...` : `Response sent to ${dAppName}.`
 
     this.toast = await this.toastController.create({
       message,
@@ -212,9 +215,9 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async sendAbortedError(id: string): Promise<void> {
+  public async sendAbortedError(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.ABORTED_ERROR
     } as any // TODO: Fix type
@@ -224,12 +227,12 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
   }
 
-  public async sendNetworkNotSupportedError(id: string): Promise<void> {
+  public async sendNetworkNotSupportedError(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NETWORK_NOT_SUPPORTED
     } as any // TODO: Fix type
@@ -239,13 +242,13 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
     await this.displayErrorPage(new Error('Network not supported!'))
   }
 
-  public async sendAccountNotFound(id: string): Promise<void> {
+  public async sendAccountNotFound(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NO_ADDRESS_ERROR
     } as any // TODO: Fix type
@@ -255,13 +258,13 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
     await this.displayErrorPage(new Error('Account not found'))
   }
 
-  public async sendInvalidTransaction(id: string, error: any /* ErrorWithData */): Promise<void> {
+  public async sendInvalidTransaction(request: BeaconRequestOutputMessage, error: any /* ErrorWithData */): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.TRANSACTION_INVALID_ERROR,
       errorData: error.data
@@ -283,7 +286,7 @@ export class BeaconService {
 
     console.log('error.message', errorMessage)
 
-    await this.respond(response)
+    await this.respond(response, request)
     await this.displayErrorPage({
       title: error.title,
       message: errorMessage,

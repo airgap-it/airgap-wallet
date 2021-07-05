@@ -117,7 +117,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async cancel(): Promise<void> {
-    await this.beaconService.sendAbortedError(this.request.id)
+    await this.beaconService.sendAbortedError(this.request)
     await this.dismiss()
   }
 
@@ -157,7 +157,7 @@ export class BeaconRequestPage implements OnInit {
       this.selectedWallet = this.selectableWallets[0]
     }
     if (!this.selectedWallet) {
-      await this.beaconService.sendAccountNotFound(request.id)
+      await this.beaconService.sendAccountNotFound(request)
       return
     }
 
@@ -201,7 +201,7 @@ export class BeaconRequestPage implements OnInit {
         scopes
       }
 
-      await this.beaconService.respond(response)
+      await this.beaconService.respond(response, request)
     }
   }
 
@@ -254,7 +254,7 @@ export class BeaconRequestPage implements OnInit {
       )
 
     if (!selectedWallet) {
-      await this.beaconService.sendAccountNotFound(request.id)
+      await this.beaconService.sendAccountNotFound(request)
       return
     }
 
@@ -308,7 +308,7 @@ export class BeaconRequestPage implements OnInit {
       )
 
     if (!selectedWallet) {
-      await this.beaconService.sendAccountNotFound(request.id)
+      await this.beaconService.sendAccountNotFound(request)
       return
     }
 
@@ -321,7 +321,7 @@ export class BeaconRequestPage implements OnInit {
       transaction = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any, false) // don't override parameters
     } catch (error) {
       await this.dismiss()
-      this.beaconService.sendInvalidTransaction(request.id, error)
+      this.beaconService.sendInvalidTransaction(request, error)
       return
     }
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
