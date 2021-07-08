@@ -13,7 +13,7 @@ import {
 
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocol, MainProtocolSymbols, RawEthereumTransaction } from '@airgap/coinlib-core'
 import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
@@ -47,7 +47,7 @@ export class BeaconService {
   public async init(): Promise<void> {
     await this.client.init()
 
-    return this.client.connect(async message => {
+    return this.client.connect(async (message) => {
       if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
         return this.sendNetworkNotSupportedError(message.id)
       } else {
@@ -60,11 +60,9 @@ export class BeaconService {
     const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
 
     return await Promise.all(
-      requests.map(
-        async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
-          return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
-        }
-      )
+      requests.map(async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
+        return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
+      })
     )
   }
 
@@ -81,8 +79,12 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(generatedId: string, request: BeaconRequestOutputMessage, protocol: ICoinProtocol): Promise<void> {
-    this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
+  public async addVaultRequest(
+    generatedId: number,
+    request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
+    protocol: ICoinProtocol
+  ): Promise<void> {
+    this.storage.setCache(generatedId.toString(), [request, protocol.identifier, protocol.options.network.identifier])
   }
 
   public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
@@ -102,7 +104,7 @@ export class BeaconService {
 
   public async respond(message: BeaconResponseInputMessage): Promise<void> {
     console.log('responding', message)
-    await this.client.respond(message).catch(err => console.error(err))
+    await this.client.respond(message).catch((err) => console.error(err))
   }
 
   public async addPeer(peer: P2PPairingRequest): Promise<void> {

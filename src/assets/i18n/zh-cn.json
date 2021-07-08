@@ -68,7 +68,7 @@
     "transaction-prepare.paste_label": "粘贴",
     "transaction-prepare.create-transaction": "创建交易",
     "account-detail.title": "{{protocolName}}",
-    "transaction-qr.title": "{{title}} 交易二维码",
+    "transaction-qr.title": "交易二维码",
     "transaction-qr.text": "打开AirGap Vault并扫描该交易，以便对其进行签名",
     "transaction-qr.sign-on-device_label": "本机签名",
     "transaction-qr.done_label": "完成",

@@ -27,7 +27,7 @@ export class SubAccountSelectPage {
     }
     this.subWallets = []
 
-    this.accountProvider.subWallets.subscribe(subWallets => {
+    this.accountProvider.subWallets$.subscribe(subWallets => {
       this.subWallets = subWallets.filter(subWallet => subWallet.publicKey === this.wallet.publicKey)
     })
   }

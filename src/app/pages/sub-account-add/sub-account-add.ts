@@ -11,10 +11,13 @@ import { PriceService } from 'src/app/services/price/price.service'
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
 import BigNumber from 'bignumber.js'
+import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 export interface IAccountWrapper {
   selected: boolean
   wallet: AirGapMarketWallet
+  groupId?: string
+  groupLabel?: string
 }
 
 @Component({
@@ -96,7 +99,7 @@ export class SubAccountAddPage {
     this.typeLabel = 'add-sub-account.tokens_label'
 
     const subProtocols = (await this.protocolService.getSubProtocols(this.wallet.protocol.identifier as MainProtocolSymbols)).filter(
-      protocol => protocol.subProtocolType === SubProtocolType.TOKEN
+      (protocol) => protocol.subProtocolType === SubProtocolType.TOKEN
     )
     this.infiniteEnabled = true
     this.subAccounts = await this.loadSubAccounts(subProtocols)
@@ -108,11 +111,14 @@ export class SubAccountAddPage {
 
     const accounts: IAccountWrapper[] = balances
       .map((balance, index) => {
+        const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
         const wallet: AirGapMarketWallet = new AirGapMarketWallet(
           subProtocols[index],
           this.wallet.publicKey,
           this.wallet.isExtendedPublicKey,
           this.wallet.derivationPath,
+          this.wallet.masterFingerprint,
+          this.wallet.status,
           this.priceService
         )
         if (this.accountProvider.walletExists(wallet)) {
@@ -121,9 +127,14 @@ export class SubAccountAddPage {
         wallet.addresses = this.wallet.addresses
         wallet.currentBalance = new BigNumber(balance)
 
-        return { wallet, selected: false }
+        return {
+          wallet,
+          selected: false,
+          groupId: walletGroup !== undefined ? walletGroup.id : undefined,
+          groupLabel: walletGroup !== undefined ? walletGroup.label : undefined
+        }
       })
-      .filter(account => account !== undefined)
+      .filter((account) => account !== undefined)
       .sort((a, b) => a.wallet.currentBalance.minus(b.wallet.currentBalance).toNumber() * -1)
 
     return accounts
@@ -137,7 +148,7 @@ export class SubAccountAddPage {
       this.loadDisplayedAccounts()
     } else {
       const searchTermLowerCase: string = searchTerm.toLowerCase()
-      this.filteredSubAccounts = this.subAccounts.filter(account => {
+      this.filteredSubAccounts = this.subAccounts.filter((account) => {
         const hasMatchingName: boolean = account.wallet.protocol.name.toLowerCase().includes(searchTermLowerCase)
         const hasMatchingSymbol: boolean = account.wallet.protocol.symbol.toLowerCase().includes(searchTermLowerCase)
 
@@ -154,7 +165,7 @@ export class SubAccountAddPage {
       this.infiniteEnabled = false
     }
 
-    newSubAccounts.forEach(account => {
+    newSubAccounts.forEach((account) => {
       if (account.wallet.currentMarketPrice === undefined) {
         account.wallet.fetchCurrentMarketPrice()
       }

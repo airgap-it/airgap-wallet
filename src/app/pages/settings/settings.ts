@@ -33,11 +33,11 @@ export class SettingsPage {
     this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public beaconPermissions(): void {
-    this.router.navigateByUrl('/beacon-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public dappPermissions(): void {
+    this.router.navigateByUrl('/dapp-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public beaconSettings(): void {
+  public dappSettings(): void {
     this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
@@ -51,10 +51,10 @@ export class SettingsPage {
 
     this.sharePlugin
       .share(options)
-      .then(result => {
+      .then((result) => {
         console.log(`Share completed: ${result}`)
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('Sharing failed with error: ' + error)
       })
   }
@@ -162,7 +162,7 @@ export class SettingsPage {
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {
-        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+        this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch((error) => console.error(error))
       },
       (err: string) => {
         console.error('Error: ' + err)

@@ -1,5 +1,7 @@
-import { IACHanderStatus, IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
+import { IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
+import { PercentPipe } from '@angular/common'
 import { Component, NgZone, ViewChild } from '@angular/core'
+// import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -10,15 +12,14 @@ import { ScanBasePage } from '../scan-base/scan-base'
 @Component({
   selector: 'page-scan',
   templateUrl: 'scan.html',
-  styleUrls: ['./scan.scss']
+  styleUrls: ['./scan.scss'],
+  providers: [PercentPipe]
 })
 export class ScanPage extends ScanBasePage {
   @ViewChild('scanner')
   public zxingScanner?: ZXingScannerComponent
 
   public percentageScanned: number = 0
-  public numberOfQrsScanned: number = 0
-  public numberOfQrsTotal: number = 0
 
   private parts: Set<string> = new Set()
 
@@ -37,50 +38,42 @@ export class ScanPage extends ScanBasePage {
   public async ionViewWillEnter(): Promise<void> {
     await super.ionViewWillEnter()
     this.resetScannerPage()
+    this.iacService.resetHandlers()
   }
 
   private resetScannerPage(): void {
     this.parts = new Set()
     this.percentageScanned = 0
     this.isMultiQr = false
+    this.iacService.resetHandlers()
   }
 
-  public async checkScan(resultString: string) {
+  public async checkScan(data: string): Promise<boolean | void> {
     const sizeBefore: number = this.parts.size
-    this.parts.add(resultString)
+    this.parts.add(data)
+
     if (sizeBefore === this.parts.size) {
       // We scanned a string we already have in our cache, ignoring it and starting scan again.
-      console.log(`[SCAN:checkScan]: Already scanned string skipping ${resultString}`)
+      console.log(`[SCAN:checkScan]: Already scanned string skipping ${data}`)
       this.startScan()
 
-      return
+      return undefined
     }
 
-    console.log(`[SCAN:checkScan]: Trying to decode string ${resultString}`)
+    console.log(`[SCAN:checkScan]: Trying to decode string ${data}`)
+
     this.ngZone.run(() => {
       this.iacService
-        .handleRequest(
-          Array.from(this.parts),
-          IACMessageTransport.QR_SCANNER,
-          (scanResult?: Error | { currentPage: number; totalPageNumber: number }) => {
-            console.log('scan result', scanResult)
-
-            const typedScanResult = (scanResult as any) as { availablePages: number[]; totalPages: number }
-            if (scanResult && typedScanResult.availablePages) {
-              this.isMultiQr = true
-              this.numberOfQrsScanned = typedScanResult.availablePages.length
-              this.numberOfQrsTotal = typedScanResult.totalPages
-              this.percentageScanned = Math.max(0, Math.min(1, typedScanResult.availablePages.length / typedScanResult.totalPages))
-            }
-            this.startScan()
-          }
-        )
-        .then((result: IACHanderStatus) => {
-          if (result === IACHanderStatus.SUCCESS) {
-            this.resetScannerPage()
-          }
+        .handleRequest(data, IACMessageTransport.QR_SCANNER, (progress: number) => {
+          console.log('scan result', progress)
+          this.isMultiQr = true
+          this.percentageScanned = progress ?? 0
+          this.startScan()
         })
         .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
     })
+  }
+  public ionViewWillLeave() {
+    this.resetScannerPage()
   }
 }
