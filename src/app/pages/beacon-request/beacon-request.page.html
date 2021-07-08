@@ -66,6 +66,11 @@
         <ng-container *ngFor="let transaction of transactions">
           <airgap-from-to [transaction]="transaction"></airgap-from-to>
         </ng-container>
+        <ng-container *ngIf="!transactions || (transactions && transactions.length === 0)">
+          <!-- TODO: Styling -->
+          <ion-spinner color="black"></ion-spinner>
+          Preparing opeartion...
+        </ng-container>
       </div>
     </ng-container>
   </ion-grid>

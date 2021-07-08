@@ -131,6 +131,7 @@ export class TransactionConfirmPage {
         .then(async (txId) => {
           console.log('transaction hash', txId)
           if (request) {
+            // TODO: Type
             if (request['transaction']) {
               this.walletConnectService.approveRequest(request.id, txId)
             } else {
@@ -139,7 +140,7 @@ export class TransactionConfirmPage {
                 type: this.beaconService.getResponseByRequestType((request as BeaconRequestOutputMessage).type),
                 transactionHash: txId
               } as BeaconResponseInputMessage
-              this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+              this.beaconService.respond(response, request as any).catch(handleErrorSentry(ErrorCategory.BEACON))
             }
           }
 
