@@ -1,4 +1,5 @@
 import { IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
+import { PercentPipe } from '@angular/common'
 import { Component, NgZone, ViewChild } from '@angular/core'
 // import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
@@ -11,7 +12,8 @@ import { ScanBasePage } from '../scan-base/scan-base'
 @Component({
   selector: 'page-scan',
   templateUrl: 'scan.html',
-  styleUrls: ['./scan.scss']
+  styleUrls: ['./scan.scss'],
+  providers: [PercentPipe]
 })
 export class ScanPage extends ScanBasePage {
   @ViewChild('scanner')

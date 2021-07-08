@@ -14,7 +14,7 @@ import {
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
-import { CommonModule, DecimalPipe } from '@angular/common'
+import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -147,7 +147,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     LedgerService,
     ProtocolGuard,
     ServiceKeyGuard,
-    TransactionHashGuard
+    TransactionHashGuard,
+    PercentPipe
   ],
   bootstrap: [AppComponent]
 })

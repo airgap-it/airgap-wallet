@@ -134,6 +134,6 @@ export class AccountImportPage implements OnDestroy {
         return this.accountProvider.addWallet(accountimport.wallet, accountimport.groupId, accountimport.groupLabel, { override: true })
       })
     )
-    await this.router.navigateByUrl('/tabs/portfolio', { skipLocationChange: true })
+    await this.router.navigateByUrl('/tabs/portfolio')
   }
 }
