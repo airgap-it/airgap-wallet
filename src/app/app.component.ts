@@ -119,7 +119,7 @@ export class AppComponent implements AfterViewInit {
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
       // TODO: Use wallet changed observable?
-      const sub: Subscription = this.accountProvider.wallets.subscribe(async () => {
+      const sub: Subscription = this.accountProvider.wallets$.subscribe(async () => {
         await this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()
@@ -163,9 +163,9 @@ export class AppComponent implements AfterViewInit {
       transaction: rawUnsignedTx
     })
 
-    const serializedTx: string[] = await this.serializerService.serialize([
+    const serializedTx: string | string[] = await this.serializerService.serialize([
       {
-        id: generateId(10),
+        id: generateId(8),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
@@ -221,9 +221,8 @@ export class AppComponent implements AfterViewInit {
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
-    const externalMethodProvider:
-      | TezosSaplingExternalMethodProvider
-      | undefined = await this.saplingNativeService.createExternalMethodProvider()
+    const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
+      await this.saplingNativeService.createExternalMethodProvider()
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(

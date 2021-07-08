@@ -67,7 +67,7 @@ export class ActionGroup {
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
       () => {
         const prepareAddTokenActionContext = new SimpleAction(() => {
-          return new Promise<AddTokenActionContext>(async resolve => {
+          return new Promise<AddTokenActionContext>(async (resolve) => {
             const info = {
               subProtocolType: SubProtocolType.TOKEN,
               wallet: this.callerContext.wallet,
@@ -76,9 +76,7 @@ export class ActionGroup {
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-                  info.wallet.addressIndex
-                }/${info.subProtocolType}`
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
               )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
@@ -172,7 +170,7 @@ export class ActionGroup {
       { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
       () => {
         const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
-          return new Promise<AddTokenActionContext>(async resolve => {
+          return new Promise<AddTokenActionContext>(async (resolve) => {
             const info = {
               subProtocolType: SubProtocolType.TOKEN,
               wallet: this.callerContext.wallet,
@@ -181,9 +179,7 @@ export class ActionGroup {
             this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
             this.callerContext.router
               .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
-                  info.wallet.addressIndex
-                }/${info.subProtocolType}`
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
               )
               .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           })
@@ -223,6 +219,7 @@ export class ActionGroup {
       return wallet
     }
 
+    const xtzWalletGroup = this.callerContext.accountProvider.findWalletGroup(xtzWallet)
     const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
 
     wallet = new AirGapMarketWallet(
@@ -230,12 +227,20 @@ export class ActionGroup {
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,
       xtzWallet.derivationPath,
+      xtzWallet.masterFingerprint,
+      xtzWallet.status,
       xtzWallet.priceService,
       index
     )
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.callerContext.accountProvider.addWallet(wallet).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    await this.callerContext.accountProvider
+      .addWallet(
+        wallet,
+        xtzWalletGroup !== undefined ? xtzWalletGroup.id : undefined,
+        xtzWalletGroup !== undefined ? xtzWalletGroup.label : undefined
+      )
+      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
 
     return wallet
   }
@@ -243,16 +248,14 @@ export class ActionGroup {
   private createDelegateButtonAction(): ButtonAction<void, void> {
     return new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' }, () => {
       return new SimpleAction(() => {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve) => {
           const info = {
             wallet: this.callerContext.wallet
           }
           this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
           this.callerContext.router
             .navigateByUrl(
-              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${
-                this.callerContext.wallet.protocol.identifier
-              }/${this.callerContext.wallet.addressIndex}`
+              `/delegation-detail/${DataServiceKey.DETAIL}/${this.callerContext.wallet.publicKey}/${this.callerContext.wallet.protocol.identifier}/${this.callerContext.wallet.addressIndex}`
             )
             .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
@@ -269,10 +272,10 @@ export class ActionGroup {
       const delegatorDetails = await this.callerContext.operationsProvider.getDelegatorDetails(this.callerContext.wallet)
 
       if (delegatorDetails.availableActions) {
-        const availableActionTypes = delegatorDetails.availableActions.map(action => action.type)
+        const availableActionTypes = delegatorDetails.availableActions.map((action) => action.type)
         return contexts
-          .filter(context => availableActionTypes.includes(context.type))
-          .map(context => {
+          .filter((context) => availableActionTypes.includes(context.type))
+          .map((context) => {
             return new ButtonAction<void, AirGapDelegatorActionContext>(context, () => {
               return new AirGapDelegatorAction({
                 wallet: this.callerContext.wallet,

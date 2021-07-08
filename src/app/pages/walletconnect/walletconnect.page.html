@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">
+      <permission-request
+        [address]="address"
+        [selectableWallets]="selectableWallets"
+        [requesterName]="requesterName"
+        [icon]="icon"
+        [targetProtocolSymbol]="'eth'"
+        (walletSetEmitter)="setWallet($event)"
+      ></permission-request>
+    </ng-container>
+
+    <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="request--container">
+      <ng-container *ngFor="let transaction of transactions">
+        <airgap-from-to [transaction]="transaction"></airgap-from-to>
+      </ng-container>
+    </div>
+
+    <div
+      *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST || request.method === requestMethod.ETH_SIGN_TYPED_DATA"
+      class="request--container"
+    >
+      <ion-row class="rawdata--container">
+        <ion-col class="ion-no-padding">
+          <pre class="ion-no-margin">{{ beaconRequest | json }}</pre>
+        </ion-col>
+      </ion-row>
+    </div>
+  </ion-grid>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="dismiss()">Cancel</ion-button>
+
+    <ion-button shape="round" color="primary" (click)="done()">Ok</ion-button>
+  </ion-fab>
+</ion-content>

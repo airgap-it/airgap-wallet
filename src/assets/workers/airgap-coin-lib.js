@@ -13,25 +13,31 @@ airgapCoinLib.addSupportedProtocol(new airgapCoinLib.KusamaProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.PolkadotProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.TezosShieldedTezProtocol())
 
-self.onmessage = function(event) {
-  airgapCoinLib.isCoinlibReady().then(function() {
-    console.log("start deriving addresses");
+self.onmessage = event => {
 
-		var wallet = event.data;
-    
-    const protocol = airgapCoinLib.getProtocolByIdentifier(wallet.protocolIdentifier)
+  airgapCoinLib.isCoinlibReady().then(async() => {
+    const wallets = event.data;
 
-    var airGapWallet = new airgapCoinLib.AirGapWallet(
-      protocol,
-      wallet.publicKey,
-      wallet.isExtendedPublicKey,
-      wallet.derivationPath
-    );
-    
-    airGapWallet.deriveAddresses(50).then(addresses => {
-      console.log("derived " + addresses.length + " addresses")
-  
-      self.postMessage({ addresses });
+    Promise.all(wallets.map(wallet => {
+      const protocol = airgapCoinLib.getProtocolByIdentifier(wallet.protocolIdentifier)
+
+      const airGapWallet = new airgapCoinLib.AirGapWallet(
+        protocol,
+        wallet.publicKey,
+        wallet.isExtendedPublicKey,
+        wallet.derivationPath,
+        wallet.masterFingerprint,
+        wallet.status
+      );
+      return airGapWallet.deriveAddresses(50).then(addresses => {
+        return {addresses: addresses, key: `${wallet.protocolIdentifier}_${wallet.publicKey}`}
+      })
+    })).then(async (addressesByKeys) => {
+      const derivedAddressesMap = addressesByKeys.reduce((obj, addressesByKey) => Object.assign(obj, { [addressesByKey.key]: addressesByKey.addresses }), {})
+      self.postMessage(derivedAddressesMap);
     })
   })
-};
+
+}
+
+               

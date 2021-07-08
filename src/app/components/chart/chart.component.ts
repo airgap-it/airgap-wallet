@@ -1,10 +1,13 @@
 import { AfterViewInit, Component, Input, OnDestroy, ViewChild } from '@angular/core'
 import * as moment from 'moment'
 import { BaseChartDirective } from 'ng2-charts'
-import { Subscription } from 'rxjs'
-import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { combineLatest, Subscription } from 'rxjs'
+import { AirGapMarketWallet, TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
 import { MarketDataService, ValueAtTimestamp } from './../../services/market-data/market-data.service'
+import { AccountProvider } from 'src/app/services/account/account.provider'
+import { AirGapWalletStatus, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { distinctUntilChanged } from 'rxjs/operators'
 
 @Component({
   selector: 'chart',
@@ -28,8 +31,13 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   public chartDatasets: { data: number[]; label: string }[] = [{ data: [], label: 'Price' }]
 
   private subscription: Subscription
+  private activeWallets: AirGapMarketWallet[]
 
-  constructor(private readonly drawChartProvider: DrawChartService, private readonly marketDataProvider: MarketDataService) {}
+  constructor(
+    private readonly drawChartProvider: DrawChartService,
+    private readonly marketDataProvider: MarketDataService,
+    private readonly accountProvider: AccountProvider
+  ) {}
 
   public ngOnInit(): void {
     this.chartOptions = {
@@ -86,10 +94,10 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         displayColors: false, // removes color box and label
 
         callbacks: {
-          title: function(data) {
+          title: function (data) {
             return moment.unix(data[0].label).format('DD.MM.YYYY')
           },
-          label: function(data): string {
+          label: function (data): string {
             if (Number(data.value) % 1 !== 0) {
               let value = parseFloat(data.value).toFixed(2)
               return `$${value}`
@@ -116,10 +124,15 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         ]
       }
     }
-
-    this.subscription = this.drawChartProvider.getChartObservable().subscribe(async data => {
-      this.drawChart(data)
-    })
+    this.subscription = combineLatest([this.drawChartProvider.getChartObservable(), this.accountProvider.wallets$.asObservable()])
+      .pipe(distinctUntilChanged())
+      .subscribe(async ([data, wallets]) => {
+        this.activeWallets =
+          wallets.filter(
+            (wallet) => wallet.status === AirGapWalletStatus.ACTIVE && wallet.protocol.identifier !== SubProtocolSymbols.XTZ_USD
+          ) ?? []
+        this.drawChart(data)
+      })
   }
 
   public async drawChart(timeInterval: TimeInterval): Promise<void> {
@@ -128,7 +141,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
     this.currentTimeInterval = timeInterval
 
-    this.marketDataProvider.fetchAllValues(this.currentTimeInterval).then(async rawData => {
+    this.marketDataProvider.fetchAllValues(this.currentTimeInterval, this.activeWallets).then(async (rawData) => {
       this.chartDatasets[0].data = rawData.map((obj: ValueAtTimestamp) => obj.usdValue)
 
       for (const value of rawData) {
@@ -145,7 +158,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   }
 
   public displayPercentageChange(rawData: number[]): number {
-    const firstValue: number = rawData.find(value => value > 0)
+    const firstValue: number = rawData.find((value) => value > 0)
     if (firstValue !== undefined) {
       const lastValue: number = rawData.slice(-1)[0]
       const percentageChange: number = ((lastValue - firstValue) / firstValue) * 100
@@ -161,7 +174,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.chartLabels = []
 
     if (this.chart) {
-      const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
+      const ctx: CanvasRenderingContext2D = this.chart.ctx as any as CanvasRenderingContext2D
 
       const color1: string = '26E8CD' // rgb(122, 141, 169)
 
