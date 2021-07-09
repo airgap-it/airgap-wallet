@@ -1,7 +1,7 @@
 <ng-container>
-  <ion-row>
+  <ion-row class="request--container ion-padding-top">
     <ion-col class="ion-text-center" size="3">
-      <ion-avatar>
+      <ion-avatar class="content--align__center-center">
         <airgap-identicon [address]="requesterName" *ngIf="!icon"></airgap-identicon>
         <img [src]="icon" *ngIf="icon" />
       </ion-avatar>
@@ -16,16 +16,16 @@
       <div class="divider--line"></div>
     </ion-col>
     <ion-col class="ion-text-center" size="3">
-      <ion-avatar>
+      <ion-avatar class="content--align__center-center">
         <airgap-identicon [address]="address"></airgap-identicon>
       </ion-avatar>
     </ion-col>
   </ion-row>
   <ion-row>
-    <ion-col class="ion-text-left" size="4">
-      <h5 class="ion-no-margin">{{ requesterName | shortenString }}</h5>
+    <ion-col class="ion-text-left" size="6">
+      <h5 class="ion-no-margin">{{ requesterName }}</h5>
     </ion-col>
-    <ion-col class="ion-text-right" size="4" push="4">
+    <ion-col class="ion-text-right" size="6">
       <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
     </ion-col>
   </ion-row>
@@ -45,24 +45,17 @@
 
   <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
 
-  <ion-row class="ion-text-center ion-padding-top" size="3">
-    <ion-col>
+  <ion-item *ngIf="selectableWallets.length > 1" lines="none" class="ion-no-padding">
+    <ion-avatar slot="start">
       <airgap-identicon [address]="address"></airgap-identicon>
-      <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
-
-      <ion-button
-        *ngIf="selectableWallets.length > 1"
-        (click)="changeAccount()"
-        color="secondary"
-        shape="round"
-        size="small"
-        fill="outline"
-      >
-        <ion-icon name="swap-vertical-outline"></ion-icon>
-        {{ 'beacon-request.select-account.button' | translate }}
-      </ion-button>
-    </ion-col>
-  </ion-row>
+    </ion-avatar>
+    <ion-label>
+      <p class="ion-no-margin">{{ address | shortenString }}</p>
+    </ion-label>
+    <ion-button (click)="changeAccount()" color="secondary" shape="round" size="small" fill="outline" slot="end">
+      {{ 'beacon-request.select-account.button' | translate }}
+    </ion-button>
+  </ion-item>
 
   <ng-container *ngIf="inputs && inputs.length > 0">
     <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>

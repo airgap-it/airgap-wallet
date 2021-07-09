@@ -13,15 +13,13 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="request">
       <ng-container *ngIf="request.type != 'permission_request'">
-        <ion-card>
+        <ion-card class="ion-margin-bottom">
           <ion-item lines="none">
             <ion-avatar slot="start">
               <airgap-identicon [address]="requesterName"></airgap-identicon>
             </ion-avatar>
             <ion-label class="ion-margin-start">
-              <p>
-                {{ 'beacon-request.request-by-dapp_label' | translate }}
-              </p>
+              <p>{{ 'beacon-request.request-by-dapp_label' | translate }}</p>
               <h3>{{requesterName}}</h3>
             </ion-label>
             <img src="assets/img/beacon_logo.svg" slot="end" class="by-beacon__img" />
@@ -47,7 +45,7 @@
         </ng-container>
       </ion-row>
 
-      <div *ngIf="request.type === 'sign_payload_request'" class="request--container">
+      <div *ngIf="request.type === 'sign_payload_request'" class="ion-padding-top">
         <ion-row class="rawdata--container ion-padding-bottom" *ngIf="request && request.payload">
           <ion-col class="ion-no-padding">
             <p>{{ 'beacon-request.sign-data_label' | translate }}</p>
@@ -62,31 +60,26 @@
         </ion-row>
       </div>
 
-      <div *ngIf="request.type === 'operation_request'" class="request--container">
+      <div *ngIf="request.type === 'operation_request'" class="ion-padding-top">
         <ng-container *ngFor="let transaction of transactions">
           <airgap-from-to [transaction]="transaction"></airgap-from-to>
         </ng-container>
         <ng-container *ngIf="!transactions || (transactions && transactions.length === 0)">
-          <!-- TODO: Styling -->
-          <ion-spinner color="black"></ion-spinner>
-          Preparing opeartion...
+          <ion-row class="ion-padding-horizontal">
+            <p>Preparing operation...</p>
+            <ion-progress-bar type="indeterminate" value="0.5"></ion-progress-bar>
+          </ion-row>
         </ng-container>
       </div>
     </ng-container>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-button shape="round" color="secondary" (click)="cancel()">
-      {{ 'beacon-request.cancel_label' | translate }}
-    </ion-button>
+    <ion-button shape="round" color="secondary" (click)="cancel()">{{ 'beacon-request.cancel_label' | translate }}</ion-button>
 
     <ion-button shape="round" color="primary" (click)="done()">
-      <ng-container *ngIf="request.type !== 'permission_request'">
-        {{ 'beacon-request.continue_label' | translate }}
-      </ng-container>
-      <ng-container *ngIf="request.type === 'permission_request'">
-        {{ 'beacon-request.connect_label' | translate }}
-      </ng-container>
+      <ng-container *ngIf="request.type !== 'permission_request'">{{ 'beacon-request.continue_label' | translate }}</ng-container>
+      <ng-container *ngIf="request.type === 'permission_request'">{{ 'beacon-request.connect_label' | translate }}</ng-container>
     </ion-button>
   </ion-fab>
 </ion-content>

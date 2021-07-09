@@ -126,7 +126,7 @@
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
-    "telegram_label": "Join Telegram",
+    "discord_label": "Join Discord",
     "share_label": "Share AirGap",
     "information_label": "Information",
     "github_label": "GitHub Repository",
@@ -614,7 +614,7 @@
     "active": "active"
   },
   "current-wallet-group": {
-    "label": "Active Group:"
+    "label": "Group"
   },
   "voting": {
     "title": "Voting",

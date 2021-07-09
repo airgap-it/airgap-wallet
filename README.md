@@ -78,7 +78,7 @@ Before integrating a new feature, please quickly reach out to us in an issue so 
 
 - If you find any bugs, submit an [issue](../../issues) or open [pull-request](../../pulls).
 - If you want to integrate a new blockchain, please read the contributing guidelines in the [airgap-coin-lib](https://github.com/airgap-it/airgap-coin-lib) project.
-- Engage with other users and developers on the [AirGap Telegram](https://t.me/AirGap).
+- Engage with other users and developers on the [AirGap Discord](https://discord.gg/gnWqCQsteh).
 
 ## Related Projects
 
