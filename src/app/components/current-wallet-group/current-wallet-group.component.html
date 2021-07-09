@@ -1,5 +1,5 @@
 <ion-item lines="none" button="true" detail="false" *ngIf="(groups$ | async) && (groups$ | async).length > 0">
-  <ion-text slot="start">{{ 'current-wallet-group.label' | translate }}</ion-text>
+  <ion-text slot="start" color="medium">{{ 'current-wallet-group.label' | translate }}</ion-text>
   <p slot="end" *ngIf="(groups$ | async) && (groups$ | async).length === 1">
     {{ currentGroup$ | async | groupLabel | translate }}
   </p>

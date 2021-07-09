@@ -3,7 +3,6 @@ import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
 import { SharePlugin } from '@capacitor/core'
 import { AlertController, ModalController, Platform } from '@ionic/angular'
-import { TranslateService } from '@ngx-translate/core'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -22,7 +21,6 @@ export class SettingsPage {
     public readonly serializerService: SerializerService,
     private readonly router: Router,
     private readonly modalController: ModalController,
-    private readonly translateService: TranslateService,
     private readonly clipboardProvider: ClipboardService,
     private readonly iacService: IACService,
     private readonly browserService: BrowserService,
@@ -76,48 +74,8 @@ export class SettingsPage {
     this.browserService.openUrl('https://github.com/airgap-it/airgap-wallet/issues')
   }
 
-  public async telegram(): Promise<void> {
-    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
-      header: this.translateService.instant('settings.alert_title'),
-      inputs: [
-        {
-          type: 'radio',
-          label: this.translateService.instant('settings.channel.international'),
-          value: 'International',
-          checked: true
-        },
-        {
-          type: 'radio',
-          label: this.translateService.instant('settings.channel.chinese'),
-          value: 'Chinese'
-        }
-      ],
-      buttons: [
-        {
-          text: this.translateService.instant('settings.alert_cancel'),
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: (): void => {
-            console.log('Confirm Cancel')
-          }
-        },
-        {
-          text: this.translateService.instant('settings.telegram_label'),
-          handler: (data: string): void => {
-            switch (data) {
-              case 'Chinese':
-                this.browserService.openUrl('https://t.me/AirGap_cn')
-                break
-              case 'International':
-              default:
-                this.browserService.openUrl('https://t.me/AirGap')
-            }
-          }
-        }
-      ]
-    })
-
-    alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  public async discord(): Promise<void> {
+    this.browserService.openUrl('https://discord.gg/gnWqCQsteh')
   }
 
   public translate(): void {
@@ -144,7 +102,7 @@ export class SettingsPage {
   }
 
   public faq(): void {
-    this.browserService.openUrl('https://airgap.it/#faq')
+    this.browserService.openUrl('https://support.airgap.it')
   }
 
   public aboutBeacon(): void {
