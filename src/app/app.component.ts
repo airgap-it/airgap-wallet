@@ -139,8 +139,6 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
-          // tslint:disable-next-line: no-console
-          console.log('Successfully received deeplink', data.url)
           this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
@@ -153,9 +151,6 @@ export class AppComponent implements AfterViewInit {
     const publicKey: string = url.searchParams.get('publicKey')
     const rawUnsignedTx: unknown = JSON.parse(url.searchParams.get('rawUnsignedTx'))
     const identifier: string = url.searchParams.get('identifier')
-    console.log('publicKey', publicKey)
-    console.log('rawUnsignedTx', rawUnsignedTx)
-    console.log('identifier', identifier)
 
     const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
     const airGapTxs: IAirGapTransaction[] = await wallet.protocol.getTransactionDetails({
@@ -226,7 +221,7 @@ export class AppComponent implements AfterViewInit {
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
-        edonetNetwork,
+        florencenetNetwork,
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )

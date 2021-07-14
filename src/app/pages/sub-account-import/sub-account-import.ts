@@ -55,7 +55,7 @@ export class SubAccountImportPage {
       .pipe(
         map((mainAccounts) =>
           mainAccounts.filter(
-            wallet =>
+            (wallet) =>
               wallet.status === AirGapWalletStatus.ACTIVE &&
               wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier) &&
               wallet.protocol.options.network.type === NetworkType.MAINNET
@@ -88,20 +88,27 @@ export class SubAccountImportPage {
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
       })
   }
-
   public importWallets() {
-    this.subWalletsWithGroups.forEach(([group, subWallet]) => {
-      this.accountProvider
-        .addWallet(subWallet, group !== undefined ? group.id : undefined, group !== undefined ? group.label : undefined)
-        .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    const walletAddInfos = this.subWalletsWithGroups.map(([group, subWallet]) => {
+      return {
+        walletToAdd: subWallet,
+        groupId: group !== undefined ? group.id : undefined,
+        groupLabel: group !== undefined ? group.label : undefined
+      }
     })
+    this.accountProvider.addWallets(walletAddInfos).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     this.popToRoot()
   }
 
   public importWallet(group: AirGapMarketWalletGroup | undefined, subWallet: AirGapMarketWallet) {
-    this.accountProvider
-      .addWallet(subWallet, group !== undefined ? group.id : undefined, group !== undefined ? group.label : undefined)
-      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    const walletAddInfos = [
+      {
+        walletToAdd: subWallet,
+        groupId: group !== undefined ? group.id : undefined,
+        groupLabel: group !== undefined ? group.label : undefined
+      }
+    ]
+    this.accountProvider.addWallets(walletAddInfos).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
     this.popToRoot()
   }
 

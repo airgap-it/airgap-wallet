@@ -34,6 +34,13 @@ interface CTAInfo {
   alertDescription: string
 }
 
+export interface WalletAddInfo {
+  walletToAdd: AirGapMarketWallet
+  groupId?: string
+  groupLabel?: string
+  options?: { override?: boolean; updateState?: boolean }
+}
+
 export type ImplicitWalletGroup = 'all'
 export type ActiveWalletGroup = AirGapMarketWalletGroup | ImplicitWalletGroup
 
@@ -50,6 +57,7 @@ export class AccountProvider {
 
   public walletGroups$: ReplaySubject<AirGapMarketWalletGroup[]> = new ReplaySubject(1)
   public wallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
+  public allWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public usedProtocols$: ReplaySubject<ICoinProtocol[]> = new ReplaySubject(1)
 
@@ -347,46 +355,63 @@ export class AccountProvider {
     } else {
       this.wallets$.next([])
     }
+    this.allWallets$.next(this.allWallets)
   }
 
-  public async addWallet(
-    walletToAdd: AirGapMarketWallet,
-    groupId?: string,
-    groupLabel?: string,
-    options: { override?: boolean; updateState?: boolean } = {}
+  public async addWallets(walletAddInfos: WalletAddInfo[]): Promise<void> {
+    let existingWallets = []
+    for (let walletAddInfo of walletAddInfos) {
+      const defaultOptions = {
+        override: false,
+        updateState: true
+      }
+
+      const resolvedOptions = {
+        ...defaultOptions,
+        ...(walletAddInfo.options ?? {})
+      }
+
+      const alreadyExists: boolean = this.walletExists(walletAddInfo.walletToAdd)
+      if (alreadyExists) {
+        existingWallets.push(walletAddInfo.walletToAdd)
+        if (!resolvedOptions.override) {
+          throw new Error('wallet already exists')
+        }
+      }
+      await this.addWallet(walletAddInfo, resolvedOptions)
+    }
+
+    const activeNewWallets = walletAddInfos
+      .filter(
+        (walletAddInfo) =>
+          walletAddInfo.walletToAdd.status === AirGapWalletStatus.ACTIVE &&
+          !existingWallets.some(
+            (wallet: AirGapMarketWallet) =>
+              this.isSameWallet(wallet, walletAddInfo.walletToAdd) && wallet.status === walletAddInfo.walletToAdd.status
+          )
+      )
+      .map((walletAddInfo) => walletAddInfo.walletToAdd)
+
+    await this.registerToPushBackend(activeNewWallets)
+    this.drawChartProvider.drawChart()
+  }
+
+  private async addWallet(
+    walletAddInfo: WalletAddInfo,
+    resolvedOptions: {
+      override: boolean
+      updateState: boolean
+    }
   ): Promise<void> {
-    const defaultOptions = {
-      override: false,
-      updateState: true
-    }
+    this.assertWalletGroupExists(walletAddInfo.groupId, walletAddInfo.groupLabel)
+    this.assertWalletGroupUpdated(walletAddInfo.groupId, walletAddInfo.groupLabel)
 
-    const resolvedOptions = {
-      ...defaultOptions,
-      ...options
-    }
-
-    const alreadyExists: boolean = this.walletExists(walletToAdd)
-    if (alreadyExists && !resolvedOptions.override) {
-      throw new Error('wallet already exists')
-    }
-
-    this.assertWalletGroupExists(groupId, groupLabel)
-    this.assertWalletGroupUpdated(groupId, groupLabel)
-
-    const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(groupId)
-    this.addToGroup(walletGroup, walletToAdd)
-
-    if (walletToAdd.status === AirGapWalletStatus.ACTIVE && !alreadyExists) {
-      await this.registerToPushBackend(walletToAdd)
-    }
+    const walletGroup: AirGapMarketWalletGroup = this.walletGroups.get(walletAddInfo.groupId)
+    this.addToGroup(walletGroup, walletAddInfo.walletToAdd)
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
       this.walletGroups$.next(this.allWalletGroups)
-      console.log('DRAW CHART addWallet')
-
-      this.drawChartProvider.drawChart()
-
       return this.persist()
     }
   }
@@ -491,9 +516,9 @@ export class AccountProvider {
     }
   }
 
-  private async registerToPushBackend(wallet: AirGapMarketWallet): Promise<void> {
+  private async registerToPushBackend(wallets: AirGapMarketWallet[]): Promise<void> {
     await this.pushProvider.setupPush()
-    this.pushProvider.registerWallets([wallet]).catch(handleErrorSentry(ErrorCategory.PUSH))
+    this.pushProvider.registerWallets(wallets).catch(handleErrorSentry(ErrorCategory.PUSH))
   }
 
   private unregisterFromPushBackend(wallet: AirGapMarketWallet): void {

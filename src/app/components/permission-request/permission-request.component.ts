@@ -1,6 +1,6 @@
 import { PermissionScope } from '@airgap/beacon-sdk'
-import { AirGapMarketWallet, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
-import { Component, Input, EventEmitter, Output } from '@angular/core'
+import { AirGapMarketWallet, AirGapWalletStatus, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
@@ -21,15 +21,17 @@ export interface CheckboxInput {
   templateUrl: './permission-request.component.html',
   styleUrls: ['./permission-request.component.scss']
 })
-export class PermissionRequestComponent {
+export class PermissionRequestComponent implements OnInit {
   public modalRef: HTMLIonModalElement | undefined
   public readonly networkType: typeof NetworkType = NetworkType
+
+  public wallets: AirGapMarketWallet[] = []
 
   @Input()
   public address: string = ''
 
   @Input()
-  public network: ProtocolNetwork | undefined = undefined
+  public network: ProtocolNetwork | undefined
 
   @Input()
   public requesterName: string = ''
@@ -38,39 +40,40 @@ export class PermissionRequestComponent {
   public icon: string = ''
 
   @Input()
-  public selectableWallets: AirGapMarketWallet[] = []
-
-  @Input()
   public inputs: CheckboxInput[] = []
 
   @Input()
-  public targetProtocolSymbol: ProtocolSymbols | undefined = undefined
+  public targetProtocolSymbol: ProtocolSymbols | undefined
 
   @Output()
   public readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter<AirGapMarketWallet>()
 
   constructor(
     private readonly modalController: ModalController,
-    private readonly accountService: AccountProvider,
     private readonly alertController: AlertController,
     private readonly shortenStringPipe: ShortenStringPipe,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
+    private readonly accountService: AccountProvider
   ) {}
+
+  ngOnInit() {
+    const allWallets = this.accountService.getWalletList()
+    this.wallets = allWallets.filter(
+      (wallet: AirGapMarketWallet) =>
+        wallet.protocol.identifier === this.targetProtocolSymbol && wallet.status === AirGapWalletStatus.ACTIVE
+    )
+  }
 
   public async changeAccount(): Promise<void> {
     this.modalRef = await this.modalController.getTop()
 
-    const wallets: AirGapMarketWallet[] = this.accountService
-      .getWalletList()
-      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === this.targetProtocolSymbol)
-
     return new Promise(async () => {
-      if (wallets.length === 1) {
+      if (this.wallets.length === 1) {
         return
       }
       const alert = await this.alertController.create({
         header: this.translateService.instant('beacon-request.select-account.alert'),
-        inputs: wallets.map(wallet => ({
+        inputs: this.wallets.map((wallet) => ({
           label: this.shortenStringPipe.transform(wallet.receivingPublicAddress),
           type: 'radio',
           value: wallet,
@@ -87,7 +90,7 @@ export class PermissionRequestComponent {
           },
           {
             text: 'Ok',
-            handler: wallet => {
+            handler: (wallet) => {
               this.walletSetEmitter.emit(wallet)
             }
           }

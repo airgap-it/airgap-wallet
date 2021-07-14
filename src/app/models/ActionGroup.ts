@@ -234,13 +234,14 @@ export class ActionGroup {
     )
     wallet.addresses = ktAddresses
     await wallet.synchronize().catch(handleErrorSentry(ErrorCategory.COINLIB))
-    await this.callerContext.accountProvider
-      .addWallet(
-        wallet,
-        xtzWalletGroup !== undefined ? xtzWalletGroup.id : undefined,
-        xtzWalletGroup !== undefined ? xtzWalletGroup.label : undefined
-      )
-      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+    const walletAddInfos = [
+      {
+        walletToAdd: wallet,
+        groupId: xtzWalletGroup !== undefined ? xtzWalletGroup.id : undefined,
+        groupLabel: xtzWalletGroup !== undefined ? xtzWalletGroup.label : undefined
+      }
+    ]
+    await this.callerContext.accountProvider.addWallets(walletAddInfos).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
 
     return wallet
   }

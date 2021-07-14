@@ -14,6 +14,7 @@ import { Router } from '@angular/router'
 import { AlertController, ModalController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
+  AirGapWalletStatus,
   IACMessageDefinitionObjectV3,
   IACMessageType,
   IAirGapTransaction,
@@ -28,11 +29,11 @@ import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { ErrorPage } from '../error/error.page'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { TranslateService } from '@ngx-translate/core'
 import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
 import { generateId } from '@airgap/coinlib-core'
+import { Subscription } from 'rxjs'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -50,16 +51,15 @@ export class BeaconRequestPage implements OnInit {
   public requesterName: string = ''
   public inputs: CheckboxInput[] = []
   public transactions: IAirGapTransaction[] | undefined | any
-
   public selectableWallets: AirGapMarketWallet[] = []
   private selectedWallet: AirGapMarketWallet | undefined
 
   public modalRef: HTMLIonModalElement | undefined
 
   public blake2bHash: string | undefined
+  private subscription: Subscription
 
   private responseHandler: (() => Promise<void>) | undefined
-
   private readonly beaconService: BeaconService | undefined
 
   constructor(
@@ -70,7 +70,14 @@ export class BeaconRequestPage implements OnInit {
     private readonly alertController: AlertController,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService
-  ) {}
+  ) {
+    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
+      this.selectableWallets = wallets.filter(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.status === AirGapWalletStatus.ACTIVE
+      )
+    })
+  }
 
   public get address(): string {
     if (this.selectedWallet !== undefined) {
@@ -133,16 +140,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
-    const modal = await this.modalController.create({
-      component: ErrorPage,
-      componentProps: {
-        title: error.name,
-        message: error.message,
-        data: error.data ? error.data : error.stack
-      }
-    })
-
-    await modal.present()
+    await this.beaconService.displayErrorPage(error)
 
     setTimeout(async () => {
       await this.dismiss() // TODO: This causes flickering because it's "behind" the error modal.
@@ -150,9 +148,6 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async permissionRequest(request: PermissionRequestOutput): Promise<void> {
-    this.selectableWallets = this.accountService
-      .getWalletList()
-      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
     if (this.selectableWallets.length > 0) {
       this.selectedWallet = this.selectableWallets[0]
     }
@@ -206,17 +201,13 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async changeAccount(): Promise<void> {
-    const wallets: AirGapMarketWallet[] = this.accountService
-      .getWalletList()
-      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ)
-
     return new Promise(async () => {
-      if (wallets.length === 1) {
+      if (this.selectableWallets.length === 1) {
         return
       }
       const alert = await this.alertController.create({
         header: this.translateService.instant('beacon-request.select-account.alert'),
-        inputs: wallets.map((wallet) => ({
+        inputs: this.selectableWallets.map((wallet) => ({
           label: this.shortenStringPipe.transform(wallet.receivingPublicAddress),
           type: 'radio',
           value: wallet,
@@ -246,12 +237,10 @@ export class BeaconRequestPage implements OnInit {
 
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
     const tezosProtocol: TezosProtocol = new TezosProtocol()
-    const selectedWallet: AirGapMarketWallet = this.accountService
-      .getWalletList()
-      .find(
-        (wallet: AirGapMarketWallet) =>
-          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
-      )
+    const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
+      (wallet: AirGapMarketWallet) =>
+        wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
+    )
 
     if (!selectedWallet) {
       await this.beaconService.sendAccountNotFound(request)
@@ -300,12 +289,10 @@ export class BeaconRequestPage implements OnInit {
   private async operationRequest(request: OperationRequestOutput): Promise<void> {
     let tezosProtocol: TezosProtocol = new TezosProtocol()
 
-    const selectedWallet: AirGapMarketWallet = this.accountService
-      .getWalletList()
-      .find(
-        (wallet: AirGapMarketWallet) =>
-          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
-      )
+    const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
+      (wallet: AirGapMarketWallet) =>
+        wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
+    )
 
     if (!selectedWallet) {
       await this.beaconService.sendAccountNotFound(request)
@@ -386,5 +373,9 @@ export class BeaconRequestPage implements OnInit {
 
   async setWallet(wallet: AirGapMarketWallet) {
     this.selectedWallet = wallet
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }

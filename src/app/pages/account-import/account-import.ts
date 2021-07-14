@@ -129,11 +129,16 @@ export class AccountImportPage implements OnDestroy {
   }
 
   public async import(): Promise<void> {
-    await Promise.all(
-      this.allAccountImports.map((accountimport: AccountImport) => {
-        return this.accountProvider.addWallet(accountimport.wallet, accountimport.groupId, accountimport.groupLabel, { override: true })
-      })
-    )
+    const addWalletInfos = this.allAccountImports.map((accountimport: AccountImport) => {
+      return {
+        walletToAdd: accountimport.wallet,
+        groupId: accountimport.groupId,
+        groupLabel: accountimport.groupLabel,
+        options: { override: true }
+      }
+    })
+
+    await this.accountProvider.addWallets(addWalletInfos)
     await this.router.navigateByUrl('/tabs/portfolio')
   }
 }

@@ -1,6 +1,7 @@
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
+  AirGapWalletStatus,
   EthereumProtocol,
   EthereumProtocolOptions,
   generateId,
@@ -15,6 +16,7 @@ import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import BigNumber from 'bignumber.js'
+import { Subscription } from 'rxjs'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -66,24 +68,33 @@ export class WalletconnectPage implements OnInit {
   public url: string = ''
   public icon: string = ''
   public transactions: IAirGapTransaction[] | undefined
-  public selectableWallets: AirGapMarketWallet[] = []
-  public selectedWallet: AirGapMarketWallet
+  public beaconRequest: any
   public readonly request: JSONRPC
   public readonly requestMethod: typeof Methods = Methods
   private readonly connector: WalletConnect | undefined
+  private selectedWallet: AirGapMarketWallet | undefined
+  public selectableWallets: AirGapMarketWallet[] = []
 
-  public beaconRequest: any
+  private subscription: Subscription
+
   private responseHandler: (() => Promise<void>) | undefined
 
   constructor(
     private readonly modalController: ModalController,
-    private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
+    private readonly accountService: AccountProvider,
     private readonly router: Router,
     private readonly alertCtrl: AlertController,
     private readonly beaconService: BeaconService,
     private readonly translateService: TranslateService
-  ) {}
+  ) {
+    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
+      this.selectableWallets = wallets.filter(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.ETH && wallet.status === AirGapWalletStatus.ACTIVE
+      )
+    })
+  }
 
   public get address(): string {
     if (this.selectedWallet !== undefined) {
@@ -124,12 +135,8 @@ export class WalletconnectPage implements OnInit {
   private async signRequest(request: JSONRPC<string>) {
     const message = request.params[0]
     const address = request.params[1]
-    console.log(address)
-    const selectedWallet: AirGapMarketWallet = this.accountService
-      .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
 
-    if (!selectedWallet) {
+    if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
 
@@ -151,7 +158,7 @@ export class WalletconnectPage implements OnInit {
     this.beaconService.addVaultRequest(generatedId, this.beaconRequest, protocol)
     this.responseHandler = async () => {
       const info = {
-        wallet: selectedWallet,
+        wallet: this.selectedWallet,
         data: this.beaconRequest,
         generatedId: generatedId,
         type: IACMessageType.MessageSignRequest
@@ -167,12 +174,11 @@ export class WalletconnectPage implements OnInit {
     this.url = request.params[0].peerMeta.url ? request.params[0].peerMeta.url : ''
     this.icon = request.params[0].peerMeta.icons ? request.params[0].peerMeta.icons[0] : ''
     this.requesterName = request.params[0].peerMeta.name ? request.params[0].peerMeta.name : ''
-    this.selectableWallets = this.accountService
-      .getWalletList()
-      .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH)
+
     if (this.selectableWallets.length > 0) {
       this.selectedWallet = this.selectableWallets[0]
     }
+
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
@@ -193,17 +199,13 @@ export class WalletconnectPage implements OnInit {
   private async operationRequest(request: JSONRPC<EthTx>): Promise<void> {
     const ethereumProtocol: EthereumProtocol = new EthereumProtocol()
 
-    const selectedWallet: AirGapMarketWallet = this.accountService
-      .getWalletList()
-      .find((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ETH) // TODO: Add wallet selection
-
-    if (!selectedWallet) {
+    if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
 
     const options: EthereumProtocolOptions = new EthereumProtocolOptions()
     const gasPrice = await options.nodeClient.getGasPrice()
-    const txCount = await options.nodeClient.fetchTransactionCount(selectedWallet.receivingPublicAddress)
+    const txCount = await options.nodeClient.fetchTransactionCount(this.selectedWallet.receivingPublicAddress)
     const protocol = new EthereumProtocol()
     const eth = request.params[0]
 
@@ -226,14 +228,14 @@ export class WalletconnectPage implements OnInit {
 
     this.beaconService.addVaultRequest(generatedId, walletConnectRequest, protocol)
     this.transactions = await ethereumProtocol.getTransactionDetails({
-      publicKey: selectedWallet.publicKey,
+      publicKey: this.selectedWallet.publicKey,
       transaction
     })
 
     this.responseHandler = async () => {
       const info = {
-        wallet: selectedWallet,
-        airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction }),
+        wallet: this.selectedWallet,
+        airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: this.selectedWallet.publicKey, transaction }),
         data: transaction,
         type: IACMessageType.TransactionSignRequest
       }
@@ -281,5 +283,9 @@ export class WalletconnectPage implements OnInit {
 
   async setWallet(wallet: AirGapMarketWallet) {
     this.selectedWallet = wallet
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 }

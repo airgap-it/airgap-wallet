@@ -51,17 +51,22 @@ describe('AccountProvider', () => {
 
   it('should successfully add and persist ETH wallets', async (done) => {
     expect(accountProvider.getWalletList().length).toEqual(1)
-    await accountProvider.addWallet(
-      new AirGapMarketWallet(
-        new EthereumProtocol(),
-        '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
-        false,
-        `m/44'/60'/0'/0/0`,
-        '',
-        AirGapWalletStatus.ACTIVE,
-        new PriceServiceMock()
-      )
+    const wallet = new AirGapMarketWallet(
+      new EthereumProtocol(),
+      '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
+      false,
+      `m/44'/60'/0'/0/0`,
+      '',
+      AirGapWalletStatus.ACTIVE,
+      new PriceServiceMock()
     )
+    const walletAddInfo = [
+      {
+        walletToAdd: wallet
+      }
+    ]
+
+    await accountProvider.addWallets(walletAddInfo)
     expect(accountProvider.getWalletList().length).toEqual(2)
     done()
   })
@@ -115,7 +120,12 @@ describe('AccountProvider', () => {
     )
     await accountProvider.removeWallet(wallet)
     expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
-    await accountProvider.addWallet(wallet)
+    const walletAddInfo = [
+      {
+        walletToAdd: wallet
+      }
+    ]
+    await accountProvider.addWallets(walletAddInfo)
     expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 
@@ -144,7 +154,13 @@ describe('AccountProvider', () => {
 
     await accountProvider.removeWallet(wallet)
     expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
-    await accountProvider.addWallet(wallet)
+
+    const walletAddInfo = [
+      {
+        walletToAdd: wallet
+      }
+    ]
+    await accountProvider.addWallets(walletAddInfo)
     expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
   })
 })
