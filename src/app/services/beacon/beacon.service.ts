@@ -191,6 +191,30 @@ export class BeaconService {
     await this.client.removeAllPeers(true)
   }
 
+  public async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+    let message = error.message
+    if (message === 'TEZOS(NETWORK)') {
+      message = 'The simulation of your transaction failed. Please make sure all the values in your transaction are valid.'
+    }
+    let data = error.data ? error.data : error.stack
+    // TODO: Parse contents and show info (eg. failwith)
+    // if (error.data) {
+    //   if ((error.data as any).contents) {
+    //     data = {}
+    //   }
+    // }
+    const modal = await this.modalController.create({
+      component: ErrorPage,
+      componentProps: {
+        title: error.name ?? 'Error',
+        message,
+        data
+      }
+    })
+
+    return modal.present()
+  }
+
   private async isNetworkSupported(network?: Network): Promise<boolean> {
     return (
       network &&
@@ -200,19 +224,6 @@ export class BeaconService {
         network.type === BeaconNetworkType.FLORENCENET ||
         network.type === BeaconNetworkType.CUSTOM)
     )
-  }
-
-  private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
-    const modal = await this.modalController.create({
-      component: ErrorPage,
-      componentProps: {
-        title: error.name,
-        message: error.message,
-        data: error.data ? error.data : error.stack
-      }
-    })
-
-    return modal.present()
   }
 
   public async sendAbortedError(request: BeaconRequestOutputMessage): Promise<void> {

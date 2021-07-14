@@ -26,9 +26,14 @@ export class AddTokenAction extends Action<void, AddTokenActionContext> {
     this.context.subAccounts
       .filter((account: IAccountWrapper) => account.selected)
       .forEach(async (account: IAccountWrapper) => {
-        this.context.accountProvider
-          .addWallet(account.wallet, account.groupId, account.groupLabel)
-          .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+        const walletAddInfos = [
+          {
+            walletToAdd: account.wallet,
+            groupId: account.groupId,
+            groupLabel: account.groupLabel
+          }
+        ]
+        this.context.accountProvider.addWallets(walletAddInfos).catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       })
   }
 }

@@ -2,19 +2,16 @@ import { AndroidFlavor, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-c
 import { Component, Inject } from '@angular/core'
 import { Capacitor } from '@capacitor/core'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { IpcRenderer } from 'electron'
+import type { IpcRenderer } from 'electron'
 
 declare global {
   interface Window {
-    require: (
-      module: 'electron'
-    ) => {
+    require: (module: 'electron') => {
       ipcRenderer: IpcRenderer
     }
   }
 }
 
-const { ipcRenderer } = window.require('electron')
 @Component({
   selector: 'page-about',
   templateUrl: 'about.html'
@@ -38,7 +35,11 @@ export class AboutPage {
 
   public async updateVersions(): Promise<void> {
     if (Capacitor.getPlatform() === 'electron') {
-      this.appInfo = ipcRenderer.sendSync('AppInfo', '')
+      if (window.require) {
+        // TODO: Look into ElectronProcess
+        const { ipcRenderer } = window.require('electron')
+        this.appInfo = ipcRenderer.sendSync('AppInfo', '')
+      }
     } else {
       this.appInfo = await this.appInfoPlugin.get()
     }
