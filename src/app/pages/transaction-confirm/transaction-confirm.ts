@@ -80,7 +80,7 @@ export class TransactionConfirmPage {
         messageObject.protocol
       )
 
-      const [request, savedProtocol] = await this.beaconService.getVaultRequest(messageObject.id)
+      const [request, savedProtocol] = await this.beaconService.getVaultRequest()
 
       const selectedProtocol =
         request && savedProtocol && savedProtocol.identifier === protocol.identifier

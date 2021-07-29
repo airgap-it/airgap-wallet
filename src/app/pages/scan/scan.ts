@@ -73,7 +73,9 @@ export class ScanPage extends ScanBasePage {
         .catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
     })
   }
-  public ionViewWillLeave() {
+
+  public ionViewWillLeave(): void {
+    super.ionViewWillLeave()
     this.resetScannerPage()
   }
 }

@@ -26,7 +26,8 @@ export enum WalletStorageKey {
   LAST_TX_BROADCAST = 'lastTxBroadcast',
   USER_ID = 'user_id',
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
-  BEACON_REQUESTS = 'BEACON_REQUESTS'
+  BEACON_REQUESTS = 'BEACON_REQUESTS',
+  PENDING_REQUEST = 'PENDING_REQUEST'
 }
 
 interface IBroadcastTransaction {
@@ -48,6 +49,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.USER_ID]: string | undefined
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
   [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
+  [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -64,7 +66,8 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.LAST_TX_BROADCAST]: undefined,
   [WalletStorageKey.USER_ID]: undefined,
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: [],
-  [WalletStorageKey.BEACON_REQUESTS]: []
+  [WalletStorageKey.BEACON_REQUESTS]: [],
+  [WalletStorageKey.PENDING_REQUEST]: []
 }
 
 @Injectable({

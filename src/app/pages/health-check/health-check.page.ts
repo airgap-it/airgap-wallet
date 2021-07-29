@@ -37,7 +37,7 @@ export class HealthCheckPage {
   constructor(
     private readonly coinlibService: CoinlibService,
     private readonly loadingController: LoadingController,
-    private readonly translateService: TranslateService
+    private readonly translateService: TranslateService,
   ) {
     this.items = [
       this.generateCheckItem('Tezos', MainProtocolSymbols.XTZ, ApiType.NODE),
@@ -57,7 +57,7 @@ export class HealthCheckPage {
 
   public async ionViewWillEnter() {
     this.displayLoading()
-    this.coinlibService.checkApiHealth().then(apiHealth => {
+    this.coinlibService.checkApiHealth().then((apiHealth) => {
       this.apiHealth = apiHealth
       this.loadingElement.dismiss()
       this.runChecks()
@@ -84,18 +84,18 @@ export class HealthCheckPage {
   }
 
   private async isHealthy(identifier: ProtocolSymbols, apiType: ApiType) {
-    const healthInfo = this.apiHealth.find(el => el.identifier === identifier)
+    const healthInfo = this.apiHealth.find((el) => el.identifier === identifier)
     return healthInfo[apiType].isHealthy
   }
 
   private async runChecks() {
-    this.items.forEach(item => (item.status = CheckStatus.LOADING))
+    this.items.forEach((item) => (item.status = CheckStatus.LOADING))
     for (let i = 0; i < this.items.length; i++) {
       const element = this.items[i]
       element.status = CheckStatus.PENDING
-      await new Promise(resolve => setTimeout(resolve, element.delay))
+      await new Promise((resolve) => setTimeout(resolve, element.delay))
       element.status = (await element.check()) ? CheckStatus.SUCCESS : CheckStatus.FAIL
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
   }
 }
