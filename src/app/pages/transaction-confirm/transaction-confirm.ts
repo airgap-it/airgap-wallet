@@ -7,7 +7,8 @@ import {
   ICoinProtocol,
   MainProtocolSymbols,
   SignedTransaction,
-  TezosSaplingProtocol
+  TezosSaplingProtocol,
+  RawEthereumTransaction
 } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component } from '@angular/core'
@@ -22,6 +23,7 @@ import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
+import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 const SECOND: number = 1000
 
@@ -37,7 +39,7 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 export class TransactionConfirmPage {
   public messageDefinitionObjects: IACMessageDefinitionObject[]
 
-  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage][] = []
+  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: string }][] = []
   public protocols: ICoinProtocol[] = []
 
   constructor(
@@ -53,7 +55,8 @@ export class TransactionConfirmPage {
     private readonly browserService: BrowserService,
     private readonly accountService: AccountProvider,
     private readonly protocolService: ProtocolService,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly walletConnectService: WalletconnectService
   ) {}
 
   public dismiss(): void {
@@ -69,7 +72,7 @@ export class TransactionConfirmPage {
 
     // TODO: Multi messages
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    this.messageDefinitionObjects.forEach(async messageObject => {
+    this.messageDefinitionObjects.forEach(async (messageObject) => {
       const protocol = await this.protocolService.getProtocol(messageObject.protocol)
 
       const wallet = this.accountService.walletBySerializerAccountIdentifier(
@@ -77,7 +80,7 @@ export class TransactionConfirmPage {
         messageObject.protocol
       )
 
-      const [request, savedProtocol] = await this.beaconService.getVaultRequest(messageObject.id)
+      const [request, savedProtocol] = await this.beaconService.getVaultRequest()
 
       const selectedProtocol =
         request && savedProtocol && savedProtocol.identifier === protocol.identifier
@@ -125,16 +128,20 @@ export class TransactionConfirmPage {
     this.txInfos.forEach(async ([signedTx, protocol, request], index) => {
       protocol
         .broadcastTransaction(signedTx)
-        .then(async txId => {
+        .then(async (txId) => {
           console.log('transaction hash', txId)
-
           if (request) {
-            const response = {
-              id: request.id,
-              type: this.beaconService.getResponseByRequestType(request.type),
-              transactionHash: txId
-            } as BeaconResponseInputMessage
-            this.beaconService.respond(response).catch(handleErrorSentry(ErrorCategory.BEACON))
+            // TODO: Type
+            if (request['transaction']) {
+              this.walletConnectService.approveRequest(request.id, txId)
+            } else {
+              const response = {
+                id: request.id,
+                type: this.beaconService.getResponseByRequestType((request as BeaconRequestOutputMessage).type),
+                transactionHash: txId
+              } as BeaconResponseInputMessage
+              this.beaconService.respond(response, request as any).catch(handleErrorSentry(ErrorCategory.BEACON))
+            }
           }
 
           if (interval) {
@@ -162,8 +169,9 @@ export class TransactionConfirmPage {
           // POST TX TO BACKEND
           // Only send it if we are on mainnet
           if (protocol.options.network.type === NetworkType.MAINNET) {
-            const signed = (await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index]
-              .payload as SignedTransaction))[0] as any
+            const signed = (
+              await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction)
+            )[0] as any
             // necessary for the transaction backend
             signed.amount = signed.amount.toString()
             signed.fee = signed.fee.toString()
@@ -175,7 +183,7 @@ export class TransactionConfirmPage {
           }
           // END POST TX TO BACKEND
         })
-        .catch(error => {
+        .catch((error) => {
           if (interval) {
             clearInterval(interval)
           }
@@ -187,7 +195,7 @@ export class TransactionConfirmPage {
           // TODO: Remove this special error case once we remove web3 from the coin-lib
           if (error && error.message && error.message.startsWith('Failed to check for transaction receipt')) {
             ;(protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction) as any).then(
-              signed => {
+              (signed) => {
                 if (signed.hash) {
                   this.showTransactionSuccessfulAlert(protocol, signed.hash)
                   // POST TX TO BACKEND
@@ -215,7 +223,7 @@ export class TransactionConfirmPage {
                 ],
                 position: 'bottom'
               })
-              .then(toast => {
+              .then((toast) => {
                 toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
               })
               .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
@@ -282,7 +290,7 @@ export class TransactionConfirmPage {
   }
 
   private async selectTezosTzAccount(protocol: ICoinProtocol): Promise<AirGapMarketWallet> {
-    return new Promise<AirGapMarketWallet>(resolve => {
+    return new Promise<AirGapMarketWallet>((resolve) => {
       const wallets: AirGapMarketWallet[] = this.accountService.getWalletList()
       const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
         wallets,
@@ -296,8 +304,8 @@ export class TransactionConfirmPage {
         incompatibleWallets,
         callback: resolve
       }
-      this.dataService.setData(DataServiceKey.WALLET, info)
-      this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.dataService.setData(DataServiceKey.ACCOUNTS, info)
+      this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     })
   }
 }

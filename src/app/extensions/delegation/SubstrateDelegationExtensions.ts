@@ -112,9 +112,11 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       extraNominatorDetails
     )
 
-    const alerts: UIAlert[] = (await Promise.all(
-      validatorsDetails.map((validatorDetails: SubstrateValidatorDetails) => this.getAlerts(protocol, nominatorDetails, validatorDetails))
-    )).reduce((flatten: UIAlert[], next: UIAlert[]) => flatten.concat(next), [])
+    const alerts: UIAlert[] = (
+      await Promise.all(
+        validatorsDetails.map((validatorDetails: SubstrateValidatorDetails) => this.getAlerts(protocol, nominatorDetails, validatorDetails))
+      )
+    ).reduce((flatten: UIAlert[], next: UIAlert[]) => flatten.concat(next), [])
 
     return [
       {

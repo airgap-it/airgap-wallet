@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core'
 import { Routes, RouterModule } from '@angular/router'
 
-import { BeaconPermissionListPage } from './beacon-permission-list.page'
+import { DappPermissionListPage } from './dapp-permission-list.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: BeaconPermissionListPage
+    component: DappPermissionListPage
   }
 ]
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class BeaconPermissionListPageRoutingModule {}
+export class DappPermissionListPageRoutingModule {}

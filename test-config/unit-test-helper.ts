@@ -28,6 +28,7 @@ import {
 import {
   AppInfoPluginMock,
   AppMock,
+  ClipboardMock,
   PermissionsMock,
   PermissionsPluginMock,
   PushNotificationsMock,
@@ -50,6 +51,7 @@ export class UnitHelper {
     saplingPlugin: new SaplingPluginMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
+    clipboard: new ClipboardMock(),
     deeplink: new DeeplinkMock(),
     toastController: new ToastControllerMock(),
     alertController: new AlertControllerMock(),

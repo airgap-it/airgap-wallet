@@ -119,7 +119,7 @@ export class AppComponent implements AfterViewInit {
     if (url.searchParams.get('rawUnsignedTx')) {
       // Wait until wallets are initialized
       // TODO: Use wallet changed observable?
-      const sub: Subscription = this.accountProvider.wallets.subscribe(async () => {
+      const sub: Subscription = this.accountProvider.wallets$.subscribe(async () => {
         await this.walletDeeplink()
         if (sub) {
           sub.unsubscribe()
@@ -139,8 +139,10 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
-          // tslint:disable-next-line: no-console
-          console.log('Successfully received deeplink', data.url)
+          if (data.url === 'airgap-wallet://' || data.url === 'https://wallet.airgap.it' || data.url === 'https://wallet.airgap.it/') {
+            // Ignore empty deeplinks
+            return
+          }
           this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
@@ -153,9 +155,6 @@ export class AppComponent implements AfterViewInit {
     const publicKey: string = url.searchParams.get('publicKey')
     const rawUnsignedTx: unknown = JSON.parse(url.searchParams.get('rawUnsignedTx'))
     const identifier: string = url.searchParams.get('identifier')
-    console.log('publicKey', publicKey)
-    console.log('rawUnsignedTx', rawUnsignedTx)
-    console.log('identifier', identifier)
 
     const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(publicKey, identifier)
     const airGapTxs: IAirGapTransaction[] = await wallet.protocol.getTransactionDetails({
@@ -163,9 +162,9 @@ export class AppComponent implements AfterViewInit {
       transaction: rawUnsignedTx
     })
 
-    const serializedTx: string[] = await this.serializerService.serialize([
+    const serializedTx: string | string[] = await this.serializerService.serialize([
       {
-        id: generateId(10),
+        id: generateId(8),
         protocol: wallet.protocol.identifier,
         type: IACMessageType.TransactionSignRequest,
         payload: {
@@ -221,13 +220,12 @@ export class AppComponent implements AfterViewInit {
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
-    const externalMethodProvider:
-      | TezosSaplingExternalMethodProvider
-      | undefined = await this.saplingNativeService.createExternalMethodProvider()
+    const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
+      await this.saplingNativeService.createExternalMethodProvider()
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
-        edonetNetwork,
+        florencenetNetwork,
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )
@@ -258,7 +256,8 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p'
+      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
+      [TezosNetwork.GRANADANET]: '',
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

@@ -103,7 +103,7 @@ ion-list-header {
   }
 }
 
-airgap-qr {
+airgap-iac-qr {
   padding: 20px;
   background-color: white;
 }
@@ -145,11 +145,26 @@ page-transaction-qr {
   }
 }
 
-page-beacon-request {
-  identicon,
-  identicon img {
-    width: 48px;
-    height: 48px;
+permission-request,
+app-walletconnect {
+  .request--container {
+    airgap-identicon,
+    airgap-identicon img,
+    img {
+      width: 48px;
+      height: 48px;
+    }
+  }
+  ion-item {
+    ion-avatar {
+      height: 24px;
+      width: 24px;
+    }
+    ion-avatar,
+    airgap-identicon img {
+      min-width: 24px !important;
+      min-height: 24px !important;
+    }
   }
 }
 

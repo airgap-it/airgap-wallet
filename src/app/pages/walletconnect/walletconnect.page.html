@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-title>{{ title }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">
+      <permission-request
+        [address]="address"
+        [requesterName]="requesterName"
+        [icon]="icon"
+        [targetProtocolSymbol]="'eth'"
+        (walletSetEmitter)="setWallet($event)"
+      ></permission-request>
+    </ng-container>
+
+    <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="ion-padding-bottom ion-margin-bottom">
+      <ng-container *ngFor="let transaction of transactions">
+        <airgap-from-to [transaction]="transaction"></airgap-from-to>
+      </ng-container>
+    </div>
+
+    <div *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST || request.method === requestMethod.ETH_SIGN_TYPED_DATA">
+      <ion-row class="rawdata--container">
+        <ion-col class="ion-no-padding">
+          <pre class="ion-no-margin">{{ beaconRequest | json }}</pre>
+        </ion-col>
+      </ion-row>
+    </div>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="dismiss()">{{ 'beacon-request.cancel_label' | translate }}</ion-button>
+
+    <ion-button shape="round" color="primary" (click)="done()">
+      <ng-container *ngIf="request.method !== requestMethod.SESSION_REQUEST">
+        {{ 'beacon-request.continue_label' | translate }}
+      </ng-container>
+      <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">{{ 'beacon-request.connect_label' | translate }}</ng-container>
+    </ion-button>
+  </ion-fab>
+</ion-content>
