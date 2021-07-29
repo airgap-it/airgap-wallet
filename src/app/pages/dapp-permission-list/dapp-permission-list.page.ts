@@ -20,7 +20,7 @@ export class DappPermissionListPage {
     private readonly beaconService: BeaconService,
     private readonly alertController: AlertController,
     private readonly translate: TranslateService,
-    private readonly walletConnectService: WalletconnectService
+    private readonly walletConnectService: WalletconnectService,
   ) {
     this.loadPermissions().catch(console.error)
   }

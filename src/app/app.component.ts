@@ -139,6 +139,10 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
         this.ngZone.run(() => {
+          if (data.url === 'airgap-wallet://' || data.url === 'https://wallet.airgap.it' || data.url === 'https://wallet.airgap.it/') {
+            // Ignore empty deeplinks
+            return
+          }
           this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
@@ -252,7 +256,8 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p'
+      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
+      [TezosNetwork.GRANADANET]: '',
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

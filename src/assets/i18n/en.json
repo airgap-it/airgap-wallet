@@ -733,7 +733,8 @@
     "title": "Beacon Settings",
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
-    "no-peers": "Not connected to any peers"
+    "no-peers": "Not connected to any peers",
+    "reset": "Reset"
   },
   "dapps": {
     "wait_for_walletconnect": "Waiting for WalletConnect"

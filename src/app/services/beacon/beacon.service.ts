@@ -93,15 +93,16 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    generatedId: number,
     request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
     protocol: ICoinProtocol
   ): Promise<void> {
-    this.storage.setCache(generatedId.toString(), [request, protocol.identifier, protocol.options.network.identifier])
+    this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [request, protocol.identifier, protocol.options.network.identifier])
   }
 
-  public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
-    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(generatedId)
+  public async getVaultRequest(): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
+    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(
+      WalletStorageKey.PENDING_REQUEST
+    )
     const result: [BeaconRequestOutputMessage, ICoinProtocol] = [undefined, undefined]
     if (cachedRequest) {
       if (cachedRequest[0]) {

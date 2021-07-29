@@ -87,14 +87,7 @@ export class WalletconnectPage implements OnInit {
     private readonly alertCtrl: AlertController,
     private readonly beaconService: BeaconService,
     private readonly translateService: TranslateService
-  ) {
-    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
-      this.selectableWallets = wallets.filter(
-        (wallet: AirGapMarketWallet) =>
-          wallet.protocol.identifier === MainProtocolSymbols.ETH && wallet.status === AirGapWalletStatus.ACTIVE
-      )
-    })
-  }
+  ) {}
 
   public get address(): string {
     if (this.selectedWallet !== undefined) {
@@ -104,6 +97,15 @@ export class WalletconnectPage implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
+    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
+      this.selectableWallets = wallets.filter(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.ETH && wallet.status === AirGapWalletStatus.ACTIVE
+      )
+      if (this.selectableWallets.length > 0) {
+        this.selectedWallet = this.selectableWallets[0]
+      }
+    })
     if (this.request && this.request.method === Methods.SESSION_REQUEST) {
       this.title = this.translateService.instant('walletconnect.connection_request')
       await this.permissionRequest(this.request as JSONRPC<SessionRequest>)
@@ -139,7 +141,6 @@ export class WalletconnectPage implements OnInit {
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
-
     const requestId = new BigNumber(request.id).toString()
     const generatedId = generateId(8)
     const protocol = new EthereumProtocol()
@@ -155,7 +156,7 @@ export class WalletconnectPage implements OnInit {
       version: '2'
     } as BeaconRequestOutputMessage
 
-    this.beaconService.addVaultRequest(generatedId, this.beaconRequest, protocol)
+    this.beaconService.addVaultRequest(this.beaconRequest, protocol)
     this.responseHandler = async () => {
       const info = {
         wallet: this.selectedWallet,
@@ -174,10 +175,6 @@ export class WalletconnectPage implements OnInit {
     this.url = request.params[0].peerMeta.url ? request.params[0].peerMeta.url : ''
     this.icon = request.params[0].peerMeta.icons ? request.params[0].peerMeta.icons[0] : ''
     this.requesterName = request.params[0].peerMeta.name ? request.params[0].peerMeta.name : ''
-
-    if (this.selectableWallets.length > 0) {
-      this.selectedWallet = this.selectableWallets[0]
-    }
 
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
@@ -224,9 +221,7 @@ export class WalletconnectPage implements OnInit {
       id: request.id
     }
 
-    const generatedId = await generateId(8)
-
-    this.beaconService.addVaultRequest(generatedId, walletConnectRequest, protocol)
+    this.beaconService.addVaultRequest(walletConnectRequest, protocol)
     this.transactions = await ethereumProtocol.getTransactionDetails({
       publicKey: this.selectedWallet.publicKey,
       transaction

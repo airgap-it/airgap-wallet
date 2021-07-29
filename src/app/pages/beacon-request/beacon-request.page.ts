@@ -34,6 +34,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
 import { generateId } from '@airgap/coinlib-core'
 import { Subscription } from 'rxjs'
+import BigNumber from 'bignumber.js'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -268,10 +269,10 @@ export class BeaconRequestPage implements OnInit {
     } catch {}
 
     const generatedId = generateId(8)
-    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+    await this.beaconService.addVaultRequest(request, tezosProtocol)
 
     const clonedRequest = { ...request }
-    // clonedRequest.id = generatedId // TODO: Remove?
+    clonedRequest.id = new BigNumber(generatedId).toString() // TODO: Remove?
 
     this.responseHandler = async () => {
       const info = {
@@ -314,7 +315,7 @@ export class BeaconRequestPage implements OnInit {
     const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(transaction)
 
     const generatedId = generateId(8)
-    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+    await this.beaconService.addVaultRequest(request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
       branch: '',
@@ -344,7 +345,7 @@ export class BeaconRequestPage implements OnInit {
     }
 
     const generatedId = generateId(8)
-    await this.beaconService.addVaultRequest(generatedId, request, tezosProtocol)
+    await this.beaconService.addVaultRequest(request, tezosProtocol)
 
     this.transactions = await tezosProtocol.getTransactionDetailsFromSigned({
       accountIdentifier: '',

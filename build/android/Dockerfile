@@ -15,17 +15,17 @@ RUN mkdir /app
 WORKDIR /app
 
 # using npm 6.5.0 to fix installing certain cordova/ionic plugins
-RUN npm install -g npm@6.5.0 ionic@5.4.0 @capacitor/core@2.4.0 @capacitor/android@2.4.0 @capacitor/cli@2.4.0
+RUN npm install -g npm@6.14.13 ionic@5.4.0 @capacitor/core@2.4.0 @capacitor/android@2.4.0 @capacitor/cli@2.4.0
 RUN npm cache clean -f
 RUN npm install -g n
-RUN n 10.14.1
+RUN n 14.17.1
 
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
 
 # install dependencies
-RUN npm ci
+RUN npm i
 
 # copy capacitor configs and ionic configs
 COPY capacitor.config.json /app/capacitor.config.json

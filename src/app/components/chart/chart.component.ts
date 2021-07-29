@@ -6,7 +6,7 @@ import { AirGapMarketWallet, TimeInterval } from '@airgap/coinlib-core/wallet/Ai
 import { DrawChartService } from './../../services/draw-chart/draw-chart.service'
 import { MarketDataService, ValueAtTimestamp } from './../../services/market-data/market-data.service'
 import { AccountProvider } from 'src/app/services/account/account.provider'
-import { AirGapWalletStatus, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapWalletStatus, NetworkType, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { distinctUntilChanged } from 'rxjs/operators'
 
 @Component({
@@ -129,7 +129,10 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       .subscribe(async ([data, wallets]) => {
         this.activeWallets =
           wallets.filter(
-            (wallet) => wallet.status === AirGapWalletStatus.ACTIVE && wallet.protocol.identifier !== SubProtocolSymbols.XTZ_USD
+            (wallet) =>
+              wallet.status === AirGapWalletStatus.ACTIVE &&
+              wallet.protocol.identifier !== SubProtocolSymbols.XTZ_USD &&
+              wallet.protocol.options.network.type === NetworkType.MAINNET
           ) ?? []
         this.drawChart(data)
       })
