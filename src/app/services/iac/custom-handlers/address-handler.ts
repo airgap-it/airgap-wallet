@@ -1,4 +1,3 @@
-import { IACMessageHandler } from '@airgap/angular-core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet, supportedProtocols } from '@airgap/coinlib-core'
 
@@ -6,11 +5,18 @@ import { partition } from '../../../utils/utils'
 import { AccountProvider } from '../../account/account.provider'
 import { DataService, DataServiceKey } from '../../data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../sentry-error-handler/sentry-error-handler'
+import { IACSinglePartHandler } from '@airgap/angular-core'
+
+interface Payload {
+  address: string
+  compatibleWallets: AirGapMarketWallet[]
+  incompatibleWallets: AirGapMarketWallet[]
+}
 
 /**
  * Handles addresses and bitcoin style payment requests
  */
-export class AddressHandler extends IACMessageHandler {
+export class AddressHandler extends IACSinglePartHandler<Payload> {
   public readonly name: string = 'AddressHandler'
 
   constructor(
@@ -21,9 +27,15 @@ export class AddressHandler extends IACMessageHandler {
     super()
   }
 
-  public async handle(data: string | string[]): Promise<boolean> {
-    const str: string = typeof data === 'string' ? data : data[0]
-    const splits: string[] = str.split(':') // Handle bitcoin payment request https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
+  public async handleComplete(): Promise<Payload> {
+    this.dataService.setData(DataServiceKey.WALLET, { actionType: 'scanned-address', ...this.payload })
+    this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+    return this.payload
+  }
+
+  public async processData(data: string): Promise<Payload | undefined> {
+    const splits: string[] = data.split(':') // Handle bitcoin payment request https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
 
     if (splits.length > 1) {
       const [address]: string[] = splits[1].split('?') // Ignore amount
@@ -36,37 +48,26 @@ export class AddressHandler extends IACMessageHandler {
           )
 
           if (compatibleWallets.length > 0) {
-            const info = {
-              actionType: 'scanned-address',
+            this.payload = {
               address,
               compatibleWallets,
               incompatibleWallets
             }
-            this.dataService.setData(DataServiceKey.WALLET, info)
-            this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-            return true
           }
         }
       }
-
-      return false
     } else {
-      const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(str)
+      const { compatibleWallets, incompatibleWallets } = await this.accountProvider.getCompatibleAndIncompatibleWalletsForAddress(data)
       if (compatibleWallets.length > 0) {
-        const info = {
-          actionType: 'scanned-address',
+        this.payload = {
           address: data,
           compatibleWallets,
           incompatibleWallets
         }
-        this.dataService.setData(DataServiceKey.WALLET, info)
-        this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-
-        return true
       } else {
-        return false
       }
     }
+
+    return undefined
   }
 }

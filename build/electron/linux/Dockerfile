@@ -20,6 +20,9 @@ RUN sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/
 RUN npm install
 RUN npm --prefix electron/ install
 
+# configure mangle (keep_fnames) for bitcoinjs https://github.com/bitcoinjs/bitcoinjs-lib/issues/959
+RUN npm run prepare-prod-build
+
 # browserify coin-lib
 RUN npm run browserify-coinlib
 

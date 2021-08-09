@@ -4,12 +4,8 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
-      <ion-title *ngIf="!isDesktop">
-        {{ 'interaction-selection.title' | translate }}
-      </ion-title>
-      <ion-title *ngIf="isDesktop">
-        {{ 'interaction-selection-desktop.title' | translate }}
-      </ion-title>
+      <ion-title *ngIf="!isDesktop">{{ 'interaction-selection.title' | translate }}</ion-title>
+      <ion-title *ngIf="isDesktop">{{ 'interaction-selection-desktop.title' | translate }}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>

@@ -1,24 +1,39 @@
-import { BaseIACService, ProtocolService, SerializerService, UiEventElementsService } from '@airgap/angular-core'
+import {
+  AppConfig,
+  APP_CONFIG,
+  BaseIACService,
+  ClipboardService,
+  DeeplinkService,
+  ProtocolService,
+  RelayMessage,
+  UiEventElementsService
+} from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
-import { Injectable } from '@angular/core'
-import { Router } from '@angular/router'
+import { Inject, Injectable } from '@angular/core'
 import {
   AccountShareResponse,
   AirGapMarketWallet,
+  AirGapWalletStatus,
   IACMessageDefinitionObject,
   IACMessageType,
-  MessageSignResponse
+  MainProtocolSymbols,
+  MessageSignResponse,
+  ProtocolSymbols
 } from '@airgap/coinlib-core'
+import { Router } from '@angular/router'
 
+import { AccountSync } from '../../types/AccountSync'
 import { AccountProvider } from '../account/account.provider'
 import { BeaconService } from '../beacon/beacon.service'
 import { DataService, DataServiceKey } from '../data/data.service'
 import { PriceService } from '../price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
+import { WalletconnectService } from '../walletconnect/walletconnect.service'
 
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
+import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
 
 @Injectable({
   providedIn: 'root'
@@ -26,49 +41,79 @@ import { BeaconHandler } from './custom-handlers/beacon-handler'
 export class IACService extends BaseIACService {
   constructor(
     uiEventElementsService: UiEventElementsService,
-    serializerService: SerializerService,
     public beaconService: BeaconService,
+    public readonly deeplinkService: DeeplinkService,
     accountProvider: AccountProvider,
+    public walletConnectService: WalletconnectService,
     private readonly dataService: DataService,
+    protected readonly clipboard: ClipboardService,
     private readonly protocolService: ProtocolService,
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
-    private readonly router: Router
+    private readonly router: Router,
+    @Inject(APP_CONFIG) appConfig: AppConfig
   ) {
-    super(uiEventElementsService, serializerService, Promise.resolve(), [
-      new BeaconHandler(beaconService),
-      new AddressHandler(accountProvider, dataService, router)
-    ])
+    super(
+      uiEventElementsService,
+      clipboard,
+      Promise.resolve(),
+      [
+        new BeaconHandler(beaconService),
+        new WalletConnectHandler(walletConnectService),
+        new AddressHandler(accountProvider, dataService, router) // Address handler is flexible because of regex, so it should be last.
+      ],
+      deeplinkService,
+      appConfig
+    )
 
-    this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
-    this.serializerMessageHandlers[IACMessageType.TransactionSignResponse] = this.handleSignedTransaction.bind(this)
-    this.serializerMessageHandlers[IACMessageType.MessageSignResponse] = this.handleMessageSignResponse.bind(this)
+    this.serializerMessageHandlers[IACMessageType.AccountShareResponse as any] = this.handleWalletSync.bind(this)
+    this.serializerMessageHandlers[IACMessageType.TransactionSignResponse as any] = this.handleSignedTransaction.bind(this)
+    this.serializerMessageHandlers[IACMessageType.MessageSignResponse as any] = this.handleMessageSignResponse.bind(this)
   }
 
-  public async relay(data: string | string[]): Promise<void> {
+  public async relay(data: RelayMessage): Promise<void> {
     const info = {
-      data
+      data: (data as any).messages, // TODO: Fix types
+      isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async handleWalletSync(_data: string | string[], deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[]): Promise<boolean> {
     this.storageSerivce.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
-    // TODO: handle multiple messages
-    const walletSync: AccountShareResponse = deserializedSyncs[0].payload as AccountShareResponse
-    const protocol = await this.protocolService.getProtocol(deserializedSyncs[0].protocol)
-    const wallet: AirGapMarketWallet = new AirGapMarketWallet(
-      protocol,
-      walletSync.publicKey,
-      walletSync.isExtendedPublicKey,
-      walletSync.derivationPath,
-      this.priceService
+    const accountSyncs: AccountSync[] = await Promise.all(
+      deserializedSyncs.map(async (deserializedSync: IACMessageDefinitionObject) => {
+        const accountShare: AccountShareResponse = deserializedSync.payload as AccountShareResponse
+        const protocol = await this.protocolService.getProtocol(deserializedSync.protocol)
+        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+          protocol,
+          accountShare.publicKey,
+          accountShare.isExtendedPublicKey,
+          accountShare.derivationPath,
+          accountShare.masterFingerprint || /* backwards compatibility */ '',
+          accountShare.isActive === undefined
+            ? /* backwards compatibility */ AirGapWalletStatus.ACTIVE
+            : accountShare.isActive
+            ? AirGapWalletStatus.ACTIVE
+            : AirGapWalletStatus.HIDDEN,
+          this.priceService
+        )
+
+        return {
+          wallet,
+          groupId: accountShare.groupId,
+          groupLabel: accountShare.groupLabel
+        }
+      })
     )
+
+    console.log(accountSyncs)
+
     if (this.router) {
-      this.dataService.setData(DataServiceKey.WALLET, wallet)
-      this.router.navigateByUrl(`/account-import/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
+      this.router.navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
       return true
     }
@@ -76,8 +121,7 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  public async handleSignedTransaction(_data: string | string[], messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
-    console.log('handleSignedTransaction', messageDefinitionObjects)
+  public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
     if (this.router) {
       const info = {
         messageDefinitionObjects: messageDefinitionObjects
@@ -91,16 +135,22 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  private async handleMessageSignResponse(_data: string | string[], deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
-    const cachedRequest = await this.beaconService.getVaultRequest(deserializedMessages[0].id)
+  private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+    const cachedRequest = await this.beaconService.getVaultRequest()
+
     const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
+    const protocol: ProtocolSymbols = deserializedMessages[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
-      id: cachedRequest[0].id,
+      id: cachedRequest[0]?.id,
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
-    await this.beaconService.respond(response)
+    if (protocol === MainProtocolSymbols.XTZ) {
+      await this.beaconService.respond(response, cachedRequest[0])
+    } else if (protocol === MainProtocolSymbols.ETH) {
+      await this.walletConnectService.approveRequest(response.id, response.signature)
+    }
     return false
   }
 }

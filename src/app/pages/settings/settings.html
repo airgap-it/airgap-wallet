@@ -23,9 +23,9 @@
         <ion-icon name="help-circle-outline" slot="start"></ion-icon>
         {{ 'settings.faq_label' | translate }}
       </ion-item>
-      <ion-item (click)="telegram()" detail="true">
+      <ion-item (click)="discord()" detail="true">
         <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
-        {{ 'settings.telegram_label' | translate }}
+        {{ 'settings.discord_label' | translate }}
       </ion-item>
       <ion-item (click)="share()" detail="true">
         <ion-icon name="share-outline" slot="start"></ion-icon>
@@ -44,22 +44,27 @@
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
         {{ 'settings.about_label' | translate }}
       </ion-item>
+
+      <ion-item (click)="goToHealthCheck()" detail="true">
+        <ion-icon name="pulse-outline" slot="start"></ion-icon>
+        {{ 'settings.health-check' | translate }}
+      </ion-item>
     </ion-list>
     <ion-list lines="none">
       <ion-list-header class="ion-no-margin" lines="none">
-        <ion-label>{{ 'settings.beacon.label' | translate }}</ion-label>
+        <ion-label>{{ 'settings.dapp.label' | translate }}</ion-label>
       </ion-list-header>
-      <ion-item (click)="beaconPermissions()" detail="true">
+      <ion-item (click)="dappPermissions()" detail="true">
         <ion-icon src="assets/img/beacon_logo_black.svg" slot="start"></ion-icon>
-        {{ 'settings.beacon.permission-list_label' | translate }}
+        {{ 'settings.dapp.permission-list_label' | translate }}
       </ion-item>
-      <ion-item (click)="beaconSettings()" detail="true">
+      <ion-item (click)="dappSettings()" detail="true">
         <ion-icon src="assets/img/beacon_logo_black.svg" slot="start"></ion-icon>
-        {{ 'settings.beacon.settings_label' | translate }}
+        {{ 'settings.dapp.settings_label' | translate }}
       </ion-item>
       <ion-item (click)="aboutBeacon()" detail="true">
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
-        {{ 'settings.beacon.about_label' | translate }}
+        {{ 'settings.dapp.about_label' | translate }}
       </ion-item>
     </ion-list>
 

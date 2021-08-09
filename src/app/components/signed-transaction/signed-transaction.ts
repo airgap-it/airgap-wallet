@@ -66,19 +66,21 @@ export class SignedTransactionComponent implements OnChanges {
         this.protocols && this.protocols[0] ? this.protocols[0] : await this.protocolService.getProtocol(this.signedTxs[0].protocol)
 
       try {
-        this.airGapTxs = (await Promise.all(
-          this.signedTxs.map(async (signedTx: IACMessageDefinitionObject) => {
-            const payload: SignedTransaction = signedTx.payload as SignedTransaction
-            if (await this.checkIfSaplingTransaction(payload, signedTx.protocol)) {
-              const saplingProtocol: TezosSaplingProtocol = await this.getSaplingProtocol()
-              return saplingProtocol.getTransactionDetailsFromSigned(payload, {
-                knownViewingKeys: this.accountProvider.getKnownViewingKeys()
-              })
-            } else {
-              return protocol.getTransactionDetailsFromSigned(payload)
-            }
-          })
-        )).reduce((flatten: IAirGapTransaction[], toFlatten: IAirGapTransaction[]) => flatten.concat(toFlatten), [])
+        this.airGapTxs = (
+          await Promise.all(
+            this.signedTxs.map(async (signedTx: IACMessageDefinitionObject) => {
+              const payload: SignedTransaction = signedTx.payload as SignedTransaction
+              if (await this.checkIfSaplingTransaction(payload, signedTx.protocol)) {
+                const saplingProtocol: TezosSaplingProtocol = await this.getSaplingProtocol()
+                return saplingProtocol.getTransactionDetailsFromSigned(payload, {
+                  knownViewingKeys: this.accountProvider.getKnownViewingKeys()
+                })
+              } else {
+                return protocol.getTransactionDetailsFromSigned(payload)
+              }
+            })
+          )
+        ).reduce((flatten: IAirGapTransaction[], toFlatten: IAirGapTransaction[]) => flatten.concat(toFlatten), [])
 
         if (
           this.airGapTxs.length > 1 &&

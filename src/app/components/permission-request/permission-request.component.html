@@ -1,0 +1,74 @@
+<ng-container>
+  <ion-row class="request--container ion-padding-top">
+    <ion-col class="ion-text-center" size="3">
+      <ion-avatar class="content--align__center-center">
+        <airgap-identicon [address]="requesterName" *ngIf="!icon"></airgap-identicon>
+        <img [src]="icon" *ngIf="icon" />
+      </ion-avatar>
+    </ion-col>
+    <ion-col>
+      <div class="divider--line"></div>
+    </ion-col>
+    <ion-col class="ion-text-center">
+      <ion-icon name="checkmark-circle-outline" color="secondary" size="large" class="ion-margin-top"></ion-icon>
+    </ion-col>
+    <ion-col>
+      <div class="divider--line"></div>
+    </ion-col>
+    <ion-col class="ion-text-center" size="3">
+      <ion-avatar class="content--align__center-center">
+        <airgap-identicon [address]="address"></airgap-identicon>
+      </ion-avatar>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col class="ion-text-left" size="6">
+      <h5 class="ion-no-margin">{{ requesterName }}</h5>
+    </ion-col>
+    <ion-col class="ion-text-right" size="6">
+      <h5 class="ion-no-margin">{{ address | shortenString }}</h5>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-align-items-center ion-padding-top">
+    <ion-col size="12">
+      <ion-row>
+        <ng-container *ngIf="network && network.type !== networkType.MAINNET" class="ion-no-padding" lines="none" slot="start">
+          <ion-badge class="badge__margin" color="danger">{{ network.name }}</ion-badge>
+          <ion-badge *ngIf="network.type === networkType.CUSTOM" class="badge__margin">
+            {{ network.rpcUrl }}
+          </ion-badge>
+        </ng-container>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+
+  <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
+
+  <ion-item *ngIf="wallets.length > 1" lines="none" class="ion-no-padding">
+    <ion-avatar slot="start">
+      <airgap-identicon [address]="address"></airgap-identicon>
+    </ion-avatar>
+    <ion-label>
+      <p class="ion-no-margin">{{ address | shortenString }}</p>
+    </ion-label>
+    <ion-button (click)="changeAccount()" color="secondary" shape="round" size="small" fill="outline" slot="end">
+      {{ 'beacon-request.select-account.button' | translate }}
+    </ion-button>
+  </ion-item>
+
+  <ng-container *ngIf="inputs && inputs.length > 0">
+    <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>
+    <ion-row class="ion-no-padding">
+      <ion-col class="ion-no-padding">
+        <ion-list lines="none">
+          <ion-item *ngFor="let input of inputs">
+            <ion-icon name="{{ input.icon }}" slot="start"></ion-icon>
+            <ion-label>{{ input.label | translate }}</ion-label>
+            <ion-checkbox [(ngModel)]="input.checked" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+</ng-container>

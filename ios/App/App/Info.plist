@@ -29,6 +29,7 @@
 			<array>
 				<string>airgap-wallet</string>
 				<string>tezos</string>
+				<string>wc</string>
 			</array>
 		</dict>
 	</array>

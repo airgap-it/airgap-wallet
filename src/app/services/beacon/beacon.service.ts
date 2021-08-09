@@ -8,12 +8,14 @@ import {
   Network,
   NetworkType as BeaconNetworkType,
   P2PPairingRequest,
-  WalletClient
+  WalletClient,
+  StorageKey,
+  AppMetadata
 } from '@airgap/beacon-sdk'
 
 import { Injectable } from '@angular/core'
-import { LoadingController, ModalController } from '@ionic/angular'
-import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { LoadingController, ModalController, ToastController } from '@ionic/angular'
+import { ICoinProtocol, MainProtocolSymbols, RawEthereumTransaction } from '@airgap/coinlib-core'
 import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 import {
   TezblockBlockExplorer,
@@ -32,24 +34,35 @@ import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorage
   providedIn: 'root'
 })
 export class BeaconService {
-  public client: WalletClient | undefined
+  public client: WalletClient
+
+  public loader: HTMLIonLoadingElement | undefined
+  public toast: HTMLIonToastElement | undefined
 
   constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
+    private readonly toastController: ToastController,
     private readonly storage: WalletStorageService,
     private readonly protocolService: ProtocolService
   ) {
-    this.client = new WalletClient({ name: 'AirGap Wallet' })
+    this.client = this.getClient()
+    this.init()
+  }
+
+  public async reset(): Promise<void> {
+    await this.client.destroy()
+    this.client = this.getClient()
     this.init()
   }
 
   public async init(): Promise<void> {
     await this.client.init()
 
-    return this.client.connect(async message => {
-      if (!(await this.isNetworkSupported((message as { network?: Network }).network))) {
-        return this.sendNetworkNotSupportedError(message.id)
+    return this.client.connect(async (message) => {
+      this.hideToast()
+      if (message.type === BeaconMessageType.PermissionRequest && !(await this.isNetworkSupported(message.network))) {
+        return this.sendNetworkNotSupportedError(message)
       } else {
         await this.presentModal(message)
       }
@@ -60,11 +73,9 @@ export class BeaconService {
     const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
 
     return await Promise.all(
-      requests.map(
-        async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
-          return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
-        }
-      )
+      requests.map(async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
+        return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
+      })
     )
   }
 
@@ -81,12 +92,17 @@ export class BeaconService {
     return modal.present()
   }
 
-  public async addVaultRequest(generatedId: string, request: BeaconRequestOutputMessage, protocol: ICoinProtocol): Promise<void> {
-    this.storage.setCache(generatedId, [request, protocol.identifier, protocol.options.network.identifier])
+  public async addVaultRequest(
+    request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
+    protocol: ICoinProtocol
+  ): Promise<void> {
+    this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [request, protocol.identifier, protocol.options.network.identifier])
   }
 
-  public async getVaultRequest(generatedId: string): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
-    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(generatedId)
+  public async getVaultRequest(): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
+    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(
+      WalletStorageKey.PENDING_REQUEST
+    )
     const result: [BeaconRequestOutputMessage, ICoinProtocol] = [undefined, undefined]
     if (cachedRequest) {
       if (cachedRequest[0]) {
@@ -100,19 +116,68 @@ export class BeaconService {
     return result ? result : []
   }
 
-  public async respond(message: BeaconResponseInputMessage): Promise<void> {
-    console.log('responding', message)
-    await this.client.respond(message).catch(err => console.error(err))
+  public async respond(response: BeaconResponseInputMessage, request: BeaconRequestOutputMessage): Promise<void> {
+    await this.client.respond(response).catch((err) => console.error(err))
+    await this.showToast('response-sent', request.appMetadata)
+  }
+
+  public async showLoader(): Promise<void> {
+    if (this.loader) {
+      return
+    }
+
+    this.loader = await this.loadingController.create({
+      message: 'Connecting to Beacon Network...',
+      duration: 10000
+    })
+    await this.loader.present()
+  }
+
+  public async hideLoader(): Promise<void> {
+    if (!this.loader) {
+      return
+    }
+    await this.loader.dismiss()
+    this.loader = undefined
+  }
+
+  public async showToast(type: 'connected' | 'response-sent', appMetadata?: AppMetadata): Promise<void> {
+    if (this.toast) {
+      return
+    }
+
+    const dAppName = appMetadata && appMetadata.name ? appMetadata.name : 'the dApp'
+
+    const message =
+      type === 'connected' ? `Beacon connection successful. Waiting for request from ${dAppName}...` : `Response sent to ${dAppName}.`
+
+    this.toast = await this.toastController.create({
+      message,
+      position: 'top',
+      duration: 5000,
+      buttons: [
+        {
+          text: 'Close',
+          role: 'cancel'
+        }
+      ]
+    })
+    await this.toast.present()
+  }
+
+  public async hideToast(): Promise<void> {
+    if (!this.toast) {
+      return
+    }
+    await this.toast.dismiss()
+    this.toast = undefined
   }
 
   public async addPeer(peer: P2PPairingRequest): Promise<void> {
-    const loading: HTMLIonLoadingElement = await this.loadingController.create({
-      message: 'Connecting to Beacon Network...',
-      duration: 3000
-    })
-    await loading.present()
+    await this.showLoader()
     await this.client.addPeer(peer)
-    await loading.dismiss()
+    await this.hideLoader()
+    await this.showToast('connected')
   }
 
   public async getPeers(): Promise<P2PPairingRequest[]> {
@@ -127,26 +192,44 @@ export class BeaconService {
     await this.client.removeAllPeers(true)
   }
 
-  private async isNetworkSupported(_network?: Network): Promise<boolean> {
-    return true
-  }
-
-  private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+  public async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {
+    let message = error.message
+    if (message === 'TEZOS(NETWORK)') {
+      message = 'The simulation of your transaction failed. Please make sure all the values in your transaction are valid.'
+    }
+    let data = error.data ? error.data : error.stack
+    // TODO: Parse contents and show info (eg. failwith)
+    // if (error.data) {
+    //   if ((error.data as any).contents) {
+    //     data = {}
+    //   }
+    // }
     const modal = await this.modalController.create({
       component: ErrorPage,
       componentProps: {
-        title: error.name,
-        message: error.message,
-        data: error.data ? error.data : error.stack
+        title: error.name ?? 'Error',
+        message,
+        data
       }
     })
 
     return modal.present()
   }
 
-  public async sendAbortedError(id: string): Promise<void> {
+  private async isNetworkSupported(network?: Network): Promise<boolean> {
+    return (
+      network &&
+      network.type &&
+      (network.type === BeaconNetworkType.MAINNET ||
+        network.type === BeaconNetworkType.EDONET ||
+        network.type === BeaconNetworkType.FLORENCENET ||
+        network.type === BeaconNetworkType.CUSTOM)
+    )
+  }
+
+  public async sendAbortedError(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.ABORTED_ERROR
     } as any // TODO: Fix type
@@ -156,12 +239,12 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
   }
 
-  public async sendNetworkNotSupportedError(id: string): Promise<void> {
+  public async sendNetworkNotSupportedError(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NETWORK_NOT_SUPPORTED
     } as any // TODO: Fix type
@@ -171,13 +254,13 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
     await this.displayErrorPage(new Error('Network not supported!'))
   }
 
-  public async sendAccountNotFound(id: string): Promise<void> {
+  public async sendAccountNotFound(request: BeaconRequestOutputMessage): Promise<void> {
     const responseInput = {
-      id,
+      id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.NO_ADDRESS_ERROR
     } as any // TODO: Fix type
@@ -187,14 +270,45 @@ export class BeaconService {
       version: BEACON_VERSION,
       ...responseInput
     }
-    await this.respond(response)
+    await this.respond(response, request)
     await this.displayErrorPage(new Error('Account not found'))
   }
 
+  public async sendInvalidTransaction(request: BeaconRequestOutputMessage, error: any /* ErrorWithData */): Promise<void> {
+    const responseInput = {
+      id: request.id,
+      type: BeaconMessageType.Error,
+      errorType: BeaconErrorType.TRANSACTION_INVALID_ERROR,
+      errorData: error.data
+    } as any // TODO: Fix type
+
+    const response: BeaconResponseInputMessage = {
+      senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
+      version: BEACON_VERSION,
+      ...responseInput
+    }
+
+    let errorMessage = ''
+    try {
+      errorMessage =
+        error.data && Array.isArray(error.data)
+          ? `The contract returned the following error: ${error.data.find((f) => f && f.with && f.with.string).with.string}`
+          : error.message
+    } catch {}
+
+    console.log('error.message', errorMessage)
+
+    await this.respond(response, request)
+    await this.displayErrorPage({
+      title: error.title,
+      message: errorMessage,
+      data: error.data ? error.data : error.stack
+    } as any)
+  }
+
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
-    // TODO: remove `Exclude`
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET>]: TezosProtocolNetwork
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.GRANADANET>]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -209,16 +323,29 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.DELPHINET]: {
+      [BeaconNetworkType.EDONET]: {
         identifier: undefined,
-        name: network.name || 'Delphinet',
+        name: network.name || 'Edonet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-delphinet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://delphinet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
         extras: {
-          network: TezosNetwork.DELPHINET,
-          conseilUrl: 'https://tezos-delphinet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.DELPHINET,
+          network: TezosNetwork.EDONET,
+          conseilUrl: 'https://tezos-edonet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.EDONET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.FLORENCENET]: {
+        identifier: undefined,
+        name: network.name || 'Florencenet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-florencenet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://florencenet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.FLORENCENET,
+          conseilUrl: 'https://tezos-florencenet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.FLORENCENET,
           conseilApiKey: 'airgap00391'
         }
       },
@@ -263,5 +390,13 @@ export class BeaconService {
     map.set(BeaconMessageType.SignPayloadRequest, BeaconMessageType.SignPayloadResponse)
 
     return map.get(requestType)
+  }
+
+  public async getConnectedServer(): Promise<string> {
+    return await (<any>this.client).storage.get(StorageKey.MATRIX_SELECTED_NODE)
+  }
+
+  private getClient(): WalletClient {
+    return new WalletClient({ name: 'AirGap Wallet' })
   }
 }

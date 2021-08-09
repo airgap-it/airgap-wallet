@@ -3,7 +3,7 @@ import { Component, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, EthereumProtocol, FeeDefaults, ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, EthereumProtocol, FeeDefaults, ICoinProtocol } from '@airgap/coinlib-core'
 import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 import { OperationsProvider } from 'src/app/services/operations/operations'
@@ -17,9 +17,9 @@ import { WalletStorageKey, WalletStorageService } from '../../services/storage/s
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Subject } from 'rxjs'
 import { PriceService } from 'src/app/services/price/price.service'
-import { debounceTime } from 'rxjs/operators'
+import { debounceTime, takeUntil } from 'rxjs/operators'
 
 interface ExchangeFormState<T> {
   value: T
@@ -84,8 +84,10 @@ export class ExchangePage {
   public loading: HTMLIonLoadingElement
 
   public state: ExchangeState
+  private walletList: AirGapMarketWallet[]
   private _state: ExchangeState | undefined = undefined
   private readonly state$: BehaviorSubject<ExchangeState> = new BehaviorSubject(this._state)
+  private readonly ngDestroyed$: Subject<void> = new Subject()
 
   constructor(
     public formBuilder: FormBuilder,
@@ -103,12 +105,21 @@ export class ExchangePage {
     private readonly protocolService: ProtocolService,
     private readonly _ngZone: NgZone
   ) {
-    this.exchangeProvider.getActiveExchange().subscribe((exchange: string) => {
-      this.activeExchange = exchange
-    })
+    this.exchangeProvider
+      .getActiveExchange()
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((exchange: string) => {
+        this.activeExchange = exchange
+      })
   }
 
   public ionViewWillEnter() {
+    this.accountProvider.allWallets$
+      .asObservable()
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((wallets: AirGapMarketWallet[]) => {
+        this.walletList = wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+      })
     this.exchangeForm = this.formBuilder.group({
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required])],
@@ -121,7 +132,7 @@ export class ExchangePage {
             this.onChanges()
             this.updateFeeEstimate()
           })
-          .catch(err => console.error(err))
+          .catch((err) => console.error(err))
       })
       .catch(() => this.showLoadingErrorAlert())
   }
@@ -291,16 +302,18 @@ export class ExchangePage {
   }
 
   private async filterSupportedProtocols(protocols: ProtocolSymbols[], filterZeroBalance: boolean = true): Promise<ProtocolSymbols[]> {
-    const walletList: AirGapMarketWallet[] = this.accountProvider.getWalletList()
     const result: ProtocolSymbols[] = protocols.filter((supportedProtocol: ProtocolSymbols) =>
-      walletList.some(
+      this.walletList.some(
         (wallet: AirGapMarketWallet) =>
           wallet.protocol.identifier === supportedProtocol &&
           (!filterZeroBalance || (filterZeroBalance && wallet.currentBalance.isGreaterThan(0)))
       )
     )
     const tzbtcIndex: number = result.indexOf(SubProtocolSymbols.XTZ_BTC)
-    if (tzbtcIndex !== -1 && !walletList.some((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.BTC)) {
+    if (
+      tzbtcIndex !== -1 &&
+      !this.walletList.some((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.BTC)
+    ) {
       result.splice(tzbtcIndex, 1)
     }
 
@@ -383,15 +396,17 @@ export class ExchangePage {
     const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
     allFromProtocols.push(SubProtocolSymbols.XTZ_BTC)
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
-    const exchangeableFromProtocols = (await Promise.all(
-      supportedFromProtocols.map(async fromProtocol => {
-        if (fromProtocol === SubProtocolSymbols.XTZ_BTC) {
-          return fromProtocol
-        }
-        const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
-        return availableToCurrencies.length > 0 ? fromProtocol : undefined
-      })
-    )).filter(fromProtocol => fromProtocol !== undefined)
+    const exchangeableFromProtocols = (
+      await Promise.all(
+        supportedFromProtocols.map(async (fromProtocol) => {
+          if (fromProtocol === SubProtocolSymbols.XTZ_BTC) {
+            return fromProtocol
+          }
+          const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
+          return availableToCurrencies.length > 0 ? fromProtocol : undefined
+        })
+      )
+    ).filter((fromProtocol) => fromProtocol !== undefined)
     return exchangeableFromProtocols
   }
 
@@ -462,21 +477,19 @@ export class ExchangePage {
   }
 
   private walletsForProtocol(protocol: string, filterZeroBalance: boolean = true): AirGapMarketWallet[] {
-    return this.accountProvider
-      .getWalletList()
-      .filter(
-        wallet =>
-          wallet.protocol.identifier === protocol &&
-          wallet.protocol.options.network.type === NetworkType.MAINNET &&
-          (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0))
-      )
+    return this.walletList.filter(
+      (wallet) =>
+        wallet.protocol.identifier === protocol &&
+        wallet.protocol.options.network.type === NetworkType.MAINNET &&
+        (!filterZeroBalance || wallet.currentBalance.isGreaterThan(0))
+    )
   }
 
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
     return (
       !wallet ||
       wallet.protocol.identifier !== walletArray[0].protocol.identifier ||
-      walletArray.every(supportedWallet => !this.accountProvider.isSameWallet(supportedWallet, wallet))
+      walletArray.every((supportedWallet) => !this.accountProvider.isSameWallet(supportedWallet, wallet))
     )
   }
 
@@ -611,7 +624,7 @@ export class ExchangePage {
       }
     })
 
-    modal.present().catch(err => console.error(err))
+    modal.present().catch((err) => console.error(err))
 
     modal
       .onDidDismiss()
@@ -672,5 +685,10 @@ export class ExchangePage {
       fee: newState.fee || currentState.fee,
       isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.ngDestroyed$.next()
+    this.ngDestroyed$.complete()
   }
 }

@@ -18,7 +18,7 @@ import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { RemoteConfigProvider, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/remote-config/remote-config'
+import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/coinlib/coinlib.service'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
@@ -26,7 +26,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private static instance: TezosDelegationExtensions
 
   public static async create(
-    remoteConfigProvider: RemoteConfigProvider,
+    coinlibService: CoinlibService,
     decimalPipe: DecimalPipe,
     amountConverter: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
@@ -36,7 +36,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   ): Promise<TezosDelegationExtensions> {
     if (!TezosDelegationExtensions.instance) {
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
-        remoteConfigProvider,
+        coinlibService,
         decimalPipe,
         amountConverter,
         shortenStringPipe,
@@ -64,7 +64,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private knownBakers?: TezosBakerCollection
 
   private constructor(
-    private readonly remoteConfigProvider: RemoteConfigProvider,
+    private readonly coinlibService: CoinlibService,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -283,7 +283,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   private async getKnownBakers(): Promise<TezosBakerCollection> {
     if (this.knownBakers === undefined) {
-      this.knownBakers = await this.remoteConfigProvider.getKnownTezosBakers()
+      this.knownBakers = await this.coinlibService.getKnownTezosBakers()
     }
 
     return this.knownBakers

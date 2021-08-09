@@ -66,7 +66,8 @@ export class TransactionPreparePage {
   public amountForm: FormGroup
 
   // temporary field until we figure out how to handle Substrate fee/tip model
-  private readonly isSubstrate: boolean
+  public readonly isSubstrate: boolean
+  public ignoreExistentialDeposit: boolean | undefined
 
   private readonly isSapling: boolean
 
@@ -123,6 +124,9 @@ export class TransactionPreparePage {
 
     this.isSubstrate =
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+    this.ignoreExistentialDeposit = this.isSubstrate ? true : undefined
+
+    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
 
@@ -449,7 +453,7 @@ export class TransactionPreparePage {
     const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
     const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.protocol.feeDecimals)
 
-    const memo = this._state.memo.value
+    const data = this.isSubstrate ? !this.ignoreExistentialDeposit : this._state.memo.value
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
@@ -457,7 +461,7 @@ export class TransactionPreparePage {
         amount,
         fee,
         this.accountProvider.getWalletList(),
-        memo
+        data
       )
 
       const info = {
@@ -521,9 +525,14 @@ export class TransactionPreparePage {
     this.updateState({
       estimatingMaxAmount: true
     })
-
+    
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.receiver.value, fee)
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(
+      this.wallet,
+      this._state.receiverAddress,
+      fee,
+      !this.ignoreExistentialDeposit
+    )
 
     const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
@@ -537,6 +546,10 @@ export class TransactionPreparePage {
         disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lte(0)
       })
     }
+  }
+
+  public toggleExcludeExistentialDeposit(): void {
+    this.ignoreExistentialDeposit = !this.ignoreExistentialDeposit
   }
 
   public pasteClipboard() {

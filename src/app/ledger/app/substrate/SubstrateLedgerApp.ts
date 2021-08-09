@@ -1,4 +1,4 @@
-import { AirGapMarketWallet, SubstrateProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, SubstrateProtocol } from '@airgap/coinlib-core'
 import {
   SubstrateSignature,
   SubstrateSignatureType
@@ -6,8 +6,7 @@ import {
 import { SubstrateTransaction } from '@airgap/coinlib-core/protocols/substrate/helpers/data/transaction/SubstrateTransaction'
 import { RawSubstrateTransaction } from '@airgap/coinlib-core/serializer/types'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
-import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
-import { Buffer } from 'buffer'
+import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-substrate'
 
 import { ReturnCode } from '../../ReturnCode'
 import { LedgerApp } from '../LedgerApp'
@@ -26,7 +25,15 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       const response: ResponseAddress = await app.getAddress(account, change, addressIndex, true)
 
       return response.return_code === ReturnCode.SUCCESS
-        ? new AirGapMarketWallet(this.protocol, response.pubKey, false, this.protocol.standardDerivationPath, priceService)
+        ? new AirGapMarketWallet(
+            this.protocol,
+            response.pubKey,
+            false,
+            this.protocol.standardDerivationPath,
+            '',
+            AirGapWalletStatus.ACTIVE,
+            priceService
+          )
         : this.rejectWithError('Could not import wallet', response)
     } catch (error) {
       return this.rejectWithError('Could not import wallet', error)
@@ -41,7 +48,7 @@ export abstract class SubstrateLedgerApp extends LedgerApp {
       signedTxs.push(await this.signSubstrateTransaction(tx.transaction, tx.payload))
     }
 
-    if (signedTxs.some(tx => tx === null)) {
+    if (signedTxs.some((tx) => tx === null)) {
       return Promise.reject('Rejected')
     }
 

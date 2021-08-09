@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+import { PipesModule } from 'src/app/pipes/pipes.module'
 
 import { ComponentsModule } from '../../components/components.module'
 
@@ -18,6 +19,7 @@ import { ScanPage } from './scan'
     TranslateModule,
     ComponentsModule,
     ZXingScannerModule,
+    PipesModule,
     RouterModule.forChild([{ path: '', component: ScanPage }])
   ],
   declarations: [ScanPage]

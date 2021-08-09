@@ -1,12 +1,14 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ 'qr-settings-page.title' | translate }}</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'qr-settings-page.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
 </ion-header>
 
-<ion-content>
+<ion-grid fixed="true">
   <airgap-qr-settings></airgap-qr-settings>
-</ion-content>
+</ion-grid>

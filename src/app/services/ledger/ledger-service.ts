@@ -10,6 +10,7 @@ import { ReturnCode } from '../../ledger/ReturnCode'
 import { isType } from '../../utils/utils'
 import { PriceService } from '../price/price.service'
 import { LedgerConnectionProvider } from './ledger-connection-provider'
+import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 
 const MAX_RETRIES = 1
 
@@ -20,7 +21,7 @@ export class LedgerService {
   private readonly supportedApps: Map<string, (connection: LedgerConnection) => LedgerApp> = new Map([
     [MainProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
     [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
-    [MainProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)]
+    [MainProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new TezosLedgerApp(connection)]
   ] as [string, (connection: LedgerConnection) => LedgerApp][])
 
   private readonly openConnections: Map<string, LedgerConnection> = new Map()

@@ -39,8 +39,8 @@ export class FundAccountAction extends Action<void, FundAccountActionContext> {
       compatibleWallets,
       incompatibleWallets
     }
-    this.context.dataService.setData(DataServiceKey.WALLET, info)
-    this.context.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.context.dataService.setData(DataServiceKey.ACCOUNTS, info)
+    this.context.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private isCompatible(wallet: AirGapMarketWallet): boolean {

@@ -324,12 +324,10 @@ export class AccountTransactionListPage {
     }
 
     const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-      oldTransactions.map(
-        (tx: IAirGapTransaction): [string, IAirGapTransaction] => {
-          const key = this.mergeKeyForTransaction(tx)
-          return [key, tx]
-        }
-      )
+      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => {
+        const key = this.mergeKeyForTransaction(tx)
+        return [key, tx]
+      })
     )
 
     const transactionCountBefore: number = transactionMap.size

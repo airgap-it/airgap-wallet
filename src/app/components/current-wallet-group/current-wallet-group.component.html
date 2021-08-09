@@ -1,0 +1,19 @@
+<ion-item lines="none" button="true" detail="false" *ngIf="(groups$ | async) && (groups$ | async).length > 0">
+  <ion-text slot="start" color="medium">{{ 'current-wallet-group.label' | translate }}</ion-text>
+  <p slot="end" *ngIf="(groups$ | async) && (groups$ | async).length === 1">
+    {{ currentGroup$ | async | groupLabel | translate }}
+  </p>
+  <ion-select
+    *ngIf="(groups$ | async) && (groups$ | async).length > 1"
+    slot="end"
+    [value]="currentGroup$ | async"
+    (ionChange)="onChange($event)"
+    interface="popover"
+  >
+    <ion-select-option *ngFor="let group of groups$ | async" [value]="group">
+      <ion-text>
+        {{ group | groupLabel | translate }}
+      </ion-text>
+    </ion-select-option>
+  </ion-select>
+</ion-item>

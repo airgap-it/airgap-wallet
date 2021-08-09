@@ -3,22 +3,22 @@ import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
-import { TranslateModule } from '@ngx-translate/core'
 import { ComponentsModule } from 'src/app/components/components.module'
+import { TranslateModule } from '@ngx-translate/core'
 
-import { BeaconPermissionListPageRoutingModule } from './beacon-permission-list-routing.module'
-import { BeaconPermissionListPage } from './beacon-permission-list.page'
+import { WalletconnectPageRoutingModule } from './walletconnect-routing.module'
+import { WalletconnectPage } from './walletconnect.page'
 
 @NgModule({
   imports: [
+    AirGapAngularCoreModule,
     CommonModule,
     FormsModule,
     IonicModule,
-    TranslateModule,
     ComponentsModule,
-    BeaconPermissionListPageRoutingModule,
-    AirGapAngularCoreModule
+    WalletconnectPageRoutingModule,
+    TranslateModule
   ],
-  declarations: [BeaconPermissionListPage]
+  declarations: [WalletconnectPage]
 })
-export class BeaconPermissionListPageModule {}
+export class WalletconnectPageModule {}
