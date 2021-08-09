@@ -34,7 +34,6 @@ import {
   TezosSaplingProtocolOptions,
   TezosShieldedTezProtocolConfig
 } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
-import { HttpClient } from '@angular/common/http'
 import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
@@ -75,7 +74,6 @@ export class AppComponent implements AfterViewInit {
     private readonly dataService: DataService,
     private readonly config: Config,
     private readonly ngZone: NgZone,
-    private readonly httpClient: HttpClient,
     private readonly saplingNativeService: SaplingNativeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
@@ -236,20 +234,6 @@ export class AppComponent implements AfterViewInit {
     })
 
     await this.initializeTezosDomains()
-    await shieldedTezProtocol.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
-  }
-
-  private async getSaplingParams(type: 'spend' | 'output'): Promise<Buffer> {
-    if (this.platform.is('hybrid')) {
-      // Sapling params are read and used in a native plugin, there's no need to read them in the Ionic part
-      return Buffer.alloc(0)
-    }
-
-    const params: ArrayBuffer = await this.httpClient
-      .get(`./assets/sapling/sapling-${type}.params`, { responseType: 'arraybuffer' })
-      .toPromise()
-
-    return Buffer.from(params)
   }
 
   private async initializeTezosDomains(): Promise<void> {
@@ -257,7 +241,7 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: '',
+      [TezosNetwork.GRANADANET]: ''
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
