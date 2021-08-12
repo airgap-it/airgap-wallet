@@ -312,9 +312,21 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
-    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
+    const delegatedFormatted = await this.amountConverterPipe.transform(
+      delegatedAmount, 
+      { 
+        protocol,
+        maxDigits: protocol.decimals
+      }
+    )
 
-    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
+    const maxDelegationFormatted = await this.amountConverterPipe.transform(
+      maxDelegationAmount, 
+      { 
+        protocol,
+        maxDigits: protocol.decimals
+      }
+    )
 
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
@@ -349,9 +361,14 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     delegatedAmount: BigNumber
   ): Promise<AirGapDelegatorAction | null> {
-    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
-      protocol
-    })
+    const delegatedAmountFormatted = await this.amountConverterPipe.transform(
+      delegatedAmount, 
+      { 
+        protocol,
+        maxDigits: protocol.decimals
+      }
+    )
+
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
 
     return this.createMainDelegatorAction(
@@ -381,12 +398,12 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     if (action && maxAmount.gte(minAmount)) {
       const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(
         maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        10
+        protocol.decimals
       )
 
       const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
         minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        10
+        protocol.decimals
       )
 
       const form = this.formBuilder.group({

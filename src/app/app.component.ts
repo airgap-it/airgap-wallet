@@ -231,7 +231,11 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [edonetProtocol, florencenetProtocol, shieldedTezProtocol],
+      extraActiveProtocols: [
+        edonetProtocol, 
+        florencenetProtocol, 
+        shieldedTezProtocol
+      ],
       extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
     })
 

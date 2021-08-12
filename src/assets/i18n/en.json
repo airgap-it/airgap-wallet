@@ -604,6 +604,34 @@
       }
     }
   },
+  "delegation-detail-moonbeam": {
+    "delegatee-label": "Collator",
+    "delegatee-label-plural": "Collators",
+    "commission_label": "Commission",
+    "nominators_label": "Nominators",
+    "collators_label": "Collators",
+    "currently-delegated_label": "Currently Delegated",
+    "nominator-status": {
+      "label": "Status",
+      "active_label": "Active",
+      "leaving_label": "Undelegating",
+      "unknown_label": "Unknown"
+    },
+    "delegate": {
+      "label": "Delegate",
+      "has-delegated_text": "You have currently <span class=\"style__strong color__primary\">{{ delegated }}</span> delegated to this collator.",
+      "not-delegated_text": "Select the amount you want to delegate.",
+      "can-delegate-has-delegated_text": "You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "can-delegate-not-delegated_text": "You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees)."
+    },
+    "undelegate": {
+      "label": "Undelegate",
+      "text": "You have currently delegated to this collatorr, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+    },
+    "undelegate-all": {
+      "label": "Undelegate All"
+    }
+  },
   "introduction-push": {
     "title": "Push Notifications",
     "heading": "You can receive push notifications if your accounts receive transactions.",
