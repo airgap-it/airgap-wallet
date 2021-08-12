@@ -53,6 +53,12 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.KUSAMA, async () => {
       return this.getKusamaActions()
     })
+    actionMap.set(MainProtocolSymbols.MOONBASE, async () => {
+      return this.getMoonbeamActions()
+    })
+    actionMap.set(MainProtocolSymbols.MOONRIVER, async () => {
+      return this.getMoonbeamActions()
+    })
 
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
@@ -203,6 +209,12 @@ export class ActionGroup {
   }
 
   private getKusamaActions(): Action<any, any>[] {
+    const delegateButtonAction = this.createDelegateButtonAction()
+
+    return [delegateButtonAction]
+  }
+
+  private getMoonbeamActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]
