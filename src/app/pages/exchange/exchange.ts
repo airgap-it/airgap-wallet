@@ -3,6 +3,7 @@ import {
   AirGapMarketWallet,
   AirGapWalletStatus,
   EthereumProtocol,
+  RskProtocol,
   FeeDefaults,
   ICoinProtocol,
   MainProtocolSymbols,
@@ -308,6 +309,10 @@ export class ExchangePage {
       if (this.selectedFromProtocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
         feeCurrentMarketPrice = this.priceService
           .getCurrentMarketPrice(new EthereumProtocol(), 'USD')
+          .then((price: BigNumber) => price.toNumber())
+      } else if (this.selectedFromProtocol.identifier.startsWith(SubProtocolSymbols.RBTC_ERC20)) {
+        feeCurrentMarketPrice = this.priceService
+          .getCurrentMarketPrice(new RskProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
       } else {
         feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()

@@ -21,8 +21,9 @@ import {
   RawAeternityTransaction,
   RawBitcoinTransaction,
   RawEthereumTransaction,
-  RawSubstrateTransaction,
-  RawTezosTransaction
+  RawRskTransaction,
+  RawTezosTransaction,
+  RawSubstrateTransaction
 } from '@airgap/coinlib-core/serializer/types'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
@@ -47,6 +48,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 export type SerializableTx =
   | RawTezosTransaction
   | RawEthereumTransaction
+  | RawRskTransaction
   | RawBitcoinTransaction
   | RawAeternityTransaction
   | CosmosTransaction

@@ -150,7 +150,7 @@ export class IACService extends BaseIACService {
     }
     if (protocol === MainProtocolSymbols.XTZ) {
       await this.beaconService.respond(response, cachedRequest[0])
-    } else if (protocol === MainProtocolSymbols.ETH) {
+    } else if (protocol === MainProtocolSymbols.ETH || protocol === MainProtocolSymbols.RBTC) {
       await this.walletConnectService.approveRequest(response.id, response.signature)
     }
     return false

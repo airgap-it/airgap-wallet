@@ -24,7 +24,7 @@ export interface ApiHealth {
     isHealthy: boolean
     errorDescription?: string
   }
-  blockExplorer?: {
+  explorer?: {
     isHealthy: boolean
     errorDescription?: string
   }
