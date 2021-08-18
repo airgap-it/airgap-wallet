@@ -392,7 +392,7 @@
       "exchange_label": "Add Coins"
     },
     "loading": {
-      "setup": "Setting up exchange ... ",
+      "setup": "Setting up exchange...",
       "header": "Loading Error",
       "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
     }
@@ -452,6 +452,11 @@
     },
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
+  },
+  "exchange-quipuswap": {
+    "slippage-tolerance": {
+      "label": "Slippage tolerance"
+    }
   },
   "delegation-detail": {
     "title": "{{ delegateeLabel }} Detail",

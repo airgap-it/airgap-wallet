@@ -16,8 +16,8 @@ export abstract class LedgerApp {
     // by default do nothing
   }
 
-  public abstract async importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet>
-  public abstract async signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
+  public abstract importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet>
+  public abstract signTransaction(transaction: any): Promise<IAirGapSignedTransaction>
 
   protected derivationPathToArray(derivationPath: string): number[] {
     if (!derivationPath.startsWith('m/')) {

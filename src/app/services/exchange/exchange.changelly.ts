@@ -1,7 +1,10 @@
+import { AirGapMarketWallet, FeeDefaults, ProtocolSymbols } from '@airgap/coinlib-core'
 import { HttpClient } from '@angular/common/http'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { BigNumber } from 'bignumber.js'
 
-import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { OperationsProvider } from '../operations/operations'
+
+import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
 // tslint:disable:max-classes-per-file
 
@@ -66,7 +69,11 @@ class ChangellyApi {
   private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
   private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(public http: HttpClient, private readonly baseURL: string = 'https://swap.airgap.prod.gke.papers.tech/') {
+  constructor(
+    protected readonly operationsProvider: OperationsProvider,
+    protected readonly http: HttpClient,
+    protected readonly baseURL: string = 'https://swap.airgap.prod.gke.papers.tech/'
+  ) {
     this.identifierExchangeToAirGapMap.set('rep', 'eth-erc20-repv2' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('usdt', 'eth-erc20-usdt' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('rlc', 'eth-erc20-rlc' as ProtocolSymbols)
@@ -178,7 +185,11 @@ class ChangellyApi {
     })
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
+  public async getMaxExchangeAmountForCurrency(_fromCurrency: string, _toCurrency: string): Promise<string | undefined> {
+    return undefined
+  }
+
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
     const method: string = 'getExchangeAmount'
@@ -201,24 +212,49 @@ class ChangellyApi {
     })
   }
 
-  public async createTransaction(
-    fromCurrency: ProtocolSymbols,
-    toCurrency: ProtocolSymbols,
-    toAddress: string,
+  public async estimateFee(
+    fromWallet: AirGapMarketWallet,
+    _toWallet: AirGapMarketWallet,
     amount: string,
-    _fromAddress?: string
-  ): Promise<CreateTransactionResponse> {
-    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    _data: any
+  ): Promise<FeeDefaults | undefined> {
+    const shiftedAmount = new BigNumber(amount).shiftedBy(fromWallet.protocol.decimals)
+    const isAmountValid = !shiftedAmount.isNaN() && shiftedAmount.gt(0)
+
+    return isAmountValid ? this.operationsProvider.estimateFees(fromWallet, fromWallet.addresses[0], shiftedAmount) : undefined
+  }
+
+  public async createTransaction(
+    fromWallet: AirGapMarketWallet,
+    toWallet: AirGapMarketWallet,
+    amount: string,
+    fee: string,
+    _data: any
+  ): Promise<ExchangeTransaction> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([
+      fromWallet.protocol.identifier
+    ])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toWallet.protocol.identifier])[0]
 
     const method: string = 'createTransaction'
 
-    return this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, {
+    const response: CreateTransactionResponse = await this.makeJsonRpcCall<Object, CreateTransactionResponse>(method, {
       from: transformedFromCurrency,
       to: transformedToCurrency,
-      address: toAddress,
+      address: toWallet.receivingPublicAddress,
       amount
     })
+
+    return {
+      id: response.id,
+      payoutAddress: response.payoutAddress,
+      payinAddress: response.payinAddress,
+      amountExpectedFrom: response.amountExpectedFrom,
+      amountExpectedTo: response.amountExpectedTo,
+      fee,
+      exchangeResult: response,
+      memo: response.payinExtraId
+    }
   }
 
   public async getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
@@ -230,11 +266,15 @@ class ChangellyApi {
 
     return new ChangellyTransactionStatusResponse(statusString)
   }
+
+  public async getCustomUI(): Promise<ExchangeUI> {
+    return { widgets: [] }
+  }
 }
 
 export class ChangellyExchange extends ChangellyApi implements Exchange {
-  constructor(public http: HttpClient) {
-    super(http)
+  constructor(operationsProvider: OperationsProvider, http: HttpClient) {
+    super(operationsProvider, http)
   }
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: ProtocolSymbols): Promise<ProtocolSymbols[]> {

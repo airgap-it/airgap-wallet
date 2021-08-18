@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { UIWidget } from 'src/app/models/widgets/UIWidget'
+import { UIWidget, UIWidgetType } from 'src/app/models/widgets/UIWidget'
 import { FormGroup } from '@angular/forms'
 import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
 
@@ -9,6 +9,8 @@ import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
   styleUrls: ['widget-selector.scss']
 })
 export class WidgetSelector {
+  public UIWidgetType = UIWidgetType
+
   @Input()
   public widget: UIWidget
 
