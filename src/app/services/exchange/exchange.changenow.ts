@@ -1,7 +1,10 @@
+import { AirGapMarketWallet, FeeDefaults, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { HttpClient } from '@angular/common/http'
-import { MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+import { BigNumber } from 'bignumber.js'
 
-import { Exchange, ExchangeIdentifier, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { OperationsProvider } from '../operations/operations'
+
+import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
 // tslint:disable:max-classes-per-file
 
@@ -30,6 +33,7 @@ export interface EstimatedAmountResponse {
 export interface TransactionChangeNowResponse {
   payinAddress: string
   payoutAddress: string
+  payinExtraId: string
   payoutExtraId: string
   fromCurrency: string
   toCurrency: string
@@ -77,7 +81,11 @@ class ChangeNowApi {
   private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
   private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(public http: HttpClient, protected readonly baseURL: string = 'https://changenow.io/api/v1') {
+  constructor(
+    protected readonly operationsProvider: OperationsProvider,
+    protected readonly http: HttpClient,
+    protected readonly baseURL: string = 'https://changenow.io/api/v1'
+  ) {
     this.identifierExchangeToAirGapMap.set('xchf', 'eth-erc20-xchf' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('usdterc20', 'eth-erc20-usdt' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('bnbmainnet', 'eth-erc20-bnb' as ProtocolSymbols)
@@ -224,7 +232,11 @@ class ChangeNowApi {
     return result.minAmount.toString()
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
+  public async getMaxExchangeAmountForCurrency(_fromCurrency: string, _toCurrency: string): Promise<string | undefined> {
+    return '0'
+  }
+
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -239,33 +251,61 @@ class ChangeNowApi {
     return { result: false, message: '' }
   }
 
-  public async createTransaction(
-    fromCurrency: ProtocolSymbols,
-    toCurrency: ProtocolSymbols,
-    toAddress: string,
+  public async estimateFee(
+    fromWallet: AirGapMarketWallet,
+    _toWallet: AirGapMarketWallet,
     amount: string,
-    fromAddress?: string
-  ): Promise<TransactionChangeNowResponse> {
-    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
-    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
+    _data: any
+  ): Promise<FeeDefaults | undefined> {
+    const shiftedAmount = new BigNumber(amount).shiftedBy(fromWallet.protocol.decimals)
+    const isAmountValid = !shiftedAmount.isNaN() && shiftedAmount.gt(0)
+
+    return isAmountValid ? this.operationsProvider.estimateFees(fromWallet, fromWallet.addresses[0], shiftedAmount) : undefined
+  }
+
+  public async createTransaction(
+    fromWallet: AirGapMarketWallet,
+    toWallet: AirGapMarketWallet,
+    amount: string,
+    fee: string,
+    data: any
+  ): Promise<ExchangeTransaction> {
+    const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([
+      fromWallet.protocol.identifier
+    ])[0]
+    const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toWallet.protocol.identifier])[0]
 
     const apiKey: string = '5eca82aabfdf9684e8fe4ff35245d9d4f2cbb1153e0f1025b697941c982763d1'
 
-    const response: any = await this.http
+    const response: TransactionChangeNowResponse = await this.http
       .post<TransactionChangeNowResponse>(`${this.baseURL}/transactions/${apiKey}`, {
         from: transformedFromCurrency,
         to: transformedToCurrency,
-        address: toAddress,
+        address: toWallet.receivingPublicAddress,
         amount,
         extraId: '',
         userId: '',
         contactEmail: '',
-        refundAddress: fromAddress ? fromAddress : '',
+        refundAddress: fromWallet.receivingPublicAddress,
         refundExtraId: ''
       })
       .toPromise()
 
-    return response
+    return {
+      id: response.id,
+      payoutAddress: response.payoutAddress,
+      payinAddress: response.payinAddress,
+      amountExpectedFrom: response.amount.toString(),
+      amountExpectedTo: await this.getExchangeAmount(
+        fromWallet.protocol.identifier,
+        toWallet.protocol.identifier,
+        response.amount.toString(),
+        data
+      ),
+      fee,
+      exchangeResult: response,
+      memo: response.payinExtraId
+    }
   }
 
   public async getStatus(transactionId: string): Promise<ChangeNowTransactionStatusResponse> {
@@ -275,11 +315,15 @@ class ChangeNowApi {
 
     return new ChangeNowTransactionStatusResponse(response)
   }
+
+  public async getCustomUI(): Promise<ExchangeUI> {
+    return { widgets: [] }
+  }
 }
 
 export class ChangeNowExchange extends ChangeNowApi implements Exchange {
-  constructor(public http: HttpClient) {
-    super(http)
+  constructor(operationsProvider: OperationsProvider, http: HttpClient) {
+    super(operationsProvider, http)
   }
 
   public async getAvailableToCurrenciesForCurrency(fromCurrency: ProtocolSymbols): Promise<ProtocolSymbols[]> {

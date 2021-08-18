@@ -82,6 +82,7 @@
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
     "@sentry/browser": "6.2.5",
+    "@taquito/taquito": "^10.0.0",
     "@types/ledgerhq__hw-transport": "^4.21.2",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
@@ -157,7 +158,7 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-config-valorsoft": "2.2.1",
     "tslint-plugin-prettier": "2.3.0",
-    "typescript": "~4.0.5"
+    "typescript": "~4.1.6"
   },
   "description": "The Most Secure Practical Way To Do Crypto Transactions",
   "cordova": {
