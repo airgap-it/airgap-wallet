@@ -161,7 +161,7 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     const maxDelegationAmount = await protocol
       .estimateMaxDelegationValueFromAddress(nominatorDetails.address)
       .then((value) => new BigNumber(value))
-    const minDelegationAmount = new BigNumber(protocol.getMinDelegationAmount())
+    const minDelegationAmount = new BigNumber(await protocol.getMinDelegationAmount(nominationDetails.nominatorDetails.address))
     const delegatedAmount = new BigNumber(nominationDetails.bond)
     const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
       protocol,
