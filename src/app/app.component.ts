@@ -192,20 +192,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Edonet',
-      NetworkType.TESTNET,
-      'https://tezos-edonet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//edonet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.EDONET,
-        'https://tezos-edonet-conseil.prod.gke.papers.tech',
-        TezosNetwork.EDONET,
-        'airgap00391'
-      )
-    )
-    const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
-
     const florencenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Florencenet',
       NetworkType.TESTNET,
@@ -220,6 +206,21 @@ export class AppComponent implements AfterViewInit {
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
+    const granadanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Florencenet',
+      NetworkType.TESTNET,
+      'https://tezos-granadanet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//granadanet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.GRANADANET,
+        'https://tezos-granadanet-conseil.prod.gke.papers.tech',
+        TezosNetwork.MAINNET,
+        'airgap00391'
+      )
+    )
+
+    const granadanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(granadanetNetwork))
+
     const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
       await this.saplingNativeService.createExternalMethodProvider()
 
@@ -231,12 +232,12 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [
-        edonetProtocol, 
-        florencenetProtocol, 
+      extraActiveProtocols: [ 
+        florencenetProtocol,
+        granadanetProtocol,
         shieldedTezProtocol
       ],
-      extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
+      extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 
     await this.initializeTezosDomains()
