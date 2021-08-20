@@ -21,6 +21,7 @@ import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { saveWalletConnectSession } from 'src/app/services/walletconnect/helpers'
 
 enum Methods {
   SESSION_REQUEST = 'session_request',
@@ -186,9 +187,9 @@ export class WalletconnectPage implements OnInit {
         chainId: 1,
         accounts: [this.address]
       }
-
       if (this.connector) {
         this.connector.approveSession(approveData)
+        saveWalletConnectSession(this.connector.peerId, this.connector.session)
       }
     }
   }
