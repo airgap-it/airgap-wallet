@@ -51,6 +51,7 @@ import { SaplingNativeService } from './services/sapling-native/sapling-native.s
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
+import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 
 @Component({
   selector: 'app-root',
@@ -71,6 +72,7 @@ export class AppComponent implements AfterViewInit {
     private readonly addressService: AddressService,
     private readonly serializerService: SerializerService,
     private readonly pushProvider: PushProvider,
+    private readonly walletconnectService: WalletconnectService,
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
@@ -88,7 +90,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   public async initializeApp(): Promise<void> {
-    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols()])
+    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
@@ -190,6 +192,9 @@ export class AppComponent implements AfterViewInit {
       defaultLanguage: 'en'
     })
   }
+  private async initializeWalletConnect(): Promise<void> {
+    this.walletconnectService.initWalletConnect()
+  }
 
   private async initializeProtocols(): Promise<void> {
     const florencenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
@@ -262,7 +267,7 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: '',
+      [TezosNetwork.GRANADANET]: ''
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

@@ -4,130 +4,116 @@ import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import { DappConfirmPage } from 'src/app/pages/dapp-confirm/dapp-confirm.page'
 import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
-
-export async function getCachedSession(): Promise<WalletconnectSession> {
-  const local = localStorage ? await localStorage.getItem('walletconnect') : null
-
-  let session = null
-  if (local) {
-    try {
-      session = JSON.parse(local)
-    } catch (error) {
-      throw error
-    }
-  }
-
-  return session
-}
-
-export interface ClientMeta {
-  description: string
-  url: string
-  icons: string[]
-  name: string
-}
-
-export interface PeerMeta {
-  description: string
-  url: string
-  icons: string[]
-  name: string
-}
-
-export interface WalletconnectSession {
-  connected: boolean
-  accounts: string[]
-  chainId: number
-  bridge: string
-  key: string
-  clientId: string
-  clientMeta: ClientMeta
-  peerId: string
-  peerMeta: PeerMeta
-  handshakeId: number
-  handshakeTopic: string
-}
-
-export interface WalletConnectRequestApproval {
-  id: number
-  result: string
-}
-
+import { getAllValidWalletConnectSessions, clientMeta } from './helpers'
+import { mapValues, isEmpty } from 'lodash'
+import { ErrorPage } from 'src/app/pages/error/error.page'
+import { UiEventService } from '@airgap/angular-core'
 @Injectable({
   providedIn: 'root'
 })
 export class WalletconnectService {
-  private connector: WalletConnect | undefined
+  private activeConnector: WalletConnect | undefined
   private loading: HTMLIonLoadingElement
+
+  private timeout: NodeJS.Timeout | undefined
 
   constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
-    private readonly translateService: TranslateService
-  ) {
-    try {
-      getCachedSession().then((session) => {
-        if (session) {
-          this.connector = new WalletConnect({ session })
-          this.subscribeToEvents()
-        }
-      })
-    } catch (e) {}
+    private readonly translateService: TranslateService,
+    private readonly uiEventService: UiEventService
+  ) {}
+
+  public async initWalletConnect(): Promise<void> {
+    const allSessions = await getAllValidWalletConnectSessions()
+    if (isEmpty(allSessions)) {
+      return
+    }
+    mapValues(allSessions, (session) => {
+      const walletConnector = new WalletConnect({ clientMeta, session })
+      this.subscribeToEvents(walletConnector)
+    })
   }
 
   public async connect(uri: string): Promise<void> {
-    this.connector = new WalletConnect({
+    let connector = new WalletConnect({
       uri,
-      clientMeta: {
-        description: 'AirGapped Transactions',
-        url: 'https://airgap.it',
-        icons: ['https://airgap.it/wp-content/uploads/2018/05/Airgap_Logo_sideways_color.png'],
-        name: 'AirGap'
-      }
+      clientMeta
     })
 
-    if (!this.connector.connected) {
-      await this.connector.createSession()
+    if (!connector.connected) {
+      await connector.createSession()
     }
+
+    this.subscribeToEvents(connector)
 
     this.presentLoading()
 
-    await this.subscribeToEvents()
+    this.timeout = setTimeout(() => {
+      this.showTimeoutAlert()
+    }, 1008)
   }
 
   async presentLoading() {
     this.loading = await this.loadingController.create({
-      message: this.translateService.instant('dapps.wait_for_walletconnect'),
+      message: this.translateService.instant('walletconnect.wait'),
       backdropDismiss: true
     })
     await this.loading.present()
   }
 
-  public async subscribeToEvents(): Promise<void> {
-    if (!this.connector) {
+  public async subscribeToEvents(connector: WalletConnect): Promise<void> {
+    if (!connector) {
       return
     }
 
-    this.connector.on('session_request', (error, payload) => {
-      if (error) {
-        throw error
-      }
+    connector.on('session_request', async (error, payload) => {
+      clearTimeout(this.timeout)
+
       this.loading.dismiss()
-      this.presentModal(payload)
+
+      if (error) {
+        const modal = await this.modalController.create({
+          component: ErrorPage,
+          componentProps: {
+            title: error.message ?? 'Error',
+            message: this.translateService.instant('walletconnect.error'),
+            data: undefined
+          }
+        })
+        return modal.present()
+      }
+
+      this.presentModal(payload, connector)
     })
 
-    // Subscribe to call requests
-    this.connector.on('call_request', (error, payload) => {
+    connector.on('call_request', (error, payload) => {
       if (error) {
         throw error
       }
+      this.activeConnector = connector
+      this.presentModal(payload, connector)
+    })
+  }
 
-      this.presentModal(payload)
+  private async showTimeoutAlert() {
+    this.loading?.dismiss()
+
+    await this.uiEventService.showTranslatedAlert({
+      header: 'walletconnect.timeout.title',
+      message: 'walletconnect.timeout.message',
+      buttons: [
+        {
+          text: 'ok',
+          role: 'cancel',
+          cssClass: 'secondary'
+        }
+      ],
+      backdropDismiss: false
     })
   }
 
   public async approveRequest(id: string, result: string) {
-    // console.log('APPROVE REQUEST', id, result)
     this.presentConfirmationModal(id, result)
   }
 
@@ -135,7 +121,7 @@ export class WalletconnectService {
     const modal = await this.modalController.create({
       component: DappConfirmPage,
       componentProps: {
-        connector: this.connector,
+        connector: this.activeConnector,
         id: id,
         result: result
       }
@@ -144,34 +130,16 @@ export class WalletconnectService {
     return modal.present()
   }
 
-  async presentModal(request: any) {
+  async presentModal(request: any, connector: WalletConnect) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,
       componentProps: {
         request,
-        connector: this.connector,
+        connector: connector,
         walletConnectService: this
       }
     })
 
     return modal.present()
-  }
-
-  public async getPermission(): Promise<WalletconnectSession> {
-    return getCachedSession()
-  }
-
-  public async removePermission(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.connector) {
-        this.connector.killSession()
-        this.connector.on('disconnect', (error) => {
-          if (error) {
-            throw error
-          }
-          resolve()
-        })
-      }
-    })
   }
 }
