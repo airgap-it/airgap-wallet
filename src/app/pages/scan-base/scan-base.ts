@@ -22,7 +22,7 @@ export class ScanBasePage {
   }
 
   public async ionViewWillEnter(): Promise<void> {
-    if (this.isMobile || this.isElectron) {
+    if (this.isMobile) {
       await this.platform.ready()
       await this.checkCameraPermissionsAndActivate()
     }
@@ -47,7 +47,7 @@ export class ScanBasePage {
   }
 
   public ionViewDidEnter(): void {
-    if (this.isBrowser) {
+    if (this.isBrowser || this.isElectron) {
       this.hasCameraPermission = true
       this.startScanBrowser()
     }
