@@ -197,6 +197,20 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
+    const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Edonet',
+      NetworkType.TESTNET,
+      'https://tezos-edonet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//edonet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.EDONET,
+        'https://tezos-edonet-conseil.prod.gke.papers.tech',
+        TezosNetwork.EDONET,
+        'airgap00391'
+      )
+    )
+    const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
+
     const florencenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Florencenet',
       NetworkType.TESTNET,
@@ -212,7 +226,7 @@ export class AppComponent implements AfterViewInit {
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
     const granadanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Florencenet',
+      'Granadanet',
       NetworkType.TESTNET,
       'https://tezos-granadanet-node.prod.gke.papers.tech',
       new TezblockBlockExplorer('https//granadanet.tezblock.io'),
@@ -237,7 +251,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [ 
+      extraActiveProtocols: [
+        edonetProtocol, 
         florencenetProtocol,
         granadanetProtocol,
         shieldedTezProtocol
