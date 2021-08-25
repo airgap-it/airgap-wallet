@@ -5,15 +5,15 @@
         <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
       </ion-buttons>
       <ion-title>{{ 'settings-beacon.title' | translate }}</ion-title>
-      <ion-buttons slot="end">
-        <ion-button (click)="removeAllPeers()">{{ 'settings-beacon.remove-all_label' | translate }}</ion-button>
-        <ion-button (click)="reset()">{{ 'settings-beacon.reset' | translate }}</ion-button>
-      </ion-buttons>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
 
 <ion-content>
+  <ion-buttons class="ion-padding">
+    <ion-button (click)="removeAllPeers()">{{ 'settings-beacon.remove-all_label' | translate }}</ion-button>
+    <ion-button (click)="reset()">{{ 'settings-beacon.reset' | translate }}</ion-button>
+  </ion-buttons>
   <ion-grid fixed="true" class="ion-no-padding">
     <div class="ion-padding-horizontal">Connected to: {{ connectedServer }}</div>
     <div *ngIf="connectedPeers.length === 0" class="empty-list ion-padding-horizontal">
