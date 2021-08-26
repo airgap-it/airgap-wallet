@@ -10,7 +10,8 @@ import {
   P2PPairingRequest,
   WalletClient,
   StorageKey,
-  AppMetadata
+  AppMetadata,
+  OperationRequest
 } from '@airgap/beacon-sdk'
 
 import { Injectable } from '@angular/core'
@@ -28,7 +29,7 @@ import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 
-import { BeaconRequest, SerializedBeaconRequest, WalletStorageKey, WalletStorageService } from '../storage/storage'
+import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 @Injectable({
   providedIn: 'root'
@@ -69,16 +70,6 @@ export class BeaconService {
     })
   }
 
-  public async getRequestsFromStorage(): Promise<BeaconRequest[]> {
-    const requests: SerializedBeaconRequest[] = await this.storage.get(WalletStorageKey.BEACON_REQUESTS)
-
-    return await Promise.all(
-      requests.map(async (request: SerializedBeaconRequest): Promise<BeaconRequest> => {
-        return [request.messageId, request.payload, await this.getProtocolBasedOnBeaconNetwork(request.network)]
-      })
-    )
-  }
-
   async presentModal(request: BeaconRequestOutputMessage) {
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
@@ -96,6 +87,13 @@ export class BeaconService {
     request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
     protocol: ICoinProtocol
   ): Promise<void> {
+    const network = (request as OperationRequest).network
+    if (network) {
+      const isProtocolAvailable = await this.protocolService.isProtocolAvailable(protocol.identifier, protocol.options.network.identifier)
+      if (!isProtocolAvailable) {
+        await this.protocolService.addActiveProtocol(protocol)
+      }
+    }
     this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [request, protocol.identifier, protocol.options.network.identifier])
   }
 
@@ -117,6 +115,7 @@ export class BeaconService {
   }
 
   public async respond(response: BeaconResponseInputMessage, request: BeaconRequestOutputMessage): Promise<void> {
+    await this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [])
     await this.client.respond(response).catch((err) => console.error(err))
     await this.showToast('response-sent', request.appMetadata)
   }
