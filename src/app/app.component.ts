@@ -51,6 +51,7 @@ import { SaplingNativeService } from './services/sapling-native/sapling-native.s
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { generateGUID } from './utils/utils'
+import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 
 @Component({
   selector: 'app-root',
@@ -71,6 +72,7 @@ export class AppComponent implements AfterViewInit {
     private readonly addressService: AddressService,
     private readonly serializerService: SerializerService,
     private readonly pushProvider: PushProvider,
+    private readonly walletconnectService: WalletconnectService,
     private readonly router: Router,
     private readonly dataService: DataService,
     private readonly config: Config,
@@ -88,7 +90,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   public async initializeApp(): Promise<void> {
-    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols()])
+    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
@@ -190,6 +192,9 @@ export class AppComponent implements AfterViewInit {
       defaultLanguage: 'en'
     })
   }
+  private async initializeWalletConnect(): Promise<void> {
+    this.walletconnectService.initWalletConnect()
+  }
 
   private async initializeProtocols(): Promise<void> {
     const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
@@ -220,6 +225,21 @@ export class AppComponent implements AfterViewInit {
     )
     const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
 
+    const granadanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Granadanet',
+      NetworkType.TESTNET,
+      'https://tezos-granadanet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//granadanet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.GRANADANET,
+        'https://tezos-granadanet-conseil.prod.gke.papers.tech',
+        TezosNetwork.MAINNET,
+        'airgap00391'
+      )
+    )
+
+    const granadanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(granadanetNetwork))
+
     const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
       await this.saplingNativeService.createExternalMethodProvider()
 
@@ -231,8 +251,13 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [edonetProtocol, florencenetProtocol, shieldedTezProtocol],
-      extraPassiveSubProtocols: [[edonetProtocol, new TezosKtProtocol(new TezosProtocolOptions(edonetNetwork))]]
+      extraActiveProtocols: [
+        edonetProtocol, 
+        florencenetProtocol,
+        granadanetProtocol,
+        shieldedTezProtocol
+      ],
+      extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 
     await this.initializeTezosDomains()
@@ -257,7 +282,7 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: '',
+      [TezosNetwork.GRANADANET]: ''
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

@@ -16,9 +16,7 @@
         <ion-col size="12">
           <h3 class="ion-no-margin" [innerHTML]="'exchange.onboarding.heading' | translate"></h3>
           <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
-          <p class="ion-no-margin ion-padding-bottom">
-            {{ 'exchange.onboarding.description' | translate }}
-          </p>
+          <p class="ion-no-margin ion-padding-bottom">{{ 'exchange.onboarding.description' | translate }}</p>
           <ion-button (click)="dismissExchangeOnboarding()" shape="round" color="primary" expand="full">
             {{ 'exchange.onboarding.exchange_label' | translate }}
           </ion-button>
@@ -31,9 +29,7 @@
         <ion-col size="12">
           <h3 class="ion-no-margin" [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
           <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
-          <p class="ion-no-margin ion-padding-bottom">
-            {{ 'exchange.no-currencies.description' | translate }}
-          </p>
+          <p class="ion-no-margin ion-padding-bottom">{{ 'exchange.no-currencies.description' | translate }}</p>
           <ion-button (click)="goToAddCoinPage()" shape="round" color="primary" expand="full">
             {{ 'exchange.no-currencies.exchange_label' | translate }}
           </ion-button>
@@ -65,16 +61,15 @@
         [swapSell]="false"
       ></swap>
       <div class="divider--line"></div>
-      <ion-row class="powered__container ion-padding ion-align-items-center " *ngIf="!isTZBTCExchange">
+      <ion-row class="powered__container ion-padding ion-align-items-center" *ngIf="!isTZBTCExchange">
         <ion-col class="ion-no-padding">
           <ion-row class="powered__container ion-align-items-center">
             <ion-text color="blackLight">
-              <small>
-                {{ 'exchange.powered-by_label' | translate }}
-              </small>
+              <small>{{ 'exchange.powered-by_label' | translate }}</small>
             </ion-text>
-            <img *ngIf="activeExchange === 'ChangeNow'" src="./assets/img/changenow_logo.svg" />
-            <img *ngIf="activeExchange === 'Changelly'" src="./assets/img/changelly_logo.svg" />
+            <img *ngIf="activeExchange === ExchangeEnum.CHANGENOW" src="./assets/img/changenow_logo.svg" />
+            <img *ngIf="activeExchange === ExchangeEnum.CHANGELLY" src="./assets/img/changelly_logo.svg" />
+            <img *ngIf="activeExchange === ExchangeEnum.QUIPUSWAP" src="./assets/img/quipuswap_logo.svg" />
           </ion-row>
         </ion-col>
         <ion-col class="ion-no-padding justify--content__end">
@@ -82,6 +77,12 @@
             {{ 'exchange.switch-exchange_label' | translate }}
             <ion-icon name="chevron-down-outline"></ion-icon>
           </ion-button>
+        </ion-col>
+      </ion-row>
+
+      <ion-row *ngFor="let widget of exchangeWidgets" class="ion-padding-horizontal ion-padding-bottom">
+        <ion-col size="12">
+          <widget-selector [widget]="widget" [widgetForm]="exchangeForm.controls[activeExchange]"></widget-selector>
         </ion-col>
       </ion-row>
 

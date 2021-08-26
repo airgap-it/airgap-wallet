@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
 import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
-import { ExchangeTransaction } from '../exchange/exchange'
+import { ExchangeTransactionDetails } from '../exchange/exchange'
 
 export type BeaconRequest = [string, any, ICoinProtocol]
 export interface SerializedBeaconRequest {
@@ -47,7 +47,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.WALLET_GROUPS]: SerializedAirGapMarketWalletGroup[] | undefined
   [WalletStorageKey.LAST_TX_BROADCAST]: IBroadcastTransaction | undefined
   [WalletStorageKey.USER_ID]: string | undefined
-  [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransaction[]
+  [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransactionDetails[]
   [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
 }

@@ -6,7 +6,7 @@
     "types": ["node"],
     "paths": {
       "@ionic/*": ["../node-modules/@ionic/*"]
-    }
+    },
   },
   "files": ["main.ts", "polyfills.ts"],
   "include": ["src/**/*.d.ts"]

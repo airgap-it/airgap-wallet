@@ -392,7 +392,7 @@
       "exchange_label": "Add Coins"
     },
     "loading": {
-      "setup": "Setting up exchange ... ",
+      "setup": "Setting up exchange...",
       "header": "Loading Error",
       "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
     }
@@ -452,6 +452,11 @@
     },
     "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
     "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
+  },
+  "exchange-quipuswap": {
+    "slippage-tolerance": {
+      "label": "Slippage tolerance"
+    }
   },
   "delegation-detail": {
     "title": "{{ delegateeLabel }} Detail",
@@ -604,6 +609,34 @@
       }
     }
   },
+  "delegation-detail-moonbeam": {
+    "delegatee-label": "Collator",
+    "delegatee-label-plural": "Collators",
+    "commission_label": "Commission",
+    "nominators_label": "Nominators",
+    "collators_label": "Collators",
+    "currently-delegated_label": "Currently Delegated",
+    "nominator-status": {
+      "label": "Status",
+      "active_label": "Active",
+      "leaving_label": "Undelegating",
+      "unknown_label": "Unknown"
+    },
+    "delegate": {
+      "label": "Delegate",
+      "has-delegated_text": "You have currently <span class=\"style__strong color__primary\">{{ delegated }}</span> delegated to this collator.",
+      "not-delegated_text": "Select the amount you want to delegate.",
+      "can-delegate-has-delegated_text": "You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
+      "can-delegate-not-delegated_text": "You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees)."
+    },
+    "undelegate": {
+      "label": "Undelegate",
+      "text": "You have currently delegated to this collatorr, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+    },
+    "undelegate-all": {
+      "label": "Undelegate All"
+    }
+  },
   "introduction-push": {
     "title": "Push Notifications",
     "heading": "You can receive push notifications if your accounts receive transactions.",
@@ -736,18 +769,22 @@
     "no-peers": "Not connected to any peers",
     "reset": "Reset"
   },
-  "dapps": {
-    "wait_for_walletconnect": "Waiting for WalletConnect"
-  },
+  
   "walletconnect": {
     "connection_request": "WalletConnect - Connection Request",
     "new_transaction": "WalletConnect - New Transaction",
     "sign_request": "WalletConnect - Sign Request",
     "sign_typed_data": "WalletConnect - Sign Typed Data",
+    "wait": "Waiting for WalletConnect",
     "alert": {
       "title": "Not supported",
       "message": "eth_signTypedData is currently not supported"
-    }
+    },
+    "timeout": {
+      "title": "Connection Failure",
+      "message": "It seems like the connection via WalletConnect cannot be established"
+    },
+    "connection_error": "There was an issue connecting to WalletConnect"
   },
   "health-check": {
     "title": "Health Check", 

@@ -1,14 +1,14 @@
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, UnsignedTransaction } from '@airgap/coinlib-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
+
+import { AccountProvider } from '../../services/account/account.provider'
+import { BrowserService } from '../../services/browser/browser.service'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
+import { ExchangeProvider } from '../../services/exchange/exchange'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { ExchangeProvider } from 'src/app/services/exchange/exchange'
-
-import { BrowserService } from 'src/app/services/browser/browser.service'
-import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'page-exchange-confirm',
@@ -21,8 +21,11 @@ export class ExchangeConfirmPage {
   public fromWallet: AirGapMarketWallet
   public toWallet: AirGapMarketWallet
 
+  public payoutAddress: string
+  public payinAddress: string
+
   public fee: string
-  public memo: string
+  public memo?: string
   public feeFiatAmount: string
 
   public amountExpectedFrom: number
@@ -34,7 +37,8 @@ export class ExchangeConfirmPage {
   public fromFiatAmount: number
   public toFiatAmount: number
 
-  public exchangeResult: any // | CreateTransactionResponse
+  public airGapTxs?: IAirGapTransaction[]
+  public unsignedTransaction?: UnsignedTransaction
 
   constructor(
     private readonly router: Router,
@@ -51,12 +55,15 @@ export class ExchangeConfirmPage {
       this.toWallet = info.toWallet
       this.fromCurrency = info.fromCurrency
       this.toCurrency = info.toCurrency
-      this.exchangeResult = info.exchangeResult
+      this.payoutAddress = info.payoutAddress
+      this.payinAddress = info.payinAddress
       this.fee = info.fee
       this.memo = info.memo
+      this.airGapTxs = info.transaction?.details
+      this.unsignedTransaction = info.transaction?.unsigned
 
-      this.amountExpectedFrom = this.exchangeResult.amountExpectedFrom ? this.exchangeResult.amountExpectedFrom : info.amountExpectedFrom
-      this.amountExpectedTo = this.exchangeResult.amountExpectedTo ? this.exchangeResult.amountExpectedTo : info.amountExpectedTo
+      this.amountExpectedFrom = info.amountExpectedFrom
+      this.amountExpectedTo = info.amountExpectedTo
 
       this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
       this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
@@ -69,31 +76,49 @@ export class ExchangeConfirmPage {
   }
 
   public async prepareTransaction() {
-    const wallet = this.fromWallet
-    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.protocol.decimals)
-    const fee = new BigNumber(this.fee).shiftedBy(wallet.protocol.feeDecimals)
-
     try {
-      const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
-        wallet,
-        this.exchangeResult.payinAddress,
-        amount,
-        fee,
-        this.accountProvider.getWalletList(),
-        this.memo
-      )
-
-      const info = {
-        wallet,
-        airGapTxs,
-        data: unsignedTx,
-        type: IACMessageType.TransactionSignRequest
-      }
+      const info = this.unsignedTransaction
+        ? await this.getInteractionInfoFromUnsignedTransaction()
+        : await this.prepareTransactionAndGetInteractionInfo()
 
       this.dataService.setData(DataServiceKey.INTERACTION, info)
       this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (error) {
       //
+    }
+  }
+
+  private async getInteractionInfoFromUnsignedTransaction(): Promise<any> {
+    const wallet: AirGapMarketWallet = this.fromWallet
+    const airGapTxs: IAirGapTransaction[] = this.airGapTxs ?? (await wallet.protocol.getTransactionDetails(this.unsignedTransaction))
+
+    return {
+      wallet,
+      airGapTxs,
+      data: this.unsignedTransaction.transaction,
+      type: IACMessageType.TransactionSignRequest
+    }
+  }
+
+  private async prepareTransactionAndGetInteractionInfo(): Promise<any> {
+    const wallet = this.fromWallet
+    const amount = new BigNumber(new BigNumber(this.amountExpectedFrom)).shiftedBy(wallet.protocol.decimals)
+    const fee = new BigNumber(this.fee).shiftedBy(wallet.protocol.feeDecimals)
+
+    const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
+      wallet,
+      this.payinAddress,
+      amount,
+      fee,
+      this.accountProvider.getWalletList(),
+      this.memo
+    )
+
+    return {
+      wallet,
+      airGapTxs,
+      data: unsignedTx,
+      type: IACMessageType.TransactionSignRequest
     }
   }
 
