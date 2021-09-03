@@ -28,15 +28,15 @@ export class SettingsPage {
   ) {}
 
   public about(): void {
-    this.router.navigateByUrl('/about').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navigate('/about')
   }
 
   public dappPermissions(): void {
-    this.router.navigateByUrl('/dapp-permission-list').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navigate('/dapp-permission-list')
   }
 
   public dappSettings(): void {
-    this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navigate('/dapp-settings')
   }
 
   public share(): void {
@@ -110,13 +110,16 @@ export class SettingsPage {
   }
 
   public goToQrSettings(): void {
-    this.router.navigateByUrl('/qr-settings').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navigate('/qr-settings')
   }
 
   public goToHealthCheck(): void {
-    this.router.navigateByUrl('/health-check').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.navigate('/health-check')
   }
 
+  private navigate(url: string) {
+    this.router.navigateByUrl(url, { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
       (text: string) => {

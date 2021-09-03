@@ -268,7 +268,7 @@ class ChangeNowApi {
     toWallet: AirGapMarketWallet,
     amount: string,
     fee: string,
-    data: any
+    _data: any
   ): Promise<ExchangeTransaction> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([
       fromWallet.protocol.identifier
@@ -295,13 +295,8 @@ class ChangeNowApi {
       id: response.id,
       payoutAddress: response.payoutAddress,
       payinAddress: response.payinAddress,
-      amountExpectedFrom: response.amount.toString(),
-      amountExpectedTo: await this.getExchangeAmount(
-        fromWallet.protocol.identifier,
-        toWallet.protocol.identifier,
-        response.amount.toString(),
-        data
-      ),
+      amountExpectedFrom: amount,
+      amountExpectedTo: response.amount.toString(),
       fee,
       exchangeResult: response,
       memo: response.payinExtraId

@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core'
 import { Routes, RouterModule } from '@angular/router'
-
-import { SettingsBeaconPage } from './settings-beacon.page'
+import { DappSettingsPage } from './dapp-settings.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: SettingsBeaconPage
+    component: DappSettingsPage
   }
 ]
 
@@ -14,4 +13,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SettingsBeaconPageRoutingModule {}
+export class DappSettingsPageRoutingModule {}
