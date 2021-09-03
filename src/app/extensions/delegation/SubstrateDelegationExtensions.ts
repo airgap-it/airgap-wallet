@@ -1,14 +1,14 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubstratePayee, SubstrateProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubstrateDelegateProtocol, SubstrateNetwork, SubstratePayee } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import { SubstrateElectionStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateEraElectionStatus'
-import { SubstrateNominationStatus } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateNominationStatus'
+import { SubstrateElectionStatus } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateEraElectionStatus'
+import { SubstrateNominationStatus } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateNominationStatus'
 import {
   SubstrateNominatorDetails,
   SubstrateStakingDetails
-} from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateNominatorDetails'
-import { SubstrateStakingActionType } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateStakingActionType'
-import { SubstrateValidatorDetails } from '@airgap/coinlib-core/protocols/substrate/helpers/data/staking/SubstrateValidatorDetails'
+} from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateNominatorDetails'
+import { SubstrateStakingActionType } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateStakingActionType'
+import { SubstrateValidatorDetails } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateValidatorDetails'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -53,7 +53,7 @@ enum ArgumentName {
   PAYEE = 'payee'
 }
 
-export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<SubstrateProtocol> {
+export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<SubstrateDelegateProtocol<SubstrateNetwork>> {
   private static instance: SubstrateDelegationExtensions
 
   public static create(
@@ -76,7 +76,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return SubstrateDelegationExtensions.instance
   }
 
-  public airGapDelegatee(_protocol: SubstrateProtocol): string | undefined {
+  public airGapDelegatee(_protocol: SubstrateDelegateProtocol<SubstrateNetwork>): string | undefined {
     return undefined
   }
 
@@ -95,7 +95,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   public async getExtraDelegationDetailsFromAddress(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
@@ -128,7 +128,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   public async getRewardDisplayDetails(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     delegator: string,
     delegatees: string[]
   ): Promise<UIRewardList | undefined> {
@@ -137,7 +137,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
   }
 
-  public async createDelegateesSummary(protocol: SubstrateProtocol, delegatees: string[]): Promise<UIAccountSummary[]> {
+  public async createDelegateesSummary(
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    delegatees: string[]
+  ): Promise<UIAccountSummary[]> {
     const delegateesDetails: SubstrateValidatorDetails[] = await Promise.all(
       delegatees.map(delegatee => protocol.options.accountController.getValidatorDetails(delegatee))
     )
@@ -156,7 +159,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async getExtraValidatorsDetails(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     validatorsDetails: SubstrateValidatorDetails[],
     nominatorDetails: SubstrateNominatorDetails,
     extraNominatorDetials: AirGapDelegatorDetails
@@ -191,7 +194,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async getAlerts(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     nominatorDetails: SubstrateNominatorDetails,
     validatorDetails: SubstrateValidatorDetails
   ): Promise<UIAlert[]> {
@@ -267,7 +270,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createDelegateeDisplayDetails(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     validatorDetails: SubstrateValidatorDetails,
     nominatorDetails: SubstrateNominatorDetails,
     extraNominatorDetails: AirGapDelegatorDetails
@@ -338,7 +341,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async getExtraNominatorDetails(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     nominatorDetails: SubstrateNominatorDetails,
     validators: string[]
   ): Promise<AirGapDelegatorDetails> {
@@ -370,7 +373,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
   // tslint:disable-next-line: cyclomatic-complexity
   private async createDelegateAction(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     stakingDetails: SubstrateStakingDetails,
     availableActions: DelegatorAction[],
     nominatorAddress: string,
@@ -462,7 +465,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async getMaxDelegationValue(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     actionType: SubstrateStakingActionType,
     nominatorAddress: string
   ): Promise<BigNumber | undefined> {
@@ -489,7 +492,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     }
   }
 
-  private async getMinDelegationValue(protocol: SubstrateProtocol, actionType: SubstrateStakingActionType): Promise<BigNumber | undefined> {
+  private async getMinDelegationValue(
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    actionType: SubstrateStakingActionType
+  ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case SubstrateStakingActionType.BOND_NOMINATE:
         return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
@@ -501,7 +507,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createDelegateActionDescription(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     address: string,
     actionType: SubstrateStakingActionType,
     bonded: string | number | BigNumber,
@@ -527,14 +533,16 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     const minValueFormatted =
       minValue !== undefined
         ? await this.amountConverterPipe.transform(minValue, {
-            protocol
+            protocol,
+            maxDigits: protocol.decimals
           })
         : undefined
 
     const maxValueFormatted =
       maxValue !== undefined
         ? await this.amountConverterPipe.transform(maxValue, {
-            protocol
+            protocol,
+            maxDigits: protocol.decimals
           })
         : undefined
 
@@ -645,7 +653,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createDelegatorExtraActions(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     stakingDetails: SubstrateStakingDetails | undefined,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction[]> {
@@ -690,7 +698,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createDelegatorDisplayDetails(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     nominatorDetails: SubstrateNominatorDetails
   ): Promise<UIWidget[]> {
     const displayDetails = []
@@ -704,7 +712,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createStakingDetailsWidgets(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     isNominating: boolean,
     stakingDetails: SubstrateStakingDetails
   ): Promise<UIWidget[]> {
@@ -720,7 +728,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   }
 
   private async createDelegatorDisplayRewards(
-    protocol: SubstrateProtocol,
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
     nominatorDetails: SubstrateNominatorDetails
   ): Promise<UIRewardList | undefined> {
     if (nominatorDetails.delegatees.length === 0 || nominatorDetails.stakingDetails.rewards.length === 0) {
@@ -743,7 +751,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     })
   }
 
-  private async createBondedDetails(protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): Promise<UIWidget[]> {
+  private async createBondedDetails(
+    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    stakingDetails: SubstrateStakingDetails
+  ): Promise<UIWidget[]> {
     const details = []
 
     const activeStaking = new BigNumber(stakingDetails.active)
@@ -799,7 +810,10 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     return details
   }
 
-  private createNominationDetails(_protocol: SubstrateProtocol, stakingDetails: SubstrateStakingDetails): UIWidget[] {
+  private createNominationDetails(
+    _protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    stakingDetails: SubstrateStakingDetails
+  ): UIWidget[] {
     const details = []
 
     const nextEraDate = new Date(stakingDetails.nextEra)

@@ -1,6 +1,7 @@
 <ng-container *ngIf="widget.isVisible">
-  <widget-account *ngIf="widget.type === 'account'" [widget]="widget"></widget-account>
-  <widget-account-summary *ngIf="widget.type === 'account_summary'" [widget]="widget"></widget-account-summary>
-  <widget-icon-text *ngIf="widget.type === 'icon_text'" [widget]="widget"></widget-icon-text>
-  <widget-input-text *ngIf="widget.type === 'input_text' && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-input-text>
+  <widget-account *ngIf="widget.type === UIWidgetType.ACCOUNT" [widget]="widget"></widget-account>
+  <widget-account-summary *ngIf="widget.type === UIWidgetType.ACCOUNT_SUMMARY" [widget]="widget"></widget-account-summary>
+  <widget-icon-text *ngIf="widget.type === UIWidgetType.ICON_TEXT" [widget]="widget"></widget-icon-text>
+  <widget-input-text *ngIf="widget.type === UIWidgetType.INPUT_TEXT && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-input-text>
+  <widget-option-button-group *ngIf="widget.type === UIWidgetType.OPTION_BUTTON_GROUP && widgetForm" [widget]="widget" [widgetForm]="widgetForm"></widget-option-button-group>
 </ng-container>

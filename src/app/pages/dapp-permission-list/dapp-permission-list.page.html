@@ -15,7 +15,7 @@
       <ion-list-header>
         <ion-label>{{ 'dapp-permission-list.connected-dapps' | translate }}</ion-label>
       </ion-list-header>
-      <div *ngIf="beaconPermissions.length === 0 && !walletconnectPermission " class="empty-list ion-padding-horizontal">
+      <div *ngIf="beaconPermissions.length === 0" class="empty-list ion-padding-horizontal">
         <img class="ion-padding-vertical" src="assets/img/empty-state-no-transaction.svg" />
         <p>{{ 'dapp-permission-list.no-permissions' | translate }}</p>
       </div>
@@ -35,22 +35,7 @@
             <ion-badge class="badge__margin" *ngIf="permission.network.rpcUrl">{{ permission.network.rpcUrl }}</ion-badge>
           </div>
         </ion-label>
-        <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission, true)">
-          {{ 'dapp-permission-list.remove_label' | translate }}
-        </ion-button>
-      </ion-item>
-
-      <ion-item lines="none" *ngIf="walletconnectPermission as permission">
-        <ion-label>
-          <h3>
-            <strong>{{ permission.peerMeta.name }}</strong>
-          </h3>
-          <div class="d-flex ion-align-items-center">
-            <airgap-identicon [address]="permission.accounts[0]"></airgap-identicon>
-            <p class="ion-no-margin">{{ permission.accounts[0] }}</p>
-          </div>
-        </ion-label>
-        <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission, false)">
+        <ion-button slot="end" size="small" fill="outline" (click)="deletePermission(permission)">
           {{ 'dapp-permission-list.remove_label' | translate }}
         </ion-button>
       </ion-item>

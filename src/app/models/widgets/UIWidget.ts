@@ -5,11 +5,10 @@ export enum UIWidgetType {
   ACCOUNT_SUMMARY = 'account_summary',
   ACCOUNT_EXTENDED_DETAILS = 'account_extended_details',
   ALERT = 'alert',
-  CHECKBOX = 'checkbox',
   ICON_TEXT = 'icon_text',
   INPUT_TEXT = 'input_text',
   REWARD_LIST = 'reward_list',
-  SELECT = 'select'
+  OPTION_BUTTON_GROUP = 'option_button_group'
 }
 
 export enum WidgetState {

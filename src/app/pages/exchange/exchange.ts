@@ -1,25 +1,34 @@
 import { ProtocolService } from '@airgap/angular-core'
+import {
+  AirGapMarketWallet,
+  AirGapWalletStatus,
+  EthereumProtocol,
+  FeeDefaults,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  ProtocolSymbols,
+  SubProtocolSymbols
+} from '@airgap/coinlib-core'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component, NgZone } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { AirGapMarketWallet, AirGapWalletStatus, EthereumProtocol, FeeDefaults, ICoinProtocol } from '@airgap/coinlib-core'
-import { MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
-import { OperationsProvider } from 'src/app/services/operations/operations'
+import { BehaviorSubject, Subject } from 'rxjs'
+import { debounceTime, first, takeUntil } from 'rxjs/operators'
 
+import { UIWidget } from '../../models/widgets/UIWidget'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeEnum, ExchangeProvider, ExchangeTransaction } from '../../services/exchange/exchange'
+import { ExchangeEnum, ExchangeProvider, ExchangeTransactionDetails } from '../../services/exchange/exchange'
+import { ExchangeTransaction, ExchangeUI } from '../../services/exchange/exchange.interface'
+import { PriceService } from '../../services/price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
-import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { BehaviorSubject, Subject } from 'rxjs'
-import { PriceService } from 'src/app/services/price/price.service'
-import { debounceTime, takeUntil } from 'rxjs/operators'
 
 interface ExchangeFormState<T> {
   value: T
@@ -35,6 +44,9 @@ interface ExchangeState {
   fee: ExchangeFormState<string>
   feeLevel: ExchangeFormState<number>
   isAdvancedMode: ExchangeFormState<boolean>
+  providerState: {} | null
+
+  lastUpdated: (keyof Omit<ExchangeState, 'lastUpdated'>)[]
 }
 
 enum ExchangePageState {
@@ -63,8 +75,10 @@ export class ExchangePage {
   public minExchangeAmount: BigNumber = new BigNumber(0)
   public amount: BigNumber = new BigNumber(0)
   public exchangeAmount: BigNumber
-  public activeExchange: string
   public disableExchangeSelection: boolean = false
+
+  public activeExchange$: BehaviorSubject<ExchangeEnum | undefined> = new BehaviorSubject(undefined)
+  public activeExchange: ExchangeEnum
 
   public exchangeForm: FormGroup
 
@@ -78,8 +92,12 @@ export class ExchangePage {
   // temporary field until we figure out how to handle Substrate fee/tip model
   private isSubstrate: boolean = false
 
+  public ExchangeEnum: typeof ExchangeEnum = ExchangeEnum
+
   public exchangePageStates: typeof ExchangePageState = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
+
+  public exchangeWidgets: UIWidget[] = []
 
   public loading: HTMLIonLoadingElement
 
@@ -101,45 +119,80 @@ export class ExchangePage {
     private readonly modalController: ModalController,
     private readonly alertCtrl: AlertController,
     private readonly priceService: PriceService,
-    private readonly operationsProvider: OperationsProvider,
     private readonly protocolService: ProtocolService,
     private readonly _ngZone: NgZone
-  ) {
-    this.exchangeProvider
-      .getActiveExchange()
-      .pipe(takeUntil(this.ngDestroyed$))
-      .subscribe((exchange: string) => {
-        this.activeExchange = exchange
-      })
-  }
+  ) {}
 
   public ionViewWillEnter() {
+    this.initForm()
+    this.initState()
+
     this.accountProvider.allWallets$
       .asObservable()
       .pipe(takeUntil(this.ngDestroyed$))
       .subscribe((wallets: AirGapMarketWallet[]) => {
         this.walletList = wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
       })
+
+    this.exchangeProvider
+      .getActiveExchange()
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((exchange: ExchangeEnum) => {
+        this.changeExchange(exchange).catch(handleErrorSentry(ErrorCategory.OTHER))
+      })
+
+    this.activeExchange$.pipe(takeUntil(this.ngDestroyed$)).subscribe((exchange: ExchangeEnum) => {
+      this.activeExchange = exchange
+    })
+
+    this.setup()
+      .then(() => {
+        try {
+          this.onChanges()
+          this.updateFeeEstimate()
+        } catch (err) {
+          console.error(err)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        this.showLoadingErrorAlert()
+      })
+  }
+
+  private async changeExchange(exchange: ExchangeEnum): Promise<void> {
+    this.exchangeForm.removeControl(this.activeExchange)
+    this.updateState({ providerState: null })
+
+    this.activeExchange$.next(exchange)
+
+    const exchangeUI: ExchangeUI = await this.exchangeProvider.getCustomUI()
+    this.exchangeWidgets = exchangeUI.widgets
+
+    if (exchangeUI.form) {
+      this.exchangeForm.addControl(this.activeExchange, exchangeUI.form)
+      this.updateState({ providerState: exchangeUI.form.value })
+      this.exchangeForm.controls[this.activeExchange].valueChanges.subscribe((providerState) => {
+        this.updateState({ providerState })
+      })
+    }
+  }
+
+  private initForm(): void {
     this.exchangeForm = this.formBuilder.group({
       feeLevel: [0, [Validators.required]],
       fee: [0, Validators.compose([Validators.required])],
       isAdvancedMode: [false, []]
     })
-    this.setup()
-      .then(() => {
-        this.initState()
-          .then(async () => {
-            this.onChanges()
-            this.updateFeeEstimate()
-          })
-          .catch((err) => console.error(err))
-      })
-      .catch(() => this.showLoadingErrorAlert())
   }
 
-  private async initState(): Promise<void> {
+  private initState(): void {
     this._state = {
-      feeDefaults: this.selectedFromProtocol.feeDefaults,
+      feeDefaults: {
+        low: '0',
+        medium: '0',
+        high: '0'
+      },
       disableAdvancedMode: this.isSubstrate,
       feeCurrentMarketPrice: null,
       disableFeeSlider: true,
@@ -156,7 +209,10 @@ export class ExchangePage {
       isAdvancedMode: {
         value: this.exchangeForm.controls.isAdvancedMode.value,
         dirty: false
-      }
+      },
+      providerState: null,
+
+      lastUpdated: []
     }
     this.state = this._state
     this.updateState(this.state)
@@ -182,16 +238,23 @@ export class ExchangePage {
 
   private onStateUpdated(newState: ExchangeState): void {
     this.state = newState
+    console.log('onStateUpdated', newState, this.state)
 
     this.updateTransactionForm({
       fee: this.state.fee,
       feeLevel: this.state.feeLevel,
       isAdvancedMode: this.state.isAdvancedMode
     })
+
+    if (this.state.lastUpdated.includes('providerState')) {
+      this.loadDataFromExchange().then(() => this.updateFeeEstimate())
+    }
   }
 
   public onChanges(): void {
+    console.log('onChanges')
     this.state$.pipe(debounceTime(200)).subscribe((state: ExchangeState) => {
+      console.log('state$')
       this.onStateUpdated(state)
     })
 
@@ -281,10 +344,8 @@ export class ExchangePage {
     }
   }
 
-  private async estimateFees(): Promise<FeeDefaults | undefined> {
-    const amount = this.amount.shiftedBy(this.selectedFromProtocol.decimals)
-    const isAmountValid = !amount.isNaN() && amount.gt(0)
-    return isAmountValid ? this.operationsProvider.estimateFees(this.fromWallet, this.fromWallet.addresses[0], amount) : undefined
+  private async estimateFees(amount?: BigNumber): Promise<FeeDefaults | undefined> {
+    return this.exchangeProvider.estimateFee(this.fromWallet, this.toWallet, (amount ?? this.amount).toString(), this.state.providerState)
   }
 
   private getFeeFromLevel(feeLevel: number, feeDefaults?: FeeDefaults): string {
@@ -321,6 +382,7 @@ export class ExchangePage {
   }
 
   private async setup(): Promise<void> {
+    await this.activeExchange$.pipe(first()).toPromise()
     const fromProtocols: ProtocolSymbols[] = await this.getSupportedFromProtocols()
     if (fromProtocols.length === 0) {
       this.supportedProtocolsFrom = []
@@ -358,6 +420,9 @@ export class ExchangePage {
     const newExchange = this.activeExchange
     this.setup() // setup new exchange
       .then(() => this.switchExchange(faultyExchange, newExchange))
+      .then(() => {
+        this.onChanges()
+      })
       .catch(() => this.displaySetupFail())
   }
 
@@ -548,7 +613,8 @@ export class ExchangePage {
     return await this.exchangeProvider.getExchangeAmount(
       this.fromWallet.protocol.identifier,
       this.toWallet.protocol.identifier,
-      this.amount.toString()
+      this.amount.toString(),
+      this.state.providerState
     )
   }
 
@@ -558,49 +624,36 @@ export class ExchangePage {
     } else {
       const loader = await this.getAndShowLoader()
       try {
-        const result = await this.exchangeProvider.createTransaction(
-          this.fromWallet.protocol.identifier,
-          this.toWallet.protocol.identifier,
-          this.toWallet.receivingPublicAddress,
-          this.amount.toString(),
-          this.fromWallet.receivingPublicAddress
-        )
-
-        const amountExpectedTo = await this.getExchangeAmount()
-
-        const amount = result.amountExpectedFrom ? new BigNumber(result.amountExpectedFrom) : this.amount
-        const feeEstimation = await this.operationsProvider.estimateFees(
+        const transaction: ExchangeTransaction = await this.exchangeProvider.createTransaction(
           this.fromWallet,
-          result.payinAddress,
-          amount.shiftedBy(this.fromWallet.protocol.decimals)
+          this.toWallet,
+          this.amount.toString(),
+          this.state.fee.value,
+          this.state.providerState
         )
 
         const info = {
+          ...transaction,
           fromWallet: this.fromWallet,
           fromCurrency: this.fromWallet.protocol.marketSymbol,
           toWallet: this.toWallet,
-          toCurrency: this.exchangeProvider.convertAirGapIdentifierToExchangeIdentifier([this.toWallet.protocol.identifier])[0],
-          exchangeResult: result,
-          amountExpectedFrom: this.amount.toString(),
-          amountExpectedTo: amountExpectedTo,
-          fee: this.state.fee.value,
-          memo: result.payinExtraId ? result.payinExtraId : undefined
+          toCurrency: this.toWallet.protocol.marketSymbol
         }
 
         this.dataService.setData(DataServiceKey.EXCHANGE, info)
         this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
-        const txId = result.id
+        const txId = transaction.id
         let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
 
-        const exchangeTxInfo: ExchangeTransaction = {
+        const exchangeTxInfo: ExchangeTransactionDetails = {
           receivingAddress: this.toWallet.addresses[0],
           sendingAddress: this.fromWallet.addresses[0],
           fromCurrency: this.fromWallet.protocol.identifier,
           toCurrency: this.toWallet.protocol.identifier,
           amountExpectedFrom: this.amount,
-          amountExpectedTo: amountExpectedTo.toString(),
-          fee: feeEstimation.medium,
+          amountExpectedTo: transaction.amountExpectedTo,
+          fee: transaction.fee,
           status: txStatus,
           exchange: this.activeExchange as ExchangeEnum,
           id: txId,
@@ -658,6 +711,10 @@ export class ExchangePage {
   }
 
   private updateState(newState: Partial<ExchangeState>, debounce: boolean = true): void {
+    if (!this._state) {
+      return
+    }
+
     this._state = this.reduceState(this._state, newState)
 
     if (debounce) {
@@ -667,7 +724,7 @@ export class ExchangePage {
     }
   }
 
-  private reduceState(currentState: ExchangeState, newState: Partial<ExchangeState>): ExchangeState {
+  private reduceState(currentState: ExchangeState, newState: Partial<Omit<ExchangeState, 'lastUpdated'>>): ExchangeState {
     return {
       feeDefaults: newState.feeDefaults || currentState.feeDefaults,
       feeCurrentMarketPrice:
@@ -683,7 +740,10 @@ export class ExchangePage {
         newState.estimatingFeeDefaults !== undefined ? newState.estimatingFeeDefaults : currentState.estimatingFeeDefaults,
       feeLevel: newState.feeLevel || currentState.feeLevel,
       fee: newState.fee || currentState.fee,
-      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode
+      isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode,
+      providerState: newState.providerState !== undefined ? newState.providerState : currentState.providerState,
+
+      lastUpdated: Object.keys(newState) as ExchangeState['lastUpdated']
     }
   }
 

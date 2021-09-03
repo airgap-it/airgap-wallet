@@ -1,20 +1,24 @@
 import { ProtocolService } from '@airgap/angular-core'
+import { AirGapMarketWallet, FeeDefaults, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { IAirGapTransaction } from '@airgap/coinlib-core'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { FormBuilder } from '@angular/forms'
 import { BigNumber } from 'bignumber.js'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
 
+import { OperationsProvider } from '../operations/operations'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
-import { Exchange, ExchangeTransactionStatusResponse } from './exchange.interface'
+import { Exchange, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
+import { QuipuswapExchange } from './exchange.quipuswap'
 
 export enum ExchangeEnum {
   CHANGELLY = 'Changelly',
-  CHANGENOW = 'ChangeNow'
+  CHANGENOW = 'ChangeNow',
+  QUIPUSWAP = 'Quipuswap'
 }
 
 export enum TransactionStatus {
@@ -27,7 +31,7 @@ export enum TransactionStatus {
   FAILED = 'FAILED'
 }
 
-export interface ExchangeTransaction {
+export interface ExchangeTransactionDetails {
   receivingAddress: string
   sendingAddress: string
   fromCurrency: ProtocolSymbols
@@ -47,71 +51,89 @@ export interface ExchangeTransaction {
 export class ExchangeProvider implements Exchange {
   private exchange: Exchange
   private exchangeIdentifier: ExchangeEnum
-  private exchangeSubject: BehaviorSubject<string> = new BehaviorSubject('ChangeNow')
+  private readonly exchangeObserable: Observable<ExchangeEnum>
+  private readonly exchangeSubject: BehaviorSubject<ExchangeEnum> = new BehaviorSubject<ExchangeEnum>(ExchangeEnum.CHANGENOW)
 
-  private pendingTransactions: ExchangeTransaction[] = []
+  private pendingTransactions: ExchangeTransactionDetails[] = []
 
   constructor(
     public http: HttpClient,
     private readonly storageService: WalletStorageService,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly operationsProvider: OperationsProvider,
+    private readonly formBuilder: FormBuilder
   ) {
     this.loadPendingTranscationsFromStorage()
-    this.exchangeSubject.subscribe(exchange => {
-      switch (exchange) {
-        case ExchangeEnum.CHANGELLY:
-          this.exchange = new ChangellyExchange(this.http)
-          this.exchangeIdentifier = ExchangeEnum.CHANGELLY
-          break
-        case ExchangeEnum.CHANGENOW:
-          this.exchange = new ChangeNowExchange(this.http)
-          this.exchangeIdentifier = ExchangeEnum.CHANGENOW
-          break
-      }
-    })
+
+    this.exchangeObserable = this.exchangeSubject.pipe(
+      tap((exchange: ExchangeEnum) => {
+        // tslint:disable-next-line: switch-default
+        switch (exchange) {
+          case ExchangeEnum.CHANGELLY:
+            this.exchange = new ChangellyExchange(this.operationsProvider, this.http)
+            this.exchangeIdentifier = ExchangeEnum.CHANGELLY
+            break
+          case ExchangeEnum.CHANGENOW:
+            this.exchange = new ChangeNowExchange(this.operationsProvider, this.http)
+            this.exchangeIdentifier = ExchangeEnum.CHANGENOW
+            break
+          case ExchangeEnum.QUIPUSWAP:
+            this.exchange = new QuipuswapExchange(this.protocolService, this.formBuilder)
+            this.exchangeIdentifier = ExchangeEnum.QUIPUSWAP
+        }
+      })
+    )
   }
 
-  public getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
+  public async getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableFromCurrencies()
   }
 
-  public getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]> {
+  public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]> {
     return this.exchange.getAvailableToCurrenciesForCurrency(selectedFrom)
   }
 
-  public getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
+  public async getMinAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string> {
     return this.exchange.getMinAmountForCurrency(fromCurrency, toCurrency)
   }
 
-  public getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
-    return this.exchange.getExchangeAmount(fromCurrency, toCurrency, amount)
+  public async getMaxExchangeAmountForCurrency(fromCurrency: string, toCurrency: string): Promise<string | undefined> {
+    return this.exchange.getMaxExchangeAmountForCurrency(fromCurrency, toCurrency)
   }
 
-  public validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
+  public async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string, data: any): Promise<string> {
+    return this.exchange.getExchangeAmount(fromCurrency, toCurrency, amount, data)
+  }
+
+  public async validateAddress(currency: string, address: string): Promise<{ result: false; message: string }> {
     return this.exchange.validateAddress(currency, address)
   }
 
-  public createTransaction(
-    fromCurrency: string,
-    toCurrency: string,
-    toAddress: string,
+  public async estimateFee(
+    fromWallet: AirGapMarketWallet,
+    toWallet: AirGapMarketWallet,
     amount: string,
-    fromAddress?: string
-  ): Promise<any> {
-    return this.exchange.createTransaction(fromCurrency, toCurrency, toAddress, amount, fromAddress)
+    data: any
+  ): Promise<FeeDefaults | undefined> {
+    return this.exchange.estimateFee(fromWallet, toWallet, amount, data)
+  }
+
+  public async createTransaction(
+    fromWallet: AirGapMarketWallet,
+    toWallet: AirGapMarketWallet,
+    amount: string,
+    fee: string,
+    data: any
+  ): Promise<ExchangeTransaction> {
+    return this.exchange.createTransaction(fromWallet, toWallet, amount, fee, data)
   }
 
   public getStatus(transactionId: string): Promise<ExchangeTransactionStatusResponse> {
     return this.exchange.getStatus(transactionId)
   }
 
-  public getStatusForTransaction(transaction: ExchangeTransaction): Promise<ExchangeTransactionStatusResponse> {
-    switch (transaction.exchange) {
-      case ExchangeEnum.CHANGELLY:
-        return new ChangellyExchange(this.http).getStatus(transaction.id)
-      case ExchangeEnum.CHANGENOW:
-        return new ChangeNowExchange(this.http).getStatus(transaction.id)
-    }
+  public getStatusForTransaction(transaction: ExchangeTransactionDetails): Promise<ExchangeTransactionStatusResponse> {
+    return this.exchange.getStatus(transaction.id)
   }
 
   public convertExchangeIdentifierToAirGapIdentifier(identifiers: string[]): string[] {
@@ -122,32 +144,33 @@ export class ExchangeProvider implements Exchange {
     return this.exchange.convertAirGapIdentifierToExchangeIdentifier(identifiers)
   }
 
-  public setActiveExchange(exchange: string) {
+  public async getCustomUI(): Promise<ExchangeUI> {
+    return this.exchange.getCustomUI()
+  }
+
+  public setActiveExchange(exchange: ExchangeEnum) {
     this.exchangeSubject.next(exchange)
   }
 
   public switchActiveExchange() {
-    switch (this.exchangeIdentifier) {
-      case ExchangeEnum.CHANGELLY:
-        this.setActiveExchange(ExchangeEnum.CHANGENOW)
-        break
-      case ExchangeEnum.CHANGENOW:
-        this.setActiveExchange(ExchangeEnum.CHANGELLY)
-        break
-    }
+    const supportedExchanges = Object.values(ExchangeEnum)
+    const activeIndex = supportedExchanges.indexOf(this.exchangeIdentifier)
+    const nextIndex = (activeIndex + 1) % supportedExchanges.length
+
+    this.setActiveExchange(supportedExchanges[nextIndex])
   }
 
-  public getActiveExchange() {
-    return this.exchangeSubject.asObservable()
+  public getActiveExchange(): Observable<ExchangeEnum> {
+    return this.exchangeObserable
   }
 
-  public pushExchangeTransaction(tx: ExchangeTransaction) {
+  public pushExchangeTransaction(tx: ExchangeTransactionDetails) {
     this.pendingTransactions.push(tx)
     this.persist()
   }
 
   public async formatExchangeTxs(
-    pendingExchangeTxs: ExchangeTransaction[],
+    pendingExchangeTxs: ExchangeTransactionDetails[],
     protocolIdentifier: ProtocolSymbols
   ): Promise<IAirGapTransaction[]> {
     const protocol = await this.protocolService.getProtocol(protocolIdentifier)
@@ -168,7 +191,7 @@ export class ExchangeProvider implements Exchange {
     })
   }
 
-  public transactionCompleted(tx: ExchangeTransaction) {
+  public transactionCompleted(tx: ExchangeTransactionDetails) {
     const index = this.pendingTransactions.indexOf(tx)
     if (index > -1) {
       this.pendingTransactions.splice(index, 1)
@@ -181,7 +204,7 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransaction[]
+    const pendingTransactions = (await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)) as ExchangeTransactionDetails[]
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }
@@ -192,7 +215,7 @@ export class ExchangeProvider implements Exchange {
     )
     const filteredByAddress = filteredByProtocol.filter(tx => tx.receivingAddress === address || tx.sendingAddress === address)
     const statusPromises: Promise<{
-      transaction: ExchangeTransaction
+      transaction: ExchangeTransactionDetails
       statusResponse?: ExchangeTransactionStatusResponse
     }>[] = filteredByAddress.map(tx => {
       return this.getStatusForTransaction(tx)

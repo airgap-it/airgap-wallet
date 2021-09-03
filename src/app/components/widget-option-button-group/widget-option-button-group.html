@@ -1,0 +1,35 @@
+<form [formGroup]="widgetForm">
+  <ion-grid class="ion-no-padding ion-no-margin">
+    <ion-row *ngIf="widget.label" class="label">
+      <ion-col size="12" class="ion-no-padding">
+        <ion-item lines="none" class="ion-no-padding">
+          <ion-text class="ion-no-margin" color="blackLight">
+            <ion-label>{{ widget.label | translate }}</ion-label>
+          </ion-text>
+          <ion-toggle *ngIf="widget.customInput" slot="end" mode="md" [formControlName]="customInputControl"></ion-toggle>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col *ngFor="let button of widget.optionButtons" class="ion-margin-end">
+        <ion-button 
+          [fill]="widget.value === button.value && !widgetForm.get(customInputControl).value ? 'solid' : 'outline'" 
+          shape="round" 
+          size="small"
+          expand="block"
+          (click)="onSelected(button.value)"
+        >{{ button.label }}</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="widgetForm.get(customInputControl).value && widget.customInput">
+      <ion-col size="12">
+        <ion-item class="ion-no-padding">
+          <ion-input [type]="widget.customInput.type" [formControlName]="widget.customInput.id"></ion-input>
+          <ion-text *ngIf="widget.customInput.suffix" class="ion-padding-start">
+            <ion-label>{{ widget.customInput.suffix }}</ion-label>
+          </ion-text>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</form>

@@ -20,11 +20,15 @@
       <ion-radio-group [(ngModel)]="selectedExchange" (ngModelChange)="onModelChange()" lines="none" name="selectedExchange" required>
         <ion-item>
           <ion-label>ChangeNow</ion-label>
-          <ion-radio slot="end" value="ChangeNow"></ion-radio>
+          <ion-radio slot="end" [value]="ExchangeEnum.CHANGENOW"></ion-radio>
         </ion-item>
         <ion-item>
           <ion-label>Changelly</ion-label>
-          <ion-radio slot="end" value="Changelly"></ion-radio>
+          <ion-radio slot="end" [value]="ExchangeEnum.CHANGELLY"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Quipuswap</ion-label>
+          <ion-radio slot="end" [value]="ExchangeEnum.QUIPUSWAP"></ion-radio>
         </ion-item>
       </ion-radio-group>
     </ion-list>
