@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: __CI_PROJECT_NAME__-config-map
+  namespace: __NAMESPACE__
+data:
+  RUN_ENV: Development
