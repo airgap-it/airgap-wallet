@@ -15,7 +15,6 @@ import { IntroductionPage } from '../introduction/introduction'
   templateUrl: 'settings.html'
 })
 export class SettingsPage {
-
   public readonly platform: string = Capacitor.getPlatform()
 
   constructor(

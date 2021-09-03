@@ -78,7 +78,7 @@ export class PushProvider {
           component: IntroductionPushPage
         })
 
-        modal.onDidDismiss().then(result => {
+        modal.onDidDismiss().then((result) => {
           if (result.data) {
             this.register()
           }
@@ -92,10 +92,10 @@ export class PushProvider {
   public async registerWallets(wallets: AirGapMarketWallet[]) {
     console.log('register wallets')
 
-    this.registrationId.pipe(take(1)).subscribe(registrationId => {
+    this.registrationId.pipe(take(1)).subscribe((registrationId) => {
       const languageCode: string = this.translate.getBrowserCultureLang()
 
-      const pushRegisterRequests = wallets.map(wallet => ({
+      const pushRegisterRequests = wallets.map((wallet) => ({
         address: wallet.receivingPublicAddress,
         identifier: wallet.protocol.identifier,
         pushToken: registrationId,
@@ -114,8 +114,8 @@ export class PushProvider {
   public async unregisterWallets(wallets: AirGapMarketWallet[]) {
     console.log('unregister wallets')
 
-    this.registrationId.pipe(take(1)).subscribe(registrationId => {
-      wallets.forEach(wallet => {
+    this.registrationId.pipe(take(1)).subscribe((registrationId) => {
+      wallets.forEach((wallet) => {
         this.unregisterWallet(wallet, registrationId)
       })
     })
@@ -154,7 +154,7 @@ export class PushProvider {
           duration: 3000,
           position: 'top'
         })
-        .then(toast => {
+        .then((toast) => {
           toast.present().catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
         })
 
@@ -168,7 +168,7 @@ export class PushProvider {
       this.registrationId.next(token.value)
     })
 
-    this.pushNotifications.addListener('registrationError', error => {
+    this.pushNotifications.addListener('registrationError', (error) => {
       console.error('Error with Push plugin', error)
       handleErrorSentry(ErrorCategory.PUSH)(error)
     })

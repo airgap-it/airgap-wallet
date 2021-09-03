@@ -238,8 +238,9 @@ export class AppComponent implements AfterViewInit {
 
     const granadanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(granadanetNetwork))
 
-    const externalMethodProvider: TezosSaplingExternalMethodProvider | undefined =
-      await this.saplingNativeService.createExternalMethodProvider()
+    const externalMethodProvider:
+      | TezosSaplingExternalMethodProvider
+      | undefined = await this.saplingNativeService.createExternalMethodProvider()
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
@@ -249,12 +250,7 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [
-        edonetProtocol, 
-        florencenetProtocol,
-        granadanetProtocol,
-        shieldedTezProtocol
-      ],
+      extraActiveProtocols: [edonetProtocol, florencenetProtocol, granadanetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 

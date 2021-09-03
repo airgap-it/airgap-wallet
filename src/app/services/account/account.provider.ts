@@ -183,8 +183,10 @@ export class AccountProvider {
   }
 
   private async loadWalletsFromStorage() {
-    const [rawGroups, rawWallets]: [SerializedAirGapMarketWalletGroup[] | undefined, SerializedAirGapWallet[] | undefined] =
-      await Promise.all([this.storageProvider.get(WalletStorageKey.WALLET_GROUPS), this.storageProvider.get(WalletStorageKey.WALLET)])
+    const [rawGroups, rawWallets]: [
+      SerializedAirGapMarketWalletGroup[] | undefined,
+      SerializedAirGapWallet[] | undefined
+    ] = await Promise.all([this.storageProvider.get(WalletStorageKey.WALLET_GROUPS), this.storageProvider.get(WalletStorageKey.WALLET)])
 
     const groups = rawGroups || []
     let wallets = rawWallets || []
@@ -629,7 +631,9 @@ export class AccountProvider {
       .map((wallet: AirGapMarketWallet) => wallet.publicKey)
   }
 
-  public async getCompatibleAndIncompatibleWalletsForAddress(address: string): Promise<{
+  public async getCompatibleAndIncompatibleWalletsForAddress(
+    address: string
+  ): Promise<{
     compatibleWallets: AirGapMarketWallet[]
     incompatibleWallets: AirGapMarketWallet[]
   }> {

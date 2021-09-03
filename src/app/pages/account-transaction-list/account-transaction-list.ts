@@ -146,7 +146,7 @@ export class AccountTransactionListPage {
     }
 
     this.actionGroup = new ActionGroup(this)
-    this.actionGroup.getActions().then(actions => {
+    this.actionGroup.getActions().then((actions) => {
       this.actions = actions
     })
   }
@@ -186,8 +186,9 @@ export class AccountTransactionListPage {
     }
     this.router
       .navigateByUrl(
-        `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${info.address !==
-          ''}/${0}/${'not_forced'}`
+        `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${
+          info.address !== ''
+        }/${0}/${'not_forced'}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
@@ -254,7 +255,7 @@ export class AccountTransactionListPage {
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
 
-    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch(error => {
+    const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch((error) => {
       console.error(error)
       // either the txs are taking too long to load or there is actually a network error
       this.showLinkToBlockExplorer = true
@@ -279,13 +280,13 @@ export class AccountTransactionListPage {
     this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
 
     // remove duplicates from pendingTransactions
-    const txHashes: string[] = this.transactions.map(value => value.hash)
-    this.pendingTransactions = this.pendingTransactions.filter(value => {
+    const txHashes: string[] = this.transactions.map((value) => value.hash)
+    this.pendingTransactions = this.pendingTransactions.filter((value) => {
       return txHashes.indexOf(value.hash) === -1
     })
 
     if (this.pendingTransactions.length > 0) {
-      this.pendingTransactions = this.pendingTransactions.map(pendingTx => {
+      this.pendingTransactions = this.pendingTransactions.map((pendingTx) => {
         pendingTx.fee = new BigNumber(pendingTx.fee).toString(10)
         pendingTx.amount = new BigNumber(pendingTx.amount).toString(10)
 
@@ -309,7 +310,7 @@ export class AccountTransactionListPage {
   public async getTransactions(cursor?: IProtocolTransactionCursor, limit: number = 10): Promise<IAirGapTransaction[]> {
     const [transactionResult]: [IAirGapTransactionResult, void] = await Promise.all([
       this.transactionResult ? this.wallet.fetchTransactions(limit, cursor) : this.wallet.fetchTransactions(limit),
-      this.wallet.synchronize().catch(error => {
+      this.wallet.synchronize().catch((error) => {
         console.error(error)
       })
     ])
@@ -331,7 +332,7 @@ export class AccountTransactionListPage {
     )
 
     const transactionCountBefore: number = transactionMap.size
-    newTransactions.forEach(tx => {
+    newTransactions.forEach((tx) => {
       const key = this.mergeKeyForTransaction(tx)
       transactionMap.set(key, tx)
     })
@@ -394,7 +395,7 @@ export class AccountTransactionListPage {
   }
 
   public async openDelegationDetails(): Promise<void> {
-    const delegateAction = this.actions.find(action => action.identifier === 'delegate-action')
+    const delegateAction = this.actions.find((action) => action.identifier === 'delegate-action')
     if (delegateAction) {
       await delegateAction.start()
     }

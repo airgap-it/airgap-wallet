@@ -26,7 +26,7 @@ export class IntroductionPage {
       component: IntroductionDownloadPage
     })
 
-    modal.dismiss(shouldCloseAllModals => {
+    modal.dismiss((shouldCloseAllModals) => {
       if (shouldCloseAllModals) {
         this.dismiss()
       }

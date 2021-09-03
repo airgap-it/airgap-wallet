@@ -259,11 +259,9 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
         protocol.decimals
       )
 
-      const {
-        address: collatorArgName,
-        amount: amountArgName,
-        amountControl: amountControlArgName
-      } = this.resolveMainArgumentNames(action.type)
+      const { address: collatorArgName, amount: amountArgName, amountControl: amountControlArgName } = this.resolveMainArgumentNames(
+        action.type
+      )
 
       let controls = {
         [collatorArgName]: collator

@@ -177,7 +177,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.chartLabels = []
 
     if (this.chart) {
-      const ctx: CanvasRenderingContext2D = this.chart.ctx as any as CanvasRenderingContext2D
+      const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
 
       const color1: string = '26E8CD' // rgb(122, 141, 169)
 

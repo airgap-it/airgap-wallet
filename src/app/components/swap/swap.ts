@@ -81,11 +81,13 @@ export class SwapComponent {
   }
 
   public async doRadio(): Promise<void> {
-    const protocols: ICoinProtocol[] = (await Promise.all(
-      this.supportedProtocols.map(async (supportedProtocol: ProtocolSymbols) =>
-        this.protocolService.getProtocol(supportedProtocol).catch(() => undefined)
+    const protocols: ICoinProtocol[] = (
+      await Promise.all(
+        this.supportedProtocols.map(async (supportedProtocol: ProtocolSymbols) =>
+          this.protocolService.getProtocol(supportedProtocol).catch(() => undefined)
+        )
       )
-    )).filter((protocol: ICoinProtocol | undefined) => protocol !== undefined)
+    ).filter((protocol: ICoinProtocol | undefined) => protocol !== undefined)
 
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: ProtocolSelectPage,

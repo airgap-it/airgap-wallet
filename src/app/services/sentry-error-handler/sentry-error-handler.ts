@@ -45,7 +45,7 @@ const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
     try {
       console.debug('sending error to sentry, category', category)
       console.debug(error.originalError || error)
-      Sentry.withScope(scope => {
+      Sentry.withScope((scope) => {
         scope.setTag(AIRGAP_ERROR_CATEGORY, category)
         Sentry.captureException(error.originalError || error)
       })
@@ -55,14 +55,14 @@ const handleErrorSentry = (category: ErrorCategory = ErrorCategory.OTHER) => {
   }
 }
 
-const handleErrorIgnore = error => {
+const handleErrorIgnore = (error) => {
   console.debug('ignoring error')
   console.debug(error.originalError || error)
 }
 
 const setSentryRelease = (release: string) => {
-  Sentry.configureScope(scope => {
-    scope.addEventProcessor(async event => {
+  Sentry.configureScope((scope) => {
+    scope.addEventProcessor(async (event) => {
       event.release = release
 
       return event
@@ -71,7 +71,7 @@ const setSentryRelease = (release: string) => {
 }
 
 const setSentryUser = (UUID: string) => {
-  Sentry.configureScope(scope => {
+  Sentry.configureScope((scope) => {
     scope.setUser({ id: UUID })
   })
 }

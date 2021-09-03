@@ -57,7 +57,7 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
   }
 
   private async showAlert(): Promise<void> {
-    return new Promise<void>(async resolve => {
+    return new Promise<void>(async (resolve) => {
       await this.context.uiEventService.showTranslatedAlert({
         header: this.context.alertTitle ? this.context.alertTitle : 'action-alert-delegation.heading',
         message: this.context.alertDescription ? this.context.alertDescription : 'action-alert-delegation.text',

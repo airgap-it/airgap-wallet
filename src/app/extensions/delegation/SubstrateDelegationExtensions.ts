@@ -142,7 +142,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     delegatees: string[]
   ): Promise<UIAccountSummary[]> {
     const delegateesDetails: SubstrateValidatorDetails[] = await Promise.all(
-      delegatees.map(delegatee => protocol.options.accountController.getValidatorDetails(delegatee))
+      delegatees.map((delegatee) => protocol.options.accountController.getValidatorDetails(delegatee))
     )
 
     return delegateesDetails.map(
@@ -289,7 +289,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     )
 
     const delegateAction = extraNominatorDetails.mainActions
-      ? extraNominatorDetails.mainActions.find(action => delegateActions.includes(action.type))
+      ? extraNominatorDetails.mainActions.find((action) => delegateActions.includes(action.type))
       : undefined
 
     const isNominated = nominatorDetails.delegatees.includes(validatorDetails.address)
@@ -307,10 +307,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       const getExpectedReward = async (userStake: BigNumber) => {
         const totalStake = new BigNumber(validatorDetails.totalStakingBalance).plus(userStake)
         const userShare = userStake.dividedBy(totalStake)
-        const expectedReward = new BigNumber(1)
-          .minus(commission)
-          .multipliedBy(totalPreviousReward)
-          .multipliedBy(userShare)
+        const expectedReward = new BigNumber(1).minus(commission).multipliedBy(totalPreviousReward).multipliedBy(userShare)
 
         return this.amountConverterPipe.transform(expectedReward, {
           protocol
@@ -323,7 +320,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
         description: 'delegation-detail-substrate.expected-reward_label'
       })
 
-      delegateAction.form.valueChanges.subscribe(value => {
+      delegateAction.form.valueChanges.subscribe((value) => {
         expectedRewardWidget.doAfterReached(
           WidgetState.INIT,
           async () => {
@@ -345,7 +342,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     nominatorDetails: SubstrateNominatorDetails,
     validators: string[]
   ): Promise<AirGapDelegatorDetails> {
-    const availableActions = nominatorDetails.availableActions.filter(action => supportedActions.includes(action.type))
+    const availableActions = nominatorDetails.availableActions.filter((action) => supportedActions.includes(action.type))
 
     const delegateAction: AirGapDelegatorAction = await this.createDelegateAction(
       protocol,
@@ -365,8 +362,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     return {
       ...nominatorDetails,
-      mainActions: [delegateAction, ...extraActions].filter(action => !!action),
-      secondaryActions: [undelegateAction].filter(action => !!action),
+      mainActions: [delegateAction, ...extraActions].filter((action) => !!action),
+      secondaryActions: [undelegateAction].filter((action) => !!action),
       displayDetails
     }
   }
@@ -380,7 +377,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     validators: string[]
   ): Promise<AirGapDelegatorAction | null> {
     const actions = availableActions
-      .filter(action => delegateActions.includes(action.type))
+      .filter((action) => delegateActions.includes(action.type))
       .sort((a1, a2) => delegateActions.indexOf(a1.type) - delegateActions.indexOf(a2.type))
 
     const action = actions[0]
@@ -473,7 +470,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
       case SubstrateStakingActionType.REBOND_NOMINATE:
       case SubstrateStakingActionType.REBOND_EXTRA:
         const [unlocking, maxUnlocked]: [BigNumber, BigNumber] = await Promise.all([
-          protocol.options.accountController.getUnlockingBalance(nominatorAddress).then(unlocking => new BigNumber(unlocking)),
+          protocol.options.accountController.getUnlockingBalance(nominatorAddress).then((unlocking) => new BigNumber(unlocking)),
           protocol
             .estimateMaxDelegationValueFromAddress(nominatorAddress)
             .then((max: string) => new BigNumber(max))
@@ -618,7 +615,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
     availableActions: DelegatorAction[]
   ): AirGapDelegatorAction | null {
     const actions = availableActions
-      .filter(action => undelegateActions.includes(action.type))
+      .filter((action) => undelegateActions.includes(action.type))
       .sort((a1, a2) => undelegateActions.indexOf(a1.type) - undelegateActions.indexOf(a2.type))
 
     const action = actions[0]
@@ -659,8 +656,8 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
   ): Promise<AirGapDelegatorAction[]> {
     return Promise.all(
       availableActions
-        .filter(action => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
-        .map(async action => {
+        .filter((action) => !delegateActions.includes(action.type) && !undelegateActions.includes(action.type))
+        .map(async (action) => {
           let label: string
           let confirmLabel: string
           let description: string
@@ -737,7 +734,7 @@ export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<
 
     return new UIRewardList({
       rewards: await Promise.all(
-        nominatorDetails.stakingDetails.rewards.slice(0, 5).map(async reward => ({
+        nominatorDetails.stakingDetails.rewards.slice(0, 5).map(async (reward) => ({
           index: reward.eraIndex,
           amount: await this.amountConverterPipe.transform(reward.amount, {
             protocol

@@ -13,7 +13,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../portfolio/portfolio.module').then(m => m.PortfolioPageModule)
+            loadChildren: () => import('../portfolio/portfolio.module').then((m) => m.PortfolioPageModule)
           }
         ]
       },
@@ -22,7 +22,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../scan/scan.module').then(m => m.ScanPageModule)
+            loadChildren: () => import('../scan/scan.module').then((m) => m.ScanPageModule)
           }
         ]
       },
@@ -31,7 +31,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../exchange/exchange.module').then(m => m.ExchangePageModule)
+            loadChildren: () => import('../exchange/exchange.module').then((m) => m.ExchangePageModule)
           }
         ]
       },
@@ -40,7 +40,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: () => import('../settings/settings.module').then(m => m.SettingsPageModule)
+            loadChildren: () => import('../settings/settings.module').then((m) => m.SettingsPageModule)
           }
         ]
       },

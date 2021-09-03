@@ -35,7 +35,7 @@ export class PriceService implements AirGapWalletPriceService {
     } else {
       const cryptoPricesResponse = await axios.get(
         `${this.baseURL}/api/v3/prices/history-usd?baseCurrencySymbols=${marketSymbols
-          .map(symbol => symbol.toUpperCase())
+          .map((symbol) => symbol.toUpperCase())
           .join()}&timeInterval=${timeInterval}`
       )
       await this.cachingService.cachePriceData(marketSymbols, cryptoPricesResponse.data, timeInterval)
@@ -57,10 +57,10 @@ export class PriceService implements AirGapWalletPriceService {
       return pendingRequest
     }
 
-    const promise: Promise<BigNumber> = new Promise(resolve => {
+    const promise: Promise<BigNumber> = new Promise((resolve) => {
       axios
         .get(`${this.baseURL}/api/v3/prices/latest-usd?baseCurrencySymbols=${protocol.marketSymbol.toUpperCase()}`)
-        .then(async response => {
+        .then(async (response) => {
           if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
             const cryptoPrices: CryptoPrices = response.data[0]
             if (cryptoPrices.price) {
@@ -92,7 +92,7 @@ export class PriceService implements AirGapWalletPriceService {
   }
 
   public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
-    return new Promise<IAirGapTransactionResult>(async resolve => {
+    return new Promise<IAirGapTransactionResult>(async (resolve) => {
       const rawTransactions: StorageObject = await this.cachingService.getWalletData(wallet, CachingServiceKey.TRANSACTIONS)
       if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
         resolve(rawTransactions.value)
@@ -105,7 +105,7 @@ export class PriceService implements AirGapWalletPriceService {
   }
 
   public async fetchBalance(wallet: AirGapMarketWallet): Promise<BigNumber> {
-    return new Promise<BigNumber>(async resolve => {
+    return new Promise<BigNumber>(async (resolve) => {
       const rawBalance: StorageObject = await this.cachingService.getWalletData(wallet, CachingServiceKey.BALANCE)
       if (rawBalance && rawBalance.timestamp > Date.now() - 30 * 60 * 1000 && rawBalance.value) {
         resolve(new BigNumber(rawBalance.value))

@@ -20,7 +20,7 @@ export interface AirGapTezosMigrateActionContext {
 
 export class AirGapTezosMigrateAction extends Action<void, AirGapTezosMigrateActionContext> {
   protected perform(): Promise<void> {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
       const mainProtocol = await this.context.protocolService.getProtocol(MainProtocolSymbols.XTZ)
       const mainAddress = await mainProtocol.getAddressFromPublicKey(this.context.wallet.publicKey)
       const shortenString = new ShortenStringPipe()
