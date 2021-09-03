@@ -168,11 +168,14 @@ build-windows:
 
 build-web:
   stage: platform_build
-  when: manual
   tags:
     - docker
   script:
     - docker build -f build/web/Dockerfile -t $GOOGLE_TAG -t $GOOGLE_TAG_DEV .
+  only:
+    - develop
+    - master
+    - feat/github-actions
   tags:
     - docker
 
@@ -190,7 +193,6 @@ publish-ios:
 
 publish-web-dev:
   stage: publish
-  when: manual
   needs:
     - build-web
   image: google/cloud-sdk
@@ -205,12 +207,14 @@ publish-web-dev:
     - docker tag $GOOGLE_TAG_DEV $GOOGLE_TAG_LATEST_DEV
     - docker push $GOOGLE_TAG_DEV
     - docker push $GOOGLE_TAG_LATEST_DEV
+  only:
+    - develop
+    - feat/github-actions
   tags:
     - docker
 
 publish-web-prod:
   stage: publish
-  when: manual
   needs:
     - build-web
   image: google/cloud-sdk
@@ -251,6 +255,7 @@ deploy-web-dev:
     - kubectl apply -f k8s/airgap-wallet/common/ --recursive
   only:
     - develop
+    - feat/github-actions
   tags:
     - docker
 

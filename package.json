@@ -131,8 +131,7 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@ionic/lab": "3.2.10",
-    "angular-cli-ghpages": "^1.0.0-rc.1",
+    "angular-cli-ghpages": "^1.0.0-rc.2",
     "clipboardy": "^2.0.0",
     "ionic-mocks": "^1.3.0",
     "jasmine-core": "~2.99.1",
