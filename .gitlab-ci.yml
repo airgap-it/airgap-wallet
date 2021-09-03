@@ -230,7 +230,7 @@ publish-web-prod:
   tags:
     - docker
 
-  deploy-web-dev:
+deploy-web-dev:
   stage: deploy
   needs:
     - publish-web-dev
