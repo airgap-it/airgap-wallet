@@ -8,6 +8,7 @@ import { promiseRetry } from '../../helpers/promise'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountSync } from 'src/app/types/AccountSync'
 
 @Component({
   selector: 'page-account-import-ledger-onboarding',
@@ -127,7 +128,13 @@ export class AccountImportLedgerOnboardingPage {
               this.isLoading = false
               this.isSuccess = true
 
-              this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, wallet)
+              const accountSyncs: AccountSync[] = [
+                {
+                  wallet
+                }
+              ]
+
+              this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
               this.router
                 .navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`)
                 .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
