@@ -249,6 +249,7 @@ deploy-web-dev:
     - gcloud container clusters get-credentials papers-cluster-development
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
+    - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__TO_BE_REPLACED_BY_IMAGE_TAG__|"$GOOGLE_TAG_DEV"|g" {} +
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/development/ --recursive
@@ -274,6 +275,7 @@ deploy-web-prod:
     - gcloud container clusters get-credentials papers-cluster-production
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
+    - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__TO_BE_REPLACED_BY_IMAGE_TAG__|"$GOOGLE_TAG"|g" {} +
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/production/ --recursive
