@@ -152,8 +152,8 @@ const routes: Routes = [
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then((m) => m.DelegationDetailPageModule)
   },
   {
-    path: 'settings-beacon',
-    loadChildren: () => import('./pages/settings-beacon/settings-beacon.module').then((m) => m.SettingsBeaconPageModule)
+    path: 'dapp-settings',
+    loadChildren: () => import('./pages/dapp-settings/dapp-settings.module').then((m) => m.SettingsBeaconPageModule)
   },
   {
     path: 'delegation-list/:id',

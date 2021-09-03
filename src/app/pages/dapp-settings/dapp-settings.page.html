@@ -4,28 +4,25 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ 'settings-beacon.title' | translate }}</ion-title>
+      <ion-title>{{ 'dapp-settings.title' | translate }}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
 
 <ion-content>
   <ion-buttons class="ion-padding">
-    <ion-button (click)="removeAllPeers()">{{ 'settings-beacon.remove-all_label' | translate }}</ion-button>
-    <ion-button (click)="reset()">{{ 'settings-beacon.reset' | translate }}</ion-button>
+    <ion-button (click)="removeAllPeers()">{{ 'dapp-settings.remove-all_label' | translate }}</ion-button>
+    <ion-button (click)="reset()">{{ 'dapp-settings.reset' | translate }}</ion-button>
   </ion-buttons>
   <ion-grid fixed="true" class="ion-no-padding">
     <div class="ion-padding-horizontal">Connected to: {{ connectedServer }}</div>
     <div *ngIf="connectedPeers.length === 0" class="empty-list ion-padding-horizontal">
       <img class="ion-padding-vertical" src="assets/img/empty-state-no-transaction.svg" />
-      <p>{{ 'settings-beacon.no-peers' | translate }}</p>
+      <p>{{ 'dapp-settings.no-peers' | translate }}</p>
     </div>
     <ion-list lines="none">
       <ion-item-sliding *ngFor="let peer of connectedPeers">
-        <ion-item>{{ peer.name }}</ion-item>
-        <ion-item-options side="end">
-          <ion-item-option color="danger" (click)="removePeer(peer)">{{ 'settings-beacon.delete_label' | translate }}</ion-item-option>
-        </ion-item-options>
+        <dapp-peer [peer]="peer" (removePeerEmitter)="removePeer($event)"></dapp-peer>
       </ion-item-sliding>
     </ion-list>
   </ion-grid>

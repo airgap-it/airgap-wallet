@@ -36,7 +36,7 @@ export class SettingsPage {
   }
 
   public dappSettings(): void {
-    this.router.navigateByUrl('/settings-beacon').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl('/dapp-settings').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public share(): void {
