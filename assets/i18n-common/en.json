@@ -19,15 +19,17 @@
   "iac": {
     "message-unknown_alert": {
       "header": "Incompatible code",
-      "message": "Could not parse message. Please make sure this is a valid AirGap message. You can try to handle this message in {{otherApp.name}} by using the \"Relay\" button below.",
+      "message": "Could not parse code. Please make sure this is a valid AirGap code. You can try to handle this code in {{otherApp.name}} by using the \"Relay\" button below.",
       "relay_label": "Relay",
-      "okay_label": "Okay"
+      "copy_label": "Copy",
+      "cancel_label": "Cancel"
     },
     "message-not-supported_alert": {
       "header": "Operation not supported",
-      "message": "Please use {{otherApp.name}} to handle this message. You can click the \"Relay\" button below to do that.",
+      "message": "Please use {{otherApp.name}} to handle this code. You can click the \"Relay\" button below to do that.",
       "relay_label": "Relay",
-      "okay_label": "Okay"
+      "copy_label": "Copy",
+      "cancel_label": "Cancel"
     }
   },
   "deeplink": {
@@ -40,12 +42,17 @@
       "title": "Oops",
       "message": "It looks like you don't have {{otherApp.name}} installed on this device.",
       "ok": "Ok"
+    },
+    "invalid": {
+      "title": "Oops",
+      "message": "It looks like the deeplink could not be generated",
+      "ok": "Ok"
     }
   },
   "qr-settings": {
     "title": "QR Settings",
     "paste-from-clipboard_label": "Paste code from clipboard",
-    "enable-new-serializer_label": "Enable new serializer",
+    "enable-new-serializer_label": "Enable Serializer V3",
     "page-time_label": "QR Page Time",
     "single-page-size_label": "Single QR Max Size",
     "multi-page-size_label": "Multi QR Max Size",
