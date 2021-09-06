@@ -70,7 +70,7 @@ export class PortfolioPage {
     wallets
       .filter((wallet: AirGapWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
       .forEach((wallet: AirGapMarketWallet) => {
-        const isSubProtocol: boolean = ((wallet.protocol as any) as ICoinSubProtocol).isSubProtocol
+        const isSubProtocol: boolean = (wallet.protocol as any as ICoinSubProtocol).isSubProtocol
         const identifier: string = isSubProtocol ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
 
         const walletKey: string = `${wallet.publicKey}_${identifier}`

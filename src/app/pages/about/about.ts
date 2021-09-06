@@ -6,9 +6,7 @@ import type { IpcRenderer } from 'electron'
 
 declare global {
   interface Window {
-    require: (
-      module: 'electron'
-    ) => {
+    require: (module: 'electron') => {
       ipcRenderer: IpcRenderer
     }
   }
