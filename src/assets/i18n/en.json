@@ -11,6 +11,7 @@
     "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
     "fund_label": "Fund Account",
+    "load_more": "Load more",
     "pending-transactions": {
       "label": "Pending Transactions",
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
@@ -151,7 +152,7 @@
     },
     "dapp": {
       "label": "Dapps",
-      "settings_label": "Beacon Settings",
+      "settings_label": "Dapp Settings",
       "about_label": "About Beacon",
       "permission-list_label": "Dapp Permissions"
     },
@@ -762,12 +763,18 @@
       "yes_label": "Yes"
     }
   },
-  "settings-beacon": {
-    "title": "Beacon Settings",
+  "dapp-settings": {
+    "title": "Dapp Settings",
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers",
-    "reset": "Reset"
+    "reset": "Reset", 
+    "alert": {
+      "heading": "Remove All",
+      "message": "Are you sure you want to remove all peers?",
+      "cancel" : "Cancel", 
+      "confirm": "Confirm"
+    }
   },
   
   "walletconnect": {

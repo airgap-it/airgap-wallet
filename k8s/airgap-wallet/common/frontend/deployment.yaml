@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: __CI_PROJECT_NAME__
+  namespace: __NAMESPACE__
+  labels:
+    app: __CI_PROJECT_NAME__
+spec:
+  selector:
+    matchLabels:
+      app: __CI_PROJECT_NAME__
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: __CI_PROJECT_NAME__
+    spec:
+      containers:
+        - name: __CI_PROJECT_NAME__
+          image: __TO_BE_REPLACED_BY_IMAGE_TAG__
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: __CI_PROJECT_NAME__-config-map
+            - secretRef:
+                name: __CI_PROJECT_NAME__-secret
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+      imagePullSecrets:
+        - name: regsecret
+      restartPolicy: Always
+status: {}

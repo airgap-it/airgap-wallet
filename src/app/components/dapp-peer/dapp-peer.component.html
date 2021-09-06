@@ -1,0 +1,14 @@
+<ion-item>
+  <ng-container>
+    <ion-item lines="none" class="ion-no-padding">
+      <ion-label>
+        <h2>
+          <span class="font--weight__med">{{ peer.name }}</span>
+        </h2>
+
+        <p class="typography--mono">Dapp Id: {{ peer.senderId }}</p>
+      </ion-label>
+    </ion-item>
+    <ion-item-option color="danger" slot="end" (click)="remove()">Delete</ion-item-option>
+  </ng-container>
+</ion-item>

@@ -54,7 +54,6 @@ export class LedgerSignPage {
             .reduce((pv: BigNumber, cv: BigNumber) => pv.plus(cv), new BigNumber(0)),
           totalFees: this.airGapTxs.reduce((pv: BigNumber, cv: IAirGapTransaction) => pv.plus(cv.fee), new BigNumber(0))
         }
-        console.log('aggregatedInfo', this.aggregatedInfo)
       }
     }
     this.connectWithLedger()

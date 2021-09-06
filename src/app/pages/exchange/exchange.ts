@@ -155,7 +155,7 @@ export class ExchangePage {
         }
       })
       .catch((err) => {
-        console.log(err)
+        console.error(err)
         this.showLoadingErrorAlert()
       })
   }
@@ -238,7 +238,6 @@ export class ExchangePage {
 
   private onStateUpdated(newState: ExchangeState): void {
     this.state = newState
-    console.log('onStateUpdated', newState, this.state)
 
     this.updateTransactionForm({
       fee: this.state.fee,
@@ -252,9 +251,7 @@ export class ExchangePage {
   }
 
   public onChanges(): void {
-    console.log('onChanges')
     this.state$.pipe(debounceTime(200)).subscribe((state: ExchangeState) => {
-      console.log('state$')
       this.onStateUpdated(state)
     })
 

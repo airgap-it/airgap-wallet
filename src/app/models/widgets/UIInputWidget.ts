@@ -42,7 +42,7 @@ export abstract class UIInputWidget<T> extends UIWidget {
       this.formControl.setValidators(this.validators)
     }
 
-    this.formControl.valueChanges.subscribe(value => {
+    this.formControl.valueChanges.subscribe((value) => {
       if (value) {
         this.value = value
         this.onValueChanged()

@@ -172,6 +172,13 @@
               "devServerTarget": "app:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "baseHref": "/airgap-wallet/",
+            "message": "Deploying latest changes"
+          }
         }
       }
     },

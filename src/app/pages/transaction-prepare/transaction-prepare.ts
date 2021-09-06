@@ -24,6 +24,7 @@ import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
+import { SaplingService } from 'src/app/services/sapling/sapling.service'
 
 interface TransactionFormState<T> {
   value: T
@@ -90,6 +91,7 @@ export class TransactionPreparePage {
     private readonly dataService: DataService,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly priceService: PriceService,
+    private readonly saplingService: SaplingService,
     private readonly addressService: AddressService,
     public readonly accountProvider: AccountProvider
   ) {
@@ -127,8 +129,9 @@ export class TransactionPreparePage {
     this.ignoreExistentialDeposit = this.isSubstrate ? true : undefined
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
-
-    this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+    if (this.isSapling) {
+      this.saplingService.initSapling()
+    }
 
     this.initState()
       .then(async () => {
@@ -525,7 +528,7 @@ export class TransactionPreparePage {
     this.updateState({
       estimatingMaxAmount: true
     })
-    
+
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
     const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(
       this.wallet,

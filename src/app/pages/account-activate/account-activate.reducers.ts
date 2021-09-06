@@ -55,7 +55,7 @@ export const reducer = createReducer(
     },
     checkedAccounts: []
   })),
-  on(actions.invalidNavigationData, state => ({
+  on(actions.invalidNavigationData, (state) => ({
     ...state,
     protocol: {
       status: UIResourceStatus.ERROR,
@@ -88,10 +88,7 @@ export const selectProtocolDetails = createSelector(
   selectFeatureState,
   (state: FeatureState): UIResource<ProtocolDetails> => state.protocol
 )
-export const selectCheckedAccounts = createSelector(
-  selectFeatureState,
-  (state: FeatureState): string[] => state.checkedAccounts
-)
+export const selectCheckedAccounts = createSelector(selectFeatureState, (state: FeatureState): string[] => state.checkedAccounts)
 
 export const selectProtocolIdentifier = createSelector(
   selectFeatureState,

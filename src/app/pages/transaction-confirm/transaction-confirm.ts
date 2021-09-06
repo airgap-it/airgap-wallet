@@ -129,7 +129,6 @@ export class TransactionConfirmPage {
       protocol
         .broadcastTransaction(signedTx)
         .then(async (txId) => {
-          console.log('transaction hash', txId)
           if (request) {
             // TODO: Type
             if (request['transaction']) {
@@ -177,8 +176,6 @@ export class TransactionConfirmPage {
             signed.fee = signed.fee.toString()
             signed.signedTx = signedTx
             signed.hash = txId
-
-            console.log('SIGNED TX', signed)
             this.pushBackendProvider.postPendingTx(signed) // Don't await
           }
           // END POST TX TO BACKEND

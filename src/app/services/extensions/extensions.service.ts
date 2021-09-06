@@ -3,7 +3,15 @@ import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import { CosmosProtocol, ICoinDelegateProtocol, KusamaProtocol, MoonbaseProtocol, MoonriverProtocol, PolkadotProtocol, TezosProtocol } from '@airgap/coinlib-core'
+import {
+  CosmosProtocol,
+  ICoinDelegateProtocol,
+  KusamaProtocol,
+  MoonbaseProtocol,
+  MoonriverProtocol,
+  PolkadotProtocol,
+  TezosProtocol
+} from '@airgap/coinlib-core'
 import { CosmosDelegationExtensions } from 'src/app/extensions/delegation/CosmosDelegationExtensions'
 import { ProtocolDelegationExtensions } from 'src/app/extensions/delegation/ProtocolDelegationExtensions'
 import { SubstrateDelegationExtensions } from 'src/app/extensions/delegation/SubstrateDelegationExtensions'

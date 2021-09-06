@@ -6,7 +6,7 @@ import { LoadingController, NavController, PopoverController, ToastController } 
 import { OverlayEventDetail } from '@ionic/core'
 import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 import { BehaviorSubject } from 'rxjs'
-import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover copy/delegate-action-popover.component'
+import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover/delegate-action-popover.component'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import {
   AirGapDelegateeDetails,
@@ -58,7 +58,7 @@ export class DelegationDetailPage {
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
 
-    return details.mainActions && details.mainActions.some(action => !!action.description || !!action.args)
+    return details.mainActions && details.mainActions.some((action) => !!action.description || !!action.args)
   }
 
   private get isAirGapDelegatee(): boolean {
@@ -114,7 +114,7 @@ export class DelegationDetailPage {
   }
 
   public filterVisible(widgets?: UIWidget[]): UIWidget[] {
-    return widgets ? widgets.filter(widget => widget.isVisible) : []
+    return widgets ? widgets.filter((widget) => widget.isVisible) : []
   }
 
   public async presentEditPopover(event: Event): Promise<void> {
@@ -173,7 +173,7 @@ export class DelegationDetailPage {
 
   public onActiveActionChange(activeDelegatorAction: string | null) {
     const activeAction = this.delegatorDetails$.value.mainActions
-      ? this.delegatorDetails$.value.mainActions.find(action => action.type.toString() === activeDelegatorAction)
+      ? this.delegatorDetails$.value.mainActions.find((action) => action.type.toString() === activeDelegatorAction)
       : null
 
     this.activeDelegatorAction = activeDelegatorAction
@@ -214,7 +214,7 @@ export class DelegationDetailPage {
 
     this.subscribeObservables()
 
-    this.operations.getCurrentDelegatees(this.wallet).then(addresses => {
+    this.operations.getCurrentDelegatees(this.wallet).then((addresses) => {
       if (addresses) {
         this.delegateeAddress$.next(addresses[0])
       }
@@ -222,17 +222,17 @@ export class DelegationDetailPage {
   }
 
   private subscribeObservables() {
-    this.delegateeAddress$.subscribe(async address => {
+    this.delegateeAddress$.subscribe(async (address) => {
       if (address) {
         this.updateDisplayedDetails(null)
         this.updateDisplayedRewards(null)
 
-        this.operations.getDelegationDetails(this.wallet, [address]).then(details => {
+        this.operations.getDelegationDetails(this.wallet, [address]).then((details) => {
           if (details && details.length > 0) {
             this.updateDisplayedDetails(details)
           }
         })
-        this.operations.getRewardDisplayDetails(this.wallet, [address]).then(rewards => {
+        this.operations.getRewardDisplayDetails(this.wallet, [address]).then((rewards) => {
           this.hasRewardDetails = rewards !== undefined
           if (rewards) {
             this.updateDisplayedRewards(rewards)
@@ -241,7 +241,7 @@ export class DelegationDetailPage {
       }
     })
 
-    this.delegateeDetails$.subscribe(details => {
+    this.delegateeDetails$.subscribe((details) => {
       this.delegateeAccountWidget = details
         ? new UIAccount({
             name: details.name,
@@ -252,20 +252,17 @@ export class DelegationDetailPage {
         : null
     })
 
-    this.delegatorDetails$.subscribe(async details => {
+    this.delegatorDetails$.subscribe(async (details) => {
       this.showOverflowMenu =
         !(this.isAirGapDelegatee || this.hideAirGapOverflow) || (details && details.secondaryActions && details.secondaryActions.length > 0)
 
       if (details) {
         this.delegatorBalanceWidget = new UIIconText({
           iconName: 'wallet-outline',
-          text: await this.amountConverter.transform(
-            details.balance, 
-            { 
-              protocol: this.wallet.protocol,
-              maxDigits: this.wallet.protocol.decimals
-            }
-          ),
+          text: await this.amountConverter.transform(details.balance, {
+            protocol: this.wallet.protocol,
+            maxDigits: this.wallet.protocol.decimals
+          }),
           description: 'delegation-detail.your-balance_label'
         })
 
@@ -282,12 +279,12 @@ export class DelegationDetailPage {
   }
 
   private setupActions(actions: AirGapDelegatorAction[]) {
-    actions.forEach(action => {
+    actions.forEach((action) => {
       this.setupFormForAction(action)
       action.form = this.delegationForms.get(action.type)
 
       if (action.args) {
-        action.args.forEach(arg => {
+        action.args.forEach((arg) => {
           arg.wallet = this.wallet
         })
       }
@@ -303,7 +300,7 @@ export class DelegationDetailPage {
     const formArgs = {}
 
     if (action.args) {
-      action.args.forEach(arg => {
+      action.args.forEach((arg) => {
         formArgs[arg.id] = form ? form.value[arg.id] : null
       })
     }
@@ -312,7 +309,7 @@ export class DelegationDetailPage {
       this.delegationForms.set(action.type, this.formBuilder.group(formArgs))
     } else {
       Object.keys(formArgs)
-        .map(key => [key, formArgs[key]] as [string, any])
+        .map((key) => [key, formArgs[key]] as [string, any])
         .forEach(([key, value]) => form.addControl(key, value))
     }
   }
@@ -351,7 +348,7 @@ export class DelegationDetailPage {
   }
 
   private callAction(actions: AirGapDelegatorAction[], type: string) {
-    const action = actions.find(action => action.type.toString() === type)
+    const action = actions.find((action) => action.type.toString() === type)
     const actionType = action ? action.type : undefined
 
     if (action.disabled) {

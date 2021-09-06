@@ -63,6 +63,7 @@ import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { CoinlibService } from './services/coinlib/coinlib.service'
 import { WalletStorageService } from './services/storage/storage'
+import { SaplingService } from './services/sapling/sapling.service'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -143,6 +144,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     CoinlibService,
     PushProvider,
     PushBackendProvider,
+    SaplingService,
     SerializerService,
     LedgerService,
     ProtocolGuard,

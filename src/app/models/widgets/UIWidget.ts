@@ -90,12 +90,12 @@ export abstract class UIWidget {
       const actions = this.scheduledActions.get(state)
       this.scheduledActions.delete(state)
 
-      actions.forEach(action => action())
+      actions.forEach((action) => action())
     }
   }
 
   private initObservers() {
-    this.state$.subscribe(state => {
+    this.state$.subscribe((state) => {
       this.invokeScheduled(state)
     })
   }
