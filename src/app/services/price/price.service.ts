@@ -97,9 +97,13 @@ export class PriceService implements AirGapWalletPriceService {
       if (rawTransactions && rawTransactions.timestamp > Date.now() - 30 * 60 * 1000 && rawTransactions.value.transactions) {
         resolve(rawTransactions.value)
       } else {
-        const rawTransactions = await wallet.fetchTransactions(100)
-        await this.cachingService.cacheWalletData(wallet, rawTransactions, CachingServiceKey.TRANSACTIONS)
-        resolve(rawTransactions)
+        try {
+          const rawTransactions = await wallet.fetchTransactions(100)
+          await this.cachingService.cacheWalletData(wallet, rawTransactions, CachingServiceKey.TRANSACTIONS)
+          resolve(rawTransactions)
+        } catch (error) {
+          resolve({ transactions: [], cursor: { page: 0 } })
+        }
       }
     })
   }

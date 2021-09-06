@@ -13,7 +13,7 @@ import { TezosKtAddress } from '@airgap/coinlib-core/protocols/tezos/kt/TezosKtA
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
+import { AlertController, LoadingController, NavController, Platform, PopoverController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
 import { Subscription, timer } from 'rxjs'
@@ -52,6 +52,8 @@ export class AccountTransactionListPage {
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
   public infiniteEnabled: boolean = false
+  public infiniteScrollActivated: boolean = false
+  public isDesktop: boolean = false
   public showLinkToBlockExplorer: boolean = false
 
   public txOffset: number = 0
@@ -61,11 +63,17 @@ export class AccountTransactionListPage {
 
   public protocolIdentifier: string
 
-  public hasPendingTransactions: boolean = false
-  public hasExchangeTransactions: boolean = false
-
   public pendingTransactions: IAirGapTransaction[] = []
+
+  public get hasPendingTransactions(): boolean {
+    return this.pendingTransactions.length > 0
+  }
+
   public formattedExchangeTransactions: IAirGapTransaction[] = []
+
+  public get hasExchangeTransactions(): boolean {
+    return this.formattedExchangeTransactions.length > 0
+  }
 
   public accountExtendedDetails: UIAccountExtendedDetails
 
@@ -101,12 +109,15 @@ export class AccountTransactionListPage {
     public readonly dataService: DataService,
     public readonly protocolService: ProtocolService,
     private readonly route: ActivatedRoute,
+    private readonly platform: Platform,
     private readonly storageProvider: WalletStorageService,
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService
   ) {
+    this.isDesktop = this.platform.is('desktop')
+
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
@@ -126,12 +137,11 @@ export class AccountTransactionListPage {
     })
 
     this.subscription = this.timer$.subscribe(async () => {
-      if (this.formattedExchangeTransactions.length > 0) {
+      if (this.hasExchangeTransactions) {
         this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
           this.wallet.protocol.identifier,
           this.wallet.addresses[0]
         )
-        this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
       }
     })
 
@@ -226,34 +236,36 @@ export class AccountTransactionListPage {
     this.loadInitialTransactions().catch(handleErrorSentry())
   }
 
-  public async doInfinite(event: { target: { complete: () => void | PromiseLike<void> } }): Promise<void> {
-    if (!this.infiniteEnabled) {
-      return event.target.complete()
-    }
-
+  public async loadMoreTransactions() {
     const newTransactions: IAirGapTransaction[] = await this.getTransactions(
       this.transactionResult ? this.transactionResult.cursor : undefined,
       this.TRANSACTION_LIMIT
     )
-
-    this.transactions = this.mergeTransactions(this.transactions, newTransactions)
+    
+    this.transactions = this.transactions.concat(newTransactions)
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
 
-    if (newTransactions.length < this.TRANSACTION_LIMIT) {
-      this.infiniteEnabled = false
+    this.infiniteEnabled = newTransactions.length >= this.TRANSACTION_LIMIT
+  }
+
+  public async doInfinite(event?: { target: { complete: () => void | PromiseLike<void> } }): Promise<void> {
+    this.infiniteScrollActivated = true
+    if (!this.infiniteEnabled) {
+      return event.target.complete()
     }
 
+    await this.loadMoreTransactions()
     event.target.complete()
   }
 
-  public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
+  public async loadInitialTransactions(_forceRefresh: boolean = false): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))) || []
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))).slice(0, 10) || []
     }
 
-    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions()
+    const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions(undefined, this.TRANSACTION_LIMIT)
 
     const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch((error) => {
       console.error(error)
@@ -261,8 +273,10 @@ export class AccountTransactionListPage {
       this.showLinkToBlockExplorer = true
       return []
     })
-
-    this.transactions = this.mergeTransactions(forceRefresh ? [] : this.transactions, transactions)
+    
+    if (transactions.length > 0) {
+      this.transactions = transactions
+    }
 
     this.isRefreshing = false
     this.initialTransactionsLoaded = true
@@ -277,7 +291,6 @@ export class AccountTransactionListPage {
       this.wallet.protocol.identifier,
       this.wallet.addresses[0]
     )
-    this.hasExchangeTransactions = this.formattedExchangeTransactions.length > 0
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map((value) => value.hash)
@@ -285,26 +298,20 @@ export class AccountTransactionListPage {
       return txHashes.indexOf(value.hash) === -1
     })
 
-    if (this.pendingTransactions.length > 0) {
+    if (this.hasPendingTransactions) {
       this.pendingTransactions = this.pendingTransactions.map((pendingTx) => {
         pendingTx.fee = new BigNumber(pendingTx.fee).toString(10)
         pendingTx.amount = new BigNumber(pendingTx.amount).toString(10)
 
         return pendingTx
       })
-      this.hasPendingTransactions = true
-    } else {
-      this.hasPendingTransactions = false
-    }
-
-    if (!forceRefresh) {
-      this.accountProvider.triggerWalletChanged()
     }
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
-    this.infiniteEnabled = true
+    this.infiniteEnabled = this.transactions.length >= this.TRANSACTION_LIMIT
+    this.infiniteScrollActivated = false
   }
 
   public async getTransactions(cursor?: IProtocolTransactionCursor, limit: number = 10): Promise<IAirGapTransaction[]> {
@@ -317,43 +324,6 @@ export class AccountTransactionListPage {
 
     this.transactionResult = transactionResult
     return transactionResult.transactions
-  }
-
-  public mergeTransactions(oldTransactions: IAirGapTransaction[], newTransactions: IAirGapTransaction[]): IAirGapTransaction[] {
-    if (!oldTransactions) {
-      return newTransactions
-    }
-
-    const transactionMap: Map<string, IAirGapTransaction> = new Map<string, IAirGapTransaction>(
-      oldTransactions.map((tx: IAirGapTransaction): [string, IAirGapTransaction] => {
-        const key = this.mergeKeyForTransaction(tx)
-        return [key, tx]
-      })
-    )
-
-    const transactionCountBefore: number = transactionMap.size
-    newTransactions.forEach((tx) => {
-      const key = this.mergeKeyForTransaction(tx)
-      transactionMap.set(key, tx)
-    })
-
-    if (transactionCountBefore === transactionMap.size) {
-      // We did not add any elements, so the list does not have to be changed
-      return oldTransactions
-    }
-
-    return Array.from(transactionMap.values()).sort((a, b) =>
-      a.timestamp !== undefined && b.timestamp !== undefined
-        ? b.timestamp - a.timestamp
-        : new BigNumber(b.blockHeight).minus(new BigNumber(a.blockHeight)).toNumber()
-    )
-  }
-
-  private mergeKeyForTransaction(transaction: IAirGapTransaction): string {
-    return `${transaction.hash ? transaction.hash : ''}${transaction.from.reduce((a, b) => a + b, '')}${transaction.to.reduce(
-      (a, b) => a + b,
-      ''
-    )}${transaction.amount}${transaction.fee}${transaction.timestamp ? transaction.timestamp : ''}`
   }
 
   public async presentEditPopover(event: any): Promise<void> {

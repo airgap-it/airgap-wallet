@@ -98,6 +98,10 @@
       [initialTransactionsLoaded]="initialTransactionsLoaded"
       [wallet]="wallet"
     ></transaction-list>
+    <ng-container *ngIf="isDesktop && infiniteEnabled && !infiniteScrollActivated">
+      <ion-button fill="clear" size="small" (click)="loadMoreTransactions()">{{ 'account-transaction-list.load_more' | translate }}</ion-button>
+    </ng-container>
+
     <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>
     </ion-infinite-scroll>
