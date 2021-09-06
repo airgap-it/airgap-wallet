@@ -90,8 +90,6 @@ export class PushProvider {
   }
 
   public async registerWallets(wallets: AirGapMarketWallet[]) {
-    console.log('register wallets')
-
     this.registrationId.pipe(take(1)).subscribe((registrationId) => {
       const languageCode: string = this.translate.getBrowserCultureLang()
 
@@ -112,8 +110,6 @@ export class PushProvider {
   }
 
   public async unregisterWallets(wallets: AirGapMarketWallet[]) {
-    console.log('unregister wallets')
-
     this.registrationId.pipe(take(1)).subscribe((registrationId) => {
       wallets.forEach((wallet) => {
         this.unregisterWallet(wallet, registrationId)

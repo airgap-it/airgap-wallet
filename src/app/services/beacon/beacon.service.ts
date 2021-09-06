@@ -295,7 +295,7 @@ export class BeaconService {
           : error.message
     } catch {}
 
-    console.log('error.message', errorMessage)
+    console.error('error.message', errorMessage)
 
     await this.respond(response, request)
     await this.displayErrorPage({
