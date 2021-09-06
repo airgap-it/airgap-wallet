@@ -155,8 +155,6 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     nominationDetails: MoonbeamNominationDetails,
     collator: string
   ): Promise<AirGapDelegatorAction | null> {
-    this.translateService
-    this.createMainDelegatorAction
     const { nominatorDetails } = nominationDetails
     const maxDelegationAmount = await protocol
       .estimateMaxDelegationValueFromAddress(nominatorDetails.address)
