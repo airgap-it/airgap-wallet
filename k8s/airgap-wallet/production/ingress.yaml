@@ -11,8 +11,17 @@ spec:
     - hosts:
         - __CI_PROJECT_NAME__.prod.gke.papers.tech
       secretName: __CI_PROJECT_NAME__-prod-tls
+    - hosts:
+        - wallet.airgap.it
+      secretName: wallet-airgap-it-prod-tls
   rules:
     - host: __CI_PROJECT_NAME__.prod.gke.papers.tech
+      http:
+        paths:
+          - backend:
+              serviceName: __CI_PROJECT_NAME__
+              servicePort: 80
+    - host: wallet.airgap.it
       http:
         paths:
           - backend:
