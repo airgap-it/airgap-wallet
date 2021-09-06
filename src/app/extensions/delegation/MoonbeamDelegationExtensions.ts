@@ -155,8 +155,6 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     nominationDetails: MoonbeamNominationDetails,
     collator: string
   ): Promise<AirGapDelegatorAction | null> {
-    this.translateService
-    this.createMainDelegatorAction
     const { nominatorDetails } = nominationDetails
     const maxDelegationAmount = await protocol
       .estimateMaxDelegationValueFromAddress(nominatorDetails.address)
@@ -259,11 +257,9 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
         protocol.decimals
       )
 
-      const {
-        address: collatorArgName,
-        amount: amountArgName,
-        amountControl: amountControlArgName
-      } = this.resolveMainArgumentNames(action.type)
+      const { address: collatorArgName, amount: amountArgName, amountControl: amountControlArgName } = this.resolveMainArgumentNames(
+        action.type
+      )
 
       let controls = {
         [collatorArgName]: collator

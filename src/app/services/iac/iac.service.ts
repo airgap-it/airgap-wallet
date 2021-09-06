@@ -109,8 +109,6 @@ export class IACService extends BaseIACService {
       })
     )
 
-    console.log(accountSyncs)
-
     if (this.router) {
       this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
       this.router.navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

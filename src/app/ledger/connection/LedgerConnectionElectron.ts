@@ -1,5 +1,7 @@
 // tslint:disable: max-classes-per-file
 import Transport from '@ledgerhq/hw-transport'
+import { DeviceModel } from '@ledgerhq/hw-transport/node_modules/@ledgerhq/devices'
+import { EventEmitter } from 'events'
 
 import {
   ExchangeMessageReply,
@@ -12,6 +14,12 @@ import {
 import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from './LedgerConnection'
 
 class TransportElectron implements Transport {
+  exchangeTimeout = 30000
+  unresponsiveTimeout = 15000
+  deviceModel: DeviceModel | null | undefined = null
+  _events = new EventEmitter()
+  _appAPIlock: string | null = null
+
   constructor(private readonly id: string, private readonly bridge: LedgerElectronBridge) {}
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer, _statusList?: readonly number[]): Promise<Buffer> {
@@ -99,8 +107,29 @@ class TransportElectron implements Transport {
     throw new Error('Method not implemented.')
   }
 
-  public setDebugMode(_debug: boolean | ((log: string) => void)): void {
+  public emit(event: string, ...args: any): void {
+    this._events.emit(event, ...args)
+  }
+
+  public setDebugMode(): void {
     // not needed
+    throw new Error('Method not implemented.')
+  }
+  public setExchangeUnresponsiveTimeout(unresponsiveTimeout: number): void {
+    this.unresponsiveTimeout = unresponsiveTimeout
+  }
+  public exchangeBusyPromise: Promise<void> | null | undefined
+
+  public exchangeAtomicImpl = async (_f: () => Promise<Buffer | void>): Promise<Buffer | void> => {
+    throw new Error('Method not implemented.')
+  }
+
+  public decorateAppAPIMethod<R, A extends any[]>(
+    _methodName: string,
+    _f: (...args: A) => Promise<R>,
+    _ctx: any,
+    _scrambleKey: string
+  ): (...args: A) => Promise<R> {
     throw new Error('Method not implemented.')
   }
 }

@@ -2,12 +2,13 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { IonSlides } from '@ionic/angular'
-import { AirGapMarketWallet, getProtocolByIdentifier, ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
 import { promiseRetry } from '../../helpers/promise'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { AccountSync } from 'src/app/types/AccountSync'
 
 @Component({
   selector: 'page-account-import-ledger-onboarding',
@@ -50,8 +51,6 @@ export class AccountImportLedgerOnboardingPage {
     private readonly dataService: DataService,
     private readonly ledgerService: LedgerService
   ) {
-    const protocolID: ProtocolSymbols = this.route.snapshot.params.protocolID
-    this.protocol = getProtocolByIdentifier(protocolID)
     this.init()
   }
 
@@ -129,7 +128,13 @@ export class AccountImportLedgerOnboardingPage {
               this.isLoading = false
               this.isSuccess = true
 
-              this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, wallet)
+              const accountSyncs: AccountSync[] = [
+                {
+                  wallet
+                }
+              ]
+
+              this.dataService.setData(DataServiceKey.SYNC_ACCOUNTS, accountSyncs)
               this.router
                 .navigateByUrl(`/account-import/${DataServiceKey.SYNC_ACCOUNTS}`)
                 .catch(handleErrorSentry(ErrorCategory.NAVIGATION))

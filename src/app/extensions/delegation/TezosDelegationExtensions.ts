@@ -241,7 +241,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     label: string,
     form?: FormGroup
   ): AirGapDelegatorAction | null {
-    const action = availableActions.find(action => types.includes(action.type))
+    const action = availableActions.find((action) => types.includes(action.type))
 
     return action
       ? {
@@ -264,7 +264,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
     return new UIRewardList({
       rewards: await Promise.all(
-        rewardInfo.map(async info => {
+        rewardInfo.map(async (info) => {
           return {
             index: info.cycle,
             amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {

@@ -241,7 +241,7 @@ export class AccountTransactionListPage {
       this.transactionResult ? this.transactionResult.cursor : undefined,
       this.TRANSACTION_LIMIT
     )
-    
+
     this.transactions = this.transactions.concat(newTransactions)
 
     await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
@@ -262,7 +262,8 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(_forceRefresh: boolean = false): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))).slice(0, 10) || []
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
+        []
     }
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions(undefined, this.TRANSACTION_LIMIT)
@@ -273,7 +274,7 @@ export class AccountTransactionListPage {
       this.showLinkToBlockExplorer = true
       return []
     })
-    
+
     if (transactions.length > 0) {
       this.transactions = transactions
     }

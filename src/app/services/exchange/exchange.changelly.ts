@@ -137,9 +137,7 @@ class ChangellyApi {
 
   public async makeJsonRpcCall<T, R>(method: string, params: T): Promise<R> {
     const wrapper: JsonRpcWrapper<T> = {
-      id: Math.random()
-        .toString(36)
-        .substring(6),
+      id: Math.random().toString(36).substring(6),
       jsonrpc: '2.0',
       method,
       params

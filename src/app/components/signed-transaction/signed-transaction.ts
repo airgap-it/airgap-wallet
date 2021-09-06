@@ -112,7 +112,7 @@ export class SignedTransactionComponent implements OnChanges {
 
       const txDetails: IAirGapTransaction[] = await tezosProtocol.getTransactionDetailsFromSigned(transaction)
       const recipients: string[] = txDetails
-        .map(details => details.to)
+        .map((details) => details.to)
         .reduce((flatten: string[], next: string[]) => flatten.concat(next), [])
 
       return recipients.includes(saplingProtocol.options.config.contractAddress)

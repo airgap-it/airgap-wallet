@@ -45,22 +45,22 @@ export class AccountAddPage {
 
   public async ionViewWillEnter() {
     this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
-      protocol => protocol.options.network.type === NetworkType.MAINNET
+      (protocol) => protocol.options.network.type === NetworkType.MAINNET
     )
     const supportedSubAccountProtocols = Array.prototype.concat.apply(
       [],
-      await Promise.all(Object.values(MainProtocolSymbols).map(protocol => this.protocolService.getSubProtocols(protocol)))
+      await Promise.all(Object.values(MainProtocolSymbols).map((protocol) => this.protocolService.getSubProtocols(protocol)))
     )
 
     this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
-      protocol =>
+      (protocol) =>
         this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
         protocol.options.network.type === NetworkType.MAINNET &&
         protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
-      protocol =>
+      (protocol) =>
         !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
         protocol.options.network.type === NetworkType.MAINNET &&
         protocol.identifier !== SubProtocolSymbols.XTZ_KT
@@ -76,13 +76,13 @@ export class AccountAddPage {
     const lowerCaseSearchTerm = this.searchTerm.toLowerCase()
 
     this.filteredAccountProtocols = this.supportedAccountProtocols.filter(
-      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+      (protocol) => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
     this.filteredFeaturedSubAccountProtocols = this.featuredSubAccountProtocols.filter(
-      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+      (protocol) => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
     this.filteredOtherSubAccountProtocols = this.otherSubAccountProtocols.filter(
-      protocol => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
+      (protocol) => protocol.name.toLowerCase().includes(lowerCaseSearchTerm) || protocol.symbol.toLowerCase().includes(lowerCaseSearchTerm)
     )
   }
 
@@ -101,14 +101,14 @@ export class AccountAddPage {
       this.accountProvider
         .getWalletList()
         .filter(
-          wallet =>
+          (wallet) =>
             wallet.protocol.identifier === mainProtocolIdentifier &&
             wallet.protocol.options.network.identifier === subProtocol.options.network.identifier
         ).length > 0
     ) {
       this.router
         .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}/${subProtocol.options.network.identifier}`)
-        .catch(err => console.error(err))
+        .catch((err) => console.error(err))
     } else {
       this.router
         .navigateByUrl(`/account-import-onboarding/${DataServiceKey.PROTOCOL}/${subProtocol.identifier}`)

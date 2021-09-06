@@ -70,7 +70,7 @@ export class ExchangeConfirmPage {
       this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
     }
 
-    this.exchangeProvider.getActiveExchange().subscribe(exchange => {
+    this.exchangeProvider.getActiveExchange().subscribe((exchange) => {
       this.activeExchange = exchange
     })
   }

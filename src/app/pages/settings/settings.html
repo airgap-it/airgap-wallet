@@ -40,7 +40,7 @@
         <ion-icon name="logo-github" slot="start"></ion-icon>
         {{ 'settings.github_label' | translate }}
       </ion-item>
-      <ion-item (click)="about()" detail="true">
+      <ion-item *ngIf="platform !== 'web'" (click)="about()" detail="true">
         <ion-icon name="information-circle-outline" slot="start"></ion-icon>
         {{ 'settings.about_label' | translate }}
       </ion-item>
