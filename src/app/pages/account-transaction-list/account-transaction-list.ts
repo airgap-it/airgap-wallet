@@ -262,7 +262,7 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(_forceRefresh: boolean = false): Promise<void> {
     if (this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet))).slice(0, 10) ||
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
         []
     }
 
