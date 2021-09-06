@@ -24,7 +24,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   ) {
     const alreadyLoaded = this.extensionProperitesWithType
       .map(([propertyKey, _]) => this.hasProperty(protocol, propertyKey))
-      .some(hasProperty => hasProperty)
+      .some((hasProperty) => hasProperty)
 
     if (!alreadyLoaded) {
       const extensions = await extensionFactory()
@@ -64,7 +64,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
 
   private static extendWithFunction(target: any, owner: any, propertyKey: string) {
     if (owner[propertyKey] !== undefined) {
-      target.prototype[propertyKey] = function(...args) {
+      target.prototype[propertyKey] = function (...args) {
         return owner[propertyKey](this, ...args)
       }
     }
@@ -86,9 +86,9 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
   }
 
   public async createDelegateesSummary(protocol: T, delegatees: string[]): Promise<UIAccountSummary[]> {
-    const delegateesDetails = await Promise.all(delegatees.map(delegatee => protocol.getDelegateeDetails(delegatee)))
+    const delegateesDetails = await Promise.all(delegatees.map((delegatee) => protocol.getDelegateeDetails(delegatee)))
     return delegateesDetails.map(
-      details =>
+      (details) =>
         new UIAccountSummary({
           address: details.address,
           header: [details.name, ''],

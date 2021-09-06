@@ -130,7 +130,7 @@ export class AccountEditPopoverComponent implements OnInit {
         },
         {
           text: 'Ok',
-          handler: async data => {
+          handler: async (data) => {
             await this.walletsProvider.setWalletNetwork(this.wallet, this.networks[data] as TezosProtocolNetwork)
             this.cdr.detectChanges()
             await this.dismissPopover()

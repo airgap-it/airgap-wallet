@@ -89,7 +89,7 @@ export class CoinlibService {
     const bakersResponse: TezosBakerCollection = await this.httpClient
       .get<TezosBakerCollection>(`${COIN_LIB_SERVICE}/api/v1/tz/bakers?acceptsDelegations=true`)
       .toPromise()
-      .catch(error => {
+      .catch((error) => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
 
         return {}
@@ -111,7 +111,7 @@ export class CoinlibService {
     const validatorsResponse: CosmosValidatorDetails[] = await this.httpClient
       .get<CosmosValidatorDetails[]>(`${COIN_LIB_SERVICE}/api/v1/cosmos/validators`)
       .toPromise()
-      .catch(error => {
+      .catch((error) => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
 
         return []
@@ -141,7 +141,7 @@ export class CoinlibService {
     const apiHealth: ApiHealth[] = await this.httpClient
       .get<ApiHealth[]>(`${COIN_LIB_SERVICE}/api/v1/health`)
       .toPromise()
-      .catch(error => {
+      .catch((error) => {
         handleErrorSentry(ErrorCategory.OTHER)(error)
         return []
       })

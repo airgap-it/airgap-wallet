@@ -34,14 +34,11 @@ export class ScanAddressPage extends ScanBasePage {
   }
 
   public checkScan(resultString: string): void {
-    console.log('got new text', resultString)
-
     this.handleQRScanned(resultString)
   }
 
   public handleQRScanned(text: string): void {
     if (!this.callbackCalled) {
-      console.log('scan callback', text)
       this.callbackCalled = true
       if (this.platform.is('hybrid')) {
         this.scanner.destroy()

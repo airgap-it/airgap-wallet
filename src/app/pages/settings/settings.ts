@@ -1,8 +1,8 @@
 import { ClipboardService, SerializerService, IACMessageTransport } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
-import { SharePlugin } from '@capacitor/core'
-import { AlertController, ModalController, Platform } from '@ionic/angular'
+import { Capacitor, SharePlugin } from '@capacitor/core'
+import { AlertController, ModalController } from '@ionic/angular'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -15,8 +15,9 @@ import { IntroductionPage } from '../introduction/introduction'
   templateUrl: 'settings.html'
 })
 export class SettingsPage {
+  public readonly platform: string = Capacitor.getPlatform()
+
   constructor(
-    public readonly platform: Platform,
     public readonly alertCtrl: AlertController,
     public readonly serializerService: SerializerService,
     private readonly router: Router,

@@ -61,7 +61,7 @@ export class UIOptionButtonGroup extends UIInputWidget<string> {
     if (!formControl) {
       return
     }
-    
+
     formControl.valueChanges.subscribe((auxValue) => {
       if (auxValue) {
         const value: string = this.customInput?.controlValueToValue ? this.customInput.controlValueToValue(auxValue) : auxValue

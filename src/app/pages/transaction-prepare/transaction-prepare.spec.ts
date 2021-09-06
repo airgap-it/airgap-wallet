@@ -133,7 +133,7 @@ describe('TransactionPrepare Page', () => {
   it('should only give an error if the amount has more than the allowed digits', () => {
     component.wallet = ethWallet
     const validAmounts = [19, 108, 4.345234523452345, 0.0000000000000001, 0.0000000000000001]
-    validAmounts.forEach(validAmount => {
+    validAmounts.forEach((validAmount) => {
       component.transactionForm.controls.amount.setValue(validAmount)
       fixture.detectChanges()
 
@@ -141,7 +141,7 @@ describe('TransactionPrepare Page', () => {
     })
 
     const invalidAmounts = [0.0000000000000000001, -1.24]
-    invalidAmounts.forEach(invalidAmount => {
+    invalidAmounts.forEach((invalidAmount) => {
       component.wallet = ethWallet
       component.transactionForm.controls.amount.setValue(invalidAmount)
       fixture.detectChanges()

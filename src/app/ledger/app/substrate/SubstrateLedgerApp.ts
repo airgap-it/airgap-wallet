@@ -7,8 +7,7 @@ import {
 } from '@airgap/coinlib-core/protocols/substrate/compat/SubstrateCompatSignature'
 import { RawSubstrateTransaction } from '@airgap/coinlib-core/serializer/types'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
-import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-polkadot'
-import { Buffer } from 'buffer'
+import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-substrate'
 
 import { ReturnCode } from '../../ReturnCode'
 import { LedgerApp } from '../LedgerApp'

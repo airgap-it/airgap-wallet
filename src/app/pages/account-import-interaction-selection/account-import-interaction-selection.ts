@@ -12,15 +12,16 @@ export enum AccountImportInteractionType {
   styleUrls: ['./account-import-interaction-selection.scss']
 })
 export class AccountInteractionSelectionPage {
-  private readonly callback: (interactionType: AccountImportInteractionType) => void
+  private callback: (interactionType: AccountImportInteractionType) => void
 
-  constructor(private readonly route: ActivatedRoute) {
+  constructor(private readonly route: ActivatedRoute) {}
+
+  public ionViewWillEnter() {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.callback = info.callback
     }
   }
-
   public selectVault(): void {
     this.select(AccountImportInteractionType.VAULT)
   }

@@ -37,7 +37,7 @@ export class HealthCheckPage {
   constructor(
     private readonly coinlibService: CoinlibService,
     private readonly loadingController: LoadingController,
-    private readonly translateService: TranslateService,
+    private readonly translateService: TranslateService
   ) {
     this.items = [
       this.generateCheckItem('Tezos', MainProtocolSymbols.XTZ, ApiType.NODE),
