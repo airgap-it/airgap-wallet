@@ -160,7 +160,9 @@ describe('TransactionPrepare Page', () => {
 
     await component.prepareTransaction()
     expect((component as any).operationsProvider.prepareTransaction).toHaveBeenCalledTimes(1)
-    expect((component as any).router.navigateByUrl).toHaveBeenCalledWith('/interaction-selection/interaction') /*
+    expect((component as any).router.navigateByUrl).toHaveBeenCalledWith(
+      '/interaction-selection/interaction'
+    ) /*
     // should create a loadingCtrl
     expect((component as any).loadingCtrl.create).toHaveBeenCalled()
 
