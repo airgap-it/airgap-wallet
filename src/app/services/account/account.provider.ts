@@ -473,7 +473,6 @@ export class AccountProvider {
       this.setActiveGroup(walletGroup)
       this.walletGroups$.next(this.allWalletGroups)
       this.drawChartProvider.drawChart()
-      console.log('DRAW CHART activateWallet')
 
       return this.persist()
     }
@@ -508,7 +507,6 @@ export class AccountProvider {
           : this.allWalletGroups[0]
       this.setActiveGroup(activeGroup)
       this.walletGroups$.next(this.allWalletGroups)
-      console.log('DRAW CHART removeWallet')
 
       this.drawChartProvider.drawChart()
 
