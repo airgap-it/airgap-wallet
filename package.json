@@ -30,7 +30,7 @@
     "e2e-update": "webdriver-manager update --standalone false --gecko false",
     "postinstall": "node config/patch_crypto.js && npm run browserify-coinlib && jetifier && node apply-diagnostic-modules.js",
     "browserify-coinlib": "browserify ./node_modules/@airgap/coinlib-core/index.js -s airgapCoinLib -o ./src/assets/libs/airgap-coin-lib.browserify.js",
-    "prettier": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "prettier": "prettier --write \"src/**/*.ts\" \"src/**/*.js\" \"e2e/**/*.ts\" \"angular.json\" \"README.md\"",
     "remove-sapling": "replace './assets/sapling/sapling-' './assets/no-sapling-web/sapling-' ./src/app/app.component.ts",
     "electron": "npm --prefix electron/ run start",
     "electron:install": "npm --prefix electron/ install --",

@@ -1,7 +1,6 @@
 export const accounts = [
   {
-    sync:
-      'airgap-wallet://?d=AerPyFXzb1kpQPp59Mug3kmKpYfPahzZ1jTW4ykyuaJcVLXeuEvLGCiEr3Fxi8H4P9513SA5RjGN87sGFWmZJ2ZoJCy8bjbJV6RthWtJpjYR4n5Ei8ahAuAWUpogSiasEK6KBhHnE',
+    sync: 'airgap-wallet://?d=AerPyFXzb1kpQPp59Mug3kmKpYfPahzZ1jTW4ykyuaJcVLXeuEvLGCiEr3Fxi8H4P9513SA5RjGN87sGFWmZJ2ZoJCy8bjbJV6RthWtJpjYR4n5Ei8ahAuAWUpogSiasEK6KBhHnE',
     toAddress: 'ak_gxMtcfvnd7aN9XdpmdNgRRETnLL4TNQ4uJgyLzcbBFa3vx6Da',
     symbol: 'AE',
     shortAddress: 'ak_gx...vx6Da',
