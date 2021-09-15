@@ -1,29 +1,26 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { MainProtocolSymbols, TezosShieldedTezProtocol } from '@airgap/coinlib-core'
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-
-import { WalletStorageKey, WalletStorageService } from '../storage/storage'
-import { HttpClient } from '@angular/common/http'
-import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaplingService {
+  private isInitialized: boolean = false
+
   constructor(
     private readonly protocolService: ProtocolService,
     private readonly platform: Platform,
-    private readonly httpClient: HttpClient,
-    private readonly storageProvider: WalletStorageService
+    private readonly httpClient: HttpClient
   ) {}
 
   public async initSapling() {
-    const initialized = await this.storageProvider.get(WalletStorageKey.SAPLING_INITIALIZED)
-    if (!initialized) {
+    if (!this.isInitialized) {
       const shieldedTezProtocol = (await this.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)) as TezosShieldedTezProtocol
       await shieldedTezProtocol.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
-      this.storageProvider.set(WalletStorageKey.SAPLING_INITIALIZED, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+      this.isInitialized = true
     }
   }
 
