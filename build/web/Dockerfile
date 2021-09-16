@@ -7,6 +7,8 @@ WORKDIR /app
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app
 COPY package-lock.json /app
+COPY config /app/config
+COPY apply-diagnostic-modules.js /app
 
 # install dependencies
 RUN npm install
