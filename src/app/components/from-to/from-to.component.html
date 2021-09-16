@@ -1,0 +1,46 @@
+<ng-container *ngFor="let transaction of transactions">
+  <airgap-from-to [transaction]="transaction"></airgap-from-to>
+</ng-container>
+
+<ng-container *ngIf="wrappedOperation !== undefined">
+  <ion-row class="rawdata--container ion-padding-bottom ion-margin-bottom">
+    <ion-col class="ion-no-padding">
+      <ion-item class="ion-no-padding" lines="none">
+        <ion-label>Change Fees</ion-label>
+        <ion-toggle [(ngModel)]="advanced" slot="end" (ngModelChange)="initForms()"></ion-toggle>
+      </ion-item>
+
+      <ng-container *ngIf="advanced && formGroup !== undefined && operationControls !== undefined">
+        <ng-container *ngFor="let wrappedOperation of operationControls.controls; let i = index">
+          <h6 *ngIf="operationControls && operationControls.length > 1">
+            <span class="style__strong color__primary">Operation #{{ i + 1 }}</span>
+          </h6>
+          <form [formGroup]="wrappedOperation" class="ion-padding-bottom">
+            <ion-row class="padding-top">
+              <ion-col size="4">
+                <ion-item mode="md" color="light">
+                  <ion-label class="ion-no-margin" position="stacked">Fee</ion-label>
+                  <ion-input type="text" formControlName="fee" id="fee"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size="4">
+                <ion-item mode="md" color="light">
+                  <ion-label class="ion-no-margin" position="stacked">Gas Limit</ion-label>
+                  <ion-input mode="md" type="number" formControlName="gasLimit" id="gas_limit"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size="4">
+                <ion-item mode="md" color="light">
+                  <ion-label class="ion-no-margin" position="stacked">Storage Limit</ion-label>
+                  <ion-input mode="md" type="number" formControlName="storageLimit" id="storage_limit"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </form>
+        </ng-container>
+
+        <ion-button color="primary" (click)="updateOperationGroup()" [disabled]="formGroup.invalid">Update</ion-button>
+      </ng-container>
+    </ion-col>
+  </ion-row>
+</ng-container>

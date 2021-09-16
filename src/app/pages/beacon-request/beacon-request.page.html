@@ -60,9 +60,12 @@
       </div>
 
       <div *ngIf="request.type === 'operation_request'" class="ion-padding-top">
-        <ng-container *ngFor="let transaction of transactions">
-          <airgap-from-to [transaction]="transaction"></airgap-from-to>
-        </ng-container>
+        <beacon-from-to
+          [transactions]="transactions"
+          [wrappedOperation]="wrappedOperation"
+          (onWrappedOperationUpdate)="updateWrappedOperation($event)"
+        ></beacon-from-to>
+
         <ng-container *ngIf="!transactions || (transactions && transactions.length === 0)">
           <ion-row class="ion-padding-horizontal">
             <p>Preparing operation...</p>

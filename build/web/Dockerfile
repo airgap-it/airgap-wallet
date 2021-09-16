@@ -1,4 +1,4 @@
-FROM node:14.5.0 as build
+FROM node:15.14.0 as build
 
 # create app directory
 RUN mkdir /app
