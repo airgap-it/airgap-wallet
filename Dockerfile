@@ -1,4 +1,4 @@
-FROM node:14.5.0
+FROM node:15.14.0
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential libxtst6
@@ -27,6 +27,8 @@ WORKDIR /app
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app
 COPY package-lock.json /app
+COPY config /app/config
+COPY apply-diagnostic-modules.js /app
 
 # install dependencies
 RUN npm install
