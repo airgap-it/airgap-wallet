@@ -12,7 +12,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
 import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
-import { map } from 'rxjs/operators'
+import { map, take } from 'rxjs/operators'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -163,6 +163,7 @@ export class PortfolioPage {
 
     this.subscription = allWalletsSynced.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+      this.wallets.pipe(take(1)).subscribe(wallets => this.refreshWalletGroups(wallets))
     })
   }
 
