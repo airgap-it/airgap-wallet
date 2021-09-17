@@ -1,8 +1,8 @@
 import {
+  AddressService,
   AppInfoPlugin,
   APP_INFO_PLUGIN,
   APP_PLUGIN,
-  AddressService,
   ExternalAliasResolver,
   IACMessageTransport,
   LanguageService,
@@ -30,11 +30,11 @@ import {
   TezosSaplingExternalMethodProvider,
   TezosShieldedTezProtocol
 } from '@airgap/coinlib-core'
+import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
 import {
   TezosSaplingProtocolOptions,
   TezosShieldedTezProtocolConfig
 } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
-import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
@@ -49,8 +49,8 @@ import { PushProvider } from './services/push/push'
 import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
-import { generateGUID } from './utils/utils'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
+import { generateGUID } from './utils/utils'
 
 @Component({
   selector: 'app-root',

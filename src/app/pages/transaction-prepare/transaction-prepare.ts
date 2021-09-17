@@ -1,30 +1,29 @@
 import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
-import { Component, NgZone } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController } from '@ionic/angular'
 import {
   AirGapMarketWallet,
   EthereumProtocol,
+  IACMessageType,
   MainProtocolSymbols,
   SubProtocolSymbols,
-  IACMessageType,
   TezosProtocol
 } from '@airgap/coinlib-core'
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { Component, NgZone } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
+import { LoadingController } from '@ionic/angular'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { AccountProvider } from 'src/app/services/account/account.provider'
-import { PriceService } from 'src/app/services/price/price.service'
 
+import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
+import { PriceService } from '../../services/price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AddressValidator } from '../../validators/AddressValidator'
 import { DecimalValidator } from '../../validators/DecimalValidator'
-import { SaplingService } from 'src/app/services/sapling/sapling.service'
 
 interface TransactionFormState<T> {
   value: T
@@ -91,7 +90,6 @@ export class TransactionPreparePage {
     private readonly dataService: DataService,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly priceService: PriceService,
-    private readonly saplingService: SaplingService,
     private readonly addressService: AddressService,
     public readonly accountProvider: AccountProvider
   ) {
@@ -129,9 +127,6 @@ export class TransactionPreparePage {
     this.ignoreExistentialDeposit = this.isSubstrate ? true : undefined
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
-    if (this.isSapling) {
-      this.saplingService.initSapling()
-    }
 
     this.initState()
       .then(async () => {

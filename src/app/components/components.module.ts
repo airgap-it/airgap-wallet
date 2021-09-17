@@ -21,6 +21,7 @@ import { DelegateActionPopoverComponent } from './delegate-action-popover/delega
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FeeComponent } from './fee/fee.component'
+import { FromToComponent } from './from-to/from-to.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
@@ -58,6 +59,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TransactionListComponent,
     TransactionItemComponent,
     FeeComponent,
+    FromToComponent,
 
     WidgetSelector,
     WidgetAccount,
@@ -101,6 +103,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TransactionListComponent,
     TransactionItemComponent,
     FeeComponent,
+    FromToComponent,
 
     WidgetSelector,
     WidgetAccount,

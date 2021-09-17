@@ -3,8 +3,8 @@ import { SaplingPartialOutputDescription, SaplingUnsignedSpendDescription } from
 import { Inject, Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
 
-import { SAPLING_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 import { SaplingPlugin } from '../../capacitor-plugins/definitions'
+import { SAPLING_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 
 @Injectable({
   providedIn: 'root'

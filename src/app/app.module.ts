@@ -7,6 +7,7 @@ import {
   ClipboardService,
   CLIPBOARD_PLUGIN,
   DeeplinkService,
+  FeeConverterPipe,
   PermissionsService,
   PERMISSIONS_PLUGIN,
   QrScannerService,
@@ -150,7 +151,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ProtocolGuard,
     ServiceKeyGuard,
     TransactionHashGuard,
-    PercentPipe
+    PercentPipe,
+    FeeConverterPipe
   ],
   bootstrap: [AppComponent]
 })
