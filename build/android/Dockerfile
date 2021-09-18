@@ -23,6 +23,8 @@ RUN n 15.14.0
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
+COPY config /app/config
+COPY apply-diagnostic-modules.js /app
 
 # install dependencies
 RUN npm i
