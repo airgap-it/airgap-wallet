@@ -273,7 +273,7 @@
   },
   "account-activate": {
     "title": "Add Accounts",
-    "message": "Select <strong>{{ protocol }}</strong> accounts to add. TODO: import more from AirGap Vault",
+    "message": "Select <strong>{{ protocol }}</strong> accounts to add.",
     "add-accounts_label": "Add Accounts"
   },
   "signed-transaction": {
