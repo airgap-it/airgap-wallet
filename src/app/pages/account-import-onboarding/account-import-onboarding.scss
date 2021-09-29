@@ -17,7 +17,7 @@ ion-slides {
 .sub-protocol__container {
   min-height: 200px;
   img {
-    height: 56px;
+    width: 56px !important;
   }
   ion-col:nth-child(2) {
     padding-bottom: 46px;
