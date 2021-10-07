@@ -314,15 +314,9 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const requiredFee = new BigNumber(protocol.feeDefaults.low).shiftedBy(protocol.feeDecimals)
     const maxDelegationAmount = availableBalance.minus(requiredFee.times(2))
 
-    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
-      protocol,
-      maxDigits: protocol.decimals
-    })
+    const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
 
-    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, {
-      protocol,
-      maxDigits: protocol.decimals
-    })
+    const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, { protocol })
 
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
@@ -357,10 +351,7 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     validator: string,
     delegatedAmount: BigNumber
   ): Promise<AirGapDelegatorAction | null> {
-    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
-      protocol,
-      maxDigits: protocol.decimals
-    })
+    const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, { protocol })
 
     const description = this.translateService.instant('delegation-detail-cosmos.undelegate.text', { delegated: delegatedAmountFormatted })
 
@@ -389,15 +380,9 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const action = availableActions.find((action) => types.includes(action.type))
 
     if (action && maxAmount.gte(minAmount)) {
-      const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(
-        maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        protocol.decimals
-      )
+      const maxAmountFormatted = maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
 
-      const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
-        minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        protocol.decimals
-      )
+      const minAmountFormatted = minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
 
       const form = this.formBuilder.group({
         [ArgumentName.VALIDATOR]: validator,
