@@ -247,15 +247,9 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     const action = availableActions.find((action) => types.includes(action.type))
 
     if (action && maxAmount.gte(minAmount)) {
-      const maxAmountFormatted = this.amountConverterPipe.formatBigNumber(
-        maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        protocol.decimals
-      )
+      const maxAmountFormatted = maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
 
-      const minAmountFormatted = this.amountConverterPipe.formatBigNumber(
-        minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals),
-        protocol.decimals
-      )
+      const minAmountFormatted = minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
 
       const { address: collatorArgName, amount: amountArgName, amountControl: amountControlArgName } = this.resolveMainArgumentNames(
         action.type
