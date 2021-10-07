@@ -5,6 +5,7 @@ self.importScripts("../libs/airgap-coin-lib.browserify.js");
 
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.AeternityProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.BitcoinProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.BitcoinSegwitProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.EthereumProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.GroestlcoinProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.TezosProtocol())
