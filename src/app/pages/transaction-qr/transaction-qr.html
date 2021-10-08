@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
       </ion-buttons>
-      <ion-title *ngIf="wallet">{{ 'transaction-qr.title' | translate: { title: wallet.protocol.symbol } }}</ion-title>
+      <ion-title>{{ 'transaction-qr.title' | translate}}</ion-title>
     </ion-toolbar>
   </ion-grid>
 </ion-header>
@@ -68,9 +68,13 @@
       </ion-row>
     </ng-container>
   </ion-grid>
+
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button id="done" size="default" color="primary" (click)="done()" shape="round">
       {{ 'transaction-qr.done_label' | translate }}
+    </ion-button>
+    <ion-button id="done" size="default" color="secondary" (click)="scanQr()" shape="round">
+      {{ 'transaction-qr.scan_qr_label' | translate }}
     </ion-button>
   </ion-fab>
 </ion-content>

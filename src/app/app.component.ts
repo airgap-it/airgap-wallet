@@ -262,7 +262,7 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: ''
+      [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk'
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

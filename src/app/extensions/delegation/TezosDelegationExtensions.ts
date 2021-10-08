@@ -51,7 +51,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
 
   public airGapDelegatee(protocol: TezosProtocol): string | undefined {
     if (protocol.options.network.type !== NetworkType.MAINNET) {
-      return 'tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17'
+      return 'tz1aWXP237BLwNHJcCD4b3DutCevhqq2T1Z9'
     }
 
     return 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'

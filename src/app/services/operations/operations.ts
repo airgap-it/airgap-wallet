@@ -63,7 +63,7 @@ export class OperationsProvider {
     private readonly toastController: ToastController,
     private readonly formBuilder: FormBuilder,
     private readonly protocolService: ProtocolService,
-    private readonly saplingService: SaplingService,
+    private readonly saplingService: SaplingService
   ) {}
 
   public async getDelegateesSummary(wallet: AirGapMarketWallet, delegatees: string[]): Promise<UIAccountSummary[]> {
@@ -455,7 +455,13 @@ export class OperationsProvider {
         if (wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED) {
           await this.saplingService.initSapling()
         }
-
+        if (wallet.protocol.identifier === MainProtocolSymbols.BTC_SEGWIT) {
+          // data could already contain "replaceByFee"
+          if (!data) {
+            data = {}
+          }
+          data.masterFingerprint = wallet.masterFingerprint
+        }
         unsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
         airGapTxs = await wallet.protocol.getTransactionDetails({
           publicKey: wallet.publicKey,

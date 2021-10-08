@@ -53,9 +53,9 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.18",
+    "@airgap/angular-core": "0.0.19",
     "@airgap/beacon-sdk": "2.2.10",
-    "@airgap/coinlib-core": "0.11.14",
+    "@airgap/coinlib-core": "0.12.0",
     "@airgap/sapling-wasm": "0.0.6",
     "@angular/animations": "^11.2.9",
     "@angular/common": "^11.2.9",
@@ -76,6 +76,7 @@
     "@ionic/angular": "5.6.4",
     "@ionic/core": "5.6.4",
     "@ionic/storage": "^2.2.0",
+    "@keystonehq/bc-ur-registry": "0.4.4",
     "@ledgerhq/hw-transport": "^6.2.0",
     "@ledgerhq/hw-transport-http": "^6.3.0",
     "@ledgerhq/hw-transport-u2f": "^5.15.0",
@@ -146,19 +147,18 @@
     "dotenv": "^8.2.0",
     "husky": "^6.0.0",
     "ionic-mocks": "^1.3.0",
-    "jasmine-core": "~2.99.1",
-    "jasmine-spec-reporter": "~4.2.1",
+    "jasmine-core": "~3.9.0",
+    "jasmine-spec-reporter": "~7.0.0",
     "jetifier": "1.6.6",
-    "karma": "~5.1.1",
-    "karma-chrome-launcher": "~2.2.0",
+    "karma": "~6.3.4",
+    "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "^2.0.3",
-    "karma-jasmine": "~1.1.2",
-    "karma-jasmine-html-reporter": "^0.2.2",
+    "karma-jasmine": "~4.0.1",
+    "karma-jasmine-html-reporter": "^1.7.0",
     "karma-spec-reporter": "0.0.32",
     "prettier": "2.0.5",
     "pretty-quick": "^1.11.0",
     "protractor": "~7.0.0",
-    "puppeteer": "^10.0.0",
     "replace": "1.2.1",
     "sonarqube-scanner": "2.8.0",
     "ts-node": "9.1.1",
@@ -174,7 +174,8 @@
     "plugins": {
       "cordova-sqlite-storage": {},
       "cordova.plugins.diagnostic": {
-        "ANDROID_SUPPORT_VERSION": "28.+"
+        "ANDROID_SUPPORT_VERSION": "28.+",
+        "ANDROIDX_VERSION": "[1.0, 1.4["
       }
     },
     "platforms": [
