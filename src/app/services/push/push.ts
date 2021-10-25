@@ -1,13 +1,6 @@
-import { PERMISSIONS_PLUGIN, PermissionStatus, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
+import { APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
-import {
-  PermissionResult,
-  PermissionsPlugin,
-  PermissionType,
-  PushNotification,
-  PushNotificationsPlugin,
-  PushNotificationToken
-} from '@capacitor/core'
+import { PermissionStatus, PushNotificationSchema, PushNotificationsPlugin, Token } from '@capacitor/push-notifications'
 import { ModalController, Platform, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
@@ -35,14 +28,13 @@ export class PushProvider {
     private readonly storageProvider: WalletStorageService,
     private readonly modalController: ModalController,
     private readonly toastController: ToastController,
-    @Inject(PERMISSIONS_PLUGIN) private readonly permissions: PermissionsPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin,
     @Inject(PUSH_NOTIFICATIONS_PLUGIN) private readonly pushNotifications: PushNotificationsPlugin
   ) {
     this.initPush()
   }
 
-  public notificationCallback = (_notification: PushNotification): void => undefined
+  public notificationCallback = (_notification: PushNotificationSchema): void => undefined
 
   public async initPush(): Promise<void> {
     await this.platform.ready()
@@ -52,9 +44,9 @@ export class PushProvider {
       return
     }
 
-    const permissionStatus: PermissionStatus = await this.checkPermission(PermissionType.Notifications)
+    const permissionStatus: PermissionStatus = await this.checkPermissions()
 
-    if (permissionStatus === PermissionStatus.GRANTED) {
+    if (permissionStatus.receive === 'granted') {
       await this.register()
     }
   }
@@ -134,9 +126,14 @@ export class PushProvider {
       return
     }
 
+    const permissionStatus: PermissionStatus = await this.requestPermissions()
+    if (permissionStatus.receive !== 'granted') {
+      return
+    }
+
     this.registerCalled = true
 
-    this.pushNotifications.addListener('pushNotificationReceived', (notification: PushNotification) => {
+    this.pushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
       console.debug('Received a notification', notification)
       this.toastController
         .create({
@@ -159,7 +156,7 @@ export class PushProvider {
       }
     })
 
-    this.pushNotifications.addListener('registration', (token: PushNotificationToken) => {
+    this.pushNotifications.addListener('registration', (token: Token) => {
       console.debug('device registered', token)
       this.registrationId.next(token.value)
     })
@@ -172,20 +169,18 @@ export class PushProvider {
     await this.pushNotifications.register()
   }
 
-  private async checkPermission(type: PermissionType): Promise<PermissionStatus> {
-    const permission: PermissionResult = await this.permissions.query({ name: type })
+  private async checkPermissions(): Promise<PermissionStatus> {
+    return this.pushNotifications.checkPermissions()
+  }
 
-    switch (permission.state) {
-      case 'granted':
-        return PermissionStatus.GRANTED
-      case 'denied':
-        return PermissionStatus.DENIED
-      case 'prompt':
-        return PermissionStatus.UNKNOWN
-
-      default:
-        throw new Error('Unknown permission type')
+  private async requestPermissions(): Promise<PermissionStatus> {
+    const permissionStatus: PermissionStatus = await this.checkPermissions()
+    if (permissionStatus.receive === 'granted') {
+      return permissionStatus
     }
+
+     return this.pushNotifications.requestPermissions()
+
   }
 
   private async isSupported(): Promise<boolean> {

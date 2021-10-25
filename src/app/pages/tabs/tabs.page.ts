@@ -27,10 +27,10 @@ export class TabsPage {
   constructor(
     public modalController: ModalController,
     private readonly storageProvider: WalletStorageService,
-    private readonly plaftorm: Platform
+    private readonly platform: Platform
   ) {
     this.showIntroductions().catch(handleErrorSentry(ErrorCategory.OTHER))
-    this.isMobile = this.plaftorm.is('mobile')
+    this.isMobile = this.platform.is('android') || this.platform.is('ios')
   }
 
   private async showIntroductions() {

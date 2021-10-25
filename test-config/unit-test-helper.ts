@@ -1,4 +1,4 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, PermissionsService, PERMISSIONS_PLUGIN } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, PermissionsService } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -26,13 +26,13 @@ import {
   ToastControllerMock
 } from './mocks-ionic'
 import {
-  AppInfoPluginMock,
+  AppInfoMock,
+  AppLauncherMock,
   AppMock,
   ClipboardMock,
   PermissionsMock,
-  PermissionsPluginMock,
   PushNotificationsMock,
-  SaplingPluginMock,
+  SaplingNativeMock,
   SplashScreenMock,
   StatusBarMock
 } from './plugins-mock'
@@ -42,13 +42,13 @@ import { StorageMock } from './storage-mock'
 export class UnitHelper {
   public readonly mockRefs = {
     app: new AppMock(),
-    appInfoPlugin: new AppInfoPluginMock(),
+    appInfo: new AppInfoMock(),
+    appLauncher: new AppLauncherMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
-    permissionsPlugin: new PermissionsPluginMock(),
     permissionsProvider: new PermissionsServiceMock(),
     pushNotifications: new PushNotificationsMock(),
-    saplingPlugin: new SaplingPluginMock(),
+    saplingNative: new SaplingNativeMock(),
     statusBar: new StatusBarMock(),
     splashScreen: new SplashScreenMock(),
     clipboard: new ClipboardMock(),
@@ -84,9 +84,9 @@ export class UnitHelper {
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
       { provide: PermissionsService, useValue: this.mockRefs.permissionsProvider },
-      { provide: PERMISSIONS_PLUGIN, useValue: this.mockRefs.permissionsPlugin },
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
-      { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfoPlugin },
+      { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfo },
+      { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
