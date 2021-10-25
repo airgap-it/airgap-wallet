@@ -1,14 +1,14 @@
 package it.airgap.wallet.plugin
 
-import com.getcapacitor.NativePlugin
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
+import com.getcapacitor.annotation.CapacitorPlugin
 import it.airgap.wallet.BuildConfig
 import it.airgap.wallet.util.applicationContext
 import it.airgap.wallet.util.resolveWithData
 
-@NativePlugin
+@CapacitorPlugin
 class AppInfo : Plugin() {
 
     @PluginMethod

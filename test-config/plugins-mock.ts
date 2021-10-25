@@ -2,10 +2,9 @@ import { newSpy } from './unit-test-helper'
 
 export class AppMock {
   public addListener = newSpy('addListener', {})
-  public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
-export class AppInfoPluginMock {
+export class AppInfoMock {
   public get: jasmine.Spy = newSpy(
     'get',
     Promise.resolve({
@@ -15,6 +14,10 @@ export class AppInfoPluginMock {
       versionCode: 0
     })
   )
+}
+
+export class AppLauncherMock {
+  public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
 export class ClipboardMock {
@@ -31,7 +34,7 @@ export class PushNotificationsMock {
   public addListener: jasmine.Spy = newSpy('addListener', {})
 }
 
-export class SaplingPluginMock {
+export class SaplingNativeMock {
   public isSupported: jasmine.Spy = newSpy('isSupported', Promise.resolve(false))
 }
 
@@ -42,7 +45,4 @@ export class SplashScreenMock {
 export class StatusBarMock {
   public setStyle: jasmine.Spy = newSpy('setStyle', Promise.resolve())
   public setBackgroundColor: jasmine.Spy = newSpy('setBackgroundColor', Promise.resolve())
-}
-export class PermissionsPluginMock {
-  public query: jasmine.Spy = newSpy('query', Promise.resolve())
 }

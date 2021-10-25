@@ -1,4 +1,6 @@
-export interface SaplingPlugin {
+import { registerPlugin } from '@capacitor/core'
+
+export interface SaplingNativePlugin {
   isSupported(): Promise<{ isSupported: boolean }>
   initParameters(): Promise<void>
   initProvingContext(): Promise<{ context: string }>
@@ -22,3 +24,5 @@ export interface SaplingPlugin {
   }): Promise<{ outputDescription: string }>
   createBindingSignature(params: { context: string; balance: string; sighash: string }): Promise<{ bindingSignature: string }>
 }
+
+export const SaplingNative: SaplingNativePlugin = registerPlugin('SaplingNative')

@@ -4,7 +4,7 @@ import { TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { PushNotification } from '@capacitor/core'
+import { PushNotificationSchema } from '@capacitor/push-notifications'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { Observable, ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
@@ -98,7 +98,7 @@ export class AccountProvider {
     this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
     this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
 
-    this.pushProvider.notificationCallback = (notification: PushNotification): void => {
+    this.pushProvider.notificationCallback = (notification: PushNotificationSchema): void => {
       // We need a timeout because otherwise routing might fail
 
       const env = {

@@ -16,6 +16,7 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:launchMode="singleTask">
 
             <intent-filter>
