@@ -1,3 +1,4 @@
+import { APP_PLUGIN } from '@airgap/angular-core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
@@ -16,7 +17,8 @@ describe('CurrentWalletGroupComponent', () => {
 
       TestBed.configureTestingModule(
         unitHelper.testBed({
-          declarations: [CurrentWalletGroupComponent]
+          declarations: [CurrentWalletGroupComponent],
+          providers: [{ provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app }]
         })
       )
         .compileComponents()

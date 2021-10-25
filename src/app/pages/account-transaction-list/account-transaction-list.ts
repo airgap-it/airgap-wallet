@@ -21,6 +21,7 @@ import { supportsDelegation } from 'src/app/helpers/delegation'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
+import { InteractionService } from 'src/app/services/interaction/interaction.service'
 
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise'
@@ -108,6 +109,7 @@ export class AccountTransactionListPage {
     public readonly http: HttpClient,
     public readonly dataService: DataService,
     public readonly protocolService: ProtocolService,
+    public readonly interactionService: InteractionService,
     private readonly route: ActivatedRoute,
     private readonly platform: Platform,
     private readonly storageProvider: WalletStorageService,

@@ -206,6 +206,14 @@ const routes: Routes = [
   {
     path: 'dapp-confirm',
     loadChildren: () => import('./pages/dapp-confirm/dapp-confirm.module').then((m) => m.DappConfirmPageModule)
+  },
+
+  {
+    path: 'interaction-selection-settings',
+    loadChildren: () =>
+      import('./pages/interaction-selection-settings/interaction-selection-settings.module').then(
+        (m) => m.InteractionSelectionSettingsPageModule
+      )
   }
 ]
 @NgModule({

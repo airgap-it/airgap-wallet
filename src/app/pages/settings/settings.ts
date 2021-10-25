@@ -119,6 +119,10 @@ export class SettingsPage {
     this.navigate('/health-check')
   }
 
+  public goToWalletInteraction(): void {
+    this.navigate('/interaction-selection-settings')
+  }
+
   private navigate(url: string) {
     this.router.navigateByUrl(url, { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

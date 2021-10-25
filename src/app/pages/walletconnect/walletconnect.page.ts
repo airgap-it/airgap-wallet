@@ -11,7 +11,6 @@ import {
 } from '@airgap/coinlib-core'
 import { RawEthereumTransaction } from '@airgap/coinlib-core/serializer/types'
 import { Component, OnInit } from '@angular/core'
-import { Router } from '@angular/router'
 import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
@@ -19,7 +18,6 @@ import BigNumber from 'bignumber.js'
 import { Subscription } from 'rxjs'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { saveWalletConnectSession } from 'src/app/services/walletconnect/helpers'
 
@@ -82,9 +80,7 @@ export class WalletconnectPage implements OnInit {
 
   constructor(
     private readonly modalController: ModalController,
-    private readonly dataService: DataService,
     private readonly accountService: AccountProvider,
-    private readonly router: Router,
     private readonly alertCtrl: AlertController,
     private readonly beaconService: BeaconService,
     private readonly translateService: TranslateService
@@ -159,15 +155,14 @@ export class WalletconnectPage implements OnInit {
 
     this.beaconService.addVaultRequest(this.beaconRequest, protocol)
     this.responseHandler = async () => {
-      const info = {
-        wallet: this.selectedWallet,
-        data: this.beaconRequest,
-        generatedId: generatedId,
-        type: IACMessageType.MessageSignRequest
-      }
-
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.accountService.startInteraction(
+        this.selectedWallet,
+        this.beaconRequest,
+        IACMessageType.MessageSignRequest,
+        undefined,
+        false,
+        generatedId
+      )
     }
   }
 
@@ -229,15 +224,8 @@ export class WalletconnectPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const info = {
-        wallet: this.selectedWallet,
-        airGapTxs: await ethereumProtocol.getTransactionDetails({ publicKey: this.selectedWallet.publicKey, transaction }),
-        data: transaction,
-        type: IACMessageType.TransactionSignRequest
-      }
-
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch((err) => console.error(err))
+      const airGapTxs = await ethereumProtocol.getTransactionDetails({ publicKey: this.selectedWallet.publicKey, transaction })
+      this.accountService.startInteraction(this.selectedWallet, transaction, IACMessageType.TransactionSignRequest, airGapTxs)
     }
   }
 

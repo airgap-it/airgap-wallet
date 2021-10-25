@@ -1,0 +1,52 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>{{ 'interaction-selection-settings.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" color="secondary">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h3
+    *ngIf="selectedSetting === interactionSetting.SAME_DEVICE"
+    [innerHTML]="'interaction-selection-settings.same-device_heading' | translate"
+  ></h3>
+  <h3
+    *ngIf="selectedSetting === interactionSetting.OFFLINE_DEVICE"
+    [innerHTML]="'interaction-selection-settings.offline-device_heading' | translate"
+  ></h3>
+
+  <p>{{ 'interaction-selection-settings.text' | translate }}</p>
+
+  <ion-list lines="none" class="ion-padding-vertical">
+    <ion-radio-group [ngModel]="selectedSetting" (ngModelChange)="onSelectedSettingChange($event)">
+      <ion-item>
+        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.always' | translate }}</ion-label>
+        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.ALWAYS_ASK"></ion-radio>
+      </ion-item>
+      <ion-item *ngIf="isMobile">
+        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.same-device' | translate }}</ion-label>
+        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.SAME_DEVICE"></ion-radio>
+      </ion-item>
+      <ion-item>
+        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.offline-device' | translate }}</ion-label>
+        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.OFFLINE_DEVICE"></ion-radio>
+      </ion-item>
+      <ion-item *ngIf="!isMobile">
+        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.ledger' | translate }}</ion-label>
+        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.LEDGER"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+
+  <p>{{ 'interaction-selection-settings.description' | translate }}</p>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button color="primary" shape="round" (click)="dismiss()">
+      {{ 'interaction-selection-settings.confirm_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>
