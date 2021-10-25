@@ -1,11 +1,11 @@
 import { ToastController, LoadingController } from '@ionic/angular'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { Router } from '@angular/router'
 import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
 
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { OperationsProvider } from 'src/app/services/operations/operations'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 export interface AirGapDelegatorActionContext {
   wallet: AirGapMarketWallet
@@ -15,7 +15,7 @@ export interface AirGapDelegatorActionContext {
   loadingController: LoadingController
   operationsProvider: OperationsProvider
   dataService: DataService
-  router: Router
+  accountService: AccountProvider
 }
 
 export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionContext> {
@@ -47,9 +47,7 @@ export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionCon
       }
 
       this.context.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.context.router
-        .navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION, { skipLocationChange: true })
-        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.context.accountService.startInteraction(this.context.wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
     } catch (error) {
       handleErrorSentry(ErrorCategory.OTHER)(`${this.identifier}-${error}`)
 

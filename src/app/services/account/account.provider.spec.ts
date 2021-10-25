@@ -1,5 +1,6 @@
 import {
   APP_INFO_PLUGIN,
+  APP_PLUGIN,
   MainProtocolStoreService,
   PermissionsService,
   ProtocolService,
@@ -31,6 +32,7 @@ describe('AccountProvider', () => {
         unitHelper.testBed({
           providers: [
             { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
+            { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
             { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
             { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
             { provide: ProtocolService, useValue: protocolService }

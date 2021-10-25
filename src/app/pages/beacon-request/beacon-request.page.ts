@@ -277,15 +277,14 @@ export class BeaconRequestPage implements OnInit {
     clonedRequest.id = new BigNumber(generatedId).toString() // TODO: Remove?
 
     this.responseHandler = async () => {
-      const info = {
-        wallet: selectedWallet,
-        data: clonedRequest,
-        generatedId: generatedId,
-        type: IACMessageType.MessageSignRequest
-      }
-
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.accountService.startInteraction(
+        selectedWallet,
+        clonedRequest,
+        IACMessageType.MessageSignRequest,
+        undefined,
+        false,
+        generatedId
+      )
     }
   }
 
@@ -324,16 +323,16 @@ export class BeaconRequestPage implements OnInit {
     })
 
     this.responseHandler = async () => {
-      const info = {
-        wallet: selectedWallet,
-        airGapTxs: await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction }),
-        data: forgedTransaction,
-        generatedId: generatedId,
-        type: IACMessageType.TransactionSignRequest
-      }
+      const airGapTxs = await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction })
 
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.accountService.startInteraction(
+        selectedWallet,
+        forgedTransaction,
+        IACMessageType.TransactionSignRequest,
+        airGapTxs,
+        false,
+        generatedId
+      )
     }
   }
   public async updateWrappedOperation(wrappedOperation: TezosWrappedOperation) {

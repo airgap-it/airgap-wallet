@@ -16,7 +16,6 @@ import { LoadingController } from '@ionic/angular'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -462,14 +461,7 @@ export class TransactionPreparePage {
         data
       )
 
-      const info = {
-        wallet: this.wallet,
-        airGapTxs,
-        data: unsignedTx,
-        type: IACMessageType.TransactionSignRequest
-      }
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.accountProvider.startInteraction(this.wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
     } catch (error) {
       //
     }

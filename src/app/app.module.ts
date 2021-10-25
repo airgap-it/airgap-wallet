@@ -72,6 +72,7 @@ import { PushProvider } from './services/push/push'
 import { CoinlibService } from './services/coinlib/coinlib.service'
 import { WalletStorageService } from './services/storage/storage'
 import { SaplingService } from './services/sapling/sapling.service'
+import { InteractionService } from './services/interaction/interaction.service'
 import { SaplingNative } from './capacitor-plugins/definitions'
 import { AppLauncher } from '@capacitor/app-launcher'
 
@@ -161,7 +162,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ServiceKeyGuard,
     TransactionHashGuard,
     PercentPipe,
-    FeeConverterPipe
+    FeeConverterPipe,
+    InteractionService
   ],
   bootstrap: [AppComponent]
 })

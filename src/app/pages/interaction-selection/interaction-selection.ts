@@ -1,13 +1,12 @@
-import { DeeplinkService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { Platform } from '@ionic/angular'
-import { AirGapMarketWallet, generateId, IACMessageDefinitionObjectV3, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
+import { ActivatedRoute } from '@angular/router'
+import { ModalController, Platform } from '@ionic/angular'
+import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
-import { OperationsProvider } from 'src/app/services/operations/operations'
-
-import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { InteractionService } from 'src/app/services/interaction/interaction.service'
+import { AirGapMarketWalletGroup, InteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
+import { InteractionSelectionComponent } from 'src/app/components/interaction-selection/interaction-selection.component'
 
 @Component({
   selector: 'page-interaction-selection',
@@ -21,23 +20,23 @@ export class InteractionSelectionPage {
   public interactionData: any
   private generatedId: number | undefined = undefined
 
+  private readonly group: AirGapMarketWalletGroup
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
   private readonly type: IACMessageType
 
   constructor(
     public readonly platform: Platform,
-    private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly deeplinkService: DeeplinkService,
-    private readonly dataService: DataService,
-    private readonly operations: OperationsProvider,
-    private readonly ledgerService: LedgerService
+    private readonly interactionService: InteractionService,
+    private readonly ledgerService: LedgerService,
+    private readonly modalController: ModalController
   ) {
     this.isDesktop = this.platform.is('desktop')
 
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
+      this.group = info.group
       this.wallet = info.wallet
       this.airGapTxs = info.airGapTxs
       this.interactionData = info.data
@@ -49,47 +48,36 @@ export class InteractionSelectionPage {
   }
 
   public async offlineDeviceSign() {
-    const dataQR = await this.prepareQRData()
-    const info = {
-      wallet: this.wallet,
-      airGapTxs: this.airGapTxs,
-      data: dataQR,
-      interactionData: this.interactionData
-    }
-    this.dataService.setData(DataServiceKey.TRANSACTION, info)
-    this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch((err) => console.error(err))
+    await this.select(InteractionSetting.OFFLINE_DEVICE)
+    this.interactionService.offlineDeviceSign(this.wallet, this.airGapTxs, this.interactionData, this.type, this.isRelay, this.generatedId)
   }
 
   public async sameDeviceSign() {
-    const dataQR = await this.prepareQRData()
-    this.deeplinkService
-      .sameDeviceDeeplink(dataQR)
-      .then(() => {
-        this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    await this.select(InteractionSetting.SAME_DEVICE)
+    this.interactionService.sameDeviceSign(this.wallet, this.interactionData, this.type, this.isRelay, this.generatedId)
+  }
+
+  public async ledgerSign() {
+    await this.select(InteractionSetting.LEDGER)
+    this.interactionService.ledgerSign(this.wallet, this.airGapTxs, this.interactionData)
+  }
+
+  async select(selectedSetting: InteractionSetting): Promise<void> {
+    return new Promise(async (resolve) => {
+      const modal: HTMLIonModalElement = await this.modalController.create({
+        component: InteractionSelectionComponent,
+        componentProps: {
+          walletGroup: this.group,
+          selectedSetting,
+          onlyOneGroupPresent: true,
+          dismissOnly: true
+        }
       })
-      .catch(handleErrorSentry(ErrorCategory.DEEPLINK_PROVIDER))
-  }
 
-  public ledgerSign() {
-    const info = {
-      wallet: this.wallet,
-      airGapTxs: this.airGapTxs,
-      data: this.interactionData
-    }
-    this.dataService.setData(DataServiceKey.TRANSACTION, info)
-    this.router.navigateByUrl('/ledger-sign/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  private async prepareQRData(): Promise<IACMessageDefinitionObjectV3[]> {
-    if (this.isRelay) {
-      return this.interactionData
-    }
-    const generatedId = this.generatedId ? this.generatedId : generateId(8)
-    return this.operations.prepareSignRequest(this.wallet, this.interactionData, this.type, generatedId).catch((error) => {
-      console.warn(`Could not serialize transaction: ${error}`)
-      // TODO: Show error (toast)
-
-      return this.interactionData // Fallback
+      modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+      modal.onDidDismiss().then(() => {
+        resolve()
+      })
     })
   }
 }

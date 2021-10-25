@@ -124,6 +124,7 @@ export const selectInactiveAccounts = createSelector(
                     new AirGapMarketWalletGroup(
                       walletGroup.id,
                       walletGroup.label,
+                      walletGroup.interactionSetting,
                       walletGroup.wallets.filter(
                         (wallet: AirGapMarketWallet) =>
                           wallet.protocol.identifier === protocolIdentifier.value && wallet.status !== AirGapWalletStatus.ACTIVE
