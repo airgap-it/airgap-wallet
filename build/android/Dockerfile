@@ -1,21 +1,20 @@
-FROM beevelop/ionic:v5.2.3
+FROM beevelop/ionic:v2021.06.1
 
 RUN apt-get update -y && apt-get install -y \
     bzip2 \
     build-essential  \
     pkg-config  \
     libjpeg-dev \
-    libcairo2-dev 
+    libcairo2-dev \
+    openjdk-11-jdk-headless
 
-# # android build tools version
-# RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui --filter build-tools-28.0.3,android-28"]
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 # create app directory
 RUN mkdir /app
 WORKDIR /app
 
-# using npm 6.5.0 to fix installing certain cordova/ionic plugins
-RUN npm install -g npm@7.7.6 ionic@5.4.0 @capacitor/core@3.2.5 @capacitor/android@2.4.0 @capacitor/cli@3.2.5
+RUN npm install -g npm@7.7.6 @capacitor/core@3.2.5 @capacitor/android@3.2.5 @capacitor/cli@3.2.5
 RUN npm cache clean -f
 RUN npm install -g n
 RUN n 15.14.0
@@ -30,7 +29,7 @@ COPY apply-diagnostic-modules.js /app
 RUN npm i
 
 # copy capacitor configs and ionic configs
-COPY capacitor.config.json /app/capacitor.config.json
+COPY capacitor.config.ts /app/capacitor.config.ts
 COPY ionic.config.json /app/ionic.config.json
 
 RUN mkdir www
@@ -68,7 +67,7 @@ RUN ionic build --prod
 RUN cap sync android
 
 # accept licenses
-RUN echo y | $ANDROID_HOME/tools/bin/sdkmanager --update
+RUN echo y | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --update
 
 # clean project
 RUN /app/android/gradlew --project-dir /app/android clean
