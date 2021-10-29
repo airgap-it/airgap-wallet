@@ -14,7 +14,7 @@
       <ion-card *ngFor="let walletGroup of activeWalletGroups">
         <ion-card-header>
           <ion-item lines="none">
-            <ion-card-title>{{walletGroup.label}}</ion-card-title>
+            <ion-card-title>{{walletGroup.label ? walletGroup.label : 'Other'}}</ion-card-title>
             <ion-button color="primary" shape="round" fill="outline" slot="end" (click)="select(walletGroup)">
               {{ 'interaction-selection-settings.button_text' | translate }}
             </ion-button>
