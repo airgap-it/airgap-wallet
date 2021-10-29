@@ -22,6 +22,7 @@ import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-e
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FeeComponent } from './fee/fee.component'
 import { FromToComponent } from './from-to/from-to.component'
+import { InteractionSelectionComponent } from './interaction-selection/interaction-selection.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
@@ -60,7 +61,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TransactionItemComponent,
     FeeComponent,
     FromToComponent,
-
+    InteractionSelectionComponent,
     WidgetSelector,
     WidgetAccount,
     WidgetAccountSummary,
@@ -99,7 +100,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     PermissionRequestComponent,
     CurrentWalletGroupComponent,
     DappPeerComponent,
-
+    InteractionSelectionComponent,
     TransactionListComponent,
     TransactionItemComponent,
     FeeComponent,

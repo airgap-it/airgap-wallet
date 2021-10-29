@@ -298,7 +298,7 @@ export class ActionGroup {
                 loadingController: this.callerContext.loadingController,
                 operationsProvider: this.callerContext.operationsProvider,
                 dataService: this.callerContext.dataService,
-                router: this.callerContext.router
+                accountService: this.callerContext.accountProvider
               })
             })
           })

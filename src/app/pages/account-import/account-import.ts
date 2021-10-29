@@ -59,7 +59,6 @@ export class AccountImportPage implements OnDestroy {
             if (!this.accountImports.has(groupLabel)) {
               this.accountImports.set(groupLabel, [])
             }
-
             this.accountImports.get(groupLabel).push({
               ...accountSync,
               alreadyExists: false
@@ -134,11 +133,16 @@ export class AccountImportPage implements OnDestroy {
         walletToAdd: accountimport.wallet,
         groupId: accountimport.groupId,
         groupLabel: accountimport.groupLabel,
+        interactionSetting: accountimport.interactionSetting,
         options: { override: true }
       }
     })
 
     await this.accountProvider.addWallets(addWalletInfos)
+    addWalletInfos.forEach((addWalletInfo) => {
+      this.accountProvider.setInteractionSettingForWalletGroupByWallet(addWalletInfo.walletToAdd, addWalletInfo.interactionSetting)
+    })
+
     await this.router.navigateByUrl('/tabs/portfolio')
   }
 }

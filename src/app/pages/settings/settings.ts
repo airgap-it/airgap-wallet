@@ -1,7 +1,8 @@
 import { ClipboardService, SerializerService, IACMessageTransport } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Router } from '@angular/router'
-import { Capacitor, SharePlugin } from '@capacitor/core'
+import { Capacitor } from '@capacitor/core'
+import { SharePlugin } from '@capacitor/share'
 import { AlertController, ModalController } from '@ionic/angular'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -116,6 +117,10 @@ export class SettingsPage {
 
   public goToHealthCheck(): void {
     this.navigate('/health-check')
+  }
+
+  public goToWalletInteraction(): void {
+    this.navigate('/interaction-selection-settings')
   }
 
   private navigate(url: string) {

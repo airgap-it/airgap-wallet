@@ -276,14 +276,7 @@ export class TransactionConfirmPage {
       { knownViewingKeys: this.accountService.getKnownViewingKeys() }
     )
 
-    const info = {
-      wallet,
-      airGapTxs,
-      data: unsignedTx,
-      type: IACMessageType.TransactionSignRequest
-    }
-    this.dataService.setData(DataServiceKey.INTERACTION, info)
-    this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
   }
 
   private async selectTezosTzAccount(protocol: ICoinProtocol): Promise<AirGapMarketWallet> {

@@ -1,15 +1,16 @@
 import {
   AirGapAngularCoreModule,
   AirGapTranslateLoader,
+  AppInfo,
   APP_CONFIG,
   APP_INFO_PLUGIN,
+  APP_LAUNCHER_PLUGIN,
   APP_PLUGIN,
   ClipboardService,
   CLIPBOARD_PLUGIN,
   DeeplinkService,
   FeeConverterPipe,
   PermissionsService,
-  PERMISSIONS_PLUGIN,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
@@ -22,7 +23,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
-import { Plugins } from '@capacitor/core'
+import { App } from '@capacitor/app'
+import { Browser } from '@capacitor/browser'
+import { Clipboard } from '@capacitor/clipboard'
+import { PushNotifications } from '@capacitor/push-notifications'
+import { Share } from '@capacitor/share'
+import { SplashScreen } from '@capacitor/splash-screen'
+import { StatusBar } from '@capacitor/status-bar'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
@@ -65,6 +72,9 @@ import { PushProvider } from './services/push/push'
 import { CoinlibService } from './services/coinlib/coinlib.service'
 import { WalletStorageService } from './services/storage/storage'
 import { SaplingService } from './services/sapling/sapling.service'
+import { InteractionService } from './services/interaction/interaction.service'
+import { SaplingNative } from './capacitor-plugins/definitions'
+import { AppLauncher } from '@capacitor/app-launcher'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -115,16 +125,16 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     IntroductionPushPageModule
   ],
   providers: [
-    { provide: APP_PLUGIN, useValue: Plugins.App },
-    { provide: APP_INFO_PLUGIN, useValue: Plugins.AppInfo },
-    { provide: BROWSER_PLUGIN, useValue: Plugins.Browser },
-    { provide: CLIPBOARD_PLUGIN, useValue: Plugins.Clipboard },
-    { provide: PERMISSIONS_PLUGIN, useValue: Plugins.Permissions },
-    { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: Plugins.PushNotifications },
-    { provide: SAPLING_PLUGIN, useValue: Plugins.SaplingNative },
-    { provide: SHARE_PLUGIN, useValue: Plugins.Share },
-    { provide: SPLASH_SCREEN_PLUGIN, useValue: Plugins.SplashScreen },
-    { provide: STATUS_BAR_PLUGIN, useValue: Plugins.StatusBar },
+    { provide: APP_PLUGIN, useValue: App },
+    { provide: APP_INFO_PLUGIN, useValue: AppInfo },
+    { provide: APP_LAUNCHER_PLUGIN, useValue: AppLauncher },
+    { provide: BROWSER_PLUGIN, useValue: Browser },
+    { provide: CLIPBOARD_PLUGIN, useValue: Clipboard },
+    { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: PushNotifications },
+    { provide: SAPLING_PLUGIN, useValue: SaplingNative },
+    { provide: SHARE_PLUGIN, useValue: Share },
+    { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
+    { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
     DecimalPipe,
     ShortenStringPipe,
@@ -152,7 +162,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ServiceKeyGuard,
     TransactionHashGuard,
     PercentPipe,
-    FeeConverterPipe
+    FeeConverterPipe,
+    InteractionService
   ],
   bootstrap: [AppComponent]
 })

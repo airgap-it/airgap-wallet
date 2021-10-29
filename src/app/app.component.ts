@@ -37,7 +37,9 @@ import {
 } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
-import { AppPlugin, AppUrlOpen, SplashScreenPlugin, StatusBarPlugin, StatusBarStyle } from '@capacitor/core'
+import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
+import { SplashScreenPlugin } from '@capacitor/splash-screen'
+import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
@@ -83,7 +85,7 @@ export class AppComponent implements AfterViewInit {
     @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
-    this.isMobile = this.platform.is('mobile')
+    this.isMobile = this.platform.is('android') || this.platform.is('ios')
     this.isElectron = this.platform.is('electron')
   }
 
@@ -92,7 +94,7 @@ export class AppComponent implements AfterViewInit {
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
-        this.statusBar.setStyle({ style: StatusBarStyle.Light }),
+        this.statusBar.setStyle({ style: Style.Light }),
         this.statusBar.setBackgroundColor({ color: '#FFFFFF' }),
         this.splashScreen.hide(),
 
@@ -137,7 +139,7 @@ export class AppComponent implements AfterViewInit {
       })
     }
     if (this.platform.is('hybrid')) {
-      this.app.addListener('appUrlOpen', (data: AppUrlOpen) => {
+      this.app.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
         this.ngZone.run(() => {
           if (data.url === 'airgap-wallet://' || data.url === 'https://wallet.airgap.it' || data.url === 'https://wallet.airgap.it/') {
             // Ignore empty deeplinks

@@ -1,0 +1,26 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'interaction-selection-settings.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+<ion-content>
+  <ng-container *ngIf="activeWalletGroups && activeWalletGroups.length > 1">
+    <ion-list>
+      <ion-card *ngFor="let walletGroup of activeWalletGroups">
+        <ion-card-header>
+          <ion-item lines="none">
+            <ion-card-title>{{walletGroup.label ? walletGroup.label : 'Other'}}</ion-card-title>
+            <ion-button color="primary" shape="round" fill="outline" slot="end" (click)="select(walletGroup)">
+              {{ 'interaction-selection-settings.button_text' | translate }}
+            </ion-button>
+          </ion-item>
+        </ion-card-header>
+      </ion-card>
+    </ion-list>
+  </ng-container>
+</ion-content>

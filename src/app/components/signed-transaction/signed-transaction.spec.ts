@@ -1,3 +1,4 @@
+import { APP_PLUGIN } from '@airgap/angular-core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
@@ -13,7 +14,8 @@ describe('SignedTransactionComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        declarations: []
+        declarations: [],
+        providers: [{ provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app }]
       })
     )
       .compileComponents()

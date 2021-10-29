@@ -375,19 +375,9 @@ export class DelegationDetailPage {
       const data = form ? form.value : undefined
       const { airGapTxs, unsignedTx } = await this.operations.prepareDelegatorAction(this.wallet, actionType, data)
 
-      const info = {
-        wallet: this.wallet,
-        airGapTxs,
-        data: unsignedTx,
-        type: IACMessageType.TransactionSignRequest
-      }
-
       this.dismissLoader()
 
-      this.dataService.setData(DataServiceKey.INTERACTION, info)
-      this.router
-        .navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION, { skipLocationChange: true })
-        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.accountProvider.startInteraction(this.wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
     } catch (error) {
       this.dismissLoader()
 

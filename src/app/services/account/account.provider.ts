@@ -1,19 +1,28 @@
 import { ProtocolService, UiEventService } from '@airgap/angular-core'
-import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SerializedAirGapWallet, TezosProtocol } from '@airgap/coinlib-core'
+import {
+  AirGapMarketWallet,
+  IACMessageType,
+  IAirGapTransaction,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  SerializedAirGapWallet,
+  TezosProtocol
+} from '@airgap/coinlib-core'
 import { TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { PushNotification } from '@capacitor/core'
+import { PushNotificationSchema } from '@capacitor/push-notifications'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { Observable, ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
-import { AirGapMarketWalletGroup, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
+import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { isType } from '../../utils/utils'
 import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
+import { InteractionService } from '../interaction/interaction.service'
 import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
@@ -67,7 +76,7 @@ export class AccountProvider {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
-  private get allWalletGroups(): AirGapMarketWalletGroup[] {
+  public get allWalletGroups(): AirGapMarketWalletGroup[] {
     return Array.from(this.walletGroups.values())
   }
 
@@ -87,6 +96,7 @@ export class AccountProvider {
     private readonly opertaionsProvider: OperationsProvider,
     private readonly dataService: DataService,
     private readonly router: Router,
+    private readonly interactionService: InteractionService,
     private readonly priceService: PriceService,
     private readonly protocolService: ProtocolService
   ) {
@@ -98,7 +108,7 @@ export class AccountProvider {
     this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
     this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
 
-    this.pushProvider.notificationCallback = (notification: PushNotification): void => {
+    this.pushProvider.notificationCallback = (notification: PushNotificationSchema): void => {
       // We need a timeout because otherwise routing might fail
 
       const env = {
@@ -109,6 +119,7 @@ export class AccountProvider {
         toastController: this.toastController,
         operationsProvider: this.opertaionsProvider,
         dataService: this.dataService,
+        accountService: this,
         router: this.router
       }
 
@@ -151,6 +162,18 @@ export class AccountProvider {
         }
       }
     }
+  }
+
+  public startInteraction(
+    wallet: AirGapMarketWallet,
+    interactionData: unknown,
+    type: IACMessageType,
+    airGapTxs?: IAirGapTransaction[],
+    isRelay: boolean = false,
+    generatedId?: number
+  ) {
+    const group = this.walletGroupByWallet(wallet)
+    this.interactionService.startInteraction(group, wallet, interactionData, type, airGapTxs, isRelay, generatedId)
   }
 
   public getActiveWalletGroupObservable(): Observable<ActiveWalletGroup> {
@@ -234,7 +257,7 @@ export class AccountProvider {
           )
         ).filter((wallet: AirGapMarketWallet | undefined) => wallet !== undefined)
 
-        const walletGroup: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(group.id, group.label, wallets)
+        const walletGroup: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(group.id, group.label, group.interactionSetting, wallets)
 
         this.walletGroups.set(walletGroup.id, walletGroup)
       })
@@ -253,7 +276,7 @@ export class AccountProvider {
     )
 
     if (ungroupedWallets.length > 0) {
-      const others: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(undefined, undefined, ungroupedWallets, true)
+      const others: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(undefined, undefined, undefined, ungroupedWallets, true)
       this.walletGroups.set(others.id, others)
     }
 
@@ -420,7 +443,7 @@ export class AccountProvider {
 
   private assertWalletGroupExists(groupId: string | undefined, groupLabel: string | undefined): void {
     if (!this.walletGroups.has(groupId)) {
-      this.walletGroups.set(groupId, new AirGapMarketWalletGroup(groupId, groupLabel, []))
+      this.walletGroups.set(groupId, new AirGapMarketWalletGroup(groupId, groupLabel, undefined, []))
     }
   }
 
@@ -533,6 +556,20 @@ export class AccountProvider {
     this.triggerWalletChanged()
   }
 
+  public async updateWalletGroup(walletGroup: AirGapMarketWalletGroup) {
+    this.walletGroups.set(walletGroup.id, walletGroup)
+    return this.persist()
+  }
+
+  public walletGroupByWallet(wallet: AirGapMarketWallet): AirGapMarketWalletGroup {
+    return this.allWalletGroups.find((group: AirGapMarketWalletGroup) => group.includesWallet(wallet))
+  }
+
+  public setInteractionSettingForWalletGroupByWallet(wallet: AirGapMarketWallet, interactionSetting: InteractionSetting): void {
+    const group = this.walletGroupByWallet(wallet)
+    group.interactionSetting = interactionSetting
+    this.updateWalletGroup(group)
+  }
   private async persist(): Promise<void> {
     await Promise.all([
       this.storageProvider.set(
