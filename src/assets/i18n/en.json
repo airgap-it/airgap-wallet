@@ -658,6 +658,12 @@
     },
     "undelegate-all": {
       "label": "Undelegate All"
+    },
+    "alert": {
+      "collator-oversubscribed": {
+        "title": "This collator is oversubscribed",
+        "description": "Collators can only pay out to {{ maxNominators }} nominators per round. If more than {{ maxNominators }} nominators nominate the same collator, only the top {{ maxNominators }} staked nominators are paid rewards. Currently, the minimum staking amount eligible for rewards from this collator is <span class=\"style__strong\">{{ minStakingAmount }}</span>."
+      }
     }
   },
   "introduction-push": {

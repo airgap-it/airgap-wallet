@@ -8,6 +8,7 @@ import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
+import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
 
 import {
   AirGapDelegateeDetails,
@@ -71,14 +72,15 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
 
     return Promise.all(
       delegationsDetails.map(async (details) => {
-        const [delegator, validator] = await Promise.all([
+        const [nominator, collator] = await Promise.all([
           this.getExtraNominatorDetails(protocol, details.delegator, details.delegatees[0].address),
           this.getExtraCollatorDetails(protocol, details.delegatees[0])
         ])
 
         return {
-          delegator,
-          delegatees: [validator]
+          delegator: nominator,
+          delegatees: [collator],
+          alerts: nominator.alerts
         }
       })
     )
@@ -88,20 +90,29 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     protocol: MoonbeamProtocol,
     delegatorDetails: DelegatorDetails,
     collator: string
-  ): Promise<AirGapDelegatorDetails> {
+  ): Promise<AirGapDelegatorDetails & { alerts?: UIAlert[] }> {
     const nominationDetails = await protocol.options.accountController.getNominationDetails(delegatorDetails.address, collator)
 
-    const delegateAction = await this.createDelegateAction(protocol, nominationDetails, collator)
-    const undelegateAction = await this.createUndelegateAction(protocol, nominationDetails, collator)
-    const undelegateAllAction = this.createUndelegateAllAction(nominationDetails.nominatorDetails)
+    const results = await Promise.all([
+      this.createDelegateAction(protocol, nominationDetails, collator),
+      this.createUndelegateAction(protocol, nominationDetails, collator),
+      this.createDisplayDetails(protocol, nominationDetails),
+      this.createNominationAlerts(protocol, nominationDetails)
+    ])
 
-    const displayDetails = await this.createDisplayDetails(protocol, nominationDetails)
+    const delegateAction = results[0]
+    const undelegateAction = results[1]
+    const displayDetails = results[2]
+    const alerts = results[3]
+
+    const undelegateAllAction = this.createUndelegateAllAction(nominationDetails.nominatorDetails)
 
     return {
       ...delegatorDetails,
       mainActions: [delegateAction, undelegateAction].filter((action) => !!action),
       secondaryActions: [undelegateAllAction].filter((action) => !!action),
-      displayDetails
+      displayDetails,
+      alerts
     }
   }
 
@@ -111,7 +122,7 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     const ownBond = new BigNumber(collatorDetails.ownStakingBalance)
     const totalBond = new BigNumber(collatorDetails.totalStakingBalance)
 
-    const displayDetails = await this.createValidatorDisplayDetails(protocol, collatorDetails)
+    const displayDetails = await this.createCollatorDisplayDetails(protocol, collatorDetails)
 
     return {
       ...delegateeDetails,
@@ -120,14 +131,12 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
         current: ownBond,
         total: totalBond
       },
-      displayDetails
+      displayDetails,
     }
   }
 
-  private async createValidatorDisplayDetails(protocol: MoonbeamProtocol, collatorDetails: MoonbeamCollatorDetails): Promise<UIWidget[]> {
-    const details = []
-
-    const maxNominators = await protocol.options.nodeClient.getMaxNominatorsPerCollator()
+  private async createCollatorDisplayDetails(_protocol: MoonbeamProtocol, collatorDetails: MoonbeamCollatorDetails): Promise<UIWidget[]> {
+    const details: UIWidget[] = []
 
     details.push(
       new UIIconText({
@@ -137,15 +146,13 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
       })
     )
 
-    if (maxNominators) {
-      details.push(
-        new UIIconText({
-          iconName: 'people-outline',
-          text: `${collatorDetails.nominators}/${maxNominators.toString()}`,
-          description: 'delegation-detail-moonbeam.nominators_label'
-        })
-      )
-    }
+    details.push(
+      new UIIconText({
+        iconName: 'people-outline',
+        text: `${collatorDetails.nominators}`,
+        description: 'delegation-detail-moonbeam.nominators_label'
+      })
+    )
 
     return details
   }
@@ -368,6 +375,30 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
     }
 
     return details
+  }
+
+  private async createNominationAlerts(protocol: MoonbeamProtocol, nominationDetails: MoonbeamNominationDetails): Promise<UIAlert[]> {
+    const alerts: UIAlert[] = []
+
+    const maxNominators = await protocol.options.nodeClient.getMaxNominatorsPerCollator()
+    if (maxNominators && maxNominators.lt(nominationDetails.collatorDetails.nominators) && new BigNumber(nominationDetails.bond).lte(nominationDetails.collatorDetails.minEligibleBalance)) {
+      alerts.push(
+        new UIAlert({
+          title: 'delegation-detail-moonbeam.alert.collator-oversubscribed.title',
+          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', { 
+            maxNominators: maxNominators.toString(), 
+            minStakingAmount: await this.amountConverterPipe.transform(nominationDetails.collatorDetails.minEligibleBalance, {
+              protocol,
+              maxDigits: protocol.decimals
+            })
+          }),
+          icon: 'alert-circle-outline',
+          color: 'warning'
+        })
+      )
+    }
+
+    return alerts
   }
 
   private getStatusDescription(nominatorDetails: MoonbeamNominatorDetails): string {

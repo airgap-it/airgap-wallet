@@ -48,17 +48,23 @@ export class InteractionSelectionPage {
   }
 
   public async offlineDeviceSign() {
-    await this.select(InteractionSetting.OFFLINE_DEVICE)
+    if (this.group.interactionSetting === InteractionSetting.UNDETERMINED) {
+      await this.select(InteractionSetting.OFFLINE_DEVICE)
+    }
     this.interactionService.offlineDeviceSign(this.wallet, this.airGapTxs, this.interactionData, this.type, this.isRelay, this.generatedId)
   }
 
   public async sameDeviceSign() {
-    await this.select(InteractionSetting.SAME_DEVICE)
+    if (this.group.interactionSetting === InteractionSetting.UNDETERMINED) {
+      await this.select(InteractionSetting.SAME_DEVICE)
+    }
     this.interactionService.sameDeviceSign(this.wallet, this.interactionData, this.type, this.isRelay, this.generatedId)
   }
 
   public async ledgerSign() {
-    await this.select(InteractionSetting.LEDGER)
+    if (this.group.interactionSetting === InteractionSetting.UNDETERMINED) {
+      await this.select(InteractionSetting.LEDGER)
+    }
     this.interactionService.ledgerSign(this.wallet, this.airGapTxs, this.interactionData)
   }
 
