@@ -10,12 +10,14 @@ import {
   CLIPBOARD_PLUGIN,
   DeeplinkService,
   FeeConverterPipe,
+  FILESYSTEM_PLUGIN,
   PermissionsService,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
+import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -75,6 +77,7 @@ import { SaplingService } from './services/sapling/sapling.service'
 import { InteractionService } from './services/interaction/interaction.service'
 import { SaplingNative } from './capacitor-plugins/definitions'
 import { AppLauncher } from '@capacitor/app-launcher'
+import { Filesystem } from '@capacitor/filesystem'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -92,6 +95,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     FormsModule,
     CommonModule,
     AirGapAngularCoreModule,
+    AirGapAngularNgRxModule,
     StoreModule.forRoot(fromRoot.reducers, {
       metaReducers: fromRoot.metaReducers,
       /* temporary fix for `ERROR TypeError: Cannot freeze array buffer views with elements` */
@@ -130,6 +134,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: APP_LAUNCHER_PLUGIN, useValue: AppLauncher },
     { provide: BROWSER_PLUGIN, useValue: Browser },
     { provide: CLIPBOARD_PLUGIN, useValue: Clipboard },
+    { provide: FILESYSTEM_PLUGIN, useValue: Filesystem },
     { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: PushNotifications },
     { provide: SAPLING_PLUGIN, useValue: SaplingNative },
     { provide: SHARE_PLUGIN, useValue: Share },

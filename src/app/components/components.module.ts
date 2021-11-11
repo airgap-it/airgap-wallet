@@ -1,8 +1,10 @@
 import { AirGapAngularCoreModule } from '@airgap/angular-core'
+import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
 import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
+import { ReactiveComponentModule } from '@ngrx/component'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
 import { ChartsModule } from 'ng2-charts'
@@ -28,6 +30,7 @@ import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
 import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
+import { TezosFAForm } from './tezos-fa-form/tezos-fa-form.component'
 import { TransactionItemComponent } from './transaction-item/transaction-item.component'
 import { TransactionListComponent } from './transaction-list/transaction-list.component'
 import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
@@ -51,6 +54,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    TezosFAForm,
     CurrencyItemComponent,
     DelegateActionPopoverComponent,
     DelegateEditPopoverComponent,
@@ -77,13 +81,15 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    ReactiveComponentModule,
 
     PipesModule,
     MomentModule,
     ChartsModule,
     TranslateModule,
     QRCodeModule,
-    AirGapAngularCoreModule
+    AirGapAngularCoreModule,
+    AirGapAngularNgRxModule
   ],
   exports: [
     PortfolioItemComponent,
@@ -95,6 +101,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    TezosFAForm,
     CurrencyItemComponent,
     DelegateEditPopoverComponent,
     PermissionRequestComponent,

@@ -103,7 +103,10 @@
   },
   "account-add": {
     "featured": "Featured",
-    "others": "Others"
+    "others": "More Assets",
+    "generic": {
+      "xtz_label": "Add Unlisted Tezos Asset"
+    }
   },
   "scan": {
     "title": "Scan QR",
@@ -338,6 +341,14 @@
     },
     "add-accounts_label": "Add {{ typeLabel }}",
     "no-imports_text": "No {{ typeLabel }} found to import."
+  },
+  "add-generic-sub-account": {
+    "title": "Add {{ genericSubProtocolName }}",
+    "add-button_label": "Add Asset",
+    "xtz-fa": {
+      "name": "Unlisted Tezos Asset"
+    },
+    "unsupported_text": "Can't add selected sub account."
   },
   "sub-account-select": {
     "title": "Select Account",
@@ -832,5 +843,23 @@
   "dapp-confirm": {
     "title": "Confirm Walletconnect Request",
     "text": "Do you want to confirm the walletconnect request?"
+  },
+  "tezos-fa-form": {
+    "header": "Provide Tezos contract details to add an unlisted Tezos asset.",
+    "contract-address_label": "Contract Address",
+    "network_label": "Network",
+    "token-interface_label": "FA Standard",
+    "token": {
+      "label": "Asset",
+      "placeholder": "Select Asset"
+    },
+    "paste_label": "Paste",
+    "error": {
+      "contract-not-found": "Contract not found, check if the address and network are correct.",
+      "interface-unknown": "Unable to determine the interface of the contract, please specify one.",
+      "token-metadata-missing": "Unable to fetch the asset metadata.",
+      "token-vague": "The address is a multi asset contract, please specify the asset you want to add.",
+      "unknown": "Unkown error has occurred."
+    }
   }
 }

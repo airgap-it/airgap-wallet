@@ -33,6 +33,12 @@
         </p>
       </ion-text>
       <currency-item
+        (click)="addGenericSubAccount(genericProtocol)"
+        *ngFor="let genericProtocol of filteredGenericSubAccountProtocols"
+        [protocol]="genericProtocol"
+        [showSymbol]="false"
+      ></currency-item>
+      <currency-item
         (click)="addSubAccount(subProtocol)"
         *ngFor="let subProtocol of filteredOtherSubAccountProtocols"
         [protocol]="subProtocol"

@@ -91,7 +91,7 @@ export class BeaconService {
     if (network) {
       const isProtocolAvailable = await this.protocolService.isProtocolAvailable(protocol.identifier, protocol.options.network.identifier)
       if (!isProtocolAvailable) {
-        await this.protocolService.addActiveProtocol(protocol)
+        await this.protocolService.addActiveProtocols(protocol)
       }
     }
     this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [request, protocol.identifier, protocol.options.network.identifier])
