@@ -80,6 +80,14 @@ const routes: Routes = [
     loadChildren: () => import('./pages/sub-account-add/sub-account-add.module').then((m) => m.SubAccountAddPageModule)
   },
   {
+    path: 'sub-account-add-generic/:id/:protocolID/:networkID/:genericSubProtocolType',
+    resolve: {
+      special: DataResolverService
+    },
+    canActivate: [ProtocolGuard, ServiceKeyGuard],
+    loadChildren: () => import('./pages/sub-account-add-generic/sub-account-add-generic.module').then((m) => m.SubAccountAddGenericPageModule)
+  },
+  {
     path: 'sub-account-select/:id',
     resolve: {
       special: DataResolverService

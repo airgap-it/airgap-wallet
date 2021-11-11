@@ -21,6 +21,12 @@ import {
   MainProtocolSymbols,
   NetworkType,
   TezblockBlockExplorer,
+  TezosFA1p2Protocol,
+  TezosFA2Protocol,
+  TezosFA2ProtocolConfig,
+  TezosFA2ProtocolOptions,
+  TezosFAProtocolConfig,
+  TezosFAProtocolOptions,
   TezosKtProtocol,
   TezosNetwork,
   TezosProtocol,
@@ -52,6 +58,7 @@ import { SaplingNativeService } from './services/sapling-native/sapling-native.s
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
+import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
 
 @Component({
@@ -256,7 +263,75 @@ export class AppComponent implements AfterViewInit {
       extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 
-    await this.initializeTezosDomains()
+    await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
+  }
+
+  private async getGenericSubProtocols(): Promise<void> {
+    const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
+    const identifiersWithOptions = Object.entries(genericSubProtocols)
+    const protocols = identifiersWithOptions
+      .map(([identifier, options]) => {
+        if (identifier.startsWith(MainProtocolSymbols.XTZ)) {
+          const tezosOptions = options as TezosProtocolOptions
+          const tezosProtocolNetwork = new TezosProtocolNetwork(
+            tezosOptions.network.name,
+            tezosOptions.network.type,
+            tezosOptions.network.rpcUrl,
+            tezosOptions.network.blockExplorer,
+            new TezosProtocolNetworkExtras(
+              tezosOptions.network.extras.network,
+              tezosOptions.network.extras.conseilUrl,
+              tezosOptions.network.extras.conseilNetwork,
+              tezosOptions.network.extras.conseilApiKey
+            )
+          )
+          if (identifier.startsWith(faProtocolSymbol('1.2'))) {
+            const faOptions = tezosOptions as TezosFAProtocolOptions
+
+            return new TezosFA1p2Protocol(
+              new TezosFAProtocolOptions(
+                tezosProtocolNetwork,
+                new TezosFAProtocolConfig(
+                  faOptions.config.contractAddress,
+                  faOptions.config.identifier,
+                  faOptions.config.symbol,
+                  faOptions.config.name,
+                  faOptions.config.marketSymbol,
+                  faOptions.config.feeDefaults,
+                  faOptions.config.decimals,
+                  faOptions.config.tokenMetadataBigMapID
+                )
+              )
+            )
+          } else if (identifier.startsWith(faProtocolSymbol('2'))) {
+            const fa2Options = tezosOptions as TezosFA2ProtocolOptions
+
+            return new TezosFA2Protocol(
+              new TezosFA2ProtocolOptions(
+                tezosProtocolNetwork,
+                new TezosFA2ProtocolConfig(
+                  fa2Options.config.contractAddress,
+                  fa2Options.config.identifier,
+                  fa2Options.config.symbol,
+                  fa2Options.config.name,
+                  fa2Options.config.marketSymbol,
+                  fa2Options.config.feeDefaults,
+                  fa2Options.config.decimals,
+                  fa2Options.config.defaultTokenID,
+                  fa2Options.config.tokenMetadataBigMapID,
+                  fa2Options.config.ledgerBigMapID,
+                  fa2Options.config.totalSupplyBigMapID
+                )
+              )
+            )
+          }
+        }
+
+        return undefined
+      })
+      .filter((protocol) => protocol !== undefined)
+
+    await this.protocolService.addActiveSubProtocols(protocols)
   }
 
   private async initializeTezosDomains(): Promise<void> {

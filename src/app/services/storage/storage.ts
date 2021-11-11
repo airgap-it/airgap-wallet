@@ -1,8 +1,10 @@
 import { BaseStorage } from '@airgap/angular-core'
 import { Network } from '@airgap/beacon-sdk'
 import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
+import { ProtocolOptions } from '@airgap/coinlib-core/utils/ProtocolOptions'
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
+
 import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { ExchangeTransactionDetails } from '../exchange/exchange'
 
@@ -28,6 +30,7 @@ export enum WalletStorageKey {
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
   BEACON_REQUESTS = 'BEACON_REQUESTS',
   PENDING_REQUEST = 'PENDING_REQUEST',
+  GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS'
 }
 
 interface IBroadcastTransaction {
@@ -50,6 +53,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: ExchangeTransactionDetails[]
   [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
+  [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -67,7 +71,8 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.USER_ID]: undefined,
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: [],
   [WalletStorageKey.BEACON_REQUESTS]: [],
-  [WalletStorageKey.PENDING_REQUEST]: []
+  [WalletStorageKey.PENDING_REQUEST]: [],
+  [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {}
 }
 
 @Injectable({

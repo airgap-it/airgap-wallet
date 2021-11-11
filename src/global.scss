@@ -115,6 +115,18 @@ airgap-iac-qr {
       bottom: 24px;
     }
   }
+  tezos-fa-form {
+    .label--radio {
+      height: 32px !important;
+      margin-top: 16px;
+    }
+  }
+}
+tezos-fa-form {
+  ion-avatar {
+    min-height: 32px;
+    min-width: 32px;
+  }
 }
 /* Fixes card padding & margin */
 ion-card {
