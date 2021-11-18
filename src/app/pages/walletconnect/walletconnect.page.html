@@ -19,9 +19,13 @@
     </ng-container>
 
     <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="ion-padding-bottom ion-margin-bottom">
-      <ng-container *ngFor="let transaction of transactions">
-        <airgap-from-to [transaction]="transaction"></airgap-from-to>
-      </ng-container>
+      <div *ngFor="let airGapTransaction of airGapTransactions">
+        <walletconnect-from-to
+          [rawTransaction]="rawTransaction"
+          [airGapTransaction]="airGapTransaction"
+          (onRawTransactionUpdate)="updateRawTransaction($event)"
+        ></walletconnect-from-to>
+      </div>
     </div>
 
     <div *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST || request.method === requestMethod.ETH_SIGN_TYPED_DATA">

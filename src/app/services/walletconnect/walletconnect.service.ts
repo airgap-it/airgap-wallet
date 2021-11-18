@@ -61,7 +61,6 @@ export class WalletconnectService {
     })
     await this.loading.present()
   }
-
   public async subscribeToEvents(connector: WalletConnect): Promise<void> {
     if (!connector) {
       return

@@ -24,6 +24,7 @@ import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-e
 import { EmptyStateComponent } from './empty-state/empty-state'
 import { FeeComponent } from './fee/fee.component'
 import { FromToComponent } from './from-to/from-to.component'
+
 import { InteractionSelectionComponent } from './interaction-selection/interaction-selection.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
@@ -33,6 +34,7 @@ import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-ca
 import { TezosFAForm } from './tezos-fa-form/tezos-fa-form.component'
 import { TransactionItemComponent } from './transaction-item/transaction-item.component'
 import { TransactionListComponent } from './transaction-list/transaction-list.component'
+import { WalletconnectFromToComponent } from './walletconnect-from-to/walletconnect-from-to.component'
 import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
 import { WidgetAccountSummary } from './widget-account-summary/widget-account-summary'
 import { WidgetAccount } from './widget-account/widget-account'
@@ -65,6 +67,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     TransactionItemComponent,
     FeeComponent,
     FromToComponent,
+    WalletconnectFromToComponent,
     InteractionSelectionComponent,
     WidgetSelector,
     WidgetAccount,
@@ -107,12 +110,12 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     PermissionRequestComponent,
     CurrentWalletGroupComponent,
     DappPeerComponent,
+    WalletconnectFromToComponent,
     InteractionSelectionComponent,
     TransactionListComponent,
     TransactionItemComponent,
     FeeComponent,
     FromToComponent,
-
     WidgetSelector,
     WidgetAccount,
     WidgetAccountSummary,
