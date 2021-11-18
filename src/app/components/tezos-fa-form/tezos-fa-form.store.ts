@@ -104,7 +104,11 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   })
 
   private updateWithError = this.updater((state: TezosFAFormState, error: unknown) => {
-    const tezosFAFormError = isTezosFAFormError(error) ? error : unknownError()
+    const tezosFAFormError = isTezosFAFormError(error) ? error : unknownError(error)
+
+    if (tezosFAFormError.type === TezosFAFormErrorType.UNKNOWN && tezosFAFormError.error) {
+      console.error(error)
+    }
 
     return {
       ...state,
@@ -253,6 +257,10 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   private async getTokenInterface(contract: TezosContract, tokenInterface?: TokenInterface): Promise<TokenInterface | undefined> {
     if (!tokenInterface) {
       const metadata = await this.getContractMetadata(contract)
+      if (!metadata) {
+        return undefined
+      }
+
       if (hasTokenInterface(metadata, TokenInterface.FA1p2)) {
         return TokenInterface.FA1p2
       } else if (hasTokenInterface(metadata, TokenInterface.FA2)) {

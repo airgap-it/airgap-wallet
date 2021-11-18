@@ -49,7 +49,9 @@ export interface ContractNotFoundError extends TezosFAFormBaseError<TezosFAFormE
 export interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> { tokenInterfaces: TokenInterface[] }
 export interface TokenMetadataMissingError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING> {}
 export interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> { tokens: TokenDetails[] }
-export interface UnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.UNKNOWN> {}
+export interface UnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.UNKNOWN> {
+  error?: any
+}
 
 export type TezosFAFormError = 
   | ContractNotFoundError 

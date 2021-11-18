@@ -22,8 +22,8 @@ export function tokenVaugeError(tokenMetadataRegistry: Record<number, TezosFATok
   return { type: TezosFAFormErrorType.TOKEN_VAGUE, tokens }
 }
 
-export function unknownError(): UnknownError {
-  return { type: TezosFAFormErrorType.UNKNOWN }
+export function unknownError(error?: any): UnknownError {
+  return { type: TezosFAFormErrorType.UNKNOWN, error }
 }
 
 export function isTezosFAFormError(error: unknown): error is TezosFAFormError {
