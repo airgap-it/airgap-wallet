@@ -27,7 +27,7 @@
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
             <portfolio-item
-              *ngFor="let subWallet of walletGroup.subWallets"
+              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network }"
               [wallet]="subWallet"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"

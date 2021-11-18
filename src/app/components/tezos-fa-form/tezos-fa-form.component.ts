@@ -1,6 +1,6 @@
 import { UIResourceStatus } from '@airgap/angular-core'
-import { ICoinProtocol, TezosNetwork } from '@airgap/coinlib-core'
-import { Component, EventEmitter, Inject, OnDestroy, Output } from '@angular/core'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { Component, EventEmitter, Inject, OnDestroy, OnInit, Output } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Subject } from 'rxjs'
 import { debounceTime, takeUntil } from 'rxjs/operators'
@@ -18,7 +18,7 @@ import { TokenInterface } from './tezos-fa-form.types'
     TezosFAFormStore
   ]
 })
-export class TezosFAForm implements OnDestroy {
+export class TezosFAForm implements OnInit, OnDestroy {
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
   public readonly tokenInterfaceDescription: Record<TokenInterface, string> = {
@@ -44,12 +44,16 @@ export class TezosFAForm implements OnDestroy {
   ) {
     this.formGroup = this.formBuilder.group({
       address: ['', Validators.compose([Validators.required, Validators.pattern(/^KT1[1-9A-Za-z]{33}$/)])],
-      network: [TezosNetwork.MAINNET, Validators.compose([Validators.required])],
+      network: [null, Validators.compose([Validators.required])],
       tokenInterface: [null],
       tokenID: [null]
     })
 
     this.setListeners()
+  }
+
+  public ngOnInit(): void {
+      this.facade.onInit()
   }
 
   public ngOnDestroy(): void {
@@ -61,10 +65,10 @@ export class TezosFAForm implements OnDestroy {
     this.formGroup
       .valueChanges
       .pipe(debounceTime(500), takeUntil(this.ngDestroyed$))
-      .subscribe((value: { address: string, network: TezosNetwork, tokenInterface: TokenInterface | null, tokenID: number | null }) => {
+      .subscribe((value: { address: string, network: string, tokenInterface: TokenInterface | null, tokenID: number | null }) => {
         this.facade.onTokenDetailsInput({ 
           address: value.address, 
-          network: value.network, 
+          networkIdentifier: value.network,
           tokenInterface: value.tokenInterface !== null ? value.tokenInterface : undefined, 
           tokenID: value.tokenID !== null ? value.tokenID : undefined
         })
@@ -93,6 +97,14 @@ export class TezosFAForm implements OnDestroy {
           this.protocol.emit(value.value)
         }
       })
+
+      this.facade.networks$
+        .pipe(takeUntil(this.ngDestroyed$))
+        .subscribe((values) => {
+          if (!this.formGroup.value.network || !values.includes(this.formGroup.value.network)) {
+            this.formGroup.patchValue({ network: values[0]?.identifier }, { emitEvent: false })
+          }
+        })
   }
 
   public async pasteFromClipboard(): Promise<void> {

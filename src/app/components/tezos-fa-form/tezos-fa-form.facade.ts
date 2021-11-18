@@ -1,5 +1,5 @@
 import { ClipboardService, UIResource } from '@airgap/angular-core'
-import { ICoinProtocol, TezosNetwork } from '@airgap/coinlib-core'
+import { ICoinProtocol, ProtocolNetwork } from '@airgap/coinlib-core'
 import { Injectable, InjectionToken } from '@angular/core'
 import { Observable } from 'rxjs'
 
@@ -13,12 +13,13 @@ export interface TezosFAFormFacade {
 
   readonly tokenInterfaces$: Observable<TokenInterface[]>
   readonly tokens$: Observable<TokenDetails[]>
-  readonly networks$: Observable<TezosNetwork[]>
+  readonly networks$: Observable<ProtocolNetwork[]>
 
   readonly protocol$: Observable<UIResource<ICoinProtocol>>
 
   readonly errorDescription$: Observable<string>
 
+  onInit(): void
   onTokenDetailsInput(details: TokenDetailsInput): void
   getFromClipboard(): Promise<string>
 }
@@ -30,7 +31,7 @@ export class TezosFAFormNgRxFacade implements TezosFAFormFacade {
 
   public readonly tokenInterfaces$: Observable<TokenInterface[]>
   public readonly tokens$: Observable<TokenDetails[]>
-  public readonly networks$: Observable<TezosNetwork[]>
+  public readonly networks$: Observable<ProtocolNetwork[]>
 
   public readonly protocol$: Observable<UIResource<ICoinProtocol>>
 
@@ -49,6 +50,10 @@ export class TezosFAFormNgRxFacade implements TezosFAFormFacade {
 
     this.protocol$ = this.store.select((state: TezosFAFormState) => state.protocol)
     this.errorDescription$ = this.store.select((state: TezosFAFormState) => state.errorDescription)
+  }
+
+  public onInit(): void {
+    this.store.onInit()
   }
 
   public onTokenDetailsInput(details: TokenDetailsInput): void {

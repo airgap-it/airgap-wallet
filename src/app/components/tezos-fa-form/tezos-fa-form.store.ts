@@ -2,13 +2,13 @@ import { FilesystemService, ProtocolService, UIResourceStatus } from '@airgap/an
 import {
   ICoinProtocol,
   MainProtocolSymbols,
+  ProtocolNetwork,
   TezosFA1p2Protocol,
   TezosFA2Protocol,
   TezosFA2ProtocolConfig,
   TezosFA2ProtocolOptions,
   TezosFAProtocolConfig,
   TezosFAProtocolOptions,
-  TezosNetwork,
   TezosProtocolOptions
 } from '@airgap/coinlib-core'
 import { TezosContract } from '@airgap/coinlib-core/protocols/tezos/contract/TezosContract'
@@ -17,27 +17,31 @@ import {
   indexerApiKey,
   indexerNetwork,
   nodeUrl,
+  TezosProtocolNetwork,
   tezosProtocolNetwork
 } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
 import { TezosContractMetadata } from '@airgap/coinlib-core/protocols/tezos/types/contract/TezosContractMetadata'
 import { TezosFATokenMetadata } from '@airgap/coinlib-core/protocols/tezos/types/fa/TezosFATokenMetadata'
 import { Injectable } from '@angular/core'
 import { ComponentStore, tapResponse } from '@ngrx/component-store'
-import { Observable, Subscriber } from 'rxjs'
-import { repeat, switchMap } from 'rxjs/operators'
+import { from, Observable, Subscriber } from 'rxjs'
+import { repeat, switchMap, withLatestFrom } from 'rxjs/operators'
 import { faProtocolSymbol } from 'src/app/types/GenericProtocolSymbols'
 import {
-  contractNotFoundError,
-  interfaceUnknownError,
-  isTezosFAFormError,
   TezosFAFormErrorType,
   TezosFAFormState,
   TokenDetailsInput,
   TokenInterface,
+} from './tezos-fa-form.types'
+import {
+  contractNotFoundError,
+  hasTokenInterface,
+  interfaceUnknownError,
+  isTezosFAFormError,
   tokenMetadataMissingError,
   tokenVaugeError,
   unknownError
-} from './tezos-fa-form.types'
+} from './tezos-fa-form.utils'
 
 const initialState: TezosFAFormState = {
   tokenInterface: { status: UIResourceStatus.IDLE, value: undefined },
@@ -45,7 +49,7 @@ const initialState: TezosFAFormState = {
 
   tokenInterfaces: [],
   tokens: [],
-  networks: Object.values(TezosNetwork),
+  networks: [],
 
   protocol: { status: UIResourceStatus.IDLE, value: undefined },
 
@@ -61,11 +65,21 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     super(initialState)
   }
 
+  public readonly onInit = this.effect(() => {
+    return from(this.initAsync()).pipe(
+      tapResponse(
+        (partialState) => this.updateWithValue(partialState),
+        (error) => this.updateWithError(error)
+      )
+    )
+  })
+
   public readonly onTokenDetailsInput = this.effect(
     (details$: Observable<TokenDetailsInput>) => {
       return details$.pipe(
-        switchMap((details) => {
-          return this.fetchTokenDetails(details).pipe(
+        withLatestFrom(this.state$),
+        switchMap(([details, state]) => {
+          return this.fetchTokenDetails(state, details).pipe(
             tapResponse(
               (partialState) => this.updateWithValue(partialState),
               (error) => this.updateWithError(error)
@@ -121,13 +135,21 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     }
   })
 
-  private fetchTokenDetails(inputDetails: TokenDetailsInput): Observable<Partial<TezosFAFormState>> {
+  private async initAsync(): Promise<Partial<TezosFAFormState>> {
+    const networks = await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ)
+
+    return {
+      networks: networks
+    }
+  }
+
+  private fetchTokenDetails(state: TezosFAFormState, inputDetails: TokenDetailsInput): Observable<Partial<TezosFAFormState>> {
     return new Observable((subscriber: Subscriber<Partial<TezosFAFormState>>) => {
       new Promise<void>(async (resolve, reject) => {
         try {
           this.emitLoading(subscriber)
 
-          const alreadySupported = await this.alreadySupported(inputDetails.address, inputDetails.network, inputDetails.tokenID)
+          const alreadySupported = await this.alreadySupported(inputDetails.address, inputDetails.networkIdentifier, inputDetails.tokenID)
           if (alreadySupported) {
             const handledAlreadySupported = await this.handleAlreadySupported(alreadySupported, inputDetails.tokenID)
             await this.tapProtocol(handledAlreadySupported)
@@ -136,7 +158,11 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
             return
           }
 
-          const contract = await this.getContract(inputDetails.address, inputDetails.network)
+          const network = state.networks.find((network: ProtocolNetwork) => network.identifier === inputDetails.networkIdentifier)
+          let contract: TezosContract | undefined
+          if (network && network instanceof TezosProtocolNetwork) {
+            contract = await this.getContract(inputDetails.address, network)
+          }
           this.emitContract(contract, subscriber)
 
           const tokenInterface: TokenInterface | undefined = await this.getTokenInterface(contract, inputDetails.tokenInterface)
@@ -168,10 +194,10 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     })
   }
 
-  private async alreadySupported(address: string, network: TezosNetwork, tokenID?: number): Promise<ICoinProtocol | undefined> {
+  private async alreadySupported(address: string, networkIdentifier: string, tokenID?: number): Promise<ICoinProtocol | undefined> {
     const subProtocols = await this.protocolService.getSubProtocols(MainProtocolSymbols.XTZ)
     const alreadySupportedProtocols = subProtocols.filter((protocol) => {
-      return protocol.contractAddress === address && (protocol.options as TezosProtocolOptions).network.extras.network === network
+      return protocol.contractAddress === address && (protocol.options as TezosProtocolOptions).network.identifier === networkIdentifier
     })
 
     const alreadySupportedToken = alreadySupportedProtocols.find((protocol) => {
@@ -205,14 +231,14 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     }
   }
 
-  private async getContract(address: string, network: TezosNetwork): Promise<TezosContract | undefined> {
+  private async getContract(address: string, network: TezosProtocolNetwork): Promise<TezosContract | undefined> {
     const contract = new TezosContract(
       address,
-      network,
-      nodeUrl(network),
-      indexerApi(network),
-      indexerNetwork(network),
-      indexerApiKey(network)
+      network.extras.network,
+      nodeUrl(network.extras.network),
+      indexerApi(network.extras.network),
+      indexerNetwork(network.extras.network),
+      indexerApiKey(network.extras.network)
     )
 
     try {
@@ -227,9 +253,9 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   private async getTokenInterface(contract: TezosContract, tokenInterface?: TokenInterface): Promise<TokenInterface | undefined> {
     if (!tokenInterface) {
       const metadata = await this.getContractMetadata(contract)
-      if (metadata?.interfaces?.some((value) => value.toLowerCase().includes(TokenInterface.FA1p2.toLowerCase()))) {
+      if (hasTokenInterface(metadata, TokenInterface.FA1p2)) {
         return TokenInterface.FA1p2
-      } else if (metadata?.interfaces?.some((value) => value.toLowerCase().includes(TokenInterface.FA2.toLowerCase()))) {
+      } else if (hasTokenInterface(metadata, TokenInterface.FA2)) {
         return TokenInterface.FA2
       }
     }
@@ -241,7 +267,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     const genericFA1p2Protocol = new TezosFA1p2Protocol(
       new TezosFAProtocolOptions(
         tezosProtocolNetwork(contract.network),
-        new TezosFAProtocolConfig(contract.address, faProtocolSymbol('1.2'))
+        new TezosFAProtocolConfig(contract.address, faProtocolSymbol('1.2', contract.address))
       )
     )
     const tokenMetadata = await this.getFA1p2TokenMetadata(genericFA1p2Protocol)
@@ -256,7 +282,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         genericFA1p2Protocol.options.network,
         new TezosFAProtocolConfig(
           genericFA1p2Protocol.options.config.contractAddress,
-          faProtocolSymbol('1.2', tokenMetadata.symbol),
+          faProtocolSymbol('1.2', contract.address),
           tokenMetadata.symbol,
           tokenMetadata.name,
           tokenMetadata.symbol,
@@ -273,7 +299,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         tezosProtocolNetwork(contract.network),
         new TezosFA2ProtocolConfig(
           contract.address,
-          faProtocolSymbol('2'),
+          faProtocolSymbol('2', contract.address, customTokenID),
           undefined,
           undefined,
           undefined,
@@ -315,7 +341,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         baseProtocol.options.network,
         new TezosFA2ProtocolConfig(
           baseProtocol.options.config.contractAddress,
-          faProtocolSymbol('2', tokenMetadata.symbol),
+          faProtocolSymbol('2', baseProtocol.contractAddress, tokenID),
           tokenMetadata.symbol,
           tokenMetadata.name,
           tokenMetadata.symbol,

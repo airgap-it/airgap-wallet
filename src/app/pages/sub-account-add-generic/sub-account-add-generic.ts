@@ -1,4 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { getProtocolAndNetworkIdentifier, ProtocolService } from '@airgap/angular-core'
 import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -53,12 +53,14 @@ export class SubAccountAddGenericPage {
   }
 
   private async saveGenericProtocol(protocol: ICoinProtocol): Promise<void> {
+    const protocolNetworkIdentifier = getProtocolAndNetworkIdentifier(protocol)
+
     await Promise.all([
       this.protocolService.addActiveSubProtocols(protocol),
       this.storage.get(WalletStorageKey.GENERIC_SUBPROTOCOLS).then((genericSubProtocols) => {
         return this.storage.set(
           WalletStorageKey.GENERIC_SUBPROTOCOLS,
-          Object.assign(genericSubProtocols, { [protocol.identifier]: protocol.options })
+          Object.assign(genericSubProtocols, { [protocolNetworkIdentifier]: protocol.options })
         )
       })
     ])
