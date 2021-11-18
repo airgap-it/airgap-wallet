@@ -40,7 +40,7 @@
       <ion-item class="ion-no-padding" lines="none">
         <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ 'tezos-fa-form.network_label' | translate }}</ion-label>
         <ion-select formControlName="network">
-          <ion-select-option *ngFor="let network of networks" [value]="network">{{ network }}</ion-select-option>
+          <ion-select-option *ngFor="let network of networks" [value]="network.identifier">{{ network.name }}</ion-select-option>
         </ion-select>
       </ion-item>
     </ion-row>

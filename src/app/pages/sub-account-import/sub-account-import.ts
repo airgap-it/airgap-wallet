@@ -64,7 +64,8 @@ export class SubAccountImportPage {
       )
       .subscribe((mainAccounts) => {
         const promises: Promise<void>[] = mainAccounts.map(async (mainAccount) => {
-          if (!this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)) {
+          const wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(mainAccount.publicKey, this.subProtocolIdentifier)
+          if (!wallet || wallet.status !== AirGapWalletStatus.ACTIVE) {
             const protocol = await this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier)
             const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(mainAccount)
             const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(

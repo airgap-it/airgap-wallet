@@ -6,7 +6,7 @@ import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 import { TezosProtocolNetwork } from '@airgap/coinlib-core'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -147,8 +147,8 @@ export class AccountEditPopoverComponent implements OnInit {
   }
 
   private async initNetworks(): Promise<void> {
-    if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
+    // if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
       this.networks = await this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
-    }
+    // }
   }
 }

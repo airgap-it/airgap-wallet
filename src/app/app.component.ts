@@ -270,8 +270,10 @@ export class AppComponent implements AfterViewInit {
     const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
     const identifiersWithOptions = Object.entries(genericSubProtocols)
     const protocols = identifiersWithOptions
-      .map(([identifier, options]) => {
-        if (identifier.startsWith(MainProtocolSymbols.XTZ)) {
+      .map(([protocolNetworkIdentifier, options]) => {
+        const [protocolIdentifier, ] = protocolNetworkIdentifier.split(':')
+        
+        if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
           const tezosOptions = options as TezosProtocolOptions
           const tezosProtocolNetwork = new TezosProtocolNetwork(
             tezosOptions.network.name,
@@ -285,7 +287,7 @@ export class AppComponent implements AfterViewInit {
               tezosOptions.network.extras.conseilApiKey
             )
           )
-          if (identifier.startsWith(faProtocolSymbol('1.2'))) {
+          if (protocolIdentifier.startsWith(faProtocolSymbol('1.2'))) {
             const faOptions = tezosOptions as TezosFAProtocolOptions
 
             return new TezosFA1p2Protocol(
@@ -303,7 +305,7 @@ export class AppComponent implements AfterViewInit {
                 )
               )
             )
-          } else if (identifier.startsWith(faProtocolSymbol('2'))) {
+          } else if (protocolIdentifier.startsWith(faProtocolSymbol('2'))) {
             const fa2Options = tezosOptions as TezosFA2ProtocolOptions
 
             return new TezosFA2Protocol(

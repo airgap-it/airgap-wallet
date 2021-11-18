@@ -6,11 +6,11 @@ export enum GenericSubProtocolSymbol {
 
 export type GenericProtocolSymbols = GenericSubProtocolSymbol
 
-export function faProtocolSymbol(interfaceVersion: '1.2' | '2', symbol?: string): ProtocolSymbols {
-  let identifer = `${GenericSubProtocolSymbol.XTZ_FA}${interfaceVersion}`
-  if (symbol) {
-    identifer += `-${symbol.toLowerCase()}`
+export function faProtocolSymbol(interfaceVersion: '1.2' | '2', contractAddress?: string, tokenID: number = 0): ProtocolSymbols {
+  let identifier = `${GenericSubProtocolSymbol.XTZ_FA}${interfaceVersion}`
+  if (contractAddress) {
+    identifier += `_${contractAddress}_${tokenID}`
   }
 
-  return identifer as ProtocolSymbols
+  return identifier as ProtocolSymbols
 }

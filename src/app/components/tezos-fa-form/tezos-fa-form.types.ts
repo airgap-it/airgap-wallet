@@ -1,6 +1,5 @@
 import { UIResource } from '@airgap/angular-core'
-import { ICoinProtocol, TezosNetwork } from '@airgap/coinlib-core'
-import { TezosFATokenMetadata } from '@airgap/coinlib-core/protocols/tezos/types/fa/TezosFATokenMetadata'
+import { ICoinProtocol, ProtocolNetwork } from '@airgap/coinlib-core'
 
 export enum TokenInterface {
   FA1p2 = 'TZIP-007',
@@ -14,7 +13,7 @@ export interface TokenDetails {
 
 export interface TokenDetailsInput { 
   address: string
-  network: TezosNetwork
+  networkIdentifier: string
   tokenInterface?: TokenInterface
   tokenID?: number
 }
@@ -25,7 +24,7 @@ export interface TezosFAFormState {
 
   tokenInterfaces: TokenInterface[]
   tokens: TokenDetails[]
-  networks: TezosNetwork[]
+  networks: ProtocolNetwork[]
 
   protocol: UIResource<ICoinProtocol>
   
@@ -46,11 +45,11 @@ interface TezosFAFormBaseError<T extends TezosFAFormErrorType> {
   type: T
 }
 
-interface ContractNotFoundError extends TezosFAFormBaseError<TezosFAFormErrorType.CONTRACT_NOT_FOUND> {}
-interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> { tokenInterfaces: TokenInterface[] }
-interface TokenMetadataMissingError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING> {}
-interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> { tokens: TokenDetails[] }
-interface UnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.UNKNOWN> {}
+export interface ContractNotFoundError extends TezosFAFormBaseError<TezosFAFormErrorType.CONTRACT_NOT_FOUND> {}
+export interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> { tokenInterfaces: TokenInterface[] }
+export interface TokenMetadataMissingError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING> {}
+export interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> { tokens: TokenDetails[] }
+export interface UnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.UNKNOWN> {}
 
 export type TezosFAFormError = 
   | ContractNotFoundError 
@@ -58,31 +57,3 @@ export type TezosFAFormError =
   | TokenMetadataMissingError 
   | TokenVagueError 
   | UnknownError
-
-export function contractNotFoundError(): ContractNotFoundError {
-  return { type: TezosFAFormErrorType.CONTRACT_NOT_FOUND }
-}
-
-export function interfaceUnknownError(tokenInterfaces: TokenInterface[] = Object.values(TokenInterface)): InterfaceUnknownError {
-  return { type: TezosFAFormErrorType.INTERFACE_UNKNOWN, tokenInterfaces }
-}
-
-export function tokenMetadataMissingError(): TokenMetadataMissingError {
-  return { type: TezosFAFormErrorType.TOKEN_METADATA_MISSING }
-}
-
-export function tokenVaugeError(tokenMetadataRegistry: Record<number, TezosFATokenMetadata>): TokenVagueError {
-  const tokens = Object.entries(tokenMetadataRegistry).map(([tokenID, tokenMetadata]) => ({
-    id: parseInt(tokenID),
-    name: tokenMetadata.name
-  }))
-  return { type: TezosFAFormErrorType.TOKEN_VAGUE, tokens }
-}
-
-export function unknownError(): UnknownError {
-  return { type: TezosFAFormErrorType.UNKNOWN }
-}
-
-export function isTezosFAFormError(error: unknown): error is TezosFAFormError {
-  return typeof error === 'object' && Object.values(TezosFAFormErrorType).includes(error['type'])
-}
