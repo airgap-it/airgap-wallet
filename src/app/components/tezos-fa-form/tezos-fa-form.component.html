@@ -1,0 +1,108 @@
+<form [formGroup]="formGroup">
+  <h5 class="ion-padding-bottom">{{ 'tezos-fa-form.header' | translate }}</h5>
+
+  <div class="asset--container ion-margin-bottom">
+    <ng-container *ngrxLet="facade.protocol$ as protocol">
+      <div
+        *ngIf="protocol.status === UIResourceStatus.SUCCESS && protocol.value"
+        class="d-flex ion-align-items-center ion-justify-content-between"
+      >
+        <ion-item class="ion-no-padding" lines="none">
+          <currency-item [protocol]="protocol.value"></currency-item>
+        </ion-item>
+
+        <airgap-network-badge [network]="protocol.value.options.network"></airgap-network-badge>
+      </div>
+      <ng-container *ngIf="protocol.status === UIResourceStatus.LOADING">
+        <ion-item class="ion-no-padding" lines="none">
+          <ion-avatar slot="start"><ion-skeleton-text animated></ion-skeleton-text></ion-avatar>
+          <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+        </ion-item>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-item class="ion-no-padding">
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+          {{ 'tezos-fa-form.contract-address_label' | translate }}
+        </ion-label>
+        <ion-input type="text" placeholder="KT1..." formControlName="address"></ion-input>
+      </ion-item>
+      <ion-button class="paste--button" fill="outline" size="small" color="secondary" shape="round" (click)="pasteFromClipboard()">
+        {{ 'tezos-fa-form.paste_label' | translate }}
+      </ion-button>
+    </ion-col>
+  </ion-row>
+  <ng-container *ngrxLet="facade.networks$ as networks">
+    <ion-row>
+      <ion-item class="ion-no-padding" lines="none">
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ 'tezos-fa-form.network_label' | translate }}</ion-label>
+        <ion-select formControlName="network">
+          <ion-select-option *ngFor="let network of networks" [value]="network.identifier">{{ network.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-row>
+  </ng-container>
+  <ng-container *ngrxLet="facade.tokenInterfaces$ as tokenInterfaces">
+    <ng-container *ngIf="tokenInterfaces.length > 0">
+      <ion-item class="ion-no-padding label--radio" lines="none">
+        <ion-label color="blackLight" position="stacked">{{ 'tezos-fa-form.token-interface_label' | translate }}</ion-label>
+      </ion-item>
+      <ion-row>
+        <ion-col>
+          <ion-item class="ion-no-padding" lines="none">
+            <ion-radio-group formControlName="tokenInterface">
+              <ion-item *ngFor="let tokenInterface of tokenInterfaces" class="ion-no-padding" lines="none" mode="md">
+                <ion-label>{{ tokenInterfaceDescription[tokenInterface] }}</ion-label>
+                <ion-radio slot="start" [value]="tokenInterface"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngrxLet="facade.tokens$ as tokens">
+    <ng-container *ngrxLet="facade.tokenInterface$ as tokenInterface">
+      <ng-container *ngIf="tokens.length > 1 && (!tokenInterface.value || isMultiAssetTokenInterface[tokenInterface.value])">
+        <ion-item class="ion-no-padding label--radio" lines="none">
+          <ion-label color="blackLight" position="stacked">{{ 'tezos-fa-form.token.label' | translate }}</ion-label>
+        </ion-item>
+        <ion-row class="ion-padding-bottom">
+          <ion-col>
+            <ion-item class="ion-no-padding" lines="none">
+              <ion-radio-group *ngIf="tokens.length <= 3" formControlName="tokenID">
+                <ion-item *ngFor="let token of tokens" class="ion-no-padding" lines="none" mode="md">
+                  <ion-label>{{ token.name }}</ion-label>
+                  <ion-radio slot="start" [value]="token.id"></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+              <ion-select
+                *ngIf="tokens.length > 3"
+                formControlName="tokenID"
+                placeholder="{{ 'tezos-fa-form.token.placeholder' | translate }}"
+              >
+                <ion-select-option *ngFor="let token of tokens" [value]="token.id" class="ion-no-padding" lines="none">
+                  {{ token.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngrxLet="facade.errorDescription$ as errorDescription">
+    <ion-row class="ion-padding-vertical">
+      <ion-col>
+        <ion-text color="secondary" *ngIf="errorDescription">
+          <strong>
+            {{ errorDescription | translate }}
+          </strong>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+</form>

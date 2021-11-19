@@ -1,0 +1,30 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-title>
+        {{ 'add-generic-sub-account.title' | translate: { genericSubProtocolName: genericSubProtocolName | translate } }}
+      </ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ng-container [ngSwitch]="genericSubProtocolType">
+      <tezos-fa-form *ngSwitchCase="GenericSubProtocolSymbol.XTZ_FA" (protocol)="saveProtocol($event)"></tezos-fa-form>
+      <ng-container *ngSwitchDefault>
+        <empty-state [text]="'add-generic-sub-account.unsupported_text' | translate" [imageName]="'no-imports.svg'"></empty-state>
+      </ng-container>
+    </ng-container>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="secondary" (click)="addGenericSubAccount()" [disabled]="protocol === undefined">
+      <ion-icon slot="start" name="add"></ion-icon>
+      {{ 'add-generic-sub-account.add-button_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

@@ -16,7 +16,7 @@ export class InteractionService {
     private readonly deeplinkService: DeeplinkService,
     private readonly operationsProvider: OperationsProvider,
     private readonly router: Router
-  ) {}
+  ) { }
 
   public startInteraction(
     group: AirGapMarketWalletGroup,
@@ -31,10 +31,10 @@ export class InteractionService {
 
     switch (interactionSetting) {
       case InteractionSetting.UNDETERMINED:
-        this.goToInteractionSelectionPage(group, wallet, airGapTxs, interactionData)
+        this.goToInteractionSelectionPage(group, wallet, airGapTxs, interactionData, type, isRelay, generatedId)
         break
       case InteractionSetting.ALWAYS_ASK:
-        this.goToInteractionSelectionPage(group, wallet, airGapTxs, interactionData)
+        this.goToInteractionSelectionPage(group, wallet, airGapTxs, interactionData, type, isRelay, generatedId)
         break
       case InteractionSetting.SAME_DEVICE:
         this.sameDeviceSign(wallet, interactionData as IACMessageDefinitionObjectV3[], type, isRelay, generatedId)
@@ -52,16 +52,20 @@ export class InteractionService {
   private goToInteractionSelectionPage(
     group: AirGapMarketWalletGroup,
     wallet: AirGapMarketWallet,
-
     airGapTxs: IAirGapTransaction[],
-    interactionData: unknown
+    interactionData: unknown,
+    type: IACMessageType,
+    isRelay: boolean = false,
+    generatedId?: number
   ): void {
     const info = {
       group,
       wallet,
       airGapTxs,
       data: interactionData,
-      type: IACMessageType.TransactionSignRequest
+      type,
+      isRelay,
+      generatedId,
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

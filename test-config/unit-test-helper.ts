@@ -1,4 +1,4 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, PermissionsService } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, PermissionsService } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -7,6 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { AlertController, IonicModule, LoadingController, NavController, Platform, ToastController } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 import { IonicStorageModule } from '@ionic/storage'
+import { StoreModule } from '@ngrx/store'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
@@ -30,6 +31,7 @@ import {
   AppLauncherMock,
   AppMock,
   ClipboardMock,
+  FilesystemMock,
   PermissionsMock,
   PushNotificationsMock,
   SaplingNativeMock,
@@ -44,6 +46,7 @@ export class UnitHelper {
     app: new AppMock(),
     appInfo: new AppInfoMock(),
     appLauncher: new AppLauncherMock(),
+    filesystem: new FilesystemMock(),
     platform: new PlatformMock(),
     permissions: new PermissionsMock(),
     permissionsProvider: new PermissionsServiceMock(),
@@ -76,7 +79,8 @@ export class UnitHelper {
       MomentModule,
       TranslateModule.forRoot({
         loader: { provide: TranslateLoader, useClass: TranslateFakeLoader }
-      })
+      }),
+      StoreModule.forRoot({})
     ]
     const mandatoryProviders: any[] = [
       DrawChartService,
@@ -87,6 +91,7 @@ export class UnitHelper {
       { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: this.mockRefs.pushNotifications },
       { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfo },
       { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
+      { provide: FILESYSTEM_PLUGIN, useValue: this.mockRefs.filesystem },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },

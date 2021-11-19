@@ -20,6 +20,12 @@ export class AppLauncherMock {
   public openUrl = newSpy('openUrl', Promise.resolve())
 }
 
+export class FilesystemMock {
+  public readFile: jasmine.Spy = newSpy('readFile', Promise.resolve({ data: 'text-from-filesystem' }))
+  public writeFile: jasmine.Spy = newSpy('writeFile', Promise.resolve())
+  public readdir: jasmine.Spy = newSpy('readdir', Promise.resolve({ files: [] }))
+}
+
 export class ClipboardMock {
   public read: jasmine.Spy = newSpy('read', Promise.resolve())
   public write: jasmine.Spy = newSpy('write', Promise.resolve())
