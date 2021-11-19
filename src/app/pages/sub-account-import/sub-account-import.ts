@@ -1,7 +1,7 @@
 import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, NetworkType, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, /*NetworkType, */ProtocolSymbols } from '@airgap/coinlib-core'
 import { map } from 'rxjs/operators'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { PriceService } from 'src/app/services/price/price.service'
@@ -41,6 +41,7 @@ export class SubAccountImportPage {
       this.networkIdentifier = info.networkIdentifier
       this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier).then((protocol: ICoinProtocol) => {
         this.subProtocol = protocol
+        this.filterWallets()
       })
     } else {
       this.subProtocolIdentifier = this.route.snapshot.params.protocolID
@@ -48,9 +49,12 @@ export class SubAccountImportPage {
 
       this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier).then((protocol: ICoinProtocol) => {
         this.subProtocol = protocol
+        this.filterWallets()
       })
     }
+  }
 
+  private filterWallets() {
     this.accountProvider.wallets$
       .pipe(
         map((mainAccounts) =>
@@ -58,7 +62,7 @@ export class SubAccountImportPage {
             (wallet) =>
               wallet.status === AirGapWalletStatus.ACTIVE &&
               wallet.protocol.identifier === getMainIdentifier(this.subProtocolIdentifier) &&
-              wallet.protocol.options.network.type === NetworkType.MAINNET
+              wallet.protocol.options.network.type === this.subProtocol.options.network.type
           )
         )
       )
@@ -89,6 +93,7 @@ export class SubAccountImportPage {
           .catch(handleErrorSentry(ErrorCategory.COINLIB))
       })
   }
+
   public importWallets() {
     const walletAddInfos = this.subWalletsWithGroups.map(([group, subWallet]) => {
       return {

@@ -44,7 +44,7 @@ export class AccountAddPage {
   public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
   public filteredGenericSubAccountProtocols: GenericSubProtocol[] = []
 
-  private featuredSubProtocols: SubProtocolSymbols[] = [SubProtocolSymbols.XTZ_KT, SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UUSD]
+  private featuredSubProtocols: SubProtocolSymbols[] = [SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UUSD, SubProtocolSymbols.XTZ_UDEFI]
 
   constructor(
     private readonly platform: Platform,
@@ -53,7 +53,7 @@ export class AccountAddPage {
     private readonly router: Router,
     private readonly ledgerService: LedgerService,
     private readonly dataService: DataService
-  ) {}
+  ) { }
 
   public async ionViewWillEnter() {
     this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(

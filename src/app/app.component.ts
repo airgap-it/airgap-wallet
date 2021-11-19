@@ -204,34 +204,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const edonetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Edonet',
-      NetworkType.TESTNET,
-      'https://tezos-edonet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//edonet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.EDONET,
-        'https://tezos-edonet-conseil.prod.gke.papers.tech',
-        TezosNetwork.EDONET,
-        'airgap00391'
-      )
-    )
-    const edonetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(edonetNetwork))
-
-    const florencenetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Florencenet',
-      NetworkType.TESTNET,
-      'https://tezos-florencenet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//florencenet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.FLORENCENET,
-        'https://tezos-florencenet-conseil.prod.gke.papers.tech',
-        TezosNetwork.FLORENCENET,
-        'airgap00391'
-      )
-    )
-    const florencenetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(florencenetNetwork))
-
     const granadanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Granadanet',
       NetworkType.TESTNET,
@@ -259,7 +231,7 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [edonetProtocol, florencenetProtocol, granadanetProtocol, shieldedTezProtocol],
+      extraActiveProtocols: [granadanetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 

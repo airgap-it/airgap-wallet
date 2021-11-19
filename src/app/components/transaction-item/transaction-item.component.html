@@ -12,8 +12,8 @@
     <h2>
       <ion-icon *ngIf="tx.isInbound" src="./assets/custom-ion-icons/md-call_received.svg"></ion-icon>
       <ion-icon *ngIf="!tx.isInbound" src="./assets/custom-ion-icons/md-call_made.svg"></ion-icon>
-      <span class="font--weight__bold" color="black">
-        {{ tx.amount | amountConverter: { protocol: tx.protocolIdentifier } | async }}
+      <span *ngIf="protocol !== undefined" class="font--weight__bold" color="black">
+        {{ tx.amount | amountConverter: { protocol: protocol } | async }}
       </span>
     </h2>
 

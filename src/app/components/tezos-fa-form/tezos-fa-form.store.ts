@@ -1,4 +1,4 @@
-import { FilesystemService, ProtocolService, UIResourceStatus } from '@airgap/angular-core'
+import { /*FilesystemService, */ProtocolService, UIResourceStatus } from '@airgap/angular-core'
 import {
   ICoinProtocol,
   MainProtocolSymbols,
@@ -61,7 +61,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   private readonly contractMetadata: Record<string, TezosContractMetadata> = {}
   private readonly tokenMetadata: Record<string, Record<number, TezosFATokenMetadata>> = {}
 
-  constructor(private readonly protocolService: ProtocolService, private readonly filesystemService: FilesystemService) {
+  constructor(private readonly protocolService: ProtocolService, /*private readonly filesystemService: FilesystemService*/) {
     super(initialState)
   }
 
@@ -116,8 +116,8 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         tezosFAFormError.type === TezosFAFormErrorType.INTERFACE_UNKNOWN
           ? { status: UIResourceStatus.ERROR, value: undefined }
           : tezosFAFormError.type === TezosFAFormErrorType.CONTRACT_NOT_FOUND
-          ? { status: UIResourceStatus.IDLE, value: undefined }
-          : state.tokenInterface,
+            ? { status: UIResourceStatus.IDLE, value: undefined }
+            : state.tokenInterface,
       tokenID:
         tezosFAFormError.type === TezosFAFormErrorType.CONTRACT_NOT_FOUND
           ? { status: UIResourceStatus.IDLE, value: undefined }
@@ -126,14 +126,14 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         tezosFAFormError.type === TezosFAFormErrorType.INTERFACE_UNKNOWN
           ? tezosFAFormError.tokenInterfaces
           : tezosFAFormError.type === TezosFAFormErrorType.CONTRACT_NOT_FOUND
-          ? []
-          : state.tokenInterfaces,
+            ? []
+            : state.tokenInterfaces,
       tokens:
         tezosFAFormError.type === TezosFAFormErrorType.TOKEN_VAGUE
           ? tezosFAFormError.tokens
           : tezosFAFormError.type === TezosFAFormErrorType.CONTRACT_NOT_FOUND
-          ? []
-          : state.tokens,
+            ? []
+            : state.tokens,
       protocol: { status: UIResourceStatus.ERROR, value: state.protocol.value },
       errorDescription: `tezos-fa-form.error.${tezosFAFormError.type}`
     }
@@ -380,16 +380,16 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
         tokenID !== undefined
           ? { status: UIResourceStatus.SUCCESS, value: tokenID }
           : protocol instanceof TezosFA2Protocol
-          ? { status: UIResourceStatus.SUCCESS, value: protocol.defaultTokenID }
-          : { status: UIResourceStatus.SUCCESS, value: 0 },
+            ? { status: UIResourceStatus.SUCCESS, value: protocol.defaultTokenID }
+            : { status: UIResourceStatus.SUCCESS, value: 0 },
       tokenInterface: {
         status: UIResourceStatus.SUCCESS,
         value:
           protocol instanceof TezosFA1p2Protocol
             ? TokenInterface.FA1p2
             : protocol instanceof TezosFA2Protocol
-            ? TokenInterface.FA2
-            : undefined
+              ? TokenInterface.FA2
+              : undefined
       },
       protocol: { status: UIResourceStatus.SUCCESS, value: protocol },
       ...(tokenInterface === undefined ? { tokenInterfaces: [] } : {}),
@@ -427,18 +427,20 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   }
 
   private async getFA2TokenMetadata(protocol: TezosFA2Protocol): Promise<Record<number, TezosFATokenMetadata> | undefined> {
-    const allTokenMetadata = await protocol.getAllTokenMetadata()
-    if (!allTokenMetadata) {
-      return undefined
-    }
+    if (!this.tokenMetadata[protocol.contractAddress]) {
+      const allTokenMetadata = await protocol.getAllTokenMetadata()
+      if (!allTokenMetadata) {
+        return undefined
+      }
 
-    await Promise.all(
-      Object.entries(allTokenMetadata).map(async ([tokenID, tokenMetadata]) => {
-        this.tokenMetadata[protocol.contractAddress] = Object.assign(this.tokenMetadata[protocol.contractAddress] ?? {}, {
-          [tokenID]: tokenMetadata
+      await Promise.all(
+        Object.entries(allTokenMetadata).map(async ([tokenID, tokenMetadata]) => {
+          this.tokenMetadata[protocol.contractAddress] = Object.assign(this.tokenMetadata[protocol.contractAddress] ?? {}, {
+            [tokenID]: tokenMetadata
+          })
         })
-      })
-    )
+      )
+    }
 
     return this.tokenMetadata[protocol.contractAddress]
   }
@@ -470,11 +472,11 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     }
   }
 
-  private async tapTokenMetadata(tokenMetadata: TezosFATokenMetadata): Promise<void> {
-    const symbol = tokenMetadata.symbol
-    const thumbnailUri = tokenMetadata.thumbnailUri
-    if (symbol && typeof thumbnailUri === 'string') {
-      await this.filesystemService.writeLazyImage(`/images/symbols/${symbol.toLowerCase()}`, thumbnailUri.trim())
-    }
+  private async tapTokenMetadata(_tokenMetadata: TezosFATokenMetadata): Promise<void> {
+    // const symbol = tokenMetadata.symbol
+    // const thumbnailUri = tokenMetadata.thumbnailUri
+    // if (symbol && typeof thumbnailUri === 'string') {
+    //   await this.filesystemService.writeLazyImage(`/images/symbols/${symbol.toLowerCase()}`, thumbnailUri.trim())
+    // }
   }
 }

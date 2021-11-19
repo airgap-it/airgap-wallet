@@ -173,6 +173,9 @@ export class ExchangeProvider implements Exchange {
     pendingExchangeTxs: ExchangeTransactionDetails[],
     protocolIdentifier: ProtocolSymbols
   ): Promise<IAirGapTransaction[]> {
+    if (pendingExchangeTxs.length === 0) {
+      return []
+    }
     const protocol = await this.protocolService.getProtocol(protocolIdentifier)
     return pendingExchangeTxs.map((tx) => {
       const rawAmount = new BigNumber(protocolIdentifier === tx.toCurrency ? tx.amountExpectedTo : tx.amountExpectedFrom)
