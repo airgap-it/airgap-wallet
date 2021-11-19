@@ -42,7 +42,7 @@
             <ion-label color="blackLight" class="ion-no-margin" position="stacked">
               {{ 'transaction-prepare.balance_label' | translate }}
               <ng-container *ngIf="state.availableBalance !== null">
-                {{ state.availableBalance | amountConverter: { protocol: wallet.protocol.identifier, maxDigits: wallet.protocol.decimals + 1
+                {{ state.availableBalance | amountConverter: { protocol: wallet.protocol, maxDigits: wallet.protocol.decimals + 1
                 } | async }}
               </ng-container>
             </ion-label>

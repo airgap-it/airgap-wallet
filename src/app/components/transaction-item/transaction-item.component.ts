@@ -16,11 +16,13 @@ export class TransactionItemComponent implements OnInit {
 
   public protocol: ICoinProtocol | undefined
 
-  constructor(private readonly protocolService: ProtocolService) {}
+  constructor(private readonly protocolService: ProtocolService) { }
 
   public async ngOnInit(): Promise<void> {
     try {
-      this.protocol = await this.protocolService.getProtocol(this.tx.protocolIdentifier)
-    } catch {}
+      this.protocol = await this.protocolService.getProtocol(this.tx.protocolIdentifier, this.tx.network)
+    } catch {
+
+    }
   }
 }
