@@ -1,4 +1,4 @@
-import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
@@ -16,6 +16,7 @@ import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 import { FundAccountAction } from './actions/FundAccountAction'
+import { CollectiblesAction } from './actions/CollectiblesAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -68,6 +69,13 @@ export class ActionGroup {
   private getTezosActions(): Action<any, any>[] {
     const delegateButtonAction = this.createDelegateButtonAction()
 
+    const collectiblesButton = new ButtonAction(
+      { name: 'account-transaction-list.collectibles_label', icon: 'images', identifier: 'collectibles-action' },
+      () => {
+        return new CollectiblesAction({ wallet: this.callerContext.wallet, router: this.callerContext.router })
+      }
+    )
+
     //TODO: Move logic to sub-account-add.ts
     const addTokenButtonAction = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
@@ -96,7 +104,7 @@ export class ActionGroup {
       }
     )
 
-    return [delegateButtonAction, addTokenButtonAction]
+    return [delegateButtonAction, collectiblesButton, addTokenButtonAction]
   }
 
   public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
@@ -234,7 +242,7 @@ export class ActionGroup {
     const xtzWalletGroup = this.callerContext.accountProvider.findWalletGroup(xtzWallet)
     const protocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(SubProtocolSymbols.XTZ_KT)
 
-    wallet = new AirGapMarketWallet(
+    wallet = new AirGapCoinWallet(
       protocol,
       xtzWallet.publicKey,
       xtzWallet.isExtendedPublicKey,

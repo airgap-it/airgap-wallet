@@ -46,7 +46,10 @@ export class PortfolioItemComponent {
   @Input()
   public maxDigits: number
 
-  public balance: string
+  public balance: BigNumber | undefined
+  public balanceFormatted: string | undefined
+  public marketPrice: BigNumber | undefined
+  
   public numberOfDecimalsInBalance: number = 0
   public readonly smallFontDecimalThreshold = 16
   private readonly defaultMaxDigits = 15
@@ -82,11 +85,12 @@ export class PortfolioItemComponent {
   }
 
   private updateBalance() {
-    if (this.wallet !== undefined && this.wallet.currentBalance !== undefined) {
+    if (this.wallet !== undefined && this.wallet.getCurrentBalance() !== undefined) {
       const converter = new AmountConverterPipe(this.protocolService)
-      const currentBalance: BigNumber = this.wallet.currentBalance
-      const balanceFormatted = converter.transformValueOnly(currentBalance, this.wallet.protocol, this.digits())
-      this.balance = `${balanceFormatted} ${this.wallet.protocol.symbol}`
+      this.balance = this.wallet.getCurrentBalance()
+      this.marketPrice = this.wallet.getCurrentMarketPrice()
+      const balanceFormatted = converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
+      this.balanceFormatted = `${balanceFormatted} ${this.wallet.protocol.symbol}`
       const balanceSplit = balanceFormatted.split('.')
       if (balanceSplit.length == 2) {
         const decimals = balanceSplit.pop()

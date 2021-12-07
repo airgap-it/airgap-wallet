@@ -62,9 +62,9 @@ export class ExchangeConfirmPage {
       this.amountExpectedFrom = info.amountExpectedFrom
       this.amountExpectedTo = info.amountExpectedTo
 
-      this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.currentMarketPrice).toString()
-      this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.currentMarketPrice).toNumber()
-      this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.currentMarketPrice).toNumber()
+      this.feeFiatAmount = new BigNumber(this.fee).multipliedBy(this.fromWallet.getCurrentMarketPrice()).toString()
+      this.fromFiatAmount = new BigNumber(this.amountExpectedFrom).multipliedBy(this.fromWallet.getCurrentMarketPrice()).toNumber()
+      this.toFiatAmount = new BigNumber(this.amountExpectedTo).multipliedBy(this.toWallet.getCurrentMarketPrice()).toNumber()
     }
 
     this.exchangeProvider.getActiveExchange().subscribe((exchange) => {
@@ -109,7 +109,7 @@ export class ExchangeConfirmPage {
       amount,
       fee,
       this.accountProvider.getWalletList(),
-      this.memo
+      { memo: this.memo }
     )
 
     return {

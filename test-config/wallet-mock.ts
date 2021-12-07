@@ -1,5 +1,6 @@
 
 import { 
+  AirGapCoinWallet,
   AirGapMarketWallet,
   BitcoinProtocol,
   EthereumProtocol,
@@ -21,7 +22,7 @@ export class PriceServiceMock implements AirGapWalletPriceService {
 
 class WalletMock {
   public ethWallet: AirGapMarketWallet = Object.assign(
-    new AirGapMarketWallet(
+    new AirGapCoinWallet(
       new EthereumProtocol(),
       '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
       false,
@@ -52,7 +53,7 @@ class WalletMock {
     }
   } as any
 
-  public btcWallet: AirGapMarketWallet = new AirGapMarketWallet(
+  public btcWallet: AirGapMarketWallet = new AirGapCoinWallet(
     new BitcoinProtocol(),
     'xpub6CcLgL3yuTNxguFdSikacKj93R77GMToq1488BKLdZMAQ2BfrVQrx31phHwqhx4kRUTNCeyiWiqvppaykiXM9w8RWJFbhj1etsCgBckA2bF',
     false,

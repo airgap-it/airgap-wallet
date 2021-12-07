@@ -24,10 +24,10 @@
 <ion-content no-bounce has-bouncing="false" forceOverscroll="false">
   <ion-grid fixed="true" class="ion-no-padding">
     <tezos-delegation-card
-      *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && wallet.currentBalance"
+      *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && balance"
       [wallet]="wallet"
       [isDelegated]="isKtDelegated"
-      [delegateAmount]="wallet.currentBalance"
+      [delegateAmount]="balance"
       (onDelegatedClick)="openDelegationDetails()"
       (onUndelegatedClick)="openDelegationDetails()"
     ></tezos-delegation-card>
@@ -121,7 +121,7 @@
           size="default"
           color="primary"
           (click)="openPreparePage()"
-          [disabled]="wallet.currentBalance?.toNumber() === 0"
+          [disabled]="balance?.toNumber() === 0"
           shape="round"
         >
           <ion-icon slot="start" name="send-outline"></ion-icon>

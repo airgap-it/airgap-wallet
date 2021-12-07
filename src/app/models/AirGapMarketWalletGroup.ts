@@ -78,7 +78,8 @@ export class AirGapMarketWalletGroup {
     const status: Record<AirGapWalletStatus, number> = {
       active: 0,
       hidden: 0,
-      deleted: 0
+      deleted: 0,
+      transient: 0
     }
 
     for (const wallet of this.wallets) {
@@ -89,8 +90,10 @@ export class AirGapMarketWalletGroup {
       return AirGapWalletStatus.ACTIVE
     } else if (status.hidden > 0) {
       return AirGapWalletStatus.HIDDEN
-    } else {
+    } else if (status.deleted > 0) {
       return AirGapWalletStatus.DELETED
+    } else {
+      return AirGapWalletStatus.TRANSIENT
     }
   }
 
@@ -100,7 +103,9 @@ export class AirGapMarketWalletGroup {
       label: this.label,
       status: this.status,
       interactionSetting: this.interactionSetting,
-      wallets: this.wallets.map((wallet: AirGapMarketWallet) => [wallet.protocol.identifier, wallet.publicKey])
+      wallets: this.wallets
+        .filter((wallet: AirGapMarketWallet) => wallet.status !== AirGapWalletStatus.TRANSIENT)
+        .map((wallet: AirGapMarketWallet) => [wallet.protocol.identifier, wallet.publicKey])
     }
   }
 

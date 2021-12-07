@@ -1,4 +1,11 @@
-import { AirGapMarketWallet, AirGapWalletPriceService, AirGapWalletStatus, RawTezosTransaction, TezosProtocol } from '@airgap/coinlib-core'
+import {
+  AirGapCoinWallet,
+  AirGapMarketWallet,
+  AirGapWalletPriceService,
+  AirGapWalletStatus,
+  RawTezosTransaction,
+  TezosProtocol
+} from '@airgap/coinlib-core'
 import Tezos from '@obsidiansystems/hw-app-xtz'
 
 import { LedgerApp } from '../LedgerApp'
@@ -11,7 +18,7 @@ export class TezosLedgerApp extends LedgerApp {
     const app = new Tezos(this.connection.transport)
     const result: Record<'publicKey', string> = await app.getAddress(this.derivationPath, true)
 
-    return new AirGapMarketWallet(
+    return new AirGapCoinWallet(
       this.protocol,
       result.publicKey.slice(2),
       false,

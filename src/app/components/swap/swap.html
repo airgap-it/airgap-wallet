@@ -27,7 +27,7 @@
     </ion-item>
     <ion-text color="blackLight">
       <p class="ion-no-margin">
-        ${{ exchangeAmount?.multipliedBy(selectedWallet?.currentMarketPrice)?.toNumber() | number: '1.2-2' }}
+        ${{ exchangeAmount?.multipliedBy(selectedWalletMarketPrice || 0)?.toNumber() | number: '1.2-2' }}
       </p>
     </ion-text>
     <ion-row class="ion-padding-top" *ngIf="swapSell && !exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
@@ -50,14 +50,14 @@
 
     <ion-row
       class="ion-padding-top"
-      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals))"
+      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWalletBalance?.shiftedBy(-1 * selectedWallet.protocol.decimals))"
     >
       <ion-text color="danger">
         <p
           class="ion-no-margin"
           [innerHTML]="
             'swap.amount-higher-than-balance-error_label'
-              | translate: { accountBalance: selectedWallet.currentBalance.shiftedBy(-1 * selectedWallet.protocol.decimals) }
+              | translate: { accountBalance: selectedWalletBalance?.shiftedBy(-1 * selectedWallet.protocol.decimals) }
           "
         ></p>
       </ion-text>

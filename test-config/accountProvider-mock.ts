@@ -1,11 +1,11 @@
-import { AirGapMarketWallet, AirGapWalletStatus, EthereumProtocol } from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, EthereumProtocol } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { PriceServiceMock } from './wallet-mock'
 
 export class AccountProviderMock {
   private mockWallet: AirGapMarketWallet = Object.assign(
-    new AirGapMarketWallet(
+    new AirGapCoinWallet(
       new EthereumProtocol(),
       '03ea568e601e6e949a3e5c60e0f4ee94383e4b083c5ab64b66e70372df008cbbe6',
       false,

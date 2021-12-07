@@ -1,0 +1,11 @@
+ion-card-header {
+  min-height: 72px;
+}
+
+img,
+.skeleton--img {
+  width: 100%;
+  height: 45vw;
+  object-fit: cover;
+  max-height: 250px;
+}

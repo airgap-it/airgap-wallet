@@ -2,7 +2,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet } from '@airgap/coinlib-core'
 import { SubProtocolType, ICoinSubProtocol } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
 import { assertNever } from '@airgap/coinlib-core/utils/assert'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
@@ -112,7 +112,7 @@ export class SubAccountAddPage {
     const accounts: IAccountWrapper[] = balances
       .map((balance, index) => {
         const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
-        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+        const wallet: AirGapMarketWallet = new AirGapCoinWallet(
           subProtocols[index],
           this.wallet.publicKey,
           this.wallet.isExtendedPublicKey,
@@ -125,7 +125,7 @@ export class SubAccountAddPage {
           return undefined
         }
         wallet.addresses = this.wallet.addresses
-        wallet.currentBalance = new BigNumber(balance)
+        wallet.setCurrentBalance(new BigNumber(balance))
 
         return {
           wallet,
@@ -135,7 +135,7 @@ export class SubAccountAddPage {
         }
       })
       .filter((account) => account !== undefined)
-      .sort((a, b) => a.wallet.currentBalance.minus(b.wallet.currentBalance).toNumber() * -1)
+      .sort((a, b) => a.wallet.getCurrentBalance().minus(b.wallet.getCurrentBalance()).toNumber() * -1)
 
     return accounts
   }
@@ -166,7 +166,7 @@ export class SubAccountAddPage {
     }
 
     newSubAccounts.forEach((account) => {
-      if (account.wallet.currentMarketPrice === undefined) {
+      if (account.wallet.getCurrentMarketPrice() === undefined) {
         account.wallet.fetchCurrentMarketPrice()
       }
       this.displayedSubAccounts.push(account)

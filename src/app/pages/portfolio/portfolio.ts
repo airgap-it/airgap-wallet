@@ -173,9 +173,9 @@ export class PortfolioPage {
     this.total = (
       await Promise.all(
         wallets.map((wallet) =>
-          cryptoToFiatPipe.transform(wallet.currentBalance, {
+          cryptoToFiatPipe.transform(wallet.getCurrentBalance(), {
             protocolIdentifier: wallet.protocol.identifier,
-            currentMarketPrice: wallet.currentMarketPrice
+            currentMarketPrice: wallet.getCurrentMarketPrice()
           })
         )
       )

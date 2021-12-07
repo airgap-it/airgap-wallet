@@ -1,5 +1,6 @@
 import { ProtocolService, UiEventService } from '@airgap/angular-core'
 import {
+  AirGapCoinWallet,
   AirGapMarketWallet,
   IACMessageType,
   IAirGapTransaction,
@@ -16,6 +17,7 @@ import { PushNotificationSchema } from '@capacitor/push-notifications'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { Observable, ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
+
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
@@ -307,7 +309,7 @@ export class AccountProvider {
       serializedWallet.networkIdentifier
     )
 
-    const airGapWallet: AirGapMarketWallet = new AirGapMarketWallet(
+    const airGapWallet: AirGapMarketWallet = new AirGapCoinWallet(
       protocol,
       serializedWallet.publicKey,
       serializedWallet.isExtendedPublicKey,
@@ -428,6 +430,13 @@ export class AccountProvider {
       updateState: boolean
     }
   ): Promise<void> {
+    if (walletAddInfo.groupId === '') {
+      walletAddInfo.groupId = undefined
+    }
+    if (walletAddInfo.groupLabel === '') {
+      walletAddInfo.groupLabel = undefined
+    }
+  
     this.assertWalletGroupExists(walletAddInfo.groupId, walletAddInfo.groupLabel)
     this.assertWalletGroupUpdated(walletAddInfo.groupId, walletAddInfo.groupLabel)
 
@@ -580,7 +589,9 @@ export class AccountProvider {
       ),
       this.storageProvider.set(
         WalletStorageKey.WALLET,
-        this.allWallets.map((wallet: AirGapMarketWallet) => wallet.toJSON())
+        this.allWallets
+          .filter((wallet: AirGapMarketWallet) => wallet.status !== AirGapWalletStatus.TRANSIENT)
+          .map((wallet: AirGapMarketWallet) => wallet.toJSON())
       )
     ])
   }
