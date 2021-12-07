@@ -1,16 +1,16 @@
 <ion-item *ngIf="wallet; else skeletonWallet" lines="none">
   <ion-avatar slot="start">
     <airgap-identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></airgap-identicon>
-    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="isToken"></airgap-currency-symbol>
-    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" *ngIf="!isToken" class="symbol--icon"></airgap-currency-symbol>
+    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" [protocolIdentifier]="wallet.protocol.identifier" *ngIf="isToken"></airgap-currency-symbol>
+    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" [protocolIdentifier]="wallet.protocol.identifier" *ngIf="!isToken" class="symbol--icon"></airgap-currency-symbol>
   </ion-avatar>
   <ion-label>
     <h2
       class="font--weight__bold"
       [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__regular': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
-      *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingHeading"
+      *ngIf="balance && marketPrice; else syncingHeading"
     >
-      {{ balance }}
+      {{ balanceFormatted }}
     </h2>
     <ng-template #syncingHeading>
       <h2>
@@ -44,10 +44,10 @@
   </ion-label>
 
   <div slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
-    <ng-container *ngIf="wallet.currentBalance && wallet.currentMarketPrice; else syncingBalance">
-      <p class="ion-text-right font--weight__bold porfolio-item__margin" *ngIf="wallet.currentMarketPrice.toNumber() > 0">
-        ${{ wallet.currentBalance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
-        wallet.currentMarketPrice } | async | number: '1.2-2' }}
+    <ng-container *ngIf="balance && marketPrice; else syncingBalance">
+      <p class="ion-text-right font--weight__bold porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
+        ${{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
+        marketPrice } | async | number: '1.2-2' }}
       </p>
     </ng-container>
     <ng-template #syncingBalance>
@@ -55,10 +55,10 @@
         <ion-skeleton-text animated style="width: 40px"></ion-skeleton-text>
       </p>
     </ng-template>
-    <p *ngIf="wallet.currentBalance; else syncingPrice">
+    <p *ngIf="balance; else syncingPrice">
       <ion-text color="blackLight">
-        <span *ngIf="wallet.currentBalance?.toNumber() > 0 && wallet.currentMarketPrice?.toNumber() > 0">
-          ${{ wallet.currentMarketPrice?.toNumber() | number: '1.2-4' }}
+        <span *ngIf="balance && balance.toNumber() > 0 && marketPrice && marketPrice.toNumber() > 0">
+          ${{ marketPrice.toNumber() | number: '1.2-4' }}
         </span>
       </ion-text>
     </p>

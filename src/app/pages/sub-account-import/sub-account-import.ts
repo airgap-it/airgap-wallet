@@ -1,7 +1,7 @@
 import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, /*NetworkType, */ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, /*NetworkType, */ProtocolSymbols } from '@airgap/coinlib-core'
 import { map } from 'rxjs/operators'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { PriceService } from 'src/app/services/price/price.service'
@@ -72,7 +72,7 @@ export class SubAccountImportPage {
           if (!wallet || wallet.status !== AirGapWalletStatus.ACTIVE) {
             const protocol = await this.protocolService.getProtocol(this.subProtocolIdentifier, this.networkIdentifier)
             const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(mainAccount)
-            const airGapMarketWallet: AirGapMarketWallet = new AirGapMarketWallet(
+            const airGapMarketWallet: AirGapMarketWallet = new AirGapCoinWallet(
               protocol,
               mainAccount.publicKey,
               mainAccount.isExtendedPublicKey,

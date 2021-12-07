@@ -16,7 +16,7 @@
         <ion-avatar>
           <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
         </ion-avatar>
-        <airgap-currency-symbol class="symbol--icon" [symbol]="wallet.protocol.symbol"></airgap-currency-symbol>
+        <airgap-currency-symbol class="symbol--icon" [symbol]="wallet.protocol.symbol" [protocolIdentifier]="wallet.protocol.identifier"></airgap-currency-symbol>
       </ion-col>
       <ion-col size="12">
         <h2>{{ wallet.protocol.name }} {{ wallet.protocol.symbol }}</h2>

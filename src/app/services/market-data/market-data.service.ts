@@ -1,7 +1,7 @@
+import { AirGapMarketWallet, TimeInterval } from '@airgap/coinlib-core'
 import { Injectable } from '@angular/core'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
-import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+
 import { CryptoPrices, PriceService } from '../price/price.service'
 
 export interface BalanceAtTimestamp {

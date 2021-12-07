@@ -1,12 +1,18 @@
-import { AirGapMarketWallet, AirGapWalletStatus, SubstrateNetwork, SubstrateProtocol } from '@airgap/coinlib-core'
+import {
+  AirGapCoinWallet,
+  AirGapMarketWallet,
+  AirGapWalletPriceService,
+  AirGapWalletStatus,
+  RawSubstrateTransaction,
+  SubstrateNetwork,
+  SubstrateProtocol,
+  SubstrateTransaction
+} from '@airgap/coinlib-core'
 import { SubstrateSignatureType } from '@airgap/coinlib-core/protocols/substrate/common/data/transaction/SubstrateSignature'
-import { SubstrateTransaction } from '@airgap/coinlib-core/protocols/substrate/common/data/transaction/SubstrateTransaction'
 import {
   SubstrateCompatSignatureType,
   substrateSignatureFactory
 } from '@airgap/coinlib-core/protocols/substrate/compat/SubstrateCompatSignature'
-import { RawSubstrateTransaction } from '@airgap/coinlib-core/serializer/types'
-import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-substrate'
 
 import { ReturnCode } from '../../ReturnCode'
@@ -26,7 +32,7 @@ export abstract class SubstrateLedgerApp<Network extends SubstrateNetwork> exten
       const response: ResponseAddress = await app.getAddress(account, change, addressIndex, true)
 
       return response.return_code === ReturnCode.SUCCESS
-        ? new AirGapMarketWallet(
+        ? new AirGapCoinWallet(
             this.protocol,
             response.pubKey,
             false,

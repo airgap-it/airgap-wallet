@@ -116,7 +116,7 @@ export abstract class ProtocolDelegationExtensions<T extends ICoinDelegateProtoc
       errorLabel: 'delegation-detail.invalid-value_error',
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
-          const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.currentMarketPrice)
+          const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.getCurrentMarketPrice())
           return `$${marketPrice.toFixed(2)}`
         } else {
           return ''

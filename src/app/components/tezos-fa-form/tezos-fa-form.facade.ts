@@ -1,4 +1,5 @@
-import { ClipboardService, UIResource } from '@airgap/angular-core'
+import { BaseFacade, ClipboardService, UIResource } from '@airgap/angular-core'
+import { BaseNgRxFacade } from '@airgap/angular-ngrx'
 import { ICoinProtocol, ProtocolNetwork } from '@airgap/coinlib-core'
 import { Injectable, InjectionToken } from '@angular/core'
 import { Observable } from 'rxjs'
@@ -7,7 +8,8 @@ import { TezosFAFormStore } from './tezos-fa-form.store'
 import { TezosFAFormState, TokenDetails, TokenDetailsInput, TokenInterface } from './tezos-fa-form.types'
 
 export const TEZOS_FA_FORM_FACADE = new InjectionToken<TezosFAFormFacade>('TezosFAFormFacade')
-export interface TezosFAFormFacade {
+export type TezosFAFormFacade<T extends BaseFacade = BaseFacade> = ITezosFAFormFacade & T
+export interface ITezosFAFormFacade {
   readonly tokenInterface$: Observable<UIResource<TokenInterface>>
   readonly tokenID$: Observable<UIResource<number>>
 
@@ -19,13 +21,12 @@ export interface TezosFAFormFacade {
 
   readonly errorDescription$: Observable<string>
 
-  onInit(): void
   onTokenDetailsInput(details: TokenDetailsInput): void
   getFromClipboard(): Promise<string>
 }
 
 @Injectable()
-export class TezosFAFormNgRxFacade implements TezosFAFormFacade {
+export class TezosFAFormNgRxFacade extends BaseNgRxFacade<TezosFAFormStore> implements ITezosFAFormFacade {
   public readonly tokenInterface$: Observable<UIResource<TokenInterface>>
   public readonly tokenID$: Observable<UIResource<number>>
 
@@ -37,10 +38,8 @@ export class TezosFAFormNgRxFacade implements TezosFAFormFacade {
 
   public readonly errorDescription$: Observable<string>
 
-  constructor(
-    private readonly store: TezosFAFormStore, 
-    private readonly clipboardService: ClipboardService
-  ) {
+  constructor(store: TezosFAFormStore, private readonly clipboardService: ClipboardService) {
+    super(store)
     this.tokenInterface$ = this.store.select((state: TezosFAFormState) => state.tokenInterface)
     this.tokenID$ = this.store.select((state: TezosFAFormState) => state.tokenID)
 
@@ -52,20 +51,23 @@ export class TezosFAFormNgRxFacade implements TezosFAFormFacade {
     this.errorDescription$ = this.store.select((state: TezosFAFormState) => state.errorDescription)
   }
 
-  public onInit(): void {
-    this.store.onInit()
+  public onViewInit(): never {
+    this.store.onInit$()
+
+    return super.onViewInit()
   }
 
   public onTokenDetailsInput(details: TokenDetailsInput): void {
-    this.store.onTokenDetailsInput(details)
+    this.store.onTokenDetailsInput$(details)
   }
-  
 
   public async getFromClipboard(): Promise<string | undefined> {
     try {
       return this.clipboardService.paste()
     } catch (error) {
-      console.error('Error: ' + error)
+      // tslint:disable-next-line: no-console
+      console.error(`Error: ${error}`)
+
       return undefined
     }
   }

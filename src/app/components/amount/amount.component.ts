@@ -59,7 +59,10 @@ export class AmountComponent {
     if (this.capMaxAmount) {
       amount = this.capMaxAmount.shiftedBy(-1 * this.wallet.protocol.decimals).toNumber()
     } else {
-      amount = this.wallet.currentBalance.shiftedBy(-1 * this.wallet.protocol.decimals).toNumber()
+      amount = this.wallet
+        .getCurrentBalance()
+        .shiftedBy(-1 * this.wallet.protocol.decimals)
+        .toNumber()
     }
     this.delegationForm.controls.amount.setValue(amount, {
       emitEvent: true

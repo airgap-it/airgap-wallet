@@ -17,7 +17,7 @@ import {
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN
 } from '@airgap/angular-core'
-import { AirGapAngularNgRxModule } from '@airgap/angular-ngrx'
+import { AirGapAngularNgRxModule, currencySymbolNgRxFacade } from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -26,8 +26,10 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
 import { App } from '@capacitor/app'
+import { AppLauncher } from '@capacitor/app-launcher'
 import { Browser } from '@capacitor/browser'
 import { Clipboard } from '@capacitor/clipboard'
+import { Filesystem } from '@capacitor/filesystem'
 import { PushNotifications } from '@capacitor/push-notifications'
 import { Share } from '@capacitor/share'
 import { SplashScreen } from '@capacitor/splash-screen'
@@ -45,6 +47,7 @@ import { MomentModule } from 'ngx-moment'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import * as fromRoot from './app.reducers'
+import { SaplingNative } from './capacitor-plugins/definitions'
 import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
@@ -59,6 +62,7 @@ import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-selec
 import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
+import { CoinlibService } from './services/coinlib/coinlib.service'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
@@ -66,18 +70,14 @@ import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
 import { TransactionHashGuard } from './services/guard/transactionHash.guard'
 import { IACService } from './services/iac/iac.service'
+import { InteractionService } from './services/interaction/interaction.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
-import { CoinlibService } from './services/coinlib/coinlib.service'
-import { WalletStorageService } from './services/storage/storage'
 import { SaplingService } from './services/sapling/sapling.service'
-import { InteractionService } from './services/interaction/interaction.service'
-import { SaplingNative } from './capacitor-plugins/definitions'
-import { AppLauncher } from '@capacitor/app-launcher'
-import { Filesystem } from '@capacitor/filesystem'
+import { WalletStorageService } from './services/storage/storage'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -94,7 +94,11 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
-    AirGapAngularCoreModule,
+    AirGapAngularCoreModule.forRoot({
+      factories: {
+        currencySymbolFacade: currencySymbolNgRxFacade
+      }
+    }),
     AirGapAngularNgRxModule,
     StoreModule.forRoot(fromRoot.reducers, {
       metaReducers: fromRoot.metaReducers,

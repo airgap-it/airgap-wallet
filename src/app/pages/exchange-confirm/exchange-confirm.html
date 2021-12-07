@@ -17,6 +17,7 @@
       [title]="'exchange-confirm.sell_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
+      [protocolIdentifier]="fromWallet.protocol.identifier"
     ></airgap-titled-address>
 
     <ion-row class="ion-align-items-center ion-padding-vertical">
@@ -43,6 +44,7 @@
       [title]="'exchange-confirm.exchange-address_label'"
       [hasSymbol]="true"
       [symbol]="fromCurrency"
+      [protocolIdentifier]="fromWallet.protocol.identifier"
     ></airgap-titled-address>
 
     <ion-row class="ion-align-items-center ion-padding-vertical">
@@ -62,6 +64,7 @@
       [title]="'exchange-confirm.receiving-to_label'"
       [hasSymbol]="true"
       [symbol]="toCurrency"
+      [protocolIdentifier]="toWallet.protocol.identifier"
     ></airgap-titled-address>
 
     <ion-row *ngIf="activeExchange === 'Changelly'" class="ion-padding ion-margin-vertical" (click)="changellyUrl()">

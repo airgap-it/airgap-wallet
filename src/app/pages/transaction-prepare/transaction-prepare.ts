@@ -1,6 +1,7 @@
 import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
+  AirGapNFTWallet,
   EthereumProtocol,
   IACMessageType,
   MainProtocolSymbols,
@@ -16,6 +17,9 @@ import { LoadingController } from '@ionic/angular'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
+import { CollectiblesService } from 'src/app/services/collectibles/collectibles.service'
+import { CollectibleDetails } from 'src/app/services/collectibles/collectibles.types'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -30,6 +34,9 @@ interface TransactionFormState<T> {
 }
 interface TransactionPrepareState {
   availableBalance: BigNumber | null
+  marketPrice: BigNumber | null
+  collectible: CollectibleDetails | null
+
   forceMigration: boolean
   feeDefaults: FeeDefaults
   feeCurrentMarketPrice: number | null
@@ -78,6 +85,9 @@ export class TransactionPreparePage {
   private protocolID: string
   private addressIndex: number | undefined
 
+  public collectibleID: string | undefined
+  public collectibleAddress: string | undefined
+
   constructor(
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
@@ -90,18 +100,23 @@ export class TransactionPreparePage {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly priceService: PriceService,
     private readonly addressService: AddressService,
-    public readonly accountProvider: AccountProvider
+    public readonly accountProvider: AccountProvider,
+    private readonly collectiblesService: CollectiblesService
   ) {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
     const addressIndex = this.route.snapshot.params.addressIndex
     this.addressIndex = addressIndex === 'undefined' ? undefined : Number(addressIndex)
+    const collectible = this.route.snapshot.params.collectible
+    const [collectibleAddress, collectibleID] = collectible && collectible !== 'undefined' ? collectible.split(':') : []
+    this.collectibleID = collectibleID
+    this.collectibleAddress = collectibleAddress
 
     this.state$ = new BehaviorSubject(this._state)
 
     const address: string = this.route.snapshot.params.address === 'false' ? '' : this.route.snapshot.params.address || ''
     const amount: number = Number(this.route.snapshot.params.amount) || 0
-    const wallet: AirGapMarketWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
+    const wallet: AirGapMarketWallet | AirGapNFTWallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(
       this.publicKey,
       this.protocolID,
       this.addressIndex
@@ -248,6 +263,8 @@ export class TransactionPreparePage {
   private async initState(): Promise<void> {
     this._state = {
       availableBalance: null,
+      marketPrice: null,
+      collectible: null,
       forceMigration: false,
       feeDefaults: this.wallet.protocol.feeDefaults,
       feeCurrentMarketPrice: null,
@@ -286,12 +303,14 @@ export class TransactionPreparePage {
     }
     this.state = this._state
 
-    const [feeCurrentMarketPrice, availableBalance]: [number, BigNumber] = await Promise.all([
+    const [feeCurrentMarketPrice, availableBalance, collectible]: [number, BigNumber, CollectibleDetails | undefined] = await Promise.all([
       this.calculateFeeCurrentMarketPrice(this.wallet),
-      this.getAvailableBalance(this.wallet)
+      this.getAvailableBalance(this.wallet),
+      this.getCollectibleDetails(this.wallet, this.collectibleAddress, this.collectibleID)
     ])
 
     this.updateState({
+      collectible,
       availableBalance,
       feeCurrentMarketPrice
     })
@@ -307,9 +326,12 @@ export class TransactionPreparePage {
     }
   }
 
+  // tslint:disable-next-line: cyclomatic-complexity
   private reduceState(currentState: TransactionPrepareState, newState: Partial<TransactionPrepareState>): TransactionPrepareState {
-    return {
+    const state = {
       availableBalance: newState.availableBalance !== undefined ? newState.availableBalance : currentState.availableBalance,
+      marketPrice: newState.marketPrice !== undefined ? newState.marketPrice : currentState.marketPrice,
+      collectible: newState.collectible !== undefined ? newState.collectible : currentState.collectible,
       forceMigration: newState.forceMigration !== undefined ? newState.forceMigration : currentState.forceMigration,
 
       feeDefaults: newState.feeDefaults || currentState.feeDefaults,
@@ -337,6 +359,11 @@ export class TransactionPreparePage {
       fee: newState.fee || currentState.fee,
       isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode,
       memo: newState.memo || currentState.memo
+    }
+
+    return {
+      ...state,
+      marketPrice: this.wallet.getCurrentMarketPrice(this.collectibleID)?.times(state.amount.value) ?? state.marketPrice
     }
   }
 
@@ -366,6 +393,7 @@ export class TransactionPreparePage {
       this.transactionForm.patchValue(updated, { emitEvent: false })
       Object.keys(updated).forEach((key: string) => {
         this.transactionForm.controls[key].markAsDirty()
+        this.transactionForm.controls[key].updateValueAndValidity()
       })
     })
   }
@@ -376,7 +404,7 @@ export class TransactionPreparePage {
     } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
       return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
-      return wallet.currentMarketPrice.toNumber()
+      return wallet.getCurrentMarketPrice(this.collectibleID)?.toNumber() ?? 0
     }
   }
 
@@ -389,8 +417,20 @@ export class TransactionPreparePage {
     ) {
       return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {
-      return wallet.currentBalance
+      return wallet.getCurrentBalance(this.collectibleID)
     }
+  }
+
+  private async getCollectibleDetails(
+    wallet: AirGapMarketWallet,
+    collectibleAddress: string | undefined,
+    collectibleID: string | undefined
+  ): Promise<CollectibleDetails | undefined> {
+    if (!collectibleAddress || !collectibleID) {
+      return undefined
+    }
+
+    return this.collectiblesService.getCollectibleDetails(wallet, collectibleAddress, collectibleID)
   }
 
   private async updateFeeEstimate(): Promise<void> {
@@ -428,7 +468,7 @@ export class TransactionPreparePage {
     const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
 
     return isAddressValid && isAmountValid && this._state.receiverAddress
-      ? this.operationsProvider.estimateFees(this.wallet, this._state.receiverAddress, amount)
+      ? this.operationsProvider.estimateFees(this.wallet, this._state.receiverAddress, amount, { assetID: this.collectibleID })
       : undefined
   }
 
@@ -450,7 +490,7 @@ export class TransactionPreparePage {
     const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
     const fee = new BigNumber(this._state.fee.value).shiftedBy(this.wallet.protocol.feeDecimals)
 
-    const data = this.isSubstrate ? !this.ignoreExistentialDeposit : this._state.memo.value
+    const data = this.isSubstrate ? { excludeExistentialDeposit: !this.ignoreExistentialDeposit } : { memo: this._state.memo.value }
     try {
       const { airGapTxs, unsignedTx } = await this.operationsProvider.prepareTransaction(
         this.wallet,
@@ -458,7 +498,7 @@ export class TransactionPreparePage {
         amount,
         fee,
         this.accountProvider.getWalletList(),
-        data
+        this.collectibleID ? { ...data, assetID: this.collectibleID } : data
       )
 
       this.accountProvider.startInteraction(this.wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
@@ -517,12 +557,10 @@ export class TransactionPreparePage {
     })
 
     const fee = formFee ? new BigNumber(formFee).shiftedBy(this.wallet.protocol.feeDecimals) : undefined
-    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(
-      this.wallet,
-      this._state.receiverAddress,
-      fee,
-      !this.ignoreExistentialDeposit
-    )
+    const maxAmount = await this.operationsProvider.estimateMaxTransferAmount(this.wallet, this._state.receiverAddress, fee, {
+      excludeExistentialDeposit: !this.ignoreExistentialDeposit,
+      assetID: this.collectibleID
+    })
 
     const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
@@ -562,6 +600,18 @@ export class TransactionPreparePage {
       (err: string) => {
         console.error('Error: ' + err)
       }
+    )
+  }
+
+  public onCollectibleThumbnailError() {
+    this.updateState(
+      {
+        collectible: {
+          ...this.state.collectible,
+          thumbnails: this.state.collectible.thumbnails.slice(1)
+        }
+      },
+      false
     )
   }
 }

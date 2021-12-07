@@ -108,7 +108,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/account-address/account-address.module').then((m) => m.AccountAddressPageModule)
   },
   {
-    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:forceMigration',
+    path: 'transaction-prepare/:id/:publicKey/:protocolID/:addressIndex/:address/:amount/:collectible/:forceMigration',
     canActivate: [ProtocolGuard, ServiceKeyGuard],
 
     loadChildren: () => import('./pages/transaction-prepare/transaction-prepare.module').then((m) => m.TransactionPreparePageModule)
@@ -222,6 +222,20 @@ const routes: Routes = [
       import('./pages/interaction-selection-settings/interaction-selection-settings.module').then(
         (m) => m.InteractionSelectionSettingsPageModule
       )
+  },
+  {
+    path: 'collectibles-list/:id/:publicKey/:protocolID/:addressIndex',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/collectibles-list/collectibles-list.module').then( m => m.CollectiblesListPageModule)
+  },
+  {
+    path: 'collectibles-item/:id/:publicKey/:protocolID/:addressIndex/:collectible',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/collectibles-item/collectibles-item.module').then( m => m.CollectiblesItemPageModule)
   }
 ]
 @NgModule({
