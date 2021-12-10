@@ -47,7 +47,7 @@ export class AirGapTipUsAction extends Action<void, TipUsActionContext> {
         .navigateByUrl(
           `/transaction-prepare/${DataServiceKey.DETAIL}/${this.context.wallet.publicKey}/${this.context.wallet.protocol.identifier}/${
             this.context.wallet.addressIndex
-          }/${this.context.tipAddress}/${this.context.amount}/${'not_forced'}`
+          }/${this.context.tipAddress}/${this.context.amount}/undefined/${'not_forced'}`
         )
         .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } else {

@@ -1,4 +1,4 @@
-import { TimeInterval } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
+import { TimeInterval } from '@airgap/coinlib-core'
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
 

@@ -99,7 +99,7 @@
       amount?.isNaN() ||
       amount?.isZero() ||
       amount?.isLessThan(minExchangeAmount) ||
-      amount?.isGreaterThan(fromWallet.currentBalance.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
+      amount?.isGreaterThan(state.fromWalletBalance?.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
     "
       (click)="startExchange()"
       shape="round"

@@ -13,6 +13,7 @@ import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airga
 import { Inject, Injectable } from '@angular/core'
 import {
   AccountShareResponse,
+  AirGapCoinWallet,
   AirGapMarketWallet,
   AirGapWalletStatus,
   IACMessageDefinitionObject,
@@ -89,7 +90,7 @@ export class IACService extends BaseIACService {
       deserializedSyncs.map(async (deserializedSync: IACMessageDefinitionObject) => {
         const accountShare: AccountShareResponse = deserializedSync.payload as AccountShareResponse
         const protocol = await this.protocolService.getProtocol(deserializedSync.protocol)
-        const wallet: AirGapMarketWallet = new AirGapMarketWallet(
+        const wallet: AirGapMarketWallet = new AirGapCoinWallet(
           protocol,
           accountShare.publicKey,
           accountShare.isExtendedPublicKey,

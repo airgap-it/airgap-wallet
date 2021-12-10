@@ -32,6 +32,11 @@
     </ion-row>
     <form [formGroup]="transactionForm" class="ion-padding-bottom">
       <ion-card>
+        <ion-item class="ion-no-padding ion-margin-bottom" lines="none" *ngIf="state.collectible">
+          <img class="collectible--img" *ngIf="state.collectible.thumbnails.length > 0" [src]="state.collectible.thumbnails[0]" (error)="onCollectibleThumbnailError()" slot="start" />
+          <img class="collectible--img" *ngIf="state.collectible.thumbnails.length === 0" src="./assets/img/collectible-placeholder.png" slot="start" />
+          <h6>{{ state.collectible.name }}</h6>
+        </ion-item>
         <ion-row class="ion-justify-content-between">
           <ion-col size="3">
             <ion-label color="blackLight" class="ion-no-margin" position="stacked">
@@ -42,8 +47,8 @@
             <ion-label color="blackLight" class="ion-no-margin" position="stacked">
               {{ 'transaction-prepare.balance_label' | translate }}
               <ng-container *ngIf="state.availableBalance !== null">
-                {{ state.availableBalance | amountConverter: { protocol: wallet.protocol, maxDigits: wallet.protocol.decimals + 1
-                } | async }}
+                {{ state.availableBalance | amountConverter: { protocol: wallet.protocol, maxDigits: wallet.protocol.decimals + 1 } | async
+                }}
               </ng-container>
             </ion-label>
           </ion-col>
@@ -93,11 +98,11 @@
             </ion-text>
           </ion-col>
         </ion-row>
-        <ion-row>
+        <ion-row *ngIf="state.marketPrice">
           <ion-col offset="2" class="ion-no-padding">
             <ion-text class="ion-no-margin" color="blackLight">
               <p class="ion-no-margin">
-                ${{ wallet.currentMarketPrice.times(state.amount.value).toNumber() | number: '1.2-2' }}
+                ${{ state.marketPrice.toNumber() | number: '1.2-2' }}
               </p>
             </ion-text>
           </ion-col>
@@ -139,7 +144,7 @@
             </ion-avatar>
           </ion-col>
           <ion-col size="10" class="ion-no-padding">
-            <ion-item class="content--align-vert__center to-address__item ion-no-padding ">
+            <ion-item class="content--align-vert__center to-address__item ion-no-padding">
               <ion-textarea
                 [attr.disabled]="state.forceMigration"
                 [placeholder]="wallet.protocol.addressPlaceholder"

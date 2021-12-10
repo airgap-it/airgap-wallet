@@ -73,3 +73,9 @@ ion-textarea {
 ion-content {
   --padding-bottom: 108px;
 }
+.collectible--img {
+  width: 25vw;
+  height: auto;
+  object-fit: cover;
+  max-height: 180px;
+}

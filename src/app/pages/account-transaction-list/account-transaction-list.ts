@@ -59,6 +59,7 @@ export class AccountTransactionListPage {
 
   public txOffset: number = 0
   public wallet: AirGapMarketWallet
+  public balance: BigNumber | undefined
 
   public transactions: IAirGapTransaction[] = []
 
@@ -131,6 +132,7 @@ export class AccountTransactionListPage {
     }
 
     this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
+    this.balance = this.wallet.getCurrentBalance()
 
     this.updateExtendedDetails()
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
@@ -200,7 +202,7 @@ export class AccountTransactionListPage {
       .navigateByUrl(
         `/transaction-prepare/${DataServiceKey.DETAIL}/${this.publicKey}/${this.protocolID}/${this.addressIndex}/${
           info.address !== ''
-        }/${0}/${'not_forced'}`
+        }/${0}/undefined/${'not_forced'}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'collectibles-item.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ng-container *ngrxLet="facade.item$ as item">
+  <ion-content class="ion-no-padding">
+    <ion-grid fixed="true" class="ion-no-padding">
+      <ng-container *ngIf="item.status === UIResourceStatus.SUCCESS">
+        <div class="content--align__center-center">
+          <img *ngIf="item.value.img" [src]="item.value.img" (error)="onImgInvalid()" />
+          <img *ngIf="!item.value.img" class="placeholder--img" src="./assets/img/collectible-placeholder.png" />
+        </div>
+
+        <div class="ion-margin-bottom ion-padding-bottom">
+          <ion-row class="ion-padding-horizontal">
+            <ion-col>
+              <h3>{{ item.value.name }}</h3>
+              <p *ngIf="item.value.description">
+                {{ item.value.description }}
+              </p>
+            </ion-col>
+          </ion-row>
+          <div class="ion-margin-bottom ion-padding-bottom">
+            <ion-card class="ion-no-padding ion-margin-horizontal">
+              <ion-card-header>
+                <ion-card-subtitle>{{ 'collectibles-item.details_label' | translate }}</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content class="ion-no-padding">
+                <ion-item>
+                  <ion-label>{{ 'collectibles-item.amount_label' | translate }}</ion-label>
+                  <ion-note slot="end">{{ item.value.amount }}</ion-note>
+                </ion-item>
+                <ion-item *ngIf="item.value.address">
+                  <ion-label>{{ ('collectibles-item.address.' + item.value.address.type + '_label') | translate }}</ion-label>
+                  <ion-note slot="end">{{ item.value.address.value | shortenString }}</ion-note>
+                </ion-item>
+                <ion-item lines="none" *ngIf="item.value.moreDetails">
+                  <ion-label>{{ 'collectibles-item.more-details_label' | translate }}</ion-label>
+                  <ion-button slot="end" size="small" fill="outline" (click)="openUrl(item.value.moreDetails.url)">
+                    <ion-icon name="link-outline" slot="start"></ion-icon>
+                    {{ item.value.moreDetails.label | translate }}
+                  </ion-button>
+                </ion-item>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="item.status === UIResourceStatus.LOADING">
+        <div class="content--align__center-center">
+          <ion-skeleton-text class="skeleton--img" animated><img /></ion-skeleton-text>
+        </div>
+        <ion-row class="ion-padding-horizontal">
+          <ion-col>
+            <h3><ion-skeleton-text animated style="width: 75%; height: 24px;"></ion-skeleton-text></h3>
+            <p><ion-skeleton-text class="ion-margin-bottom" style="width: 50%; height: 16px;" animated></ion-skeleton-text></p>
+          </ion-col>
+        </ion-row>
+      </ng-container>
+    </ion-grid>
+  </ion-content>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="send(item.value)" [disabled]="item.status !== UIResourceStatus.SUCCESS">
+      <ion-icon slot="start" name="send-outline"></ion-icon>
+      {{ 'collectibles-item.send-button_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ng-container>

@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-grid fixed="true" class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'collectibles-list.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+
+<ng-container *ngrxLet="facade.items$ as items">
+  <ion-content>
+    <ion-grid fixed="true">
+      <ion-row *ngIf="items.value.length > 0">
+        <ion-col *ngFor="let item of items.value" size="6" size-md="3">
+          <ion-card class="ion-no-padding ion-no-margin" (click)="onItemClick(item)">
+            <img *ngIf="item.thumbnail" [src]="item.thumbnail" (error)="onInvalidThumbnail(item)" />
+            <img *ngIf="!item.thumbnail" src="./assets/img/collectible-placeholder.png" />
+            <ion-card-header>
+              <ion-card-subtitle>{{ item.name }}</ion-card-subtitle>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <empty-state
+        *ngIf="items.status !== UIResourceStatus.LOADING && (!items.value || items.value.length === 0)"
+        [text]="'collectibles-list.empty-state_text' | translate"
+        [imageName]="'empty-state-no-transaction.svg'"
+        [fullHeight]="true"
+      ></empty-state>
+      <ion-row *ngIf="items.status === UIResourceStatus.LOADING && (!items.value || items.value.length === 0) && !isDesktop">
+        <ion-col *ngFor="let skeleton of [1,2,3]" size="6" size-md="3">
+          <ion-card class="ion-no-padding ion-no-margin">
+            <ion-skeleton-text class="skeleton--img ion-no-margin" animated><img /></ion-skeleton-text>
+            <ion-card-header>
+              <ion-card-subtitle><ion-skeleton-text animated></ion-skeleton-text></ion-card-subtitle>
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ng-container *ngIf="isDesktop">
+        <ion-spinner class="ion-padding-vertical" *ngIf="items.status === UIResourceStatus.LOADING"></ion-spinner>
+        <ng-container *ngrxLet="facade.loadedAll$ as loadedAll">
+          <div class="content--align__center-center ion-padding-top">
+            <ion-button fill="outline" *ngIf="!loadedAll" [disabled]="items.status === UIResourceStatus.LOADING" (click)="loadMore()">
+              {{ "collectibles-list.load-more_label" | translate }}
+            </ion-button>
+          </div>
+        </ng-container>
+      </ng-container>
+    </ion-grid>
+    <ion-infinite-scroll *ngIf="!isDesktop" (ionInfinite)="loadMore()">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-content>
+</ng-container>

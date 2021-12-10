@@ -57,7 +57,7 @@ export class SelectWalletPage {
       .navigateByUrl(
         `/transaction-prepare/${DataServiceKey.TRANSACTION}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${
           info.wallet.addressIndex
-        }/${info.address}/${0}/${'not_forced'}`
+        }/${info.address}/${0}/undefined/${'not_forced'}`
       )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

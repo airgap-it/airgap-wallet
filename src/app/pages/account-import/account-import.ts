@@ -105,7 +105,7 @@ export class AccountImportPage implements OnDestroy {
         accountImport.wallet
           .synchronize()
           .then(() => {
-            if (accountImport.wallet.currentBalance !== undefined && accountImport.wallet.currentBalance.gt(0)) {
+            if (accountImport.wallet.getCurrentBalance() !== undefined && accountImport.wallet.getCurrentBalance().gt(0)) {
               accountImport.wallet.status = AirGapWalletStatus.ACTIVE
             }
             this.ngZone.run(() => {

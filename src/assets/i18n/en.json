@@ -3,6 +3,7 @@
     "title": "Account",
     "transactions_label": "Transactions",
     "add-tokens_label": "Add Tokens",
+    "collectibles_label": "Collectibles",
     "import-accounts_label": "Import Accounts",
     "delegate_label": "Delegation",
     "undelegate_label": "Undelegate",
@@ -860,6 +861,51 @@
       "token-metadata-missing": "Unable to fetch the asset metadata.",
       "token-vague": "The address is a multi asset contract, please specify the asset you want to add.",
       "unknown": "Unkown error has occurred."
+    }
+  },
+  "collectibles-list": {
+    "title": "Collectibles",
+    "load-more_label": "Load more",
+    "empty-state_text": "Aww..<br>Looks like you don't have any collectibles yet. Go to <strong><a href='https://objkt.com' target='blank'>objkt.com</a></strong> and start collecting.",
+    "error": {
+      "loading": {
+        "message": "Unable to load collectibles"
+      },
+      "show-details": {
+        "message": "Unable to show the collectible's details"
+      },
+      "unknown": {
+        "message": "Unknown error"
+      }
+    }
+  },
+  "collectibles-item": {
+    "title": "Collectibles Details",
+    "details_label": "Details",
+    "amount_label": "Amount",
+    "more-details_label": "More Details",
+    "send-button_label": "Send",
+    "address": {
+      "contract_label": "Related Contract"
+    },
+    "error": {
+      "loading": {
+        "message": "Unable to load the collectible's details"
+      },
+      "open-url": {
+        "message": "Unable to open URL"
+      },
+      "send": {
+        "message": "Unable to prepare transfer"
+      },
+      "unknown": {
+        "message": "Unknown error"
+      }
+    }
+  },
+  "objkt-collectible-explorer": {
+    "more-details": {
+      "view-on": "View on objkt.com"
     }
   }
 }

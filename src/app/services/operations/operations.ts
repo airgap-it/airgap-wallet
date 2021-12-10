@@ -390,7 +390,7 @@ export class OperationsProvider {
     amount: BigNumber,
     fee: BigNumber,
     knownWallets: AirGapMarketWallet[],
-    data?: any
+    data?: { [key: string]: any }
   ): Promise<{ airGapTxs: IAirGapTransaction[]; unsignedTx: any }> {
     const loader = await this.getAndShowLoader()
 
@@ -492,13 +492,18 @@ export class OperationsProvider {
     wallet: AirGapMarketWallet,
     destination: string,
     fee?: BigNumber,
-    excludeExistentialDeposit?: boolean
+    data?: { [key: string]: any }
   ): Promise<BigNumber> {
-    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined, excludeExistentialDeposit)
+    const maxAmount = await wallet.getMaxTransferValue([destination], fee ? fee.toFixed() : undefined, data)
     return new BigNumber(maxAmount)
   }
 
-  public async estimateFees(wallet: AirGapMarketWallet, address: string, amount: BigNumber, data?: any): Promise<FeeDefaults> {
+  public async estimateFees(
+    wallet: AirGapMarketWallet,
+    address: string,
+    amount: BigNumber,
+    data?: { [key: string]: any }
+  ): Promise<FeeDefaults> {
     try {
       return await wallet.estimateFees([address], [amount.toFixed()], data)
     } catch (error) {
