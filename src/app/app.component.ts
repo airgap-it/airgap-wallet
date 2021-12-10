@@ -216,8 +216,21 @@ export class AppComponent implements AfterViewInit {
         'airgap00391'
       )
     )
-
     const granadanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(granadanetNetwork))
+
+    const hangzhounetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Hangzhounet',
+      NetworkType.TESTNET,
+      'https://tezos-hangzhounet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//hangzhounet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.HANGZHOUNET,
+        'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
+        TezosNetwork.MAINNET,
+        'airgap00391'
+      )
+    )
+    const hangzhounetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(hangzhounetNetwork))
 
     const externalMethodProvider:
       | TezosSaplingExternalMethodProvider
@@ -231,7 +244,7 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [granadanetProtocol, shieldedTezProtocol],
+      extraActiveProtocols: [hangzhounetProtocol, granadanetProtocol, shieldedTezProtocol],
       extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
     })
 
@@ -243,8 +256,8 @@ export class AppComponent implements AfterViewInit {
     const identifiersWithOptions = Object.entries(genericSubProtocols)
     const protocols = identifiersWithOptions
       .map(([protocolNetworkIdentifier, options]) => {
-        const [protocolIdentifier, ] = protocolNetworkIdentifier.split(':')
-        
+        const [protocolIdentifier,] = protocolNetworkIdentifier.split(':')
+
         if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
           const tezosOptions = options as TezosProtocolOptions
           const tezosProtocolNetwork = new TezosProtocolNetwork(
@@ -313,7 +326,8 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk'
+      [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk',
+      [TezosNetwork.HANGZHOUNET]: 'KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii',
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
