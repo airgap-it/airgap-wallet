@@ -226,7 +226,7 @@ export class AppComponent implements AfterViewInit {
       new TezosProtocolNetworkExtras(
         TezosNetwork.HANGZHOUNET,
         'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
-        TezosNetwork.MAINNET,
+        TezosNetwork.HANGZHOUNET,
         'airgap00391'
       )
     )
@@ -238,7 +238,7 @@ export class AppComponent implements AfterViewInit {
 
     const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
-        granadanetNetwork,
+        hangzhounetNetwork,
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )

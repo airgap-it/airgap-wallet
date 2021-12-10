@@ -150,7 +150,7 @@ export class PortfolioPage {
     this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
 
     const observables = [
-      this.walletsProvider.getWalletList().map((wallet) => {
+      this.walletsProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).map((wallet) => {
         return from(wallet.synchronize())
       })
     ]
