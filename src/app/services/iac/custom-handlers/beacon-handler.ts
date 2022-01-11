@@ -1,4 +1,4 @@
-import { IACSinglePartHandler } from '@airgap/angular-core'
+import { IACMessageWrapper, IACSinglePartHandler } from '@airgap/angular-core'
 import { P2PPairingRequest, Serializer } from '@airgap/beacon-sdk'
 
 import { BeaconService } from '../../beacon/beacon.service'
@@ -30,11 +30,11 @@ export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
     super()
   }
 
-  public async handleComplete(): Promise<P2PPairingRequest> {
+  public async handleComplete(): Promise<IACMessageWrapper<P2PPairingRequest>> {
     await this.beaconService.client.isConnected
     await this.beaconService.addPeer(this.payload)
 
-    return this.payload
+    return { result: this.payload, data: await this.getDataSingle() }
   }
 
   public async processData(data: string): Promise<P2PPairingRequest | undefined> {

@@ -5,6 +5,7 @@ import {
   ClipboardService,
   DeeplinkService,
   IACMessageTransport,
+  IACMessageWrapper,
   ProtocolService,
   RelayMessage,
   UiEventElementsService
@@ -16,7 +17,7 @@ import {
   AirGapCoinWallet,
   AirGapMarketWallet,
   AirGapWalletStatus,
-  IACMessageDefinitionObject,
+  IACMessageDefinitionObjectV3,
   IACMessageType,
   MainProtocolSymbols,
   MessageSignResponse,
@@ -69,9 +70,9 @@ export class IACService extends BaseIACService {
       appConfig
     )
 
-    this.serializerMessageHandlers[IACMessageType.AccountShareResponse as any] = this.handleWalletSync.bind(this)
-    this.serializerMessageHandlers[IACMessageType.TransactionSignResponse as any] = this.handleSignedTransaction.bind(this)
-    this.serializerMessageHandlers[IACMessageType.MessageSignResponse as any] = this.handleMessageSignResponse.bind(this)
+    this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
+    this.serializerMessageHandlers[IACMessageType.TransactionSignResponse] = this.handleSignedTransaction.bind(this)
+    this.serializerMessageHandlers[IACMessageType.MessageSignResponse] = this.handleMessageSignResponse.bind(this)
   }
 
   public async relay(data: RelayMessage): Promise<void> {
@@ -83,11 +84,15 @@ export class IACService extends BaseIACService {
     this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async handleWalletSync(deserializedSyncs: IACMessageDefinitionObject[], transport: IACMessageTransport): Promise<boolean> {
+  public async handleWalletSync(
+    messageWrapper: IACMessageWrapper<IACMessageDefinitionObjectV3[]>,
+    transport: IACMessageTransport
+  ): Promise<boolean> {
+    const deserializedSyncs = messageWrapper.result
     this.storageSerivce.set(WalletStorageKey.DEEP_LINK, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     const accountSyncs: AccountSync[] = await Promise.all(
-      deserializedSyncs.map(async (deserializedSync: IACMessageDefinitionObject) => {
+      deserializedSyncs.map(async (deserializedSync: IACMessageDefinitionObjectV3) => {
         const accountShare: AccountShareResponse = deserializedSync.payload as AccountShareResponse
         const protocol = await this.protocolService.getProtocol(deserializedSync.protocol)
         const wallet: AirGapMarketWallet = new AirGapCoinWallet(
@@ -123,10 +128,10 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  public async handleSignedTransaction(messageDefinitionObjects: IACMessageDefinitionObject[]): Promise<boolean> {
+  public async handleSignedTransaction(messageWrapper: IACMessageWrapper<IACMessageDefinitionObjectV3[]>): Promise<boolean> {
     if (this.router) {
       const info = {
-        messageDefinitionObjects: messageDefinitionObjects
+        messageDefinitionObjects: messageWrapper.result
       }
       this.dataService.setData(DataServiceKey.TRANSACTION, info)
       this.router.navigateByUrl(`/transaction-confirm/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -137,11 +142,11 @@ export class IACService extends BaseIACService {
     return false
   }
 
-  private async handleMessageSignResponse(deserializedMessages: IACMessageDefinitionObject[]): Promise<boolean> {
+  private async handleMessageSignResponse(messageWrapper: IACMessageWrapper<IACMessageDefinitionObjectV3[]>): Promise<boolean> {
     const cachedRequest = await this.beaconService.getVaultRequest()
 
-    const messageSignResponse = deserializedMessages[0].payload as MessageSignResponse
-    const protocol: ProtocolSymbols = deserializedMessages[0].protocol
+    const messageSignResponse = messageWrapper.result[0].payload as MessageSignResponse
+    const protocol: ProtocolSymbols = messageWrapper.result[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
       id: cachedRequest[0]?.id,

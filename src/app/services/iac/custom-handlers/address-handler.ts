@@ -5,7 +5,7 @@ import { partition } from '../../../utils/utils'
 import { AccountProvider } from '../../account/account.provider'
 import { DataService, DataServiceKey } from '../../data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../sentry-error-handler/sentry-error-handler'
-import { IACSinglePartHandler } from '@airgap/angular-core'
+import { IACMessageWrapper, IACSinglePartHandler } from '@airgap/angular-core'
 
 interface Payload {
   address: string
@@ -27,11 +27,11 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
     super()
   }
 
-  public async handleComplete(): Promise<Payload> {
+  public async handleComplete(): Promise<IACMessageWrapper<Payload>> {
     this.dataService.setData(DataServiceKey.WALLET, { actionType: 'scanned-address', ...this.payload })
     this.router.navigateByUrl(`/select-wallet/${DataServiceKey.WALLET}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-    return this.payload
+    return { result: this.payload, data: await this.getDataSingle() }
   }
 
   public async processData(data: string): Promise<Payload | undefined> {
