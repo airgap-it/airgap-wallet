@@ -1,4 +1,4 @@
-import { IACSinglePartHandler } from '@airgap/angular-core'
+import { IACMessageWrapper, IACSinglePartHandler } from '@airgap/angular-core'
 import { WalletconnectService } from '../../walletconnect/walletconnect.service'
 
 /**
@@ -11,10 +11,10 @@ export class WalletConnectHandler extends IACSinglePartHandler<string> {
     super()
   }
 
-  public async handleComplete(): Promise<string> {
+  public async handleComplete(): Promise<IACMessageWrapper<string>> {
     await this.walletConnectService.connect(this.payload)
 
-    return this.payload
+    return { result: this.payload, data: await this.getDataSingle() }
   }
 
   public async processData(data: string): Promise<string | undefined> {

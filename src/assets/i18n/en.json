@@ -648,13 +648,14 @@
     "delegatee-label": "Collator",
     "delegatee-label-plural": "Collators",
     "commission_label": "Commission",
-    "nominators_label": "Nominators",
+    "delegators_label": "Delegators",
     "collators_label": "Collators",
     "currently-delegated_label": "Currently Delegated",
-    "nominator-status": {
+    "delegator-status": {
       "label": "Status",
       "active_label": "Active",
       "leaving_label": "Undelegating",
+      "ready-to-leave_label": "Ready to undelegate",
       "unknown_label": "Unknown"
     },
     "delegate": {
@@ -665,16 +666,37 @@
       "can-delegate-not-delegated_text": "You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees)."
     },
     "undelegate": {
-      "label": "Undelegate",
-      "text": "You have currently delegated to this collatorr, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+      "schedule": {
+        "label": "Schedule Undelegate",
+        "text": "You have currently delegated to this collator, you can undelegate up to <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+      },
+      "execute": {
+        "label": "Execute Undelegate",
+        "text": "Your request to undelegate <span class=\"style__strong color__primary\">{{ amount }}</span> can be executed now.",
+        "text-unknown-request": "Your request to undelegate can be executed now."
+      },
+      "cancel": {
+        "label": "Cancel Undelegate",
+        "text": "Your request to undelegate <span class=\"style__strong color__primary\">{{ amount }}</span> will be executable in {{ executableIn }} rounds. You can cancel it until then.",
+        "text-single-round": "Your request to undelegate <span class=\"style__strong color__primary\">{{ amount }}</span> will be executable in 1 round. You can cancel it until then.",
+        "text-unknown-request": "Your request to undelegate is pending. You can cancel it until it becomes executable."
+      }
     },
     "undelegate-all": {
-      "label": "Undelegate All"
+      "schedule": {
+        "label": "Schedule Undelegate All"
+      },
+      "execute": {
+        "label": "Execute Undelegate All"
+      },
+      "cancel": {
+        "label": "Cancel Undelegate All"
+      }
     },
     "alert": {
       "collator-oversubscribed": {
         "title": "This collator is oversubscribed",
-        "description": "Collators can only pay out to {{ maxNominators }} nominators per round. If more than {{ maxNominators }} nominators nominate the same collator, only the top {{ maxNominators }} staked nominators are paid rewards. Currently, the minimum staking amount eligible for rewards from this collator is <span class=\"style__strong\">{{ minStakingAmount }}</span>."
+        "description": "Collators can only pay out to {{ maxDelegators }} delegators per round. If more than {{ maxDelegators }} delegators delegate the same collator, only the top {{ maxDelegators }} staked delegators are paid rewards. Currently, the minimum staking amount eligible for rewards from this collator is <span class=\"style__strong\">{{ minStakingAmount }}</span>."
       }
     }
   },

@@ -8,6 +8,7 @@ import {
   ICoinDelegateProtocol,
   KusamaProtocol,
   MoonbaseProtocol,
+  MoonbeamProtocol,
   MoonriverProtocol,
   PolkadotProtocol,
   TezosProtocol
@@ -79,6 +80,10 @@ export class ExtensionsService {
     ],
     [
       MoonriverProtocol,
+      async () => MoonbeamDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
+    ],
+    [
+      MoonbeamProtocol,
       async () => MoonbeamDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
     ]
   ]

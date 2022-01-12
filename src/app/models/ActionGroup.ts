@@ -60,6 +60,9 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.MOONRIVER, async () => {
       return this.getMoonbeamActions()
     })
+    actionMap.set(MainProtocolSymbols.MOONBEAM, async () => {
+      return this.getMoonbeamActions()
+    })
 
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 

@@ -53,10 +53,10 @@
     }
   },
   "dependencies": {
-    "@airgap/angular-core": "0.0.22",
-    "@airgap/angular-ngrx": "0.0.22",
+    "@airgap/angular-core": "0.0.23",
+    "@airgap/angular-ngrx": "0.0.23",
     "@airgap/beacon-sdk": "2.3.8",
-    "@airgap/coinlib-core": "0.12.4",
+    "@airgap/coinlib-core": "0.12.5",
     "@airgap/sapling-wasm": "0.0.6",
     "@angular/animations": "^11.2.9",
     "@angular/common": "^11.2.9",
@@ -89,6 +89,7 @@
     "@ionic/core": "5.6.4",
     "@ionic/storage": "^2.2.0",
     "@keystonehq/bc-ur-registry": "0.4.4",
+    "@keystonehq/bc-ur-registry-eth": "0.7.5",
     "@ledgerhq/hw-transport": "^6.2.0",
     "@ledgerhq/hw-transport-http": "^6.3.0",
     "@ledgerhq/hw-transport-u2f": "^5.15.0",

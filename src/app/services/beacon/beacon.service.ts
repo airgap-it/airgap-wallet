@@ -220,8 +220,8 @@ export class BeaconService {
       network &&
       network.type &&
       (network.type === BeaconNetworkType.MAINNET ||
-        network.type === BeaconNetworkType.EDONET ||
-        network.type === BeaconNetworkType.FLORENCENET ||
+        network.type === BeaconNetworkType.HANGZHOUNET ||
+        network.type === BeaconNetworkType.GRANADANET ||
         network.type === BeaconNetworkType.CUSTOM)
     )
   }
@@ -307,7 +307,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.HANGZHOUNET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -322,29 +322,16 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.EDONET]: {
+      [BeaconNetworkType.HANGZHOUNET]: {
         identifier: undefined,
-        name: network.name || 'Edonet',
+        name: network.name || 'Hangzhounet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-edonet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://edonet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-hangzhounet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://hangzhounet.tezblock.io'),
         extras: {
-          network: TezosNetwork.EDONET,
-          conseilUrl: 'https://tezos-edonet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.EDONET,
-          conseilApiKey: 'airgap00391'
-        }
-      },
-      [BeaconNetworkType.FLORENCENET]: {
-        identifier: undefined,
-        name: network.name || 'Florencenet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-florencenet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://florencenet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.FLORENCENET,
-          conseilUrl: 'https://tezos-florencenet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.FLORENCENET,
+          network: TezosNetwork.HANGZHOUNET,
+          conseilUrl: 'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.HANGZHOUNET,
           conseilApiKey: 'airgap00391'
         }
       },
@@ -355,9 +342,9 @@ export class BeaconService {
         rpcUrl: network.rpcUrl || 'https://tezos-granadanet-node.prod.gke.papers.tech',
         blockExplorer: new TezblockBlockExplorer('https://granadanet.tezblock.io'),
         extras: {
-          network: TezosNetwork.FLORENCENET,
+          network: TezosNetwork.GRANADANET,
           conseilUrl: 'https://tezos-granadanet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.FLORENCENET,
+          conseilNetwork: TezosNetwork.GRANADANET,
           conseilApiKey: 'airgap00391'
         }
       },
