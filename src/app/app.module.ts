@@ -62,6 +62,7 @@ import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-selec
 import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
+import { ThemeService } from './services/appearance/theme.service'
 import { CoinlibService } from './services/coinlib/coinlib.service'
 import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
@@ -172,8 +173,9 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     TransactionHashGuard,
     PercentPipe,
     FeeConverterPipe,
-    InteractionService
-  ],
+    InteractionService,
+    ThemeService
+   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

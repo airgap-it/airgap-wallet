@@ -51,6 +51,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
+import { ThemeService } from './services/appearance/theme.service'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
@@ -86,6 +87,7 @@ export class AppComponent implements AfterViewInit {
     private readonly config: Config,
     private readonly ngZone: NgZone,
     private readonly saplingNativeService: SaplingNativeService,
+    private readonly themeService: ThemeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
@@ -97,12 +99,16 @@ export class AppComponent implements AfterViewInit {
   }
 
   public async initializeApp(): Promise<void> {
+
+    this.themeService.register()
+
     await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
-        this.statusBar.setStyle({ style: Style.Light }),
-        this.statusBar.setBackgroundColor({ color: '#FFFFFF' }),
+        this.statusBar.setStyle({ style: true ? Style.Dark : Style.Light  }),
+        this.statusBar.setBackgroundColor({ color: true ? "#000000" : '#FFFFFF' }),
+
         this.splashScreen.hide(),
 
         this.pushProvider.initPush()
