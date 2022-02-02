@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 import { Capacitor } from '@capacitor/core'
 import { SharePlugin } from '@capacitor/share'
 import { AlertController, ModalController } from '@ionic/angular'
+import { ThemeService } from 'src/app/services/appearance/theme.service'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -21,6 +22,7 @@ export class SettingsPage {
   constructor(
     public readonly alertCtrl: AlertController,
     public readonly serializerService: SerializerService,
+    public readonly themeService: ThemeService,
     private readonly router: Router,
     private readonly modalController: ModalController,
     private readonly clipboardProvider: ClipboardService,
@@ -28,6 +30,13 @@ export class SettingsPage {
     private readonly browserService: BrowserService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
+
+  public onThemeSelection(event): void {
+    const pref = event.detail.value
+
+    this.themeService.themeSubject.next(pref)
+    this.themeService.setStorageItem(pref)
+  }
 
   public about(): void {
     this.navigate('/about')

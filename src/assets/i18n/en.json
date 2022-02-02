@@ -128,6 +128,8 @@
   },
   "settings": {
     "title": "Settings",
+    "appearance_label": "Appearance",
+    "theme_label": "Theme",
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
@@ -275,7 +277,7 @@
     "description":"You can always change your preference in the Settings Tab",
     "button_text": "Edit"
   },
-  
+
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
     "heading": "Select the device to sign this transaction",
@@ -830,15 +832,15 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers",
-    "reset": "Reset", 
+    "reset": "Reset",
     "alert": {
       "heading": "Remove All",
       "message": "Are you sure you want to remove all peers?",
-      "cancel" : "Cancel", 
+      "cancel" : "Cancel",
       "confirm": "Confirm"
     }
   },
-  
+
   "walletconnect": {
     "connection_request": "WalletConnect - Connection Request",
     "new_transaction": "WalletConnect - New Transaction",
@@ -856,7 +858,7 @@
     "connection_error": "There was an issue connecting to WalletConnect"
   },
   "health-check": {
-    "title": "Health Check", 
+    "title": "Health Check",
     "message": "Checking API Health"
   },
   "group-label": {
