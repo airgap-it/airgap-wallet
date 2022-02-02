@@ -106,18 +106,11 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('hybrid')) {
       await Promise.all([
         this.statusBar.setStyle({ style: this.themeService.isDarkMode() ? Style.Dark : Style.Light }),
-        // Do we have different colors for android and iOS? if so, #121212 (Material Design) should be changed to respect such.
-        this.statusBar.setBackgroundColor({ color: this.themeService.isDarkMode() ? '#1f1f1f' : '#FFFFFF' }),
+        this.statusBar.setBackgroundColor({ color: this.themeService.isDarkMode() ? '#121212' : '#FFFFFF' }),
 
         this.splashScreen.hide(),
         this.pushProvider.initPush()
       ])
-
-      // Should this be placed elseWhere? It is necessary for the statusBar to dynamically change when themeSubject is changed.
-      this.themeService.themeSubject.subscribe((theme) => {
-        this.statusBar.setStyle({ style: this.themeService.isDarkMode(theme) ? Style.Dark : Style.Light })
-        this.statusBar.setBackgroundColor({ color: this.themeService.isDarkMode(theme) ? '#1f1f1f' : '#FFFFFF' })
-      })
 
       this.appInfo
         .get()

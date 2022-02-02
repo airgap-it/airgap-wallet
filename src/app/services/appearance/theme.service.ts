@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core'
+import { STATUS_BAR_PLUGIN } from '@airgap/angular-core'
+import { Inject, Injectable } from '@angular/core'
+import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Subject } from 'rxjs'
 
 type themeOptions = 'light' | 'dark' | 'system'
@@ -13,6 +15,8 @@ export class ThemeService {
 
   public readonly supportsSystemPref = CSS.supports('color-scheme', 'dark')
 
+  constructor(@Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin) {}
+
   public register() {
     this.systemThemeQuery().addEventListener('change', () => {
       this.themeSubject.next(this.getTheme())
@@ -21,8 +25,14 @@ export class ThemeService {
     this.themeSubject.subscribe((theme) => {
       if (this.isDarkMode(theme)) {
         this.toggleDarkMode(true)
+
+        this.statusBar.setStyle({ style: Style.Dark })
+        this.statusBar.setBackgroundColor({ color: '#121212' })
         return
       }
+
+      this.statusBar.setStyle({ style: Style.Light })
+      this.statusBar.setBackgroundColor({ color: '#FFFFFF' })
 
       this.toggleDarkMode(false)
     })
