@@ -13,34 +13,27 @@ export class ThemeService {
 
   public readonly supportsSystemPref = CSS.supports('color-scheme', 'dark')
 
-  constructor() {}
-
   public register() {
     this.systemThemeQuery().addEventListener('change', () => {
       this.themeSubject.next(this.getTheme())
     })
 
-    this.themeSubject.subscribe((value: themeOptions) => {
-      switch (value) {
-        case 'light':
-          this.toggleDarkMode(false)
-          return
-        case 'dark':
-          this.toggleDarkMode(true)
-          return
-        default:
-          this.toggleDarkMode(this.systemThemeQuery().matches ? true : false)
-          return
+    this.themeSubject.subscribe((theme) => {
+      if (this.isDarkMode(theme)) {
+        this.toggleDarkMode(true)
+        return
       }
+
+      this.toggleDarkMode(false)
     })
 
     this.themeSubject.next(this.getTheme())
   }
 
-  public isDarkMode(): boolean {
-    const theme = this.getTheme()
+  public isDarkMode(theme?: themeOptions): boolean {
+    theme = theme ?? this.getTheme()
 
-    if (theme == 'dark' || (theme == 'system' && this.systemThemeQuery().matches)) {
+    if (theme === 'dark' || this.systemPrefersDark(theme)) {
       return true
     }
 
@@ -51,8 +44,8 @@ export class ThemeService {
     document.body.classList.toggle('dark', enabled)
   }
 
-  public setStorageItem(pref: themeOptions): void {
-    localStorage.setItem(this.storageKey, pref)
+  public setStorageItem(theme: themeOptions): void {
+    localStorage.setItem(this.storageKey, theme)
   }
 
   public getTheme(): themeOptions {
@@ -71,5 +64,9 @@ export class ThemeService {
 
   private fallBackTheme(): themeOptions {
     return this.supportsSystemPref ? 'system' : 'light'
+  }
+
+  private systemPrefersDark(theme: themeOptions): boolean {
+    return theme === 'system' && this.systemThemeQuery().matches
   }
 }

@@ -130,6 +130,11 @@
     "title": "Settings",
     "appearance_label": "Appearance",
     "theme_label": "Theme",
+    "select-theme": {
+      "system": "Device Theme",
+      "light": "Light Theme",
+      "dark": "Dark Theme"
+    },
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",

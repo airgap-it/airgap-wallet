@@ -32,10 +32,8 @@ export class SettingsPage {
   ) {}
 
   public onThemeSelection(event): void {
-    const pref = event.detail.value
-
-    this.themeService.themeSubject.next(pref)
-    this.themeService.setStorageItem(pref)
+    this.themeService.themeSubject.next(event.detail.value)
+    this.themeService.setStorageItem(event.detail.value)
   }
 
   public about(): void {
