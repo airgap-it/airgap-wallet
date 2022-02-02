@@ -17,7 +17,6 @@ export class ThemeService {
 
   public register() {
     this.systemThemeQuery().addEventListener('change', () => {
-      console.log(this.getTheme())
       this.themeSubject.next(this.getTheme())
     })
 
