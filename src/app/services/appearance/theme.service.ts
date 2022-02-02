@@ -38,6 +38,16 @@ export class ThemeService {
     this.themeSubject.next(this.getTheme())
   }
 
+  public isDarkMode(): boolean {
+    const theme = this.getTheme()
+
+    if (theme == 'dark' || (theme == 'system' && this.systemThemeQuery().matches)) {
+      return true
+    }
+
+    return false
+  }
+
   public toggleDarkMode(enabled: boolean): void {
     document.body.classList.toggle('dark', enabled)
   }

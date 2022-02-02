@@ -99,15 +99,14 @@ export class AppComponent implements AfterViewInit {
   }
 
   public async initializeApp(): Promise<void> {
-
     this.themeService.register()
 
     await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
 
     if (this.platform.is('hybrid')) {
       await Promise.all([
-        this.statusBar.setStyle({ style: true ? Style.Dark : Style.Light  }),
-        this.statusBar.setBackgroundColor({ color: true ? "#000000" : '#FFFFFF' }),
+        this.statusBar.setStyle({ style: this.themeService.isDarkMode() ? Style.Dark : Style.Light }),
+        this.statusBar.setBackgroundColor({ color: this.themeService.isDarkMode() ? '#000000' : '#FFFFFF' }),
 
         this.splashScreen.hide(),
 
@@ -262,7 +261,7 @@ export class AppComponent implements AfterViewInit {
     const identifiersWithOptions = Object.entries(genericSubProtocols)
     const protocols = identifiersWithOptions
       .map(([protocolNetworkIdentifier, options]) => {
-        const [protocolIdentifier,] = protocolNetworkIdentifier.split(':')
+        const [protocolIdentifier] = protocolNetworkIdentifier.split(':')
 
         if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
           const tezosOptions = options as TezosProtocolOptions
@@ -333,7 +332,7 @@ export class AppComponent implements AfterViewInit {
       [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
       [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
       [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk',
-      [TezosNetwork.HANGZHOUNET]: 'KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii',
+      [TezosNetwork.HANGZHOUNET]: 'KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii'
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
