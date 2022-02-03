@@ -18,6 +18,7 @@ import { IntroductionPage } from '../introduction/introduction'
 })
 export class SettingsPage {
   public readonly platform: string = Capacitor.getPlatform()
+  public readonly getTheme = this.themeService.getTheme()
 
   constructor(
     public readonly alertCtrl: AlertController,
@@ -31,9 +32,10 @@ export class SettingsPage {
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
 
-  public onThemeSelection(event): void {
+  public async onThemeSelection(event) {
     this.themeService.themeSubject.next(event.detail.value)
-    this.themeService.setStorageItem(event.detail.value)
+
+    await this.themeService.setStorageItem(event.detail.value)
   }
 
   public about(): void {

@@ -9,6 +9,8 @@ import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWall
 import { ExchangeTransactionDetails } from '../exchange/exchange'
 
 export type BeaconRequest = [string, any, ICoinProtocol]
+export type themeOptions = 'light' | 'dark' | 'system'
+
 export interface SerializedBeaconRequest {
   messageId: string
   payload: any
@@ -30,7 +32,8 @@ export enum WalletStorageKey {
   PENDING_EXCHANGE_TRANSACTIONS = 'PENDING_EXCHANGE_TRANSACTIONS',
   BEACON_REQUESTS = 'BEACON_REQUESTS',
   PENDING_REQUEST = 'PENDING_REQUEST',
-  GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS'
+  GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS',
+  THEME = 'theme'
 }
 
 interface IBroadcastTransaction {
@@ -54,6 +57,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
+  [WalletStorageKey.THEME]: themeOptions
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -72,7 +76,8 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS]: [],
   [WalletStorageKey.BEACON_REQUESTS]: [],
   [WalletStorageKey.PENDING_REQUEST]: [],
-  [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {}
+  [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {},
+  [WalletStorageKey.THEME]: undefined
 }
 
 @Injectable({

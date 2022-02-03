@@ -8,8 +8,7 @@ import {
   LanguageService,
   ProtocolService,
   SerializerService,
-  SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN
+  SPLASH_SCREEN_PLUGIN
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
@@ -45,7 +44,6 @@ import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
 import { SplashScreenPlugin } from '@capacitor/splash-screen'
-import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
@@ -90,8 +88,7 @@ export class AppComponent implements AfterViewInit {
     private readonly themeService: ThemeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
-    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
-    @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
+    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('android') || this.platform.is('ios')
@@ -103,14 +100,10 @@ export class AppComponent implements AfterViewInit {
 
     this.themeService.register()
 
-    if (this.platform.is('hybrid')) {
-      await Promise.all([
-        this.statusBar.setStyle({ style: this.themeService.isDarkMode() ? Style.Dark : Style.Light }),
-        this.statusBar.setBackgroundColor({ color: this.themeService.isDarkMode() ? '#121212' : '#FFFFFF' }),
+    this.themeService.statusBarStyleDark(await this.themeService.isDarkMode())
 
-        this.splashScreen.hide(),
-        this.pushProvider.initPush()
-      ])
+    if (this.platform.is('hybrid')) {
+      await Promise.all([this.splashScreen.hide(), this.pushProvider.initPush()])
 
       this.appInfo
         .get()

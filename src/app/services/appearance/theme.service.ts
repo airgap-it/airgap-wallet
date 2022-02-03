@@ -1,47 +1,58 @@
+import { Platform } from '@ionic/angular'
+import { WalletStorageService, themeOptions, WalletStorageKey } from './../storage/storage'
 import { STATUS_BAR_PLUGIN } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
 import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Subject } from 'rxjs'
-
-type themeOptions = 'light' | 'dark' | 'system'
-
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  private readonly storageKey = 'theme'
-
   public themeSubject: Subject<themeOptions> = new Subject()
 
   public readonly supportsSystemPref = CSS.supports('color-scheme', 'dark')
 
-  constructor(@Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin) {}
+  constructor(
+    private readonly platform: Platform,
+    private readonly storage: WalletStorageService,
+    @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
+  ) {}
 
-  public register() {
-    this.systemThemeQuery().addEventListener('change', () => {
-      this.themeSubject.next(this.getTheme())
+  public async register() {
+    this.systemThemeQuery().addEventListener('change', async () => {
+      const theme = await this.getTheme()
+
+      if (theme === 'system' || theme == null) {
+        this.themeSubject.next(theme)
+      }
     })
 
-    this.themeSubject.subscribe((theme) => {
-      if (this.isDarkMode(theme)) {
+    this.themeSubject.subscribe(async (theme) => {
+      if (await this.isDarkMode(theme)) {
         this.toggleDarkMode(true)
+        this.statusBarStyleDark(true)
 
-        this.statusBar.setStyle({ style: Style.Dark })
-        this.statusBar.setBackgroundColor({ color: '#121212' })
         return
       }
 
-      this.statusBar.setStyle({ style: Style.Light })
-      this.statusBar.setBackgroundColor({ color: '#FFFFFF' })
-
+      this.statusBarStyleDark(false)
       this.toggleDarkMode(false)
     })
 
-    this.themeSubject.next(this.getTheme())
+    this.themeSubject.next(await this.getTheme())
   }
 
-  public isDarkMode(theme?: themeOptions): boolean {
-    theme = theme ?? this.getTheme()
+  public async statusBarStyleDark(isDarkMode: boolean) {
+    if (this.platform.is('hybrid')) {
+      Promise.all([
+        this.statusBar.setStyle({ style: isDarkMode ? Style.Dark : Style.Light }),
+        this.statusBar.setBackgroundColor({ color: isDarkMode ? '#1f1f1f' : '#FFFFFF' })
+      ])
+    }
+  }
+
+  public async isDarkMode(theme?: any): Promise<boolean> {
+    theme = theme ?? (await this.getTheme())
 
     if (theme === 'dark' || this.systemPrefersDark(theme)) {
       return true
@@ -54,12 +65,12 @@ export class ThemeService {
     document.body.classList.toggle('dark', enabled)
   }
 
-  public setStorageItem(theme: themeOptions): void {
-    localStorage.setItem(this.storageKey, theme)
+  public async setStorageItem(theme: themeOptions): Promise<void> {
+    return this.storage.set(WalletStorageKey.THEME, theme)
   }
 
-  public getTheme(): themeOptions {
-    const storageItem: any = localStorage.getItem(this.storageKey)
+  public async getTheme(): Promise<themeOptions> {
+    const storageItem = await this.storage.get(WalletStorageKey.THEME)
 
     if (storageItem == null) {
       return this.fallBackTheme()

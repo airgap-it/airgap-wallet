@@ -18,8 +18,10 @@
       <ion-item>
         <ion-icon name="build-outline" slot="start"></ion-icon>
         {{ 'settings.theme_label' | translate }}
-        <ion-select [attr.value]="this.themeService.getTheme()" (ionChange)="onThemeSelection($event)" interface="action-sheet" slot="end">
-          <ion-select-option *ngIf="this.themeService.supportsSystemPref" value="system">{{ 'settings.select-theme.system' | translate }}</ion-select-option>
+        <ion-select [attr.value]="this.getTheme | async" (ionChange)="onThemeSelection($event)" interface="action-sheet" slot="end">
+          <ion-select-option *ngIf="this.themeService.supportsSystemPref" value="system">
+            {{ 'settings.select-theme.system' | translate }}
+          </ion-select-option>
           <ion-select-option value="light">{{ 'settings.select-theme.light' | translate }}</ion-select-option>
           <ion-select-option value="dark">{{ 'settings.select-theme.dark' | translate }}</ion-select-option>
         </ion-select>
