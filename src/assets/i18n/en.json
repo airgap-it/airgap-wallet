@@ -696,7 +696,7 @@
     "alert": {
       "collator-oversubscribed": {
         "title": "This collator is oversubscribed",
-        "description": "Collators can only pay out to {{ maxDelegators }} delegators per round. If more than {{ maxDelegators }} delegators delegate the same collator, only the top {{ maxDelegators }} staked delegators are paid rewards. Currently, the minimum staking amount eligible for rewards from this collator is <span class=\"style__strong\">{{ minStakingAmount }}</span>."
+        "description": "Collators can only pay out to {{ maxTopDelegations }} delegators per round. If more than {{ maxTopDelegations }} delegators delegate the same collator, only the top {{ maxTopDelegations }} staked delegators are paid rewards. Currently, the minimum staking amount eligible for rewards from this collator is <span class=\"style__strong\">{{ minStakingAmount }}</span>."
       }
     }
   },

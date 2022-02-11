@@ -1,4 +1,4 @@
-FROM node:15.14.0
+FROM node:16.13.1
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential libxtst6
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 	&& wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
 	&& sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
 	&& apt-get update \
-	&& apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont libxss1 \
+	&& apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
 	--no-install-recommends --allow-unauthenticated \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& apt-get purge --auto-remove -y curl \
@@ -49,6 +49,6 @@ RUN export NODE_ENV=production
 RUN node config/patch_crypto.js
 
 # build
-RUN npx ionic build --prod
+RUN npm run build:prod
 
 CMD ["static", "-p", "8100", "-a", "0.0.0.0", "www"]
