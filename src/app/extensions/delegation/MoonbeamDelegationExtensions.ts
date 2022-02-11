@@ -480,17 +480,22 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
   private async createDelegationAlerts(protocol: MoonbeamProtocol, delegationDetails: MoonbeamDelegationDetails): Promise<UIAlert[]> {
     const alerts: UIAlert[] = []
 
-    const maxDelegators = await protocol.options.nodeClient.getMaxDelegatorsPerCandidate()
+    const runtimeVersion = await protocol.options.nodeClient.getRuntimeVersion()
+    const maxTopDelegations =
+      runtimeVersion === null || runtimeVersion.specVersion >= 1200
+        ? await protocol.options.nodeClient.getMaxTopDelegationsPerCandidate()
+        : await protocol.options.nodeClient.getMaxDelegatorsPerCandidate() // TODO: Remove once Moonriver and Moonbeam are updated to runtime 1200.
+
     if (
-      maxDelegators &&
-      maxDelegators.lt(delegationDetails.collatorDetails.delegators) &&
+      maxTopDelegations &&
+      maxTopDelegations.lt(delegationDetails.collatorDetails.delegators) &&
       new BigNumber(delegationDetails.bond).lte(delegationDetails.collatorDetails.minEligibleBalance)
     ) {
       alerts.push(
         new UIAlert({
           title: 'delegation-detail-moonbeam.alert.collator-oversubscribed.title',
           description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', { 
-            maxDelegators: maxDelegators.toString(), 
+            maxTopDelegations: maxTopDelegations.toString(),
             minStakingAmount: await this.amountConverterPipe.transform(delegationDetails.collatorDetails.minEligibleBalance, {
               protocol,
               maxDigits: protocol.decimals
