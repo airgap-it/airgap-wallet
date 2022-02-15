@@ -119,6 +119,7 @@
     "angularx-qrcode": "^11.0.0",
     "axios": "^0.21.1",
     "bignumber.js": "9.0.1",
+    "bs58check": "^2.1.2",
     "chart.js": "^2.9.4",
     "cordova-plugin-qrscanner": "3.0.1",
     "cordova-sqlite-storage": "^6.0.0",
