@@ -480,11 +480,7 @@ export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<M
   private async createDelegationAlerts(protocol: MoonbeamProtocol, delegationDetails: MoonbeamDelegationDetails): Promise<UIAlert[]> {
     const alerts: UIAlert[] = []
 
-    const runtimeVersion = await protocol.options.nodeClient.getRuntimeVersion()
-    const maxTopDelegations =
-      runtimeVersion === null || runtimeVersion.specVersion >= 1200
-        ? await protocol.options.nodeClient.getMaxTopDelegationsPerCandidate()
-        : await protocol.options.nodeClient.getMaxDelegatorsPerCandidate() // TODO: Remove once Moonriver and Moonbeam are updated to runtime 1200.
+    const maxTopDelegations = await protocol.options.nodeClient.getMaxTopDelegationsPerCandidate()
 
     if (
       maxTopDelegations &&

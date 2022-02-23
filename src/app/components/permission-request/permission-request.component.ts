@@ -1,5 +1,5 @@
 import { PermissionScope } from '@airgap/beacon-sdk'
-import { AirGapMarketWallet, AirGapWalletStatus, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
@@ -57,10 +57,10 @@ export class PermissionRequestComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const allWallets = this.accountService.getWalletList()
+    const allWallets = this.accountService.getActiveWalletList()
     this.wallets = allWallets.filter(
       (wallet: AirGapMarketWallet) =>
-        wallet.protocol.identifier === this.targetProtocolSymbol && wallet.status === AirGapWalletStatus.ACTIVE
+        wallet.protocol.identifier === this.targetProtocolSymbol
     )
   }
 

@@ -307,7 +307,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -332,19 +332,6 @@ export class BeaconService {
           network: TezosNetwork.HANGZHOUNET,
           conseilUrl: 'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
           conseilNetwork: TezosNetwork.HANGZHOUNET,
-          conseilApiKey: 'airgap00391'
-        }
-      },
-      [BeaconNetworkType.GRANADANET]: {
-        identifier: undefined,
-        name: network.name || 'Granadanet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-granadanet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://granadanet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.GRANADANET,
-          conseilUrl: 'https://tezos-granadanet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.GRANADANET,
           conseilApiKey: 'airgap00391'
         }
       },

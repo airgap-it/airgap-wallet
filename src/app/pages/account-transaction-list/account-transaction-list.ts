@@ -263,15 +263,15 @@ export class AccountTransactionListPage {
     event.target.complete()
   }
 
-  public async loadInitialTransactions(_forceRefresh: boolean = false): Promise<void> {
-    if (this.transactions.length === 0) {
+  public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
+    if (forceRefresh || this.transactions.length === 0) {
       this.transactions =
         (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
         []
     }
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions(undefined, this.TRANSACTION_LIMIT)
-
+    this.showLinkToBlockExplorer = false
     const transactions: IAirGapTransaction[] = await promiseTimeout(10000, transactionPromise).catch((error) => {
       console.error(error)
       // either the txs are taking too long to load or there is actually a network error

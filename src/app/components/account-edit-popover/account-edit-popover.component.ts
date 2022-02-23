@@ -4,7 +4,6 @@ import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
-import { TezosProtocolNetwork } from '@airgap/coinlib-core'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import { supportsDelegation } from 'src/app/helpers/delegation'
@@ -131,7 +130,7 @@ export class AccountEditPopoverComponent implements OnInit {
         {
           text: 'Ok',
           handler: async (data) => {
-            await this.walletsProvider.setWalletNetwork(this.wallet, this.networks[data] as TezosProtocolNetwork)
+            await this.walletsProvider.setWalletNetwork(this.wallet, this.networks[data])
             this.cdr.detectChanges()
             await this.dismissPopover()
           }
@@ -147,8 +146,6 @@ export class AccountEditPopoverComponent implements OnInit {
   }
 
   private async initNetworks(): Promise<void> {
-    // if (this.wallet.protocol.identifier === MainProtocolSymbols.XTZ) {
-      this.networks = await this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
-    // }
+    this.networks = await this.protocolService.getNetworksForProtocol(this.wallet.protocol.identifier)
   }
 }

@@ -1,4 +1,4 @@
-import { partition, ProtocolService } from '@airgap/angular-core'
+import { ProtocolService } from '@airgap/angular-core'
 import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
@@ -260,42 +260,56 @@ export class TransactionConfirmPage {
   }
 
   private async wrapInTezosOperation(protocol: TezosSaplingProtocol, transaction: string): Promise<void> {
-    const wallet = await this.selectTezosTzAccount(protocol)
-    const unsignedTx = await protocol.wrapSaplingTransactions(
-      wallet.publicKey,
-      transaction,
-      new BigNumber(wallet.protocol.feeDefaults.medium).shiftedBy(wallet.protocol.feeDecimals).toString(),
-      true
-    )
-
-    const airGapTxs = await protocol.getTransactionDetails(
-      {
-        publicKey: wallet.publicKey,
-        transaction: unsignedTx
-      },
-      { knownViewingKeys: this.accountService.getKnownViewingKeys() }
-    )
-
-    this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
+    this.selectTezosTzAccount(protocol, async (wallet) => {
+      try {
+        const unsignedTx = await protocol.wrapSaplingTransactions(
+          wallet.publicKey,
+          transaction,
+          new BigNumber(wallet.protocol.feeDefaults.medium).shiftedBy(wallet.protocol.feeDecimals).toString(),
+          true
+        )
+    
+        const airGapTxs = await protocol.getTransactionDetails(
+          {
+            publicKey: wallet.publicKey,
+            transaction: unsignedTx
+          },
+          { knownViewingKeys: this.accountService.getKnownViewingKeys() }
+        )
+    
+        this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs) 
+      } catch (error) {
+        this.toastCtrl
+          .create({
+            duration: TOAST_ERROR_DURATION,
+            message: 'Failed to prepare tezos operation: ' + error,
+            buttons: [
+              {
+                text: 'Ok',
+                role: 'cancel'
+              }
+            ],
+            position: 'bottom'
+          })
+          .then((toast) => {
+            toast.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+          .catch(handleErrorSentry(ErrorCategory.IONIC_TOAST))
+      }
+    })
   }
 
-  private async selectTezosTzAccount(protocol: ICoinProtocol): Promise<AirGapMarketWallet> {
-    return new Promise<AirGapMarketWallet>((resolve) => {
-      const wallets: AirGapMarketWallet[] = this.accountService.getWalletList()
-      const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
-        wallets,
-        (wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ
-      )
-
+  private selectTezosTzAccount(protocol: ICoinProtocol, onSelected: (wallet: AirGapMarketWallet) => void): void {
+    const wallets: AirGapMarketWallet[] = this.accountService.getActiveWalletList()
+      const compatibleWallets = wallets.filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.protocol.options.network.identifier === protocol.options.network.identifier)
       const info = {
         actionType: 'broadcast',
         targetIdentifier: protocol.identifier,
         compatibleWallets,
-        incompatibleWallets,
-        callback: resolve
+        incompatibleWallets: [],
+        callback: onSelected
       }
       this.dataService.setData(DataServiceKey.ACCOUNTS, info)
       this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-    })
   }
 }
