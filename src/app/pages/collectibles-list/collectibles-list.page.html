@@ -18,7 +18,7 @@
             <img *ngIf="item.thumbnail" [src]="item.thumbnail" (error)="onInvalidThumbnail(item)" />
             <img *ngIf="!item.thumbnail" src="./assets/img/collectible-placeholder.png" />
             <ion-card-header>
-              <ion-card-subtitle>{{ item.name }}</ion-card-subtitle>
+              <ion-card-subtitle>{{ item.name | truncateString: { limit: 25 } }}</ion-card-subtitle>
             </ion-card-header>
           </ion-card>
         </ion-col>

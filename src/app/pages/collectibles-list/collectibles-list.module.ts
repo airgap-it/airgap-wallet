@@ -10,6 +10,7 @@ import { StoreModule } from '@ngrx/store'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
+import { PipesModule } from '../../pipes/pipes.module'
 
 import { CollectiblesListPageRoutingModule } from './collectibles-list-routing.module'
 import { CollectiblesListEffects } from './collectibles-list.effects'
@@ -27,6 +28,7 @@ import * as fromCollectiblesList from './collectibles-list.reducers'
     CollectiblesListPageRoutingModule,
     AirGapAngularCoreModule,
     AirGapAngularNgRxModule,
+    PipesModule,
     StoreModule.forFeature('collectiblesList', fromCollectiblesList.reducer),
     EffectsModule.forFeature([CollectiblesListEffects])
   ],
