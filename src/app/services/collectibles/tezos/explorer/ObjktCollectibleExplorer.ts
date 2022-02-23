@@ -12,28 +12,28 @@ import { CollectibleCursor } from '../../collectibles.types'
 import { TezosCollectible, TezosCollectibleDetails, TezosCollectibleExplorer } from './TezosCollectibleExplorer'
 
 interface Token {
-  id?: string
-  metadata?: string
-  description?: string
-  title?: string
-  fa2?: FA2
+  token_id?: string | null
+  metadata?: string | null
+  name?: string | null
+  description?: string | null
+  fa?: FA
 }
 
 interface TokenHolder {
   token?: Token
-  quantity?: number
+  quantity?: number | null
 }
 
-interface FA2 {
-  contract?: string
-  name?: string
+interface FA {
+  contract?: string | null
+  name?: string | null
 }
 
 interface TokenHolderResponse {
   token_holder?: TokenHolder[]
 }
 
-const OBJKT_API_URL = 'https://data.objkt.com/v1/graphql'
+const OBJKT_API_URL = 'https://data.objkt.com/v2/graphql'
 const OBJKT_PAGE_URL = 'https://objkt.com'
 const OBJKT_ASSETS_URL = 'https://assets.objkt.com/file/assets-001'
 
@@ -112,7 +112,7 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
       return undefined
     }
 
-    return this.tokenToTezosCollectible(protocol, { token: { id: tokenID, fa2: { contract: contractAddress } }, ...tokenHolder })
+    return this.tokenToTezosCollectible(protocol, { token: { token_id: tokenID, fa: { contract: contractAddress } }, ...tokenHolder })
   }
 
   private async fetchTokenHolderForTokenId(contractAddress: string, tokenID: string): Promise<TokenHolderResponse> {
@@ -120,10 +120,10 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
       {
         token_holder(limit: 1, where: {
           token: {
-            fa2_id: {
+            fa_contract: {
               _eq: "${contractAddress}"
             }
-            id: {
+            token_id: {
               _eq: "${tokenID}"
             }
           },
@@ -132,11 +132,11 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
           }
         }) {
           token {
-            id
+            token_id
             metadata
+            token
             description
-            title
-            fa2 {
+            fa {
               contract
               name
             }
@@ -153,14 +153,14 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     const query = gql`
       {
         token_holder(limit: ${limit}, offset: ${offset}, where: {
-          holder_id: {
+          holder_address: {
             _eq: "${address}"
           },
           token: {
-            id: {
+            token_id: {
               _nlike: ""
             },
-            fa2_id: {
+            fa_contract: {
               _nlike: ""
             }
           },
@@ -169,11 +169,11 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
           }
         }) {
           token {
-            id
+            token_id
             metadata
+            name
             description
-            title
-            fa2 {
+            fa {
               contract
               name
             }
@@ -187,13 +187,13 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
   }
 
   private async tokenToTezosCollectible(protocol: TezosProtocol, tokenHolder: TokenHolder): Promise<TezosCollectible | undefined> {
-    const id = tokenHolder.token?.id
-    const amount = tokenHolder.quantity
-    const metadataUri = tokenHolder.token?.metadata
-    const contractAddress = tokenHolder.token?.fa2?.contract
-    const contractName = tokenHolder.token?.fa2?.name
-    const description = tokenHolder.token?.description
-    const title = tokenHolder.token?.title
+    const id = tokenHolder.token?.token_id ?? undefined
+    const amount = tokenHolder.quantity ?? undefined
+    const metadataUri = tokenHolder.token?.metadata ?? undefined
+    const contractAddress = tokenHolder.token?.fa?.contract ?? undefined
+    const contractName = tokenHolder.token?.fa?.name ?? undefined
+    const description = tokenHolder.token?.description ?? undefined
+    const name = tokenHolder.token?.name ?? undefined
 
     if (!id || !contractAddress) {
       return undefined
@@ -213,7 +213,7 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
         name: contractName
       },
       description,
-      name: title,
+      name: name ?? description,
       imgs: [
         this.getAssetUrl(contractAddress, id, 'display'),
         this.getAssetUrl(contractAddress, id, 'thumb400'),
