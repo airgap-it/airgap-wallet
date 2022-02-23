@@ -21,7 +21,7 @@
         <div class="ion-margin-bottom ion-padding-bottom">
           <ion-row class="ion-padding-horizontal">
             <ion-col>
-              <h3>{{ item.value.name }}</h3>
+              <h3>{{ item.value.name | truncateString: { limit: 25 } }}</h3>
               <p *ngIf="item.value.description">
                 {{ item.value.description }}
               </p>

@@ -35,6 +35,7 @@ import { CheckboxInput } from 'src/app/components/permission-request/permission-
 import { generateId } from '@airgap/coinlib-core'
 import { Subscription } from 'rxjs'
 import BigNumber from 'bignumber.js'
+import * as bs58check from 'bs58check'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -191,10 +192,15 @@ export class BeaconRequestPage implements OnInit {
     this.responseHandler = async (): Promise<void> => {
       const scopes: PermissionScope[] = this.inputs.filter((input) => input.checked).map((input) => input.value)
 
+      // The public key is in 'hex' format, convert it to "edpk" format
+      const rawPublicKey = Buffer.from(this.selectedWallet.publicKey, 'hex')
+      const edpkPrefix = Buffer.from(new Uint8Array([13, 15, 37, 217]))
+      const edpkPublicKey = bs58check.encode(Buffer.concat([edpkPrefix, rawPublicKey]))
+
       const response: PermissionResponseInput = {
         id: request.id,
         type: BeaconMessageType.PermissionResponse,
-        publicKey: this.selectedWallet.publicKey,
+        publicKey: edpkPublicKey,
         network: request.network,
         scopes
       }
@@ -277,14 +283,7 @@ export class BeaconRequestPage implements OnInit {
     clonedRequest.id = new BigNumber(generatedId).toString() // TODO: Remove?
 
     this.responseHandler = async () => {
-      this.accountService.startInteraction(
-        selectedWallet,
-        clonedRequest,
-        IACMessageType.MessageSignRequest,
-        undefined,
-        false,
-        generatedId
-      )
+      this.accountService.startInteraction(selectedWallet, clonedRequest, IACMessageType.MessageSignRequest, undefined, false, generatedId)
     }
   }
 

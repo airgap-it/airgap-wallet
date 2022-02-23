@@ -21,13 +21,15 @@
       <portfolio-item [wallet]="wallet" tappable (click)="onSelected(wallet)"></portfolio-item>
     </ion-list>
 
-    <ion-text color="primary">
-      <p class="font--weight__bold ion-padding-horizontal">
-        {{ 'select-wallet.incompatible_label' | translate }}
-      </p>
-    </ion-text>
-    <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of incompatibleWallets">
-      <portfolio-item [wallet]="wallet" tappable (click)="onSelected(wallet)"></portfolio-item>
-    </ion-list>
+    <ng-container *ngIf="incompatibleWallets.length > 0">
+      <ion-text color="primary">
+        <p class="font--weight__bold ion-padding-horizontal">
+          {{ 'select-wallet.incompatible_label' | translate }}
+        </p>
+      </ion-text>
+      <ion-list lines="none" class="ion-margin-top" *ngFor="let wallet of incompatibleWallets">
+        <portfolio-item [wallet]="wallet" tappable (click)="onSelected(wallet)"></portfolio-item>
+      </ion-list>
+    </ng-container>
   </ion-grid>
 </ion-content>

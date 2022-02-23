@@ -422,7 +422,7 @@ export class OperationsProvider {
         })
       } else if (wallet.protocol.identifier === MainProtocolSymbols.XTZ && TezosSaplingAddress.isZetAddress(address)) {
         const protocols: ICoinProtocol[] = (await this.protocolService.getProtocolsForAddress(address)).filter(
-          (protocol: ICoinProtocol) => protocol.identifier !== MainProtocolSymbols.XTZ
+          (protocol: ICoinProtocol) => protocol.identifier !== MainProtocolSymbols.XTZ && protocol.options.network.identifier === wallet.protocol.options.network.identifier
         )
 
         if (protocols.length > 1) {

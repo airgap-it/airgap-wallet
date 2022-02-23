@@ -8,7 +8,7 @@
     <h2
       class="font--weight__bold"
       [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__regular': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
-      *ngIf="balance && marketPrice; else syncingHeading"
+      *ngIf="balance; else syncingHeading"
     >
       {{ balanceFormatted }}
     </h2>
