@@ -16,7 +16,6 @@ export class TransactionQrPage {
   public isBrowser: boolean = false
   public qrDataTooBig: boolean = false
   public interactionData: any
-  public displayRawData: boolean = false
 
   public aggregatedInfo:
     | {
@@ -58,9 +57,5 @@ export class TransactionQrPage {
 
   public done() {
     this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-  }
-
-  public toggleDisplayRawData(): void {
-    this.displayRawData = !this.displayRawData
   }
 }

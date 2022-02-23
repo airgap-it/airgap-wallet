@@ -25,8 +25,6 @@ interface WalletGroup {
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
-  private subscription: Subscription
-
   public isVisible = 'hidden'
 
   public total: number = 0
@@ -38,6 +36,8 @@ export class PortfolioPage {
   public isDesktop: boolean = false
 
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
+
+  private subscriptions: Subscription[] = []
 
   constructor(
     private readonly router: Router,
@@ -52,14 +52,16 @@ export class PortfolioPage {
     this.activeWallets = this.wallets.pipe(map((wallets) => wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE) ?? []))
 
     // If a wallet gets added or removed, recalculate all values
-    this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
-      this.calculateTotal(wallets)
+    const walletSub = this.wallets.subscribe((wallets: AirGapMarketWallet[]) => {
+      this.calculateTotal(this.walletsProvider.getActiveWalletList())
 
       this.refreshWalletGroups(wallets)
     })
-    this.walletsProvider.walletChangedObservable.subscribe(() => {
-      this.calculateTotal(this.walletsProvider.getWalletList())
+    this.subscriptions.push(walletSub)
+    const walletChangedSub = this.walletsProvider.walletChangedObservable.subscribe(() => {
+      this.calculateTotal(this.walletsProvider.getActiveWalletList())
     })
+    this.subscriptions.push(walletChangedSub)
   }
 
   private refreshWalletGroups(wallets: AirGapMarketWallet[]) {
@@ -145,12 +147,13 @@ export class PortfolioPage {
   public openAccountAddPage() {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
+
   public async doRefresh(event: any = null) {
     // XTZ: Refresh delegation status
-    this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getWalletList())
+    this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getActiveWalletList())
 
     const observables = [
-      this.walletsProvider.getWalletList().filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE).map((wallet) => {
+      this.walletsProvider.getActiveWalletList().map((wallet) => {
         return from(wallet.synchronize())
       })
     ]
@@ -161,8 +164,8 @@ export class PortfolioPage {
      */
     const allWalletsSynced = forkJoin([observables])
 
-    this.subscription = allWalletsSynced.subscribe(() => {
-      this.calculateTotal(this.walletsProvider.getWalletList(), event ? event.target : null)
+    allWalletsSynced.pipe(take(1)).subscribe(() => {
+      this.calculateTotal(this.walletsProvider.getActiveWalletList(), event ? event.target : null)
       this.wallets.pipe(take(1)).subscribe(wallets => this.refreshWalletGroups(wallets))
     })
   }
@@ -191,6 +194,9 @@ export class PortfolioPage {
   }
 
   public ngOnDestroy(): void {
-    this.subscription.unsubscribe()
+    for (const sub of this.subscriptions) {
+      sub.unsubscribe()
+    }
+    this.subscriptions = []
   }
 }

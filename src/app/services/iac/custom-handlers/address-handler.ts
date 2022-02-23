@@ -39,7 +39,7 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
 
     if (splits.length > 1) {
       const [address]: string[] = splits[1].split('?') // Ignore amount
-      const wallets: AirGapMarketWallet[] = this.accountProvider.getWalletList()
+      const wallets: AirGapMarketWallet[] = this.accountProvider.getActiveWalletList()
       for (const protocol of supportedProtocols()) {
         if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
           const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(

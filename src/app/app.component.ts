@@ -204,20 +204,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const granadanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Granadanet',
-      NetworkType.TESTNET,
-      'https://tezos-granadanet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//granadanet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.GRANADANET,
-        'https://tezos-granadanet-conseil.prod.gke.papers.tech',
-        TezosNetwork.MAINNET,
-        'airgap00391'
-      )
-    )
-    const granadanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(granadanetNetwork))
-
     const hangzhounetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Hangzhounet',
       NetworkType.TESTNET,
@@ -236,16 +222,23 @@ export class AppComponent implements AfterViewInit {
       | TezosSaplingExternalMethodProvider
       | undefined = await this.saplingNativeService.createExternalMethodProvider()
 
-    const shieldedTezProtocol: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
+    const shieldedTezProtocolTestnet: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
         hangzhounetNetwork,
+        new TezosShieldedTezProtocolConfig(undefined, undefined, 'KT1THKUU1urnd2siSM9inxcJpsbnVQuYt2qr', externalMethodProvider)
+      )
+    )
+
+    const shieldedTezProtocol = new TezosShieldedTezProtocol(
+      new TezosSaplingProtocolOptions(
+        undefined, 
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [hangzhounetProtocol, granadanetProtocol, shieldedTezProtocol],
-      extraPassiveSubProtocols: [[granadanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(granadanetNetwork))]]
+      extraActiveProtocols: [shieldedTezProtocol, hangzhounetProtocol, shieldedTezProtocolTestnet],
+      extraPassiveSubProtocols: [[hangzhounetProtocol, new TezosKtProtocol(new TezosProtocolOptions(hangzhounetNetwork))]]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -254,6 +247,9 @@ export class AppComponent implements AfterViewInit {
   private async getGenericSubProtocols(): Promise<void> {
     const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
     const identifiersWithOptions = Object.entries(genericSubProtocols)
+    const supportedTestNetworkIdentifiers = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ))
+      .filter(network => network.type == NetworkType.TESTNET)
+      .map(network => network.identifier)
     const protocols = identifiersWithOptions
       .map(([protocolNetworkIdentifier, options]) => {
         const [protocolIdentifier,] = protocolNetworkIdentifier.split(':')
@@ -272,6 +268,10 @@ export class AppComponent implements AfterViewInit {
               tezosOptions.network.extras.conseilApiKey
             )
           )
+          if (tezosProtocolNetwork.type === NetworkType.TESTNET && !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)) {
+            delete genericSubProtocols[protocolNetworkIdentifier]
+            return undefined
+          }
           if (protocolIdentifier.startsWith(faProtocolSymbol('1.2'))) {
             const faOptions = tezosOptions as TezosFAProtocolOptions
 
@@ -317,7 +317,7 @@ export class AppComponent implements AfterViewInit {
         return undefined
       })
       .filter((protocol) => protocol !== undefined)
-
+    await this.storageProvider.set(WalletStorageKey.GENERIC_SUBPROTOCOLS, genericSubProtocols)
     await this.protocolService.addActiveSubProtocols(protocols)
   }
 

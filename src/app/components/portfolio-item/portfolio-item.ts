@@ -54,7 +54,7 @@ export class PortfolioItemComponent {
   public readonly smallFontDecimalThreshold = 16
   private readonly defaultMaxDigits = 15
 
-  private walletChanged: Subscription
+  private walletChanged?: Subscription
 
   constructor(
     private readonly operationsProvider: OperationsProvider,
@@ -63,10 +63,12 @@ export class PortfolioItemComponent {
   ) {}
 
   public ngOnInit(): void {
-    this.updateBalance()
+    this.initBalance()
+    this.initMarketPrice()
     this.updateDelegationStatus()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
       this.updateBalance()
+      this.updateMarketPrice()
       this.updateDelegationStatus()
     })
   }
@@ -84,11 +86,17 @@ export class PortfolioItemComponent {
     }
   }
 
+  private async initBalance() {
+    if (this.wallet?.getCurrentBalance() === undefined) {
+      await this.wallet?.balanceOf()
+    } 
+    this.updateBalance()
+  }
+
   private updateBalance() {
-    if (this.wallet !== undefined && this.wallet.getCurrentBalance() !== undefined) {
+    if (this.wallet?.getCurrentBalance() !== undefined) {
       const converter = new AmountConverterPipe(this.protocolService)
       this.balance = this.wallet.getCurrentBalance()
-      this.marketPrice = this.wallet.getCurrentMarketPrice()
       const balanceFormatted = converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
       this.balanceFormatted = `${balanceFormatted} ${this.wallet.protocol.symbol}`
       const balanceSplit = balanceFormatted.split('.')
@@ -97,6 +105,17 @@ export class PortfolioItemComponent {
         this.numberOfDecimalsInBalance = decimals.length
       }
     }
+  }
+
+  private async initMarketPrice() {
+    if (this.wallet?.getCurrentMarketPrice() === undefined) {
+      await this.wallet?.fetchCurrentMarketPrice()
+    }
+    this.updateMarketPrice()
+  }
+
+  private updateMarketPrice() {
+    this.marketPrice = this.wallet?.getCurrentMarketPrice()
   }
 
   public digits(): number {
@@ -108,6 +127,6 @@ export class PortfolioItemComponent {
   }
 
   public ngOnDestroy(): void {
-    this.walletChanged.unsubscribe()
+    this.walletChanged?.unsubscribe()
   }
 }
