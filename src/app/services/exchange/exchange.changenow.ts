@@ -192,6 +192,7 @@ class ChangeNowApi {
     this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.COSMOS, 'atom')
     this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.POLKADOT, 'dot')
     this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.KUSAMA, 'ksm')
+    this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.BTC_SEGWIT, 'btc')
   }
 
   public convertExchangeIdentifierToAirGapIdentifier(identifiers: ExchangeIdentifier[]): ProtocolSymbols[] {

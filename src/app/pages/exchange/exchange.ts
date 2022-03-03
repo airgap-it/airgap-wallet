@@ -305,7 +305,7 @@ export class ExchangePage {
   private async updateFeeEstimate(): Promise<void> {
     if (this._state) {
       let feeCurrentMarketPrice
-      if (this.selectedFromProtocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
+      if (this.selectedFromProtocol?.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
         feeCurrentMarketPrice = this.priceService
           .getCurrentMarketPrice(new EthereumProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
@@ -458,12 +458,12 @@ export class ExchangePage {
 
   private async getSupportedFromProtocols(): Promise<ProtocolSymbols[]> {
     const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
-    allFromProtocols.push(SubProtocolSymbols.XTZ_BTC)
+    allFromProtocols.push(SubProtocolSymbols.XTZ_BTC, MainProtocolSymbols.BTC_SEGWIT)
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
     const exchangeableFromProtocols = (
       await Promise.all(
         supportedFromProtocols.map(async (fromProtocol) => {
-          if (fromProtocol === SubProtocolSymbols.XTZ_BTC) {
+          if (fromProtocol === SubProtocolSymbols.XTZ_BTC || fromProtocol === MainProtocolSymbols.BTC_SEGWIT) {
             return fromProtocol
           }
           const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
@@ -481,6 +481,8 @@ export class ExchangePage {
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
     if (from === MainProtocolSymbols.BTC) {
       toProtocols.push(SubProtocolSymbols.XTZ_BTC)
+    } else {
+      toProtocols.push(MainProtocolSymbols.BTC_SEGWIT)
     }
     return this.filterSupportedProtocols(toProtocols, false)
   }
