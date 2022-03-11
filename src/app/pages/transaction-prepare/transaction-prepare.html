@@ -33,8 +33,19 @@
     <form [formGroup]="transactionForm" class="ion-padding-bottom">
       <ion-card>
         <ion-item class="ion-no-padding ion-margin-bottom" lines="none" *ngIf="state.collectible">
-          <img class="collectible--img" *ngIf="state.collectible.thumbnails.length > 0" [src]="state.collectible.thumbnails[0]" (error)="onCollectibleThumbnailError()" slot="start" />
-          <img class="collectible--img" *ngIf="state.collectible.thumbnails.length === 0" src="./assets/img/collectible-placeholder.png" slot="start" />
+          <img
+            class="collectible--img"
+            *ngIf="state.collectible.thumbnails.length > 0"
+            [src]="state.collectible.thumbnails[0]"
+            (error)="onCollectibleThumbnailError()"
+            slot="start"
+          />
+          <img
+            class="collectible--img"
+            *ngIf="state.collectible.thumbnails.length === 0"
+            src="./assets/img/collectible-placeholder.png"
+            slot="start"
+          />
           <h6>{{ state.collectible.name }}</h6>
         </ion-item>
         <ion-row class="ion-justify-content-between">
@@ -71,7 +82,7 @@
             </ion-item>
           </ion-col>
           <ion-col size="3" class="ion-no-padding d-flex ion-align-items-center">
-            <ion-toolbar>
+            <ion-toolbar color="transparent">
               <ion-buttons slot="end">
                 <ion-button
                   shape="round"
