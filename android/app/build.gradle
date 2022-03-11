@@ -41,9 +41,9 @@ android {
             buildConfigField("String", "PRODUCT_FLAVOR", '"fdroid"')
         }
     }
-    lintOptions{
-        disable 'MissingDefaultResource'
-    }
+  lint {
+    disable 'MissingDefaultResource'
+  }
 }
 
 repositories {
