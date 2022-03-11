@@ -13,6 +13,22 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-list lines="none">
       <ion-list-header class="ion-no-margin" lines="none">
+        <ion-label>{{ 'settings.appearance_label' | translate }}</ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-icon name="build-outline" slot="start"></ion-icon>
+        {{ 'settings.theme_label' | translate }}
+        <ion-select [attr.value]="this.getTheme | async" (ionChange)="onThemeSelection($event)" interface="action-sheet" slot="end">
+          <ion-select-option *ngIf="this.themeService.supportsSystemPref" value="system">
+            {{ 'settings.select-theme.system' | translate }}
+          </ion-select-option>
+          <ion-select-option value="light">{{ 'settings.select-theme.light' | translate }}</ion-select-option>
+          <ion-select-option value="dark">{{ 'settings.select-theme.dark' | translate }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <ion-list lines="none">
+      <ion-list-header class="ion-no-margin" lines="none">
         <ion-label>{{ 'settings.help_label' | translate }}</ion-label>
       </ion-list-header>
       <ion-item (click)="introduction()" detail="true">

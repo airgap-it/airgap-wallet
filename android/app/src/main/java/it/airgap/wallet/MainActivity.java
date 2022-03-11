@@ -1,6 +1,8 @@
 package it.airgap.wallet;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.webkit.WebSettings;
 
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.Plugin;
