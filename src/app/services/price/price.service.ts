@@ -43,7 +43,7 @@ export class PriceService implements AirGapWalletPriceService {
   }
 
   public async getCurrentMarketPrice(protocol: ICoinProtocol, _baseSymbol: string): Promise<BigNumber> {
-    if (protocol.marketSymbol.length === 0) {
+    if (!protocol || protocol.marketSymbol.length === 0) {
       return new BigNumber(0)
     }
     // TODO change when market data is available for USDtz

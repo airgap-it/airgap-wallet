@@ -15,7 +15,7 @@ import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
-import { FundAccountAction } from './actions/FundAccountAction'
+// import { FundAccountAction } from './actions/FundAccountAction'
 import { CollectiblesAction } from './actions/CollectiblesAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
@@ -39,9 +39,9 @@ export class ActionGroup {
     actionMap.set(SubProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
     })
-    actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
-      return this.getTezosShieldedTezActions()
-    })
+    // actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
+    //   return this.getTezosShieldedTezActions()
+    // })
     actionMap.set(MainProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
     })
@@ -152,23 +152,23 @@ export class ActionGroup {
     return [migrateAction]
   }
 
-  private getTezosShieldedTezActions(): Action<any, any>[] {
-    const fundAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
-      () => {
-        const action = new FundAccountAction({
-          wallet: this.callerContext.wallet,
-          accountProvider: this.callerContext.accountProvider,
-          dataService: this.callerContext.dataService,
-          router: this.callerContext.router
-        })
+  // private getTezosShieldedTezActions(): Action<any, any>[] {
+  //   const fundAction: ButtonAction<void, void> = new ButtonAction(
+  //     { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
+  //     () => {
+  //       const action = new FundAccountAction({
+  //         wallet: this.callerContext.wallet,
+  //         accountProvider: this.callerContext.accountProvider,
+  //         dataService: this.callerContext.dataService,
+  //         router: this.callerContext.router
+  //       })
 
-        return action
-      }
-    )
+  //       return action
+  //     }
+  //   )
 
-    return [fundAction]
-  }
+  //   return [fundAction]
+  // }
 
   private async getCosmosActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
