@@ -6,6 +6,7 @@ import {
   IACMessageType,
   MainProtocolSymbols,
   SubProtocolSymbols,
+  SubstrateProtocol,
   TezosProtocol
 } from '@airgap/coinlib-core'
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
@@ -136,8 +137,7 @@ export class TransactionPreparePage {
 
     this.wallet = wallet
 
-    this.isSubstrate =
-      wallet.protocol.identifier === MainProtocolSymbols.KUSAMA || wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+    this.isSubstrate = wallet.protocol instanceof SubstrateProtocol
     this.ignoreExistentialDeposit = this.isSubstrate ? true : undefined
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
@@ -390,10 +390,10 @@ export class TransactionPreparePage {
     })
 
     this._ngZone.run(() => {
-      this.transactionForm.patchValue(updated, { emitEvent: false })
+      this.transactionForm.patchValue(updated, { onlySelf: true, emitEvent: false })
       Object.keys(updated).forEach((key: string) => {
-        this.transactionForm.controls[key].markAsDirty()
-        this.transactionForm.controls[key].updateValueAndValidity()
+        this.transactionForm.get(key).markAsDirty({ onlySelf: true })
+        this.transactionForm.get(key).updateValueAndValidity({ onlySelf: true, emitEvent: false })
       })
     })
   }
@@ -413,7 +413,8 @@ export class TransactionPreparePage {
     if (
       wallet.protocol.identifier === MainProtocolSymbols.COSMOS ||
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
-      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT
+      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT || 
+      wallet.protocol.identifier === MainProtocolSymbols.ASTAR
     ) {
       return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {
