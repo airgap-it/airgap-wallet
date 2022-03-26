@@ -218,6 +218,20 @@ export class AppComponent implements AfterViewInit {
     )
     const hangzhounetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(hangzhounetNetwork))
 
+    const ithacanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Ithacanet',
+      NetworkType.TESTNET,
+      'https://tezos-ithacanet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//ithacanet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.ITHACANET,
+        'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
+        TezosNetwork.ITHACANET,
+        'airgap00391'
+      )
+    )
+    const ithacanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ithacanetNetwork))
+
     const externalMethodProvider:
       | TezosSaplingExternalMethodProvider
       | undefined = await this.saplingNativeService.createExternalMethodProvider()
@@ -237,8 +251,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [shieldedTezProtocol, hangzhounetProtocol, shieldedTezProtocolTestnet],
-      extraPassiveSubProtocols: [[hangzhounetProtocol, new TezosKtProtocol(new TezosProtocolOptions(hangzhounetNetwork))]]
+      extraActiveProtocols: [ithacanetProtocol, shieldedTezProtocol, hangzhounetProtocol, shieldedTezProtocolTestnet],
+      extraPassiveSubProtocols: [[hangzhounetProtocol, new TezosKtProtocol(new TezosProtocolOptions(hangzhounetNetwork))], [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -324,9 +338,7 @@ export class AppComponent implements AfterViewInit {
   private async initializeTezosDomains(): Promise<void> {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
-      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk',
+      [TezosNetwork.ITHACANET]: undefined,
       [TezosNetwork.HANGZHOUNET]: 'KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii',
     }
 
