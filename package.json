@@ -121,7 +121,7 @@
     "bignumber.js": "9.0.1",
     "bs58check": "^2.1.2",
     "chart.js": "^2.9.4",
-    "cordova-plugin-qrscanner": "3.0.1",
+    "cordova-plugin-qrscanner-11": "3.0.3",
     "cordova-sqlite-storage": "^6.0.0",
     "cordova.plugins.diagnostic": "^6.0.3",
     "core-js": "^3.10.1",

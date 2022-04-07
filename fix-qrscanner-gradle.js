@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const rootdir = ''
-const qrscannerGradle = path.join(rootdir, 'node_modules/cordova-plugin-qrscanner/src/android/qrscanner.gradle')
+const qrscannerGradle = path.join(rootdir, 'node_modules/cordova-plugin-qrscanner-11/src/android/qrscanner.gradle')
 
 const configFiles = [qrscannerGradle]
 
