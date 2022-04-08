@@ -1,5 +1,5 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { ICoinProtocol, MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocol, ICoinSubProtocol, MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols, TezosFA2Protocol, TezosFAProtocol } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
@@ -9,7 +9,7 @@ import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { GenericSubProtocolSymbol } from '../../types/GenericProtocolSymbols'
+import { faProtocolSymbol, GenericSubProtocolSymbol } from '../../types/GenericProtocolSymbols'
 import { AccountImportInteractionType } from '../account-import-interaction-selection/account-import-interaction-selection'
 
 interface GenericSubProtocol {
@@ -44,7 +44,7 @@ export class AccountAddPage {
   public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
   public filteredGenericSubAccountProtocols: GenericSubProtocol[] = []
 
-  private featuredSubProtocols: SubProtocolSymbols[] = [SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UUSD, SubProtocolSymbols.XTZ_UDEFI]
+  private featuredSubProtocols: SubProtocolSymbols[] = [SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UUSD, SubProtocolSymbols.XTZ_UDEFI, SubProtocolSymbols.XTZ_UBTC]
 
   constructor(
     private readonly platform: Platform,
@@ -59,23 +59,37 @@ export class AccountAddPage {
     this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
       (protocol) => protocol.options.network.type === NetworkType.MAINNET
     )
-    const supportedSubAccountProtocols = Array.prototype.concat.apply(
+    const supportedSubAccountProtocols: ICoinSubProtocol[] = Array.prototype.concat.apply(
       [],
       await Promise.all(Object.values(MainProtocolSymbols).map((protocol) => this.protocolService.getSubProtocols(protocol)))
     )
 
     this.featuredSubAccountProtocols = supportedSubAccountProtocols.filter(
       (protocol) =>
-        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        this.featuredSubProtocols.includes(protocol.identifier.toLowerCase() as SubProtocolSymbols) &&
         protocol.options.network.type === NetworkType.MAINNET &&
         protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
 
+    const mappedGenericIdentifier = (protocol: TezosFAProtocol): string => {
+      let interfaceVersion: '1.2' | '2' = '1.2'
+      let tokenId = 0
+      if (protocol instanceof TezosFA2Protocol) {
+        interfaceVersion = '2'
+        tokenId = protocol.tokenID ?? 0
+      }
+      return faProtocolSymbol(interfaceVersion, protocol.options.config.contractAddress, tokenId)
+    }
+    const xtzSubProtocols = supportedSubAccountProtocols.filter((protocol): protocol is TezosFAProtocol => protocol instanceof TezosFAProtocol)
+    const standardSubprotocols = xtzSubProtocols.filter(protocol => Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols))
+    const genericSubprotocols = xtzSubProtocols.filter(protocol => !Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols))
+    const toFilter = standardSubprotocols.map((protocol) => mappedGenericIdentifier(protocol)).filter(identifier => genericSubprotocols.find(protocol => protocol.identifier === identifier) !== undefined)
+
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
       (protocol) =>
-        !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase()) &&
+        !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase() as SubProtocolSymbols) &&
         protocol.options.network.type === NetworkType.MAINNET &&
-        protocol.identifier !== SubProtocolSymbols.XTZ_KT
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT && !toFilter.includes(protocol.identifier)
     )
     this.filterProtocols()
   }
