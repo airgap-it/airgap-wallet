@@ -307,7 +307,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET>]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -332,6 +332,19 @@ export class BeaconService {
           network: TezosNetwork.HANGZHOUNET,
           conseilUrl: 'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
           conseilNetwork: TezosNetwork.HANGZHOUNET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.ITHACANET]: {
+        identifier: undefined,
+        name: network.name || 'Ithacanet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-ithacanet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://ithacanet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.ITHACANET,
+          conseilUrl: 'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.ITHACANET,
           conseilApiKey: 'airgap00391'
         }
       },
