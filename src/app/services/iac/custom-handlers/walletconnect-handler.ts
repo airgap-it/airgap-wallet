@@ -22,7 +22,7 @@ export class WalletConnectHandler extends IACSinglePartHandler<string> {
     if (typeof payload === 'string' && payload.startsWith('wc')) {
       return payload
     } else if (typeof payload === 'string' && payload.startsWith('airgap-wallet://wc?uri=')) {
-      return payload.replace('airgap-wallet://wc?uri=', '')
+      return decodeURIComponent(payload.replace('airgap-wallet://wc?uri=', ''))
     }
 
     return undefined
