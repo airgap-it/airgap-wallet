@@ -14,6 +14,8 @@ airgapCoinLib.addSupportedProtocol(new airgapCoinLib.KusamaProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.PolkadotProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.MoonriverProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.MoonbeamProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.AstarProtocol())
+airgapCoinLib.addSupportedProtocol(new airgapCoinLib.ShidenProtocol())
 airgapCoinLib.addSupportedProtocol(new airgapCoinLib.TezosShieldedTezProtocol())
 
 self.onmessage = event => {

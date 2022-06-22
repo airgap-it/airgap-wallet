@@ -2,7 +2,7 @@ import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import { DelegationInfo, TezosDelegatorAction, TezosProtocol } from '@airgap/coinlib-core'
+import { /*DelegationInfo, */TezosDelegatorAction, TezosProtocol } from '@airgap/coinlib-core'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import BigNumber from 'bignumber.js'
@@ -28,7 +28,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   public static async create(
     coinlibService: CoinlibService,
     decimalPipe: DecimalPipe,
-    amountConverter: AmountConverterPipe,
+    _amountConverter: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService,
     addressService: AddressService,
@@ -38,7 +38,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
         coinlibService,
         decimalPipe,
-        amountConverter,
+        // amountConverter,
         shortenStringPipe,
         translateService,
         addressService,
@@ -66,7 +66,7 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
   private constructor(
     private readonly coinlibService: CoinlibService,
     private readonly decimalPipe: DecimalPipe,
-    private readonly amountConverterPipe: AmountConverterPipe,
+    // private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly addressService: AddressService,
@@ -187,10 +187,11 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
     }
   }
 
-  public async getRewardDisplayDetails(protocol: TezosProtocol, delegator: string): Promise<UIRewardList | undefined> {
-    const delegatorExtraInfo = await protocol.getDelegationInfo(delegator)
+  public async getRewardDisplayDetails(_protocol: TezosProtocol, _delegator: string): Promise<UIRewardList | undefined> {
+    return undefined
+    // const delegatorExtraInfo = await protocol.getDelegationInfo(delegator)
 
-    return this.createDelegatorDisplayRewards(protocol, delegator, delegatorExtraInfo).catch(() => undefined)
+    // return this.createDelegatorDisplayRewards(protocol, delegator, delegatorExtraInfo).catch(() => undefined)
   }
 
   private createDelegateeDisplayDetails(protocol: TezosProtocol, baker?: TezosBakerDetails): UIWidget[] {
@@ -252,34 +253,34 @@ export class TezosDelegationExtensions extends ProtocolDelegationExtensions<Tezo
       : null
   }
 
-  private async createDelegatorDisplayRewards(
-    protocol: TezosProtocol,
-    address: string,
-    delegatorExtraInfo: DelegationInfo
-  ): Promise<UIRewardList | undefined> {
-    if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
-      return undefined
-    }
-    const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
+  // private async createDelegatorDisplayRewards(
+  //   protocol: TezosProtocol,
+  //   address: string,
+  //   delegatorExtraInfo: DelegationInfo
+  // ): Promise<UIRewardList | undefined> {
+  //   if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
+  //     return undefined
+  //   }
+  //   const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
 
-    return new UIRewardList({
-      rewards: await Promise.all(
-        rewardInfo.map(async (info) => {
-          return {
-            index: info.cycle,
-            amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
-              protocol
-            }),
-            collected: info.payout < new Date(),
-            timestamp: info.payout.getTime()
-          }
-        })
-      ),
-      indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
-      amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
-      payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'
-    })
-  }
+  //   return new UIRewardList({
+  //     rewards: await Promise.all(
+  //       rewardInfo.map(async (info) => {
+  //         return {
+  //           index: info.cycle,
+  //           amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
+  //             protocol
+  //           }),
+  //           collected: info.payout < new Date(),
+  //           timestamp: info.payout.getTime()
+  //         }
+  //       })
+  //     ),
+  //     indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
+  //     amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
+  //     payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'
+  //   })
+  // }
 
   private async getKnownBakers(): Promise<TezosBakerCollection> {
     if (this.knownBakers === undefined) {

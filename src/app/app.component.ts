@@ -201,30 +201,37 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const hangzhounetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Hangzhounet',
+    const jakartanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Jakartanet',
       NetworkType.TESTNET,
-      'https://tezos-hangzhounet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//hangzhounet.tezblock.io'),
+      'https://tezos-jakartanet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//jakartanet.tezblock.io'),
       new TezosProtocolNetworkExtras(
-        TezosNetwork.HANGZHOUNET,
-        'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
-        TezosNetwork.HANGZHOUNET,
+        TezosNetwork.JAKARTANET,
+        'https://tezos-jakartanet-conseil.prod.gke.papers.tech',
+        TezosNetwork.JAKARTANET,
         'airgap00391'
       )
     )
-    const hangzhounetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(hangzhounetNetwork))
+    const jakartanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(jakartanetNetwork))
+
+    const ithacanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Ithacanet',
+      NetworkType.TESTNET,
+      'https://tezos-ithacanet-node.prod.gke.papers.tech',
+      new TezblockBlockExplorer('https//ithacanet.tezblock.io'),
+      new TezosProtocolNetworkExtras(
+        TezosNetwork.ITHACANET,
+        'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
+        TezosNetwork.ITHACANET,
+        'airgap00391'
+      )
+    )
+    const ithacanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ithacanetNetwork))
 
     const externalMethodProvider:
       | TezosSaplingExternalMethodProvider
       | undefined = await this.saplingNativeService.createExternalMethodProvider()
-
-    const shieldedTezProtocolTestnet: TezosShieldedTezProtocol = new TezosShieldedTezProtocol(
-      new TezosSaplingProtocolOptions(
-        hangzhounetNetwork,
-        new TezosShieldedTezProtocolConfig(undefined, undefined, 'KT1THKUU1urnd2siSM9inxcJpsbnVQuYt2qr', externalMethodProvider)
-      )
-    )
 
     const shieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
@@ -234,8 +241,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [shieldedTezProtocol, hangzhounetProtocol, shieldedTezProtocolTestnet],
-      extraPassiveSubProtocols: [[hangzhounetProtocol, new TezosKtProtocol(new TezosProtocolOptions(hangzhounetNetwork))]]
+      extraActiveProtocols: [ithacanetProtocol, shieldedTezProtocol, jakartanetProtocol],
+      extraPassiveSubProtocols: [[jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))], [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -321,10 +328,8 @@ export class AppComponent implements AfterViewInit {
   private async initializeTezosDomains(): Promise<void> {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
-      [TezosNetwork.EDONET]: 'KT1JJbWfW8CHUY95hG9iq2CEMma1RiKhMHDR',
-      [TezosNetwork.FLORENCENET]: 'KT1PfBfkfUuvQRN8zuCAyp5MHjNrQqgevS9p',
-      [TezosNetwork.GRANADANET]: 'KT1Ch6PstAQG32uNfQJUSL2bf2WvimvY5umk',
-      [TezosNetwork.HANGZHOUNET]: 'KT1MgQjmWMBQ4LyuMAqZccTkMSUJbEXeGqii'
+      [TezosNetwork.ITHACANET]: undefined,
+      [TezosNetwork.JAKARTANET]: undefined,
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

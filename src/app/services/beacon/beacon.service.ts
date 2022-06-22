@@ -220,8 +220,8 @@ export class BeaconService {
       network &&
       network.type &&
       (network.type === BeaconNetworkType.MAINNET ||
-        network.type === BeaconNetworkType.HANGZHOUNET ||
-        network.type === BeaconNetworkType.GRANADANET ||
+        network.type === BeaconNetworkType.ITHACANET ||
+        network.type === BeaconNetworkType.JAKARTANET ||
         network.type === BeaconNetworkType.CUSTOM)
     )
   }
@@ -307,7 +307,7 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET | BeaconNetworkType.IDIAZABALNET>]: TezosProtocolNetwork
+      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET | BeaconNetworkType.HANGZHOUNET>]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -322,16 +322,29 @@ export class BeaconService {
           conseilApiKey: undefined
         }
       },
-      [BeaconNetworkType.HANGZHOUNET]: {
+      [BeaconNetworkType.JAKARTANET]: {
         identifier: undefined,
-        name: network.name || 'Hangzhounet',
+        name: network.name || 'Jakartanet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-hangzhounet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://hangzhounet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-jakartanet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://jakartanet.tezblock.io'),
         extras: {
-          network: TezosNetwork.HANGZHOUNET,
-          conseilUrl: 'https://tezos-hangzhounet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.HANGZHOUNET,
+          network: TezosNetwork.JAKARTANET,
+          conseilUrl: 'https://tezos-jakartanet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.JAKARTANET,
+          conseilApiKey: 'airgap00391'
+        }
+      },
+      [BeaconNetworkType.ITHACANET]: {
+        identifier: undefined,
+        name: network.name || 'Ithacanet',
+        type: NetworkType.TESTNET,
+        rpcUrl: network.rpcUrl || 'https://tezos-ithacanet-node.prod.gke.papers.tech',
+        blockExplorer: new TezblockBlockExplorer('https://ithacanet.tezblock.io'),
+        extras: {
+          network: TezosNetwork.ITHACANET,
+          conseilUrl: 'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
+          conseilNetwork: TezosNetwork.ITHACANET,
           conseilApiKey: 'airgap00391'
         }
       },

@@ -17,6 +17,7 @@ interface Token {
   name?: string | null
   description?: string | null
   fa?: FA
+  artifact_uri?: string
 }
 
 interface TokenHolder {
@@ -35,7 +36,7 @@ interface TokenHolderResponse {
 
 const OBJKT_API_URL = 'https://data.objkt.com/v2/graphql'
 const OBJKT_PAGE_URL = 'https://objkt.com'
-const OBJKT_ASSETS_URL = 'https://assets.objkt.com/file/assets-001'
+const OBJKT_ASSETS_URL = 'https://assets.objkt.media/file/assets-003'
 
 export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
   private readonly remoteDataFactory: TezosContractRemoteDataFactory = new TezosContractRemoteDataFactory()
@@ -171,6 +172,7 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
           token {
             token_id
             metadata
+            artifact_uri
             name
             description
             fa {
@@ -204,9 +206,9 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
       networkIdentifier: protocol.options.network.identifier,
       id,
       thumbnails: [
-        this.getAssetUrl(contractAddress, id, 'thumb400'),
-        this.getAssetUrl(contractAddress, id, 'thumb288'),
-        this.getAssetUrl(contractAddress, id, 'display')
+        await this.getAssetUrl(contractAddress, id, 'thumb400'),
+        await this.getAssetUrl(contractAddress, id, 'thumb288'),
+        await this.getAssetUrl(contractAddress, id, 'artifact', tokenHolder.token?.artifact_uri)
       ],
       contract: {
         address: contractAddress,
@@ -215,9 +217,9 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
       description,
       name: name ?? description,
       imgs: [
-        this.getAssetUrl(contractAddress, id, 'display'),
-        this.getAssetUrl(contractAddress, id, 'thumb400'),
-        this.getAssetUrl(contractAddress, id, 'thumb288')
+        await this.getAssetUrl(contractAddress, id, 'artifact', tokenHolder.token?.artifact_uri),
+        await this.getAssetUrl(contractAddress, id, 'thumb400'),
+        await this.getAssetUrl(contractAddress, id, 'thumb288')
       ],
       amount: amount.toString(),
       address: { type: 'contract', value: contractAddress },
@@ -258,10 +260,35 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     return this.tokenMetadata.get(uri)
   }
 
-  private getAssetUrl(contractAddress: string, tokenID: string, type: 'thumb288' | 'thumb400' | 'display'): string {
-    const path = tokenID.slice(-2).padStart(2, '0').split('').join('/')
+  private async getAssetUrl(
+    contractAddress: string,
+    tokenID: string,
+    type: 'thumb288' | 'thumb400' | 'artifact',
+    artifactUri?: string
+  ): Promise<string> {
+    if (artifactUri) {
+      if (artifactUri.startsWith('ipfs')) {
+        const sanitizedArtifactUri = artifactUri.replace('ipfs://', '')
+        if (artifactUri.indexOf('?') !== -1) {
+          const split = sanitizedArtifactUri.split('?')
+          return `${this.assetsUrl}/${split[0]}/artifact/index.html?${split[1]}` // query params in artifact_uri
+        }
+        return `${this.assetsUrl}/${sanitizedArtifactUri}/artifact` // Single files (in directory) over IPFS
+      }
 
-    return `${this.assetsUrl}/${contractAddress}/${path}/${tokenID}/${type}`
+      const digest = await this.digestMessage(artifactUri)
+      return `${this.assetsUrl}/${digest}/artifact` // Single files over HTTP(s)
+    }
+    return `${this.assetsUrl}/${contractAddress}/${tokenID}/${type}` // Thumbs
+  }
+
+  // From OBJKT CDN V2 documentation at https://gist.github.com/vhf/e6f63e4b9f400caa115884a19a12b5d4#objktcom-assets-cdn-v2
+  private async digestMessage(message) {
+    const msgUint8 = new TextEncoder().encode(message)
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+    return hashHex
   }
 
   private getDetailsUrl(contractAddress: string, tokenID: string): string {

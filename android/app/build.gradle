@@ -41,9 +41,9 @@ android {
             buildConfigField("String", "PRODUCT_FLAVOR", '"fdroid"')
         }
     }
-    lintOptions{
-        disable 'MissingDefaultResource'
-    }
+  lint {
+    disable 'MissingDefaultResource'
+  }
 }
 
 repositories {
@@ -66,7 +66,7 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    def saplingVersion = "0.0.6"
+    def saplingVersion = "0.0.7"
     implementation "com.github.airgap-it:airgap-sapling:$saplingVersion"
 }
 

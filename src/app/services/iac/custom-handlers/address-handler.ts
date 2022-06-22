@@ -53,6 +53,7 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
               compatibleWallets,
               incompatibleWallets
             }
+            return this.payload
           }
         }
       }
@@ -64,7 +65,7 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
           compatibleWallets,
           incompatibleWallets
         }
-      } else {
+        return this.payload
       }
     }
 
