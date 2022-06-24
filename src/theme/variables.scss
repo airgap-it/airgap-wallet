@@ -419,6 +419,12 @@ body.dark {
   --ion-card-background: #1e1e1e;
 }
 
+body.dark {
+  .rawdata--container {
+    color: #222222;
+  }
+}
+
 ion-avatar {
   min-width: 48px;
   min-height: 48px;
