@@ -390,7 +390,10 @@ export class TransactionPreparePage {
     })
 
     this._ngZone.run(() => {
-      this.transactionForm.patchValue(updated, { onlySelf: true, emitEvent: false })
+      this.transactionForm.patchValue(updated, {
+        onlySelf: true,
+        emitEvent: false
+      })
       Object.keys(updated).forEach((key: string) => {
         this.transactionForm.get(key).markAsDirty({ onlySelf: true })
         this.transactionForm.get(key).updateValueAndValidity({ onlySelf: true, emitEvent: false })
@@ -413,7 +416,7 @@ export class TransactionPreparePage {
     if (
       wallet.protocol.identifier === MainProtocolSymbols.COSMOS ||
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
-      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT || 
+      wallet.protocol.identifier === MainProtocolSymbols.POLKADOT ||
       wallet.protocol.identifier === MainProtocolSymbols.ASTAR
     ) {
       return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
@@ -596,7 +599,7 @@ export class TransactionPreparePage {
           disablePrepareButton:
             this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
         })
-        this.updateFeeEstimate()
+        this.transactionForm.controls.receiver.setValue(receiverAddress, { onlySelf: false, emitEvent: true })
       },
       (err: string) => {
         console.error('Error: ' + err)
