@@ -36,6 +36,7 @@ export class ScanPage extends ScanBasePage {
   }
 
   public async ionViewWillEnter(): Promise<void> {
+    document.body.style.backgroundColor = 'transparent'
     await super.ionViewWillEnter()
     this.resetScannerPage()
     this.iacService.resetHandlers()
