@@ -217,6 +217,9 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async operationRequest(request: JSONRPC<EthTx>): Promise<void> {
+    const wallet = this.selectableWallets.find((wallet) => wallet.addresses[0] === request.params[0].from)
+    this.setWallet(wallet)
+
     const ethereumProtocol: EthereumProtocol = new EthereumProtocol()
 
     if (!this.selectedWallet) {

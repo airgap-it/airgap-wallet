@@ -860,7 +860,7 @@
       "title": "Connection Failure",
       "message": "It seems like the connection via WalletConnect cannot be established"
     },
-    "connection_error": "There was an issue connecting to WalletConnect"
+    "connection_error": "There was an issue connecting to WalletConnect",
   },
   "health-check": {
     "title": "Health Check",

@@ -192,7 +192,7 @@ export class AppComponent implements AfterViewInit {
 
   private async initializeTranslations(): Promise<void> {
     return this.languageService.init({
-      supportedLanguages: ['en', 'de', 'zh-cn'],
+      supportedLanguages: ['en', 'de', 'zh'],
       defaultLanguage: 'en'
     })
   }
@@ -235,14 +235,17 @@ export class AppComponent implements AfterViewInit {
 
     const shieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
-        undefined, 
+        undefined,
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )
 
     this.protocolService.init({
       extraActiveProtocols: [ithacanetProtocol, shieldedTezProtocol, jakartanetProtocol],
-      extraPassiveSubProtocols: [[jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))], [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]]
+      extraPassiveSubProtocols: [
+        [jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))],
+        [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]
+      ]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -252,8 +255,8 @@ export class AppComponent implements AfterViewInit {
     const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
     const identifiersWithOptions = Object.entries(genericSubProtocols)
     const supportedTestNetworkIdentifiers = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ))
-      .filter(network => network.type == NetworkType.TESTNET)
-      .map(network => network.identifier)
+      .filter((network) => network.type == NetworkType.TESTNET)
+      .map((network) => network.identifier)
     const protocols = identifiersWithOptions
       .map(([protocolNetworkIdentifier, options]) => {
         const [protocolIdentifier] = protocolNetworkIdentifier.split(':')
@@ -272,7 +275,10 @@ export class AppComponent implements AfterViewInit {
               tezosOptions.network.extras.conseilApiKey
             )
           )
-          if (tezosProtocolNetwork.type === NetworkType.TESTNET && !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)) {
+          if (
+            tezosProtocolNetwork.type === NetworkType.TESTNET &&
+            !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)
+          ) {
             delete genericSubProtocols[protocolNetworkIdentifier]
             return undefined
           }
@@ -329,7 +335,7 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.ITHACANET]: undefined,
-      [TezosNetwork.JAKARTANET]: undefined,
+      [TezosNetwork.JAKARTANET]: undefined
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
