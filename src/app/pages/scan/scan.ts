@@ -36,6 +36,7 @@ export class ScanPage extends ScanBasePage {
   }
 
   public async ionViewWillEnter(): Promise<void> {
+    // We need this for the background to be transparent when using dark mode
     document.body.style.backgroundColor = 'transparent'
     await super.ionViewWillEnter()
     this.resetScannerPage()
