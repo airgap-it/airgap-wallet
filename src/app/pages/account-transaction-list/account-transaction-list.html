@@ -11,7 +11,7 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-row style="display: block"><portfolio-item [wallet]="wallet" [maxDigits]="0"></portfolio-item></ion-row>
+    <ion-row style="display: block;"><portfolio-item [wallet]="wallet" [maxDigits]="0"></portfolio-item></ion-row>
     <ion-row class="ion-padding-top ion-padding-horizontal action--container">
       <ion-button *ngFor="let action of actions" color="secondary" (click)="action.start()" shape="round" size="small" fill="outline">
         <ion-icon slot="start" [name]="action.context.icon"></ion-icon>
@@ -22,7 +22,7 @@
 </ion-header>
 
 <ion-content no-bounce has-bouncing="false" forceOverscroll="false">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid fixed="true" class="ion-no-padding action--container">
     <tezos-delegation-card
       *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && balance"
       [wallet]="wallet"
@@ -99,7 +99,9 @@
       [wallet]="wallet"
     ></transaction-list>
     <ng-container *ngIf="isDesktop && infiniteEnabled && !infiniteScrollActivated">
-      <ion-button fill="clear" size="small" (click)="loadMoreTransactions()">{{ 'account-transaction-list.load_more' | translate }}</ion-button>
+      <ion-button fill="clear" size="small" (click)="loadMoreTransactions()">
+        {{ 'account-transaction-list.load_more' | translate }}
+      </ion-button>
     </ng-container>
 
     <ion-infinite-scroll (ionInfinite)="doInfinite($event)">

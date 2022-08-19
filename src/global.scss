@@ -138,27 +138,6 @@ page-account-transaction-list {
   }
 }
 
-/* Card Styling */
-page-portfolio,
-page-delegation-baker-detail,
-page-delegation-polkadot-validator-detail,
-page-account-address,
-page-transaction-qr,
-page-beacon-request,
-page-exchange-custom,
-page-transaction-qr,
-page-collectibles-list,
-page-collectibles-item {
-  .sc-ion-card-md-h,
-  .sc-ion-card-ios-h,
-  ion-card,
-  airgap-qr {
-    box-shadow: 0 10px 20px 0 rgba(49, 27, 88, 0.12);
-    border: 1px solid rgba(0, 232, 204, 0.08);
-    border-radius: 0;
-  }
-}
-
 permission-request,
 app-walletconnect {
   .request--container {
