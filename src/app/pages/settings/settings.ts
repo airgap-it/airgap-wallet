@@ -4,6 +4,7 @@ import { Router } from '@angular/router'
 import { Capacitor } from '@capacitor/core'
 import { SharePlugin } from '@capacitor/share'
 import { AlertController, ModalController } from '@ionic/angular'
+import { ThemeService } from 'src/app/services/appearance/theme.service'
 import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
@@ -17,10 +18,12 @@ import { IntroductionPage } from '../introduction/introduction'
 })
 export class SettingsPage {
   public readonly platform: string = Capacitor.getPlatform()
+  public readonly getTheme = this.themeService.getTheme()
 
   constructor(
     public readonly alertCtrl: AlertController,
     public readonly serializerService: SerializerService,
+    public readonly themeService: ThemeService,
     private readonly router: Router,
     private readonly modalController: ModalController,
     private readonly clipboardProvider: ClipboardService,
@@ -28,6 +31,12 @@ export class SettingsPage {
     private readonly browserService: BrowserService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
   ) {}
+
+  public async onThemeSelection(event) {
+    this.themeService.themeSubject.next(event.detail.value)
+
+    await this.themeService.setStorageItem(event.detail.value)
+  }
 
   public about(): void {
     this.navigate('/about')

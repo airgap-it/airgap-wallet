@@ -128,6 +128,13 @@
   },
   "settings": {
     "title": "Settings",
+    "appearance_label": "Appearance",
+    "theme_label": "Theme",
+    "select-theme": {
+      "system": "Device Theme",
+      "light": "Light Theme",
+      "dark": "Dark Theme"
+    },
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
@@ -259,23 +266,21 @@
     "offline-device_label": "Offline Device",
     "offline-device_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet."
   },
-
-  "interaction-selection-settings":{
-    "title":"Wallet Interaction",
-    "same-device_heading":"Looks like you're using <span class=\"style__strong color__primary\">AirGap Vault</span> and AirGap Wallet on the <span class=\"style__strong color__primary\">same device</span>.",
-    "offline-device_heading":"Looks like you’re using <span class=\"style__strong color__primary\">AirGap Vault</span> on an <span class=\"style__strong color__primary\">offline device</span>.",
-    "text":"You can define where you have AirGap Wallet installed to make the interaction with the Vault a bit simpler.",
+  "interaction-selection-settings": {
+    "title": "Wallet Interaction",
+    "same-device_heading": "Looks like you're using <span class=\"style__strong color__primary\">AirGap Vault</span> and AirGap Wallet on the <span class=\"style__strong color__primary\">same device</span>.",
+    "offline-device_heading": "Looks like you're using <span class=\"style__strong color__primary\">AirGap Vault</span> on an <span class=\"style__strong color__primary\">offline device</span>.",
+    "text": "You can define where you have AirGap Wallet installed to make the interaction with the Vault a bit simpler.",
     "selector": {
-      "always":"Always ask",
-      "same-device":"Vault and Wallet on the same device",
-      "offline-device":"Vault is an offline device",
-      "ledger":"Wallet pairs with Ledger"
+      "always": "Always ask",
+      "same-device": "Vault and Wallet on the same device",
+      "offline-device": "Vault is an offline device",
+      "ledger": "Wallet pairs with Ledger"
     },
-    "confirm_label":"Confirm",
-    "description":"You can always change your preference in the Settings Tab",
+    "confirm_label": "Confirm",
+    "description": "You can always change your preference in the Settings Tab",
     "button_text": "Edit"
   },
-  
   "interaction-selection-desktop": {
     "title": "Select Signer Option",
     "heading": "Select the device to sign this transaction",
@@ -376,7 +381,7 @@
       },
       "slide-4": {
         "text": "The account can now be imported to AirGap Wallet.",
-        "description": "You’re now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
+        "description": "You're now ready to create <strong>{{protocolName}}</strong> transactions with AirGap Vault and AirGap Wallet."
       }
     },
     "back": "Back",
@@ -475,7 +480,7 @@
     },
     "sygnum": {
       "title": "Sygnum",
-      "text": "Sygnum is the world’s first digital asset bank, and a digital asset specialist with global reach. Sygnum offers a portfolio of regulated banking services which seamlessly integrates traditional and digital assets into one account, including major national currencies, Bitcoin, Ethereum, a Digital CHF and asset tokens. Founded on Swiss and Singapore heritage, Sygnum empowers institutional clients to invest in the digital asset economy with complete trust."
+      "text": "Sygnum is the world's first digital asset bank, and a digital asset specialist with global reach. Sygnum offers a portfolio of regulated banking services which seamlessly integrates traditional and digital assets into one account, including major national currencies, Bitcoin, Ethereum, a Digital CHF and asset tokens. Founded on Swiss and Singapore heritage, Sygnum empowers institutional clients to invest in the digital asset economy with complete trust."
     },
     "taurus": {
       "title": "Taurus",
@@ -830,15 +835,14 @@
     "remove-all_label": "Remove All",
     "delete_label": "Delete",
     "no-peers": "Not connected to any peers",
-    "reset": "Reset", 
+    "reset": "Reset",
     "alert": {
       "heading": "Remove All",
       "message": "Are you sure you want to remove all peers?",
-      "cancel" : "Cancel", 
+      "cancel": "Cancel",
       "confirm": "Confirm"
     }
   },
-  
   "walletconnect": {
     "connection_request": "WalletConnect - Connection Request",
     "new_transaction": "WalletConnect - New Transaction",
@@ -856,7 +860,7 @@
     "connection_error": "There was an issue connecting to WalletConnect"
   },
   "health-check": {
-    "title": "Health Check", 
+    "title": "Health Check",
     "message": "Checking API Health"
   },
   "group-label": {

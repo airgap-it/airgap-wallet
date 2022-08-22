@@ -8,8 +8,7 @@ import {
   LanguageService,
   ProtocolService,
   SerializerService,
-  SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN
+  SPLASH_SCREEN_PLUGIN
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
@@ -45,12 +44,12 @@ import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
 import { SplashScreenPlugin } from '@capacitor/splash-screen'
-import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Config, Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
+import { ThemeService } from './services/appearance/theme.service'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
 import { PushProvider } from './services/push/push'
@@ -86,10 +85,10 @@ export class AppComponent implements AfterViewInit {
     private readonly config: Config,
     private readonly ngZone: NgZone,
     private readonly saplingNativeService: SaplingNativeService,
+    private readonly themeService: ThemeService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
-    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin,
-    @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
+    @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
   ) {
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('android') || this.platform.is('ios')
@@ -99,14 +98,12 @@ export class AppComponent implements AfterViewInit {
   public async initializeApp(): Promise<void> {
     await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
 
-    if (this.platform.is('hybrid')) {
-      await Promise.all([
-        this.statusBar.setStyle({ style: Style.Light }),
-        this.statusBar.setBackgroundColor({ color: '#FFFFFF' }),
-        this.splashScreen.hide(),
+    this.themeService.register()
 
-        this.pushProvider.initPush()
-      ])
+    this.themeService.statusBarStyleDark(await this.themeService.isDarkMode())
+
+    if (this.platform.is('hybrid')) {
+      await Promise.all([this.splashScreen.hide(), this.pushProvider.initPush()])
 
       this.appInfo
         .get()
@@ -195,7 +192,7 @@ export class AppComponent implements AfterViewInit {
 
   private async initializeTranslations(): Promise<void> {
     return this.languageService.init({
-      supportedLanguages: ['en', 'de', 'zh-cn'],
+      supportedLanguages: ['en', 'de', 'zh'],
       defaultLanguage: 'en'
     })
   }
@@ -238,14 +235,17 @@ export class AppComponent implements AfterViewInit {
 
     const shieldedTezProtocol = new TezosShieldedTezProtocol(
       new TezosSaplingProtocolOptions(
-        undefined, 
+        undefined,
         new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
       )
     )
 
     this.protocolService.init({
       extraActiveProtocols: [ithacanetProtocol, shieldedTezProtocol, jakartanetProtocol],
-      extraPassiveSubProtocols: [[jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))], [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]]
+      extraPassiveSubProtocols: [
+        [jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))],
+        [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]
+      ]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -255,11 +255,11 @@ export class AppComponent implements AfterViewInit {
     const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
     const identifiersWithOptions = Object.entries(genericSubProtocols)
     const supportedTestNetworkIdentifiers = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ))
-      .filter(network => network.type == NetworkType.TESTNET)
-      .map(network => network.identifier)
+      .filter((network) => network.type == NetworkType.TESTNET)
+      .map((network) => network.identifier)
     const protocols = identifiersWithOptions
       .map(([protocolNetworkIdentifier, options]) => {
-        const [protocolIdentifier,] = protocolNetworkIdentifier.split(':')
+        const [protocolIdentifier] = protocolNetworkIdentifier.split(':')
 
         if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
           const tezosOptions = options as TezosProtocolOptions
@@ -275,7 +275,10 @@ export class AppComponent implements AfterViewInit {
               tezosOptions.network.extras.conseilApiKey
             )
           )
-          if (tezosProtocolNetwork.type === NetworkType.TESTNET && !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)) {
+          if (
+            tezosProtocolNetwork.type === NetworkType.TESTNET &&
+            !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)
+          ) {
             delete genericSubProtocols[protocolNetworkIdentifier]
             return undefined
           }
@@ -332,7 +335,7 @@ export class AppComponent implements AfterViewInit {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
       [TezosNetwork.ITHACANET]: undefined,
-      [TezosNetwork.JAKARTANET]: undefined,
+      [TezosNetwork.JAKARTANET]: undefined
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(
