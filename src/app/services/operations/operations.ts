@@ -1,4 +1,4 @@
-// import { ProtocolService } from '@airgap/angular-core'
+import { ProtocolService } from '@airgap/angular-core'
 import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
 import {
   AirGapMarketWallet,
@@ -7,12 +7,12 @@ import {
   IACMessageType,
   IAirGapTransaction,
   ICoinDelegateProtocol,
-  // ICoinProtocol,
+  ICoinProtocol,
   MainProtocolSymbols,
   SubProtocolSymbols,
   TezosBTC,
   TezosKtProtocol,
-  // TezosSaplingProtocol
+  TezosSaplingProtocol
 } from '@airgap/coinlib-core'
 import { CosmosTransaction } from '@airgap/coinlib-core/protocols/cosmos/CosmosTransaction'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
@@ -62,7 +62,7 @@ export class OperationsProvider {
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
     private readonly formBuilder: FormBuilder,
-    // private readonly protocolService: ProtocolService,
+    private readonly protocolService: ProtocolService,
     private readonly saplingService: SaplingService
   ) {}
 
@@ -389,7 +389,7 @@ export class OperationsProvider {
     address: string,
     amount: BigNumber,
     fee: BigNumber,
-    _knownWallets: AirGapMarketWallet[],
+    knownWallets: AirGapMarketWallet[],
     data?: { [key: string]: any }
   ): Promise<{ airGapTxs: IAirGapTransaction[]; unsignedTx: any }> {
     const loader = await this.getAndShowLoader()
@@ -421,37 +421,36 @@ export class OperationsProvider {
           transaction: unsignedTx
         })
       } else if (wallet.protocol.identifier === MainProtocolSymbols.XTZ && TezosSaplingAddress.isZetAddress(address)) {
-        throw new Error('Transactions to sapling addresses are temporarily disabled')
-        // const protocols: ICoinProtocol[] = (await this.protocolService.getProtocolsForAddress(address)).filter(
-        //   (protocol: ICoinProtocol) => protocol.identifier !== MainProtocolSymbols.XTZ && protocol.options.network.identifier === wallet.protocol.options.network.identifier
-        // )
+        const protocols: ICoinProtocol[] = (await this.protocolService.getProtocolsForAddress(address)).filter(
+          (protocol: ICoinProtocol) => protocol.identifier !== MainProtocolSymbols.XTZ && protocol.options.network.identifier === wallet.protocol.options.network.identifier
+        )
 
-        // if (protocols.length > 1) {
-        //   throw new Error('More than 1 sapling protocol is supported')
-        // }
+        if (protocols.length > 1) {
+          throw new Error('More than 1 sapling protocol is supported')
+        }
 
-        // const protocol: ICoinProtocol = protocols[0]
+        const protocol: ICoinProtocol = protocols[0]
 
-        // if (!(protocol instanceof TezosSaplingProtocol)) {
-        //   throw new Error('Invalid sapling protocol')
-        // }
+        if (!(protocol instanceof TezosSaplingProtocol)) {
+          throw new Error('Invalid sapling protocol')
+        }
 
-        // await this.saplingService.initSapling()
-        // unsignedTx = await protocol.prepareShieldTransaction(wallet.publicKey, address, amount.toString(10), fee.toString(10), {
-        //   overrideFees: true
-        // })
+        await this.saplingService.initSapling()
+        unsignedTx = await protocol.prepareShieldTransaction(wallet.publicKey, address, amount.toString(10), fee.toString(10), {
+          overrideFees: true
+        })
 
-        // const knownViewingKeys: string[] = knownWallets
-        //   .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier)
-        //   .map((wallet: AirGapMarketWallet) => wallet.publicKey)
+        const knownViewingKeys: string[] = knownWallets
+          .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier)
+          .map((wallet: AirGapMarketWallet) => wallet.publicKey)
 
-        // airGapTxs = await protocol.getTransactionDetails(
-        //   {
-        //     publicKey: wallet.publicKey,
-        //     transaction: unsignedTx
-        //   },
-        //   { knownViewingKeys }
-        // )
+        airGapTxs = await protocol.getTransactionDetails(
+          {
+            publicKey: wallet.publicKey,
+            transaction: unsignedTx
+          },
+          { knownViewingKeys }
+        )
       } else {
         if (wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED) {
           await this.saplingService.initSapling()

@@ -268,7 +268,7 @@ export class TransactionConfirmPage {
           new BigNumber(wallet.protocol.feeDefaults.medium).shiftedBy(wallet.protocol.feeDecimals).toString(),
           true
         )
-    
+
         const airGapTxs = await protocol.getTransactionDetails(
           {
             publicKey: wallet.publicKey,
@@ -276,7 +276,7 @@ export class TransactionConfirmPage {
           },
           { knownViewingKeys: this.accountService.getKnownViewingKeys() }
         )
-    
+
         this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs) 
       } catch (error) {
         this.toastCtrl
