@@ -17,13 +17,8 @@ import {
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController, ToastController } from '@ionic/angular'
 import { ICoinProtocol, MainProtocolSymbols, RawEthereumTransaction } from '@airgap/coinlib-core'
-import { TezosNetwork, TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
-import {
-  TezblockBlockExplorer,
-  TezosProtocolNetwork,
-  TezosProtocolNetworkExtras,
-  TezosProtocolOptions
-} from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
+import { TezosProtocol } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
+import { TezosBlockExplorer, TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
 import { ProtocolService } from '@airgap/angular-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
@@ -220,8 +215,7 @@ export class BeaconService {
       network &&
       network.type &&
       (network.type === BeaconNetworkType.MAINNET ||
-        network.type === BeaconNetworkType.ITHACANET ||
-        network.type === BeaconNetworkType.JAKARTANET ||
+        network.type === BeaconNetworkType.GHOSTNET ||
         network.type === BeaconNetworkType.CUSTOM)
     )
   }
@@ -293,7 +287,7 @@ export class BeaconService {
         error.data && Array.isArray(error.data)
           ? `The contract returned the following error: ${error.data.find((f) => f && f.with && f.with.string).with.string}`
           : error.message
-    } catch { }
+    } catch {}
 
     console.error('error.message', errorMessage)
 
@@ -307,7 +301,19 @@ export class BeaconService {
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
     const configs: {
-      [key in Exclude<BeaconNetworkType, BeaconNetworkType.DELPHINET | BeaconNetworkType.EDONET | BeaconNetworkType.FLORENCENET | BeaconNetworkType.GRANADANET | BeaconNetworkType.HANGZHOUNET>]: TezosProtocolNetwork
+      [key in Exclude<
+        BeaconNetworkType,
+        | BeaconNetworkType.DELPHINET
+        | BeaconNetworkType.EDONET
+        | BeaconNetworkType.FLORENCENET
+        | BeaconNetworkType.GRANADANET
+        | BeaconNetworkType.HANGZHOUNET
+        | BeaconNetworkType.JAKARTANET
+        | BeaconNetworkType.ITHACANET
+        | BeaconNetworkType.KATHMANDUNET
+        | BeaconNetworkType.MONDAYNET
+        | BeaconNetworkType.DAILYNET
+      >]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: {
         identifier: undefined,
@@ -317,35 +323,18 @@ export class BeaconService {
         blockExplorer: undefined,
         extras: {
           network: undefined,
-          conseilUrl: undefined,
-          conseilNetwork: undefined,
-          conseilApiKey: undefined
+          indexerClient: undefined
         }
       },
-      [BeaconNetworkType.JAKARTANET]: {
+      [BeaconNetworkType.GHOSTNET]: {
         identifier: undefined,
-        name: network.name || 'Jakartanet',
+        name: network.name || 'Ghostnet',
         type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-jakartanet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://jakartanet.tezblock.io'),
+        rpcUrl: network.rpcUrl || 'https://tezos-ghostnet-node.prod.gke.papers.tech',
+        blockExplorer: new TezosBlockExplorer('https://ghostnet.tzkt.io'),
         extras: {
-          network: TezosNetwork.JAKARTANET,
-          conseilUrl: 'https://tezos-jakartanet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.JAKARTANET,
-          conseilApiKey: 'airgap00391'
-        }
-      },
-      [BeaconNetworkType.ITHACANET]: {
-        identifier: undefined,
-        name: network.name || 'Ithacanet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-ithacanet-node.prod.gke.papers.tech',
-        blockExplorer: new TezblockBlockExplorer('https://ithacanet.tezblock.io'),
-        extras: {
-          network: TezosNetwork.ITHACANET,
-          conseilUrl: 'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
-          conseilNetwork: TezosNetwork.ITHACANET,
-          conseilApiKey: 'airgap00391'
+          network: undefined,
+          indexerClient: undefined
         }
       },
       [BeaconNetworkType.CUSTOM]: {
@@ -353,12 +342,10 @@ export class BeaconService {
         name: network.name || 'Custom Network',
         type: NetworkType.CUSTOM,
         rpcUrl: network.rpcUrl || '',
-        blockExplorer: new TezblockBlockExplorer(''),
+        blockExplorer: new TezosBlockExplorer(''),
         extras: {
-          network: TezosNetwork.MAINNET,
-          conseilUrl: '',
-          conseilNetwork: TezosNetwork.MAINNET,
-          conseilApiKey: ''
+          network: undefined,
+          indexerClient: undefined
         }
       }
     }
@@ -370,12 +357,7 @@ export class BeaconService {
           configs[network.type].type,
           configs[network.type].rpcUrl,
           configs[network.type].blockExplorer,
-          new TezosProtocolNetworkExtras(
-            configs[network.type].extras.network,
-            configs[network.type].extras.conseilUrl,
-            configs[network.type].extras.conseilNetwork,
-            configs[network.type].extras.conseilApiKey
-          )
+          configs[network.type].extras
         )
       )
     )

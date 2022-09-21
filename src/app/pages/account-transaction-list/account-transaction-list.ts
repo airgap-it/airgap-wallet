@@ -65,6 +65,10 @@ export class AccountTransactionListPage {
 
   public protocolIdentifier: string
 
+  public get isSapling(): boolean {
+    return this.wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+  }
+
   public pendingTransactions: IAirGapTransaction[] = []
 
   public get hasPendingTransactions(): boolean {
