@@ -19,7 +19,7 @@ import {
   ICoinSubProtocol,
   MainProtocolSymbols,
   NetworkType,
-  TezblockBlockExplorer,
+  TezosBlockExplorer,
   TezosFA1p2Protocol,
   TezosFA2Protocol,
   TezosFA2ProtocolConfig,
@@ -30,7 +30,7 @@ import {
   TezosNetwork,
   TezosProtocol,
   TezosProtocolNetwork,
-  TezosProtocolNetworkExtras,
+  TezosIndexerClient,
   TezosProtocolOptions,
   TezosSaplingExternalMethodProvider,
   TezosShieldedTezProtocol
@@ -201,33 +201,17 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
-    const jakartanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Jakartanet',
+    const ghostnetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
+      'Ghostnet',
       NetworkType.TESTNET,
-      'https://tezos-jakartanet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//jakartanet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.JAKARTANET,
-        'https://tezos-jakartanet-conseil.prod.gke.papers.tech',
-        TezosNetwork.JAKARTANET,
-        'airgap00391'
-      )
+      'https://tezos-ghostnet-node.prod.gke.papers.tech',
+      new TezosBlockExplorer('https://ghostnet.tzkt.io'),
+      {
+        network: TezosNetwork.GHOSTNET,
+        indexerClient: new TezosIndexerClient('https://tezos-ghostnet-indexer.prod.gke.papers.tech')
+      }
     )
-    const jakartanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(jakartanetNetwork))
-
-    const ithacanetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
-      'Ithacanet',
-      NetworkType.TESTNET,
-      'https://tezos-ithacanet-node.prod.gke.papers.tech',
-      new TezblockBlockExplorer('https//ithacanet.tezblock.io'),
-      new TezosProtocolNetworkExtras(
-        TezosNetwork.ITHACANET,
-        'https://tezos-ithacanet-conseil.prod.gke.papers.tech',
-        TezosNetwork.ITHACANET,
-        'airgap00391'
-      )
-    )
-    const ithacanetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ithacanetNetwork))
+    const ghostnetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ghostnetNetwork))
 
     const externalMethodProvider:
       | TezosSaplingExternalMethodProvider
@@ -241,11 +225,8 @@ export class AppComponent implements AfterViewInit {
     )
 
     this.protocolService.init({
-      extraActiveProtocols: [ithacanetProtocol, shieldedTezProtocol, jakartanetProtocol],
-      extraPassiveSubProtocols: [
-        [jakartanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(jakartanetNetwork))],
-        [ithacanetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ithacanetNetwork))]
-      ]
+      extraActiveProtocols: [ghostnetProtocol, shieldedTezProtocol],
+      extraPassiveSubProtocols: [[ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))]]
     })
 
     await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
@@ -268,12 +249,7 @@ export class AppComponent implements AfterViewInit {
             tezosOptions.network.type,
             tezosOptions.network.rpcUrl,
             tezosOptions.network.blockExplorer,
-            new TezosProtocolNetworkExtras(
-              tezosOptions.network.extras.network,
-              tezosOptions.network.extras.conseilUrl,
-              tezosOptions.network.extras.conseilNetwork,
-              tezosOptions.network.extras.conseilApiKey
-            )
+            tezosOptions.network.extras
           )
           if (
             tezosProtocolNetwork.type === NetworkType.TESTNET &&
@@ -334,8 +310,7 @@ export class AppComponent implements AfterViewInit {
   private async initializeTezosDomains(): Promise<void> {
     const tezosDomainsAddresses: Record<TezosNetwork, string | undefined> = {
       [TezosNetwork.MAINNET]: 'KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS',
-      [TezosNetwork.ITHACANET]: undefined,
-      [TezosNetwork.JAKARTANET]: undefined
+      [TezosNetwork.GHOSTNET]: undefined
     }
 
     const tezosNetworks: TezosProtocolNetwork[] = (await this.protocolService.getNetworksForProtocol(

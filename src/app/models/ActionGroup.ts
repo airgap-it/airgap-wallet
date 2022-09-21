@@ -1,11 +1,11 @@
 import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
 import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
 import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
 import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
-import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
@@ -13,10 +13,10 @@ import { ErrorCategory, handleErrorSentry } from '../services/sentry-error-handl
 
 import { AddTokenAction, AddTokenActionContext } from './actions/AddTokenAction'
 import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
-import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
-import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
-// import { FundAccountAction } from './actions/FundAccountAction'
 import { CollectiblesAction } from './actions/CollectiblesAction'
+import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
+import { FundAccountAction } from './actions/FundAccountAction'
+import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
   type: any
@@ -39,9 +39,9 @@ export class ActionGroup {
     actionMap.set(SubProtocolSymbols.XTZ_KT, async () => {
       return this.getTezosKTActions()
     })
-    // actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
-    //   return this.getTezosShieldedTezActions()
-    // })
+    actionMap.set(MainProtocolSymbols.XTZ_SHIELDED, async () => {
+      return this.getTezosShieldedTezActions()
+    })
     actionMap.set(MainProtocolSymbols.ETH, async () => {
       return this.getEthereumActions()
     })
@@ -152,23 +152,23 @@ export class ActionGroup {
     return [migrateAction]
   }
 
-  // private getTezosShieldedTezActions(): Action<any, any>[] {
-  //   const fundAction: ButtonAction<void, void> = new ButtonAction(
-  //     { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
-  //     () => {
-  //       const action = new FundAccountAction({
-  //         wallet: this.callerContext.wallet,
-  //         accountProvider: this.callerContext.accountProvider,
-  //         dataService: this.callerContext.dataService,
-  //         router: this.callerContext.router
-  //       })
+  private getTezosShieldedTezActions(): Action<any, any>[] {
+    const fundAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
+      () => {
+        const action = new FundAccountAction({
+          wallet: this.callerContext.wallet,
+          accountProvider: this.callerContext.accountProvider,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
+        })
 
-  //       return action
-  //     }
-  //   )
+        return action
+      }
+    )
 
-  //   return [fundAction]
-  // }
+    return [fundAction]
+  }
 
   private async getCosmosActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
