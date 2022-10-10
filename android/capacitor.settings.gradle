@@ -34,6 +34,3 @@ project(':capacitor-splash-screen').projectDir = new File('../node_modules/@capa
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
-
-include ':robingenz-capacitor-android-dark-mode-support'
-project(':robingenz-capacitor-android-dark-mode-support').projectDir = new File('../node_modules/@robingenz/capacitor-android-dark-mode-support/android')

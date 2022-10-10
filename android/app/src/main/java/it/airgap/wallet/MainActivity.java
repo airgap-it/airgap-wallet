@@ -15,9 +15,9 @@ import it.airgap.wallet.plugin.SaplingNative;
 public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
     registerPlugin(AppInfo.class);
     registerPlugin(SaplingNative.class);
+
+    super.onCreate(savedInstanceState);
   }
 }
