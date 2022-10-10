@@ -179,8 +179,7 @@ export class PushProvider {
       return permissionStatus
     }
 
-     return this.pushNotifications.requestPermissions()
-
+    return this.pushNotifications.requestPermissions()
   }
 
   private async isSupported(): Promise<boolean> {

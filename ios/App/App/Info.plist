@@ -45,11 +45,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>AirGap uses your camera to scan QR Codes of transactions.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
