@@ -421,7 +421,7 @@ body.dark {
 
 body.dark {
   .rawdata--container {
-    color: #222222;
+    color: var(--ion-color-black);
   }
 }
 
