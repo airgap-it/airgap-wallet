@@ -155,7 +155,7 @@
     "@angular/language-service": "~11.2.9",
     "@capacitor/cli": "^4.0.0",
     "@ionic/angular-toolkit": "3.1.1",
-    "@ionic/cli": "^6.17.1",
+    "@ionic/cli": "^6.20.3",
     "@types/chrome": "0.0.134",
     "@types/jasmine": "3.6.9",
     "@types/jasminewd2": "2.0.8",
