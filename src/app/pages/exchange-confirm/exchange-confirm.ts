@@ -1,7 +1,9 @@
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction, UnsignedTransaction } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, IAirGapTransaction, UnsignedTransaction } from '@airgap/coinlib-core'
+import { IACMessageType } from '@airgap/serializer'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import BigNumber from 'bignumber.js'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { BrowserService } from '../../services/browser/browser.service'
 import { DataService, DataServiceKey } from '../../services/data/data.service'

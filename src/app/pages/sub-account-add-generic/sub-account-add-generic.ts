@@ -53,7 +53,7 @@ export class SubAccountAddGenericPage {
   }
 
   private async saveGenericProtocol(protocol: ICoinProtocol): Promise<void> {
-    const protocolNetworkIdentifier = getProtocolAndNetworkIdentifier(protocol)
+    const protocolNetworkIdentifier = await getProtocolAndNetworkIdentifier(protocol)
 
     await Promise.all([
       this.protocolService.addActiveSubProtocols(protocol),

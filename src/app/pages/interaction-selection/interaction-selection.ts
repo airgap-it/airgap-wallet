@@ -1,12 +1,13 @@
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
+import { IACMessageType } from '@airgap/serializer'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ModalController, Platform } from '@ionic/angular'
-import { AirGapMarketWallet, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
+import { InteractionSelectionComponent } from 'src/app/components/interaction-selection/interaction-selection.component'
+import { AirGapMarketWalletGroup, InteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
+import { InteractionService } from 'src/app/services/interaction/interaction.service'
 import { LedgerService } from 'src/app/services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { InteractionService } from 'src/app/services/interaction/interaction.service'
-import { AirGapMarketWalletGroup, InteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
-import { InteractionSelectionComponent } from 'src/app/components/interaction-selection/interaction-selection.component'
 
 @Component({
   selector: 'page-interaction-selection',

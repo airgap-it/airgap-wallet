@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { IAirGapTransaction, RawEthereumTransaction } from '@airgap/coinlib-core'
+import { IAirGapTransaction } from '@airgap/coinlib-core'
+import { RawEthereumTransaction } from '@airgap/ethereum'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import BigNumber from 'bignumber.js'
 

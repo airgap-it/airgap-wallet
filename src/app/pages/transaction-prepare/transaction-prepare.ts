@@ -1,16 +1,11 @@
 import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
-import {
-  AirGapMarketWallet,
-  AirGapNFTWallet,
-  EthereumProtocol,
-  IACMessageType,
-  MainProtocolSymbols,
-  SubProtocolSymbols,
-  SubstrateProtocol,
-  TezosProtocol
-} from '@airgap/coinlib-core'
+import { AirGapMarketWallet, AirGapNFTWallet, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { EthereumProtocol } from '@airgap/ethereum'
+import { IACMessageType } from '@airgap/serializer'
+import { SubstrateProtocol } from '@airgap/substrate'
+import { TezosProtocol } from '@airgap/tezos'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -566,7 +561,7 @@ export class TransactionPreparePage {
       assetID: this.collectibleID
     })
 
-    const formAmount = this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
+    const formAmount = await this.amountConverterPipe.transformValueOnly(maxAmount, this.wallet.protocol, this.wallet.protocol.decimals + 1)
 
     if (!maxAmount.isNaN()) {
       this.updateState({

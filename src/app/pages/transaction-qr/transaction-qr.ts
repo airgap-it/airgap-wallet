@@ -1,7 +1,8 @@
+import { IAirGapTransaction } from '@airgap/coinlib-core'
+import { IACMessageDefinitionObjectV3 } from '@airgap/serializer'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
-import { IACMessageDefinitionObjectV3, IAirGapTransaction } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

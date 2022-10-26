@@ -2,7 +2,6 @@ import { ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   AirGapWalletStatus,
-  EthereumProtocol,
   FeeDefaults,
   ICoinProtocol,
   MainProtocolSymbols,
@@ -10,6 +9,7 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { EthereumProtocol } from '@airgap/ethereum'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'

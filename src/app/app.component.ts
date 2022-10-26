@@ -12,34 +12,14 @@ import {
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
-  generateId,
-  IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
   ICoinSubProtocol,
   MainProtocolSymbols,
   NetworkType,
-  TezosBlockExplorer,
-  TezosFA1p2Protocol,
-  TezosFA2Protocol,
-  TezosFA2ProtocolConfig,
-  TezosFA2ProtocolOptions,
-  TezosFAProtocolConfig,
-  TezosFAProtocolOptions,
-  TezosKtProtocol,
-  TezosNetwork,
-  TezosProtocol,
-  TezosProtocolNetwork,
-  TezosIndexerClient,
-  TezosProtocolOptions,
-  TezosSaplingExternalMethodProvider,
-  TezosShieldedTezProtocol
 } from '@airgap/coinlib-core'
-import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
-import {
-  TezosSaplingProtocolOptions,
-  TezosShieldedTezProtocolConfig
-} from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
+import { generateId, IACMessageType } from '@airgap/serializer'
+import { TezosProtocolNetwork, TezosBlockExplorer, TezosNetwork, TezosIndexerClient, TezosProtocol, TezosProtocolOptions, TezosSaplingExternalMethodProvider, TezosShieldedTezProtocol, TezosSaplingProtocolOptions, TezosShieldedTezProtocolConfig, TezosKtProtocol, TezosFAProtocolOptions, TezosFA1p2Protocol, TezosFAProtocolConfig, TezosFA2ProtocolOptions, TezosFA2Protocol, TezosFA2ProtocolConfig, TezosDomains } from '@airgap/tezos'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'

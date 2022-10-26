@@ -2,7 +2,6 @@ import { ProtocolService, UiEventService } from '@airgap/angular-core'
 import {
   AirGapCoinWallet,
   AirGapMarketWallet,
-  IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
   MainProtocolSymbols,
@@ -10,6 +9,7 @@ import {
   SerializedAirGapWallet,
 } from '@airgap/coinlib-core'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { IACMessageType } from '@airgap/serializer'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotificationSchema } from '@capacitor/push-notifications'
@@ -594,9 +594,11 @@ export class AccountProvider {
       ),
       this.storageProvider.set(
         WalletStorageKey.WALLET,
-        this.allWallets
-          .filter((wallet: AirGapMarketWallet) => wallet.status !== AirGapWalletStatus.TRANSIENT)
-          .map((wallet: AirGapMarketWallet) => wallet.toJSON())
+        await Promise.all(
+          this.allWallets
+            .filter((wallet: AirGapMarketWallet) => wallet.status !== AirGapWalletStatus.TRANSIENT)
+            .map((wallet: AirGapMarketWallet) => wallet.toJSON())
+        )
       )
     ])
   }

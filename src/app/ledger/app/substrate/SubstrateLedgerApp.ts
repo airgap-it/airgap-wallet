@@ -1,18 +1,7 @@
-import {
-  AirGapCoinWallet,
-  AirGapMarketWallet,
-  AirGapWalletPriceService,
-  AirGapWalletStatus,
-  RawSubstrateTransaction,
-  SubstrateNetwork,
-  SubstrateProtocol,
-  SubstrateTransaction
-} from '@airgap/coinlib-core'
-import { SubstrateSignatureType } from '@airgap/coinlib-core/protocols/substrate/common/data/transaction/SubstrateSignature'
-import {
-  SubstrateCompatSignatureType,
-  substrateSignatureFactory
-} from '@airgap/coinlib-core/protocols/substrate/compat/SubstrateCompatSignature'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletPriceService, AirGapWalletStatus } from '@airgap/coinlib-core'
+import { RawSubstrateTransaction, SubstrateNetwork, SubstrateProtocol, SubstrateTransaction } from '@airgap/substrate'
+import { SubstrateSignatureType } from '@airgap/substrate/protocol/common/data/transaction/SubstrateSignature'
+import { SubstrateCompatSignatureType, substrateSignatureFactory } from '@airgap/substrate/protocol/compat/SubstrateCompatSignature'
 import { ResponseAddress, ResponseBase, ResponseSign, SubstrateApp } from '@zondax/ledger-substrate'
 
 import { ReturnCode } from '../../ReturnCode'

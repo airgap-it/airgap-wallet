@@ -1,7 +1,7 @@
 import { UiEventService } from '@airgap/angular-core'
-import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { AirGapMarketWallet, TezosDelegatorAction } from '@airgap/coinlib-core'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
+import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
 import { DataService } from 'src/app/services/data/data.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
@@ -9,6 +9,7 @@ import { WalletActionInfo } from '../ActionGroup'
 
 import { AirGapDelegatorAction } from './DelegatorAction'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { TezosDelegatorAction } from '@airgap/tezos'
 
 export interface DelegateAlertActionContext {
   isAccepted?: boolean

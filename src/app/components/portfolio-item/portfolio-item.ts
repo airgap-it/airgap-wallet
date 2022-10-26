@@ -67,7 +67,7 @@ export class PortfolioItemComponent {
     this.initMarketPrice()
     this.updateDelegationStatus()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
-      this.updateBalance()
+      await this.updateBalance()
       this.updateMarketPrice()
       this.updateDelegationStatus()
     })
@@ -90,14 +90,14 @@ export class PortfolioItemComponent {
     if (this.wallet?.getCurrentBalance() === undefined) {
       await this.wallet?.balanceOf()
     } 
-    this.updateBalance()
+    await this.updateBalance()
   }
 
-  private updateBalance() {
+  private async updateBalance() {
     if (this.wallet?.getCurrentBalance() !== undefined) {
       const converter = new AmountConverterPipe(this.protocolService)
       this.balance = this.wallet.getCurrentBalance()
-      const balanceFormatted = converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
+      const balanceFormatted = await converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
       this.balanceFormatted = `${balanceFormatted} ${this.wallet.protocol.symbol}`
       const balanceSplit = balanceFormatted.split('.')
       if (balanceSplit.length == 2) {

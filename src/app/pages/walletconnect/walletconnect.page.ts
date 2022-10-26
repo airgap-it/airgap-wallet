@@ -1,15 +1,7 @@
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
-import {
-  AirGapMarketWallet,
-  AirGapWalletStatus,
-  EthereumProtocol,
-  EthereumProtocolOptions,
-  generateId,
-  IACMessageType,
-  IAirGapTransaction,
-  MainProtocolSymbols
-} from '@airgap/coinlib-core'
-import { RawEthereumTransaction } from '@airgap/coinlib-core/serializer/types'
+import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { EthereumProtocol, EthereumProtocolOptions, RawEthereumTransaction } from '@airgap/ethereum'
+import { generateId, IACMessageType } from '@airgap/serializer'
 import { Component, OnInit } from '@angular/core'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'

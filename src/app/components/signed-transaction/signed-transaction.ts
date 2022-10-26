@@ -1,18 +1,12 @@
 import { ProtocolService, SerializerService } from '@airgap/angular-core'
+import { IAirGapTransaction, ICoinProtocol, MainProtocolSymbols, ProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
+import { IACMessageDefinitionObject } from '@airgap/serializer'
+import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component, Input, OnChanges } from '@angular/core'
-import {
-  IACMessageDefinitionObject,
-  IAirGapTransaction,
-  ICoinProtocol,
-  MainProtocolSymbols,
-  ProtocolSymbols,
-  SignedTransaction,
-  TezosSaplingProtocol
-} from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
+import { AccountProvider } from 'src/app/services/account/account.provider'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AccountProvider } from 'src/app/services/account/account.provider'
 
 @Component({
   selector: 'signed-transaction',

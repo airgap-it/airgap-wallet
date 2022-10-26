@@ -1,14 +1,17 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
-import { MainProtocolSymbols, SubstrateDelegateProtocol, SubstrateNetwork, SubstratePayee } from '@airgap/coinlib-core'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import { SubstrateElectionStatus } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateEraElectionStatus'
-import { SubstrateNominationStatus } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateNominationStatus'
 import {
+  SubstrateDelegateProtocol,
+  SubstrateElectionStatus,
+  SubstrateNetwork,
+  SubstrateNominationStatus,
   SubstrateNominatorDetails,
-  SubstrateStakingDetails
-} from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateNominatorDetails'
-import { SubstrateStakingActionType } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateStakingActionType'
-import { SubstrateValidatorDetails } from '@airgap/coinlib-core/protocols/substrate/common/data/staking/SubstrateValidatorDetails'
+  SubstratePayee,
+  SubstrateStakingActionType,
+  SubstrateStakingDetails,
+  SubstrateValidatorDetails
+} from '@airgap/substrate'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'

@@ -6,9 +6,12 @@ import {
   ProtocolService,
   SubProtocolStoreService
 } from '@airgap/angular-core'
-import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, BitcoinProtocol, EthereumProtocol } from '@airgap/coinlib-core'
-import { take } from 'rxjs/operators'
+import { BitcoinProtocol } from '@airgap/bitcoin'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus } from '@airgap/coinlib-core'
+import { EthereumProtocol } from '@airgap/ethereum'
 import { TestBed, waitForAsync } from '@angular/core/testing'
+import { take } from 'rxjs/operators'
+
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { PriceServiceMock } from '../../../../test-config/wallet-mock'
 import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
