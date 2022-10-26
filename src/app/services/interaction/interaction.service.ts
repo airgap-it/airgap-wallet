@@ -1,8 +1,10 @@
 import { DeeplinkService } from '@airgap/angular-core'
-import { AirGapMarketWallet, generateId, IACMessageDefinitionObjectV3, IACMessageType, IAirGapTransaction } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
+import { generateId, IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWalletGroup, InteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
+
 import { DataService, DataServiceKey } from '../data/data.service'
 import { OperationsProvider } from '../operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'

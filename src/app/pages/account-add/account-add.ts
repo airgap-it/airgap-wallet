@@ -1,6 +1,7 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { ICoinProtocol, ICoinSubProtocol, MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols, TezosFA2Protocol, TezosFAProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols, ICoinProtocol, SubProtocolSymbols, ICoinSubProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { TezosFAProtocol, TezosFA2Protocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'

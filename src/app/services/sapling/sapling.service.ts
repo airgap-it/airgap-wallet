@@ -1,5 +1,6 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, TezosShieldedTezProtocol } from '@airgap/coinlib-core'
+import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { TezosShieldedTezProtocol } from '@airgap/tezos'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'

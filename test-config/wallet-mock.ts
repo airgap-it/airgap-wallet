@@ -1,15 +1,9 @@
 
-import { 
-  AirGapCoinWallet,
-  AirGapMarketWallet,
-  BitcoinProtocol,
-  EthereumProtocol,
-  IAirGapTransaction,
-  ICoinProtocol,
-  MainProtocolSymbols
-} from '@airgap/coinlib-core'
+import { BitcoinProtocol } from '@airgap/bitcoin'
+import { AirGapCoinWallet, AirGapMarketWallet, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { EthereumProtocol } from '@airgap/ethereum'
 import BigNumber from 'bignumber.js'
 
 // tslint:disable:max-classes-per-file

@@ -1,16 +1,10 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
-import {
-  AirGapMarketWallet,
-  IACMessageDefinitionObject,
-  IACMessageType,
-  ICoinProtocol,
-  MainProtocolSymbols,
-  SignedTransaction,
-  TezosSaplingProtocol,
-  RawEthereumTransaction
-} from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { RawEthereumTransaction } from '@airgap/ethereum'
+import { IACMessageDefinitionObject, IACMessageType } from '@airgap/serializer'
+import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
@@ -18,12 +12,12 @@ import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
-import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
 
 const SECOND: number = 1000
 

@@ -27,7 +27,7 @@
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
             <portfolio-item
-              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network }"
+              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async"
               [wallet]="subWallet"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"
@@ -68,7 +68,7 @@
     </ng-template>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ng-container *ngIf="wallets | async | walletFilter: { status: AirGapWalletStatus.ACTIVE } as walletsArray">
+    <ng-container *ngIf="wallets | async | walletFilter: { status: AirGapWalletStatus.ACTIVE } | async as walletsArray">
       <ion-fab-button *ngIf="walletsArray.length > 0" id="add-more-coins-button" color="secondary" (click)="openAccountAddPage()">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>

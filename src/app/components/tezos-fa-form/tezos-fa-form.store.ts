@@ -1,20 +1,18 @@
 import { /* FilesystemService, */ ProtocolService, UIResourceStatus } from '@airgap/angular-core'
+import { ICoinProtocol, MainProtocolSymbols, ProtocolNetwork } from '@airgap/coinlib-core'
 import {
-  ICoinProtocol,
-  MainProtocolSymbols,
-  ProtocolNetwork,
   TezosFA1p2Protocol,
   TezosFA2Protocol,
   TezosFA2ProtocolConfig,
   TezosFA2ProtocolOptions,
   TezosFAProtocolConfig,
   TezosFAProtocolOptions,
+  TezosProtocolNetwork,
   TezosProtocolOptions
-} from '@airgap/coinlib-core'
-import { TezosContract } from '@airgap/coinlib-core/protocols/tezos/contract/TezosContract'
-import { TezosProtocolNetwork } from '@airgap/coinlib-core/protocols/tezos/TezosProtocolOptions'
-import { TezosContractMetadata } from '@airgap/coinlib-core/protocols/tezos/types/contract/TezosContractMetadata'
-import { TezosFATokenMetadata } from '@airgap/coinlib-core/protocols/tezos/types/fa/TezosFATokenMetadata'
+} from '@airgap/tezos'
+import { TezosContract } from '@airgap/tezos/protocol/contract/TezosContract'
+import { TezosContractMetadata } from '@airgap/tezos/protocol/types/contract/TezosContractMetadata'
+import { TezosFATokenMetadata } from '@airgap/tezos/protocol/types/fa/TezosFATokenMetadata'
 import { Injectable } from '@angular/core'
 import { ComponentStore, tapResponse } from '@ngrx/component-store'
 import { from, Observable, Subscriber } from 'rxjs'

@@ -1,11 +1,11 @@
+import { IACMessageWrapper, IACSinglePartHandler, ProtocolService } from '@airgap/angular-core'
+import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { Router } from '@angular/router'
-import { AirGapMarketWallet, supportedProtocols } from '@airgap/coinlib-core'
 
 import { partition } from '../../../utils/utils'
 import { AccountProvider } from '../../account/account.provider'
 import { DataService, DataServiceKey } from '../../data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../sentry-error-handler/sentry-error-handler'
-import { IACMessageWrapper, IACSinglePartHandler } from '@airgap/angular-core'
 
 interface Payload {
   address: string
@@ -22,7 +22,8 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
   constructor(
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly protocolService: ProtocolService
   ) {
     super()
   }
@@ -40,7 +41,8 @@ export class AddressHandler extends IACSinglePartHandler<Payload> {
     if (splits.length > 1) {
       const [address]: string[] = splits[1].split('?') // Ignore amount
       const wallets: AirGapMarketWallet[] = this.accountProvider.getActiveWalletList()
-      for (const protocol of supportedProtocols()) {
+      const supportedProtocols: ICoinProtocol[] = await this.protocolService.getSupportedProtocols()
+      for (const protocol of supportedProtocols) {
         if (splits[0].toLowerCase() === protocol.symbol.toLowerCase() || splits[0].toLowerCase() === protocol.name.toLowerCase()) {
           const [compatibleWallets, incompatibleWallets]: [AirGapMarketWallet[], AirGapMarketWallet[]] = partition<AirGapMarketWallet>(
             wallets,

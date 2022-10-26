@@ -5,11 +5,11 @@ import {
   ICoinDelegateProtocol,
   MainProtocolSymbols,
   SubProtocolSymbols,
-  TezosKtProtocol
 } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { TezosKtAddress } from '@airgap/coinlib-core/protocols/tezos/kt/TezosKtAddress'
+import { TezosKtProtocol } from '@airgap/tezos'
+import { TezosKtAddressResult } from '@airgap/tezos/protocol/types/kt/TezosKtAddressResult'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -362,11 +362,11 @@ export class AccountTransactionListPage {
 
   public async getKtAddresses(): Promise<string[]> {
     const protocol: TezosKtProtocol = new TezosKtProtocol()
-    const ktAddresses: TezosKtAddress[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+    const ktAddresses: TezosKtAddressResult[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 
-    return ktAddresses.map((address: TezosKtAddress) => address.getValue())
+    return ktAddresses.map((address: TezosKtAddressResult) => address.address)
   }
 
   public async openDelegationDetails(): Promise<void> {

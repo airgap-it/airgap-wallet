@@ -11,19 +11,11 @@ import {
   UiEventElementsService
 } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AccountShareResponse, IACMessageDefinitionObjectV3, IACMessageType, MessageSignResponse } from '@airgap/serializer'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AccountShareResponse,
-  AirGapCoinWallet,
-  AirGapMarketWallet,
-  AirGapWalletStatus,
-  IACMessageDefinitionObjectV3,
-  IACMessageType,
-  MainProtocolSymbols,
-  MessageSignResponse,
-  ProtocolSymbols
-} from '@airgap/coinlib-core'
 import { Router } from '@angular/router'
+import { transportToInteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
 
 import { AccountSync } from '../../types/AccountSync'
 import { AccountProvider } from '../account/account.provider'
@@ -37,7 +29,6 @@ import { WalletconnectService } from '../walletconnect/walletconnect.service'
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
 import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
-import { transportToInteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +55,7 @@ export class IACService extends BaseIACService {
       [
         new BeaconHandler(beaconService),
         new WalletConnectHandler(walletConnectService),
-        new AddressHandler(accountProvider, dataService, router) // Address handler is flexible because of regex, so it should be last.
+        new AddressHandler(accountProvider, dataService, router, protocolService) // Address handler is flexible because of regex, so it should be last.
       ],
       deeplinkService,
       appConfig

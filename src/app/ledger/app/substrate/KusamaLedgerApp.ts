@@ -1,5 +1,6 @@
+import { KusamaProtocol } from '@airgap/polkadot'
+import { SubstrateNetwork, SubstrateProtocol } from '@airgap/substrate'
 import { newKusamaApp, SubstrateApp } from '@zondax/ledger-substrate'
-import { KusamaProtocol, SubstrateNetwork, SubstrateProtocol } from '@airgap/coinlib-core'
 
 import { SubstrateLedgerApp } from './SubstrateLedgerApp'
 
