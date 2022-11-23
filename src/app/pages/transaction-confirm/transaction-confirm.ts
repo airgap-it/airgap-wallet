@@ -91,8 +91,12 @@ export class TransactionConfirmPage {
   public async broadcastTransaction() {
     if (this.protocols.length === 1 && this.protocols[0].identifier === MainProtocolSymbols.XTZ_SHIELDED) {
       // temporary
-      await this.wrapInTezosOperation(this.protocols[0] as TezosSaplingProtocol, this.txInfos[0][0])
-      return
+      const saplingProtocol = this.protocols[0] as TezosSaplingProtocol
+      const injectorUrl = (await saplingProtocol.getOptions()).config.injectorUrl
+      if (injectorUrl === undefined) {
+        await this.wrapInTezosOperation(this.protocols[0] as TezosSaplingProtocol, this.txInfos[0][0])
+        return
+      }
     }
 
     const loading = await this.loadingCtrl.create({

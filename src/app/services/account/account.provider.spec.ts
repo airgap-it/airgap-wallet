@@ -16,16 +16,20 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { PriceServiceMock } from '../../../../test-config/wallet-mock'
 import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 import { AccountProvider } from '../../services/account/account.provider'
+import { AppService } from '../app/app.service'
 
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
   let protocolService: ProtocolService
+  let appService: AppService
 
   let unitHelper: UnitHelper
 
-  beforeAll(() => {
+  beforeAll(async () => {
     protocolService = protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
-    protocolService.init()
+    await protocolService.init()
+    appService = new AppService()
+    appService.setReady()
   })
 
   beforeEach(
@@ -38,7 +42,8 @@ describe('AccountProvider', () => {
             { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
             { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
             { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
-            { provide: ProtocolService, useValue: protocolService }
+            { provide: ProtocolService, useValue: protocolService },
+            { provide: AppService, useValue: appService }
           ]
         })
       )

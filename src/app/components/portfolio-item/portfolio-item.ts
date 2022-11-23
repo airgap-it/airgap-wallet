@@ -94,7 +94,12 @@ export class PortfolioItemComponent {
   }
 
   private async updateBalance() {
-    if (this.wallet?.getCurrentBalance() !== undefined) {
+    if (!this.wallet) {
+      return
+    }
+
+    await this.wallet.balanceOf()
+    if (this.wallet.getCurrentBalance() !== undefined) {
       const converter = new AmountConverterPipe(this.protocolService)
       this.balance = this.wallet.getCurrentBalance()
       const balanceFormatted = await converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())

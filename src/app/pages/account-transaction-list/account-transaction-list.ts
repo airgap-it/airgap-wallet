@@ -248,7 +248,10 @@ export class AccountTransactionListPage {
 
     this.transactions = this.transactions.concat(newTransactions)
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(
+      await this.accountProvider.getAccountIdentifier(this.wallet),
+      this.transactions
+    )
 
     this.infiniteEnabled = newTransactions.length >= this.TRANSACTION_LIMIT
   }
@@ -266,7 +269,7 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
     if (forceRefresh || this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
         []
     }
 
@@ -312,7 +315,7 @@ export class AccountTransactionListPage {
       })
     }
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = this.transactions.length >= this.TRANSACTION_LIMIT

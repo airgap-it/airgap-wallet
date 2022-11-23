@@ -11,6 +11,8 @@
     "vote_label": "Voting",
     "migrate_label": "Migrate Balance",
     "delegation-status_label": "Delegation",
+    "set-contract_label": "Set Contract",
+    "change-contract_label": "Change Contract",
     "fund_label": "Fund Account",
     "load_more": "Load more",
     "pending-transactions": {
@@ -932,6 +934,33 @@
   "objkt-collectible-explorer": {
     "more-details": {
       "view-on": "View on objkt.com"
+    }
+  },
+  "set-contract": {
+    "title": "Set {{ protocolName }} Contract",
+    "xtz_shielded": {
+      "name": "Sapling"
+    },
+    "set-button_label": "Set Address",
+    "unsupported_text": "Can't set the contract address for the selected protocol."
+  },
+  "tezos-sapling-contract-form": {
+    "header": "Provide Tezos Sapling contract details.",
+    "contract-address_label": "Contract Address",
+    "contract-address_text": " AirGap is compatible with the Sapling smart contract reference implementation available on the <a href='' target='_blank'>Tezos GitLab</a>.",
+    "injector-url_label": "Injector URL",
+    "injector-url_text": "AirGap is compatible with the injector service reference implementation available on the <a href='' target='_blank'>AirGap GitHub</a>.",
+    "paste_label": "Paste",
+    "include-injector_label": "Injector Service",
+    "include-injector_text": "Privacy preserving and usability improvement with the injectors service. Sapling transactions have to be signed only once in AirGap instead of twice with this service.", 
+    "warning": {
+      "contract-not-compatible": "The contract seems not to be compatible, you may still use it, if you're sure it'll work.",
+      "contract-cannot-assess-compatibility": "The contract address could not be verified, you may still use it, if you're sure it'll work."
+    },
+    "error": {
+      "contract-invalid": "The contract address is invalid.",
+      "injector-invalid": "The injector URL is invalid.",
+      "unknown": "Unkown error has occurred."
     }
   }
 }
