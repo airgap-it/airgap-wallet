@@ -1,0 +1,111 @@
+<form [formGroup]="formGroup">
+  <h5 class="ion-padding-bottom">{{ 'tezos-sapling-contract-form.header' | translate }}</h5>
+
+  <div class="asset--container ion-margin-bottom">
+    <ng-container *ngrxLet="facade.protocol$ as protocol">
+      <div
+        *ngIf="protocol.status === UIResourceStatus.SUCCESS && protocol.value"
+        class="d-flex ion-align-items-center ion-justify-content-between"
+      >
+        <ion-item class="ion-no-padding" lines="none">
+          <currency-item [protocol]="protocol.value"></currency-item>
+        </ion-item>
+
+        <airgap-network-badge [network]="protocol.value.options.network"></airgap-network-badge>
+      </div>
+      <ng-container *ngIf="protocol.status === UIResourceStatus.LOADING">
+        <ion-item class="ion-no-padding" lines="none">
+          <ion-avatar slot="start"><ion-skeleton-text animated></ion-skeleton-text></ion-avatar>
+          <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+        </ion-item>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <ion-row class="ion-padding-bottom">
+    <ng-container *ngrxLet="facade.currentContractAddress$ as currentContractAddress">
+      <div *ngIf="currentContractAddress.status === UIResourceStatus.SUCCESS && currentContractAddress.value">
+        {{ currentContractAddress.value }}
+      </div>
+    </ng-container>
+    <ng-container *ngrxLet="facade.currentInjectorUrl$ as currentInjectorUrl">
+      <div *ngIf="currentInjectorUrl.status === UIResourceStatus.SUCCESS && currentInjectorUrl.value">
+        {{ currentInjectorUrl.value }}
+      </div>
+    </ng-container>
+  </ion-row>
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-item class="ion-no-padding">
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+          {{ 'tezos-sapling-contract-form.contract-address_label' | translate }}
+        </ion-label>
+        <ion-input type="text" placeholder="KT1..." formControlName="address"></ion-input>
+      </ion-item>
+      <ion-button class="paste--button" fill="outline" size="small" color="secondary" shape="round" (click)="pasteFromClipboard('address')">
+        {{ 'tezos-sapling-contract-form.paste_label' | translate }}
+      </ion-button>
+
+      <p class="ion-padding-top" (click)="openSaplingLink()" [innerHTML]="'tezos-sapling-contract-form.contract-address_text' | translate"></p>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-bottom">
+    <ion-col size="12">
+      <ion-item class="ion-no-padding">
+        <ion-label class="ion-text-wrap">
+          {{ 'tezos-sapling-contract-form.include-injector_label' | translate }}
+          <p class="ion-padding-top">
+            {{ 'tezos-sapling-contract-form.include-injector_text' | translate }}
+          </p>
+        </ion-label>
+
+        <ion-toggle slot="end" formControlName="injector"></ion-toggle>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ng-container *ngrxLet="facade.includeInjector$ as includeInjector">
+    <ion-row *ngIf="includeInjector" class="ion-padding-bottom">
+      <ion-col size="12">
+        <ion-item class="ion-no-padding">
+          <ion-label color="blackLight" class="ion-no-margin" position="stacked">
+            {{ 'tezos-sapling-contract-form.injector-url_label' | translate }}
+          </ion-label>
+          <ion-input type="text" placeholder="https://" formControlName="injectorUrl"></ion-input>
+        </ion-item>
+        <ion-button
+          class="paste--button"
+          fill="outline"
+          size="small"
+          color="secondary"
+          shape="round"
+          (click)="pasteFromClipboard('injectorUrl')"
+        >
+          {{ 'tezos-sapling-contract-form.paste_label' | translate }}
+        </ion-button>
+        <p class="ion-padding-top" (click)="openInjectorLink()" [innerHTML]="'tezos-sapling-contract-form.injector-url_text' | translate"></p>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+  <ng-container *ngrxLet="facade.warningDescription$ as warningDescription">
+    <ion-row class="ion-padding-vertical">
+      <ion-col>
+        <ion-text color="secondary" *ngIf="warningDescription">
+          <strong>
+            {{ warningDescription | translate }}
+          </strong>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+  <ng-container *ngrxLet="facade.errorDescription$ as errorDescription">
+    <ion-row class="ion-padding-vertical">
+      <ion-col>
+        <ion-text color="secondary" *ngIf="errorDescription">
+          <strong>
+            {{ errorDescription | translate }}
+          </strong>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+</form>

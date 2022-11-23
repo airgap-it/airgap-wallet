@@ -228,14 +228,21 @@ const routes: Routes = [
     resolve: {
       special: DataResolverService
     },
-    loadChildren: () => import('./pages/collectibles-list/collectibles-list.module').then( m => m.CollectiblesListPageModule)
+    loadChildren: () => import('./pages/collectibles-list/collectibles-list.module').then((m) => m.CollectiblesListPageModule)
   },
   {
     path: 'collectibles-item/:id/:publicKey/:protocolID/:addressIndex/:collectible',
     resolve: {
       special: DataResolverService
     },
-    loadChildren: () => import('./pages/collectibles-item/collectibles-item.module').then( m => m.CollectiblesItemPageModule)
+    loadChildren: () => import('./pages/collectibles-item/collectibles-item.module').then((m) => m.CollectiblesItemPageModule)
+  },
+  {
+    path: 'set-contract/:id/:protocolID/:networkID',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/set-contract/set-contract.module').then((m) => m.SetContractPageModule)
   }
 ]
 @NgModule({

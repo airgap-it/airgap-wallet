@@ -33,6 +33,7 @@ export enum WalletStorageKey {
   BEACON_REQUESTS = 'BEACON_REQUESTS',
   PENDING_REQUEST = 'PENDING_REQUEST',
   GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS',
+  CONTRACT_ADDRESSES = 'CONTRACT_ADDRESSES',
   THEME = 'theme'
 }
 
@@ -57,6 +58,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.BEACON_REQUESTS]: SerializedBeaconRequest[]
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
+  [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
   [WalletStorageKey.THEME]: themeOptions
 }
 
@@ -77,6 +79,7 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.BEACON_REQUESTS]: [],
   [WalletStorageKey.PENDING_REQUEST]: [],
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {},
+  [WalletStorageKey.CONTRACT_ADDRESSES]: {},
   [WalletStorageKey.THEME]: undefined
 }
 

@@ -2,6 +2,7 @@ import { ProtocolService, UiEventService } from '@airgap/angular-core'
 import {
   AirGapCoinWallet,
   AirGapMarketWallet,
+  hasConfigurableContract,
   IAirGapTransaction,
   ICoinProtocol,
   MainProtocolSymbols,
@@ -21,6 +22,7 @@ import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { isType } from '../../utils/utils'
+import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
 import { DrawChartService } from '../draw-chart/draw-chart.service'
 import { InteractionService } from '../interaction/interaction.service'
@@ -86,6 +88,7 @@ export class AccountProvider {
   }
 
   constructor(
+    private readonly appService: AppService,
     private readonly storageProvider: WalletStorageService,
     private readonly pushProvider: PushProvider,
     private readonly drawChartProvider: DrawChartService,
@@ -207,6 +210,8 @@ export class AccountProvider {
   }
 
   private async loadWalletsFromStorage() {
+    await this.appService.waitReady()
+
     const [rawGroups, rawWallets]: [
       SerializedAirGapMarketWalletGroup[] | undefined,
       SerializedAirGapWallet[] | undefined
@@ -603,10 +608,23 @@ export class AccountProvider {
     ])
   }
 
-  public getAccountIdentifier(wallet: AirGapMarketWallet): string {
+  public async getAccountIdentifier(wallet: AirGapMarketWallet): Promise<string> {
+    const [protocolIdentifier, networkIdentifier] = await Promise.all([
+      wallet.protocol.getIdentifier(),
+      wallet.protocol.getOptions().then((options) => options.network.identifier)
+    ])
+
+    let extendedNetworkIdentifier: string = networkIdentifier
+    if (hasConfigurableContract(wallet.protocol)) {
+      const contractAddress = await wallet.protocol.getContractAddress()
+      if (contractAddress) {
+        extendedNetworkIdentifier += `:${contractAddress}`
+      }
+    }
+
     return wallet.addressIndex
-      ? `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.protocol.options.network.identifier}-${wallet.addressIndex}`
-      : `${wallet.protocol.identifier}-${wallet.publicKey}-${wallet.protocol.options.network.identifier}`
+      ? `${protocolIdentifier}-${wallet.publicKey}-${extendedNetworkIdentifier}-${wallet.addressIndex}`
+      : `${protocolIdentifier}-${wallet.publicKey}-${extendedNetworkIdentifier}`
   }
 
   public walletBySerializerAccountIdentifier(accountIdentifier: string, protocolIdentifier: string): AirGapMarketWallet {
