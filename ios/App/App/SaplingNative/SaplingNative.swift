@@ -8,7 +8,7 @@
 import Foundation
 import Capacitor
 
-#if (arch(x86_64) || arch(arm64))
+#if (arch(x86_64) || arch(arm64)) && !targetEnvironment(simulator)
 import Sapling
 #endif
 
@@ -16,14 +16,14 @@ import Sapling
 public class SaplingNative: CAPPlugin {
     
     @objc func isSupported(_ call: CAPPluginCall) {
-        #if (arch(x86_64) || arch(arm64))
+        #if (arch(x86_64) || arch(arm64)) && !targetEnvironment(simulator)
         call.resolve([Key.IS_SUPPORTED: true])
         #else
         call.resolve([Key.IS_SUPPORTED: false])
         #endif
     }
     
-    #if (arch(x86_64) || arch(arm64))
+    #if (arch(x86_64) || arch(arm64)) && !targetEnvironment(simulator)
     private lazy var sapling = Sapling()
     
     @objc func initParameters(_ call: CAPPluginCall) {
