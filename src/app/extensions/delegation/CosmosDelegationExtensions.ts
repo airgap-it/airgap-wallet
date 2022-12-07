@@ -165,19 +165,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[0], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[0], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.delegated_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[1], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[1], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.unbonding_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[2], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[2], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.reward_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
       }
     ]
 
