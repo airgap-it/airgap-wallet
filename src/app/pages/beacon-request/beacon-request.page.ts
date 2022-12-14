@@ -52,7 +52,7 @@ export class BeaconRequestPage implements OnInit {
   public blake2bHash: string | undefined
   private subscription: Subscription
 
-  private responseHandler: (() => Promise<void>) | undefined
+  public responseHandler: (() => Promise<void>) | undefined
   private readonly beaconService: BeaconService | undefined
 
   constructor(
