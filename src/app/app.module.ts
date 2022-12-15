@@ -74,6 +74,7 @@ import { IACService } from './services/iac/iac.service'
 import { InteractionService } from './services/interaction/interaction.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
+import { NavigationService } from './services/navigation/navigation.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
@@ -174,7 +175,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     PercentPipe,
     FeeConverterPipe,
     InteractionService,
-    ThemeService
+    ThemeService,
+    NavigationService
    ],
   bootstrap: [AppComponent]
 })

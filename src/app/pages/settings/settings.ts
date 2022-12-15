@@ -133,7 +133,7 @@ export class SettingsPage {
   }
 
   private navigate(url: string) {
-    this.router.navigateByUrl(url, { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(url).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
   public pasteClipboard(): void {
     this.clipboardProvider.paste().then(
