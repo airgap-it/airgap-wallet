@@ -17,10 +17,29 @@ import {
   ICoinProtocol,
   ICoinSubProtocol,
   MainProtocolSymbols,
-  NetworkType,
+  NetworkType
 } from '@airgap/coinlib-core'
 import { generateId, IACMessageType } from '@airgap/serializer'
-import { TezosProtocolNetwork, TezosBlockExplorer, TezosNetwork, TezosIndexerClient, TezosProtocol, TezosProtocolOptions, TezosSaplingExternalMethodProvider, TezosShieldedTezProtocol, TezosSaplingProtocolOptions, TezosShieldedTezProtocolConfig, TezosKtProtocol, TezosFAProtocolOptions, TezosFA1p2Protocol, TezosFAProtocolConfig, TezosFA2ProtocolOptions, TezosFA2Protocol, TezosFA2ProtocolConfig, TezosDomains } from '@airgap/tezos'
+import {
+  TezosProtocolNetwork,
+  TezosBlockExplorer,
+  TezosNetwork,
+  TezosIndexerClient,
+  TezosProtocol,
+  TezosProtocolOptions,
+  TezosSaplingExternalMethodProvider,
+  TezosShieldedTezProtocol,
+  TezosSaplingProtocolOptions,
+  TezosShieldedTezProtocolConfig,
+  TezosKtProtocol,
+  TezosFAProtocolOptions,
+  TezosFA1p2Protocol,
+  TezosFAProtocolConfig,
+  TezosFA2ProtocolOptions,
+  TezosFA2Protocol,
+  TezosFA2ProtocolConfig,
+  TezosDomains
+} from '@airgap/tezos'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
@@ -34,6 +53,7 @@ import { AppService } from './services/app/app.service'
 import { ThemeService } from './services/appearance/theme.service'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
+import { NavigationService } from './services/navigation/navigation.service'
 import { PushProvider } from './services/push/push'
 import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
@@ -69,6 +89,7 @@ export class AppComponent implements AfterViewInit {
     private readonly ngZone: NgZone,
     private readonly saplingNativeService: SaplingNativeService,
     private readonly themeService: ThemeService,
+    private readonly navigationService: NavigationService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
@@ -121,6 +142,11 @@ export class AppComponent implements AfterViewInit {
 
   public async ngAfterViewInit(): Promise<void> {
     await this.platform.ready()
+    if (this.platform.is('android')) {
+      this.platform.backButton.subscribeWithPriority(-1, () => {
+        this.navigationService.handleBackNavigation(this.router.url)
+      })
+    }
     if (this.platform.is('ios')) {
       this.translate.get(['back-button']).subscribe((translated: { [key: string]: string | undefined }) => {
         const back: string = translated['back-button']
