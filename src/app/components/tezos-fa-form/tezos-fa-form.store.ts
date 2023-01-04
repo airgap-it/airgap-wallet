@@ -10,9 +10,9 @@ import {
   TezosProtocolNetwork,
   TezosProtocolOptions
 } from '@airgap/tezos'
-import { TezosContract } from '@airgap/tezos/protocol/contract/TezosContract'
-import { TezosContractMetadata } from '@airgap/tezos/protocol/types/contract/TezosContractMetadata'
-import { TezosFATokenMetadata } from '@airgap/tezos/protocol/types/fa/TezosFATokenMetadata'
+import { TezosContract } from '@airgap/tezos/v0/protocol/contract/TezosContract'
+import { TezosContractMetadata } from '@airgap/tezos/v0/protocol/types/contract/TezosContractMetadata'
+import { TezosFATokenMetadata } from '@airgap/tezos/v0/protocol/types/fa/TezosFATokenMetadata'
 import { Injectable } from '@angular/core'
 import { ComponentStore, tapResponse } from '@ngrx/component-store'
 import { from, Observable, Subscriber } from 'rxjs'
