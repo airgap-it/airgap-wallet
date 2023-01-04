@@ -9,7 +9,7 @@ import {
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { TezosKtProtocol } from '@airgap/tezos'
-import { TezosKtAddressResult } from '@airgap/tezos/protocol/types/kt/TezosKtAddressResult'
+import { TezosKtAddressResult } from '@airgap/tezos/v0/protocol/types/kt/TezosKtAddressResult'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'

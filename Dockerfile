@@ -31,6 +31,7 @@ COPY config /app/config
 COPY apply-diagnostic-modules.js /app
 COPY fix-qrscanner-gradle.js /app
 COPY patch-dependency-versions.js /app
+COPY patch-coinlib.js /app
 
 # install dependencies
 RUN npm install

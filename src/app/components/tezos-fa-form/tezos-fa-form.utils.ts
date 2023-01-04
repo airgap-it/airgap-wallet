@@ -1,5 +1,5 @@
-import { TezosContractMetadata } from '@airgap/tezos/protocol/types/contract/TezosContractMetadata'
-import { TezosFATokenMetadata } from '@airgap/tezos/protocol/types/fa/TezosFATokenMetadata'
+import { TezosContractMetadata } from '@airgap/tezos/v0/protocol/types/contract/TezosContractMetadata'
+import { TezosFATokenMetadata } from '@airgap/tezos/v0/protocol/types/fa/TezosFATokenMetadata'
 
 import {
   ContractNotFoundError,
