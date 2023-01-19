@@ -1,11 +1,5 @@
-import {
-  AirGapCoinWallet,
-  AirGapMarketWallet,
-  AirGapWalletPriceService,
-  AirGapWalletStatus,
-  RawTezosTransaction,
-  TezosProtocol
-} from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletPriceService, AirGapWalletStatus } from '@airgap/coinlib-core'
+import { RawTezosTransaction, TezosProtocol } from '@airgap/tezos'
 import Tezos from '@obsidiansystems/hw-app-xtz'
 
 import { LedgerApp } from '../LedgerApp'

@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { IAirGapTransaction, MainProtocolSymbols, TezosWrappedOperation } from '@airgap/coinlib-core'
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { FeeConverterPipe, ProtocolService } from '@airgap/angular-core'
+import { IAirGapTransaction, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { TezosWrappedOperation } from '@airgap/tezos'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 @Component({
   selector: 'beacon-from-to',

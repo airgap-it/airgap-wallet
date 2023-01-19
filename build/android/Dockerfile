@@ -20,12 +20,13 @@ RUN npm install -g n
 RUN n 15.14.0
 
 # Install app dependencies, using wildcard if package-lock exists
-COPY package.json /app/package.json
-COPY package-lock.json /app/package-lock.json
+COPY package.json /app
+COPY package-lock.json /app
 COPY config /app/config
 COPY apply-diagnostic-modules.js /app
 COPY fix-qrscanner-gradle.js /app
 COPY patch-dependency-versions.js /app
+COPY patch-coinlib.js /app
 
 # install dependencies
 RUN npm i
@@ -49,7 +50,7 @@ RUN node config/patch_crypto.js
 ARG BUILD_NR
 RUN sed -i -e "s/versionCode 1/versionCode $BUILD_NR/g" /app/android/app/build.gradle
 
-# disable pure getters due to https://github.com/angular/angular-cli/issues/11439 
+# disable pure getters due to https://github.com/angular/angular-cli/issues/11439
 # configure mangle (keep_fnames) for bitcoinjs https://github.com/bitcoinjs/bitcoinjs-lib/issues/959
 RUN npm run prepare-prod-build
 

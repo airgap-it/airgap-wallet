@@ -1,13 +1,11 @@
 import { AmountConverterPipe } from '@airgap/angular-core'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { CosmosDelegationActionType, CosmosProtocol, CosmosUnbondingDelegation, CosmosValidator } from '@airgap/cosmos'
 import { DecimalPipe } from '@angular/common'
-import * as moment from 'moment'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import { CosmosProtocol } from '@airgap/coinlib-core'
-import { CosmosUnbondingDelegation, CosmosValidator } from '@airgap/coinlib-core/protocols/cosmos/CosmosTypes'
-import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
-import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 import {
   AirGapDelegateeDetails,
   AirGapDelegationDetails,
@@ -19,7 +17,7 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { CosmosValidatorDetails, CoinlibService } from 'src/app/services/coinlib/coinlib.service'
+import { CoinlibService, CosmosValidatorDetails } from 'src/app/services/coinlib/coinlib.service'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
 import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
@@ -167,19 +165,19 @@ export class CosmosDelegationExtensions extends ProtocolDelegationExtensions<Cos
     const items: UIAccountExtendedDetailsItem[] = [
       {
         label: 'account-transaction-detail.available_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[0], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[0], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.delegated_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[1], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[1], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.unbonding_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[2], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[2], protocol, 0)} ${protocol.symbol}`
       },
       {
         label: 'account-transaction-detail.reward_label',
-        text: `${this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
+        text: `${await this.amountConverterPipe.transformValueOnly(results[3], protocol, 0)} ${protocol.symbol}`
       }
     ]
 

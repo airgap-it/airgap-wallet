@@ -1,12 +1,6 @@
 import { getMainIdentifier, ProtocolService } from '@airgap/angular-core'
-import {
-  ICoinProtocol,
-  MainProtocolSymbols,
-  TezosFA2Protocol,
-  TezosFA2ProtocolConfig,
-  TezosFA2ProtocolOptions,
-  TezosProtocolNetwork
-} from '@airgap/coinlib-core'
+import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { TezosFA2Protocol, TezosFA2ProtocolConfig, TezosFA2ProtocolOptions, TezosProtocolNetwork } from '@airgap/tezos'
 
 import { Collectible } from '../collectibles.types'
 

@@ -9,33 +9,23 @@ import {
   SigningType,
   SignPayloadRequestOutput
 } from '@airgap/beacon-sdk'
+import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { generateId, IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
+import { TezosCryptoClient, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
-import {
-  AirGapMarketWallet,
-  AirGapWalletStatus,
-  IACMessageDefinitionObjectV3,
-  IACMessageType,
-  IAirGapTransaction,
-  ICoinProtocol,
-  TezosCryptoClient,
-  TezosProtocol
-} from '@airgap/coinlib-core'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
-import { TezosWrappedOperation } from '@airgap/coinlib-core/protocols/tezos/types/TezosWrappedOperation'
-import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { TranslateService } from '@ngx-translate/core'
+import BigNumber from 'bignumber.js'
+import * as bs58check from 'bs58check'
+import { Subscription } from 'rxjs'
+import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { TranslateService } from '@ngx-translate/core'
-import { CheckboxInput } from 'src/app/components/permission-request/permission-request.component'
-import { generateId } from '@airgap/coinlib-core'
-import { Subscription } from 'rxjs'
-import BigNumber from 'bignumber.js'
-import * as bs58check from 'bs58check'
 
 export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknown } {
   return x !== null && typeof x === 'object'
@@ -62,7 +52,7 @@ export class BeaconRequestPage implements OnInit {
   public blake2bHash: string | undefined
   private subscription: Subscription
 
-  private responseHandler: (() => Promise<void>) | undefined
+  public responseHandler: (() => Promise<void>) | undefined
   private readonly beaconService: BeaconService | undefined
 
   constructor(

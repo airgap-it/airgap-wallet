@@ -1,11 +1,11 @@
-import { ToastController, LoadingController } from '@ionic/angular'
-import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
-import { AirGapMarketWallet, IACMessageType } from '@airgap/coinlib-core'
-
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
-import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { OperationsProvider } from 'src/app/services/operations/operations'
+import { IACMessageType } from '@airgap/serializer'
+import { LoadingController, ToastController } from '@ionic/angular'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
+import { OperationsProvider } from 'src/app/services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 export interface AirGapDelegatorActionContext {
   wallet: AirGapMarketWallet

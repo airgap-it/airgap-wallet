@@ -1,29 +1,25 @@
+import { RawAeternityTransaction } from '@airgap/aeternity'
 import { ProtocolService } from '@airgap/angular-core'
 import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
+import { RawBitcoinTransaction } from '@airgap/bitcoin'
 import {
   AirGapMarketWallet,
+  DelegateeDetails,
+  DelegatorAction,
+  DelegatorDetails,
   FeeDefaults,
-  IACMessageDefinitionObjectV3,
-  IACMessageType,
   IAirGapTransaction,
   ICoinDelegateProtocol,
   ICoinProtocol,
   MainProtocolSymbols,
-  SubProtocolSymbols,
-  TezosBTC,
-  TezosKtProtocol,
-  TezosSaplingProtocol
+  SubProtocolSymbols
 } from '@airgap/coinlib-core'
-import { CosmosTransaction } from '@airgap/coinlib-core/protocols/cosmos/CosmosTransaction'
-import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import { TezosSaplingAddress } from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingAddress'
-import {
-  RawAeternityTransaction,
-  RawBitcoinTransaction,
-  RawEthereumTransaction,
-  RawSubstrateTransaction,
-  RawTezosTransaction
-} from '@airgap/coinlib-core/serializer/types'
+import { CosmosTransaction } from '@airgap/cosmos'
+import { RawEthereumTransaction } from '@airgap/ethereum'
+import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
+import { RawSubstrateTransaction } from '@airgap/substrate'
+import { RawTezosTransaction, TezosBTC, TezosKtProtocol, TezosSaplingProtocol } from '@airgap/tezos'
+import { TezosSaplingAddress } from '@airgap/tezos/v0/protocol/sapling/TezosSaplingAddress'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'

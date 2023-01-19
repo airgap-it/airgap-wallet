@@ -1,10 +1,10 @@
 import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
+import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { TezosDelegatorAction, TezosProtocol } from '@airgap/tezos'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import { /*DelegationInfo, */TezosDelegatorAction, TezosProtocol } from '@airgap/coinlib-core'
-import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
 import {

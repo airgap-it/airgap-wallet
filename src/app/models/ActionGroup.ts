@@ -1,11 +1,10 @@
-import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
-import { ImportAccountAction, ImportAccoutActionContext } from '@airgap/coinlib-core/actions/GetKtAccountsAction'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
 import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
-import { CosmosDelegationActionType } from '@airgap/coinlib-core/protocols/cosmos/CosmosProtocol'
 import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { CosmosDelegationActionType } from '@airgap/cosmos'
+import { ImportAccountAction, ImportAccoutActionContext, TezosShieldedTezProtocol } from '@airgap/tezos'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
@@ -16,6 +15,7 @@ import { ButtonAction, ButtonActionContext } from './actions/ButtonAction'
 import { CollectiblesAction } from './actions/CollectiblesAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { FundAccountAction } from './actions/FundAccountAction'
+import { SetContractAction } from './actions/SetContractAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
@@ -152,7 +152,27 @@ export class ActionGroup {
     return [migrateAction]
   }
 
-  private getTezosShieldedTezActions(): Action<any, any>[] {
+  private async getTezosShieldedTezActions(): Promise<Action<any, any>[]> {
+    const shieldedTezProtocol = (await this.callerContext.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)) as TezosShieldedTezProtocol
+    const isContractSet = (await shieldedTezProtocol.getOptions()).config.contractAddress !== undefined
+
+    const setContract: ButtonAction<void, void> = new ButtonAction(
+      {
+        name: isContractSet ? 'account-transaction-list.change-contract_label' : 'account-transaction-list.set-contract_label',
+        icon: 'construct-outline',
+        identifier: 'set-contract-action'
+      },
+      () => {
+        const action = new SetContractAction({
+          wallet: this.callerContext.wallet,
+          dataService: this.callerContext.dataService,
+          router: this.callerContext.router
+        })
+
+        return action
+      }
+    )
+
     const fundAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.fund_label', icon: 'logo-usd', identifier: 'fund-action' },
       () => {
@@ -167,7 +187,7 @@ export class ActionGroup {
       }
     )
 
-    return [fundAction]
+    return [setContract, fundAction]
   }
 
   private async getCosmosActions(): Promise<Action<any, any>[]> {

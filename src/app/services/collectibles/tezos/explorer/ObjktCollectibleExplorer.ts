@@ -1,9 +1,10 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { AirGapMarketWallet, ProtocolNetwork, TezosProtocol, TezosProtocolNetwork } from '@airgap/coinlib-core'
-import { TezosContractRemoteDataFactory } from '@airgap/coinlib-core/protocols/tezos/contract/remote-data/TezosContractRemoteDataFactory'
-import { TezosContract } from '@airgap/coinlib-core/protocols/tezos/contract/TezosContract'
-import { TezosFATokenMetadata } from '@airgap/coinlib-core/protocols/tezos/types/fa/TezosFATokenMetadata'
+import { AirGapMarketWallet, ProtocolNetwork } from '@airgap/coinlib-core'
 import { RemoteData } from '@airgap/coinlib-core/utils/remote-data/RemoteData'
+import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
+import { TezosContractRemoteDataFactory } from '@airgap/tezos/v0/protocol/contract/remote-data/TezosContractRemoteDataFactory'
+import { TezosContract } from '@airgap/tezos/v0/protocol/contract/TezosContract'
+import { TezosFATokenMetadata } from '@airgap/tezos/v0/protocol/types/fa/TezosFATokenMetadata'
 import { gql, request } from 'graphql-request'
 
 import { faProtocolSymbol } from '../../../../types/GenericProtocolSymbols'
@@ -61,7 +62,7 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     const tezosProtocol = wallet.protocol
 
     const address = await tezosProtocol.getAddressFromPublicKey(wallet.publicKey)
-    const { token_holder: tokenHolders } = await this.fetchTokenHoldersForAddress(address.getValue(), limit + 1, page * limit)
+    const { token_holder: tokenHolders } = await this.fetchTokenHoldersForAddress(address.address, limit + 1, page * limit)
     const collectiblesOrUndefined: (TezosCollectible | undefined)[] | undefined = await Promise.all(
       tokenHolders?.slice(0, limit)?.map(async (tokenHolder) => this.tokenToTezosCollectible(tezosProtocol, tokenHolder))
     )

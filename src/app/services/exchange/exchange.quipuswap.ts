@@ -7,16 +7,14 @@ import {
   isProtocolSymbol,
   MainProtocolSymbols,
   ProtocolSymbols,
-  RawTezosTransaction,
-  SubProtocolSymbols,
-  TezosAddress,
-  TezosProtocol,
-  TezosWrappedOperation
+  SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { AirGapTransactionStatus, IAirGapTransaction } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { TezosOperation } from '@airgap/coinlib-core/protocols/tezos/types/operations/TezosOperation'
-import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/coinlib-core/protocols/tezos/types/operations/Transaction'
-import { TezosOperationType } from '@airgap/coinlib-core/protocols/tezos/types/TezosOperationType'
+import { RawTezosTransaction, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
+import { TezosOperation } from '@airgap/tezos/v0/protocol/types/operations/TezosOperation'
+import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/tezos/v0/protocol/types/operations/Transaction'
+import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
+import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Schema } from '@taquito/michelson-encoder'
 import { Contract, TezosToolkit, TransferParams } from '@taquito/taquito'
@@ -297,11 +295,11 @@ export class QuipuswapExchange implements Exchange {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
     const minTokenAmount: BigNumber = await this.getMinTezToTokenExchangeAmount(token, mutezAmount, slippageTolerance)
-    const address: TezosAddress = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
     const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
-      address.getValue(),
-      address.getValue(),
+      address.address,
+      address.address,
       token,
       mutezAmount,
       minTokenAmount
@@ -319,11 +317,11 @@ export class QuipuswapExchange implements Exchange {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
     const minTezAmount: BigNumber = await this.getMinTokenToTezExchangeAmount(token, tokenAmount, slippageTolerance)
-    const address: TezosAddress = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
     const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
-      address.getValue(),
-      address.getValue(),
+      address.address,
+      address.address,
       token,
       tokenAmount,
       minTezAmount
@@ -401,9 +399,9 @@ export class QuipuswapExchange implements Exchange {
   ): Promise<QuipuswapTransaction> {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
-    const address: TezosAddress = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
     const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
-      address.getValue(),
+      address.address,
       recipient,
       tokenProtocol.identifier,
       mutezAmount,
@@ -450,9 +448,9 @@ export class QuipuswapExchange implements Exchange {
   ): Promise<QuipuswapTransaction> {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
-    const address: TezosAddress = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
     const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
-      address.getValue(),
+      address.address,
       recipient,
       tokenProtocol.identifier,
       tokenAmount,

@@ -4,6 +4,7 @@ import {
   APP_INFO_PLUGIN,
   APP_PLUGIN,
   ExternalAliasResolver,
+  getProtocolAndNetworkIdentifier,
   IACMessageTransport,
   LanguageService,
   ProtocolService,
@@ -12,34 +13,33 @@ import {
 } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
-  generateId,
-  IACMessageType,
   IAirGapTransaction,
   ICoinProtocol,
   ICoinSubProtocol,
   MainProtocolSymbols,
-  NetworkType,
-  TezosBlockExplorer,
-  TezosFA1p2Protocol,
-  TezosFA2Protocol,
-  TezosFA2ProtocolConfig,
-  TezosFA2ProtocolOptions,
-  TezosFAProtocolConfig,
-  TezosFAProtocolOptions,
-  TezosKtProtocol,
-  TezosNetwork,
-  TezosProtocol,
+  NetworkType
+} from '@airgap/coinlib-core'
+import { generateId, IACMessageType } from '@airgap/serializer'
+import {
   TezosProtocolNetwork,
+  TezosBlockExplorer,
+  TezosNetwork,
   TezosIndexerClient,
+  TezosProtocol,
   TezosProtocolOptions,
   TezosSaplingExternalMethodProvider,
-  TezosShieldedTezProtocol
-} from '@airgap/coinlib-core'
-import { TezosDomains } from '@airgap/coinlib-core/protocols/tezos/domains/TezosDomains'
-import {
+  TezosShieldedTezProtocol,
   TezosSaplingProtocolOptions,
-  TezosShieldedTezProtocolConfig
-} from '@airgap/coinlib-core/protocols/tezos/sapling/TezosSaplingProtocolOptions'
+  TezosShieldedTezProtocolConfig,
+  TezosKtProtocol,
+  TezosFAProtocolOptions,
+  TezosFA1p2Protocol,
+  TezosFAProtocolConfig,
+  TezosFA2ProtocolOptions,
+  TezosFA2Protocol,
+  TezosFA2ProtocolConfig,
+  TezosDomains
+} from '@airgap/tezos'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
@@ -49,9 +49,11 @@ import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
 
 import { AccountProvider } from './services/account/account.provider'
+import { AppService } from './services/app/app.service'
 import { ThemeService } from './services/appearance/theme.service'
 import { DataService, DataServiceKey } from './services/data/data.service'
 import { IACService } from './services/iac/iac.service'
+import { NavigationService } from './services/navigation/navigation.service'
 import { PushProvider } from './services/push/push'
 import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
@@ -69,6 +71,7 @@ export class AppComponent implements AfterViewInit {
   public isElectron: boolean = false
 
   constructor(
+    private readonly appSerivce: AppService,
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly languageService: LanguageService,
@@ -86,6 +89,7 @@ export class AppComponent implements AfterViewInit {
     private readonly ngZone: NgZone,
     private readonly saplingNativeService: SaplingNativeService,
     private readonly themeService: ThemeService,
+    private readonly navigationService: NavigationService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
@@ -132,10 +136,17 @@ export class AppComponent implements AfterViewInit {
         }
       })
     }
+
+    this.appSerivce.setReady()
   }
 
   public async ngAfterViewInit(): Promise<void> {
     await this.platform.ready()
+    if (this.platform.is('android')) {
+      this.platform.backButton.subscribeWithPriority(-1, () => {
+        this.navigationService.handleBackNavigation(this.router.url)
+      })
+    }
     if (this.platform.is('ios')) {
       this.translate.get(['back-button']).subscribe((translated: { [key: string]: string | undefined }) => {
         const back: string = translated['back-button']
@@ -213,23 +224,41 @@ export class AppComponent implements AfterViewInit {
     )
     const ghostnetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ghostnetNetwork))
 
+    await this.protocolService.init({
+      extraActiveProtocols: [ghostnetProtocol],
+      extraPassiveSubProtocols: [[ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))]]
+    })
+
+    await Promise.all([this.initSaplingProtocols(), this.getGenericSubProtocols(), this.initializeTezosDomains()])
+  }
+
+  private async initSaplingProtocols(networks: TezosProtocolNetwork[] = []): Promise<void> {
+    if (networks.length === 0) {
+      const supportedNetworks = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ)) as TezosProtocolNetwork[]
+      networks.push(...supportedNetworks)
+    }
+
     const externalMethodProvider:
       | TezosSaplingExternalMethodProvider
       | undefined = await this.saplingNativeService.createExternalMethodProvider()
 
-    const shieldedTezProtocol = new TezosShieldedTezProtocol(
-      new TezosSaplingProtocolOptions(
-        undefined,
-        new TezosShieldedTezProtocolConfig(undefined, undefined, undefined, externalMethodProvider)
-      )
+    const shieldedTezProtocols = await Promise.all(
+      networks.map(async (network) => {
+        const contractAddresses = await this.storageProvider.get(WalletStorageKey.CONTRACT_ADDRESSES)
+        const protocolAndNetworkIdentifier = await getProtocolAndNetworkIdentifier(MainProtocolSymbols.XTZ_SHIELDED, network)
+        const contractAddress = contractAddresses[protocolAndNetworkIdentifier]?.address
+        const configuration = contractAddresses[protocolAndNetworkIdentifier]?.configuration
+
+        return new TezosShieldedTezProtocol(
+          new TezosSaplingProtocolOptions(
+            network,
+            new TezosShieldedTezProtocolConfig(undefined, undefined, contractAddress, externalMethodProvider, configuration?.injectorUrl)
+          )
+        )
+      })
     )
 
-    this.protocolService.init({
-      extraActiveProtocols: [ghostnetProtocol, shieldedTezProtocol],
-      extraPassiveSubProtocols: [[ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))]]
-    })
-
-    await Promise.all([this.getGenericSubProtocols(), this.initializeTezosDomains()])
+    await this.protocolService.addActiveMainProtocols(shieldedTezProtocols)
   }
 
   private async getGenericSubProtocols(): Promise<void> {

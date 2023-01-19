@@ -5,11 +5,11 @@ import {
   ICoinDelegateProtocol,
   MainProtocolSymbols,
   SubProtocolSymbols,
-  TezosKtProtocol
 } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { TezosKtAddress } from '@airgap/coinlib-core/protocols/tezos/kt/TezosKtAddress'
+import { TezosKtProtocol } from '@airgap/tezos'
+import { TezosKtAddressResult } from '@airgap/tezos/v0/protocol/types/kt/TezosKtAddressResult'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -248,7 +248,10 @@ export class AccountTransactionListPage {
 
     this.transactions = this.transactions.concat(newTransactions)
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(
+      await this.accountProvider.getAccountIdentifier(this.wallet),
+      this.transactions
+    )
 
     this.infiniteEnabled = newTransactions.length >= this.TRANSACTION_LIMIT
   }
@@ -266,7 +269,7 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
     if (forceRefresh || this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
         []
     }
 
@@ -312,7 +315,7 @@ export class AccountTransactionListPage {
       })
     }
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = this.transactions.length >= this.TRANSACTION_LIMIT
@@ -362,11 +365,11 @@ export class AccountTransactionListPage {
 
   public async getKtAddresses(): Promise<string[]> {
     const protocol: TezosKtProtocol = new TezosKtProtocol()
-    const ktAddresses: TezosKtAddress[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+    const ktAddresses: TezosKtAddressResult[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 
-    return ktAddresses.map((address: TezosKtAddress) => address.getValue())
+    return ktAddresses.map((address: TezosKtAddressResult) => address.address)
   }
 
   public async openDelegationDetails(): Promise<void> {
