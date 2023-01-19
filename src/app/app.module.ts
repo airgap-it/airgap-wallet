@@ -43,10 +43,8 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
-
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import * as fromRoot from './app.reducers'
 import { SaplingNative } from './capacitor-plugins/definitions'
 import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
@@ -80,6 +78,8 @@ import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { SaplingService } from './services/sapling/sapling.service'
 import { WalletStorageService } from './services/storage/storage'
+import { metaReducers, ROOT_REDUCERS } from './app.reducers'
+import { ExchangeEffects } from './pages/exchange/effects'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -102,15 +102,15 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
       }
     }),
     AirGapAngularNgRxModule,
-    StoreModule.forRoot(fromRoot.reducers, {
-      metaReducers: fromRoot.metaReducers,
+    StoreModule.forRoot(ROOT_REDUCERS, {
+      metaReducers,
       /* temporary fix for `ERROR TypeError: Cannot freeze array buffer views with elements` */
       runtimeChecks: {
         strictStateImmutability: false,
         strictActionImmutability: false
       }
     }),
-    EffectsModule.forRoot(),
+    EffectsModule.forRoot([ExchangeEffects]),
     ZXingScannerModule,
     MomentModule,
     IonicModule.forRoot(),

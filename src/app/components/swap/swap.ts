@@ -5,9 +5,9 @@ import { AlertController, ModalController } from '@ionic/angular'
 import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
-
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { FormControl } from '@angular/forms'
 
 @Component({
   selector: 'swap',
@@ -30,6 +30,12 @@ export class SwapComponent {
   public expandWalletSelection: boolean = false
 
   @Input()
+  public amountControl: FormControl
+
+  @Input()
+  public readonly liquidity: boolean = false
+
+  @Input()
   public readonly currentlyNotSupported: boolean = false
 
   @Input()
@@ -42,6 +48,9 @@ export class SwapComponent {
   public readonly supportedWallets: AirGapMarketWallet[]
 
   @Input()
+  public readonly disableWalletSelection: boolean = false
+
+  @Input()
   public readonly selectedProtocol: ICoinProtocol
 
   @Input()
@@ -51,7 +60,16 @@ export class SwapComponent {
   public readonly minExchangeAmount: BigNumber
 
   @Input()
-  public exchangeAmount: BigNumber
+  public amount: BigNumber
+
+  @Input()
+  public fiatAmount: BigNumber
+
+  @Input()
+  public customBalance: BigNumber
+
+  @Input()
+  public customSymbol: string
 
   protected _amount: string
 
@@ -61,25 +79,11 @@ export class SwapComponent {
   @Output()
   private readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter()
 
-  @Output()
-  private readonly amountSetEmitter: EventEmitter<string> = new EventEmitter()
-
-  public selectedWalletBalance: BigNumber | undefined
-  public selectedWalletMarketPrice: BigNumber | undefined
-
   constructor(
     public alertCtrl: AlertController,
     public modalController: ModalController,
     private readonly protocolService: ProtocolService
-  ) {
-    this.selectedWalletBalance = this.selectedWallet?.getCurrentBalance()
-    this.selectedWalletMarketPrice = this.selectedWallet?.getCurrentMarketPrice()
-  }
-
-  public amountSet(amount: string): void {
-    this._amount = amount
-    this.amountSetEmitter.emit(amount)
-  }
+  ) {}
 
   public walletSet(wallet: AirGapMarketWallet): void {
     this.walletSetEmitter.emit(wallet)
@@ -87,6 +91,9 @@ export class SwapComponent {
   }
 
   public async doRadio(): Promise<void> {
+    if (this.liquidity) {
+      return
+    }
     const protocols: ICoinProtocol[] = (
       await Promise.all(
         this.supportedProtocols.map(async (supportedProtocol: ProtocolSymbols) =>

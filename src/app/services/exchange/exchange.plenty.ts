@@ -6,15 +6,10 @@ import {
   ICoinProtocol,
   isProtocolSymbol,
   MainProtocolSymbols,
-  ProtocolSymbols,
-  SubProtocolSymbols
+  SubProtocolSymbols,
+  ProtocolSymbols
 } from '@airgap/coinlib-core'
 import { AirGapTransactionStatus, IAirGapTransaction } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { RawTezosTransaction, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
-import { TezosOperation } from '@airgap/tezos/v0/protocol/types/operations/TezosOperation'
-import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/tezos/v0/protocol/types/operations/Transaction'
-import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
-import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { Schema } from '@taquito/michelson-encoder'
@@ -25,31 +20,36 @@ import { UIWidget } from '../../models/widgets/UIWidget'
 import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 import * as fromRoot from '../../app.reducers'
 import { getSelectedSlippage } from 'src/app/app.selectors'
+import { TezosOperation } from '@airgap/tezos/v0/protocol/types/operations/TezosOperation'
+import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/tezos/v0/protocol/types/operations/Transaction'
+import { RawTezosTransaction, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
+import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
+import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
 
 interface DexStorage {
-  storage: {
-    tez_pool: number
-    token_pool: number
+  token1_pool: number
+  token2_pool: number
 
-    token_address: string
-    token_id: number
-  }
+  token1Address: string
+  token2Address: string
+  token1Id: number
+  token2Id: number
 }
 
 type PartialTransactionOperation = TezosOperation & Partial<TezosTransactionOperation>
 
-interface QuipuswapTransaction {
+interface PlentyTransaction {
   details: IAirGapTransaction[]
   unsigned: RawTezosTransaction
 }
 
-interface QuipuswapSlippageTolerance {
+interface PlentySlippageTolerance {
   low: number
   medium: number
   high: number
 }
 
-class QuipuswapTransactionStatusResponse implements ExchangeTransactionStatusResponse {
+class PlentyTransactionStatusResponse implements ExchangeTransactionStatusResponse {
   constructor(public readonly status: string) { }
 
   public isPending(): boolean {
@@ -65,9 +65,7 @@ class QuipuswapTransactionStatusResponse implements ExchangeTransactionStatusRes
 
 const NODE_URL: string = 'https://tezos-node.prod.gke.papers.tech'
 
-const XTZ_QUIPU_IDENTIFIER: string = 'tez'
-
-const QUIPUSWAP_FEE: number = 0.003 // 0.3%
+const PLENTY_FEE: number = 0.0035 // 0.35%
 
 enum ControlId {
   SLIPPAGE_TOLERANCE = 'slippageTolerance',
@@ -75,13 +73,24 @@ enum ControlId {
 }
 
 const DEX_CONTRACTS = {
-  // [SubProtocolSymbols.XTZ_BTC]: 'KT1WBLrLE2vG8SedBqiSJFm4VVAZZBytJYHc',
-  [SubProtocolSymbols.XTZ_ETHTZ]: 'KT1Evsp2yA19Whm24khvFPcwimK6UaAJu8Zo',
-  [SubProtocolSymbols.XTZ_KUSD]: 'KT1K4EwTpbvYN9agJdjpyJm4ZZdhpUNKB3F6',
-  [SubProtocolSymbols.XTZ_STKR]: 'KT1BMEEPX7MWzwwadW3NCSZe9XGmFJ7rs7Dr',
-  [SubProtocolSymbols.XTZ_USD]: 'KT1WxgZ1ZSfMgmsSDDcUn8Xn577HwnQ7e1Lb',
-  [SubProtocolSymbols.XTZ_UUSD]: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
-  [SubProtocolSymbols.XTZ_YOU]: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_USD}`]: 'KT1D36ZG99YuhoCRZXLL86tQYAbv36bCq9XM',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_ETHTZ}`]: 'KT1AbuUaPQmYLsB8n8FdSzBrxvrsm8ctwW1V',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_KUSD}`]: 'KT1UNBvCJXiwJY6tmHM7CJUVwNPew53XkSfh',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_QUIPU}`]: 'KT1NtsnKQ1c3rYB12ZToP77XaJs8WDBvF221',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_BTC}`]: 'KT1HaDP8fRW7kavK2beST7o4RvzuvZbn5VwV',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_UUSD}`]: 'KT1Cba383ZJpEearqnUyUKUMsgu5Z3TXBgeH',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_YOU}`]: 'KT1EM6NjJdJXmz3Pj13pfu3MWVDwXEQnoH3N',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_CTEZ}`]: 'KT1C9gJRfkpPbNdBn3XyYbrUHT6XgfPzZqXP',
+  [`${SubProtocolSymbols.XTZ_PLENTY}/${SubProtocolSymbols.XTZ_WRAP}`]: 'KT1C2SXoGcje3VVMJHKRVhYXuWuNmv5ztJcw',
+  [`${SubProtocolSymbols.XTZ_UUSD}/${SubProtocolSymbols.XTZ_YOU}`]: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',
+  [`${SubProtocolSymbols.XTZ_UUSD}/${SubProtocolSymbols.XTZ_UDEFI}`]: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
+  [`${SubProtocolSymbols.XTZ_KUSD}/${SubProtocolSymbols.XTZ_USD}`]: 'KT1TnsQ6JqzyTz5PHMsGj28WwJyBtgc146aJ',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_WRAP}`]: 'KT19Qe4KbEVAiaVeNsgo9Tkqa6qvZho8c4W5',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_UUSD}`]: 'KT1Rx3pQzsn4FBuuYhcWsqUS7vWFx3ktqSWD',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_QUIPU}`]: 'KT1Ss8rb1UFVqG2LYEU5g4NEbK5SqW5Xadwp',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_ETHTZ}`]: 'KT1GSYhwanehtwCK3NPfkMFbD1bNQmvosbqL',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_KUSD}`]: 'KT1X1nkqJDR1UHwbfpcnME5Z7agJLjUQNguB',
+  [`${SubProtocolSymbols.XTZ_CTEZ}/${SubProtocolSymbols.XTZ_USD}`]: 'KT1PWAXfPatPWBNJUxTHin4ECin1kYJHHnsr'
 }
 
 const FA1p2_ENTRYPOINTS = {
@@ -94,23 +103,36 @@ const FA2_ENTRYPOINTS = {
 
 const DEX_ENTRYPOINTS = {
   tezToTokenPayment: 'tezToTokenPayment',
-  tokenToTezPayment: 'tokenToTezPayment'
+  tokenToTezPayment: 'tokenToTezPayment',
+  swap: 'Swap'
 }
 
-export class QuipuswapExchange implements Exchange {
+export class PlentyExchange implements Exchange {
   private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
   private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  private readonly dexContracts: Map<ProtocolSymbols, Contract> = new Map<ProtocolSymbols, Contract>()
+  private readonly dexContracts: Map<string, Contract> = new Map<ProtocolSymbols, Contract>()
 
-  private readonly supportedTokens: ProtocolSymbols[] = Object.keys(DEX_CONTRACTS) as ProtocolSymbols[]
-  private get supportedCurrencies(): ProtocolSymbols[] {
-    return [MainProtocolSymbols.XTZ, ...this.supportedTokens]
+  private readonly supportedTokens: ProtocolSymbols[] = [
+    SubProtocolSymbols.XTZ_PLENTY,
+    SubProtocolSymbols.XTZ_UUSD,
+    SubProtocolSymbols.XTZ_YOU,
+    SubProtocolSymbols.XTZ_UDEFI,
+    SubProtocolSymbols.XTZ_CTEZ,
+    SubProtocolSymbols.XTZ_KUSD,
+    SubProtocolSymbols.XTZ_USD,
+    SubProtocolSymbols.XTZ_ETHTZ,
+    SubProtocolSymbols.XTZ_QUIPU,
+    SubProtocolSymbols.XTZ_BTC,
+  ]
+
+  private get supportedFromCurrencies(): ProtocolSymbols[] {
+    return this.supportedTokens
   }
 
   private readonly tezos: TezosToolkit = new TezosToolkit(NODE_URL)
 
-  private readonly slippageDefaults: QuipuswapSlippageTolerance = {
+  private readonly slippageDefaults: PlentySlippageTolerance = {
     low: 0.005, // 0.5%
     medium: 0.01, // 1%
     high: 0.03 // 3%
@@ -137,14 +159,6 @@ export class QuipuswapExchange implements Exchange {
 
   private initIdentifierMapping(protocolIdentifier: ProtocolSymbols): void {
     let exchangeIdentifier: string | undefined
-    switch (protocolIdentifier) {
-      case MainProtocolSymbols.XTZ:
-        exchangeIdentifier = XTZ_QUIPU_IDENTIFIER
-        break
-      default:
-        exchangeIdentifier = DEX_CONTRACTS[protocolIdentifier]
-    }
-
     if (exchangeIdentifier !== undefined) {
       this.identifierExchangeToAirGapMap.set(exchangeIdentifier, protocolIdentifier)
       this.identifierAirGapToExchangeMap.set(protocolIdentifier, exchangeIdentifier)
@@ -152,21 +166,63 @@ export class QuipuswapExchange implements Exchange {
   }
 
   public async getAvailableFromCurrencies(): Promise<ProtocolSymbols[]> {
-    return this.supportedCurrencies
+    return this.supportedFromCurrencies
   }
 
   public async getAvailableToCurrenciesForCurrency(selectedFrom: string): Promise<ProtocolSymbols[]> {
     const identifier: ProtocolSymbols | undefined = this.getAirGapIdentifier(selectedFrom)
-    if (identifier === undefined) {
+    if (identifier === undefined || !this.isTokenSupported(identifier)) {
       return []
     }
 
-    if (identifier === MainProtocolSymbols.XTZ) {
-      return this.supportedTokens
-    } else if (this.isTokenSupported(identifier)) {
-      return [MainProtocolSymbols.XTZ]
-    } else {
-      return []
+    switch (identifier) {
+      case SubProtocolSymbols.XTZ_PLENTY:
+        return [
+          SubProtocolSymbols.XTZ_USD,
+          SubProtocolSymbols.XTZ_ETHTZ,
+          SubProtocolSymbols.XTZ_KUSD,
+          SubProtocolSymbols.XTZ_QUIPU,
+          SubProtocolSymbols.XTZ_BTC,
+          SubProtocolSymbols.XTZ_UUSD,
+          SubProtocolSymbols.XTZ_YOU,
+          SubProtocolSymbols.XTZ_CTEZ,
+          SubProtocolSymbols.XTZ_WRAP
+        ]
+
+      case SubProtocolSymbols.XTZ_UUSD:
+        return [SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UDEFI, SubProtocolSymbols.XTZ_PLENTY, SubProtocolSymbols.XTZ_CTEZ]
+
+      case SubProtocolSymbols.XTZ_YOU:
+        return [SubProtocolSymbols.XTZ_UUSD, SubProtocolSymbols.XTZ_PLENTY]
+
+      case SubProtocolSymbols.XTZ_UDEFI:
+        return [SubProtocolSymbols.XTZ_UUSD]
+
+      case SubProtocolSymbols.XTZ_CTEZ:
+        return [
+          SubProtocolSymbols.XTZ_WRAP,
+          SubProtocolSymbols.XTZ_UUSD,
+          SubProtocolSymbols.XTZ_QUIPU,
+          SubProtocolSymbols.XTZ_ETHTZ,
+          SubProtocolSymbols.XTZ_KUSD,
+          SubProtocolSymbols.XTZ_USD,
+          SubProtocolSymbols.XTZ_PLENTY
+        ]
+
+      case SubProtocolSymbols.XTZ_KUSD:
+        return [SubProtocolSymbols.XTZ_USD, SubProtocolSymbols.XTZ_PLENTY, SubProtocolSymbols.XTZ_CTEZ]
+
+      case SubProtocolSymbols.XTZ_USD:
+        return [SubProtocolSymbols.XTZ_KUSD, SubProtocolSymbols.XTZ_PLENTY, SubProtocolSymbols.XTZ_CTEZ]
+
+      case SubProtocolSymbols.XTZ_ETHTZ:
+        return [SubProtocolSymbols.XTZ_PLENTY, SubProtocolSymbols.XTZ_CTEZ]
+
+      case SubProtocolSymbols.XTZ_QUIPU:
+        return [SubProtocolSymbols.XTZ_PLENTY, SubProtocolSymbols.XTZ_CTEZ]
+
+      default:
+        return [SubProtocolSymbols.XTZ_PLENTY]
     }
   }
 
@@ -190,10 +246,8 @@ export class QuipuswapExchange implements Exchange {
     }
 
     let maxAmount: BigNumber | undefined
-    if (toProtocol.identifier === MainProtocolSymbols.XTZ) {
-      maxAmount = await this.getMaxTezAmount(fromProtocol.identifier)
-    } else if (this.isTokenSupported(toProtocol.identifier)) {
-      maxAmount = await this.getMaxTokenAmount(toProtocol.identifier)
+    if (this.isTokenSupported(toProtocol.identifier)) {
+      maxAmount = await this.getMaxTokenAmount([fromProtocol.identifier, toProtocol.identifier])
     }
 
     return maxAmount.shiftedBy(-toProtocol.decimals).toFixed()
@@ -208,51 +262,49 @@ export class QuipuswapExchange implements Exchange {
     if (fromProtocol === undefined || toProtocol === undefined) {
       return undefined
     }
-
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromProtocol.decimals)
 
-    let minAmount: BigNumber = new BigNumber(0)
-    if (fromProtocol.identifier === MainProtocolSymbols.XTZ) {
-      minAmount = await this.getMinTezToTokenExchangeAmount(toProtocol.identifier, shiftedAmount, this.slippageTolerance)
-    } else if (this.isTokenSupported(fromProtocol.identifier)) {
-      minAmount = await this.getMinTokenToTezExchangeAmount(fromProtocol.identifier, shiftedAmount, this.slippageTolerance)
-    }
+    let minAmount: BigNumber = await this.getMinExchangeAmount(
+      fromProtocol.identifier,
+      toProtocol.identifier,
+      shiftedAmount,
+      this.slippageTolerance
+    )
 
     return minAmount.shiftedBy(-toProtocol.decimals).toFixed()
   }
 
-  private async getMinTezToTokenExchangeAmount(
-    token: ProtocolSymbols,
-    mutezAmount: BigNumber,
-    slippageTolerance: BigNumber
-  ): Promise<BigNumber> {
-    return this.getMinExchangeAmount(token, mutezAmount, slippageTolerance, { in: 'tez_pool', out: 'token_pool' })
-  }
-
-  private async getMinTokenToTezExchangeAmount(
-    token: ProtocolSymbols,
-    tokenAmount: BigNumber,
-    slippageTolerance: BigNumber
-  ): Promise<BigNumber> {
-    return this.getMinExchangeAmount(token, tokenAmount, slippageTolerance, { in: 'token_pool', out: 'tez_pool' })
+  private dexContractKey(identifiers: ProtocolSymbols[], inverse: boolean = false) {
+    return inverse ? `${identifiers[1]}/${identifiers[0]}` : `${identifiers[0]}/${identifiers[1]}`
   }
 
   private async getMinExchangeAmount(
-    token: ProtocolSymbols,
+    fromIdentifier: ProtocolSymbols,
+    toIdentifier: ProtocolSymbols,
     amount: BigNumber,
-    slippageTolerance: BigNumber,
-    pools: { in: 'tez_pool'; out: 'token_pool' } | { in: 'token_pool'; out: 'tez_pool' }
+    slippageTolerance: BigNumber
   ): Promise<BigNumber> {
-    const storage: DexStorage | undefined = await this.getDexStorage(token)
+    const contractKey = this.dexContractKey([fromIdentifier, toIdentifier])
+    const pools = DEX_CONTRACTS[contractKey]
+      ? {
+        in: 'token1_pool',
+        out: 'token2_pool'
+      }
+      : {
+        in: 'token2_pool',
+        out: 'token1_pool'
+      }
+
+    const storage: DexStorage | undefined = await this.getDexStorage([fromIdentifier, toIdentifier])
     if (storage === undefined) {
       return new BigNumber(0)
     }
 
-    const currentInPool: BigNumber = new BigNumber(storage.storage[pools.in])
-    const currentOutPool: BigNumber = new BigNumber(storage.storage[pools.out])
+    const currentInPool: BigNumber = new BigNumber(storage[pools.in])
+    const currentOutPool: BigNumber = new BigNumber(storage[pools.out])
 
     const constantProduct: BigNumber = currentInPool.multipliedBy(currentOutPool)
-    const expectedInPool: BigNumber = currentInPool.plus(amount.multipliedBy(1 - QUIPUSWAP_FEE))
+    const expectedInPool: BigNumber = currentInPool.plus(amount.multipliedBy(1 - PLENTY_FEE))
     const expectedOutPool: BigNumber = constantProduct.dividedBy(expectedInPool)
 
     return currentOutPool.minus(expectedOutPool).multipliedBy(slippageTolerance.minus(1).abs()).integerValue(BigNumber.ROUND_DOWN)
@@ -265,22 +317,13 @@ export class QuipuswapExchange implements Exchange {
   public async estimateFee(fromWallet: AirGapMarketWallet, toWallet: AirGapMarketWallet, amount: string): Promise<FeeDefaults | undefined> {
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromWallet.protocol.decimals)
 
-    let feeDefaults: FeeDefaults
-    if (fromWallet.protocol.identifier === MainProtocolSymbols.XTZ) {
-      feeDefaults = await this.estimateTezToTokenTransactionFee(
-        fromWallet.publicKey,
-        toWallet.protocol.identifier,
-        shiftedAmount,
-        this.slippageTolerance
-      )
-    } else if (this.supportedTokens.includes(fromWallet.protocol.identifier)) {
-      feeDefaults = await this.estimateTokenToTezTransactionFee(
-        fromWallet.publicKey,
-        fromWallet.protocol.identifier,
-        shiftedAmount,
-        this.slippageTolerance
-      )
-    }
+    const feeDefaults: FeeDefaults = await this.estimateTransactionFee(
+      fromWallet.publicKey,
+      fromWallet.protocol.identifier,
+      toWallet.protocol.identifier,
+      shiftedAmount,
+      this.slippageTolerance
+    )
 
     if (feeDefaults === undefined) {
       throw new Error(`Currency ${fromWallet.protocol.identifier} is not supported.`)
@@ -289,45 +332,25 @@ export class QuipuswapExchange implements Exchange {
     return feeDefaults
   }
 
-  private async estimateTezToTokenTransactionFee(
+  private async estimateTransactionFee(
     publicKey: string,
-    token: ProtocolSymbols,
+    fromIdentifier: ProtocolSymbols,
+    toIdentifier: ProtocolSymbols,
     mutezAmount: BigNumber,
     slippageTolerance: BigNumber
   ): Promise<FeeDefaults> {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
-    const minTokenAmount: BigNumber = await this.getMinTezToTokenExchangeAmount(token, mutezAmount, slippageTolerance)
+    const minTokenAmount: BigNumber = await this.getMinExchangeAmount(fromIdentifier, toIdentifier, mutezAmount, slippageTolerance)
     const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
-    const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
+    const operations: TezosOperation[] = await this.prepareTokenOperations(
       address.address,
       address.address,
-      token,
+      fromIdentifier,
+      toIdentifier,
       mutezAmount,
       minTokenAmount
-    )
-
-    return tezosProtocol.estimateFeeDefaultsForOperations(publicKey, operations)
-  }
-
-  private async estimateTokenToTezTransactionFee(
-    publicKey: string,
-    token: ProtocolSymbols,
-    tokenAmount: BigNumber,
-    slippageTolerance: BigNumber
-  ): Promise<FeeDefaults> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
-
-    const minTezAmount: BigNumber = await this.getMinTokenToTezExchangeAmount(token, tokenAmount, slippageTolerance)
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
-
-    const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
-      address.address,
-      address.address,
-      token,
-      tokenAmount,
-      minTezAmount
     )
 
     return tezosProtocol.estimateFeeDefaultsForOperations(publicKey, operations)
@@ -345,25 +368,19 @@ export class QuipuswapExchange implements Exchange {
     const recipient: string = toWallet.receivingPublicAddress
 
     let minAmount: BigNumber = new BigNumber(0)
-    let tokenProtocol: ICoinProtocol | undefined
-    let transaction: QuipuswapTransaction | undefined
-    if (fromWallet.protocol.identifier === MainProtocolSymbols.XTZ) {
-      tokenProtocol = toWallet.protocol
-      minAmount = await this.getMinTezToTokenExchangeAmount(tokenProtocol.identifier, shiftedAmount, this.slippageTolerance)
-      transaction = await this.createTezToTokenTransaction(
-        fromWallet.publicKey,
-        tokenProtocol,
-        recipient,
+    let transaction: PlentyTransaction | undefined
+
+    if (this.supportedTokens.includes(fromWallet.protocol.identifier)) {
+      minAmount = await this.getMinExchangeAmount(
+        fromWallet.protocol.identifier,
+        toWallet.protocol.identifier,
         shiftedAmount,
-        minAmount,
-        shiftedFee
+        this.slippageTolerance
       )
-    } else if (this.supportedTokens.includes(fromWallet.protocol.identifier)) {
-      tokenProtocol = fromWallet.protocol
-      minAmount = await this.getMinTokenToTezExchangeAmount(tokenProtocol.identifier, shiftedAmount, this.slippageTolerance)
-      transaction = await this.createTokenToTezTransaction(
+      transaction = await this.createTokenTransaction(
         fromWallet.publicKey,
-        tokenProtocol,
+        fromWallet.protocol,
+        toWallet.protocol,
         recipient,
         shiftedAmount,
         minAmount,
@@ -377,7 +394,7 @@ export class QuipuswapExchange implements Exchange {
 
     return {
       payoutAddress: fromWallet.addresses[0],
-      payinAddress: DEX_CONTRACTS[tokenProtocol.identifier],
+      payinAddress: this.getDexContractAddress([fromWallet.protocol.identifier, toWallet.protocol.identifier]),
       amountExpectedFrom: amount,
       amountExpectedTo: minAmount.shiftedBy(-toWallet.protocol.decimals).toFixed(),
       fee,
@@ -391,82 +408,32 @@ export class QuipuswapExchange implements Exchange {
     }
   }
 
-  private async createTezToTokenTransaction(
+  private async createTokenTransaction(
     publicKey: string,
-    tokenProtocol: ICoinProtocol,
-    recipient: string,
-    mutezAmount: BigNumber,
-    minTokenAmount: BigNumber,
-    fee?: BigNumber
-  ): Promise<QuipuswapTransaction> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
-
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
-    const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
-      address.address,
-      recipient,
-      tokenProtocol.identifier,
-      mutezAmount,
-      minTokenAmount,
-      fee
-    )
-    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-    const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
-    const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
-
-    return { details, unsigned: transaction }
-  }
-
-  private async prepareTezToTokenOperations(
-    sourceAddress: string,
-    destinationAddress: string,
-    token: ProtocolSymbols,
-    mutezAmount: BigNumber,
-    minTokenAmount: BigNumber,
-    fee?: BigNumber
-  ): Promise<TezosOperation[]> {
-    const contract: Contract | undefined = await this.getDexContract(token)
-    if (contract === undefined) {
-      throw new Error('Could not create an exchange transaction.')
-    }
-
-    const payment: TransferParams = contract.methods[DEX_ENTRYPOINTS.tezToTokenPayment](
-      minTokenAmount.toNumber(),
-      destinationAddress
-    ).toTransferParams({ source: sourceAddress, amount: mutezAmount.toNumber(), mutez: true, fee: fee?.toNumber() })
-
-    const paymentOperation: PartialTransactionOperation = this.prepareTransactionOperation(payment)
-
-    return [paymentOperation]
-  }
-
-  private async createTokenToTezTransaction(
-    publicKey: string,
-    tokenProtocol: ICoinProtocol,
+    fromProtocol: ICoinProtocol,
+    toProtocol: ICoinProtocol,
     recipient: string,
     tokenAmount: BigNumber,
-    minTezAmount: BigNumber,
+    minReceivedAmount: BigNumber,
     fee?: BigNumber
-  ): Promise<QuipuswapTransaction> {
+  ): Promise<PlentyTransaction> {
     const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
 
     const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
-    const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
+    const operations: TezosOperation[] = await this.prepareTokenOperations(
       address.address,
       recipient,
-      tokenProtocol.identifier,
+      fromProtocol.identifier,
+      toProtocol.identifier,
       tokenAmount,
-      minTezAmount,
+      minReceivedAmount,
       fee
     )
 
-
-    console.log(publicKey)
-    console.log(JSON.stringify(operations, null, 2))
     const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
     const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
-    const baseDetails: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
-    const extendedDetails: IAirGapTransaction[] = await this.getExtendedTokenTransactionDetails(tokenProtocol, baseDetails)
+    const baseDetails: IAirGapTransaction[] = await toProtocol.getTransactionDetails({ publicKey, transaction })
+    const extendedDetails: IAirGapTransaction[] = await this.getExtendedTokenTransactionDetails(fromProtocol, toProtocol, baseDetails)
 
     return {
       details: extendedDetails,
@@ -474,42 +441,52 @@ export class QuipuswapExchange implements Exchange {
     }
   }
 
-  private async prepareTokenToTezOperations(
+  private async prepareTokenOperations(
     sourceAddress: string,
     destinationAddress: string,
-    token: ProtocolSymbols,
+    fromIdentifier: ProtocolSymbols,
+    toIdentifier: ProtocolSymbols,
     tokenAmount: BigNumber,
-    minTezAmount: BigNumber,
+    minReceivedAmount: BigNumber,
     fee?: BigNumber
   ): Promise<TezosOperation[]> {
-    const dexContract: Contract | undefined = await this.getDexContract(token)
+    const dexContract: Contract | undefined = await this.getDexContract([fromIdentifier, toIdentifier])
     if (dexContract === undefined) {
       throw new Error('Could not create an exchange transaction.')
     }
 
     const storage: DexStorage = await this.getDexStorage(dexContract)
 
-    const tokenAddress: string = storage.storage.token_address
-    const tokenContract: Contract = await this.getContract(tokenAddress)
+    const inverseDirection = this.isSwapDirectionInverse([fromIdentifier, toIdentifier])
+    const inputTokenAddress: string = inverseDirection ? storage.token2Address : storage.token1Address
+    const inputTokenContract: Contract = await this.getContract(inputTokenAddress)
+    const outputTokenAddress: string = inverseDirection ? storage.token1Address : storage.token2Address
+    const outputTokenId: number = inverseDirection ? storage.token1Id : storage.token2Id
 
-    if (this.isFA1p2(tokenContract)) {
-      return this.prepareFA1p2TokenToTezOperations(
+    if (this.isFA1p2(inputTokenContract)) {
+      return this.prepareFA1p2TokenOperations(
         dexContract,
-        tokenContract,
+        inputTokenContract,
         sourceAddress,
         destinationAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        outputTokenId,
         tokenAmount,
-        minTezAmount,
+        minReceivedAmount,
         fee
       )
-    } else if (this.isFA2(tokenContract)) {
+    } else if (this.isFA2(inputTokenContract)) {
       return this.prepareFA2TokenToTezOperations(
         dexContract,
-        tokenContract,
+        inputTokenContract,
         sourceAddress,
         destinationAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        outputTokenId,
         tokenAmount,
-        minTezAmount,
+        minReceivedAmount,
         fee
       )
     } else {
@@ -517,79 +494,86 @@ export class QuipuswapExchange implements Exchange {
     }
   }
 
-  private async prepareFA1p2TokenToTezOperations(
+  private async prepareFA1p2TokenOperations(
     dexContract: Contract,
-    tokenContract: Contract,
+    inputTokenContract: Contract,
     sourceAddress: string,
     destinationAddress: string,
+    inputTokenAddress: string,
+    outputTokenAddress: string,
+    outputTokenId: number,
     tokenAmount: BigNumber,
-    minTezAmount: BigNumber,
+    minReceivedAmount: BigNumber,
     fee?: BigNumber
   ): Promise<TezosOperation[]> {
-    const approve: TransferParams = tokenContract.methods[FA1p2_ENTRYPOINTS.approve](
+    const approve: TransferParams = inputTokenContract.methods[FA1p2_ENTRYPOINTS.approve](
       dexContract.address,
       tokenAmount.toNumber()
     ).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
-    const payment: TransferParams = dexContract.methods[DEX_ENTRYPOINTS.tokenToTezPayment](
-      tokenAmount.toFixed(),
-      minTezAmount.toFixed(),
-      destinationAddress
+    const swap: TransferParams = dexContract.methods[DEX_ENTRYPOINTS.swap](
+      minReceivedAmount.toFixed(),
+      destinationAddress,
+      outputTokenAddress,
+      outputTokenId,
+      tokenAmount.toFixed()
     ).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
-    const approveOperation: PartialTransactionOperation = this.prepareTransactionOperation(approve)
-    const paymentOperation: PartialTransactionOperation = this.prepareTransactionOperation(payment)
-
-    return [approveOperation, paymentOperation]
+    const approveOperation: PartialTransactionOperation = this.prepareApproveOperation(approve, inputTokenAddress)
+    const swapOperation: PartialTransactionOperation = this.prepareTransactionOperation(swap)
+    return [approveOperation, swapOperation]
   }
 
   private async prepareFA2TokenToTezOperations(
     dexContract: Contract,
-    tokenContract: Contract,
+    inputTokenContract: Contract,
     sourceAddress: string,
     destinationAddress: string,
+    _inputTokenAddress: string,
+    outputTokenAddress: string,
+    outputTokenId: number,
     tokenAmount: BigNumber,
-    minTezAmount: BigNumber,
+    minReceivedAmount: BigNumber,
     fee?: BigNumber
   ): Promise<TezosOperation[]> {
-    const storage: DexStorage = await this.getDexStorage(dexContract)
-    const tokenId: number = storage.storage.token_id
-
-    const addOperator: TransferParams = tokenContract.methods[FA2_ENTRYPOINTS.updateOperators]([
+    const addOperator: TransferParams = inputTokenContract.methods[FA2_ENTRYPOINTS.updateOperators]([
       {
         add_operator: {
           owner: sourceAddress,
           operator: dexContract.address,
-          token_id: tokenId
+          token_id: outputTokenId
         }
       }
     ]).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
-    const payment: TransferParams = dexContract.methods[DEX_ENTRYPOINTS.tokenToTezPayment](
-      tokenAmount.toFixed(),
-      minTezAmount.toFixed(),
-      destinationAddress
+    const swap: TransferParams = dexContract.methods[DEX_ENTRYPOINTS.swap](
+      minReceivedAmount.toFixed(),
+      destinationAddress,
+      outputTokenAddress,
+      outputTokenId,
+      tokenAmount.toFixed()
     ).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
-    const removeOperator: TransferParams = tokenContract.methods[FA2_ENTRYPOINTS.updateOperators]([
+    const removeOperator: TransferParams = inputTokenContract.methods[FA2_ENTRYPOINTS.updateOperators]([
       {
         remove_operator: {
           owner: sourceAddress,
           operator: dexContract.address,
-          token_id: tokenId
+          token_id: outputTokenId
         }
       }
-    ]).toTransferParams({ source: sourceAddress })
+    ]).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
     const addOperatorOperation: PartialTransactionOperation = this.prepareTransactionOperation(addOperator)
-    const paymentOperation: PartialTransactionOperation = this.prepareTransactionOperation(payment)
+    const swapOperation: PartialTransactionOperation = this.prepareTransactionOperation(swap)
     const removeOperatorOperation: PartialTransactionOperation = this.prepareTransactionOperation(removeOperator)
 
-    return [addOperatorOperation, paymentOperation, removeOperatorOperation]
+    return [addOperatorOperation, swapOperation, removeOperatorOperation]
   }
 
   private async getExtendedTokenTransactionDetails(
-    tokenProtocol: ICoinProtocol,
+    fromProtocol: ICoinProtocol,
+    toProtocol: ICoinProtocol,
     baseDetails: IAirGapTransaction[]
   ): Promise<IAirGapTransaction[]> {
     return Promise.all(
@@ -598,7 +582,7 @@ export class QuipuswapExchange implements Exchange {
 
         let extendedDetails: Partial<IAirGapTransaction> = {}
         if (parameters?.entrypoint === DEX_ENTRYPOINTS.tokenToTezPayment) {
-          extendedDetails = await this.getDetailsFromTokenToTezPayment(tokenProtocol, parameters)
+          extendedDetails = await this.getDetailsFromTokenToTezPayment(fromProtocol, toProtocol, parameters)
         }
 
         return Object.assign(details, extendedDetails)
@@ -607,10 +591,11 @@ export class QuipuswapExchange implements Exchange {
   }
 
   private async getDetailsFromTokenToTezPayment(
-    tokenProtocol: ICoinProtocol,
+    fromProtocol: ICoinProtocol,
+    toProtocol: ICoinProtocol,
     parameters: TezosTransactionParameters
   ): Promise<Partial<IAirGapTransaction>> {
-    const contract: Contract = await this.getDexContract(tokenProtocol.identifier)
+    const contract: Contract = await this.getDexContract([fromProtocol.identifier, toProtocol.identifier])
     if (contract === undefined) {
       return {}
     }
@@ -633,9 +618,9 @@ export class QuipuswapExchange implements Exchange {
       const transactionStatuses: AirGapTransactionStatus[] = await tezosProtocol.getTransactionStatuses([transactionId])
       const transactionStatus: AirGapTransactionStatus = transactionStatuses[0]
 
-      return new QuipuswapTransactionStatusResponse(transactionStatus)
+      return new PlentyTransactionStatusResponse(transactionStatus)
     } catch {
-      return new QuipuswapTransactionStatusResponse('not_injected')
+      return new PlentyTransactionStatusResponse('not_injected')
     }
   }
 
@@ -660,7 +645,7 @@ export class QuipuswapExchange implements Exchange {
   }
 
   public async getCustomUI(): Promise<ExchangeUI> {
-    const defaultSlippageTolerance: keyof QuipuswapSlippageTolerance = 'low'
+    const defaultSlippageTolerance: keyof PlentySlippageTolerance = 'low'
     const defaultValue: string = this.slippageDefaults[defaultSlippageTolerance].toString()
 
     const valueToControlValue = (value: string) => new BigNumber(value).multipliedBy(100).toFixed()
@@ -702,7 +687,7 @@ export class QuipuswapExchange implements Exchange {
   }
 
   private getAirGapIdentifier(identifier: string): ProtocolSymbols | undefined {
-    return isProtocolSymbol(identifier) ? identifier : this.exchangeIdentifierToAirGapIdentifier(identifier)
+    return isProtocolSymbol(identifier) ? identifier : undefined
   }
 
   private async getProtocol(currency: string): Promise<ICoinProtocol | undefined> {
@@ -728,7 +713,10 @@ export class QuipuswapExchange implements Exchange {
     return this.tezos.contract.at(address)
   }
 
-  private async getDexContract(identifier: ProtocolSymbols): Promise<Contract | undefined> {
+  private async getDexContract(identifiers: ProtocolSymbols[]): Promise<Contract | undefined> {
+    const contractKey = this.dexContractKey(identifiers)
+    const identifier = DEX_CONTRACTS[contractKey] ? contractKey : this.dexContractKey(identifiers, true)
+
     if (!this.dexContracts.has(identifier)) {
       const address: string | undefined = DEX_CONTRACTS[identifier]
       const contract: Contract | undefined = address ? await this.getContract(address) : undefined
@@ -741,33 +729,34 @@ export class QuipuswapExchange implements Exchange {
     return this.dexContracts.get(identifier)
   }
 
-  private async getDexStorage(identifier: ProtocolSymbols): Promise<DexStorage | undefined>
+  private isSwapDirectionInverse(identifiers: ProtocolSymbols[]): boolean {
+    const contractKey = this.dexContractKey(identifiers)
+    return DEX_CONTRACTS[contractKey] ? false : true
+  }
+
+  private getDexContractAddress(identifiers: ProtocolSymbols[]): string {
+    const contractKey = this.dexContractKey(identifiers)
+    const identifier = DEX_CONTRACTS[contractKey] ? contractKey : this.dexContractKey(identifiers, true)
+    return DEX_CONTRACTS[identifier]
+  }
+
+  private async getDexStorage(identifiers: ProtocolSymbols[]): Promise<DexStorage | undefined>
   private async getDexStorage(contract: Contract): Promise<DexStorage>
-  private async getDexStorage(identifierOrContract: ProtocolSymbols | Contract): Promise<DexStorage | undefined> {
-    const contract: Contract | undefined =
-      typeof identifierOrContract === 'string' ? await this.getDexContract(identifierOrContract) : identifierOrContract
+  private async getDexStorage(identifiersOrContract: ProtocolSymbols[] | Contract): Promise<DexStorage | undefined> {
+    const contract: Contract | undefined = Array.isArray(identifiersOrContract)
+      ? await this.getDexContract(identifiersOrContract)
+      : identifiersOrContract
 
     return contract?.storage()
   }
 
-  private async getMaxTezAmount(identifier: ProtocolSymbols): Promise<BigNumber | undefined> {
-    const storage: DexStorage | undefined = await this.getDexStorage(identifier)
+  private async getMaxTokenAmount(identifiers: ProtocolSymbols[]): Promise<BigNumber | undefined> {
+    const storage: DexStorage | undefined = await this.getDexStorage(identifiers)
     if (storage === undefined) {
       return undefined
     }
 
-    const tezPool: number = storage.storage.tez_pool
-
-    return new BigNumber(tezPool).dividedBy(3)
-  }
-
-  private async getMaxTokenAmount(identifier: ProtocolSymbols): Promise<BigNumber | undefined> {
-    const storage: DexStorage | undefined = await this.getDexStorage(identifier)
-    if (storage === undefined) {
-      return undefined
-    }
-
-    const tokenPool: number = storage.storage.token_pool
+    const tokenPool: number = storage.token2_pool
 
     return new BigNumber(tokenPool).dividedBy(3)
   }
@@ -779,6 +768,17 @@ export class QuipuswapExchange implements Exchange {
       fee: transferParams.fee?.toString(),
       amount: transferParams.amount.toString(),
       destination: transferParams.to,
+      parameters: transferParams.parameter as any
+    }
+  }
+
+  private prepareApproveOperation(transferParams: TransferParams, destination: string): PartialTransactionOperation {
+    return {
+      kind: TezosOperationType.TRANSACTION,
+      source: transferParams.source,
+      fee: transferParams.fee?.toString(),
+      amount: transferParams.amount.toString(),
+      destination,
       parameters: transferParams.parameter as any
     }
   }

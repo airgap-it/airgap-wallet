@@ -1,0 +1,60 @@
+<swap
+  [amountControl]="amountControl"
+  [liquidity]="true"
+  [customBalance]="customBalance"
+  [customSymbol]="customSymbol"
+  [selectedWallet]="selectedWallet"
+  [supportedWallets]="supportedWallets"
+  [selectedProtocol]="selectedProtocol"
+  [supportedProtocols]="supportedProtocols"
+  [amount]="amount"
+  [minExchangeAmount]="minExchangeAmount"
+  [currentlyNotSupported]="currentlyNotSupported"
+></swap>
+
+<ion-row class="ion-padding-horizontal ion-padding-bottom">
+  <ion-col size="12" class="ion-padding-vertical">
+    <ion-text color="blackLight">
+      <ion-label>
+        You receive
+      </ion-label>
+    </ion-text>
+  </ion-col>
+  <ion-col size="12">
+    <div class="small d-flex ion-align-items-center receive__container">
+      <div class="d-flex ion-align-items-center">
+        <img [src]="'./assets/symbols/xtz.svg'" />
+
+        <ng-container *ngIf="minCurrencyLiquidated$ | async as minCurrencyLiquidated">
+          <ng-container *ngIf="minCurrencyLiquidated > 0; else zero">
+            {{
+              minCurrencyLiquidated
+                ?.multipliedBy((selectedSlippage$ | async)?.minus(1).abs())
+                .shiftedBy(-6)
+                .toString()
+            }}
+          </ng-container>
+        </ng-container>
+      </div>
+      <ion-icon name="add" color="secondary" class="ion-margin-horizontal"></ion-icon>
+      <div class="d-flex ion-align-items-center">
+        <img [src]="'./assets/symbols/tzbtc.svg'" />
+
+        <ng-container *ngIf="minCurrencyLiquidated$ | async as minCurrencyLiquidated">
+          <ng-container *ngIf="minCurrencyLiquidated > 0; else zero">
+            {{
+              (minTokensLiquidated$ | async)
+                ?.multipliedBy((selectedSlippage$ | async)?.minus(1).abs())
+                .shiftedBy(-6)
+                .toString()
+            }}
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <ng-template #zero>
+        0
+      </ng-template>
+    </div>
+  </ion-col>
+</ion-row>

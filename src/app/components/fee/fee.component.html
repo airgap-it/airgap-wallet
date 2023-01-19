@@ -1,4 +1,4 @@
-<form [formGroup]="form">
+<form [formGroup]="form" *ngIf="_wallet">
   <ion-row class="fee--amount__label ion-padding-horizontal">
     <ion-col size="12" class="ion-no-padding">
       <ion-item lines="none" class="ion-no-padding">
@@ -72,11 +72,11 @@
                 ${{ form.get('fee').value * state.feeCurrentMarketPrice | number: '1.2-4' }}
               </ng-container>
             </span>
-            <span id="fee-amount-advanced" *ngIf="state">
+            <span id="fee-amount-advanced" *ngIf="state?.fee?.value > 0">
               ({{ state.fee.value | number: '1.2-6' }} {{ _wallet.protocol.feeSymbol | uppercase }})
             </span>
           </ng-container>
-          <ion-skeleton-text animated style="width: 30%" *ngIf="state && state.estimatingFeeDefaults"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 30%;" *ngIf="state && state.estimatingFeeDefaults"></ion-skeleton-text>
         </p>
       </ion-text>
     </ion-col>

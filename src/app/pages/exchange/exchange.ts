@@ -3,6 +3,7 @@ import {
   AirGapMarketWallet,
   AirGapWalletStatus,
   FeeDefaults,
+  IAirGapTransaction,
   ICoinProtocol,
   MainProtocolSymbols,
   ProtocolSymbols,
@@ -10,32 +11,38 @@ import {
 } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { EthereumProtocol } from '@airgap/ethereum'
-import { Component, NgZone } from '@angular/core'
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
-import { AlertController, LoadingController, ModalController } from '@ionic/angular'
+import { AlertController, LoadingController } from '@ionic/angular'
+import { Store } from '@ngrx/store'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
-import { BehaviorSubject, Subject } from 'rxjs'
-import { debounceTime, first, takeUntil } from 'rxjs/operators'
-
+import { BehaviorSubject, Observable, OperatorFunction, pipe, Subject, UnaryFunction } from 'rxjs'
+import { debounceTime, filter, first, take, takeUntil } from 'rxjs/operators'
 import { UIWidget } from '../../models/widgets/UIWidget'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
-import { ExchangeEnum, ExchangeProvider, ExchangeTransactionDetails } from '../../services/exchange/exchange'
+import { ExchangeEnum, ExchangeProvider, ExchangeTransactionDetails, LiquidityExchangeEnum } from '../../services/exchange/exchange'
 import { ExchangeTransaction, ExchangeUI } from '../../services/exchange/exchange.interface'
 import { PriceService } from '../../services/price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
+import * as fromExchange from './reducer'
+import { getFromWallet, getToWallet } from './selectors'
+import * as actions from './actions'
+import { SegmentType } from './reducer'
+import { TezosProtocol } from '@airgap/tezos'
+import { IACMessageType } from '@airgap/serializer'
 
-import { ExchangeSelectPage } from './../exchange-select/exchange-select.page'
-
+export function filterNullish<T>(): UnaryFunction<Observable<T | null | undefined>, Observable<T>> {
+  return pipe(filter((x) => x != null) as OperatorFunction<T | null | undefined, T>)
+}
 interface ExchangeFormState<T> {
   value: T
   dirty: boolean
 }
-interface ExchangeState {
-  fromWalletBalance: BigNumber | null
+export interface ExchangeState {
   feeDefaults: FeeDefaults
   feeCurrentMarketPrice: number | null
   disableFeeSlider: boolean
@@ -62,38 +69,39 @@ enum ExchangePageState {
   templateUrl: 'exchange.html',
   styleUrls: ['./exchange.scss']
 })
-export class ExchangePage {
+export class ExchangePage implements OnInit, OnDestroy {
   // TODO remove unused properties
+
+  public fromWallet$: Observable<AirGapMarketWallet>
+  public fromWalletBalance$: Observable<BigNumber>
+  public toWallet$: Observable<AirGapMarketWallet>
+  public toWalletBalance$: Observable<BigNumber>
+  public currentlyNotSupported$: Observable<boolean>
   public selectedFromProtocol: ICoinProtocol
   public selectedToProtocol: ICoinProtocol
   public supportedProtocolsFrom: ProtocolSymbols[] = []
   public supportedProtocolsTo: ProtocolSymbols[] = []
-  public currentlyNotSupported: boolean = false
-  public fromWallet: AirGapMarketWallet
   public supportedFromWallets: AirGapMarketWallet[]
-  public toWallet: AirGapMarketWallet
   public supportedToWallets: AirGapMarketWallet[]
-  public minExchangeAmount: BigNumber = new BigNumber(0)
   public amount: BigNumber = new BigNumber(0)
-  public exchangeAmount: BigNumber
   public disableExchangeSelection: boolean = false
-
+  public removeLiquiditySymbol: string
   public activeExchange$: BehaviorSubject<ExchangeEnum | undefined> = new BehaviorSubject(undefined)
   public activeExchange: ExchangeEnum
-
   public exchangeForm: FormGroup
+  public removeLiquidityBalance$: Observable<BigNumber>
+  public fiatInputAmount$: Observable<BigNumber>
+  public fiatExchangeAmount$: Observable<BigNumber>
+  public exchangeAmount$: Observable<BigNumber>
+  public inputAmount$: Observable<BigNumber>
+  public minExchangeAmount$: Observable<BigNumber>
+  public buttonDisabled$: Observable<boolean>
 
-  get isTZBTCExchange(): boolean {
-    return (
-      (this.selectedFromProtocol !== undefined && this.selectedFromProtocol.identifier === SubProtocolSymbols.XTZ_BTC) ||
-      (this.selectedToProtocol !== undefined && this.selectedToProtocol.identifier === SubProtocolSymbols.XTZ_BTC)
-    )
-  }
+  private fromWallet: AirGapMarketWallet
+  private toWallet: AirGapMarketWallet
 
   // temporary field until we figure out how to handle Substrate fee/tip model
   private isSubstrate: boolean = false
-
-  public ExchangeEnum: typeof ExchangeEnum = ExchangeEnum
 
   public exchangePageStates: typeof ExchangePageState = ExchangePageState
   public exchangePageState: ExchangePageState = ExchangePageState.LOADING
@@ -108,6 +116,10 @@ export class ExchangePage {
   private readonly state$: BehaviorSubject<ExchangeState> = new BehaviorSubject(this._state)
   private readonly ngDestroyed$: Subject<void> = new Subject()
 
+  public segmentType: string = SegmentType.SWAP
+  public segmentTypeInner: string = SegmentType.ADD_LIQUIDITY
+  public formGroup: FormGroup
+
   constructor(
     public formBuilder: FormBuilder,
     private readonly router: Router,
@@ -117,12 +129,46 @@ export class ExchangePage {
     private readonly dataService: DataService,
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService,
-    private readonly modalController: ModalController,
     private readonly alertCtrl: AlertController,
     private readonly priceService: PriceService,
     private readonly protocolService: ProtocolService,
-    private readonly _ngZone: NgZone
-  ) {}
+    private readonly _ngZone: NgZone,
+    private readonly store$: Store<fromExchange.State>
+  ) {
+    this.formGroup = this.formBuilder.group({
+      amountControl: [null, [Validators.min(0), Validators.required, Validators.pattern('^[+-]?(\\d*\\.)?\\d+$')]]
+    })
+  }
+
+  ngOnInit() {
+    this.fromWallet$ = this.store$.select(getFromWallet)
+    this.fromWallet$.pipe(filterNullish(), takeUntil(this.ngDestroyed$)).subscribe((wallet) => (this.fromWallet = wallet))
+    this.toWallet$ = this.store$.select(getToWallet)
+    this.toWallet$.pipe(filterNullish(), takeUntil(this.ngDestroyed$)).subscribe((wallet) => (this.toWallet = wallet))
+
+    this.fromWalletBalance$ = this.store$.select((state) => state.exchange.fromWalletBalance)
+    this.toWalletBalance$ = this.store$.select((state) => state.exchange.toWalletBalance)
+    this.currentlyNotSupported$ = this.store$.select((state) => state.exchange.currentlyNotSupported)
+    this.exchangeAmount$ = this.store$.select((state) => state.exchange.exchangeAmount)
+    this.inputAmount$ = this.store$.select((state) => state.exchange.amount)
+    this.inputAmount$.pipe(takeUntil(this.ngDestroyed$)).subscribe((amount) => {
+      this.amount = amount
+      if (new BigNumber(amount).gt(0)) {
+        this.updateFeeEstimate()
+      }
+    })
+
+    this.fiatInputAmount$ = this.store$.select((state) => state.exchange.fiatInputAmount)
+    this.fiatExchangeAmount$ = this.store$.select((state) => state.exchange.fiatExchangeAmount)
+    this.minExchangeAmount$ = this.store$.select((state) => state.exchange.minExchangeAmount)
+    this.removeLiquidityBalance$ = this.store$.select((state) => state.exchange.removeLiquidityBalance)
+    this.buttonDisabled$ = this.store$.select((state) => state.exchange.buttonDisabled)
+
+    this.formGroup.controls['amountControl'].valueChanges.pipe(takeUntil(this.ngDestroyed$), debounceTime(200)).subscribe((amount) => {
+      this.store$.dispatch(actions.setAmount({ amount: new BigNumber(amount) }))
+      this.loadDataFromExchange()
+    })
+  }
 
   public ionViewWillEnter() {
     this.initForm()
@@ -174,6 +220,9 @@ export class ExchangePage {
       this.exchangeForm.addControl(this.activeExchange, exchangeUI.form)
       this.updateState({ providerState: exchangeUI.form.value })
       this.exchangeForm.controls[this.activeExchange].valueChanges.subscribe((providerState) => {
+        if (providerState.slippageTolerance) {
+          this.exchangeProvider.setSlippage(new BigNumber(providerState.slippageTolerance))
+        }
         this.updateState({ providerState })
       })
     }
@@ -189,7 +238,6 @@ export class ExchangePage {
 
   private initState(): void {
     this._state = {
-      fromWalletBalance: null,
       feeDefaults: {
         low: '0',
         medium: '0',
@@ -306,8 +354,12 @@ export class ExchangePage {
     if (this._state) {
       let feeCurrentMarketPrice
       if (this.selectedFromProtocol?.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
-        feeCurrentMarketPrice = this.priceService
+        feeCurrentMarketPrice = await this.priceService
           .getCurrentMarketPrice(new EthereumProtocol(), 'USD')
+          .then((price: BigNumber) => price.toNumber())
+      } else if (this.selectedFromProtocol?.identifier === SubProtocolSymbols.XTZ_BTC) {
+        feeCurrentMarketPrice = await this.priceService
+          .getCurrentMarketPrice(new TezosProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
       } else {
         feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()
@@ -362,27 +414,23 @@ export class ExchangePage {
   }
 
   private async filterSupportedProtocols(protocols: ProtocolSymbols[], filterZeroBalance: boolean = true): Promise<ProtocolSymbols[]> {
-    const result: ProtocolSymbols[] = protocols.filter((supportedProtocol: ProtocolSymbols) =>
+    return protocols.filter((supportedProtocol: ProtocolSymbols) =>
       this.walletList.some(
         (wallet: AirGapMarketWallet) =>
           wallet.protocol.identifier === supportedProtocol &&
-          (!filterZeroBalance || (filterZeroBalance && wallet.getCurrentBalance().isGreaterThan(0)))
+          (!filterZeroBalance || (filterZeroBalance && wallet.getCurrentBalance()?.isGreaterThan(0)))
       )
     )
-    const tzbtcIndex: number = result.indexOf(SubProtocolSymbols.XTZ_BTC)
-    if (
-      tzbtcIndex !== -1 &&
-      !this.walletList.some((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.BTC)
-    ) {
-      result.splice(tzbtcIndex, 1)
-    }
-
-    return result
   }
 
-  private async setup(): Promise<void> {
+  public async setup(): Promise<void> {
     await this.activeExchange$.pipe(first()).toPromise()
+
+    if (this.isLiquidityExchange(this.activeExchange)) {
+      this.toggleAddLiquidity()
+    }
     const fromProtocols: ProtocolSymbols[] = await this.getSupportedFromProtocols()
+
     if (fromProtocols.length === 0) {
       this.supportedProtocolsFrom = []
       this.supportedProtocolsTo = []
@@ -456,46 +504,59 @@ export class ExchangePage {
     alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
-  private async getSupportedFromProtocols(): Promise<ProtocolSymbols[]> {
+  private async getSupportedFromProtocols(retry: number = 0): Promise<ProtocolSymbols[]> {
     const allFromProtocols = await this.exchangeProvider.getAvailableFromCurrencies()
-    allFromProtocols.push(SubProtocolSymbols.XTZ_BTC, MainProtocolSymbols.BTC_SEGWIT)
     const supportedFromProtocols = await this.filterSupportedProtocols(allFromProtocols)
+
     const exchangeableFromProtocols = (
       await Promise.all(
         supportedFromProtocols.map(async (fromProtocol) => {
-          if (fromProtocol === SubProtocolSymbols.XTZ_BTC || fromProtocol === MainProtocolSymbols.BTC_SEGWIT) {
+          if (fromProtocol === MainProtocolSymbols.BTC_SEGWIT) {
             return fromProtocol
           }
-          const availableToCurrencies = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)
+          const availableToCurrencies = (await this.exchangeProvider.getAvailableToCurrenciesForCurrency(fromProtocol)).filter(
+            (currency) => {
+              const availableIdentifiers = this.walletList.map((wallet) => wallet.protocol.identifier)
+              return availableIdentifiers.includes(currency)
+            }
+          )
           return availableToCurrencies.length > 0 ? fromProtocol : undefined
         })
       )
     ).filter((fromProtocol) => fromProtocol !== undefined)
+
+    const maxRetry = this.exchangeProvider.numberOfAvailableSwapExchanges() - 1
+
+    if (exchangeableFromProtocols.length === 0 && retry < maxRetry && this.segmentType === SegmentType.SWAP) {
+      this.exchangePageState = ExchangePageState.EXCHANGE
+      this.exchangeProvider.switchActiveExchange()
+      await this.activeExchange$.pipe(first()).toPromise()
+      return this.getSupportedFromProtocols((retry += 1))
+    }
     return exchangeableFromProtocols
   }
 
   private async getSupportedToProtocols(from: string): Promise<ProtocolSymbols[]> {
-    if (from === SubProtocolSymbols.XTZ_BTC) {
-      return this.filterSupportedProtocols([MainProtocolSymbols.BTC], false)
-    }
     const toProtocols = await this.exchangeProvider.getAvailableToCurrenciesForCurrency(from)
-    if (from === MainProtocolSymbols.BTC) {
-      toProtocols.push(SubProtocolSymbols.XTZ_BTC)
-    } else {
-      toProtocols.push(MainProtocolSymbols.BTC_SEGWIT)
-    }
     return this.filterSupportedProtocols(toProtocols, false)
   }
 
-  async setFromProtocol(protocol: ICoinProtocol): Promise<void> {
+  async setFromProtocol(protocol: ICoinProtocol, retry: number = 0): Promise<void> {
     this.selectedFromProtocol = protocol
     this.supportedProtocolsTo = await this.getSupportedToProtocols(protocol.identifier)
-
+    const maxRetry = this.exchangeProvider.numberOfAvailableSwapExchanges() - 1
     if (this.supportedProtocolsTo.length === 0) {
+      if (retry < maxRetry && this.segmentType === SegmentType.SWAP) {
+        this.exchangePageState = ExchangePageState.EXCHANGE
+        this.exchangeProvider.switchActiveExchange()
+        await this.activeExchange$.pipe(first()).toPromise()
+        return this.setFromProtocol(protocol, (retry += 1))
+      }
       this.supportedProtocolsFrom = []
       this.supportedProtocolsTo = []
       this.selectedFromProtocol = undefined
       this.selectedToProtocol = undefined
+
       this.exchangePageState = ExchangePageState.NOT_ENOUGH_CURRENCIES
       return
     }
@@ -511,6 +572,7 @@ export class ExchangePage {
     }
 
     this.loadWalletsForSelectedFromProtocol()
+
     this.loadDataFromExchange()
     // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
     this.accountProvider.triggerWalletChanged()
@@ -526,22 +588,24 @@ export class ExchangePage {
   }
 
   private loadWalletsForSelectedFromProtocol() {
-    this.supportedFromWallets = this.walletsForProtocol(this.selectedFromProtocol.identifier, true)
+    this.supportedFromWallets = this.walletsForProtocol(this.selectedFromProtocol?.identifier, true)
+
     // Only set wallet if it's another protocol or not available
     if (this.shouldReplaceActiveWallet(this.fromWallet, this.supportedFromWallets)) {
-      this.fromWallet = this.supportedFromWallets[0]
-      this.updateState({
-        fromWalletBalance: this.fromWallet?.getCurrentBalance()
-      })
+      if (this.supportedFromWallets.length > 0) {
+        this.store$.dispatch(actions.setFromWallet({ fromWallet: this.supportedFromWallets[0] }))
+      }
     }
   }
 
   private loadWalletsForSelectedToProtocol() {
     this.supportedToWallets = this.walletsForProtocol(this.selectedToProtocol.identifier, false)
-    this.toWallet = this.supportedToWallets[0]
+
+    this.store$.dispatch(actions.setToWallet({ toWallet: this.supportedToWallets[0] }))
     // Only set wallet if it's another protocol or not available
+
     if (this.shouldReplaceActiveWallet(this.toWallet, this.supportedToWallets)) {
-      this.toWallet = this.supportedToWallets[0]
+      this.store$.dispatch(actions.setToWallet({ toWallet: this.supportedToWallets[0] }))
     }
   }
 
@@ -557,13 +621,24 @@ export class ExchangePage {
   private shouldReplaceActiveWallet(wallet: AirGapMarketWallet, walletArray: AirGapMarketWallet[]): boolean {
     return (
       !wallet ||
-      wallet.protocol.identifier !== walletArray[0].protocol.identifier ||
+      wallet?.protocol.identifier !== walletArray[0]?.protocol.identifier ||
       walletArray.every((supportedWallet) => !this.accountProvider.isSameWallet(supportedWallet, wallet))
     )
   }
 
-  async setFromWallet(wallet: AirGapMarketWallet) {
-    this.fromWallet = wallet
+  async setFromWallet(fromWallet: AirGapMarketWallet, setToWallet: boolean = false) {
+    if (!fromWallet) {
+      return
+    }
+    this.store$.dispatch(actions.setFromWallet({ fromWallet }))
+
+    if (setToWallet) {
+      const walletWithSameAddress = this.supportedToWallets.find((wallet) => wallet.addresses.includes(fromWallet.addresses[0]))
+      if (walletWithSameAddress) {
+        this.store$.dispatch(actions.setToWallet({ toWallet: walletWithSameAddress }))
+      }
+    }
+
     this.isSubstrate =
       this.fromWallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
       this.selectedFromProtocol.identifier === MainProtocolSymbols.POLKADOT
@@ -572,123 +647,89 @@ export class ExchangePage {
     this.accountProvider.triggerWalletChanged()
   }
 
-  async setToWallet(wallet: AirGapMarketWallet) {
-    this.toWallet = wallet
+  async setToWallet(toWallet: AirGapMarketWallet) {
+    this.store$.dispatch(actions.setToWallet({ toWallet }))
+
     this.loadDataFromExchange()
     // TODO: this is needed to update the amount in the portfolio-item component, need to find a better way to do this.
     this.accountProvider.triggerWalletChanged()
   }
 
-  async amountSet(amount: string) {
-    this.amount = new BigNumber(amount)
-    this.updateFeeEstimate()
-    this.loadDataFromExchange()
-  }
-
   private async loadDataFromExchange() {
-    this.currentlyNotSupported = false
-    try {
-      if (this.fromWallet && this.toWallet) {
-        this.minExchangeAmount = await this.getMinAmountForCurrency()
-      }
-      if (this.fromWallet && this.toWallet && this.amount.isGreaterThan(0)) {
-        this.exchangeAmount = new BigNumber(await this.getExchangeAmount())
-      } else {
-        this.exchangeAmount = new BigNumber(0)
-      }
-    } catch (error) {
-      this.currentlyNotSupported = true
-    }
+    this.store$.dispatch(actions.loadExchangeData({ amount: new BigNumber(this.formGroup.controls['amountControl'].value) }))
   }
 
-  private async getMinAmountForCurrency(): Promise<BigNumber> {
-    if (this.isTZBTCExchange) {
-      return new BigNumber(0)
-    }
-    return new BigNumber(
-      await this.exchangeProvider.getMinAmountForCurrency(this.fromWallet.protocol.identifier, this.toWallet.protocol.identifier)
-    )
+  public setActiveExchange(exchange: string) {
+    this.exchangeProvider.setActiveExchange(exchange as ExchangeEnum)
+
+    this.exchangeProvider
+      .getActiveExchange()
+      .pipe(take(1))
+      .subscribe(() => {
+        this.setup()
+      })
   }
 
-  private async getExchangeAmount(): Promise<string> {
-    if (this.isTZBTCExchange) {
-      return this.amount.toFixed()
-    }
-    return await this.exchangeProvider.getExchangeAmount(
-      this.fromWallet.protocol.identifier,
-      this.toWallet.protocol.identifier,
+  async startExchange(liquidity: boolean = false) {
+    const transaction: ExchangeTransaction = await this.exchangeProvider.createTransaction(
+      this.fromWallet,
+      this.toWallet,
       this.amount.toString(),
+      this.state.fee.value,
       this.state.providerState
     )
-  }
+    if (liquidity) {
+      const wallet: AirGapMarketWallet = this.fromWallet
+      const airGapTxs: IAirGapTransaction[] = await wallet.protocol.getTransactionDetails(transaction.transaction.unsigned)
 
-  async startExchange() {
-    if (this.isTZBTCExchange) {
-      this.router.navigateByUrl('/exchange-custom').catch(handleErrorSentry(ErrorCategory.STORAGE))
-    } else {
-      const loader = await this.getAndShowLoader()
-      try {
-        const transaction: ExchangeTransaction = await this.exchangeProvider.createTransaction(
-          this.fromWallet,
-          this.toWallet,
-          this.amount.toString(),
-          this.state.fee.value,
-          this.state.providerState
-        )
-
-        const info = {
-          ...transaction,
-          fromWallet: this.fromWallet,
-          fromCurrency: this.fromWallet.protocol.marketSymbol,
-          toWallet: this.toWallet,
-          toCurrency: this.toWallet.protocol.marketSymbol
-        }
-
-        this.dataService.setData(DataServiceKey.EXCHANGE, info)
-        this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
-
-        const txId = transaction.id
-        let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
-
-        const exchangeTxInfo: ExchangeTransactionDetails = {
-          receivingAddress: this.toWallet.addresses[0],
-          sendingAddress: this.fromWallet.addresses[0],
-          fromCurrency: this.fromWallet.protocol.identifier,
-          toCurrency: this.toWallet.protocol.identifier,
-          amountExpectedFrom: this.amount,
-          amountExpectedTo: transaction.amountExpectedTo,
-          fee: transaction.fee,
-          status: txStatus,
-          exchange: this.activeExchange as ExchangeEnum,
-          id: txId,
-          timestamp: new BigNumber(Date.now()).toNumber()
-        }
-
-        this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        this.hideLoader(loader)
+      const info = {
+        wallet,
+        airGapTxs,
+        data: transaction.transaction.unsigned.transaction,
+        type: IACMessageType.TransactionSignRequest
       }
+
+      this.dataService.setData(DataServiceKey.INTERACTION, info)
+
+      return this.accountProvider.startInteraction(info.wallet, info.data, info.type, info.airGapTxs)
     }
-  }
 
-  async doRadio(): Promise<void> {
-    const modal: HTMLIonModalElement = await this.modalController.create({
-      component: ExchangeSelectPage,
-      componentProps: {
-        activeExchange: this.activeExchange
+    const loader = await this.getAndShowLoader()
+    try {
+      const info = {
+        ...transaction,
+        fromWallet: this.fromWallet,
+        fromCurrency: this.fromWallet.protocol.marketSymbol,
+        toWallet: this.toWallet,
+        toCurrency: this.toWallet.protocol.marketSymbol
       }
-    })
 
-    modal.present().catch((err) => console.error(err))
+      this.dataService.setData(DataServiceKey.EXCHANGE, info)
+      this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
-    modal
-      .onDidDismiss()
-      .then(async () => {
-        await this.setup()
-      })
-      .catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+      const txId = transaction.id
+      let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
+
+      const exchangeTxInfo: ExchangeTransactionDetails = {
+        receivingAddress: this.toWallet.addresses[0],
+        sendingAddress: this.fromWallet.addresses[0],
+        fromCurrency: this.fromWallet.protocol.identifier,
+        toCurrency: this.toWallet.protocol.identifier,
+        amountExpectedFrom: this.amount,
+        amountExpectedTo: transaction.amountExpectedTo,
+        fee: transaction.fee,
+        status: txStatus,
+        exchange: this.activeExchange as ExchangeEnum,
+        id: txId,
+        timestamp: new BigNumber(Date.now()).toNumber()
+      }
+
+      this.exchangeProvider.pushExchangeTransaction(exchangeTxInfo)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      this.hideLoader(loader)
+    }
   }
 
   dismissExchangeOnboarding() {
@@ -730,7 +771,6 @@ export class ExchangePage {
 
   private reduceState(currentState: ExchangeState, newState: Partial<Omit<ExchangeState, 'lastUpdated'>>): ExchangeState {
     return {
-      fromWalletBalance: newState.fromWalletBalance !== undefined ? newState.fromWalletBalance : currentState.fromWalletBalance,
       feeDefaults: newState.feeDefaults || currentState.feeDefaults,
       feeCurrentMarketPrice:
         newState.feeCurrentMarketPrice !== undefined ? newState.feeCurrentMarketPrice : currentState.feeCurrentMarketPrice,
@@ -750,6 +790,40 @@ export class ExchangePage {
 
       lastUpdated: Object.keys(newState) as ExchangeState['lastUpdated']
     }
+  }
+
+  public async toggleAddLiquidity() {
+    this.selectedFromProtocol = await this.protocolService.getProtocol(MainProtocolSymbols.XTZ)
+    this.selectedToProtocol = await this.protocolService.getProtocol(SubProtocolSymbols.XTZ_BTC)
+    this.setFromProtocol(this.selectedFromProtocol)
+    this.setToProtocol(this.selectedToProtocol)
+    this.store$.dispatch(actions.setSegment({ segmentType: SegmentType.ADD_LIQUIDITY }))
+  }
+
+  public async toggleRemoveLiquidity() {
+    this.selectedFromProtocol = await this.protocolService.getProtocol(SubProtocolSymbols.XTZ_BTC)
+    this.removeLiquiditySymbol = 'Sirius'
+    this.store$.dispatch(actions.loadRemoveLiquidityBalance())
+    this.store$.dispatch(actions.loadRemoveLiquidityData())
+    this.store$.dispatch(actions.setSegment({ segmentType: SegmentType.REMOVE_LIQUIDITY }))
+  }
+
+  public async toggleLiquiditySwap() {
+    this.selectedFromProtocol = await this.protocolService.getProtocol(MainProtocolSymbols.XTZ)
+    this.selectedToProtocol = await this.protocolService.getProtocol(SubProtocolSymbols.XTZ_BTC)
+    this.supportedProtocolsFrom = [MainProtocolSymbols.XTZ, SubProtocolSymbols.XTZ_BTC]
+    this.supportedProtocolsTo = [SubProtocolSymbols.XTZ_BTC, MainProtocolSymbols.XTZ]
+    this.setFromProtocol(this.selectedFromProtocol)
+    this.setToProtocol(this.selectedToProtocol)
+    this.store$.dispatch(actions.setSegment({ segmentType: SegmentType.SWAP }))
+  }
+
+  public isLiquidityExchange(exchange: ExchangeEnum): exchange is LiquidityExchangeEnum {
+    return Object.values(LiquidityExchangeEnum).includes(exchange as any)
+  }
+
+  public ionViewWillLeave() {
+    this.segmentType = SegmentType.SWAP
   }
 
   public ngOnDestroy(): void {

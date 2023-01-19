@@ -14,6 +14,10 @@
     <ion-toolbar>
       <ion-searchbar mode="md" [(ngModel)]="searchTerm" (ionChange)="searchTermChanged()"></ion-searchbar>
     </ion-toolbar>
+
+    <ion-text color="secondary">
+      <p class="ion-margin">{{ 'protocol-select.swap_info' | translate }}</p>
+    </ion-text>
   </ion-grid>
 </ion-header>
 

@@ -12,7 +12,7 @@ describe('CollectiblesListPage', () => {
 
   let unitHelper: UnitHelper
 
-  const initialState: fromCollectiblesList.State = {
+  const initialState: Partial<fromCollectiblesList.State> = {
     collectiblesList: fromCollectiblesList.initialState
   }
 
