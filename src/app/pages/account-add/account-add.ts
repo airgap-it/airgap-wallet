@@ -45,7 +45,12 @@ export class AccountAddPage {
   public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
   public filteredGenericSubAccountProtocols: GenericSubProtocol[] = []
 
-  private featuredSubProtocols: SubProtocolSymbols[] = [SubProtocolSymbols.XTZ_YOU, SubProtocolSymbols.XTZ_UUSD, SubProtocolSymbols.XTZ_UDEFI, SubProtocolSymbols.XTZ_UBTC]
+  private featuredSubProtocols: SubProtocolSymbols[] = [
+    SubProtocolSymbols.XTZ_YOU,
+    SubProtocolSymbols.XTZ_UUSD,
+    SubProtocolSymbols.XTZ_UDEFI,
+    SubProtocolSymbols.XTZ_UBTC
+  ]
 
   constructor(
     private readonly platform: Platform,
@@ -54,7 +59,7 @@ export class AccountAddPage {
     private readonly router: Router,
     private readonly ledgerService: LedgerService,
     private readonly dataService: DataService
-  ) { }
+  ) {}
 
   public async ionViewWillEnter() {
     this.supportedAccountProtocols = (await this.protocolService.getActiveProtocols()).filter(
@@ -81,16 +86,25 @@ export class AccountAddPage {
       }
       return faProtocolSymbol(interfaceVersion, protocol.options.config.contractAddress, tokenId)
     }
-    const xtzSubProtocols = supportedSubAccountProtocols.filter((protocol): protocol is TezosFAProtocol => protocol instanceof TezosFAProtocol)
-    const standardSubprotocols = xtzSubProtocols.filter(protocol => Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols))
-    const genericSubprotocols = xtzSubProtocols.filter(protocol => !Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols))
-    const toFilter = standardSubprotocols.map((protocol) => mappedGenericIdentifier(protocol)).filter(identifier => genericSubprotocols.find(protocol => protocol.identifier === identifier) !== undefined)
+    const xtzSubProtocols = supportedSubAccountProtocols.filter(
+      (protocol): protocol is TezosFAProtocol => protocol instanceof TezosFAProtocol
+    )
+    const standardSubprotocols = xtzSubProtocols.filter((protocol) =>
+      Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols)
+    )
+    const genericSubprotocols = xtzSubProtocols.filter(
+      (protocol) => !Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols)
+    )
+    const toFilter = standardSubprotocols
+      .map((protocol) => mappedGenericIdentifier(protocol))
+      .filter((identifier) => genericSubprotocols.find((protocol) => protocol.identifier === identifier) !== undefined)
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
       (protocol) =>
         !this.featuredSubProtocols.includes(protocol.identifier.toLowerCase() as SubProtocolSymbols) &&
         protocol.options.network.type === NetworkType.MAINNET &&
-        protocol.identifier !== SubProtocolSymbols.XTZ_KT && !toFilter.includes(protocol.identifier)
+        protocol.identifier !== SubProtocolSymbols.XTZ_KT &&
+        !toFilter.includes(protocol.identifier)
     )
     this.filterProtocols()
   }
