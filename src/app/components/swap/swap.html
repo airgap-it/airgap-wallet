@@ -1,36 +1,31 @@
-<ion-row class="amount__container border--vertical ion-no-padding ion-align-items-stretch ">
+<ion-row class="amount__container border--vertical ion-no-padding ion-align-items-stretch">
   <ion-col class="ion-padding" size="8">
     <ion-item class="ion-no-padding" lines="none">
-      <ion-label class="ion-no-margin" position="stacked" color="blackLight">
+      <ion-label *ngIf="!liquidity" class="ion-no-margin" position="stacked" color="blackLight">
         {{ (swapSell ? 'swap.sell_label' : 'swap.buy_label') | translate }}
         <span
           *ngIf="minExchangeAmount"
           [innerHTML]="'swap.min-amount_label' | translate: { minExchangeAmount: minExchangeAmount.toString() }"
         ></span>
       </ion-label>
-      <ion-input
-        *ngIf="swapSell"
-        type="number"
-        id="buy-input"
-        (input)="amountSet($event.target.value)"
-        placeholder="0.0"
-        [disabled]="currentlyNotSupported"
-      ></ion-input>
-      <ion-input
-        *ngIf="!swapSell"
-        [disabled]="true"
-        type="number"
-        id="sell-input"
-        [(ngModel)]="exchangeAmount"
-        placeholder="0.0"
-      ></ion-input>
+
+      <ion-label *ngIf="liquidity" class="ion-no-margin" position="stacked" color="blackLight">
+        <ng-container>
+          Balance:
+          <span>
+            {{customBalance?.shiftedBy(-1 * selectedWallet?.protocol.decimals)}} {{customSymbol}}
+          </span>
+        </ng-container>
+      </ion-label>
+      <ion-input *ngIf="swapSell" type="number" id="buy-input" [formControl]="amountControl" placeholder="0.0"></ion-input>
+      <ion-input *ngIf="!swapSell" [disabled]="true" type="number" id="sell-input" [(ngModel)]="amount" placeholder="0.0"></ion-input>
     </ion-item>
-    <ion-text color="blackLight">
+    <ion-text color="blackLight" *ngIf="!liquidity">
       <p class="ion-no-margin">
-        ${{ exchangeAmount?.multipliedBy(selectedWalletMarketPrice || 0)?.toNumber() | number: '1.2-2' }}
+        ${{ fiatAmount?.toNumber() | number: '1.2-2' }}
       </p>
     </ion-text>
-    <ion-row class="ion-padding-top" *ngIf="swapSell && !exchangeAmount?.isZero() && exchangeAmount?.isLessThan(minExchangeAmount)">
+    <ion-row class="ion-padding-top" *ngIf="swapSell && !amount?.isZero() && amount?.isLessThan(minExchangeAmount)">
       <ion-text no-margin color="danger">
         <p
           class="ion-no-margin"
@@ -50,37 +45,37 @@
 
     <ion-row
       class="ion-padding-top"
-      *ngIf="swapSell && exchangeAmount?.isGreaterThan(selectedWalletBalance?.shiftedBy(-1 * selectedWallet.protocol.decimals))"
+      *ngIf="(swapSell || liquidity) && amount?.isGreaterThan(customBalance?.shiftedBy(-1 * selectedWallet?.protocol.decimals))"
     >
       <ion-text color="danger">
         <p
           class="ion-no-margin"
           [innerHTML]="
-            'swap.amount-higher-than-balance-error_label'
-              | translate: { accountBalance: selectedWalletBalance?.shiftedBy(-1 * selectedWallet.protocol.decimals) }
-          "
+          'swap.amount-higher-than-balance-error_label'
+            | translate: { accountBalance: customBalance?.shiftedBy(-1 * selectedWallet?.protocol.decimals) }
+        "
         ></p>
       </ion-text>
     </ion-row>
   </ion-col>
   <ion-col (click)="doRadio()" size="4" class="coin__selection ion-padding">
-    <ion-row><img [src]="'./assets/symbols/' + selectedProtocol?.symbol?.toLowerCase() + '.svg'" /></ion-row>
+    <ion-row><airgap-currency-symbol class="item__image" [symbol]="selectedProtocol?.symbol" [protocolIdentifier]="selectedProtocol?.identifier"></airgap-currency-symbol></ion-row>
     <ion-row>
-      <h5>
+      <h5 *ngIf="!liquidity">
         {{ selectedProtocol?.symbol }}
         <ion-icon name="chevron-down-outline"></ion-icon>
       </h5>
     </ion-row>
   </ion-col>
 </ion-row>
-<ion-list class="ion-no-margin ion-padding-vertical" [@expandWalletAnimation]>
+<ion-list *ngIf="!liquidity || supportedWallets?.length > 1" class="ion-no-margin ion-padding-vertical" [@expandWalletAnimation]>
   <portfolio-item
     [wallet]="selectedWallet"
     tappable
     [hideDelegationBadge]="true"
-    [isExpendable]="supportedWallets?.length > 1"
+    [isExpendable]="supportedWallets?.length > 1 && !disableWalletSelection"
     [hideFiatAmounts]="true"
-    (click)="supportedWallets?.length > 1 ? (expandWalletSelection = !expandWalletSelection) : {}"
+    (click)="supportedWallets?.length > 1 && !disableWalletSelection ? (expandWalletSelection = !expandWalletSelection) : {}"
     [isExtended]="expandWalletSelection"
   ></portfolio-item>
   <ng-container *ngIf="expandWalletSelection">

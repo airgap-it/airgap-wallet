@@ -26,6 +26,6 @@ export class FeeComponent {
   constructor() {}
 
   private checkEnableMemo(wallet: AirGapMarketWallet) {
-    this.enableMemo = wallet.protocol.identifier === MainProtocolSymbols.COSMOS
+    this.enableMemo = wallet?.protocol.identifier === MainProtocolSymbols.COSMOS
   }
 }

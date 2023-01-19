@@ -1,0 +1,28 @@
+<ion-row class="powered__container ion-padding ion-align-items-center" *ngIf="!hideExchangeSelection">
+  <ion-col class="ion-no-padding">
+    <ion-row class="powered__container ion-align-items-center">
+      <ion-text color="blackLight">
+        <small>{{ 'exchange.powered-by_label' | translate }}</small>
+      </ion-text>
+      <img *ngIf="activeExchange === ExchangeEnum.CHANGENOW" src="./assets/img/changenow_logo.svg" />
+      <img *ngIf="activeExchange === ExchangeEnum.CHANGELLY" src="./assets/img/changelly_logo.svg" />
+      <img *ngIf="activeExchange === ExchangeEnum.QUIPUSWAP" src="./assets/img/quipuswap_logo.svg" />
+      <img *ngIf="activeExchange === ExchangeEnum.PLENTY" src="./assets/img/plenty_logo.svg" />
+      <img *ngIf="activeExchange === LiquidityExchangeEnum.SIRIUS" src="./assets/img/sirs.svg" />
+    </ion-row>
+  </ion-col>
+  <ion-col class="ion-no-padding justify--content__end">
+    <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()" [disabled]="disableExchangeSelection">
+      {{ 'exchange.switch-exchange_label' | translate }}
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </ion-button>
+  </ion-col>
+</ion-row>
+
+<ion-row *ngFor="let widget of exchangeWidgets" class="ion-padding-horizontal ion-padding-bottom">
+  <ion-col size="12">
+    <widget-selector [widget]="widget" [widgetForm]="exchangeForm.controls[activeExchange]"></widget-selector>
+  </ion-col>
+</ion-row>
+
+<fee [state]="state" [form]="exchangeForm" [wallet]="wallet"></fee>

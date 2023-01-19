@@ -12,13 +12,14 @@ describe('CollectiblesItemPage', () => {
 
   let unitHelper: UnitHelper
 
-  const initialState: fromCollectiblesItem.State = {
+  const initialState: Partial<fromCollectiblesItem.State> = {
     collectiblesItem: fromCollectiblesItem.initialState
   }
 
-  beforeEach(waitForAsync(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
+  beforeEach(
+    waitForAsync(() => {
+      unitHelper = new UnitHelper()
+      TestBed.configureTestingModule(
         unitHelper.testBed({
           declarations: [CollectiblesItemPage],
           providers: [provideMockStore({ initialState })]
@@ -27,10 +28,11 @@ describe('CollectiblesItemPage', () => {
         .compileComponents()
         .catch(console.error)
 
-    fixture = TestBed.createComponent(CollectiblesItemPage)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  }))
+      fixture = TestBed.createComponent(CollectiblesItemPage)
+      component = fixture.componentInstance
+      fixture.detectChanges()
+    })
+  )
 
   it('should create', () => {
     expect(component).toBeTruthy()

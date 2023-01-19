@@ -54,7 +54,8 @@
       <ion-col size="9" class="ion-padding-bottom">
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'exchange-confirm.buy-amount_label' | translate }}</ion-label>
         <div class="typography--mono" item-content>
-          <span class="typography--mono">{{ amountExpectedTo }} (~${{ toFiatAmount | number: '1.2-2' }})</span>
+          <span *ngIf="toFiatAmount" class="typography--mono">{{ amountExpectedTo }} (~${{ toFiatAmount | number: '1.2-2' }})</span>
+          <span *ngIf="!toFiatAmount" class="typography--mono">{{ amountExpectedTo }}</span>
         </div>
       </ion-col>
     </ion-row>

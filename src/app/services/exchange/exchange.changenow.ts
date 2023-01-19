@@ -138,6 +138,7 @@ class ChangeNowApi {
     this.identifierExchangeToAirGapMap.set('atom', MainProtocolSymbols.COSMOS)
     this.identifierExchangeToAirGapMap.set('dot', MainProtocolSymbols.POLKADOT)
     this.identifierExchangeToAirGapMap.set('ksm', MainProtocolSymbols.KUSAMA)
+    this.identifierExchangeToAirGapMap.set('btc', MainProtocolSymbols.BTC_SEGWIT)
 
     this.identifierAirGapToExchangeMap.set('eth-erc20-xchf' as ProtocolSymbols, 'xchf')
     this.identifierAirGapToExchangeMap.set('eth-erc20-usdt' as ProtocolSymbols, 'usdterc20')
@@ -237,7 +238,7 @@ class ChangeNowApi {
     return '0'
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -314,6 +315,10 @@ class ChangeNowApi {
 
   public async getCustomUI(): Promise<ExchangeUI> {
     return { widgets: [] }
+  }
+
+  public async getCustomData(_input: unknown): Promise<void> {
+    return
   }
 }
 

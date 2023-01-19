@@ -187,7 +187,7 @@ class ChangellyApi {
     return undefined
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
     const method: string = 'getExchangeAmount'
@@ -267,6 +267,10 @@ class ChangellyApi {
 
   public async getCustomUI(): Promise<ExchangeUI> {
     return { widgets: [] }
+  }
+
+  public async getCustomData(_input: unknown): Promise<void> {
+    return
   }
 }
 
