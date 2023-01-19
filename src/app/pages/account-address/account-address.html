@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/tabs/portfolio"></ion-back-button>
@@ -16,7 +16,11 @@
         <ion-avatar>
           <airgap-identicon [address]="wallet.receivingPublicAddress"></airgap-identicon>
         </ion-avatar>
-        <airgap-currency-symbol class="symbol--icon" [symbol]="wallet.protocol.symbol" [protocolIdentifier]="wallet.protocol.identifier"></airgap-currency-symbol>
+        <airgap-currency-symbol
+          class="symbol--icon"
+          [symbol]="wallet.protocol.symbol"
+          [protocolIdentifier]="wallet.protocol.identifier"
+        ></airgap-currency-symbol>
       </ion-col>
       <ion-col size="12">
         <h2>{{ wallet.protocol.name }} {{ wallet.protocol.symbol }}</h2>

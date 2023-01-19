@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
@@ -19,7 +19,7 @@
         <ng-container *ngIf="isMultiQr">{{ 'scan.multi-qr_text' | translate }}</ng-container>
       </p>
     </ion-text>
-    <ion-progress-bar *ngIf="isMultiQr" style="height: 8px" color="secondary" [value]="percentageScanned"></ion-progress-bar>
+    <ion-progress-bar *ngIf="isMultiQr" style="height: 8px;" color="secondary" [value]="percentageScanned"></ion-progress-bar>
 
     <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center">
       <ion-col class="guides--container content--align__center-center">
