@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
@@ -16,7 +16,7 @@
         {{ 'scan-address.text' | translate }}
       </p>
     </ion-text>
-    <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center ">
+    <ion-row [hidden]="!hasCameraPermission" class="row--height__100 ion-justify-content-center ion-align-items-center">
       <ion-col class="guides--container content--align__center-center">
         <img class="guides--container__img" src="./assets/img/qr_code_guides.svg" />
       </ion-col>
@@ -26,7 +26,7 @@
     <ion-row
       [hidden]="hasCameraPermission"
       (click)="requestPermission()"
-      class="row--height__100 ion-justify-content-center ion-align-items-center "
+      class="row--height__100 ion-justify-content-center ion-align-items-center"
     >
       <ion-col class="text-center">
         <img src="./assets/img/permission_onboarding_camera.svg" />
