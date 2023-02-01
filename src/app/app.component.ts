@@ -9,17 +9,36 @@ import {
   LanguageService,
   ProtocolService,
   SerializerService,
-  SPLASH_SCREEN_PLUGIN
+  SPLASH_SCREEN_PLUGIN,
+  ICoinProtocolAdapter
 } from '@airgap/angular-core'
+
+import {
+  AirGapModule,
+  AirGapOnlineProtocol,
+  AirGapBlockExplorer,
+  AirGapV3SerializerCompanion,
+  V3SchemaConfiguration
+} from '@airgap/module-kit'
+import { ICPModule } from '@airgap/icp'
+
 import {
   AirGapMarketWallet,
   IAirGapTransaction,
   ICoinProtocol,
   ICoinSubProtocol,
   MainProtocolSymbols,
-  NetworkType
+  NetworkType,
+  ProtocolSymbols
 } from '@airgap/coinlib-core'
-import { generateId, IACMessageType } from '@airgap/serializer'
+import {
+  generateId,
+  IACMessageType,
+  SerializerV3,
+  TransactionSignRequest,
+  TransactionSignResponse,
+  TransactionValidator
+} from '@airgap/serializer'
 import {
   TezosProtocolNetwork,
   TezosBlockExplorer,
@@ -61,6 +80,18 @@ import { WalletStorageKey, WalletStorageService } from './services/storage/stora
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
+
+class GenericTransactionValidator implements TransactionValidator {
+  public constructor(private readonly protocolIdentifier: string, private readonly serializerCompanion: AirGapV3SerializerCompanion) {}
+
+  public async validateUnsignedTransaction(transaction: TransactionSignRequest): Promise<any> {
+    return this.serializerCompanion.validateTransactionSignRequest(this.protocolIdentifier, transaction)
+  }
+
+  public async validateSignedTransaction(transaction: TransactionSignResponse): Promise<any> {
+    return this.serializerCompanion.validateTransactionSignResponse(this.protocolIdentifier, transaction)
+  }
+}
 
 @Component({
   selector: 'app-root',
@@ -224,8 +255,32 @@ export class AppComponent implements AfterViewInit {
     )
     const ghostnetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ghostnetNetwork))
 
+    // ICP MODULE
+    const module: AirGapModule = new ICPModule()
+    const [protocol, blockExplorer, v3SerializerCompanion]: [
+      AirGapOnlineProtocol,
+      AirGapBlockExplorer,
+      AirGapV3SerializerCompanion
+    ] = await Promise.all([module.createOnlineProtocol('icp'), module.createBlockExplorer('icp'), module.createV3SerializerCompanion()])
+
+    v3SerializerCompanion.schemas.forEach((configuration: V3SchemaConfiguration) => {
+      SerializerV3.addSchema(configuration.type, configuration.schema, configuration.protocolIdentifier as ProtocolSymbols)
+
+      if (configuration.protocolIdentifier) {
+        SerializerV3.addValidator(configuration.protocolIdentifier as ProtocolSymbols, {
+          create(): TransactionValidator {
+            return new GenericTransactionValidator(configuration.protocolIdentifier, v3SerializerCompanion)
+          }
+        })
+      }
+    })
+
+    console.log("SerializerV3", SerializerV3.getInstance());
+
+    const adapter = await ICoinProtocolAdapter.create(protocol, blockExplorer, v3SerializerCompanion)
+
     await this.protocolService.init({
-      extraActiveProtocols: [ghostnetProtocol],
+      extraActiveProtocols: [ghostnetProtocol, adapter],
       extraPassiveSubProtocols: [[ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))]]
     })
 

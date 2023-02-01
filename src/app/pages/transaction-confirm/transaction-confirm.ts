@@ -8,6 +8,7 @@ import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
+import { AlertButton } from '@ionic/core'
 import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -161,14 +162,15 @@ export class TransactionConfirmPage {
 
           loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
-          this.showTransactionSuccessfulAlert(protocol, txId)
+          const signed = (
+            await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction)
+          )[0] as any
+
+          this.showTransactionSuccessfulAlert(protocol, txId, signed.from)
 
           // POST TX TO BACKEND
           // Only send it if we are on mainnet
           if (protocol.options.network.type === NetworkType.MAINNET) {
-            const signed = (
-              await protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction)
-            )[0] as any
             // necessary for the transaction backend
             signed.amount = signed.amount.toString()
             signed.fee = signed.fee.toString()
@@ -192,7 +194,7 @@ export class TransactionConfirmPage {
             ;(protocol.getTransactionDetailsFromSigned(this.messageDefinitionObjects[index].payload as SignedTransaction) as any).then(
               (signed) => {
                 if (signed.hash) {
-                  this.showTransactionSuccessfulAlert(protocol, signed.hash)
+                  this.showTransactionSuccessfulAlert(protocol, signed.hash, signed.from)
                   // POST TX TO BACKEND
                   // necessary for the transaction backend
                   signed.amount = signed.amount.toString()
@@ -228,28 +230,34 @@ export class TransactionConfirmPage {
     })
   }
 
-  private async showTransactionSuccessfulAlert(protocol: ICoinProtocol, transactionHash: string): Promise<void> {
-    const blockexplorer: string = await protocol.getBlockExplorerLinkForTxId(transactionHash)
+  private async showTransactionSuccessfulAlert(protocol: ICoinProtocol, transactionHash: string, fromAddress: string): Promise<void> {
+    const blockexplorer: string | undefined = transactionHash && transactionHash.length > 0 ? await protocol.getBlockExplorerLinkForTxId(transactionHash) : fromAddress && fromAddress.length > 0 ? await protocol.getBlockExplorerLinkForAddress(fromAddress) : undefined
+    let buttons: AlertButton[] = [
+      {
+        text: 'Ok',
+        handler: (): void => {
+          this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        }
+      }
+    ]
+    if (blockexplorer) {
+      buttons = [
+        {
+          text: 'Open Blockexplorer',
+          handler: (): void => {
+            this.browserService.openUrl(blockexplorer)
+
+            this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          }
+        },
+        ...buttons
+      ]
+    }
     this.alertCtrl
       .create({
         header: 'Transaction broadcasted!',
         message: 'Your transaction has been successfully broadcasted',
-        buttons: [
-          {
-            text: 'Open Blockexplorer',
-            handler: (): void => {
-              this.browserService.openUrl(blockexplorer)
-
-              this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            }
-          },
-          {
-            text: 'Ok',
-            handler: (): void => {
-              this.router.navigateByUrl('/tabs/portfolio').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-            }
-          }
-        ]
+        buttons,
       })
       .then((alert: HTMLIonAlertElement) => {
         alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -275,7 +283,7 @@ export class TransactionConfirmPage {
           { knownViewingKeys: this.accountService.getKnownViewingKeys() }
         )
 
-        this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs) 
+        this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
       } catch (error) {
         this.toastCtrl
           .create({
