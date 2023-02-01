@@ -1,0 +1,32 @@
+.onboarding__container {
+  img {
+    width: 50vh;
+    height: 50vh;
+  }
+}
+.divider--line {
+  border-top: 1px solid rgba(var(--ion-color-primary-rgb), 0.24);
+}
+.powered__container {
+  img {
+    width: auto;
+    height: 24px;
+    margin-left: 8px;
+    max-width: 96px;
+  }
+  padding-bottom: 8px;
+}
+
+ion-content {
+  --padding-bottom: 108px;
+}
+.receive__container {
+  img {
+    height: 32px;
+    margin-right: 8px;
+  }
+}
+
+.small {
+  font-size: small;
+}

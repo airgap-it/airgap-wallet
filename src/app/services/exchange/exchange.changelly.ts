@@ -92,6 +92,7 @@ class ChangellyApi {
     this.identifierExchangeToAirGapMap.set('dai', 'eth-erc20-dai' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('enj', 'eth-erc20-enj' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('fet', 'eth-erc20-fet' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('fet', 'eth-erc20-fet-new' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('ht', 'eth-erc20-ht' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('knc', 'eth-erc20-knc' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('lrc', 'eth-erc20-lrc' as ProtocolSymbols)
@@ -122,6 +123,7 @@ class ChangellyApi {
     this.identifierAirGapToExchangeMap.set('eth-erc20-dai' as ProtocolSymbols, 'dai')
     this.identifierAirGapToExchangeMap.set('eth-erc20-enj' as ProtocolSymbols, 'enj')
     this.identifierAirGapToExchangeMap.set('eth-erc20-fet' as ProtocolSymbols, 'fet')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-fet-new' as ProtocolSymbols, 'fet')
     this.identifierAirGapToExchangeMap.set('eth-erc20-ht' as ProtocolSymbols, 'ht')
     this.identifierAirGapToExchangeMap.set('eth-erc20-knc' as ProtocolSymbols, 'knc')
     this.identifierAirGapToExchangeMap.set('eth-erc20-lrc' as ProtocolSymbols, 'lrc')
@@ -187,7 +189,7 @@ class ChangellyApi {
     return undefined
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
     const method: string = 'getExchangeAmount'
@@ -267,6 +269,10 @@ class ChangellyApi {
 
   public async getCustomUI(): Promise<ExchangeUI> {
     return { widgets: [] }
+  }
+
+  public async getCustomData(_input: unknown): Promise<void> {
+    return
   }
 }
 

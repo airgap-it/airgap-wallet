@@ -12,7 +12,7 @@ describe('AccountActivatePage', () => {
 
   let unitHelper: UnitHelper
 
-  const initialState: fromAccountActivate.State = {
+  const initialState: Partial<fromAccountActivate.State> = {
     accountActivate: fromAccountActivate.initialState
   }
 

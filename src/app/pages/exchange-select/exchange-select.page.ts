@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { ModalController, NavParams } from '@ionic/angular'
-
-import { ExchangeEnum, ExchangeProvider } from './../../services/exchange/exchange'
+import { ExchangeEnum, ExchangeProvider, LiquidityExchangeEnum, SwapExchangeEnum } from './../../services/exchange/exchange'
 
 @Component({
   selector: 'page-exchange-select',
@@ -9,8 +8,8 @@ import { ExchangeEnum, ExchangeProvider } from './../../services/exchange/exchan
 })
 export class ExchangeSelectPage {
   public selectedExchange: ExchangeEnum
-  public ExchangeEnum: typeof ExchangeEnum = ExchangeEnum
-
+  public ExchangeEnum: typeof SwapExchangeEnum = SwapExchangeEnum
+  public LiquidityExchangeEnum: typeof LiquidityExchangeEnum = LiquidityExchangeEnum
   constructor(public navParams: NavParams, public viewCtrl: ModalController, private readonly exchangeProvider: ExchangeProvider) {
     this.selectedExchange = this.navParams.get('activeExchange')
   }

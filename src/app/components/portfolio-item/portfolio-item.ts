@@ -49,7 +49,7 @@ export class PortfolioItemComponent {
   public balance: BigNumber | undefined
   public balanceFormatted: string | undefined
   public marketPrice: BigNumber | undefined
-  
+
   public numberOfDecimalsInBalance: number = 0
   public readonly smallFontDecimalThreshold = 16
   private readonly defaultMaxDigits = 15
@@ -74,13 +74,13 @@ export class PortfolioItemComponent {
   }
 
   private async updateDelegationStatus() {
-    if (this.wallet !== undefined && this.wallet.receivingPublicAddress !== undefined) {
+    if (this.wallet !== undefined && this.wallet?.receivingPublicAddress !== undefined) {
       if (!supportsDelegation(this.wallet.protocol)) {
         this.isDelegated = null
       } else {
         this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-          this.wallet.protocol as ICoinDelegateProtocol,
-          this.wallet.receivingPublicAddress
+          this.wallet?.protocol as ICoinDelegateProtocol,
+          this.wallet?.receivingPublicAddress
         )
       }
     }
@@ -89,7 +89,7 @@ export class PortfolioItemComponent {
   private async initBalance() {
     if (this.wallet?.getCurrentBalance() === undefined) {
       await this.wallet?.balanceOf()
-    } 
+    }
     await this.updateBalance()
   }
 

@@ -133,11 +133,13 @@ class ChangeNowApi {
     this.identifierExchangeToAirGapMap.set('dia', 'eth-erc20-dia' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('agi', 'eth-erc20-agi' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('fet', 'eth-erc20-fet' as ProtocolSymbols)
+    this.identifierExchangeToAirGapMap.set('fet', 'eth-erc20-fet-new' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('waxp', 'eth-erc20-wax' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('aion', 'eth-erc20-aion' as ProtocolSymbols)
     this.identifierExchangeToAirGapMap.set('atom', MainProtocolSymbols.COSMOS)
     this.identifierExchangeToAirGapMap.set('dot', MainProtocolSymbols.POLKADOT)
     this.identifierExchangeToAirGapMap.set('ksm', MainProtocolSymbols.KUSAMA)
+    this.identifierExchangeToAirGapMap.set('btc', MainProtocolSymbols.BTC_SEGWIT)
 
     this.identifierAirGapToExchangeMap.set('eth-erc20-xchf' as ProtocolSymbols, 'xchf')
     this.identifierAirGapToExchangeMap.set('eth-erc20-usdt' as ProtocolSymbols, 'usdterc20')
@@ -187,6 +189,7 @@ class ChangeNowApi {
     this.identifierAirGapToExchangeMap.set('eth-erc20-dia' as ProtocolSymbols, 'dia')
     this.identifierAirGapToExchangeMap.set('eth-erc20-agi' as ProtocolSymbols, 'agi')
     this.identifierAirGapToExchangeMap.set('eth-erc20-fet' as ProtocolSymbols, 'fet')
+    this.identifierAirGapToExchangeMap.set('eth-erc20-fet-new' as ProtocolSymbols, 'fet')
     this.identifierAirGapToExchangeMap.set('eth-erc20-wax' as ProtocolSymbols, 'waxp')
     this.identifierAirGapToExchangeMap.set('eth-erc20-aion' as ProtocolSymbols, 'aion')
     this.identifierAirGapToExchangeMap.set(MainProtocolSymbols.COSMOS, 'atom')
@@ -237,7 +240,7 @@ class ChangeNowApi {
     return '0'
   }
 
-  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string, _data: any): Promise<string> {
+  public async getExchangeAmount(fromCurrency: ProtocolSymbols, toCurrency: ProtocolSymbols, amount: string): Promise<string> {
     const transformedFromCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([fromCurrency])[0]
     const transformedToCurrency: ExchangeIdentifier = this.convertAirGapIdentifierToExchangeIdentifier([toCurrency])[0]
 
@@ -314,6 +317,10 @@ class ChangeNowApi {
 
   public async getCustomUI(): Promise<ExchangeUI> {
     return { widgets: [] }
+  }
+
+  public async getCustomData(_input: unknown): Promise<void> {
+    return
   }
 }
 

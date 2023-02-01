@@ -1,9 +1,6 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/"></ion-back-button>
-      </ion-buttons>
       <ion-title>{{ 'exchange-select.title' | translate }}</ion-title>
       <ion-buttons slot="end">
         <ion-button (click)="dismiss()" fill="clear" color="secondary">
@@ -29,6 +26,14 @@
         <ion-item>
           <ion-label>Quipuswap</ion-label>
           <ion-radio slot="end" [value]="ExchangeEnum.QUIPUSWAP"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Plenty</ion-label>
+          <ion-radio slot="end" [value]="ExchangeEnum.PLENTY"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Sirius DEX</ion-label>
+          <ion-radio slot="end" [value]="LiquidityExchangeEnum.SIRIUS"></ion-radio>
         </ion-item>
       </ion-radio-group>
     </ion-list>

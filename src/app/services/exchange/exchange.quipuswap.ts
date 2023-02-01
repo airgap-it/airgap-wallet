@@ -16,14 +16,15 @@ import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/t
 import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
 import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { Store } from '@ngrx/store'
 import { Schema } from '@taquito/michelson-encoder'
 import { Contract, TezosToolkit, TransferParams } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-
 import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
 import { UIWidget } from '../../models/widgets/UIWidget'
-
 import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
+import * as fromRoot from '../../app.reducers'
+import { getSelectedSlippage } from 'src/app/app.selectors'
 
 interface DexStorage {
   storage: {
@@ -49,7 +50,7 @@ interface QuipuswapSlippageTolerance {
 }
 
 class QuipuswapTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  constructor(public readonly status: string) {}
+  constructor(public readonly status: string) { }
 
   public isPending(): boolean {
     switch (this.status) {
@@ -109,14 +110,23 @@ export class QuipuswapExchange implements Exchange {
 
   private readonly tezos: TezosToolkit = new TezosToolkit(NODE_URL)
 
-  private readonly slippageTolerance: QuipuswapSlippageTolerance = {
+  private readonly slippageDefaults: QuipuswapSlippageTolerance = {
     low: 0.005, // 0.5%
     medium: 0.01, // 1%
     high: 0.03 // 3%
   }
 
-  constructor(private readonly protocolService: ProtocolService, private readonly formBuilder: FormBuilder) {
+  private slippageTolerance: BigNumber
+
+  constructor(
+    private readonly protocolService: ProtocolService,
+    private readonly formBuilder: FormBuilder,
+    private readonly store$: Store<fromRoot.State>
+  ) {
     this.initIdentifierMappings(this.supportedTokens)
+    this.store$.select(getSelectedSlippage).subscribe((slippage) => {
+      this.slippageTolerance = slippage
+    })
   }
 
   private initIdentifierMappings(protocolIdentifiers: ProtocolSymbols[]): void {
@@ -189,7 +199,7 @@ export class QuipuswapExchange implements Exchange {
     return maxAmount.shiftedBy(-toProtocol.decimals).toFixed()
   }
 
-  public async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string, data: any): Promise<string> {
+  public async getExchangeAmount(fromCurrency: string, toCurrency: string, amount: string): Promise<string> {
     const [fromProtocol, toProtocol]: [ICoinProtocol | undefined, ICoinProtocol | undefined] = await Promise.all([
       this.getProtocol(fromCurrency),
       this.getProtocol(toCurrency)
@@ -200,13 +210,12 @@ export class QuipuswapExchange implements Exchange {
     }
 
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromProtocol.decimals)
-    const slippageTolerance: BigNumber = this.getSlippageToleranceFromFormData(data)
 
     let minAmount: BigNumber = new BigNumber(0)
     if (fromProtocol.identifier === MainProtocolSymbols.XTZ) {
-      minAmount = await this.getMinTezToTokenExchangeAmount(toProtocol.identifier, shiftedAmount, slippageTolerance)
+      minAmount = await this.getMinTezToTokenExchangeAmount(toProtocol.identifier, shiftedAmount, this.slippageTolerance)
     } else if (this.isTokenSupported(fromProtocol.identifier)) {
-      minAmount = await this.getMinTokenToTezExchangeAmount(fromProtocol.identifier, shiftedAmount, slippageTolerance)
+      minAmount = await this.getMinTokenToTezExchangeAmount(fromProtocol.identifier, shiftedAmount, this.slippageTolerance)
     }
 
     return minAmount.shiftedBy(-toProtocol.decimals).toFixed()
@@ -253,14 +262,8 @@ export class QuipuswapExchange implements Exchange {
     return { result: false, message: '' }
   }
 
-  public async estimateFee(
-    fromWallet: AirGapMarketWallet,
-    toWallet: AirGapMarketWallet,
-    amount: string,
-    data: any
-  ): Promise<FeeDefaults | undefined> {
+  public async estimateFee(fromWallet: AirGapMarketWallet, toWallet: AirGapMarketWallet, amount: string): Promise<FeeDefaults | undefined> {
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromWallet.protocol.decimals)
-    const slippageTolerance: BigNumber = this.getSlippageToleranceFromFormData(data)
 
     let feeDefaults: FeeDefaults
     if (fromWallet.protocol.identifier === MainProtocolSymbols.XTZ) {
@@ -268,14 +271,14 @@ export class QuipuswapExchange implements Exchange {
         fromWallet.publicKey,
         toWallet.protocol.identifier,
         shiftedAmount,
-        slippageTolerance
+        this.slippageTolerance
       )
     } else if (this.supportedTokens.includes(fromWallet.protocol.identifier)) {
       feeDefaults = await this.estimateTokenToTezTransactionFee(
         fromWallet.publicKey,
         fromWallet.protocol.identifier,
         shiftedAmount,
-        slippageTolerance
+        this.slippageTolerance
       )
     }
 
@@ -335,11 +338,10 @@ export class QuipuswapExchange implements Exchange {
     toWallet: AirGapMarketWallet,
     amount: string,
     fee: string,
-    data: any
+    _data: any
   ): Promise<ExchangeTransaction> {
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromWallet.protocol.decimals)
     const shiftedFee: BigNumber = new BigNumber(fee).shiftedBy(fromWallet.protocol.feeDecimals)
-    const slippageTolerance: BigNumber = this.getSlippageToleranceFromFormData(data)
     const recipient: string = toWallet.receivingPublicAddress
 
     let minAmount: BigNumber = new BigNumber(0)
@@ -347,7 +349,7 @@ export class QuipuswapExchange implements Exchange {
     let transaction: QuipuswapTransaction | undefined
     if (fromWallet.protocol.identifier === MainProtocolSymbols.XTZ) {
       tokenProtocol = toWallet.protocol
-      minAmount = await this.getMinTezToTokenExchangeAmount(tokenProtocol.identifier, shiftedAmount, slippageTolerance)
+      minAmount = await this.getMinTezToTokenExchangeAmount(tokenProtocol.identifier, shiftedAmount, this.slippageTolerance)
       transaction = await this.createTezToTokenTransaction(
         fromWallet.publicKey,
         tokenProtocol,
@@ -358,7 +360,7 @@ export class QuipuswapExchange implements Exchange {
       )
     } else if (this.supportedTokens.includes(fromWallet.protocol.identifier)) {
       tokenProtocol = fromWallet.protocol
-      minAmount = await this.getMinTokenToTezExchangeAmount(tokenProtocol.identifier, shiftedAmount, slippageTolerance)
+      minAmount = await this.getMinTokenToTezExchangeAmount(tokenProtocol.identifier, shiftedAmount, this.slippageTolerance)
       transaction = await this.createTokenToTezTransaction(
         fromWallet.publicKey,
         tokenProtocol,
@@ -457,6 +459,10 @@ export class QuipuswapExchange implements Exchange {
       minTezAmount,
       fee
     )
+
+
+    console.log(publicKey)
+    console.log(JSON.stringify(operations, null, 2))
     const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
     const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
     const baseDetails: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
@@ -529,7 +535,7 @@ export class QuipuswapExchange implements Exchange {
       tokenAmount.toFixed(),
       minTezAmount.toFixed(),
       destinationAddress
-    ).toTransferParams({ source: sourceAddress })
+    ).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
     const approveOperation: PartialTransactionOperation = this.prepareTransactionOperation(approve)
     const paymentOperation: PartialTransactionOperation = this.prepareTransactionOperation(payment)
@@ -563,7 +569,7 @@ export class QuipuswapExchange implements Exchange {
       tokenAmount.toFixed(),
       minTezAmount.toFixed(),
       destinationAddress
-    ).toTransferParams({ source: sourceAddress })
+    ).toTransferParams({ source: sourceAddress, fee: fee?.toNumber() })
 
     const removeOperator: TransferParams = tokenContract.methods[FA2_ENTRYPOINTS.updateOperators]([
       {
@@ -655,7 +661,7 @@ export class QuipuswapExchange implements Exchange {
 
   public async getCustomUI(): Promise<ExchangeUI> {
     const defaultSlippageTolerance: keyof QuipuswapSlippageTolerance = 'low'
-    const defaultValue: string = this.slippageTolerance[defaultSlippageTolerance].toString()
+    const defaultValue: string = this.slippageDefaults[defaultSlippageTolerance].toString()
 
     const valueToControlValue = (value: string) => new BigNumber(value).multipliedBy(100).toFixed()
     const controlValueToValue = (controlValue: string) => new BigNumber(controlValue).dividedBy(100).toFixed()
@@ -670,7 +676,7 @@ export class QuipuswapExchange implements Exchange {
         id: ControlId.SLIPPAGE_TOLERANCE,
         label: 'exchange-quipuswap.slippage-tolerance.label',
         defaultSelected: defaultValue,
-        optionButtons: Object.entries(this.slippageTolerance).map(([_, value]: [string, string]) => ({
+        optionButtons: Object.entries(this.slippageDefaults).map(([_, value]: [string, string]) => ({
           value: value.toString(),
           label: `${valueToControlValue(value)}%`
         })),
@@ -689,6 +695,10 @@ export class QuipuswapExchange implements Exchange {
       form,
       widgets
     }
+  }
+
+  public async getCustomData(_input: unknown): Promise<void> {
+    return
   }
 
   private getAirGapIdentifier(identifier: string): ProtocolSymbols | undefined {
@@ -760,12 +770,6 @@ export class QuipuswapExchange implements Exchange {
     const tokenPool: number = storage.storage.token_pool
 
     return new BigNumber(tokenPool).dividedBy(3)
-  }
-
-  private getSlippageToleranceFromFormData(data: any): BigNumber {
-    const fromData = data ?? {}
-
-    return new BigNumber(fromData[ControlId.SLIPPAGE_TOLERANCE] ?? this.slippageTolerance.low)
   }
 
   private prepareTransactionOperation(transferParams: TransferParams): PartialTransactionOperation {

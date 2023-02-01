@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
@@ -24,9 +24,153 @@
       </ion-row>
     </ng-container>
 
+    <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
+      <ng-container *ngIf="!isLiquidityExchange(activeExchange)">
+        <swap
+          [amountControl]="formGroup.controls['amountControl']"
+          [customBalance]="fromWalletBalance$ | async"
+          [selectedWallet]="fromWallet$ | async"
+          [supportedWallets]="supportedFromWallets"
+          [selectedProtocol]="selectedFromProtocol"
+          [supportedProtocols]="supportedProtocolsFrom"
+          [amount]="inputAmount$ | async"
+          [fiatAmount]="fiatInputAmount$ | async"
+          [minExchangeAmount]="minExchangeAmount$ | async"
+          [currentlyNotSupported]="currentlyNotSupported$ | async"
+          (protocolSetEmitter)="setFromProtocol($event)"
+          (walletSetEmitter)="setFromWallet($event, true)"
+        ></swap>
+        <swap
+          [selectedWallet]="toWallet$ | async"
+          [supportedWallets]="supportedToWallets"
+          [selectedProtocol]="selectedToProtocol"
+          [supportedProtocols]="supportedProtocolsTo"
+          [amount]="exchangeAmount$ | async"
+          [fiatAmount]="fiatExchangeAmount$ | async"
+          (protocolSetEmitter)="setToProtocol($event)"
+          (walletSetEmitter)="setToWallet($event)"
+          [disableWalletSelection]="true"
+          [swapSell]="false"
+        ></swap>
+        <div class="divider--line"></div>
+      </ng-container>
+
+      <ng-container *ngIf="isLiquidityExchange(activeExchange)">
+        <ion-segment value="liquidity" [(ngModel)]="segmentTypeInner">
+          <ion-segment-button value="addLiquidity" (click)="toggleAddLiquidity()">
+            <ion-label>{{ 'exchange.liquidity.add_label' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="removeLiquidity" (click)="toggleRemoveLiquidity()">
+            <ion-label>{{ 'exchange.liquidity.remove_label' | translate }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="swap" (click)="toggleLiquiditySwap()">
+            <ion-label>{{ 'exchange.liquidity.swap_label' | translate }}</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+        <ng-container *ngIf="segmentTypeInner === 'addLiquidity'">
+          <swap
+            [amountControl]="formGroup.controls['amountControl']"
+            [liquidity]="true"
+            [customBalance]="fromWalletBalance$ | async"
+            [selectedWallet]="fromWallet$ | async"
+            [supportedWallets]="supportedFromWallets"
+            [selectedProtocol]="selectedFromProtocol"
+            [supportedProtocols]="supportedProtocolsFrom"
+            [amount]="amount"
+            [minExchangeAmount]="minExchangeAmount$ | async"
+            [currentlyNotSupported]="currentlyNotSupported$ | async"
+            (protocolSetEmitter)="setFromProtocol($event)"
+            (walletSetEmitter)="setFromWallet($event)"
+          ></swap>
+          <swap
+            [liquidity]="true"
+            [customBalance]="toWalletBalance$ | async"
+            [selectedWallet]="toWallet$ | async"
+            [supportedWallets]="supportedToWallets"
+            [supportedWallets]="supportedToWallets.length"
+            [selectedProtocol]="selectedToProtocol"
+            [supportedProtocols]="supportedProtocolsTo"
+            [amount]="exchangeAmount$ | async"
+            (protocolSetEmitter)="setToProtocol($event)"
+            [swapSell]="false"
+          ></swap>
+
+          <div class="divider--line"></div>
+        </ng-container>
+
+        <ng-container *ngIf="segmentTypeInner === 'removeLiquidity'">
+          <remove-liquidity
+            [amountControl]="formGroup.controls['amountControl']"
+            [customBalance]="removeLiquidityBalance$ | async"
+            [customSymbol]="removeLiquiditySymbol"
+            [selectedWallet]="fromWallet$ | async"
+            [supportedWallets]="supportedFromWallets"
+            [selectedProtocol]="selectedFromProtocol"
+            [supportedProtocols]="supportedProtocolsFrom"
+            [amount]="inputAmount$ | async"
+            [minExchangeAmount]="minExchangeAmount$ | async"
+            [currentlyNotSupported]="currentlyNotSupported$ | async"
+          ></remove-liquidity>
+
+          <div class="divider--line"></div>
+
+          <exchange-selection
+            [hideExchangeSelection]="true"
+            [disableExchangeSelection]="true"
+            [activeExchange]="activeExchange$ | async"
+            [exchangeWidgets]="exchangeWidgets"
+            [wallet]="fromWallet$ | async"
+            [state]="state"
+            [exchangeForm]="exchangeForm"
+            (setupEmitter)="setup()"
+          ></exchange-selection>
+        </ng-container>
+
+        <ng-container *ngIf="segmentTypeInner === 'swap'">
+          <swap
+            [amountControl]="formGroup.controls['amountControl']"
+            [customBalance]="fromWalletBalance$ | async"
+            [selectedWallet]="fromWallet$ | async"
+            [supportedWallets]="supportedFromWallets"
+            [selectedProtocol]="selectedFromProtocol"
+            [supportedProtocols]="supportedProtocolsFrom"
+            [amount]="inputAmount$ | async"
+            [fiatAmount]="fiatInputAmount$ | async"
+            [minExchangeAmount]="minExchangeAmount$ | async"
+            [currentlyNotSupported]="currentlyNotSupported$ | async"
+            (protocolSetEmitter)="setFromProtocol($event)"
+            (walletSetEmitter)="setFromWallet($event, true)"
+          ></swap>
+
+          <swap
+            [selectedWallet]="toWallet$ | async"
+            [supportedWallets]="supportedToWallets"
+            [selectedProtocol]="selectedToProtocol"
+            [supportedProtocols]="supportedProtocolsTo"
+            [amount]="exchangeAmount$ | async"
+            [fiatAmount]="fiatExchangeAmount$ | async"
+            (protocolSetEmitter)="setToProtocol($event)"
+            (walletSetEmitter)="setToWallet($event)"
+            [disableWalletSelection]="true"
+            [swapSell]="false"
+          ></swap>
+        </ng-container>
+      </ng-container>
+
+      <exchange-selection
+        [disableExchangeSelection]="disableExchangeSelection"
+        [activeExchange]="activeExchange$ | async"
+        [exchangeWidgets]="exchangeWidgets"
+        [wallet]="fromWallet$ | async"
+        [state]="state"
+        [exchangeForm]="exchangeForm"
+        (setupEmitter)="setup()"
+      ></exchange-selection>
+    </ng-container>
+
     <ng-container *ngIf="exchangePageState === exchangePageStates.NOT_ENOUGH_CURRENCIES">
       <ion-row class="onboarding__container ion-padding">
-        <ion-col size="12">
+        <ion-col *ngIf="!isLiquidityExchange(activeExchange)" size="12">
           <h3 class="ion-no-margin" [innerHTML]="'exchange.no-currencies.heading' | translate"></h3>
           <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
           <p class="ion-no-margin ion-padding-bottom">{{ 'exchange.no-currencies.description' | translate }}</p>
@@ -34,59 +178,16 @@
             {{ 'exchange.no-currencies.exchange_label' | translate }}
           </ion-button>
         </ion-col>
-      </ion-row>
-    </ng-container>
 
-    <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
-      <swap
-        [selectedWallet]="fromWallet"
-        [supportedWallets]="supportedFromWallets"
-        [selectedProtocol]="selectedFromProtocol"
-        [supportedProtocols]="supportedProtocolsFrom"
-        [exchangeAmount]="amount"
-        [minExchangeAmount]="minExchangeAmount"
-        [currentlyNotSupported]="currentlyNotSupported"
-        (protocolSetEmitter)="setFromProtocol($event)"
-        (walletSetEmitter)="setFromWallet($event)"
-        (amountSetEmitter)="amountSet($event)"
-      ></swap>
-      <swap
-        [selectedWallet]="toWallet"
-        [supportedWallets]="supportedToWallets"
-        [selectedProtocol]="selectedToProtocol"
-        [supportedProtocols]="supportedProtocolsTo"
-        [exchangeAmount]="exchangeAmount"
-        (protocolSetEmitter)="setToProtocol($event)"
-        (walletSetEmitter)="setToWallet($event)"
-        [swapSell]="false"
-      ></swap>
-      <div class="divider--line"></div>
-      <ion-row class="powered__container ion-padding ion-align-items-center" *ngIf="!isTZBTCExchange">
-        <ion-col class="ion-no-padding">
-          <ion-row class="powered__container ion-align-items-center">
-            <ion-text color="blackLight">
-              <small>{{ 'exchange.powered-by_label' | translate }}</small>
-            </ion-text>
-            <img *ngIf="activeExchange === ExchangeEnum.CHANGENOW" src="./assets/img/changenow_logo.svg" />
-            <img *ngIf="activeExchange === ExchangeEnum.CHANGELLY" src="./assets/img/changelly_logo.svg" />
-            <img *ngIf="activeExchange === ExchangeEnum.QUIPUSWAP" src="./assets/img/quipuswap_logo.svg" />
-          </ion-row>
-        </ion-col>
-        <ion-col class="ion-no-padding justify--content__end">
-          <ion-button fill="clear" color="secondary" size="small" (click)="doRadio()" [disabled]="disableExchangeSelection">
-            {{ 'exchange.switch-exchange_label' | translate }}
-            <ion-icon name="chevron-down-outline"></ion-icon>
+        <ion-col *ngIf="isLiquidityExchange(activeExchange)" size="12">
+          <h3 class="ion-no-margin" [innerHTML]="'exchange.no-currencies-liquidity.heading' | translate"></h3>
+          <ion-col class="content--align__center-center ion-no-padding"><img src="./assets/img/token_swap.svg" /></ion-col>
+          <p class="ion-no-margin ion-padding-bottom">{{ 'exchange.no-currencies-liquidity.description' | translate }}</p>
+          <ion-button (click)="goToAddCoinPage()" shape="round" color="primary" expand="full">
+            {{ 'exchange.no-currencies.exchange_label' | translate }}
           </ion-button>
         </ion-col>
       </ion-row>
-
-      <ion-row *ngFor="let widget of exchangeWidgets" class="ion-padding-horizontal ion-padding-bottom">
-        <ion-col size="12">
-          <widget-selector [widget]="widget" [widgetForm]="exchangeForm.controls[activeExchange]"></widget-selector>
-        </ion-col>
-      </ion-row>
-
-      <fee [state]="state" [form]="exchangeForm" [wallet]="fromWallet"></fee>
     </ng-container>
   </ion-grid>
 </ion-content>
@@ -94,17 +195,41 @@
 <ng-container *ngIf="exchangePageState === exchangePageStates.EXCHANGE">
   <ion-fab vertical="bottom" horizontal="end">
     <ion-button
+      *ngIf="!isLiquidityExchange(activeExchange)"
       color="primary"
-      [disabled]="
-      amount?.isNaN() ||
-      amount?.isZero() ||
-      amount?.isLessThan(minExchangeAmount) ||
-      amount?.isGreaterThan(state.fromWalletBalance?.shiftedBy(-1 * fromWallet.protocol.decimals)) || currentlyNotSupported
-    "
       (click)="startExchange()"
       shape="round"
+      [disabled]="buttonDisabled$ | async"
     >
       {{ 'exchange.exchange_label' | translate }}
+    </ion-button>
+    <ion-button
+      *ngIf="isLiquidityExchange(activeExchange) && segmentTypeInner === 'addLiquidity'"
+      color="primary"
+      shape="round"
+      (click)="startExchange(true)"
+      [disabled]="buttonDisabled$ | async"
+    >
+      {{ 'exchange.liquidity.add_label' | translate }}
+    </ion-button>
+    <ion-button
+      *ngIf="isLiquidityExchange(activeExchange) && segmentTypeInner === 'removeLiquidity'"
+      color="primary"
+      shape="round"
+      (click)="startExchange(true)"
+      [disabled]="buttonDisabled$ | async"
+    >
+      {{ 'exchange.liquidity.remove_label' | translate }}
+    </ion-button>
+
+    <ion-button
+      *ngIf="isLiquidityExchange(activeExchange) && segmentTypeInner === 'swap'"
+      color="primary"
+      shape="round"
+      (click)="startExchange(true)"
+      [disabled]="buttonDisabled$ | async"
+    >
+      {{ 'exchange.liquidity.swap_label' | translate }}
     </ion-button>
   </ion-fab>
 </ng-container>

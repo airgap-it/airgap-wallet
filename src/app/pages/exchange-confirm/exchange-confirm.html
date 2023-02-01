@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-grid fixed="true" class="ion-no-padding">
+  <ion-grid class="ion-no-padding">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/"></ion-back-button>
@@ -54,7 +54,8 @@
       <ion-col size="9" class="ion-padding-bottom">
         <ion-label position="stacked" class="ion-text-uppercase">{{ 'exchange-confirm.buy-amount_label' | translate }}</ion-label>
         <div class="typography--mono" item-content>
-          <span class="typography--mono">{{ amountExpectedTo }} (~${{ toFiatAmount | number: '1.2-2' }})</span>
+          <span *ngIf="toFiatAmount" class="typography--mono">{{ amountExpectedTo }} (~${{ toFiatAmount | number: '1.2-2' }})</span>
+          <span *ngIf="!toFiatAmount" class="typography--mono">{{ amountExpectedTo }}</span>
         </div>
       </ion-col>
     </ion-row>

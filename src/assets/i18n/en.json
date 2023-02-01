@@ -421,6 +421,11 @@
   "exchange": {
     "title": "Exchange",
     "exchange_label": "Exchange",
+    "liquidity": {
+     "add_label": "Add Liquidity",
+     "remove_label": "Remove Liquidity",
+     "swap_label": "Swap" 
+    },
     "powered-by_label": "powered by",
     "switch-exchange_label": "Exchange",
     "onboarding": {
@@ -432,23 +437,33 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
+    },   
+    "no-currencies-liquidity": {
+      "heading": "To provide liquidity to the Tezos Liquidity Baking, you need both <span class=\"style__strong color__primary\">Tez</span> and <span class=\"style__strong color__primary\">tzBTC</span> in AirGap.",
+      "description": "Before you can provide or remove liquidty in AirGap you need to add both Tez and tzBTC",
+      "exchange_label": "Add Coins"
     },
     "loading": {
       "setup": "Setting up exchange...",
       "header": "Loading Error",
-      "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later"
+      "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later. <span class=\"style__strong color__secondary\">Note that you need to first add an account of the respective tokens you want to swap</span>"
     }
   },
   "swap": {
     "min-amount_label": "(min. {{minExchangeAmount}})",
+    "available_label": "{{minExchangeAmount}} ",
     "sell_label": "Sell",
     "buy_label": "Buy",
     "currently_not_supported": "The selected trading pair is currently not supported",
     "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
     "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
   },
+  "remove-liquidity": {
+    "receive": "You receive"
+  },
   "protocol-select": {
-    "title": "Select Coin"
+    "title": "Select Coin",
+    "swap_info": "In order to swap tokens of a certain kind, you need to first add an account of the respective token"
   },
   "exchange-select": {
     "title": "Select Exchange"
