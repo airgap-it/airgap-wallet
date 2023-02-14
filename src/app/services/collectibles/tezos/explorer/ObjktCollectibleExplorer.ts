@@ -35,7 +35,7 @@ interface TokenHolderResponse {
   token_holder?: TokenHolder[]
 }
 
-const OBJKT_API_URL = 'https://data.objkt.com/v2/graphql'
+const OBJKT_API_URL = 'https://data.objkt.com/v3/graphql'
 const OBJKT_PAGE_URL = 'https://objkt.com'
 const OBJKT_ASSETS_URL = 'https://assets.objkt.media/file/assets-003'
 
