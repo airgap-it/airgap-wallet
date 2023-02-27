@@ -41,6 +41,7 @@ export class ScanBasePage {
     const permission: PermissionStatus = await this.permissionsProvider.hasCameraPermission()
 
     if (permission === PermissionStatus.GRANTED) {
+      document.body.style.backgroundColor = 'transparent' // We need this for the background to be transparent when using dark mode
       this.hasCameraPermission = true
       this.startScan()
     }
