@@ -1,4 +1,4 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, PermissionsService } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -93,6 +93,7 @@ export class UnitHelper {
       { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
       { provide: FILESYSTEM_PLUGIN, useValue: this.mockRefs.filesystem },
       { provide: APP_CONFIG, useValue: appConfig },
+      { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules() },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
       { provide: LoadingController, useValue: this.mockRefs.loadingController }

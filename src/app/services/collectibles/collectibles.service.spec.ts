@@ -1,4 +1,4 @@
-import { APP_INFO_PLUGIN, APP_PLUGIN, MainProtocolStoreService, PermissionsService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
+import { APP_INFO_PLUGIN, APP_PLUGIN, IsolatedModulesPlugin, MainProtocolStoreService, PermissionsService, ProtocolService, SubProtocolStoreService, WebIsolatedModules } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
@@ -9,10 +9,16 @@ import { CollectiblesService } from './collectibles.service'
 describe('CollectiblesService', () => {
   let collectiblesService: CollectiblesService
   let protocolService: ProtocolService
+  let isolatedModules: IsolatedModulesPlugin
   let unitHelper: UnitHelper
 
   beforeAll(() => {
-    protocolService = protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    isolatedModules = new WebIsolatedModules()
+    protocolService = new ProtocolService(
+      new MainProtocolStoreService(isolatedModules), 
+      new SubProtocolStoreService(isolatedModules), 
+      isolatedModules
+    )
     protocolService.init()
   })
 
