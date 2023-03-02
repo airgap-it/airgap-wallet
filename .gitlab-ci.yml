@@ -1,4 +1,6 @@
-image: docker:latest
+include:
+  - project: "papers/papers-internal/internal"
+    file: "/.base-gitlab-ci.yml"
 
 variables:
   TEST_TAG: test_$CI_COMMIT_SHA
@@ -22,8 +24,6 @@ build_ionic:
   stage: build
   script:
     - docker build -t $TEST_TAG .
-  tags:
-    - docker
 
 unit:
   allow_failure: true
@@ -36,8 +36,6 @@ unit:
   after_script:
     - docker rm unit-$CI_COMMIT_SHA
     - docker rm lint-$CI_COMMIT_SHA
-  tags:
-    - docker
   artifacts:
     paths:
       - lcov.info
@@ -64,14 +62,10 @@ qa:
     - docker start -a qa-$CI_PIPELINE_ID
   after_script:
     - docker rm -f qa-$CI_PIPELINE_ID || true
-  tags:
-    - docker
 
 build-android:
   stage: platform_build
   when: manual
-  tags:
-    - docker
   variables:
     LOCAL_ANDROID: 'android-$CI_PIPELINE_ID'
   script:
@@ -131,8 +125,6 @@ build-mac:
 build-linux:
   stage: platform_build
   when: manual
-  tags:
-    - docker
   variables:
     LOCAL_LINUX: 'linux-$CI_PIPELINE_ID'
   script:
@@ -149,8 +141,6 @@ build-linux:
 build-windows:
   stage: platform_build
   when: manual
-  tags:
-    - docker
   variables:
     LOCAL_WINDOWS: 'windows-$CI_PIPELINE_ID'
   script:
@@ -173,8 +163,6 @@ build-web:
     - docker
   script:
     - docker build -f build/web/Dockerfile -t $GOOGLE_TAG -t $GOOGLE_TAG_DEV .
-  tags:
-    - docker
 
 publish-ios:
   stage: publish
@@ -190,58 +178,24 @@ publish-ios:
 
 publish-web-dev:
   stage: publish
+  extends: .publish-dev
   when: manual
   needs:
     - build-web
-  image: google/cloud-sdk
-  before_script:
-    - echo $GCLOUD_GOOGLE_KEY_DEV > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT_DEV
-    - gcloud config set project $GCLOUD_PROJECT_DEV
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud auth configure-docker
-  script:
-    - docker tag $GOOGLE_TAG_DEV $GOOGLE_TAG_LATEST_DEV
-    - docker push $GOOGLE_TAG_DEV
-    - docker push $GOOGLE_TAG_LATEST_DEV
-  tags:
-    - docker
+  
 
 publish-web-prod:
   stage: publish
+  extends: .publish-prod
   needs:
     - build-web
-  image: google/cloud-sdk
-  before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud auth configure-docker
-  script:
-    - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST
-    - docker push $GOOGLE_TAG
-    - docker push $GOOGLE_TAG_LATEST
-  only:
-    - master
-  tags:
-    - docker
 
 deploy-web-dev:
   stage: deploy
+  extends: .run_dev
   needs:
     - publish-web-dev
   when: manual
-  image: google/cloud-sdk
-  before_script:
-    - echo $GCLOUD_GOOGLE_KEY_DEV > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT_DEV
-    - gcloud config set project $GCLOUD_PROJECT_DEV
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud container clusters get-credentials papers-cluster-development
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
@@ -249,24 +203,13 @@ deploy-web-dev:
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/development/ --recursive
     - kubectl apply -f k8s/airgap-wallet/common/ --recursive
-  only:
-    - develop
-  tags:
-    - docker
 
 deploy-web-prod:
   stage: deploy
+  extends: .run_prod
   needs:
     - publish-web-prod
   when: manual
-  image: google/cloud-sdk
-  before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud container clusters get-credentials papers-cluster-production
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
@@ -274,7 +217,3 @@ deploy-web-prod:
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/production/ --recursive
     - kubectl apply -f k8s/airgap-wallet/common/ --recursive
-  only:
-    - master
-  tags:
-    - docker
