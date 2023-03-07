@@ -31,9 +31,9 @@ const protocols = [
 ]
 
 const getProtocolByIdentifier = async (identifier) => {
-  if (identifier === 'icp') {
+  if (identifier === 'icp' || identifier === 'icp_ckbtc') {
     const module = new airgapCoinLibICP.ICPModule()
-    let protocol = await module.createOnlineProtocol('icp')
+    let protocol = await module.createOnlineProtocol(identifier)
     protocol.getAddressesFromPublicKey = async (publicKey, cursor) => {
       const address = await protocol.getAddressFromPublicKey({ value: publicKey })
       return [{ address: address }]

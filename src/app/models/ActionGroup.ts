@@ -63,6 +63,9 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.MOONBEAM, async () => {
       return this.getMoonbeamActions()
     })
+    actionMap.set(MainProtocolSymbols.ICP, async () => {
+      return this.getICPActions()
+    })
 
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
@@ -249,6 +252,11 @@ export class ActionGroup {
     const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]
+  }
+
+  private getICPActions(): Action<any, any>[] {
+    // TODO: staking
+    return []
   }
 
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
