@@ -1,4 +1,4 @@
-import { APP_INFO_PLUGIN, APP_PLUGIN, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
+import { APP_INFO_PLUGIN, APP_PLUGIN, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ZIP_PLUGIN } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
@@ -19,7 +19,8 @@ describe('AppComponent', () => {
           { provide: SAPLING_PLUGIN, useValue: unitHelper.mockRefs.saplingNative },
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen },
-          { provide: CLIPBOARD_PLUGIN, useValue: unitHelper.mockRefs.clipboard }
+          { provide: CLIPBOARD_PLUGIN, useValue: unitHelper.mockRefs.clipboard },
+          { provide: ZIP_PLUGIN, useValue: unitHelper.mockRefs.zip }
         ],
         declarations: [AppComponent]
       })

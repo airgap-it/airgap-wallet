@@ -1,17 +1,15 @@
 import { ProtocolService } from '@airgap/angular-core'
+import { AirGapCoinWallet, AirGapMarketWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinSubProtocol, SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { assertNever } from '@airgap/coinlib-core/utils/assert'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import { AirGapCoinWallet, AirGapMarketWallet } from '@airgap/coinlib-core'
-import { SubProtocolType, ICoinSubProtocol } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
-import { assertNever } from '@airgap/coinlib-core/utils/assert'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 import { PriceService } from 'src/app/services/price/price.service'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
-import BigNumber from 'bignumber.js'
-import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 export interface IAccountWrapper {
   selected: boolean
@@ -107,33 +105,34 @@ export class SubAccountAddPage {
   }
 
   private async loadSubAccounts(subProtocols: ICoinSubProtocol[]) {
-    const balances = await this.wallet.protocol.getBalanceOfPublicKeyForSubProtocols(this.wallet.publicKey, subProtocols)
+    const accounts: IAccountWrapper[] = (
+      await Promise.all(
+        subProtocols.map(async (subProtocol) => {
+          const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
+          const wallet: AirGapMarketWallet = new AirGapCoinWallet(
+            subProtocol,
+            this.wallet.publicKey,
+            this.wallet.isExtendedPublicKey,
+            this.wallet.derivationPath,
+            this.wallet.masterFingerprint,
+            this.wallet.status,
+            this.priceService
+          )
+          if (this.accountProvider.walletExists(wallet)) {
+            return undefined
+          }
+          wallet.addresses = this.wallet.addresses
+          await wallet.synchronize()
 
-    const accounts: IAccountWrapper[] = balances
-      .map((balance, index) => {
-        const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
-        const wallet: AirGapMarketWallet = new AirGapCoinWallet(
-          subProtocols[index],
-          this.wallet.publicKey,
-          this.wallet.isExtendedPublicKey,
-          this.wallet.derivationPath,
-          this.wallet.masterFingerprint,
-          this.wallet.status,
-          this.priceService
-        )
-        if (this.accountProvider.walletExists(wallet)) {
-          return undefined
-        }
-        wallet.addresses = this.wallet.addresses
-        wallet.setCurrentBalance(new BigNumber(balance))
-
-        return {
-          wallet,
-          selected: false,
-          groupId: walletGroup !== undefined ? walletGroup.id : undefined,
-          groupLabel: walletGroup !== undefined ? walletGroup.label : undefined
-        }
-      })
+          return {
+            wallet,
+            selected: false,
+            groupId: walletGroup !== undefined ? walletGroup.id : undefined,
+            groupLabel: walletGroup !== undefined ? walletGroup.label : undefined
+          }
+        })
+      )
+    )
       .filter((account) => account !== undefined)
       .sort((a, b) => a.wallet.getCurrentBalance().minus(b.wallet.getCurrentBalance()).toNumber() * -1)
 

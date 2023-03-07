@@ -36,7 +36,8 @@ import {
   PushNotificationsMock,
   SaplingNativeMock,
   SplashScreenMock,
-  StatusBarMock
+  StatusBarMock,
+  ZipMock
 } from './plugins-mock'
 import { PermissionsServiceMock } from './service-mock'
 import { StorageMock } from './storage-mock'
@@ -59,7 +60,8 @@ export class UnitHelper {
     toastController: new ToastControllerMock(),
     alertController: new AlertControllerMock(),
     loadingController: new LoadingControllerMock(),
-    modalController: new ModalControllerMock()
+    modalController: new ModalControllerMock(),
+    zip: new ZipMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
