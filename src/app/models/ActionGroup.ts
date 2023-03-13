@@ -48,6 +48,9 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.COSMOS, async () => {
       return this.getCosmosActions()
     })
+    actionMap.set(MainProtocolSymbols.COREUM, async () => {
+      return this.getCoreumActions()
+    })
     actionMap.set(MainProtocolSymbols.POLKADOT, async () => {
       return this.getPolkadotActions()
     })
@@ -194,6 +197,18 @@ export class ActionGroup {
   }
 
   private async getCosmosActions(): Promise<Action<any, any>[]> {
+    const delegateButtonAction = this.createDelegateButtonAction()
+    const extraDelegatorButtonActions = await this.createDelegatorButtonActions({
+      type: CosmosDelegationActionType.WITHDRAW_ALL_REWARDS,
+      name: 'account-transaction-list.claim_rewards_label',
+      icon: 'logo-usd',
+      identifier: 'claim-rewards'
+    })
+
+    return [delegateButtonAction, ...extraDelegatorButtonActions]
+  }
+
+  private async getCoreumActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
     const extraDelegatorButtonActions = await this.createDelegatorButtonActions({
       type: CosmosDelegationActionType.WITHDRAW_ALL_REWARDS,

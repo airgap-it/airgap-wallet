@@ -20,9 +20,9 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/coinlib/coinlib.service'
 
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { V0ProtocolDelegationExtensions } from './base/V0ProtocolDelegationExtensions'
 
-export class TezosDelegationExtensions extends ProtocolDelegationExtensions<TezosProtocol> {
+export class TezosDelegationExtensions extends V0ProtocolDelegationExtensions<TezosProtocol> {
   private static instance: TezosDelegationExtensions
 
   public static async create(
