@@ -32,7 +32,7 @@ import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { V0ProtocolDelegationExtensions } from './base/V0ProtocolDelegationExtensions'
 
 // sorted by priority
 const delegateActions = [
@@ -56,7 +56,7 @@ enum ArgumentName {
   PAYEE = 'payee'
 }
 
-export class SubstrateDelegationExtensions extends ProtocolDelegationExtensions<SubstrateDelegateProtocol<SubstrateNetwork>> {
+export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtensions<SubstrateDelegateProtocol<SubstrateNetwork>> {
   private static instance: SubstrateDelegationExtensions
 
   public static create(

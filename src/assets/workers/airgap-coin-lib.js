@@ -12,6 +12,7 @@ self.importScripts('../libs/airgap-moonbeam.browserify.js')
 self.importScripts('../libs/airgap-polkadot.browserify.js')
 self.importScripts('../libs/airgap-tezos.browserify.js')
 self.importScripts('../libs/airgap-icp.browserify.js')
+self.importScripts('../libs/airgap-coreum.browserify.js')
 
 const protocols = [
   new airgapCoinLibAeternity.AeternityProtocol(),
@@ -36,6 +37,15 @@ const getProtocolByIdentifier = async (identifier) => {
     let protocol = await module.createOnlineProtocol(identifier)
     protocol.getAddressesFromPublicKey = async (publicKey, cursor) => {
       const address = await protocol.getAddressFromPublicKey({ value: publicKey })
+      return [{ address: address }]
+    }
+    return protocol
+  }
+  if (identifier === 'coreum') {
+    const module = new airgapCoinLibCoreum.CoreumModule()
+    let protocol = await module.createOnlineProtocol(identifier)
+    protocol.getAddressesFromPublicKey = async (publicKey, cursor) => {
+      const address = await protocol.getAddressFromPublicKey({ value: publicKey, type: 'pub', format: 'hex' })
       return [{ address: address }]
     }
     return protocol
