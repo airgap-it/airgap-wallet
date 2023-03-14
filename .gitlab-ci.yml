@@ -73,7 +73,7 @@ build-android:
     - docker build -f build/android/Dockerfile -t $GOOGLE_TAG_ANDROID_CURRENT --build-arg BUILD_NR="$CI_PIPELINE_ID" --build-arg VERSION="$VERSION" .
     - docker run --name $LOCAL_ANDROID $GOOGLE_TAG_ANDROID_CURRENT echo "container ran."
     - docker cp $LOCAL_ANDROID:/app/android-release-unsigned.apk airgap-wallet-release-unsigned-$CI_PIPELINE_ID.apk
-    - docker cp $LOCAL_ANDROID:/app/android-debug.apk airgap-wallet-debug-$CI_PIPELINE_ID.apk
+    - docker cp $LOCAL_ANDROID:/app/android-debug-aligned.apk airgap-wallet-debug-$CI_PIPELINE_ID.apk
   after_script:
     - docker rm -f $LOCAL_ANDROID || true
   artifacts:
@@ -180,9 +180,12 @@ publish-web-dev:
   stage: publish
   extends: .publish-dev
   when: manual
+  only:
+    - develop
+    - release/3.24.0
   needs:
     - build-web
-  
+
 
 publish-web-prod:
   stage: publish
@@ -196,6 +199,9 @@ deploy-web-dev:
   needs:
     - publish-web-dev
   when: manual
+  only:
+    - develop
+    - release/3.24.0
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
