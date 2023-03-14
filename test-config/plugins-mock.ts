@@ -52,3 +52,7 @@ export class StatusBarMock {
   public setStyle: jasmine.Spy = newSpy('setStyle', Promise.resolve())
   public setBackgroundColor: jasmine.Spy = newSpy('setBackgroundColor', Promise.resolve())
 }
+
+export class ZipMock {
+  public unzip: jasmine.Spy = newSpy('unzip', Promise.resolve())
+}

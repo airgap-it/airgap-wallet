@@ -1,28 +1,10 @@
-import { ICoinDelegateProtocol, ICoinProtocol, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
-import { TezosProtocol } from '@airgap/tezos'
+import { supportsV0Delegation } from '@airgap/angular-core'
+import { ICoinDelegateProtocol, ICoinProtocol } from '@airgap/coinlib-core'
 
 import { IAirGapCoinDelegateProtocol } from '../interfaces/IAirGapCoinDelegateProtocol'
 
 export function supportsDelegation(protocol: ICoinProtocol): protocol is ICoinDelegateProtocol {
-  const delegateProtocol = protocol as ICoinDelegateProtocol
-
-  // temporary until Tezos subprotocols stop inherit TezosProtocol and implement ICoinDelegateProtocol
-  const supportingTezosProtocols: string[] = [MainProtocolSymbols.XTZ, SubProtocolSymbols.XTZ_KT]
-  if (delegateProtocol instanceof TezosProtocol && !supportingTezosProtocols.includes(delegateProtocol.identifier)) {
-    return false
-  }
-
-  return (
-    !!delegateProtocol.getDefaultDelegatee &&
-    !!delegateProtocol.getCurrentDelegateesForPublicKey &&
-    !!delegateProtocol.getCurrentDelegateesForAddress &&
-    !!delegateProtocol.getDelegateeDetails &&
-    !!delegateProtocol.isPublicKeyDelegating &&
-    !!delegateProtocol.isAddressDelegating &&
-    !!delegateProtocol.getDelegationDetailsFromPublicKey &&
-    !!delegateProtocol.getDelegationDetailsFromAddress &&
-    !!delegateProtocol.prepareDelegatorActionFromPublicKey
-  )
+  return supportsV0Delegation(protocol)
 }
 
 export function supportsAirGapDelegation(protocol: ICoinProtocol): protocol is IAirGapCoinDelegateProtocol {

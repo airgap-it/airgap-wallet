@@ -84,4 +84,5 @@ RUN cp /app/android/app/build/outputs/apk/playstore/release/app-playstore-releas
 RUN cp android-release-unsigned.apk android-debug.apk
 
 # sign using debug key
-RUN jarsigner -verbose -keystore ./build/android/debug.keystore -storepass android -keypass android android-debug.apk androiddebugkey
+RUN zipalign -p -f -v 4 android-debug.apk android-debug-aligned.apk \
+    && apksigner sign --ks ./build/android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android android-debug-aligned.apk

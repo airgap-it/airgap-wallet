@@ -1,5 +1,5 @@
-import { AddressService, AmountConverterPipe } from '@airgap/angular-core'
-import { ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { ICoinDelegateProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { CosmosProtocol } from '@airgap/cosmos'
 import { MoonbaseProtocol, MoonbeamProtocol, MoonriverProtocol } from '@airgap/moonbeam'
 import { KusamaProtocol, PolkadotProtocol } from '@airgap/polkadot'
@@ -8,20 +8,22 @@ import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
+// import { CoreumDelegationExtensions } from 'src/app/extensions/delegation/CoreumDelegationExtensions'
 
 import { CosmosDelegationExtensions } from '../../extensions/delegation/CosmosDelegationExtensions'
 import { MoonbeamDelegationExtensions } from '../../extensions/delegation/MoonbeamDelegationExtensions'
-import { ProtocolDelegationExtensions } from '../../extensions/delegation/ProtocolDelegationExtensions'
+import { V0ProtocolDelegationExtensions } from '../../extensions/delegation/base/V0ProtocolDelegationExtensions'
 import { SubstrateDelegationExtensions } from '../../extensions/delegation/SubstrateDelegationExtensions'
 import { TezosDelegationExtensions } from '../../extensions/delegation/TezosDelegationExtensions'
 import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService } from '../coinlib/coinlib.service'
+import { V1ProtocolDelegationExtensions } from 'src/app/extensions/delegation/base/V1ProtocolDelegationExtensions'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
-  private extensions: [new () => ICoinDelegateProtocol, () => Promise<ProtocolDelegationExtensions<any>>][] = [
+  private v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = [
     [
       KusamaProtocol,
       async () =>
@@ -83,6 +85,20 @@ export class ExtensionsService {
     ]
   ]
 
+  private readonly v1Extensions: [ProtocolSymbols, () => Promise<V1ProtocolDelegationExtensions<any>>][] = [
+    // [
+    //   MainProtocolSymbols.COREUM,
+    //   async () =>
+    //     CoreumDelegationExtensions.create(
+    //       this.formBuilder,
+    //       this.decimalPipe,
+    //       this.amountConverterPipe,
+    //       this.shortenStringPipe,
+    //       this.translateService
+    //     )
+    // ]
+  ]
+
   public constructor(
     private readonly formBuilder: FormBuilder,
     private readonly decimalPipe: DecimalPipe,
@@ -90,12 +106,33 @@ export class ExtensionsService {
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly coinlibService: CoinlibService,
-    private readonly addressService: AddressService
+    private readonly addressService: AddressService,
+    private readonly protocolService: ProtocolService
   ) {}
 
   public async loadDelegationExtensions(): Promise<void> {
+    await Promise.all([
+      this.loadV0Extensions(),
+      this.loadV1Extensions()
+    ])
+  }
+
+  private async loadV0Extensions(): Promise<void> {
     await Promise.all(
-      this.extensions.map(async ([protocol, extensionFactory]) => await ProtocolDelegationExtensions.load(protocol, extensionFactory))
+      this.v0Extensions.map(async ([protocol, extensionFactory]) => await V0ProtocolDelegationExtensions.load(protocol, extensionFactory))
+    )
+  }
+
+  private async loadV1Extensions(): Promise<void> {
+    await Promise.all(
+      this.v1Extensions.map(async ([protocolIdentifier, extensionFactory]) => {
+        const protocol = await this.protocolService.getProtocol(protocolIdentifier)
+        if (!(protocol instanceof ICoinDelegateProtocolAdapter)) {
+          return
+        }
+
+        V1ProtocolDelegationExtensions.load(protocol, extensionFactory)
+      })
     )
   }
 }

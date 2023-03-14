@@ -1,4 +1,4 @@
-import { MainProtocolStoreService, ProtocolService, SubProtocolStoreService } from '@airgap/angular-core'
+import { IsolatedModulesPlugin, MainProtocolStoreService, ProtocolService, SubProtocolStoreService, WebIsolatedModules } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 
@@ -7,9 +7,15 @@ import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe
   let protocolService: ProtocolService
+  let isolatedModules: IsolatedModulesPlugin
 
   beforeAll(() => {
-    protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    isolatedModules = new WebIsolatedModules()
+    protocolService = new ProtocolService(
+      new MainProtocolStoreService(isolatedModules), 
+      new SubProtocolStoreService(isolatedModules), 
+      isolatedModules
+    )
     protocolService.init()
   })
 

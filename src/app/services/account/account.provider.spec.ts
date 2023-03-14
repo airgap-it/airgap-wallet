@@ -1,10 +1,12 @@
 import {
   APP_INFO_PLUGIN,
   APP_PLUGIN,
+  IsolatedModulesPlugin,
   MainProtocolStoreService,
   PermissionsService,
   ProtocolService,
-  SubProtocolStoreService
+  SubProtocolStoreService,
+  WebIsolatedModules
 } from '@airgap/angular-core'
 import { BitcoinProtocol } from '@airgap/bitcoin'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus } from '@airgap/coinlib-core'
@@ -21,12 +23,18 @@ import { AppService } from '../app/app.service'
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
   let protocolService: ProtocolService
+  let isolatedModules: IsolatedModulesPlugin
   let appService: AppService
 
   let unitHelper: UnitHelper
 
   beforeAll(async () => {
-    protocolService = protocolService = new ProtocolService(new MainProtocolStoreService(), new SubProtocolStoreService())
+    isolatedModules = new WebIsolatedModules()
+    protocolService = new ProtocolService(
+      new MainProtocolStoreService(isolatedModules), 
+      new SubProtocolStoreService(isolatedModules), 
+      isolatedModules
+    )
     await protocolService.init()
     appService = new AppService()
     appService.setReady()

@@ -11,13 +11,18 @@ import {
   DeeplinkService,
   FeeConverterPipe,
   FILESYSTEM_PLUGIN,
+  ISOLATED_MODULES_PLUGIN,
   PermissionsService,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
-  STATUS_BAR_PLUGIN
+  STATUS_BAR_PLUGIN,
+  WebIsolatedModules,
+  Zip,
+  ZIP_PLUGIN
 } from '@airgap/angular-core'
 import { AirGapAngularNgRxModule, currencySymbolNgRxFacade } from '@airgap/angular-ngrx'
+import { ICPModule } from '@airgap/icp'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -43,8 +48,10 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
+
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
+import { metaReducers, ROOT_REDUCERS } from './app.reducers'
 import { SaplingNative } from './capacitor-plugins/definitions'
 import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
@@ -53,6 +60,7 @@ import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.m
 import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
 import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
+import { ExchangeEffects } from './pages/exchange/effects'
 import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
@@ -78,8 +86,6 @@ import { PushBackendProvider } from './services/push-backend/push-backend'
 import { PushProvider } from './services/push/push'
 import { SaplingService } from './services/sapling/sapling.service'
 import { WalletStorageService } from './services/storage/storage'
-import { metaReducers, ROOT_REDUCERS } from './app.reducers'
-import { ExchangeEffects } from './pages/exchange/effects'
 
 export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   return new AirGapTranslateLoader(http, { prefix: './assets/i18n/', suffix: '.json' })
@@ -147,6 +153,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
+    { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules([new ICPModule()]) },
+    { provide: ZIP_PLUGIN, useValue: Zip },
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,

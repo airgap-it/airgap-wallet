@@ -22,7 +22,7 @@ import { UIInputWidget } from '../../models/widgets/UIInputWidget'
 import { UIWidget } from '../../models/widgets/UIWidget'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 
-import { ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
+import { V0ProtocolDelegationExtensions } from './base/V0ProtocolDelegationExtensions'
 
 enum ArgumentName {
   COLLATOR = 'collator',
@@ -35,7 +35,7 @@ enum ArgumentName {
   LESS_CONTROL = 'lessControl'
 }
 
-export class MoonbeamDelegationExtensions extends ProtocolDelegationExtensions<MoonbeamProtocol> {
+export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions<MoonbeamProtocol> {
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,

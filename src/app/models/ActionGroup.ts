@@ -48,6 +48,9 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.COSMOS, async () => {
       return this.getCosmosActions()
     })
+    actionMap.set(MainProtocolSymbols.COREUM, async () => {
+      return this.getCoreumActions()
+    })
     actionMap.set(MainProtocolSymbols.POLKADOT, async () => {
       return this.getPolkadotActions()
     })
@@ -62,6 +65,9 @@ export class ActionGroup {
     })
     actionMap.set(MainProtocolSymbols.MOONBEAM, async () => {
       return this.getMoonbeamActions()
+    })
+    actionMap.set(MainProtocolSymbols.ICP, async () => {
+      return this.getICPActions()
     })
 
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
@@ -202,6 +208,18 @@ export class ActionGroup {
     return [delegateButtonAction, ...extraDelegatorButtonActions]
   }
 
+  private async getCoreumActions(): Promise<Action<any, any>[]> {
+    const delegateButtonAction = this.createDelegateButtonAction()
+    const extraDelegatorButtonActions = await this.createDelegatorButtonActions({
+      type: CosmosDelegationActionType.WITHDRAW_ALL_REWARDS,
+      name: 'account-transaction-list.claim_rewards_label',
+      icon: 'logo-usd',
+      identifier: 'claim-rewards'
+    })
+
+    return [delegateButtonAction, ...extraDelegatorButtonActions]
+  }
+
   private getEthereumActions(): Action<any, any>[] {
     const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
       { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
@@ -249,6 +267,11 @@ export class ActionGroup {
     const delegateButtonAction = this.createDelegateButtonAction()
 
     return [delegateButtonAction]
+  }
+
+  private getICPActions(): Action<any, any>[] {
+    // TODO: staking
+    return []
   }
 
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {

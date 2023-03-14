@@ -10,17 +10,8 @@ import {
   ProtocolService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
-  ICoinProtocolAdapter
+  IsolatedModulesService
 } from '@airgap/angular-core'
-
-import {
-  AirGapModule,
-  AirGapOnlineProtocol,
-  AirGapBlockExplorer,
-  AirGapV3SerializerCompanion,
-  V3SchemaConfiguration
-} from '@airgap/module-kit'
-import { ICPModule } from '@airgap/icp'
 
 import {
   AirGapMarketWallet,
@@ -28,16 +19,11 @@ import {
   ICoinProtocol,
   ICoinSubProtocol,
   MainProtocolSymbols,
-  NetworkType,
-  ProtocolSymbols
+  NetworkType
 } from '@airgap/coinlib-core'
 import {
   generateId,
-  IACMessageType,
-  SerializerV3,
-  TransactionSignRequest,
-  TransactionSignResponse,
-  TransactionValidator
+  IACMessageType
 } from '@airgap/serializer'
 import {
   TezosProtocolNetwork,
@@ -81,18 +67,6 @@ import { WalletconnectService } from './services/walletconnect/walletconnect.ser
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
 
-class GenericTransactionValidator implements TransactionValidator {
-  public constructor(private readonly protocolIdentifier: string, private readonly serializerCompanion: AirGapV3SerializerCompanion) {}
-
-  public async validateUnsignedTransaction(transaction: TransactionSignRequest): Promise<any> {
-    return this.serializerCompanion.validateTransactionSignRequest(this.protocolIdentifier, transaction)
-  }
-
-  public async validateSignedTransaction(transaction: TransactionSignResponse): Promise<any> {
-    return this.serializerCompanion.validateTransactionSignResponse(this.protocolIdentifier, transaction)
-  }
-}
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
@@ -121,6 +95,7 @@ export class AppComponent implements AfterViewInit {
     private readonly saplingNativeService: SaplingNativeService,
     private readonly themeService: ThemeService,
     private readonly navigationService: NavigationService,
+    private readonly isolatedModulesService: IsolatedModulesService,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
@@ -243,6 +218,8 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeProtocols(): Promise<void> {
+    const v1Protocols = await this.isolatedModulesService.loadProtocols('online')
+
     const ghostnetNetwork: TezosProtocolNetwork = new TezosProtocolNetwork(
       'Ghostnet',
       NetworkType.TESTNET,
@@ -255,33 +232,14 @@ export class AppComponent implements AfterViewInit {
     )
     const ghostnetProtocol: TezosProtocol = new TezosProtocol(new TezosProtocolOptions(ghostnetNetwork))
 
-    // ICP MODULE
-    const module: AirGapModule = new ICPModule()
-    const [protocol, blockExplorer, v3SerializerCompanion]: [
-      AirGapOnlineProtocol,
-      AirGapBlockExplorer,
-      AirGapV3SerializerCompanion
-    ] = await Promise.all([module.createOnlineProtocol('icp'), module.createBlockExplorer('icp'), module.createV3SerializerCompanion()])
-
-    v3SerializerCompanion.schemas.forEach((configuration: V3SchemaConfiguration) => {
-      SerializerV3.addSchema(configuration.type, configuration.schema, configuration.protocolIdentifier as ProtocolSymbols)
-
-      if (configuration.protocolIdentifier) {
-        SerializerV3.addValidator(configuration.protocolIdentifier as ProtocolSymbols, {
-          create(): TransactionValidator {
-            return new GenericTransactionValidator(configuration.protocolIdentifier, v3SerializerCompanion)
-          }
-        })
-      }
-    })
-
-    console.log("SerializerV3", SerializerV3.getInstance());
-
-    const adapter = await ICoinProtocolAdapter.create(protocol, blockExplorer, v3SerializerCompanion)
-
     await this.protocolService.init({
-      extraActiveProtocols: [ghostnetProtocol, adapter],
-      extraPassiveSubProtocols: [[ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))]]
+      extraActiveProtocols: [ghostnetProtocol, ...v1Protocols.activeProtocols],
+      extraPassiveProtocols: v1Protocols.passiveProtocols.length > 0 ? [...v1Protocols.passiveProtocols] : undefined,
+      extraActiveSubProtocols: v1Protocols.activeSubProtocols.length > 0 ? [...v1Protocols.activeSubProtocols] : undefined,
+      extraPassiveSubProtocols: [
+        [ghostnetProtocol, new TezosKtProtocol(new TezosProtocolOptions(ghostnetNetwork))],
+        ...v1Protocols.passiveSubProtocols
+      ]
     })
 
     await Promise.all([this.initSaplingProtocols(), this.getGenericSubProtocols(), this.initializeTezosDomains()])

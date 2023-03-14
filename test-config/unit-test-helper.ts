@@ -1,4 +1,4 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, PermissionsService } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -36,7 +36,8 @@ import {
   PushNotificationsMock,
   SaplingNativeMock,
   SplashScreenMock,
-  StatusBarMock
+  StatusBarMock,
+  ZipMock
 } from './plugins-mock'
 import { PermissionsServiceMock } from './service-mock'
 import { StorageMock } from './storage-mock'
@@ -59,7 +60,8 @@ export class UnitHelper {
     toastController: new ToastControllerMock(),
     alertController: new AlertControllerMock(),
     loadingController: new LoadingControllerMock(),
-    modalController: new ModalControllerMock()
+    modalController: new ModalControllerMock(),
+    zip: new ZipMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
@@ -93,6 +95,7 @@ export class UnitHelper {
       { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
       { provide: FILESYSTEM_PLUGIN, useValue: this.mockRefs.filesystem },
       { provide: APP_CONFIG, useValue: appConfig },
+      { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules() },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
       { provide: LoadingController, useValue: this.mockRefs.loadingController }
