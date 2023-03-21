@@ -22,6 +22,7 @@ import {
   ZIP_PLUGIN
 } from '@airgap/angular-core'
 import { AirGapAngularNgRxModule, currencySymbolNgRxFacade } from '@airgap/angular-ngrx'
+import { CoreumModule } from '@airgap/coreum'
 import { ICPModule } from '@airgap/icp'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
@@ -153,7 +154,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
-    { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules([new ICPModule()]) },
+    { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules([new ICPModule(), new CoreumModule()]) },
     { provide: ZIP_PLUGIN, useValue: Zip },
     DecimalPipe,
     ShortenStringPipe,
