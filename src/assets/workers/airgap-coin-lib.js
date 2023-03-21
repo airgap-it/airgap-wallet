@@ -55,6 +55,9 @@ const getProtocolByIdentifier = async (identifier) => {
 
 self.onmessage = (event) => {
   const wallets = event.data
+  if (wallets.map === undefined) {
+    return;
+  }
 
   Promise.all(
     wallets.map(async (wallet) => {

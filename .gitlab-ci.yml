@@ -182,7 +182,6 @@ publish-web-dev:
   when: manual
   only:
     - develop
-    - release/3.24.0
   needs:
     - build-web
 
@@ -201,7 +200,6 @@ deploy-web-dev:
   when: manual
   only:
     - develop
-    - release/3.24.0
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
