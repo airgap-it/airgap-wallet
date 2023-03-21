@@ -1,5 +1,5 @@
 import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter, ProtocolService } from '@airgap/angular-core'
-import { ICoinDelegateProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinDelegateProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { CosmosProtocol } from '@airgap/cosmos'
 import { MoonbaseProtocol, MoonbeamProtocol, MoonriverProtocol } from '@airgap/moonbeam'
 import { KusamaProtocol, PolkadotProtocol } from '@airgap/polkadot'
@@ -8,7 +8,7 @@ import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-// import { CoreumDelegationExtensions } from 'src/app/extensions/delegation/CoreumDelegationExtensions'
+import { CoreumDelegationExtensions } from 'src/app/extensions/delegation/CoreumDelegationExtensions'
 
 import { CosmosDelegationExtensions } from '../../extensions/delegation/CosmosDelegationExtensions'
 import { MoonbeamDelegationExtensions } from '../../extensions/delegation/MoonbeamDelegationExtensions'
@@ -86,17 +86,17 @@ export class ExtensionsService {
   ]
 
   private readonly v1Extensions: [ProtocolSymbols, () => Promise<V1ProtocolDelegationExtensions<any>>][] = [
-    // [
-    //   MainProtocolSymbols.COREUM,
-    //   async () =>
-    //     CoreumDelegationExtensions.create(
-    //       this.formBuilder,
-    //       this.decimalPipe,
-    //       this.amountConverterPipe,
-    //       this.shortenStringPipe,
-    //       this.translateService
-    //     )
-    // ]
+    [
+      MainProtocolSymbols.COREUM,
+      async () =>
+        CoreumDelegationExtensions.create(
+          this.formBuilder,
+          this.decimalPipe,
+          this.amountConverterPipe,
+          this.shortenStringPipe,
+          this.translateService
+        )
+    ]
   ]
 
   public constructor(

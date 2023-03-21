@@ -253,35 +253,6 @@ export class TezosDelegationExtensions extends V0ProtocolDelegationExtensions<Te
       : null
   }
 
-  // private async createDelegatorDisplayRewards(
-  //   protocol: TezosProtocol,
-  //   address: string,
-  //   delegatorExtraInfo: DelegationInfo
-  // ): Promise<UIRewardList | undefined> {
-  //   if (!delegatorExtraInfo.isDelegated || !delegatorExtraInfo.value) {
-  //     return undefined
-  //   }
-  //   const rewardInfo = await protocol.getDelegationRewards(delegatorExtraInfo.value, address)
-
-  //   return new UIRewardList({
-  //     rewards: await Promise.all(
-  //       rewardInfo.map(async (info) => {
-  //         return {
-  //           index: info.cycle,
-  //           amount: await this.amountConverterPipe.transform(new BigNumber(info.reward), {
-  //             protocol
-  //           }),
-  //           collected: info.payout < new Date(),
-  //           timestamp: info.payout.getTime()
-  //         }
-  //       })
-  //     ),
-  //     indexColLabel: 'delegation-detail-tezos.rewards.index-col_label',
-  //     amountColLabel: 'delegation-detail-tezos.rewards.amount-col_label',
-  //     payoutColLabel: 'delegation-detail-tezos.rewards.payout-col_label'
-  //   })
-  // }
-
   private async getKnownBakers(): Promise<TezosBakerCollection> {
     if (this.knownBakers === undefined) {
       this.knownBakers = await this.coinlibService.getKnownTezosBakers()
