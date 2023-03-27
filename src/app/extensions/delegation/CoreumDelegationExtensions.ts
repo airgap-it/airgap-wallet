@@ -66,7 +66,11 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
     super()
   }
 
-  // TODO: add translations
+  public airGapDelegatee(_protocol: ICoinDelegateProtocolAdapter<CoreumProtocol>): string | undefined {
+    return 'corevaloper1xprcq3xdcuht0a8p082l3srgtwfgl57h2avmsq'
+  }
+
+
   public async getExtraDelegationDetailsFromAddress(
     adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>,
     delegator: string,
@@ -504,12 +508,4 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
 
     return details
   }
-
-  // private async getKnownValidators(): Promise<CosmosValidatorDetails[]> {
-  //   if (this.knownValidators === undefined) {
-  //     this.knownValidators = await this.coinlibService.getKnownCosmosValidators()
-  //   }
-
-  //   return this.knownValidators
-  // }
 }
