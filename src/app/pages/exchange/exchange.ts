@@ -9,6 +9,7 @@ import {
   ProtocolSymbols,
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
+import { RskProtocol } from '@airgap/rsk'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { EthereumProtocol } from '@airgap/ethereum'
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
@@ -360,6 +361,10 @@ export class ExchangePage implements OnInit, OnDestroy {
       } else if (this.selectedFromProtocol?.identifier === SubProtocolSymbols.XTZ_BTC) {
         feeCurrentMarketPrice = await this.priceService
           .getCurrentMarketPrice(new TezosProtocol(), 'USD')
+          .then((price: BigNumber) => price.toNumber())
+      } else if (this.selectedFromProtocol.identifier.startsWith(SubProtocolSymbols.RBTC_ERC20)) {
+        feeCurrentMarketPrice = this.priceService
+          .getCurrentMarketPrice(new RskProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
       } else {
         feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()

@@ -15,6 +15,7 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { CosmosTransaction } from '@airgap/cosmos'
+import { RawRskTransaction } from '@airgap/rsk'
 import { RawEthereumTransaction } from '@airgap/ethereum'
 import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
 import { RawSubstrateTransaction } from '@airgap/substrate'
@@ -43,6 +44,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
 export type SerializableTx =
   | RawTezosTransaction
   | RawEthereumTransaction
+  | RawRskTransaction
   | RawBitcoinTransaction
   | RawAeternityTransaction
   | CosmosTransaction

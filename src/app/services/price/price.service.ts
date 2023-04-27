@@ -218,7 +218,10 @@ export class PriceService implements AirGapWalletPriceService {
         yfi: 'yearn-finance',
         zb: 'zb-token',
         zil: 'zilliqa',
-        xchf: 'cryptofranc'
+        xchf: 'cryptofranc',
+        rbtc: 'rootstock',
+        rif: 'rif-token',
+        sov: 'sovryn'
       }
 
       const id = symbolMapping[protocol.marketSymbol.toLowerCase()]

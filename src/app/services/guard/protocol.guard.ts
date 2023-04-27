@@ -20,7 +20,7 @@ export class ProtocolGuard implements CanActivate {
     let subSymbols: string[] = Object.values(SubProtocolSymbols).map((p: SubProtocolSymbols) => p.toString())
 
     if (mainProtocolID !== undefined) {
-      if (mainProtocolID === MainProtocolSymbols.ETH || mainProtocolID === MainProtocolSymbols.XTZ) {
+      if (mainProtocolID === MainProtocolSymbols.ETH || mainProtocolID === MainProtocolSymbols.RBTC || mainProtocolID === MainProtocolSymbols.XTZ) {
         subSymbols = (await this.protocolService.getAllSubProtocols(mainProtocolID)).map((protocol: ICoinProtocol) =>
           protocol.identifier.toString()
         )

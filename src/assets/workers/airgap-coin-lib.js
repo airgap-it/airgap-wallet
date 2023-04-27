@@ -19,6 +19,7 @@ const protocols = [
   new airgapCoinLibBitcoin.BitcoinProtocol(),
   new airgapCoinLibBitcoin.BitcoinSegwitProtocol(),
   new airgapCoinLibEthereum.EthereumProtocol(),
+  new airgapCoinLib.addSupportedProtocol(new airgapCoinLib.RskProtocol()),
   new airgapCoinLibGroestlcoin.GroestlcoinProtocol(),
   new airgapCoinLibTezos.TezosProtocol(),
   new airgapCoinLibCosmos.CosmosProtocol(),

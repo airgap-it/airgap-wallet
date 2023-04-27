@@ -3,6 +3,7 @@ import { AirGapMarketWallet, AirGapNFTWallet, MainProtocolSymbols, SubProtocolSy
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { EthereumProtocol } from '@airgap/ethereum'
+import { RskProtocol } from '@airgap/rsk'
 import { IACMessageType } from '@airgap/serializer'
 import { SubstrateProtocol } from '@airgap/substrate'
 import { TezosProtocol } from '@airgap/tezos'
@@ -401,6 +402,8 @@ export class TransactionPreparePage {
       return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
       return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+    } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.RBTC_ERC20)) {
+      return this.priceService.getCurrentMarketPrice(new RskProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.getCurrentMarketPrice(this.collectibleID)?.toNumber() ?? 0
     }

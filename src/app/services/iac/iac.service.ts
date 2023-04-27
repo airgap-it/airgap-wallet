@@ -144,7 +144,7 @@ export class IACService extends BaseIACService {
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
-    if (protocol === MainProtocolSymbols.XTZ) {
+    if (protocol === MainProtocolSymbols.XTZ || protocol === MainProtocolSymbols.RBTC) {
       await this.beaconService.respond(response, cachedRequest[0])
     } else if (protocol === MainProtocolSymbols.ETH) {
       await this.walletConnectService.approveRequest(response.id, response.signature)
