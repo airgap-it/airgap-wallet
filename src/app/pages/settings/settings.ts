@@ -112,6 +112,14 @@ export class SettingsPage {
     this.browserService.openUrl('https://github.com/airgap-it')
   }
 
+  public airgapWebsite(): void {
+    this.browserService.openUrl('https://airgap.it/')
+  }
+
+  public airgapShop(): void {
+    this.browserService.openUrl('https://shop.airgap.it/')
+  }
+
   public faq(): void {
     this.browserService.openUrl('https://support.airgap.it')
   }

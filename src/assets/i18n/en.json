@@ -100,6 +100,7 @@
     "go_label": "Let's Go"
   },
   "portfolio": {
+    "shop_banner": "Gain an extra layer of security - Get the AirGap Recovery Plate",
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the <span class=\"style__strong color__primary\">AirGap Vault</span> application where your secret is securely stored.",
     "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
     "add-coins_label": "Add Coins"
@@ -142,7 +143,9 @@
     "faq_label": "FAQ",
     "discord_label": "Join Discord",
     "share_label": "Share AirGap",
-    "information_label": "Information",
+    "information_label": "More",
+    "airgap_website": "AirGap Website",
+    "airgap_shop": "AirGap Shop",
     "github_label": "GitHub Repository",
     "other_label": "Other",
     "paste-from-clipboard_label": "Paste code from clipboard",
@@ -422,9 +425,9 @@
     "title": "Exchange",
     "exchange_label": "Exchange",
     "liquidity": {
-     "add_label": "Add Liquidity",
-     "remove_label": "Remove Liquidity",
-     "swap_label": "Swap" 
+      "add_label": "Add Liquidity",
+      "remove_label": "Remove Liquidity",
+      "swap_label": "Swap"
     },
     "powered-by_label": "powered by",
     "switch-exchange_label": "Exchange",
@@ -437,7 +440,7 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
-    },   
+    },
     "no-currencies-liquidity": {
       "heading": "To provide liquidity to the Tezos Liquidity Baking, you need both <span class=\"style__strong color__primary\">Tez</span> and <span class=\"style__strong color__primary\">tzBTC</span> in AirGap.",
       "description": "Before you can provide or remove liquidty in AirGap you need to add both Tez and tzBTC",
@@ -1020,7 +1023,7 @@
     "injector-url_text": "AirGap is compatible with the injector service reference implementation available on the <a href='' target='_blank'>AirGap GitHub</a>.",
     "paste_label": "Paste",
     "include-injector_label": "Injector Service",
-    "include-injector_text": "Privacy preserving and usability improvement with the injectors service. Sapling transactions have to be signed only once in AirGap instead of twice with this service.", 
+    "include-injector_text": "Privacy preserving and usability improvement with the injectors service. Sapling transactions have to be signed only once in AirGap instead of twice with this service.",
     "warning": {
       "contract-not-compatible": "The contract seems not to be compatible, you may still use it, if you're sure it'll work.",
       "contract-cannot-assess-compatibility": "The contract address could not be verified, you may still use it, if you're sure it'll work."

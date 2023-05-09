@@ -13,6 +13,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
 import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { map, take } from 'rxjs/operators'
+import axios from 'axios'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -39,6 +40,10 @@ export class PortfolioPage {
 
   private subscriptions: Subscription[] = []
 
+  // Shop banner
+  public shopBannerText: string = ''
+  public shopBannerLink: string = ''
+
   constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
@@ -62,6 +67,12 @@ export class PortfolioPage {
       this.calculateTotal(this.walletsProvider.getActiveWalletList())
     })
     this.subscriptions.push(walletChangedSub)
+
+    const url = `https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url=${encodeURI('https://airgap.it/wallet-announcement/')}`
+    axios.get<{ text: string, link: string }>(url).then(response => {
+      this.shopBannerText = response.data.text
+      this.shopBannerLink = response.data.link
+    })
   }
 
   private refreshWalletGroups(wallets: AirGapMarketWallet[]) {
@@ -117,7 +128,7 @@ export class PortfolioPage {
     the app has to be restarted or another wallet has to be added. When investigating,
     we saw that it is related to the transition phase. If the observable emits at the same time
     as the transition is happening, then this weird state occurs. If we simply wait, everything
-    works as intended. 
+    works as intended.
     */
     setTimeout(() => {
       this.walletGroups.next(groups)
@@ -166,7 +177,7 @@ export class PortfolioPage {
 
     allWalletsSynced.pipe(take(1)).subscribe(() => {
       this.calculateTotal(this.walletsProvider.getActiveWalletList(), event ? event.target : null)
-      this.wallets.pipe(take(1)).subscribe(wallets => this.refreshWalletGroups(wallets))
+      this.wallets.pipe(take(1)).subscribe((wallets) => this.refreshWalletGroups(wallets))
     })
   }
 
@@ -198,5 +209,9 @@ export class PortfolioPage {
       sub.unsubscribe()
     }
     this.subscriptions = []
+  }
+
+  public onClickShopBanner() {
+    if (this.shopBannerLink.length > 0) window.open(this.shopBannerLink, '_blank')
   }
 }
