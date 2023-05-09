@@ -99,6 +99,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
   public async getExtraDelegationDetailsFromAddress(
     protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {

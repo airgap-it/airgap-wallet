@@ -43,7 +43,7 @@ export abstract class UIInputWidget<T> extends UIWidget {
     }
 
     this.formControl.valueChanges.subscribe((value) => {
-      if (value) {
+      if (value !== undefined || value !== null) {
         this.value = value
         this.onValueChanged()
       }

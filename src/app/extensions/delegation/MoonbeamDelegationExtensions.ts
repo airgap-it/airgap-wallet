@@ -64,6 +64,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
 
   public async getExtraDelegationDetailsFromAddress(
     protocol: MoonbeamProtocol,
+    _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
@@ -132,7 +133,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
         current: ownBond,
         total: totalBond
       },
-      displayDetails,
+      displayDetails
     }
   }
 
@@ -491,7 +492,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
       alerts.push(
         new UIAlert({
           title: 'delegation-detail-moonbeam.alert.collator-oversubscribed.title',
-          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', { 
+          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', {
             maxTopDelegations: maxTopDelegations.toString(),
             minStakingAmount: await this.amountConverterPipe.transform(delegationDetails.collatorDetails.minEligibleBalance, {
               protocol,

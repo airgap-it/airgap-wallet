@@ -63,6 +63,7 @@ export class DelegationListPage {
       this.areMultipleDelegationsSupported = info.areMultipleDelegationsSupported
       this.callback = info.callback
 
+      // tslint:disable-next-line: no-floating-promises
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then((summary: UIAccountSummary[]) => {
         this.currentDelegatees = summary.filter(
           (summary) => summary.address !== undefined && info.currentDelegatees.includes(summary.address)

@@ -1,7 +1,7 @@
 import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
-import { Component, Input } from '@angular/core'
-import { AirGapMarketWallet, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { Component, Input } from '@angular/core'
 import BigNumber from 'bignumber.js'
 import { Observable, Subscription } from 'rxjs'
 
@@ -78,10 +78,7 @@ export class PortfolioItemComponent {
       if (!supportsDelegation(this.wallet.protocol)) {
         this.isDelegated = null
       } else {
-        this.isDelegated = await this.operationsProvider.getDelegationStatusObservableOfAddress(
-          this.wallet?.protocol as ICoinDelegateProtocol,
-          this.wallet?.receivingPublicAddress
-        )
+        this.isDelegated = await this.operationsProvider.getDelegationStatusObservable(this.wallet)
       }
     }
   }

@@ -159,7 +159,9 @@ export class ActionGroup {
   }
 
   private async getTezosShieldedTezActions(): Promise<Action<any, any>[]> {
-    const shieldedTezProtocol = (await this.callerContext.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)) as TezosShieldedTezProtocol
+    const shieldedTezProtocol = (await this.callerContext.protocolService.getProtocol(
+      MainProtocolSymbols.XTZ_SHIELDED
+    )) as TezosShieldedTezProtocol
     const isContractSet = (await shieldedTezProtocol.getOptions()).config.contractAddress !== undefined
 
     const setContract: ButtonAction<void, void> = new ButtonAction(
@@ -269,9 +271,9 @@ export class ActionGroup {
     return [delegateButtonAction]
   }
 
-  private getICPActions(): Action<any, any>[] {
-    // TODO: staking
-    return []
+  private async getICPActions(): Promise<Action<any, any>[]> {
+    const delegateButtonAction = this.createDelegateButtonAction()
+    return [delegateButtonAction]
   }
 
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {

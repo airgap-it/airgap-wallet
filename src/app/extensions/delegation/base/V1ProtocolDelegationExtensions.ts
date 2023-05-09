@@ -7,7 +7,9 @@ import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummar
 import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
 import { DefaultProtocolDelegationExtensions, ProtocolDelegationExtensions } from './ProtocolDelegationExtensions'
 
-export abstract class V1ProtocolDelegationExtensions<T extends AirGapOnlineProtocol & AirGapDelegateProtocol> extends ProtocolDelegationExtensions {
+export abstract class V1ProtocolDelegationExtensions<
+  T extends AirGapOnlineProtocol & AirGapDelegateProtocol
+> extends ProtocolDelegationExtensions {
   public static async load<T extends AirGapOnlineProtocol & AirGapDelegateProtocol>(
     adapter: ICoinDelegateProtocolAdapter<T>,
     extensionFactory: () => Promise<V1ProtocolDelegationExtensions<T>>
@@ -41,7 +43,9 @@ export abstract class V1ProtocolDelegationExtensions<T extends AirGapOnlineProto
     }
   }
 
-  private readonly defaults: DefaultProtocolDelegationExtensions<ICoinDelegateProtocolAdapter<T>> = new DefaultProtocolDelegationExtensions()
+  private readonly defaults: DefaultProtocolDelegationExtensions<
+    ICoinDelegateProtocolAdapter<T>
+  > = new DefaultProtocolDelegationExtensions()
 
   public abstract delegateeLabel: string
   public abstract delegateeLabelPlural: string
@@ -52,32 +56,38 @@ export abstract class V1ProtocolDelegationExtensions<T extends AirGapOnlineProto
   }
 
   public async getExtraDelegationDetailsFromAddress(
-    adapter: ICoinDelegateProtocolAdapter<T>, 
+    adapter: ICoinDelegateProtocolAdapter<T>,
+    publicKey: string,
     delegator: string,
-    delegatees: string[]
+    delegatees: string[],
+    data?: any
   ): Promise<AirGapDelegationDetails[]> {
-    return this.defaults.getExtraDelegationDetailsFromAddress(adapter, delegator, delegatees)
+    return this.defaults.getExtraDelegationDetailsFromAddress(adapter, publicKey, delegator, delegatees, data)
   }
 
   public getRewardDisplayDetails(
-    adapter: ICoinDelegateProtocolAdapter<T>, 
-    delegator: string, 
-    delegatees: string[]
+    adapter: ICoinDelegateProtocolAdapter<T>,
+    delegator: string,
+    delegatees: string[],
+    data?: any
   ): Promise<UIRewardList | undefined> {
-    return this.defaults.getRewardDisplayDetails(adapter, delegator, delegatees)
+    return this.defaults.getRewardDisplayDetails(adapter, delegator, delegatees, data)
   }
 
   public async createDelegateesSummary(
-    adapter: ICoinDelegateProtocolAdapter<T>, 
-    delegatees: string[]
+    adapter: ICoinDelegateProtocolAdapter<T>,
+    delegatees: string[],
+    data?: any
   ): Promise<UIAccountSummary[]> {
-    return this.defaults.createDelegateesSummary(adapter, delegatees)
+    return this.defaults.createDelegateesSummary(adapter, delegatees, data)
   }
 
   public async createAccountExtendedDetails(
-    adapter: ICoinDelegateProtocolAdapter<T>, 
-    address: string
+    adapter: ICoinDelegateProtocolAdapter<T>,
+    publicKey: string,
+    address: string,
+    data?: any
   ): Promise<UIAccountExtendedDetails> {
-    return this.defaults.createAccountExtendedDetails(adapter, address)
+    return this.defaults.createAccountExtendedDetails(adapter, publicKey, address, data)
   }
 }

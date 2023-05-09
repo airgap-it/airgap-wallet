@@ -1,3 +1,4 @@
+// tslint:disable: max-classes-per-file
 import { AirGapMarketWallet, ICoinDelegateProtocol } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
@@ -49,17 +50,19 @@ export class DefaultProtocolDelegationExtensions<T extends ICoinDelegateProtocol
 
   public async getExtraDelegationDetailsFromAddress(
     _protocol: T,
+    _publicKey: string,
     _delegator: string,
-    _delegatees: string[]
+    _delegatees: string[],
+    _data?: any
   ): Promise<AirGapDelegationDetails[]> {
     return []
   }
 
-  public getRewardDisplayDetails(_protocol: T, _delegator: string, _delegatees: string[]): Promise<UIRewardList | undefined> {
+  public getRewardDisplayDetails(_protocol: T, _delegator: string, _delegatees: string[], _data?: any): Promise<UIRewardList | undefined> {
     return undefined // by default display no rewards
   }
 
-  public async createDelegateesSummary(protocol: T, delegatees: string[]): Promise<UIAccountSummary[]> {
+  public async createDelegateesSummary(protocol: T, delegatees: string[], _data?: any): Promise<UIAccountSummary[]> {
     const delegateesDetails = await Promise.all(delegatees.map((delegatee) => protocol.getDelegateeDetails(delegatee)))
     return delegateesDetails.map(
       (details) =>
@@ -71,7 +74,7 @@ export class DefaultProtocolDelegationExtensions<T extends ICoinDelegateProtocol
     )
   }
 
-  public async createAccountExtendedDetails(_protocol: T, _address: string): Promise<UIAccountExtendedDetails> {
+  public async createAccountExtendedDetails(_protocol: T, _publicKey: string, _address: string, _data?: any): Promise<UIAccountExtendedDetails> {
     // default implementation provides no details
     return new UIAccountExtendedDetails({
       items: []

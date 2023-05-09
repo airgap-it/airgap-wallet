@@ -1,0 +1,31 @@
+<form [formGroup]="widgetForm">
+  <ion-row class="ion-padding-horizontal padding-top ion-align-items-center value__container">
+    <ion-col size="9" class="value--container__input ion-no-padding">
+      <ion-item class="ion-no-padding" lines="none">
+        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ widget.label | translate }}</ion-label>
+        <ion-input [type]="widget.inputType" [placeholder]="widget.fixedMinValue" [formControlName]="widget.id"></ion-input>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal">
+    <ion-col size="12">
+      <ion-range
+        [min]="widget.fixedMinValue"
+        [max]="widget.maxValue"
+        [value]="value"
+        step="1"
+        (ionChange)="onRangeChange($event)"
+      ></ion-range>
+      <ion-text class="ion-no-margin ion-no-padding" color="blackLight" *ngIf="widget.extraLabel || widget.createExtraLabel">
+        <p [innerHTML]="widget.extraLabel | translate"></p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+  <ion-row class="ion-padding-horizontal ion-padding-bottom" *ngIf="widget.formControl && (widget.errorLabel)">
+    <ion-col size="12" *ngIf="widget.formControl.invalid">
+      <ion-text class="ion-no-margin" color="danger">
+        <p class="ion-no-margin">{{ widget.errorLabel | translate }}</p>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+</form>

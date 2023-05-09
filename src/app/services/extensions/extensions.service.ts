@@ -18,11 +18,14 @@ import { TezosDelegationExtensions } from '../../extensions/delegation/TezosDele
 import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService } from '../coinlib/coinlib.service'
 import { V1ProtocolDelegationExtensions } from 'src/app/extensions/delegation/base/V1ProtocolDelegationExtensions'
+import { ICPDelegationExtensions } from 'src/app/extensions/delegation/ICPDelegationExtensions'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
+  private extensionsLoaded: boolean = false
+
   private v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = [
     [
       KusamaProtocol,
@@ -96,6 +99,18 @@ export class ExtensionsService {
           this.shortenStringPipe,
           this.translateService
         )
+    ],
+    [
+      
+      MainProtocolSymbols.ICP,
+      async () =>
+        ICPDelegationExtensions.create(
+          this.formBuilder,
+          this.decimalPipe,
+          this.amountConverterPipe,
+          this.shortenStringPipe,
+          this.translateService
+        )
     ]
   ]
 
@@ -111,10 +126,16 @@ export class ExtensionsService {
   ) {}
 
   public async loadDelegationExtensions(): Promise<void> {
+    if (this.extensionsLoaded) {
+      return
+    }
+
     await Promise.all([
       this.loadV0Extensions(),
       this.loadV1Extensions()
     ])
+
+    this.extensionsLoaded = true
   }
 
   private async loadV0Extensions(): Promise<void> {
@@ -126,12 +147,25 @@ export class ExtensionsService {
   private async loadV1Extensions(): Promise<void> {
     await Promise.all(
       this.v1Extensions.map(async ([protocolIdentifier, extensionFactory]) => {
-        const protocol = await this.protocolService.getProtocol(protocolIdentifier)
-        if (!(protocol instanceof ICoinDelegateProtocolAdapter)) {
+        try {
+          const networks = await this.protocolService.getNetworksForProtocol(protocolIdentifier)
+          await Promise.all(
+            networks.map(async (network) => {
+              try {
+                const protocol = await this.protocolService.getProtocol(protocolIdentifier, network)
+                if (!(protocol instanceof ICoinDelegateProtocolAdapter)) {
+                  return
+                }
+
+                await V1ProtocolDelegationExtensions.load(protocol, extensionFactory)
+              } catch {
+                return
+              }
+            })
+          )
+        } catch {
           return
         }
-
-        V1ProtocolDelegationExtensions.load(protocol, extensionFactory)
       })
     )
   }

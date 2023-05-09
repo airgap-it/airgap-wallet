@@ -18,94 +18,226 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-row class="ion-padding-horizontal">
       <ion-col size="12">
-        <widget-account *ngIf="delegateeAccountWidget; else delegateeAvatarSkeleton" [widget]="delegateeAccountWidget"></widget-account>
-        <ng-template #delegateeAvatarSkeleton>
-          <div>
-            <ion-item lines="none" class="ion-no-padding">
-              <ion-avatar slot="start">
-                <ion-skeleton-text animated></ion-skeleton-text>
-              </ion-avatar>
-              <ion-label>
-                <h2>
-                  <ion-skeleton-text animated style="width: 40%; height: 19px;"></ion-skeleton-text>
-                </h2>
-                <p>
-                  <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-                </p>
-              </ion-label>
-            </ion-item>
-          </div>
-        </ng-template>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal action--container" *ngIf="(delegateeDetails$ | async)">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
-          <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
-          {{ "delegation-detail.change-delegatee_label" | translate: { delegateeLabel: (delegateeLabel | translate) } }}
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-padding-horizontal ion-padding-bottom">
-      <ion-col size="12" class="ion-no-padding">
-        <p>{{ ((delegateeDetails$ | async)?.status | translate) | titlecase }}</p>
-      </ion-col>
-      <ion-col size="12" class="ion-no-padding">
-        <div class="progress--container">
-          <div
-            class="progress--current"
-            [style.width]="((delegateeDetails$ | async)?.usageDetails?.usage.toNumber() * 100).toFixed(2) + '%'"
-          ></div>
+        <widget-account 
+          *ngIf="delegateeAccountWidget.status === UIResourceStatus.SUCCESS && delegateeAccountWidget.value" 
+          [widget]="delegateeAccountWidget.value"
+        ></widget-account>
+        <div *ngIf="delegateeAccountWidget.status === UIResourceStatus.SUCCESS && !delegateeAccountWidget.value">
+          <ion-item lines="none" class="ion-no-padding">
+            <ion-avatar slot="start">
+              <ion-skeleton-text></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text style="width: 40%; height: 19px;"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text style="width: 80%;"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
+        </div>
+        <div *ngIf="delegateeAccountWidget.status === UIResourceStatus.LOADING">
+          <ion-item lines="none" class="ion-no-padding">
+            <ion-avatar slot="start">
+              <ion-skeleton-text animated></ion-skeleton-text>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                <ion-skeleton-text animated style="width: 40%; height: 19px;"></ion-skeleton-text>
+              </h2>
+              <p>
+                <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+              </p>
+            </ion-label>
+          </ion-item>
         </div>
       </ion-col>
-      <ion-col size="12" class="ion-no-padding">
-        <ion-row>
-          <ion-col size="6" class="ion-no-padding">
-            <small *ngIf="(delegateeDetails$ | async); else delegateeUsageSkeleton">
-              <span *ngIf="(delegateeDetails$ | async).usageDetails">
-                {{ (delegateeDetails$ | async).usageDetails.usage.toNumber() * 100 | number: '1.2-2' }}%
-              </span>
-            </small>
-            <ng-template #delegateeUsageSkeleton>
-              <div>
+    </ion-row>
+    <ng-container *ngIf="(delegateeDetails$ | async) as delegateeDetails">
+      <ion-row class="ion-padding-horizontal action--container" *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
+        <ion-col size="12" class="ion-no-padding">
+          <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
+            <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
+            {{ "delegation-detail.change-delegatee_label" | translate: { delegateeLabel: (delegateeLabel | translate) } }}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-padding-horizontal ion-padding-bottom">
+        <ion-col size="12" class="ion-no-padding">
+          <p>{{ (delegateeDetails.value?.status | translate) | titlecase }}</p>
+        </ion-col>
+        <ion-col size="12" class="ion-no-padding">
+          <div class="progress--container">
+            <div
+              class="progress--current"
+              [style.width]="((delegateeDetails$ | async)?.usageDetails?.usage.toNumber() * 100).toFixed(2) + '%'"
+            ></div>
+          </div>
+        </ion-col>
+        <ion-col size="12" class="ion-no-padding">
+          <ion-row>
+            <ion-col size="6" class="ion-no-padding">
+              <small *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
+                <span *ngIf="delegateeDetails.value.usageDetails">
+                  {{ delegateeDetails.value.usageDetails.usage.toNumber() * 100 | number: '1.2-2' }}%
+                </span>
+              </small>
+              <div *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && !delegateeDetails.value">
+                <p class="ion-no-margin">
+                  <ion-skeleton-text style="width: 50%;"></ion-skeleton-text>
+                </p>
+              </div>
+              <div *ngIf="delegateeDetails.status === UIResourceStatus.LOADING">
                 <p class="ion-no-margin">
                   <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
                 </p>
               </div>
-            </ng-template>
-          </ion-col>
-          <ion-col size="6" class="ion-no-padding ion-text-right">
-            <small *ngIf="(delegateeDetails$ | async); else delegateeUsageDetailsSkeleton">
-              <span *ngIf="(delegateeDetails$ | async).usageDetails">
-                {{ (delegateeDetails$ | async).usageDetails.current.toFixed() | amountConverter: { protocol: wallet.protocol, maxDigits: 3 }
-                | async }} / {{ (delegateeDetails$ | async).usageDetails.total.toFixed() | amountConverter: { protocol: wallet.protocol,
-                maxDigits: 3 } | async }}
-              </span>
-            </small>
-            <ng-template #delegateeUsageDetailsSkeleton>
-              <div class="justify--content__end">
+            </ion-col>
+            <ion-col size="6" class="ion-no-padding ion-text-right">
+              <small *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
+                <span *ngIf="delegateeDetails.value.usageDetails">
+                  {{ delegateeDetails.value.usageDetails.current.toFixed() | amountConverter: { protocol: wallet.protocol, maxDigits: 3 }
+                  | async }} / {{ delegateeDetails.value.usageDetails.total.toFixed() | amountConverter: { protocol: wallet.protocol,
+                  maxDigits: 3 } | async }}
+                </span>
+              </small>
+              <div *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && !delegateeDetails.value" class="justify--content__end">
+                <ion-skeleton-text style="width: 50%;"></ion-skeleton-text>
+              </div>
+              <div *ngIf="delegateeDetails.status === UIResourceStatus.LOADING">
                 <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
               </div>
-            </ng-template>
-          </ion-col>
-        </ion-row>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-padding-bottom">
+        <ion-col size="12">
+          <ng-container *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
+            <ion-card *ngIf="delegateeDetails.value.displayDetails">
+              <ng-container *ngFor="let extra of filterVisible(delegateeDetails.value.displayDetails)">
+                <ion-item lines="none">
+                  <widget-selector [widget]="extra"></widget-selector>
+                </ion-item>
+              </ng-container>
+            </ion-card>
+          </ng-container>
+          <ion-card *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && !delegateeDetails.value">
+            <ion-item lines="none">
+              <ion-avatar slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+              </ion-avatar>
+              <ion-label>
+                <h2>
+                  <ion-skeleton-text style="width: 80%; height: 19px;"></ion-skeleton-text>
+                </h2>
+                <h3>
+                  <ion-skeleton-text style="width: 40%;"></ion-skeleton-text>
+                </h3>
+              </ion-label>
+            </ion-item>
+          </ion-card>
+          <ion-card *ngIf="delegateeDetails.status === UIResourceStatus.LOADING">
+            <ion-item lines="none">
+              <ion-avatar slot="start">
+                <ion-skeleton-text animated></ion-skeleton-text>
+              </ion-avatar>
+              <ion-label>
+                <h2>
+                  <ion-skeleton-text animated style="width: 80%; height: 19px;"></ion-skeleton-text>
+                </h2>
+                <h3>
+                  <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+                </h3>
+              </ion-label>
+            </ion-item>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+
+    <ion-row class="ion-padding-horizontal" *ngIf="delegationAlertWidgets.value">
+      <ion-col size="12">
+        <widget-alert *ngFor="let widget of delegationAlertWidgets.value" [widget]="widget"></widget-alert>
       </ion-col>
     </ion-row>
 
-    <ion-row class="ion-padding-bottom">
-      <ion-col size="12">
-        <ng-container *ngIf="(delegateeDetails$ | async); else delegateeExtraSkeleton">
-          <ion-card *ngIf="(delegateeDetails$ | async).displayDetails">
-            <ng-container *ngFor="let extra of filterVisible((delegateeDetails$ | async).displayDetails)">
-              <ion-item lines="none">
-                <widget-selector [widget]="extra"></widget-selector>
-              </ion-item>
+    <ng-container *ngIf="delegatorDetails$ | async as delegatorDetails">
+      <ion-row *ngIf="delegatorDetails.status === UIResourceStatus.SUCCESS && delegatorDetails.value">
+        <ion-col size="12">
+          <ion-segment
+            scrollable="true"
+            class="ion-padding-horizontal"
+            [(ngModel)]="activeDelegatorAction"
+            (ionChange)="onActiveActionChange(activeDelegatorAction)"
+            *ngIf="shouldDisplaySegmentButtons"
+          >
+            <ion-segment-button *ngFor="let main of delegatorDetails.value.mainActions || []" [value]="main.type">
+              <ion-label>{{ main.label | translate }}</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+
+          <div [ngClass]="{'segment--container': shouldDisplaySegmentButtons}">
+            <ng-container *ngFor="let main of delegatorDetails.value.mainActions || []">
+              <ng-container *ngIf="activeDelegatorAction === main.type.toString()">
+                <ion-row class="ion-padding-horizontal" *ngIf="main.description">
+                  <ion-col size="12">
+                    <p [innerHtml]="main.description | translate"></p>
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngFor="let arg of filterVisible(main.args)">
+                  <ion-col size="12">
+                    <form *ngIf="delegationForms.get(main.type)" [formGroup]="delegationForms.get(main.type)">
+                      <widget-selector [widget]="arg" [widgetForm]="delegationForms.get(main.type)"></widget-selector>
+                    </form>
+                    <widget-selector [widget]="arg" *ngIf="!delegationForms.get(main.type)"></widget-selector>
+                  </ion-col>
+                </ion-row>
+              </ng-container>
             </ng-container>
-          </ion-card>
-        </ng-container>
-        <ng-template #delegateeExtraSkeleton>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-padding-horizontal">
+        <ion-col size="12" class="ion-no-padding">
+          <ion-text color="primary">
+            <p class="font--weight__bold ion-no-margin ion-ion-text">
+              {{ "delegation-detail.your-delegation_label" | translate }}
+            </p>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-padding-bottom">
+        <ion-col size="12">
           <ion-card>
-            <ion-item lines="none">
+            <ng-container *ngIf="delegatorDetails.status === UIResourceStatus.SUCCESS && delegatorDetails.value">
+              <ion-item lines="none" *ngIf="delegatorBalanceWidget.value">
+                <widget-icon-text [widget]="delegatorBalanceWidget.value"></widget-icon-text>
+              </ion-item>
+              <ng-container *ngFor="let extra of filterVisible(delegatorDetails.value.displayDetails)">
+                <ion-item lines="none">
+                  <widget-selector [widget]="extra"></widget-selector>
+                </ion-item>
+              </ng-container>
+            </ng-container>
+            <ion-item *ngIf="delegatorDetails.status === UIResourceStatus.SUCCESS && !delegatorDetails.value" lines="none">
+              <ion-avatar slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+              </ion-avatar>
+              <ion-label>
+                <h2>
+                  <ion-skeleton-text style="width: 80%; height: 19px;"></ion-skeleton-text>
+                </h2>
+                <h3>
+                  <ion-skeleton-text style="width: 40%;"></ion-skeleton-text>
+                </h3>
+              </ion-label>
+            </ion-item>
+            <ion-item *ngIf="delegatorDetails.status === UIResourceStatus.LOADING" lines="none">
               <ion-avatar slot="start">
                 <ion-skeleton-text animated></ion-skeleton-text>
               </ion-avatar>
@@ -119,95 +251,11 @@
               </ion-label>
             </ion-item>
           </ion-card>
-        </ng-template>
-      </ion-col>
-    </ion-row>
+        </ion-col>
+      </ion-row>
+    </ng-container>
 
-    <ion-row class="ion-padding-horizontal" *ngIf="delegationAlertWidgets">
-      <ion-col size="12">
-        <widget-alert *ngFor="let widget of delegationAlertWidgets" [widget]="widget"></widget-alert>
-      </ion-col>
-    </ion-row>
-
-    <ion-row *ngIf="(delegatorDetails$ | async)">
-      <ion-col size="12">
-        <ion-segment
-          scrollable="true"
-          class="ion-padding-horizontal"
-          [(ngModel)]="activeDelegatorAction"
-          (ionChange)="onActiveActionChange(activeDelegatorAction)"
-          *ngIf="shouldDisplaySegmentButtons"
-        >
-          <ion-segment-button *ngFor="let main of (delegatorDetails$ | async).mainActions || []" [value]="main.type">
-            <ion-label>{{ main.label | translate }}</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-
-        <div [ngClass]="{'segment--container': shouldDisplaySegmentButtons}">
-          <ng-container *ngFor="let main of (delegatorDetails$ | async).mainActions || []">
-            <ng-container *ngIf="activeDelegatorAction === main.type.toString()">
-              <ion-row class="ion-padding-horizontal" *ngIf="main.description">
-                <ion-col size="12">
-                  <p [innerHtml]="main.description | translate"></p>
-                </ion-col>
-              </ion-row>
-              <ion-row *ngFor="let arg of filterVisible(main.args)">
-                <ion-col size="12">
-                  <form *ngIf="delegationForms.get(main.type)" [formGroup]="delegationForms.get(main.type)">
-                    <widget-selector [widget]="arg" [widgetForm]="delegationForms.get(main.type)"></widget-selector>
-                  </form>
-                  <widget-selector [widget]="arg" *ngIf="!delegationForms.get(main.type)"></widget-selector>
-                </ion-col>
-              </ion-row>
-            </ng-container>
-          </ng-container>
-        </div>
-      </ion-col>
-    </ion-row>
-
-    <ion-row class="ion-padding-horizontal">
-      <ion-col size="12" class="ion-no-padding">
-        <ion-text color="primary">
-          <p class="font--weight__bold ion-no-margin ion-ion-text">
-            {{ "delegation-detail.your-delegation_label" | translate }}
-          </p>
-        </ion-text>
-      </ion-col>
-    </ion-row>
-
-    <ion-row class="ion-padding-bottom">
-      <ion-col size="12">
-        <ion-card>
-          <ng-container *ngIf="(delegatorDetails$ | async); else delegatorDetailsSkeleton">
-            <ion-item lines="none" *ngIf="delegatorBalanceWidget">
-              <widget-icon-text [widget]="delegatorBalanceWidget"></widget-icon-text>
-            </ion-item>
-            <ng-container *ngFor="let extra of filterVisible((delegatorDetails$ | async).displayDetails)">
-              <ion-item lines="none">
-                <widget-selector [widget]="extra"></widget-selector>
-              </ion-item>
-            </ng-container>
-          </ng-container>
-          <ng-template #delegatorDetailsSkeleton>
-            <ion-item lines="none">
-              <ion-avatar slot="start">
-                <ion-skeleton-text animated></ion-skeleton-text>
-              </ion-avatar>
-              <ion-label>
-                <h2>
-                  <ion-skeleton-text animated style="width: 80%; height: 19px;"></ion-skeleton-text>
-                </h2>
-                <h3>
-                  <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
-                </h3>
-              </ion-label>
-            </ion-item>
-          </ng-template>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ng-container *ngIf="(rewardDisplay$ | async) else rewardsSkeleton">
+    <ng-container *ngIf="(rewardDisplay$ | async).status === UIResourceStatus.SUCCESS else rewardsSkeleton">
       <ion-row class="ion-padding-horizontal">
         <ion-text color="primary">
           <p ion-text class="font--weight__bold ion-no-margin">
@@ -218,7 +266,7 @@
 
       <ion-row>
         <ion-col size="12">
-          <widget-reward-list [widget]="(rewardDisplay$ | async)"></widget-reward-list>
+          <widget-reward-list [widget]="(rewardDisplay$ | async).value"></widget-reward-list>
         </ion-col>
       </ion-row>
     </ng-container>

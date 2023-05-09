@@ -1,12 +1,13 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, UIResource, UIResourceStatus } from '@airgap/angular-core'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { IACMessageType } from '@airgap/serializer'
-import { Component } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoadingController, NavController, PopoverController, ToastController } from '@ionic/angular'
+import { LoadingController, NavController, PopoverController, ToastController, ViewWillEnter } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Subject } from 'rxjs'
+import { takeUntil } from 'rxjs/operators'
 import { DelegateActionPopoverComponent } from 'src/app/components/delegate-action-popover/delegate-action-popover.component'
 import { supportsAirGapDelegation } from 'src/app/helpers/delegation'
 import {
@@ -32,26 +33,37 @@ import { isType } from 'src/app/utils/utils'
   templateUrl: './delegation-detail.html',
   styleUrls: ['./delegation-detail.scss']
 })
-export class DelegationDetailPage {
+export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
+  public UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
+
   public wallet: AirGapMarketWallet
 
   public showOverflowMenu: boolean
 
   public delegationForms: Map<string, FormGroup> = new Map()
-  public delegationAlertWidgets: UIAlert[] | undefined
+  public delegationAlertWidgets: UIResource<UIAlert[]> = { status: UIResourceStatus.IDLE, value: undefined }
 
   public delegateeLabel: string
   public delegateeLabelPlural: string
-  public delegateeAccountWidget: UIAccount
+  public delegateeAccountWidget: UIResource<UIAccount> = { status: UIResourceStatus.IDLE, value: undefined }
 
-  public delegatorBalanceWidget: UIIconText
+  public delegatorBalanceWidget: UIResource<UIIconText> = { status: UIResourceStatus.IDLE, value: undefined }
 
   public activeDelegatorAction: string | null = null
   public activeDelegatorActionConfirmButton: string | null = null
 
-  public delegateeDetails$: BehaviorSubject<AirGapDelegateeDetails | null> = new BehaviorSubject(null)
-  public delegatorDetails$: BehaviorSubject<AirGapDelegatorDetails | null> = new BehaviorSubject(null)
-  public rewardDisplay$: BehaviorSubject<UIRewardList | null> = new BehaviorSubject(null)
+  public delegateeDetails$: BehaviorSubject<UIResource<AirGapDelegateeDetails>> = new BehaviorSubject<UIResource<AirGapDelegateeDetails>>({
+    status: UIResourceStatus.IDLE,
+    value: undefined
+  })
+  public delegatorDetails$: BehaviorSubject<UIResource<AirGapDelegatorDetails>> = new BehaviorSubject<UIResource<AirGapDelegatorDetails>>({
+    status: UIResourceStatus.IDLE,
+    value: undefined
+  })
+  public rewardDisplay$: BehaviorSubject<UIResource<UIRewardList>> = new BehaviorSubject<UIResource<UIRewardList>>({
+    status: UIResourceStatus.IDLE,
+    value: undefined
+  })
 
   public canProceed: boolean = true
   public hasRewardDetails: boolean | undefined = undefined
@@ -59,7 +71,7 @@ export class DelegationDetailPage {
   public get shouldDisplaySegmentButtons(): boolean {
     const details = this.delegatorDetails$.value
 
-    return details.mainActions && details.mainActions.some((action) => !!action.description || !!action.args)
+    return details.value?.mainActions && details.value.mainActions.some((action) => !!action.description || !!action.args)
   }
 
   private get isAirGapDelegatee(): boolean {
@@ -83,6 +95,17 @@ export class DelegationDetailPage {
   private protocolID: string
   private addressIndex
 
+  private data$: BehaviorSubject<any>
+
+  private _ngDestroyed$: Subject<void> | undefined
+  private get ngDestroyed$(): Subject<void> {
+    if (this._ngDestroyed$ === undefined) {
+      this._ngDestroyed$ = new Subject()
+    }
+
+    return this._ngDestroyed$
+  }
+
   constructor(
     private readonly router: Router,
     private readonly navController: NavController,
@@ -96,9 +119,11 @@ export class DelegationDetailPage {
     private readonly formBuilder: FormBuilder,
     private readonly amountConverter: AmountConverterPipe,
     public readonly accountProvider: AccountProvider
-  ) {}
+  ) {
+    this.data$ = new BehaviorSubject(this.loadNavigationData())
+  }
 
-  ngOnInit() {
+  public ngOnInit(): void {
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
     this.addressIndex = this.route.snapshot.params.addressIndex
@@ -110,8 +135,32 @@ export class DelegationDetailPage {
     this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
 
     this.extensionsService.loadDelegationExtensions().then(() => {
-      this.initView()
+      this.initView(this.data$.value)
     })
+  }
+
+  public ngOnDestroy(): void {
+    this._ngDestroyed$?.next()
+    this._ngDestroyed$?.complete()
+    this._ngDestroyed$ = undefined
+  }
+
+  public ionViewWillEnter(): void {
+    const previousData = this.data$.value
+    const currentData = this.loadNavigationData()
+
+    if (previousData !== currentData) {
+      this.data$.next(currentData)
+    }
+  }
+
+  private loadNavigationData(): any {
+    if (this.route.snapshot.data.special) {
+      const info = this.route.snapshot.data.special
+      return info?.data ?? info
+    }
+
+    return undefined
   }
 
   public filterVisible(widgets?: UIWidget[]): UIWidget[] {
@@ -120,7 +169,7 @@ export class DelegationDetailPage {
 
   public async presentEditPopover(event: Event): Promise<void> {
     const delegatorDetails = this.delegatorDetails$.value
-    const secondaryActions = delegatorDetails ? delegatorDetails.secondaryActions : undefined
+    const secondaryActions = delegatorDetails.value ? delegatorDetails.value.secondaryActions : undefined
 
     const popover: HTMLIonPopoverElement = await this.popoverController.create({
       component: DelegateActionPopoverComponent,
@@ -155,26 +204,26 @@ export class DelegationDetailPage {
       return
     }
 
-    if (!delegatorDetails.mainActions || delegatorDetails.mainActions.length === 0) {
+    if (!delegatorDetails.value?.mainActions || delegatorDetails.value.mainActions.length === 0) {
       this.navController.back()
       return
     }
 
-    this.callAction(delegatorDetails.mainActions, type)
+    this.callAction(delegatorDetails.value.mainActions, type)
   }
 
   public callSecondaryAction(type: string) {
     const delegatorDetails = this.delegatorDetails$.value
-    if (!delegatorDetails) {
+    if (!delegatorDetails.value) {
       return
     }
 
-    this.callAction(delegatorDetails.secondaryActions || [], type)
+    this.callAction(delegatorDetails.value.secondaryActions || [], type)
   }
 
   public onActiveActionChange(activeDelegatorAction: string | null) {
-    const activeAction = this.delegatorDetails$.value.mainActions
-      ? this.delegatorDetails$.value.mainActions.find((action) => action.type.toString() === activeDelegatorAction)
+    const activeAction = this.delegatorDetails$.value.value?.mainActions
+      ? this.delegatorDetails$.value.value.mainActions.find((action) => action.type.toString() === activeDelegatorAction)
       : null
 
     this.activeDelegatorAction = activeDelegatorAction
@@ -188,7 +237,8 @@ export class DelegationDetailPage {
       delegateeLabel: this.delegateeLabel,
       delegateeLabelPlural: this.delegateeLabelPlural,
       areMultipleDelegationsSupported: this.areMultipleDelegationsSupported,
-      currentDelegatees: this.delegatorDetails$.value.delegatees,
+      currentDelegatees: this.delegatorDetails$.value.value?.delegatees,
+      data: this.data$.value,
       callback: (address: string) => {
         this.changeDisplayedDetails(address)
       }
@@ -200,7 +250,7 @@ export class DelegationDetailPage {
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  private initView() {
+  private initView(data: any) {
     this.delegateeLabel = supportsAirGapDelegation(this.wallet.protocol)
       ? this.wallet.protocol.delegateeLabel
       : 'delegation-detail.default-delegatee-label'
@@ -215,7 +265,8 @@ export class DelegationDetailPage {
 
     this.subscribeObservables()
 
-    this.operations.getCurrentDelegatees(this.wallet).then((addresses) => {
+    // tslint:disable-next-line: no-floating-promises
+    this.operations.getCurrentDelegatees(this.wallet, data).then((addresses) => {
       if (addresses) {
         this.delegateeAddress$.next(addresses[0])
       }
@@ -223,53 +274,73 @@ export class DelegationDetailPage {
   }
 
   private subscribeObservables() {
-    this.delegateeAddress$.subscribe(async (address) => {
-      if (address) {
-        this.updateDisplayedDetails(null)
-        this.updateDisplayedRewards(null)
+    this.data$.pipe(takeUntil(this.ngDestroyed$)).subscribe(async (data) => {
+      const currentDelegatees = await this.operations.getCurrentDelegatees(this.wallet, data)
+      const address = currentDelegatees[0] ?? this.delegateeAddress$.value
+      this.loadDelegationDetails(address, data)
+    })
 
-        this.operations.getDelegationDetails(this.wallet, [address]).then((details) => {
-          if (details && details.length > 0) {
-            this.updateDisplayedDetails(details)
-          }
-        })
-        this.operations.getRewardDisplayDetails(this.wallet, [address]).then((rewards) => {
-          this.hasRewardDetails = rewards !== undefined
-          if (rewards) {
-            this.updateDisplayedRewards(rewards)
-          }
-        })
+    this.delegateeAddress$.pipe(takeUntil(this.ngDestroyed$)).subscribe((address) => {
+      if (address) {
+        this.loadDelegationDetails(address, this.data$.value)
       }
     })
 
-    this.delegateeDetails$.subscribe((details) => {
-      this.delegateeAccountWidget = details
-        ? new UIAccount({
-            name: details.name,
-            address: details.address,
-            logo: details.logo,
-            shortenAddress: true
-          })
-        : null
+    this.delegateeDetails$.pipe(takeUntil(this.ngDestroyed$)).subscribe((details) => {
+      this.delegateeAccountWidget = {
+        status: details.status,
+        value: details.value
+          ? new UIAccount({
+              name: details.value.name,
+              address: details.value.address,
+              logo: details.value.logo,
+              shortenAddress: true
+            })
+          : undefined
+      }
     })
 
-    this.delegatorDetails$.subscribe(async (details) => {
+    this.delegatorDetails$.pipe(takeUntil(this.ngDestroyed$)).subscribe(async (details) => {
       this.showOverflowMenu =
-        !(this.isAirGapDelegatee || this.hideAirGapOverflow) || (details && details.secondaryActions && details.secondaryActions.length > 0)
+        !(this.isAirGapDelegatee || this.hideAirGapOverflow) || (details && details.value?.secondaryActions && details.value?.secondaryActions.length > 0)
 
-      if (details) {
-        this.delegatorBalanceWidget = new UIIconText({
-          iconName: 'wallet-outline',
-          text: await this.amountConverter.transform(details.balance, {
-            protocol: this.wallet.protocol,
-            maxDigits: this.wallet.protocol.decimals
-          }),
-          description: 'delegation-detail.your-balance_label'
-        })
+      this.delegatorBalanceWidget = {
+        status: details.status,
+        value: details.value
+          ? new UIIconText({
+              iconName: 'wallet-outline',
+              text: await this.amountConverter.transform(details.value.balance, {
+                protocol: this.wallet.protocol,
+                maxDigits: this.wallet.protocol.decimals
+              }),
+              description: 'delegation-detail.your-balance_label'
+            })
+          : undefined
+      }
 
-        this.setupAllActions(details)
+      if (details.value) {
+        this.setupAllActions(details.value)
         this.setupFormObservers()
-        this.initActiveDelegatorAction(details)
+        this.initActiveDelegatorAction(details.value)
+      }
+    })
+  }
+
+  private loadDelegationDetails(address: string, data: any) {
+    this.updateDisplayedDetails({ status: UIResourceStatus.LOADING, value: undefined })
+    this.updateDisplayedRewards({ status: UIResourceStatus.LOADING, value: undefined })
+
+    // tslint:disable-next-line: no-floating-promises
+    this.operations.getDelegationDetails(this.wallet, [address], data).then((details) => {
+      if (details && details.length > 0) {
+        this.updateDisplayedDetails({ status: UIResourceStatus.SUCCESS, value: details })
+      }
+    })
+    // tslint:disable-next-line: no-floating-promises
+    this.operations.getRewardDisplayDetails(this.wallet, [address], data).then((rewards) => {
+      this.hasRewardDetails = rewards !== undefined
+      if (rewards) {
+        this.updateDisplayedRewards({ status: UIResourceStatus.SUCCESS, value: rewards })
       }
     })
   }
@@ -317,7 +388,7 @@ export class DelegationDetailPage {
 
   private setupFormObservers() {
     Array.from(this.delegationForms.entries()).forEach(([type, formGroup]) => {
-      formGroup.valueChanges.subscribe(() => {
+      formGroup.valueChanges.pipe(takeUntil(this.ngDestroyed$)).subscribe(() => {
         if (this.activeDelegatorAction === type.toString()) {
           setTimeout(() => {
             this.canProceed = formGroup.valid
@@ -332,15 +403,24 @@ export class DelegationDetailPage {
     this.onActiveActionChange(activeAction ? activeAction.type.toString() : null)
   }
 
-  private updateDisplayedDetails(details: AirGapDelegationDetails[] | null) {
+  private updateDisplayedDetails(details: UIResource<AirGapDelegationDetails[]>) {
     // TODO: support multiple cases
-    this.delegationAlertWidgets = details ? details[0].alerts : undefined
+    this.delegationAlertWidgets = {
+      status: details.status,
+      value: details.value ? details.value[0].alerts : undefined
+    }
 
-    this.delegateeDetails$.next(details ? details[0].delegatees[0] : null)
-    this.delegatorDetails$.next(details ? details[0].delegator : null)
+    this.delegateeDetails$.next({
+      status: details.status,
+      value: details.value ? details.value[0].delegatees[0] : undefined
+    })
+    this.delegatorDetails$.next({
+      status: details.status,
+      value: details.value ? details.value[0].delegator : undefined
+    })
   }
 
-  private updateDisplayedRewards(rewardDisplay: UIRewardList) {
+  private updateDisplayedRewards(rewardDisplay: UIResource<UIRewardList>) {
     this.rewardDisplay$.next(rewardDisplay)
   }
 
