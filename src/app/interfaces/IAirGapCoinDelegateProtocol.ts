@@ -53,8 +53,13 @@ export interface IAirGapCoinDelegateProtocol extends ICoinDelegateProtocol {
   delegateeLabelPlural: string
   supportsMultipleDelegations: boolean
 
-  getRewardDisplayDetails(delegator: string, delegatees: string[]): Promise<UIRewardList | undefined>
-  getExtraDelegationDetailsFromAddress(delegator: string, delegatees: string[]): Promise<AirGapDelegationDetails[]>
-  createDelegateesSummary(delegatees: string[]): Promise<UIAccountSummary[]>
-  createAccountExtendedDetails(address: string): Promise<UIAccountExtendedDetails>
+  getRewardDisplayDetails(delegator: string, delegatees: string[], data?: any): Promise<UIRewardList | undefined>
+  getExtraDelegationDetailsFromAddress(
+    publicKey: string,
+    delegator: string,
+    delegatees: string[],
+    data?: any
+  ): Promise<AirGapDelegationDetails[]>
+  createDelegateesSummary(delegatees: string[], data?: any): Promise<UIAccountSummary[]>
+  createAccountExtendedDetails(publicKey: string, address: string, data?: any): Promise<UIAccountExtendedDetails>
 }

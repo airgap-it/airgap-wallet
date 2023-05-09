@@ -722,6 +722,59 @@
       }
     }
   },
+  "delegation-detail-icp": {
+    "delegatee-label": "Followee",
+    "delegatee-label-plural": "Followees",
+    "voting-power_label": "Voting Power",
+    "neuron-balance_label": "Neuron Subaccount Balance",
+    "staked_label": "Staked",
+    "maturity_label": "Maturity",
+    "age_label": "Age",
+    "dissolve-delay_label": "Dissolve Delay",
+    "followee-status": {
+      "unknown": "Unknown (load more details)",
+      "followed": "Followed",
+      "not-followed": "Not Folllowed"
+    },
+    "stake-and-follow": {
+      "label": "Follow",
+      "not-staking-not-following_text": "Follow this neuron and delegate your stake.<br><br>Currently you're not staking, select the amount you want to stake. You can stake from <span class=\"style__strong color__primary\">{{ minStake }}</span> up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees).",
+      "staking-not-following_text": "Follow this neuron and delegate your stake.<br><br>You have currently <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> staked. You can additionally stake up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees).",
+      "staking-following_text": "You're following this neuron. Increase your stake to gain more voting power.<br><br>You have currently <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> staked. You can additionally stake up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees)."
+    },
+    "follow": {
+      "label": "Follow",
+      "text": "Follow this neuron."
+    },
+    "increase-dissolve-delay": {
+      "label": "Set Delay",
+      "text": "The  <span class=\"style__strong color__primary\">Dissolve Delay</span> determines how much voting power you have and how long you'll wait for your funds to unlock once you start dissolving your neuron. Your current Dissolve Delay is set to  <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span> and you can increase it up to  <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
+    },
+    "more-details": {
+      "label": "More Details",
+      "text": "Full neuron details are meant to be private therefore access to a private key is required to fetch them. Create and sign a query transaction to load more data."
+    },
+    "disburse": {
+      "label": "Disburse",
+      "text": "You neuron has dissolved, withdraw the unlocked tokens."
+    },
+    "start-dissolving": {
+      "label": "Start Dissolving"
+    },
+    "stop-dissolving": {
+      "label": "Stop Dissolving",
+      "text": "Your neuron is currently dissolving, your funds will be unlocked in <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Stop dissolving to cancel the process."
+    },
+    "form": {
+      "dissolve-delay": {
+        "label": "Dissolve Delay (in days)",
+        "extra-label": "{{ duration }} (Voting Power {{ votingPower }}x)",
+        "extra-label-no-rewards": "{{ duration }} (Voting Power {{ votingPower }}x)<br><br>Warning: the Dissolve Delay shouldn't be lower than {{ minDelay }} otherwise you won't get any rewards.",
+        "invalid-state": "The Dissolve Delay shouldn't be lower than {{ minDelay }} otherwise you won't get any rewards. The maximum delay is {{ maxDelay }}.",
+        "invalid-decrease": "Invalid Dissolve Delay, the value can be only increased therefore can't drop below the current value ({{ minDelay }}) and can't exceed {{ maxDelay }}."
+      }
+    }
+  },
   "introduction-push": {
     "title": "Push Notifications",
     "heading": "You can receive push notifications if your accounts receive transactions.",

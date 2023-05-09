@@ -72,21 +72,23 @@ export abstract class V0ProtocolDelegationExtensions<T extends ICoinDelegateProt
 
   public getExtraDelegationDetailsFromAddress(
     protocol: T,
+    publicKey: string,
     delegator: string,
-    delegatees: string[]
+    delegatees: string[],
+    data?: any
   ): Promise<AirGapDelegationDetails[]> {
-    return this.defaults.getExtraDelegationDetailsFromAddress(protocol, delegator, delegatees)
+    return this.defaults.getExtraDelegationDetailsFromAddress(protocol, publicKey, delegator, delegatees, data)
   }
 
-  public getRewardDisplayDetails(protocol: T, delegator: string, delegatees: string[]): Promise<UIRewardList | undefined> {
-    return this.defaults.getRewardDisplayDetails(protocol, delegator, delegatees)
+  public getRewardDisplayDetails(protocol: T, delegator: string, delegatees: string[], data?: any): Promise<UIRewardList | undefined> {
+    return this.defaults.getRewardDisplayDetails(protocol, delegator, delegatees, data)
   }
 
-  public async createDelegateesSummary(protocol: T, delegatees: string[]): Promise<UIAccountSummary[]> {
-    return this.defaults.createDelegateesSummary(protocol, delegatees)
+  public async createDelegateesSummary(protocol: T, delegatees: string[], data?: any): Promise<UIAccountSummary[]> {
+    return this.defaults.createDelegateesSummary(protocol, delegatees, data)
   }
 
-  public async createAccountExtendedDetails(protocol: T, address: string): Promise<UIAccountExtendedDetails> {
-    return this.defaults.createAccountExtendedDetails(protocol, address)
+  public async createAccountExtendedDetails(protocol: T, publicKey: string, address: string, data?: any): Promise<UIAccountExtendedDetails> {
+    return this.defaults.createAccountExtendedDetails(protocol, publicKey, address, data)
   }
 }

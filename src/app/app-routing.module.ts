@@ -155,8 +155,10 @@ const routes: Routes = [
   },
   {
     path: 'delegation-detail/:id/:publicKey/:protocolID/:addressIndex',
+    resolve: {
+      special: DataResolverService
+    },
     canActivate: [ProtocolGuard, ServiceKeyGuard],
-
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then((m) => m.DelegationDetailPageModule)
   },
   {

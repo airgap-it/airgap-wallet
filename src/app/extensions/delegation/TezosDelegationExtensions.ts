@@ -77,6 +77,7 @@ export class TezosDelegationExtensions extends V0ProtocolDelegationExtensions<Te
 
   public async getExtraDelegationDetailsFromAddress(
     protocol: TezosProtocol,
+    _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {

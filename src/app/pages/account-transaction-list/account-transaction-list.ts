@@ -2,7 +2,6 @@ import { ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   IAirGapTransaction,
-  ICoinDelegateProtocol,
   MainProtocolSymbols,
   SubProtocolSymbols,
 } from '@airgap/coinlib-core'
@@ -354,10 +353,7 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const isDelegated = await this.operationsProvider.checkDelegated(
-      this.wallet.protocol as ICoinDelegateProtocol,
-      this.wallet.receivingPublicAddress
-    )
+    const isDelegated = await this.operationsProvider.checkDelegated(this.wallet)
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
