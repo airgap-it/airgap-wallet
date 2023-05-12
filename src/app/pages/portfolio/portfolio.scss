@@ -63,7 +63,9 @@ ion-card {
   justify-content: center;
   background-color: rgb(112, 228, 206);
   padding: 6px 10px;
-  
+  margin-top: constant(safe-area-inset-top);
+  margin-top: env(safe-area-inset-top);
+
   cursor: pointer;
 
   .shop-banner-text {
