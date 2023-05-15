@@ -162,5 +162,15 @@
         {{ 'settings.qr-advanced-settings_label' | translate }}
       </ion-item>
     </ion-list>
+
+    <ion-list lines="none">
+      <ion-list-header class="ion-no-margin" lines="none">
+        <ion-label>{{ 'settings.trading_settings.label' | translate }}</ion-label>
+      </ion-list-header>
+      <ion-item (click)="goToTradingSettings()" detail="true">
+        <ion-icon name="repeat-outline" slot="start"></ion-icon>
+        {{ 'settings.trading_settings.text' | translate }}
+      </ion-item>
+    </ion-list>
   </ion-grid>
 </ion-content>
