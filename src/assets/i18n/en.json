@@ -44,7 +44,8 @@
       "cancel": "Cancel",
       "confirm": "Migrate"
     },
-    "no-transactions_text": "There are no transactions yet for this account."
+    "no-transactions_text": "There are no transactions yet for this account.",
+    "provided_by": "Provided by"
   },
   "account-transaction-detail": {
     "available_label": "Available",
@@ -177,7 +178,23 @@
     "interaction": {
       "label": "Interaction Setting",
       "text": "Vault and Wallet Interaction Settings"
+    },
+    "trading_settings": {
+      "label": "Trading",
+      "text": "Advanced Trading Settings",
+      "mtpelerin": "Use Mt Pelerin"
     }
+  },
+  "mtpelerin": {
+    "header1": "Buy & sell crypto with Mt Pelerin – The Swiss gateway to the crypto world",
+    "paragraph1": "Invest in Bitcoin, Ether and the most popular assets on multiple chains in a few clicks, at the best prices on the market and no KYC required. Withdraw them at any time in 14 currencies back on your bank account in 171 countries.",
+    "header2": "Simple and transparent",
+    "lineItem1": "No identification required",
+    "lineItem2": "Live, transparent exchange rate",
+    "lineItem3": "Make a payment, get crypto directly on AirGap",
+    "button1": "Learn more about buying",
+    "button2": "Learn more about selling",
+    "note": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe."
   },
   "qr-settings-page": {
     "title": "QR Settings"

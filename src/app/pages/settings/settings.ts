@@ -140,6 +140,10 @@ export class SettingsPage {
     this.navigate('/interaction-selection-settings')
   }
 
+  public goToTradingSettings(): void {
+    this.navigate('/trading-settings')
+  }
+
   private navigate(url: string) {
     this.router.navigateByUrl(url).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }

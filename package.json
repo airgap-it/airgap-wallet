@@ -56,8 +56,8 @@
   },
   "dependencies": {
     "@airgap/aeternity": "0.13.15-beta.10",
-    "@airgap/angular-core": "0.0.37-beta.17",
-    "@airgap/angular-ngrx": "0.0.37-beta.17",
+    "@airgap/angular-core": "0.0.37-beta.21",
+    "@airgap/angular-ngrx": "0.0.37-beta.21",
     "@airgap/astar": "0.13.15-beta.10",
     "@airgap/beacon-sdk": "3.1.5-beta.0",
     "@airgap/bitcoin": "0.13.15-beta.10",
