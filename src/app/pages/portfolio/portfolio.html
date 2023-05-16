@@ -11,7 +11,9 @@
 <ion-content fullscreen="true">
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="activeWallets | async as walletsArray">
-      <chart *ngIf="walletsArray.length > 0" [total]="total"></chart>
+      <ion-row *ngIf="walletsArray.length > 0" class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
+        <h1 class="ion-no-margin">${{ total | number: '1.2-2' }}</h1>
+      </ion-row>
     </ng-container>
     <ion-toolbar color="translucent">
       <current-wallet-group></current-wallet-group>

@@ -47,7 +47,6 @@ import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
-import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
@@ -71,7 +70,6 @@ import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
 import { ThemeService } from './services/appearance/theme.service'
 import { CoinlibService } from './services/coinlib/coinlib.service'
-import { DrawChartService } from './services/draw-chart/draw-chart.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
@@ -98,7 +96,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
   exports: [],
   imports: [
     BrowserModule,
-    ChartsModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
@@ -159,7 +156,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,
-    DrawChartService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     QrScannerService,
     Diagnostic,
@@ -186,7 +182,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     InteractionService,
     ThemeService,
     NavigationService
-   ],
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
