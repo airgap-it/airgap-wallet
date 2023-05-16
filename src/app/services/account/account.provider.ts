@@ -7,7 +7,7 @@ import {
   ICoinProtocol,
   MainProtocolSymbols,
   ProtocolNetwork,
-  SerializedAirGapWallet,
+  SerializedAirGapWallet
 } from '@airgap/coinlib-core'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { IACMessageType } from '@airgap/serializer'
@@ -24,7 +24,6 @@ import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWall
 import { isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
-import { DrawChartService } from '../draw-chart/draw-chart.service'
 import { InteractionService } from '../interaction/interaction.service'
 import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
@@ -91,7 +90,6 @@ export class AccountProvider {
     private readonly appService: AppService,
     private readonly storageProvider: WalletStorageService,
     private readonly pushProvider: PushProvider,
-    private readonly drawChartProvider: DrawChartService,
     private readonly popoverController: PopoverController,
     private readonly uiEventService: UiEventService,
     private readonly alertController: AlertController,
@@ -239,7 +237,7 @@ export class AccountProvider {
         Object.assign(obj, { [this.createWalletIdentifier(next.protocolIdentifier, next.publicKey)]: next }),
       {}
     )
-    
+
     const walletInitPromises: Promise<void>[] = []
 
     // read groups
@@ -256,7 +254,7 @@ export class AccountProvider {
               walletMap[walletIdentifier] = undefined
               const airGapWallet = await this.readSerializedWallet(serializedWallet)
               if (airGapWallet !== undefined) {
-                walletInitPromises.push(this.initializeWallet(airGapWallet)) 
+                walletInitPromises.push(this.initializeWallet(airGapWallet))
               }
               return airGapWallet
             })
@@ -270,17 +268,19 @@ export class AccountProvider {
     )
 
     // read ungrouped wallets
-    const ungroupedWallets: AirGapMarketWallet[] = (await Promise.all(
-      Object.values(walletMap)
-        .filter((serializedWallet: SerializedAirGapWallet | undefined) => serializedWallet !== undefined)
-        .map(async (serializedWallet: SerializedAirGapWallet) => {
-          const airGapWallet = await this.readSerializedWallet(serializedWallet)
-          if (airGapWallet !== undefined) {
-            walletInitPromises.push(this.initializeWallet(airGapWallet))
-          }
-          return airGapWallet
-        })
-    )).filter((wallet: AirGapMarketWallet | undefined) => wallet !== undefined)
+    const ungroupedWallets: AirGapMarketWallet[] = (
+      await Promise.all(
+        Object.values(walletMap)
+          .filter((serializedWallet: SerializedAirGapWallet | undefined) => serializedWallet !== undefined)
+          .map(async (serializedWallet: SerializedAirGapWallet) => {
+            const airGapWallet = await this.readSerializedWallet(serializedWallet)
+            if (airGapWallet !== undefined) {
+              walletInitPromises.push(this.initializeWallet(airGapWallet))
+            }
+            return airGapWallet
+          })
+      )
+    ).filter((wallet: AirGapMarketWallet | undefined) => wallet !== undefined)
 
     if (ungroupedWallets.length > 0) {
       const others: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(undefined, undefined, undefined, ungroupedWallets, true)
@@ -294,7 +294,7 @@ export class AccountProvider {
     if (this.allWallets.length > 0) {
       this.pushProvider.setupPush()
     }
-    
+
     this.setActiveGroup(this.allWalletGroups.length > 1 ? 'all' : this.allWalletGroups[0])
     this.walletGroups$.next(this.allWalletGroups)
     this.pushProvider.registerWallets(this.allWallets)
@@ -334,14 +334,14 @@ export class AccountProvider {
           airGapWallet.addresses = event.data.addresses
           if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
             airGapWallet
-            .synchronize()
-            .then(() => {
-              resolve()
-            })
-            .catch((error) => {
-              console.error(error)
-              resolve()
-            })
+              .synchronize()
+              .then(() => {
+                resolve()
+              })
+              .catch((error) => {
+                console.error(error)
+                resolve()
+              })
           } else {
             resolve()
           }
@@ -375,7 +375,7 @@ export class AccountProvider {
   }
 
   public getActiveWalletList(): AirGapMarketWallet[] {
-    return this.allWallets.filter(wallet => wallet.status === AirGapWalletStatus.ACTIVE)
+    return this.allWallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
   }
 
   public setActiveGroup(groupToSet: AirGapMarketWalletGroup | ImplicitWalletGroup | undefined): void {
@@ -429,7 +429,6 @@ export class AccountProvider {
       .map((walletAddInfo) => walletAddInfo.walletToAdd)
 
     await this.registerToPushBackend(activeNewWallets)
-    this.drawChartProvider.drawChart()
   }
 
   private async addWallet(
@@ -445,7 +444,7 @@ export class AccountProvider {
     if (walletAddInfo.groupLabel === '') {
       walletAddInfo.groupLabel = undefined
     }
-  
+
     this.assertWalletGroupExists(walletAddInfo.groupId, walletAddInfo.groupLabel)
     this.assertWalletGroupUpdated(walletAddInfo.groupId, walletAddInfo.groupLabel)
 
@@ -515,7 +514,6 @@ export class AccountProvider {
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
       this.walletGroups$.next(this.allWalletGroups)
-      this.drawChartProvider.drawChart()
 
       return this.persist()
     }
@@ -550,8 +548,6 @@ export class AccountProvider {
           : this.allWalletGroups[0]
       this.setActiveGroup(activeGroup)
       this.walletGroups$.next(this.allWalletGroups)
-
-      this.drawChartProvider.drawChart()
 
       return this.persist()
     }

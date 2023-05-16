@@ -7,13 +7,11 @@ import { IonicModule } from '@ionic/angular'
 import { ReactiveComponentModule } from '@ngrx/component'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
-import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { PipesModule } from '../pipes/pipes.module'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { AmountComponent } from './amount/amount.component'
 import { CardActionableComponent } from './card-actionable/card-actionable'
-import { ChartComponent } from './chart/chart.component'
 import { CurrencyItemComponent } from './currency-item/currency-item'
 import { CurrentWalletGroupComponent } from './current-wallet-group/current-wallet-group.component'
 import { DappPeerComponent } from './dapp-peer/dapp-peer.component'
@@ -49,7 +47,6 @@ import { WidgetSelector } from './widget-selector/widget-selector'
 @NgModule({
   declarations: [
     PortfolioItemComponent,
-    ChartComponent,
     SwapComponent,
     AccountEditPopoverComponent,
     AmountComponent,
@@ -93,7 +90,6 @@ import { WidgetSelector } from './widget-selector/widget-selector'
 
     PipesModule,
     MomentModule,
-    ChartsModule,
     TranslateModule,
     QRCodeModule,
     AirGapAngularCoreModule,
@@ -101,7 +97,6 @@ import { WidgetSelector } from './widget-selector/widget-selector'
   ],
   exports: [
     PortfolioItemComponent,
-    ChartComponent,
     AmountComponent,
     SwapComponent,
     AccountEditPopoverComponent,

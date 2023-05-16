@@ -1,4 +1,12 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules } from '@airgap/angular-core'
+import {
+  APP_CONFIG,
+  APP_INFO_PLUGIN,
+  APP_LAUNCHER_PLUGIN,
+  FILESYSTEM_PLUGIN,
+  ISOLATED_MODULES_PLUGIN,
+  PermissionsService,
+  WebIsolatedModules
+} from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -15,7 +23,6 @@ import { appConfig } from 'src/app/config/app-config'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
-import { DrawChartService } from '../src/app/services/draw-chart/draw-chart.service'
 
 import {
   AlertControllerMock,
@@ -85,7 +92,6 @@ export class UnitHelper {
       StoreModule.forRoot({})
     ]
     const mandatoryProviders: any[] = [
-      DrawChartService,
       { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
