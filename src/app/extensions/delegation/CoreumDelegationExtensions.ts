@@ -73,6 +73,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
 
   public async getExtraDelegationDetailsFromAddress(
     adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>,
+    _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
@@ -100,8 +101,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
     delegatees: string[]
   ): Promise<UIAccountSummary[]> {
     const unkownValidators: CosmosValidator[] = await Promise.all(
-      delegatees
-        .map((address: string) => adapter.protocolV1.fetchValidator(address))
+      delegatees.map((address: string) => adapter.protocolV1.fetchValidator(address))
     )
 
     type ValidatorDetails = CosmosValidatorDetails | (CosmosValidator & Pick<CosmosValidatorDetails, 'logo'>)
@@ -142,6 +142,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
 
   public async createAccountExtendedDetails(
     adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>,
+    _publicKey: string,
     address: string
   ): Promise<UIAccountExtendedDetails> {
     const results = await Promise.all([
@@ -179,14 +180,16 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
       }
     ]
 
-    const unbondingCompletionItems = await Promise.all(unbondingDetails.map(async (unbondingDetail) => {
-      return {
-        label: 'account-transaction-detail.unbonding_completion',
-        text: `${await this.amountConverterPipe.transformValueOnly(unbondingDetail.balance, adapter, 0)} ${adapter.symbol} - ${
-          unbondingDetail.completionTime
-        }`
-      }
-    }))
+    const unbondingCompletionItems = await Promise.all(
+      unbondingDetails.map(async (unbondingDetail) => {
+        return {
+          label: 'account-transaction-detail.unbonding_completion',
+          text: `${await this.amountConverterPipe.transformValueOnly(unbondingDetail.balance, adapter, 0)} ${adapter.symbol} - ${
+            unbondingDetail.completionTime
+          }`
+        }
+      })
+    )
 
     items.splice(3, 0, ...unbondingCompletionItems)
 
@@ -201,7 +204,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
   ): Promise<AirGapDelegateeDetails> {
     const results = await Promise.all([
       adapter.protocolV1.fetchValidator(validatorDetails.address),
-      adapter.protocolV1.fetchSelfDelegation(validatorDetails.address),
+      adapter.protocolV1.fetchSelfDelegation(validatorDetails.address)
     ])
 
     const allDetails = results[0]
@@ -224,7 +227,10 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
     }
   }
 
-  private async createValidatorDisplayDetails(adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>, validatorDetails: CosmosValidator): Promise<UIWidget[]> {
+  private async createValidatorDisplayDetails(
+    adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>,
+    validatorDetails: CosmosValidator
+  ): Promise<UIWidget[]> {
     const details = []
 
     const votingPower = await this.fetchVotingPower(adapter.protocolV1, validatorDetails.operator_address)

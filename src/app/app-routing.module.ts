@@ -85,7 +85,8 @@ const routes: Routes = [
       special: DataResolverService
     },
     canActivate: [ProtocolGuard, ServiceKeyGuard],
-    loadChildren: () => import('./pages/sub-account-add-generic/sub-account-add-generic.module').then((m) => m.SubAccountAddGenericPageModule)
+    loadChildren: () =>
+      import('./pages/sub-account-add-generic/sub-account-add-generic.module').then((m) => m.SubAccountAddGenericPageModule)
   },
   {
     path: 'sub-account-select/:id',
@@ -155,8 +156,10 @@ const routes: Routes = [
   },
   {
     path: 'delegation-detail/:id/:publicKey/:protocolID/:addressIndex',
+    resolve: {
+      special: DataResolverService
+    },
     canActivate: [ProtocolGuard, ServiceKeyGuard],
-
     loadChildren: () => import('./pages/delegation-detail/delegation-detail.module').then((m) => m.DelegationDetailPageModule)
   },
   {
@@ -222,6 +225,10 @@ const routes: Routes = [
       import('./pages/interaction-selection-settings/interaction-selection-settings.module').then(
         (m) => m.InteractionSelectionSettingsPageModule
       )
+  },
+  {
+    path: 'trading-settings',
+    loadChildren: () => import('./pages/trading-settings/trading-settings.module').then((m) => m.TradingSettingsPageModule)
   },
   {
     path: 'collectibles-list/:id/:publicKey/:protocolID/:addressIndex',

@@ -109,6 +109,31 @@
     </ion-infinite-scroll>
   </ion-grid>
   <ion-fab vertical="bottom" slot="fixed">
+    <ng-container *ngIf="isMtPerelinActive">
+      <ion-row>
+        <ion-col>
+          <ion-button class="mt-perelin-button" expand="full" size="default" color="white" (click)="buyMtPerelin()" shape="round">
+            {{ 'swap.buy_label' | translate }}
+            <div>
+              {{ 'account-transaction-list.provided_by' | translate }}
+              <img src="https://www.mtpelerin.com/images/logo.svg" />
+            </div>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-button class="mt-perelin-button" expand="full" size="default" color="white" (click)="sellMtPerelin()" shape="round">
+            {{ 'swap.sell_label' | translate }}
+            <div>
+              {{ 'account-transaction-list.provided_by' | translate }}
+              <img src="https://www.mtpelerin.com/images/logo.svg" />
+            </div>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+
     <ion-row>
       <ion-col>
         <ion-button id="receive" expand="full" size="default" color="primary" (click)="openReceivePage()" shape="round">

@@ -112,6 +112,14 @@ export class SettingsPage {
     this.browserService.openUrl('https://github.com/airgap-it')
   }
 
+  public airgapWebsite(): void {
+    this.browserService.openUrl('https://airgap.it/')
+  }
+
+  public airgapShop(): void {
+    this.browserService.openUrl('https://shop.airgap.it/')
+  }
+
   public faq(): void {
     this.browserService.openUrl('https://support.airgap.it')
   }
@@ -130,6 +138,10 @@ export class SettingsPage {
 
   public goToWalletInteraction(): void {
     this.navigate('/interaction-selection-settings')
+  }
+
+  public goToTradingSettings(): void {
+    this.navigate('/trading-settings')
   }
 
   private navigate(url: string) {

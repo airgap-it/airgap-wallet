@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+  <ion-grid class="ion-no-padding">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'settings.trading_settings.text' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-grid>
+</ion-header>
+<ion-content>
+  <ion-item>
+    {{ 'settings.trading_settings.mtpelerin' | translate }}
+    <ion-toggle [checked]="useMtPerelin" (ionChange)="toggleUseMtPerelin($event)" slot="end"></ion-toggle>
+  </ion-item>
+
+  <div class="mtpelerin-wrapper">
+    <img src="https://www.mtpelerin.com/images/logo.svg" />
+    <h3>{{ 'mtpelerin.header1' | translate }}</h3>
+    <p>
+      {{ 'mtpelerin.paragraph1' | translate }}
+    </p>
+    <h3>{{ 'mtpelerin.header2' | translate }}</h3>
+    <ul>
+      <li>{{ 'mtpelerin.lineItem1' | translate }}</li>
+      <li>{{ 'mtpelerin.lineItem2' | translate }}</li>
+      <li>{{ 'mtpelerin.lineItem3' | translate }}</li>
+    </ul>
+
+    <ion-row>
+      <ion-col>
+        <ion-button
+          class="mt-perelin-button"
+          expand="full"
+          size="small"
+          color="white"
+          shape="round"
+          (click)="navigate('https://www.mtpelerin.com/buy-crypto')"
+        >
+          {{ 'mtpelerin.button1' | translate }}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button
+          class="mt-perelin-button"
+          expand="full"
+          size="small"
+          color="white"
+          shape="round"
+          (click)="navigate('https://www.mtpelerin.com/sell-crypto')"
+        >
+          {{ 'mtpelerin.button2' | translate }}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <span>
+      {{ 'mtpelerin.note' | translate }}
+    </span>
+  </div>
+</ion-content>

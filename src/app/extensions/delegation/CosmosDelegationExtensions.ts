@@ -77,6 +77,7 @@ export class CosmosDelegationExtensions extends V0ProtocolDelegationExtensions<C
   // TODO: add translations
   public async getExtraDelegationDetailsFromAddress(
     protocol: CosmosProtocol,
+    _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
@@ -145,7 +146,7 @@ export class CosmosDelegationExtensions extends V0ProtocolDelegationExtensions<C
     )
   }
 
-  public async createAccountExtendedDetails(protocol: CosmosProtocol, address: string): Promise<UIAccountExtendedDetails> {
+  public async createAccountExtendedDetails(protocol: CosmosProtocol, _publicKey: string, address: string): Promise<UIAccountExtendedDetails> {
     const results = await Promise.all([
       protocol.getAvailableBalanceOfAddresses([address]),
       protocol.fetchTotalDelegatedAmount(address),

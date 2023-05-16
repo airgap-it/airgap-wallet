@@ -21,10 +21,7 @@ import {
   MainProtocolSymbols,
   NetworkType
 } from '@airgap/coinlib-core'
-import {
-  generateId,
-  IACMessageType
-} from '@airgap/serializer'
+import { generateId, IACMessageType } from '@airgap/serializer'
 import {
   TezosProtocolNetwork,
   TezosBlockExplorer,
@@ -66,6 +63,7 @@ import { WalletStorageKey, WalletStorageService } from './services/storage/stora
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
+import { HttpClient } from '@angular/common/http'
 
 @Component({
   selector: 'app-root',
@@ -96,6 +94,7 @@ export class AppComponent implements AfterViewInit {
     private readonly themeService: ThemeService,
     private readonly navigationService: NavigationService,
     private readonly isolatedModulesService: IsolatedModulesService,
+    private readonly http: HttpClient,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
@@ -142,6 +141,14 @@ export class AppComponent implements AfterViewInit {
         }
       })
     }
+
+    // Mt Perelin
+    this.http
+      .get('https://api.mtpelerin.com/currencies/tokens')
+      .toPromise()
+      .then((result) => {
+        this.storageProvider.setCache('mtperelin-currencies', result)
+      })
 
     this.appSerivce.setReady()
   }

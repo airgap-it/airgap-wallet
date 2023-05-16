@@ -44,7 +44,8 @@
       "cancel": "Cancel",
       "confirm": "Migrate"
     },
-    "no-transactions_text": "There are no transactions yet for this account."
+    "no-transactions_text": "There are no transactions yet for this account.",
+    "provided_by": "Provided by"
   },
   "account-transaction-detail": {
     "available_label": "Available",
@@ -100,6 +101,7 @@
     "go_label": "Let's Go"
   },
   "portfolio": {
+    "shop_banner": "Gain an extra layer of security - Get the AirGap Recovery Plate",
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the <span class=\"style__strong color__primary\">AirGap Vault</span> application where your secret is securely stored.",
     "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
     "add-coins_label": "Add Coins"
@@ -142,7 +144,9 @@
     "faq_label": "FAQ",
     "discord_label": "Join Discord",
     "share_label": "Share AirGap",
-    "information_label": "Information",
+    "information_label": "More",
+    "airgap_website": "AirGap Website",
+    "airgap_shop": "AirGap Shop",
     "github_label": "GitHub Repository",
     "other_label": "Other",
     "paste-from-clipboard_label": "Paste code from clipboard",
@@ -174,7 +178,23 @@
     "interaction": {
       "label": "Interaction Setting",
       "text": "Vault and Wallet Interaction Settings"
+    },
+    "trading_settings": {
+      "label": "Trading",
+      "text": "Advanced Trading Settings",
+      "mtpelerin": "Use Mt Pelerin"
     }
+  },
+  "mtpelerin": {
+    "header1": "Buy & sell crypto with Mt Pelerin – The Swiss gateway to the crypto world",
+    "paragraph1": "Invest in Bitcoin, Ether and the most popular assets on multiple chains in a few clicks, at the best prices on the market and no KYC required. Withdraw them at any time in 14 currencies back on your bank account in 171 countries.",
+    "header2": "Simple and transparent",
+    "lineItem1": "No identification required",
+    "lineItem2": "Live, transparent exchange rate",
+    "lineItem3": "Make a payment, get crypto directly on AirGap",
+    "button1": "Learn more about buying",
+    "button2": "Learn more about selling",
+    "note": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe."
   },
   "qr-settings-page": {
     "title": "QR Settings"
@@ -422,9 +442,9 @@
     "title": "Exchange",
     "exchange_label": "Exchange",
     "liquidity": {
-     "add_label": "Add Liquidity",
-     "remove_label": "Remove Liquidity",
-     "swap_label": "Swap" 
+      "add_label": "Add Liquidity",
+      "remove_label": "Remove Liquidity",
+      "swap_label": "Swap"
     },
     "powered-by_label": "powered by",
     "switch-exchange_label": "Exchange",
@@ -437,7 +457,7 @@
       "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
       "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
       "exchange_label": "Add Coins"
-    },   
+    },
     "no-currencies-liquidity": {
       "heading": "To provide liquidity to the Tezos Liquidity Baking, you need both <span class=\"style__strong color__primary\">Tez</span> and <span class=\"style__strong color__primary\">tzBTC</span> in AirGap.",
       "description": "Before you can provide or remove liquidty in AirGap you need to add both Tez and tzBTC",
@@ -722,6 +742,59 @@
       }
     }
   },
+  "delegation-detail-icp": {
+    "delegatee-label": "Followee",
+    "delegatee-label-plural": "Followees",
+    "voting-power_label": "Voting Power",
+    "neuron-balance_label": "Neuron Subaccount Balance",
+    "staked_label": "Staked",
+    "maturity_label": "Maturity",
+    "age_label": "Age",
+    "dissolve-delay_label": "Dissolve Delay",
+    "followee-status": {
+      "unknown": "Unknown (load more details)",
+      "followed": "Followed",
+      "not-followed": "Not Folllowed"
+    },
+    "stake-and-follow": {
+      "label": "Follow",
+      "not-staking-not-following_text": "Follow this neuron and delegate your stake.<br><br>Currently you're not staking, select the amount you want to stake. You can stake from <span class=\"style__strong color__primary\">{{ minStake }}</span> up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees).",
+      "staking-not-following_text": "Follow this neuron and delegate your stake.<br><br>You have currently <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> staked. You can additionally stake up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees).",
+      "staking-following_text": "You're following this neuron. Increase your stake to gain more voting power.<br><br>You have currently <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> staked. You can additionally stake up to <span class=\"style__strong color__primary\">{{ maxStake }}</span> (after transaction fees)."
+    },
+    "follow": {
+      "label": "Follow",
+      "text": "Follow this neuron."
+    },
+    "increase-dissolve-delay": {
+      "label": "Set Delay",
+      "text": "The  <span class=\"style__strong color__primary\">Dissolve Delay</span> determines how much voting power you have and how long you'll wait for your funds to unlock once you start dissolving your neuron. Your current Dissolve Delay is set to  <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span> and you can increase it up to  <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
+    },
+    "more-details": {
+      "label": "More Details",
+      "text": "Full neuron details are meant to be private therefore access to a private key is required to fetch them. Create and sign a query transaction to load more data."
+    },
+    "disburse": {
+      "label": "Disburse",
+      "text": "You neuron has dissolved, withdraw the unlocked tokens."
+    },
+    "start-dissolving": {
+      "label": "Start Dissolving"
+    },
+    "stop-dissolving": {
+      "label": "Stop Dissolving",
+      "text": "Your neuron is currently dissolving, your funds will be unlocked in <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Stop dissolving to cancel the process."
+    },
+    "form": {
+      "dissolve-delay": {
+        "label": "Dissolve Delay (in days)",
+        "extra-label": "{{ duration }} (Voting Power {{ votingPower }}x)",
+        "extra-label-no-rewards": "{{ duration }} (Voting Power {{ votingPower }}x)<br><br>Warning: the Dissolve Delay shouldn't be lower than {{ minDelay }} otherwise you won't get any rewards.",
+        "invalid-state": "The Dissolve Delay shouldn't be lower than {{ minDelay }} otherwise you won't get any rewards. The maximum delay is {{ maxDelay }}.",
+        "invalid-decrease": "Invalid Dissolve Delay, the value can be only increased therefore can't drop below the current value ({{ minDelay }}) and can't exceed {{ maxDelay }}."
+      }
+    }
+  },
   "introduction-push": {
     "title": "Push Notifications",
     "heading": "You can receive push notifications if your accounts receive transactions.",
@@ -967,7 +1040,7 @@
     "injector-url_text": "AirGap is compatible with the injector service reference implementation available on the <a href='' target='_blank'>AirGap GitHub</a>.",
     "paste_label": "Paste",
     "include-injector_label": "Injector Service",
-    "include-injector_text": "Privacy preserving and usability improvement with the injectors service. Sapling transactions have to be signed only once in AirGap instead of twice with this service.", 
+    "include-injector_text": "Privacy preserving and usability improvement with the injectors service. Sapling transactions have to be signed only once in AirGap instead of twice with this service.",
     "warning": {
       "contract-not-compatible": "The contract seems not to be compatible, you may still use it, if you're sure it'll work.",
       "contract-cannot-assess-compatibility": "The contract address could not be verified, you may still use it, if you're sure it'll work."

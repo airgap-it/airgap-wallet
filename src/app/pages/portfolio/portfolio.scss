@@ -56,3 +56,23 @@ ion-card {
     font-weight: bold;
   }
 }
+
+.shop-banner-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(112, 228, 206);
+  padding: 6px 10px;
+  margin-top: constant(safe-area-inset-top);
+  margin-top: env(safe-area-inset-top);
+
+  cursor: pointer;
+
+  .shop-banner-text {
+    color: black;
+    text-align: center;
+    font-weight: 400;
+    padding: 0px;
+    margin: 0px;
+  }
+}

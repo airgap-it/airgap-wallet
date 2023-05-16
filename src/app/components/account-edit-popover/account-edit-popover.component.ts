@@ -66,10 +66,7 @@ export class AccountEditPopoverComponent implements OnInit {
       this.isTezosKT = true
     }
     if (supportsDelegation(this.wallet.protocol)) {
-      this.isDelegated = await this.operationsProvider.getDelegationStatusOfAddress(
-        this.wallet.protocol,
-        this.wallet.receivingPublicAddress
-      )
+      this.isDelegated = await this.operationsProvider.getDelegationStatus(this.wallet)
     }
     // tezos end
   }

@@ -1,10 +1,9 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { InternalStorageKey, InternalStorageService, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   IAirGapTransaction,
-  ICoinDelegateProtocol,
   MainProtocolSymbols,
-  SubProtocolSymbols,
+  SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
@@ -97,6 +96,9 @@ export class AccountTransactionListPage {
   private protocolID: string
   private addressIndex
 
+  // Mt Perelin
+  public isMtPerelinActive: boolean = false
+
   constructor(
     public readonly alertCtrl: AlertController,
     public readonly navController: NavController,
@@ -117,7 +119,8 @@ export class AccountTransactionListPage {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
-    private readonly browserService: BrowserService
+    private readonly browserService: BrowserService,
+    private readonly storageService: InternalStorageService
   ) {
     this.isDesktop = this.platform.is('desktop')
 
@@ -162,6 +165,18 @@ export class AccountTransactionListPage {
     this.actionGroup = new ActionGroup(this)
     this.actionGroup.getActions().then((actions) => {
       this.actions = actions
+    })
+
+    // Mt Perelin
+    this.storageService.get(InternalStorageKey.SETTINGS_TRADING_USE_MTPELERIN).then((active) => {
+      if (active) {
+        this.storageProvider.getCache('mtperelin-currencies').then((savedCurrencies) => {
+          this.wallet.protocol.getSymbol().then((symbol) => {
+            const validCurrency = Object.values(savedCurrencies).find((currency) => currency.symbol === symbol)
+            this.isMtPerelinActive = !!active && !!validCurrency
+          })
+        })
+      }
     })
   }
 
@@ -269,8 +284,10 @@ export class AccountTransactionListPage {
   public async loadInitialTransactions(forceRefresh: boolean = false): Promise<void> {
     if (forceRefresh || this.transactions.length === 0) {
       this.transactions =
-        (await this.storageProvider.getCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(0, 10) ??
-        []
+        (await this.storageProvider.getCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet)))?.slice(
+          0,
+          10
+        ) ?? []
     }
 
     const transactionPromise: Promise<IAirGapTransaction[]> = this.getTransactions(undefined, this.TRANSACTION_LIMIT)
@@ -315,7 +332,10 @@ export class AccountTransactionListPage {
       })
     }
 
-    await this.storageProvider.setCache<IAirGapTransaction[]>(await this.accountProvider.getAccountIdentifier(this.wallet), this.transactions)
+    await this.storageProvider.setCache<IAirGapTransaction[]>(
+      await this.accountProvider.getAccountIdentifier(this.wallet),
+      this.transactions
+    )
     this.txOffset = this.transactions.length
 
     this.infiniteEnabled = this.transactions.length >= this.TRANSACTION_LIMIT
@@ -354,10 +374,7 @@ export class AccountTransactionListPage {
 
   // Tezos
   public async isDelegated(): Promise<void> {
-    const isDelegated = await this.operationsProvider.checkDelegated(
-      this.wallet.protocol as ICoinDelegateProtocol,
-      this.wallet.receivingPublicAddress
-    )
+    const isDelegated = await this.operationsProvider.checkDelegated(this.wallet)
     this.isKtDelegated = isDelegated
     // const action = isDelegated ? this.getStatusAction() : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
@@ -405,5 +422,18 @@ export class AccountTransactionListPage {
   public ngOnDestroy(): void {
     this.subscription.unsubscribe()
     this.walletChanged.unsubscribe()
+  }
+
+  // Mt Perelin
+  public async buyMtPerelin() {
+    this.wallet.protocol.getSymbol().then((symbol) => {
+      window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
+    })
+  }
+
+  public async sellMtPerelin() {
+    this.wallet.protocol.getSymbol().then((symbol) => {
+      window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
+    })
   }
 }

@@ -1,8 +1,9 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { RawEthereumTransaction } from '@airgap/ethereum'
+import { ICPActionType, ICPModule, ICPProtocol, ICPSignedTransaction } from '@airgap/icp'
 import { IACMessageDefinitionObject, IACMessageType } from '@airgap/serializer'
 import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
@@ -36,6 +37,7 @@ export class TransactionConfirmPage {
 
   public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: string }][] = []
   public protocols: ICoinProtocol[] = []
+  public wallet: AirGapMarketWallet | undefined
 
   constructor(
     private readonly loadingCtrl: LoadingController,
@@ -86,6 +88,7 @@ export class TransactionConfirmPage {
 
       this.txInfos.push([(messageObject.payload as SignedTransaction).transaction, selectedProtocol, request])
       this.protocols.push(selectedProtocol)
+      this.wallet = wallet
     })
   }
 
@@ -96,6 +99,14 @@ export class TransactionConfirmPage {
       const injectorUrl = (await saplingProtocol.getOptions()).config.injectorUrl
       if (injectorUrl === undefined) {
         await this.wrapInTezosOperation(this.protocols[0] as TezosSaplingProtocol, this.txInfos[0][0])
+        return
+      }
+    }
+
+    if (this.protocols.length === 1 && this.protocols[0].identifier === MainProtocolSymbols.ICP) {
+      const transaction = this.txInfos[0][0]
+      const handled = await this.interceptICPTransaction(this.protocols[0], transaction)
+      if (handled) {
         return
       }
     }
@@ -317,5 +328,39 @@ export class TransactionConfirmPage {
       }
       this.dataService.setData(DataServiceKey.ACCOUNTS, info)
       this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  private async interceptICPTransaction(protocol: ICoinProtocol, transaction: string): Promise<boolean /* handled */> {
+    const adapter = protocol as ICoinProtocolAdapter<ICPProtocol>
+
+    const icpModule = new ICPModule()
+    const v3SerializerCompanion = await icpModule.createV3SerializerCompanion()
+    const signedTransaction = await v3SerializerCompanion.fromTransactionSignResponse(adapter.identifier, { transaction, accountIdentifier: '' }) as ICPSignedTransaction
+    if (signedTransaction.transactions.some(({ actionType }) => actionType === ICPActionType.GET_NEURON_INFO)) {
+      return this.loadICPFullNeuron(adapter, signedTransaction)
+    }
+
+    return false
+  }
+
+  private async loadICPFullNeuron(adapter: ICoinProtocolAdapter<ICPProtocol>, transaction: ICPSignedTransaction): Promise<boolean> {
+    if (this.wallet === undefined) {
+      return false
+    }
+
+    const data = (await adapter.protocolV1.sendQuery(transaction))[0]
+    if ('Err' in data) {
+      throw new Error(data.Err.error_message)
+    }
+
+    const info = {
+      neuron: data.Ok
+    }
+    this.dataService.setData(DataServiceKey.DETAIL, info)
+    this.router
+      .navigateByUrl(`/delegation-detail/${DataServiceKey.DETAIL}/${this.wallet.publicKey}/${adapter.identifier}/${this.wallet.addressIndex}`, { replaceUrl: true })
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
+    return true
   }
 }
