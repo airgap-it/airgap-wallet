@@ -52,7 +52,7 @@ export class TezosFAForm extends BaseComponent<TezosFAFormFacade> {
           address: value.address,
           networkIdentifier: value.network,
           tokenInterface: value.tokenInterface !== null ? value.tokenInterface : undefined,
-          tokenID: value.tokenID !== null ? value.tokenID : undefined
+          tokenId: value.tokenID !== null ? value.tokenID : undefined
         })
       })
 

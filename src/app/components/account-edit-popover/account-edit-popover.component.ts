@@ -1,12 +1,12 @@
 import { ClipboardService, ProtocolService } from '@airgap/angular-core'
 import { AirGapMarketWallet, ICoinProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { ImportAccoutActionContext } from '@airgap/tezos'
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { AlertController, NavParams, PopoverController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { ButtonAction } from 'src/app/models/actions/ButtonAction'
+import { TezosImportKtAccountAction } from 'src/app/models/actions/TezosImportKtAccountAction'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
@@ -22,7 +22,7 @@ export class AccountEditPopoverComponent implements OnInit {
   private readonly onDelete: Function
 
   // Tezos
-  public importAccountAction: ButtonAction<string[], ImportAccoutActionContext>
+  public importAccountAction: ButtonAction<string[], TezosImportKtAccountAction>
   public isTezosKT: boolean = false
   public isDelegated: boolean = false
 

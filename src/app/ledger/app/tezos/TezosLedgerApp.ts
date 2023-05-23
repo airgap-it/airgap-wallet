@@ -1,34 +1,52 @@
+import { createV0TezosProtocol, ICoinProtocolAdapter } from '@airgap/angular-core'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletPriceService, AirGapWalletStatus } from '@airgap/coinlib-core'
-import { RawTezosTransaction, TezosProtocol } from '@airgap/tezos'
+import { TezosProtocol, TezosTransactionSignRequest } from '@airgap/tezos'
 import Tezos from '@obsidiansystems/hw-app-xtz'
 
 import { LedgerApp } from '../LedgerApp'
 
 export class TezosLedgerApp extends LedgerApp {
-  private readonly protocol: TezosProtocol = new TezosProtocol()
-  private readonly derivationPath: string = this.protocol.standardDerivationPath.slice(2).replace(/h/g, "'")
+  private _adapter: ICoinProtocolAdapter<TezosProtocol> | undefined
+  private async adapter(): Promise<ICoinProtocolAdapter<TezosProtocol>> {
+    if (this._adapter === undefined) {
+      this._adapter = await createV0TezosProtocol()
+    }
+
+    return this._adapter
+  }
+
+  private _derivationPath: string | undefined
+  private async derivationPath(): Promise<string> {
+    if (this._derivationPath === undefined) {
+      const protocol: ICoinProtocolAdapter<TezosProtocol> = await this.adapter()
+      this._derivationPath = protocol.standardDerivationPath.slice(2).replace(/h/g, "'")
+    }
+
+    return this._derivationPath
+  }
 
   public async importWallet(priceService: AirGapWalletPriceService): Promise<AirGapMarketWallet> {
+    const adapter: ICoinProtocolAdapter<TezosProtocol> = await this.adapter()
     const app = new Tezos(this.connection.transport)
-    const result: Record<'publicKey', string> = await app.getAddress(this.derivationPath, true)
+    const result: Record<'publicKey', string> = await app.getAddress(await this.derivationPath(), true)
 
     return new AirGapCoinWallet(
-      this.protocol,
+      adapter,
       result.publicKey.slice(2),
       false,
-      this.protocol.standardDerivationPath,
+      adapter.standardDerivationPath,
       '',
       AirGapWalletStatus.ACTIVE,
       priceService
     )
   }
 
-  public async signTransaction(transaction: RawTezosTransaction): Promise<string> {
+  public async signTransaction(transaction: TezosTransactionSignRequest['transaction']): Promise<string> {
     const app = new Tezos(this.connection.transport)
 
     const watermark: string = '03'
     const result: Record<'signature', string> = await app.signOperation(
-      this.derivationPath,
+      await this.derivationPath(),
       Buffer.from(watermark + transaction.binaryTransaction, 'hex')
     )
 

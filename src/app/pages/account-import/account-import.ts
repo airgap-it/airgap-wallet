@@ -1,10 +1,11 @@
 import { flattened } from '@airgap/angular-core'
-import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
+import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { Component, NgZone, OnDestroy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, Platform } from '@ionic/angular'
 import { Subject } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
+import { WalletModulesService } from 'src/app/services/modules/modules.service'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService } from '../../services/data/data.service'
@@ -38,7 +39,8 @@ export class AccountImportPage implements OnDestroy {
     private readonly router: Router,
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
-    private readonly ngZone: NgZone
+    private readonly ngZone: NgZone,
+    private readonly modulesService: WalletModulesService
   ) {
     if (!this.route.snapshot.data.special) {
       this.router.navigateByUrl('/')
@@ -79,43 +81,27 @@ export class AccountImportPage implements OnDestroy {
   }
 
   public async ionViewDidEnter(): Promise<void> {
-    const message = this.allAccountImports.map((accountImport) => {
-      return {
-        protocolIdentifier: accountImport.wallet.protocol.identifier,
-        publicKey: accountImport.wallet.publicKey,
-        isExtendedPublicKey: accountImport.wallet.isExtendedPublicKey,
-        derivationPath: accountImport.wallet.derivationPath,
-        masterFingerprint: accountImport.wallet.masterFingerprint,
-        status: accountImport.wallet.status
-      }
-    })
+    const options: AirGapWallet[] = this.allAccountImports.map((accountImport) => accountImport.wallet)
 
-    const airGapWorker: Worker = new Worker('./assets/workers/airgap-coin-lib.js')
+    const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(options)
+    this.allAccountImports.forEach((accountImport: AccountImport) => {
+      accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
 
-    airGapWorker.postMessage(message)
-
-    airGapWorker.onmessage = (event) => {
-      const derivedAddressesMap = event.data
-
-      this.allAccountImports.forEach((accountImport: AccountImport) => {
-        accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
-
-        const key = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
-        accountImport.wallet.addresses = derivedAddressesMap[key]
-        accountImport.wallet
-          .synchronize()
-          .then(() => {
-            if (accountImport.wallet.getCurrentBalance() !== undefined && accountImport.wallet.getCurrentBalance().gt(0)) {
-              accountImport.wallet.status = AirGapWalletStatus.ACTIVE
-            }
-            this.ngZone.run(() => {
-              this.accountProvider.triggerWalletChanged()
-            })
+      const key = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
+      accountImport.wallet.addresses = addresses[key]
+      accountImport.wallet
+        .synchronize()
+        .then(() => {
+          if (accountImport.wallet.getCurrentBalance() !== undefined && accountImport.wallet.getCurrentBalance().gt(0)) {
+            accountImport.wallet.status = AirGapWalletStatus.ACTIVE
+          }
+          this.ngZone.run(() => {
+            this.accountProvider.triggerWalletChanged()
           })
-          .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-        this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-      })
-    }
+        })
+        .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    })
   }
 
   public ngOnDestroy(): void {

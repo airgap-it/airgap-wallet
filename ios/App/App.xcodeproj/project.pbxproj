@@ -22,6 +22,22 @@
 		88BD9D0E25F0CDF900780458 /* SaplingNative.m in Sources */ = {isa = PBXBuildFile; fileRef = 88BD9D0D25F0CDF900780458 /* SaplingNative.m */; };
 		88BD9D1325F0CE4800780458 /* PluginCall+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
+		A35472FF29EDA1F700AFD5A7 /* Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35472FE29EDA1F700AFD5A7 /* Hex.swift */; };
+		A3FCA8F329E5B5500012FE3C /* JSValue+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */; };
+		A3FCA8F529E5B5680012FE3C /* WK_Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */; };
+		A3FCA8F729E5B57C0012FE3C /* Sequence+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */; };
+		A3FCA8F929E5B5870012FE3C /* JS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F829E5B5870012FE3C /* JS.swift */; };
+		A3FCA8FB29E5B5980012FE3C /* Filesystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8FA29E5B5980012FE3C /* Filesystem.swift */; };
+		A3FCA90029E5C2890012FE3C /* FileExplorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8FD29E5C2890012FE3C /* FileExplorer.swift */; };
+		A3FCA90129E5C2890012FE3C /* IsolatedModules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8FE29E5C2890012FE3C /* IsolatedModules.swift */; };
+		A3FCA90229E5C2890012FE3C /* IsolatedModules.m in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8FF29E5C2890012FE3C /* IsolatedModules.m */; };
+		A3FCA90729E5C29E0012FE3C /* WebViewEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA90529E5C29E0012FE3C /* WebViewEnvironment.swift */; };
+		A3FCA90829E5C29E0012FE3C /* JSEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA90629E5C29E0012FE3C /* JSEnvironment.swift */; };
+		A3FCA90B29E5C2A40012FE3C /* JSEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA90929E5C2A40012FE3C /* JSEvaluator.swift */; };
+		A3FCA90C29E5C2A40012FE3C /* JSModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA90A29E5C2A40012FE3C /* JSModule.swift */; };
+		A3FCA90E29E5C2AD0012FE3C /* ModuleManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA90D29E5C2AD0012FE3C /* ModuleManifest.swift */; };
+		A3FCA91129E5C5590012FE3C /* Zip.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA91029E5C5590012FE3C /* Zip.swift */; };
+		A3FCA91329E5C56B0012FE3C /* Zip.m in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA91229E5C56B0012FE3C /* Zip.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +58,22 @@
 		88BD9D0A25F0CDE600780458 /* SaplingNative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaplingNative.swift; sourceTree = "<group>"; };
 		88BD9D0D25F0CDF900780458 /* SaplingNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SaplingNative.m; sourceTree = "<group>"; };
 		88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PluginCall+Additions.swift"; sourceTree = "<group>"; };
+		A35472FE29EDA1F700AFD5A7 /* Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hex.swift; sourceTree = "<group>"; };
+		A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSValue+Additions.swift"; sourceTree = "<group>"; };
+		A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WK_Additions.swift; sourceTree = "<group>"; };
+		A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Additions.swift"; sourceTree = "<group>"; };
+		A3FCA8F829E5B5870012FE3C /* JS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JS.swift; sourceTree = "<group>"; };
+		A3FCA8FA29E5B5980012FE3C /* Filesystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filesystem.swift; sourceTree = "<group>"; };
+		A3FCA8FD29E5C2890012FE3C /* FileExplorer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileExplorer.swift; sourceTree = "<group>"; };
+		A3FCA8FE29E5C2890012FE3C /* IsolatedModules.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsolatedModules.swift; sourceTree = "<group>"; };
+		A3FCA8FF29E5C2890012FE3C /* IsolatedModules.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IsolatedModules.m; sourceTree = "<group>"; };
+		A3FCA90529E5C29E0012FE3C /* WebViewEnvironment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewEnvironment.swift; sourceTree = "<group>"; };
+		A3FCA90629E5C29E0012FE3C /* JSEnvironment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSEnvironment.swift; sourceTree = "<group>"; };
+		A3FCA90929E5C2A40012FE3C /* JSEvaluator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSEvaluator.swift; sourceTree = "<group>"; };
+		A3FCA90A29E5C2A40012FE3C /* JSModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSModule.swift; sourceTree = "<group>"; };
+		A3FCA90D29E5C2AD0012FE3C /* ModuleManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleManifest.swift; sourceTree = "<group>"; };
+		A3FCA91029E5C5590012FE3C /* Zip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zip.swift; sourceTree = "<group>"; };
+		A3FCA91229E5C56B0012FE3C /* Zip.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Zip.m; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
@@ -89,6 +121,8 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				A3FCA90F29E5C54D0012FE3C /* Zip */,
+				A3FCA8FC29E5C2660012FE3C /* IsolatedModules */,
 				88B98CD6272020CB0089A746 /* public */,
 				88BD9D1025F0CE2700780458 /* Helpers */,
 				88BD9D0925F0CDD600780458 /* SaplingNative */,
@@ -138,6 +172,9 @@
 			isa = PBXGroup;
 			children = (
 				88BD9D1125F0CE3300780458 /* Extensions */,
+				A3FCA8F829E5B5870012FE3C /* JS.swift */,
+				A3FCA8FA29E5B5980012FE3C /* Filesystem.swift */,
+				A35472FE29EDA1F700AFD5A7 /* Hex.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -146,8 +183,51 @@
 			isa = PBXGroup;
 			children = (
 				88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */,
+				A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */,
+				A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */,
+				A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		A3FCA8FC29E5C2660012FE3C /* IsolatedModules */ = {
+			isa = PBXGroup;
+			children = (
+				A3FCA90329E5C28E0012FE3C /* JS */,
+				A3FCA8FF29E5C2890012FE3C /* IsolatedModules.m */,
+				A3FCA8FE29E5C2890012FE3C /* IsolatedModules.swift */,
+				A3FCA8FD29E5C2890012FE3C /* FileExplorer.swift */,
+				A3FCA90D29E5C2AD0012FE3C /* ModuleManifest.swift */,
+			);
+			path = IsolatedModules;
+			sourceTree = "<group>";
+		};
+		A3FCA90329E5C28E0012FE3C /* JS */ = {
+			isa = PBXGroup;
+			children = (
+				A3FCA90429E5C2930012FE3C /* Environment */,
+				A3FCA90929E5C2A40012FE3C /* JSEvaluator.swift */,
+				A3FCA90A29E5C2A40012FE3C /* JSModule.swift */,
+			);
+			path = JS;
+			sourceTree = "<group>";
+		};
+		A3FCA90429E5C2930012FE3C /* Environment */ = {
+			isa = PBXGroup;
+			children = (
+				A3FCA90629E5C29E0012FE3C /* JSEnvironment.swift */,
+				A3FCA90529E5C29E0012FE3C /* WebViewEnvironment.swift */,
+			);
+			path = Environment;
+			sourceTree = "<group>";
+		};
+		A3FCA90F29E5C54D0012FE3C /* Zip */ = {
+			isa = PBXGroup;
+			children = (
+				A3FCA91029E5C5590012FE3C /* Zip.swift */,
+				A3FCA91229E5C56B0012FE3C /* Zip.m */,
+			);
+			path = Zip;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -270,11 +350,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A3FCA91329E5C56B0012FE3C /* Zip.m in Sources */,
+				A3FCA90B29E5C2A40012FE3C /* JSEvaluator.swift in Sources */,
+				A3FCA90E29E5C2AD0012FE3C /* ModuleManifest.swift in Sources */,
+				A3FCA90829E5C29E0012FE3C /* JSEnvironment.swift in Sources */,
+				A3FCA91129E5C5590012FE3C /* Zip.swift in Sources */,
+				A35472FF29EDA1F700AFD5A7 /* Hex.swift in Sources */,
+				A3FCA8FB29E5B5980012FE3C /* Filesystem.swift in Sources */,
 				881CF03424530A6F007A5381 /* AppInfo.m in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				A3FCA90729E5C29E0012FE3C /* WebViewEnvironment.swift in Sources */,
+				A3FCA90C29E5C2A40012FE3C /* JSModule.swift in Sources */,
 				881CF03124530A4D007A5381 /* AppInfo.swift in Sources */,
+				A3FCA90129E5C2890012FE3C /* IsolatedModules.swift in Sources */,
+				A3FCA8F329E5B5500012FE3C /* JSValue+Additions.swift in Sources */,
+				A3FCA8F729E5B57C0012FE3C /* Sequence+Additions.swift in Sources */,
 				88BD9D0E25F0CDF900780458 /* SaplingNative.m in Sources */,
+				A3FCA8F529E5B5680012FE3C /* WK_Additions.swift in Sources */,
 				88BD9D1325F0CE4800780458 /* PluginCall+Additions.swift in Sources */,
+				A3FCA8F929E5B5870012FE3C /* JS.swift in Sources */,
+				A3FCA90029E5C2890012FE3C /* FileExplorer.swift in Sources */,
+				A3FCA90229E5C2890012FE3C /* IsolatedModules.m in Sources */,
 				88BD9D0B25F0CDE600780458 /* SaplingNative.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

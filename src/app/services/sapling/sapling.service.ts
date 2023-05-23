@@ -1,5 +1,5 @@
-import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosShieldedTezProtocol } from '@airgap/tezos'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
@@ -19,8 +19,13 @@ export class SaplingService {
 
   public async initSapling() {
     if (!this.isInitialized) {
-      const shieldedTezProtocol = (await this.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)) as TezosShieldedTezProtocol
-      await shieldedTezProtocol.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
+      const shieldedTezProtocol: ICoinProtocol = await this.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)
+      if (!(shieldedTezProtocol instanceof ICoinProtocolAdapter)) {
+        return
+      }
+
+      const shieldedTezAdapter: ICoinProtocolAdapter<TezosShieldedTezProtocol> = shieldedTezProtocol
+      await shieldedTezAdapter.protocolV1.initParameters(await this.getSaplingParams('spend'), await this.getSaplingParams('output'))
       this.isInitialized = true
     }
   }

@@ -1,7 +1,7 @@
 import { AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import { CoreumProtocol } from '@airgap/coreum'
-import { CosmosDelegationActionType, CosmosUnbondingDelegation, CosmosValidator } from '@airgap/cosmos'
+import { CosmosDelegationActionType, CosmosUnbondingDelegation, CosmosValidator } from '@airgap/cosmos-core'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'

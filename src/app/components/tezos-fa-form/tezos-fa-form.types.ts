@@ -1,5 +1,5 @@
-import { UIResource } from '@airgap/angular-core'
-import { ICoinProtocol, ProtocolNetwork } from '@airgap/coinlib-core'
+import { ICoinSubProtocolAdapter, UIResource } from '@airgap/angular-core'
+import { TezosFAProtocol, TezosProtocolNetwork } from '@airgap/tezos'
 
 export enum TokenInterface {
   FA1p2 = 'TZIP-007',
@@ -15,19 +15,19 @@ export interface TokenDetailsInput {
   address: string
   networkIdentifier: string
   tokenInterface?: TokenInterface
-  tokenID?: number
+  tokenId?: number
 }
 
 export interface TezosFAFormState {
   tokenInterface: UIResource<TokenInterface>
-  tokenID: UIResource<number>
+  tokenId: UIResource<number>
 
   tokenInterfaces: TokenInterface[]
   tokens: TokenDetails[]
-  networks: ProtocolNetwork[]
+  networks: TezosProtocolNetwork[]
 
-  protocol: UIResource<ICoinProtocol>
-  
+  protocol: UIResource<ICoinSubProtocolAdapter<TezosFAProtocol>>
+
   errorDescription: string | undefined
 }
 
@@ -46,16 +46,15 @@ interface TezosFAFormBaseError<T extends TezosFAFormErrorType> {
 }
 
 export interface ContractNotFoundError extends TezosFAFormBaseError<TezosFAFormErrorType.CONTRACT_NOT_FOUND> {}
-export interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> { tokenInterfaces: TokenInterface[] }
+export interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> {
+  tokenInterfaces: TokenInterface[]
+}
 export interface TokenMetadataMissingError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING> {}
-export interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> { tokens: TokenDetails[] }
+export interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> {
+  tokens: TokenDetails[]
+}
 export interface UnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.UNKNOWN> {
   error?: any
 }
 
-export type TezosFAFormError = 
-  | ContractNotFoundError 
-  | InterfaceUnknownError 
-  | TokenMetadataMissingError 
-  | TokenVagueError 
-  | UnknownError
+export type TezosFAFormError = ContractNotFoundError | InterfaceUnknownError | TokenMetadataMissingError | TokenVagueError | UnknownError

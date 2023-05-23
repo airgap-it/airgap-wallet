@@ -56,3 +56,7 @@ export class StatusBarMock {
 export class ZipMock {
   public unzip: jasmine.Spy = newSpy('unzip', Promise.resolve())
 }
+
+export class FilePickerMock {
+  public pickFiles: jasmine.Spy = newSpy('pickFiles', Promise.resolve())
+}

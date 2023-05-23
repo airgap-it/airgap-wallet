@@ -1,36 +1,34 @@
 import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { ICoinDelegateProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
-import { CosmosProtocol } from '@airgap/cosmos'
-import { MoonbaseProtocol, MoonbeamProtocol, MoonriverProtocol } from '@airgap/moonbeam'
-import { KusamaProtocol, PolkadotProtocol } from '@airgap/polkadot'
-import { TezosProtocol } from '@airgap/tezos'
 import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { CoreumDelegationExtensions } from 'src/app/extensions/delegation/CoreumDelegationExtensions'
+import { ICPDelegationExtensions } from 'src/app/extensions/delegation/ICPDelegationExtensions'
 
+import { V0ProtocolDelegationExtensions } from '../../extensions/delegation/base/V0ProtocolDelegationExtensions'
+import { V1ProtocolDelegationExtensions } from '../../extensions/delegation/base/V1ProtocolDelegationExtensions'
 import { CosmosDelegationExtensions } from '../../extensions/delegation/CosmosDelegationExtensions'
 import { MoonbeamDelegationExtensions } from '../../extensions/delegation/MoonbeamDelegationExtensions'
-import { V0ProtocolDelegationExtensions } from '../../extensions/delegation/base/V0ProtocolDelegationExtensions'
-import { SubstrateDelegationExtensions } from '../../extensions/delegation/SubstrateDelegationExtensions'
+import { PolkadotDelegationExtensions } from '../../extensions/delegation/PolkadotDelegationExtensions'
 import { TezosDelegationExtensions } from '../../extensions/delegation/TezosDelegationExtensions'
 import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService } from '../coinlib/coinlib.service'
-import { V1ProtocolDelegationExtensions } from 'src/app/extensions/delegation/base/V1ProtocolDelegationExtensions'
-import { ICPDelegationExtensions } from 'src/app/extensions/delegation/ICPDelegationExtensions'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtensionsService {
   private extensionsLoaded: boolean = false
+  
+  private v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = []
 
-  private v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = [
+  private readonly v1Extensions: [ProtocolSymbols, () => Promise<V1ProtocolDelegationExtensions<any>>][] = [
     [
-      KusamaProtocol,
+      MainProtocolSymbols.KUSAMA,
       async () =>
-        SubstrateDelegationExtensions.create(
+        PolkadotDelegationExtensions.create(
           this.formBuilder,
           this.decimalPipe,
           this.amountConverterPipe,
@@ -39,9 +37,9 @@ export class ExtensionsService {
         )
     ],
     [
-      PolkadotProtocol,
+      MainProtocolSymbols.POLKADOT,
       async () =>
-        SubstrateDelegationExtensions.create(
+        PolkadotDelegationExtensions.create(
           this.formBuilder,
           this.decimalPipe,
           this.amountConverterPipe,
@@ -50,7 +48,7 @@ export class ExtensionsService {
         )
     ],
     [
-      TezosProtocol,
+      MainProtocolSymbols.XTZ,
       async () =>
         TezosDelegationExtensions.create(
           this.coinlibService,
@@ -63,7 +61,7 @@ export class ExtensionsService {
         )
     ],
     [
-      CosmosProtocol,
+      MainProtocolSymbols.COSMOS,
       async () =>
         CosmosDelegationExtensions.create(
           this.coinlibService,
@@ -75,20 +73,17 @@ export class ExtensionsService {
         )
     ],
     [
-      MoonbaseProtocol,
+      MainProtocolSymbols.MOONBEAM,
       async () => MoonbeamDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
     ],
     [
-      MoonriverProtocol,
+      MainProtocolSymbols.MOONRIVER,
       async () => MoonbeamDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
     ],
     [
-      MoonbeamProtocol,
+      MainProtocolSymbols.MOONBASE,
       async () => MoonbeamDelegationExtensions.create(this.formBuilder, this.decimalPipe, this.amountConverterPipe, this.translateService)
-    ]
-  ]
-
-  private readonly v1Extensions: [ProtocolSymbols, () => Promise<V1ProtocolDelegationExtensions<any>>][] = [
+    ],
     [
       MainProtocolSymbols.COREUM,
       async () =>
@@ -140,7 +135,7 @@ export class ExtensionsService {
 
   private async loadV0Extensions(): Promise<void> {
     await Promise.all(
-      this.v0Extensions.map(async ([protocol, extensionFactory]) => await V0ProtocolDelegationExtensions.load(protocol, extensionFactory))
+      this.v0Extensions.map(async ([protocol, extensionFactory]) => V0ProtocolDelegationExtensions.load(protocol, extensionFactory))
     )
   }
 

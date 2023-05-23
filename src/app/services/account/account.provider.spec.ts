@@ -1,56 +1,43 @@
 import {
   APP_INFO_PLUGIN,
   APP_PLUGIN,
-  IsolatedModulesPlugin,
-  MainProtocolStoreService,
+  createV0BitcoinProtocol,
+  createV0EthereumProtocol,
+  FILESYSTEM_PLUGIN,
   PermissionsService,
-  ProtocolService,
-  SubProtocolStoreService,
-  WebIsolatedModules
-} from '@airgap/angular-core'
-import { BitcoinProtocol } from '@airgap/bitcoin'
+  ProtocolService} from '@airgap/angular-core'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus } from '@airgap/coinlib-core'
-import { EthereumProtocol } from '@airgap/ethereum'
 import { TestBed, waitForAsync } from '@angular/core/testing'
 import { take } from 'rxjs/operators'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { PriceServiceMock } from '../../../../test-config/wallet-mock'
-import { PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
+import { FILE_PICKER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN } from '../../capacitor-plugins/injection-tokens'
 import { AccountProvider } from '../../services/account/account.provider'
 import { AppService } from '../app/app.service'
 
 describe('AccountProvider', () => {
   let accountProvider: AccountProvider
   let protocolService: ProtocolService
-  let isolatedModules: IsolatedModulesPlugin
   let appService: AppService
 
   let unitHelper: UnitHelper
 
-  beforeAll(async () => {
-    isolatedModules = new WebIsolatedModules()
-    protocolService = new ProtocolService(
-      new MainProtocolStoreService(isolatedModules), 
-      new SubProtocolStoreService(isolatedModules), 
-      isolatedModules
-    )
-    await protocolService.init()
-    appService = new AppService()
-    appService.setReady()
-  })
-
   beforeEach(
     waitForAsync(async () => {
       unitHelper = new UnitHelper()
-      TestBed.configureTestingModule(
+      appService = new AppService()
+      appService.setReady()
+      
+      await TestBed.configureTestingModule(
         unitHelper.testBed({
           providers: [
             { provide: PermissionsService, useValue: unitHelper.mockRefs.permissionsProvider },
             { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
             { provide: APP_INFO_PLUGIN, useValue: unitHelper.mockRefs.appInfo },
             { provide: PUSH_NOTIFICATIONS_PLUGIN, useValue: unitHelper.mockRefs.pushNotifications },
-            { provide: ProtocolService, useValue: protocolService },
+            { provide: FILE_PICKER_PLUGIN, useValue: unitHelper.mockRefs.filePicker },
+            { provide: FILESYSTEM_PLUGIN, useValue: unitHelper.mockRefs.filesystem },
             { provide: AppService, useValue: appService }
           ]
         })
@@ -58,6 +45,8 @@ describe('AccountProvider', () => {
         .compileComponents()
         .catch(console.error)
 
+      protocolService = TestBed.inject(ProtocolService)
+      await protocolService.init()
       accountProvider = TestBed.inject(AccountProvider)
       await accountProvider.walletChangedObservable.pipe(take(1)).toPromise() // Wait for initial load to be over
     })
@@ -68,9 +57,9 @@ describe('AccountProvider', () => {
   })
 
   it('should successfully add and persist ETH wallets', async (done) => {
-    expect(accountProvider.getWalletList().length).toEqual(1)
+    const currentLength = accountProvider.getWalletList().length
     const wallet = new AirGapCoinWallet(
-      new EthereumProtocol(),
+      await createV0EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
@@ -85,13 +74,13 @@ describe('AccountProvider', () => {
     ]
 
     await accountProvider.addWallets(walletAddInfo)
-    expect(accountProvider.getWalletList().length).toEqual(2)
+    expect(accountProvider.getWalletList().length).toEqual(currentLength + 1)
     done()
   })
 
   it('should be able to compare wallets', async () => {
     const wallet1 = new AirGapCoinWallet(
-      new EthereumProtocol(),
+      await createV0EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
@@ -100,7 +89,7 @@ describe('AccountProvider', () => {
       new PriceServiceMock()
     )
     const wallet1Same = new AirGapCoinWallet(
-      new EthereumProtocol(),
+      await createV0EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
@@ -109,7 +98,7 @@ describe('AccountProvider', () => {
       new PriceServiceMock()
     )
     const wallet2 = new AirGapCoinWallet(
-      new BitcoinProtocol(),
+      await createV0BitcoinProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
       false,
       `m/44'/60'/0'/0/0`,
@@ -128,7 +117,7 @@ describe('AccountProvider', () => {
 
   it('should successfully add and persist BTC wallets', async () => {
     const wallet: AirGapMarketWallet = new AirGapCoinWallet(
-      new BitcoinProtocol(),
+      await createV0BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,
@@ -149,7 +138,7 @@ describe('AccountProvider', () => {
 
   it('should update wallet observalbe when adding a wallet', async (done) => {
     const wallet: AirGapMarketWallet = new AirGapCoinWallet(
-      new BitcoinProtocol(),
+      await createV0BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
       true,
       `m/44'/0'/0'`,

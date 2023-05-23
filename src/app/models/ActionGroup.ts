@@ -1,10 +1,11 @@
+import { ICoinProtocolAdapter } from '@airgap/angular-core'
 import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
 import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
 import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
-import { CosmosDelegationActionType } from '@airgap/cosmos'
-import { ImportAccountAction, ImportAccoutActionContext, TezosShieldedTezProtocol } from '@airgap/tezos'
+import { CosmosDelegationActionType } from '@airgap/cosmos-core'
+import { TezosShieldedTezProtocol } from '@airgap/tezos'
 
 import { AccountTransactionListPage } from '../pages/account-transaction-list/account-transaction-list'
 import { DataServiceKey } from '../services/data/data.service'
@@ -16,6 +17,7 @@ import { CollectiblesAction } from './actions/CollectiblesAction'
 import { AirGapDelegatorAction, AirGapDelegatorActionContext } from './actions/DelegatorAction'
 import { FundAccountAction } from './actions/FundAccountAction'
 import { SetContractAction } from './actions/SetContractAction'
+import { TezosImportKtAccountAction, TezosImportKtAccountActionContext } from './actions/TezosImportKtAccountAction'
 import { AirGapTezosMigrateAction } from './actions/TezosMigrateAction'
 
 interface DelegatorButtonActionContext extends ButtonActionContext {
@@ -116,11 +118,11 @@ export class ActionGroup {
     return [delegateButtonAction, collectiblesButton, addTokenButtonAction]
   }
 
-  public getImportAccountsAction(): ButtonAction<string[], ImportAccoutActionContext> {
-    const importButtonAction: ButtonAction<string[], ImportAccoutActionContext> = new ButtonAction(
+  public getImportAccountsAction(): ButtonAction<string[], TezosImportKtAccountActionContext> {
+    const importButtonAction: ButtonAction<string[], TezosImportKtAccountActionContext> = new ButtonAction(
       { name: 'account-transaction-list.import-accounts_label', icon: 'add-outline', identifier: 'import-accounts' },
       () => {
-        const importAccountAction: ImportAccountAction = new ImportAccountAction({ publicKey: this.callerContext.wallet.publicKey })
+        const importAccountAction: TezosImportKtAccountAction = new TezosImportKtAccountAction({ publicKey: this.callerContext.wallet.publicKey, protocolService: this.callerContext.protocolService })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
           if (ktAddresses.length === 0) {
             this.callerContext.showToast('No accounts to import.')
@@ -159,10 +161,13 @@ export class ActionGroup {
   }
 
   private async getTezosShieldedTezActions(): Promise<Action<any, any>[]> {
-    const shieldedTezProtocol = (await this.callerContext.protocolService.getProtocol(
-      MainProtocolSymbols.XTZ_SHIELDED
-    )) as TezosShieldedTezProtocol
-    const isContractSet = (await shieldedTezProtocol.getOptions()).config.contractAddress !== undefined
+    const shieldedTezProtocol: ICoinProtocol = await this.callerContext.protocolService.getProtocol(MainProtocolSymbols.XTZ_SHIELDED)
+    if (!(shieldedTezProtocol instanceof ICoinProtocolAdapter)) {
+      return []
+    }
+    const shieldedTezAdapter: ICoinProtocolAdapter<TezosShieldedTezProtocol> = shieldedTezProtocol
+
+    const isContractSet = (await shieldedTezAdapter.protocolV1.getContractAddress()) !== undefined
 
     const setContract: ButtonAction<void, void> = new ButtonAction(
       {

@@ -1,10 +1,7 @@
-import { ProtocolService } from '@airgap/angular-core'
-import { AirGapMarketWallet, ProtocolNetwork } from '@airgap/coinlib-core'
+import { convertNetworkV0ToV1, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { AirGapMarketWallet, MainProtocolSymbols, ProtocolNetwork } from '@airgap/coinlib-core'
 import { RemoteData } from '@airgap/coinlib-core/utils/remote-data/RemoteData'
-import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
-import { TezosContractRemoteDataFactory } from '@airgap/tezos/v0/protocol/contract/remote-data/TezosContractRemoteDataFactory'
-import { TezosContract } from '@airgap/tezos/v0/protocol/contract/TezosContract'
-import { TezosFATokenMetadata } from '@airgap/tezos/v0/protocol/types/fa/TezosFATokenMetadata'
+import { TezosContract, TezosContractRemoteDataFactory, TezosFAProtocol, TezosFATokenMetadata, TezosProtocolNetwork } from '@airgap/tezos'
 import { gql, request } from 'graphql-request'
 
 import { faProtocolSymbol } from '../../../../types/GenericProtocolSymbols'
@@ -52,14 +49,15 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
   ) {}
 
   public async getCollectibles(wallet: AirGapMarketWallet, page: number, limit: number): Promise<CollectibleCursor<TezosCollectible>> {
-    if (!(wallet.protocol instanceof TezosProtocol)) {
+    const protocolIdentifier = await wallet.protocol.getIdentifier()
+    if (protocolIdentifier !== MainProtocolSymbols.XTZ || !(wallet.protocol instanceof ICoinProtocolAdapter)) {
       return {
         collectibles: [],
         page,
         hasNext: false
       }
     }
-    const tezosProtocol = wallet.protocol
+    const tezosProtocol: ICoinProtocolAdapter<TezosFAProtocol> = wallet.protocol
 
     const address = await tezosProtocol.getAddressFromPublicKey(wallet.publicKey)
     const { token_holder: tokenHolders } = await this.fetchTokenHoldersForAddress(address.address, limit + 1, page * limit)
@@ -84,10 +82,11 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     address: string,
     id: string
   ): Promise<TezosCollectibleDetails | undefined> {
-    if (!(wallet.protocol instanceof TezosProtocol)) {
+    const protocolIdentifier = await wallet.protocol.getIdentifier()
+    if (!protocolIdentifier.startsWith(MainProtocolSymbols.XTZ) || !(wallet.protocol instanceof ICoinProtocolAdapter)) {
       return undefined
     }
-    const tezosProtocol = wallet.protocol
+    const tezosProtocol: ICoinProtocolAdapter<TezosFAProtocol> = wallet.protocol
 
     const collectible = await this.getCollectible(tezosProtocol, address, id)
     const tokenMetadata = collectible.metadataUri
@@ -101,7 +100,11 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     }
   }
 
-  private async getCollectible(protocol: TezosProtocol, contractAddress: string, tokenID: string): Promise<TezosCollectible | undefined> {
+  private async getCollectible(
+    protocol: ICoinProtocolAdapter<TezosFAProtocol>,
+    contractAddress: string,
+    tokenID: string
+  ): Promise<TezosCollectible | undefined> {
     const key = this.getCollectibleKey(contractAddress, tokenID)
     const cached = this.collectibles.get(key)
     if (cached) {
@@ -189,7 +192,10 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     return request(this.apiUrl, query)
   }
 
-  private async tokenToTezosCollectible(protocol: TezosProtocol, tokenHolder: TokenHolder): Promise<TezosCollectible | undefined> {
+  private async tokenToTezosCollectible(
+    protocol: ICoinProtocolAdapter<TezosFAProtocol>,
+    tokenHolder: TokenHolder
+  ): Promise<TezosCollectible | undefined> {
     const id = tokenHolder.token?.token_id ?? undefined
     const amount = tokenHolder.quantity ?? undefined
     const metadataUri = tokenHolder.token?.metadata ?? undefined
@@ -232,18 +238,22 @@ export class ObjktCollectibleExplorer implements TezosCollectibleExplorer {
     }
   }
 
-  private async getTokenMetadata(protocol: TezosProtocol, contractAddress: string, uri: string): Promise<TezosFATokenMetadata | undefined> {
+  private async getTokenMetadata(
+    protocol: ICoinProtocolAdapter<TezosFAProtocol>,
+    contractAddress: string,
+    uri: string
+  ): Promise<TezosFATokenMetadata | undefined> {
     if (!this.tokenMetadata.has(uri)) {
-      const contract = new TezosContract(contractAddress, protocol.options.network)
+      const protocolNetwork = await protocol.protocolV1.getNetwork()
+      const contract = new TezosContract(contractAddress, protocolNetwork)
 
       const networks = await this.protocolService.getNetworksForProtocol(protocol)
       const remoteData: RemoteData<TezosFATokenMetadata> = this.remoteDataFactory.create(uri, {
         contract,
         networkResolver: (network: string) => {
-          return networks.find(
-            (protocolNetwork: ProtocolNetwork) =>
-              protocolNetwork instanceof TezosProtocolNetwork && protocolNetwork.extras.network === network
-          ) as TezosProtocolNetwork
+          return networks
+            .map((protocolNetworkV0: ProtocolNetwork) => convertNetworkV0ToV1(protocolNetworkV0) as TezosProtocolNetwork)
+            .find((protocolNetwork: TezosProtocolNetwork) => protocolNetwork.network === network)
         }
       })
       if (!remoteData) {

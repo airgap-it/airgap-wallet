@@ -6,24 +6,23 @@ import {
   APP_INFO_PLUGIN,
   APP_LAUNCHER_PLUGIN,
   APP_PLUGIN,
+  BaseModulesService,
   ClipboardService,
   CLIPBOARD_PLUGIN,
   DeeplinkService,
   FeeConverterPipe,
   FILESYSTEM_PLUGIN,
+  IsolatedModules,
   ISOLATED_MODULES_PLUGIN,
   PermissionsService,
   QrScannerService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN,
   STATUS_BAR_PLUGIN,
-  WebIsolatedModules,
   Zip,
   ZIP_PLUGIN
 } from '@airgap/angular-core'
-import { AirGapAngularNgRxModule, currencySymbolNgRxFacade } from '@airgap/angular-ngrx'
-import { CoreumModule } from '@airgap/coreum'
-import { ICPModule } from '@airgap/icp'
+import { AirGapAngularNgRxModule, currencySymbolNgRxFacade, isolatedModulesDetailsNgRxFacade, isolatedModulesListNgRxFacade, isolatedModulesListPageNgRxFacade } from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -40,6 +39,7 @@ import { PushNotifications } from '@capacitor/push-notifications'
 import { Share } from '@capacitor/share'
 import { SplashScreen } from '@capacitor/splash-screen'
 import { StatusBar } from '@capacitor/status-bar'
+import { FilePicker } from '@capawesome/capacitor-file-picker'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
@@ -53,7 +53,7 @@ import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { metaReducers, ROOT_REDUCERS } from './app.reducers'
 import { SaplingNative } from './capacitor-plugins/definitions'
-import { BROWSER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { BROWSER_PLUGIN, FILE_PICKER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
@@ -63,6 +63,7 @@ import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page
 import { ExchangeEffects } from './pages/exchange/effects'
 import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
+import { IsolatedModulesOnboardingPageModule } from './pages/isolated-modules-onboarding/isolated-modules-onboarding.module'
 import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
 import { PipesModule } from './pipes/pipes.module'
@@ -79,6 +80,7 @@ import { IACService } from './services/iac/iac.service'
 import { InteractionService } from './services/interaction/interaction.service'
 import { LedgerService } from './services/ledger/ledger-service'
 import { MarketDataService } from './services/market-data/market-data.service'
+import { WalletModulesService } from './services/modules/modules.service'
 import { NavigationService } from './services/navigation/navigation.service'
 import { OperationsProvider } from './services/operations/operations'
 import { PushBackendProvider } from './services/push-backend/push-backend'
@@ -102,7 +104,10 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     CommonModule,
     AirGapAngularCoreModule.forRoot({
       factories: {
-        currencySymbolFacade: currencySymbolNgRxFacade
+        currencySymbolFacade: currencySymbolNgRxFacade,
+        isolatedModulesDetailsFacade: isolatedModulesDetailsNgRxFacade,
+        isolatedModulesListFacade: isolatedModulesListNgRxFacade,
+        isolatedModulesListPageFacade: isolatedModulesListPageNgRxFacade
       }
     }),
     AirGapAngularNgRxModule,
@@ -136,7 +141,8 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ProtocolSelectPageModule,
     BeaconRequestPageModule,
     ExchangeSelectPageModule,
-    IntroductionPushPageModule
+    IntroductionPushPageModule,
+    IsolatedModulesOnboardingPageModule,
   ],
   providers: [
     { provide: APP_PLUGIN, useValue: App },
@@ -151,8 +157,10 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
-    { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules([new ICPModule(), new CoreumModule()]) },
+    { provide: ISOLATED_MODULES_PLUGIN, useValue: IsolatedModules },
     { provide: ZIP_PLUGIN, useValue: Zip },
+    { provide: FILE_PICKER_PLUGIN, useValue: FilePicker },
+    { provide: BaseModulesService, useClass: WalletModulesService },
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,

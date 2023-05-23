@@ -1,6 +1,6 @@
-import { getMainIdentifier, ProtocolService } from '@airgap/angular-core'
+import { convertNetworkV0ToV1, createV0TezosFA2Protocol, getMainIdentifier, ProtocolService } from '@airgap/angular-core'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
-import { TezosFA2Protocol, TezosFA2ProtocolConfig, TezosFA2ProtocolOptions, TezosProtocolNetwork } from '@airgap/tezos'
+import { TezosProtocolNetwork } from '@airgap/tezos'
 
 import { Collectible } from '../collectibles.types'
 
@@ -12,25 +12,26 @@ export async function createTezosCollectibleProtocol(protocolService: ProtocolSe
     throw new Error('[collectibles#createTezosProtocol] Unrecognized Collectible structure.')
   }
 
-  const protocolNetwork = await protocolService.getNetworkForProtocol(MainProtocolSymbols.XTZ, collectible.networkIdentifier, false)
-  if (!(protocolNetwork instanceof TezosProtocolNetwork)) {
-    throw new Error('[collectibles#createTezosProtocol] Unsupported protocol network.')
-  }
+  const protocolNetworkV0 = await protocolService.getNetworkForProtocol(MainProtocolSymbols.XTZ, collectible.networkIdentifier, false)
+  const protocolNetworkV1 = convertNetworkV0ToV1(protocolNetworkV0) as TezosProtocolNetwork
 
-  return new TezosFA2Protocol(
-    new TezosFA2ProtocolOptions(
-      protocolNetwork,
-      new TezosFA2ProtocolConfig(
-        collectible.contract.address,
-        collectible.protocolIdentifier,
-        collectible.symbol,
-        collectible.contract.name,
-        collectible.symbol,
-        undefined,
-        0
-      )
-    )
-  )
+  return createV0TezosFA2Protocol({
+    network: {
+      ...protocolNetworkV1,
+      contractAddress: collectible.contract.address
+    },
+    identifier: collectible.protocolIdentifier,
+    name: collectible.contract.name,
+    units: collectible.symbol
+      ? {
+          [collectible.symbol]: {
+            symbol: { value: collectible.symbol },
+            decimals: 0
+          }
+        }
+      : undefined,
+    mainUnit: collectible.symbol
+  })
 }
 
 export function tezosCollectibleExplorer(protocolService: ProtocolService): TezosCollectibleExplorer {

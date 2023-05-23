@@ -1,4 +1,4 @@
-package it.airgap.wallet.plugin
+package it.airgap.wallet.plugin.appinfo
 
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall

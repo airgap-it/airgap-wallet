@@ -1,6 +1,8 @@
+import { createV0EthereumProtocol, ICoinProtocolAdapter } from '@airgap/angular-core'
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, MainProtocolSymbols } from '@airgap/coinlib-core'
-import { EthereumProtocol, EthereumProtocolOptions, RawEthereumTransaction } from '@airgap/ethereum'
+import { EthereumProtocol, EthereumTransactionSignRequest, EthereumUnits } from '@airgap/ethereum'
+import { Amount } from '@airgap/module-kit'
 import { generateId, IACMessageType } from '@airgap/serializer'
 import { Component, OnInit } from '@angular/core'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
@@ -62,7 +64,7 @@ export class WalletconnectPage implements OnInit {
   public request: JSONRPC
   public selectableWallets: AirGapMarketWallet[] = []
   public airGapTransactions: IAirGapTransaction[] | undefined
-  public rawTransaction: RawEthereumTransaction
+  public rawTransaction: EthereumTransactionSignRequest['transaction']
   public readonly requestMethod: typeof Methods = Methods
 
   private subscription: Subscription
@@ -117,10 +119,10 @@ export class WalletconnectPage implements OnInit {
     }
   }
 
-  public async updateRawTransaction(rawTransaction: RawEthereumTransaction) {
+  public async updateRawTransaction(rawTransaction: EthereumTransactionSignRequest['transaction']) {
     this.rawTransaction = { ...this.rawTransaction, gasPrice: rawTransaction.gasPrice, gasLimit: rawTransaction.gasLimit }
 
-    const ethereumProtocol = new EthereumProtocol()
+    const ethereumProtocol = await createV0EthereumProtocol()
     this.airGapTransactions = await ethereumProtocol.getTransactionDetails({
       publicKey: this.selectedWallet.publicKey,
       transaction: this.rawTransaction
@@ -159,7 +161,7 @@ export class WalletconnectPage implements OnInit {
     }
     const requestId = new BigNumber(request.id).toString()
     const generatedId = generateId(8)
-    const protocol = new EthereumProtocol()
+    const protocol = await createV0EthereumProtocol()
 
     this.beaconRequest = {
       type: BeaconMessageType.SignPayloadRequest,
@@ -212,21 +214,20 @@ export class WalletconnectPage implements OnInit {
     const wallet = this.selectableWallets.find((wallet) => wallet.addresses[0] === request.params[0].from)
     this.setWallet(wallet)
 
-    const ethereumProtocol: EthereumProtocol = new EthereumProtocol()
+    const ethereumProtocol: ICoinProtocolAdapter<EthereumProtocol> = await createV0EthereumProtocol()
 
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
 
-    const options: EthereumProtocolOptions = new EthereumProtocolOptions()
-    const gasPrice = await options.nodeClient.getGasPrice()
-    const txCount = await options.nodeClient.fetchTransactionCount(this.selectedWallet.receivingPublicAddress)
-    const protocol = new EthereumProtocol()
+    const gasPrice: Amount<EthereumUnits> = await ethereumProtocol.protocolV1.getGasPrice()
+    const txCount: number = await ethereumProtocol.protocolV1.fetchTransactionCountForAddress(this.selectedWallet.receivingPublicAddress)
+    const protocol = await createV0EthereumProtocol() // why is there another instance created? can't `ethereumProtocol` be used instead?
     const eth = request.params[0]
 
     this.rawTransaction = {
       nonce: eth.nonce ? eth.nonce : `0x${new BigNumber(txCount).toString(16)}`,
-      gasPrice: eth.gasPrice ? eth.gasPrice : `0x${new BigNumber(gasPrice).toString(16)}`,
+      gasPrice: eth.gasPrice ? eth.gasPrice : `0x${new BigNumber(gasPrice.value).toString(16)}`,
       gasLimit: `0x${(300000).toString(16)}`,
       to: eth.to,
       value: eth.value,

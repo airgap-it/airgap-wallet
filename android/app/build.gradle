@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 31
@@ -60,6 +59,8 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.0"
+    implementation 'androidx.webkit:webkit:1.6.0'
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test:core:$androidxTestCoreVersion"
@@ -68,8 +69,18 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    def coroutinesVersion = "1.6.4"
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+
     def saplingVersion = "0.0.7"
     implementation "com.github.airgap-it:airgap-sapling:$saplingVersion"
+
+    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
+
+    implementation "androidx.javascriptengine:javascriptengine:1.0.0-alpha04"
+    implementation 'com.google.guava:listenablefuture:1.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$coroutinesVersion"
 }
 
 apply from: 'capacitor.build.gradle'

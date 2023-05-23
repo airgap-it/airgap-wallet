@@ -1,53 +1,53 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import {
-  SubstrateDelegateProtocol,
-  SubstrateElectionStatus,
-  SubstrateNetwork,
-  SubstrateNominationStatus,
-  SubstrateNominatorDetails,
-  SubstratePayee,
-  SubstrateStakingActionType,
-  SubstrateStakingDetails,
-  SubstrateValidatorDetails
-} from '@airgap/substrate'
+  PolkadotElectionStatus,
+  PolkadotNominationStatus,
+  PolkadotNominatorDetails,
+  PolkadotPayee,
+  PolkadotStakingActionType,
+  PolkadotStakingDetails,
+  PolkadotValidatorDetails
+} from '@airgap/polkadot'
+import { PolkadotBaseProtocol } from '@airgap/polkadot/v1/protocol/PolkadotBaseProtocol'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
+
 import {
   AirGapDelegateeDetails,
   AirGapDelegationDetails,
   AirGapDelegatorAction,
   AirGapDelegatorDetails
-} from 'src/app/interfaces/IAirGapCoinDelegateProtocol'
-import { UIAccountSummary } from 'src/app/models/widgets/display/UIAccountSummary'
-import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
-import { UIIconText } from 'src/app/models/widgets/display/UIIconText'
-import { UIRewardList } from 'src/app/models/widgets/display/UIRewardList'
-import { UIInputWidget } from 'src/app/models/widgets/UIInputWidget'
-import { UIWidget, WidgetState } from 'src/app/models/widgets/UIWidget'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+} from '../../interfaces/IAirGapCoinDelegateProtocol'
+import { UIAccountSummary } from '../../models/widgets/display/UIAccountSummary'
+import { UIAlert } from '../../models/widgets/display/UIAlert'
+import { UIIconText } from '../../models/widgets/display/UIIconText'
+import { UIRewardList } from '../../models/widgets/display/UIRewardList'
+import { UIInputWidget } from '../../models/widgets/UIInputWidget'
+import { UIWidget, WidgetState } from '../../models/widgets/UIWidget'
+import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
+import { DecimalValidator } from '../../validators/DecimalValidator'
 
-import { V0ProtocolDelegationExtensions } from './base/V0ProtocolDelegationExtensions'
+import { V1ProtocolDelegationExtensions } from './base/V1ProtocolDelegationExtensions'
 
 // sorted by priority
 const delegateActions = [
-  SubstrateStakingActionType.BOND_NOMINATE,
-  SubstrateStakingActionType.REBOND_NOMINATE,
-  SubstrateStakingActionType.NOMINATE,
-  SubstrateStakingActionType.CHANGE_NOMINATION,
-  SubstrateStakingActionType.BOND_EXTRA,
-  SubstrateStakingActionType.REBOND_EXTRA
+  PolkadotStakingActionType.BOND_NOMINATE,
+  PolkadotStakingActionType.REBOND_NOMINATE,
+  PolkadotStakingActionType.NOMINATE,
+  PolkadotStakingActionType.CHANGE_NOMINATION,
+  PolkadotStakingActionType.BOND_EXTRA,
+  PolkadotStakingActionType.REBOND_EXTRA
 ]
 
 // sorted by priority
-const undelegateActions = [SubstrateStakingActionType.CANCEL_NOMINATION, SubstrateStakingActionType.UNBOND]
+const undelegateActions = [PolkadotStakingActionType.CANCEL_NOMINATION, PolkadotStakingActionType.UNBOND]
 
-const supportedActions = [...delegateActions, ...undelegateActions, SubstrateStakingActionType.WITHDRAW_UNBONDED]
+const supportedActions = [...delegateActions, ...undelegateActions, PolkadotStakingActionType.WITHDRAW_UNBONDED]
 
 enum ArgumentName {
   TARGETS = 'targets',
@@ -56,8 +56,8 @@ enum ArgumentName {
   PAYEE = 'payee'
 }
 
-export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtensions<SubstrateDelegateProtocol<SubstrateNetwork>> {
-  private static instance: SubstrateDelegationExtensions
+export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions<PolkadotBaseProtocol> {
+  private static instance: PolkadotDelegationExtensions
 
   public static create(
     formBuilder: FormBuilder,
@@ -65,9 +65,9 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService
-  ): SubstrateDelegationExtensions {
-    if (!SubstrateDelegationExtensions.instance) {
-      SubstrateDelegationExtensions.instance = new SubstrateDelegationExtensions(
+  ): PolkadotDelegationExtensions {
+    if (!PolkadotDelegationExtensions.instance) {
+      PolkadotDelegationExtensions.instance = new PolkadotDelegationExtensions(
         formBuilder,
         decimalPipe,
         amountConverterPipe,
@@ -76,15 +76,15 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
       )
     }
 
-    return SubstrateDelegationExtensions.instance
+    return PolkadotDelegationExtensions.instance
   }
 
-  public airGapDelegatee(_protocol: SubstrateDelegateProtocol<SubstrateNetwork>): string | undefined {
+  public airGapDelegatee(_adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>): string | undefined {
     return undefined
   }
 
-  public delegateeLabel: string = 'delegation-detail-substrate.delegatee-label'
-  public delegateeLabelPlural: string = 'delegation-detail-substrate.delegatee-label-plural'
+  public delegateeLabel: string = 'delegation-detail-polkadot.delegatee-label'
+  public delegateeLabelPlural: string = 'delegation-detail-polkadot.delegatee-label-plural'
   public supportsMultipleDelegations: boolean = true
 
   private constructor(
@@ -98,19 +98,19 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   public async getExtraDelegationDetailsFromAddress(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const [nominatorDetails, validatorsDetails]: [SubstrateNominatorDetails, SubstrateValidatorDetails[]] = await Promise.all([
-      protocol.options.accountController.getNominatorDetails(delegator, delegatees),
-      Promise.all(delegatees.map((validator: string) => protocol.options.accountController.getValidatorDetails(validator)))
+    const [nominatorDetails, validatorsDetails]: [PolkadotNominatorDetails, PolkadotValidatorDetails[]] = await Promise.all([
+      adapter.protocolV1.getNominatorDetails(delegator, delegatees),
+      Promise.all(delegatees.map((validator: string) => adapter.protocolV1.getValidatorDetails(validator)))
     ])
 
-    const extraNominatorDetails: AirGapDelegatorDetails = await this.getExtraNominatorDetails(protocol, nominatorDetails, delegatees)
+    const extraNominatorDetails: AirGapDelegatorDetails = await this.getExtraNominatorDetails(adapter, nominatorDetails, delegatees)
     const extraValidatorsDetails: AirGapDelegateeDetails[] = await this.getExtraValidatorsDetails(
-      protocol,
+      adapter,
       validatorsDetails,
       nominatorDetails,
       extraNominatorDetails
@@ -118,7 +118,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
     const alerts: UIAlert[] = (
       await Promise.all(
-        validatorsDetails.map((validatorDetails: SubstrateValidatorDetails) => this.getAlerts(protocol, nominatorDetails, validatorDetails))
+        validatorsDetails.map((validatorDetails: PolkadotValidatorDetails) => this.getAlerts(adapter, nominatorDetails, validatorDetails))
       )
     ).reduce((flatten: UIAlert[], next: UIAlert[]) => flatten.concat(next), [])
 
@@ -132,25 +132,25 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   public async getRewardDisplayDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     delegator: string,
     delegatees: string[]
   ): Promise<UIRewardList | undefined> {
-    const nominatorDetails = await protocol.options.accountController.getNominatorDetails(delegator, delegatees)
+    const nominatorDetails = await adapter.protocolV1.getNominatorDetails(delegator, delegatees)
 
-    return this.createDelegatorDisplayRewards(protocol, nominatorDetails)
+    return this.createDelegatorDisplayRewards(adapter, nominatorDetails)
   }
 
   public async createDelegateesSummary(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     delegatees: string[]
   ): Promise<UIAccountSummary[]> {
-    const delegateesDetails: SubstrateValidatorDetails[] = await Promise.all(
-      delegatees.map((delegatee) => protocol.options.accountController.getValidatorDetails(delegatee))
+    const delegateesDetails: PolkadotValidatorDetails[] = await Promise.all(
+      delegatees.map((delegatee) => adapter.protocolV1.getValidatorDetails(delegatee))
     )
 
     return delegateesDetails.map(
-      (details: SubstrateValidatorDetails) =>
+      (details: PolkadotValidatorDetails) =>
         new UIAccountSummary({
           address: details.address,
           header: [
@@ -163,20 +163,20 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async getExtraValidatorsDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    validatorsDetails: SubstrateValidatorDetails[],
-    nominatorDetails: SubstrateNominatorDetails,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    validatorsDetails: PolkadotValidatorDetails[],
+    nominatorDetails: PolkadotNominatorDetails,
     extraNominatorDetials: AirGapDelegatorDetails
   ): Promise<AirGapDelegateeDetails[]> {
     return Promise.all(
-      validatorsDetails.map(async (validatorDetails: SubstrateValidatorDetails) => {
+      validatorsDetails.map(async (validatorDetails: PolkadotValidatorDetails) => {
         const ownStash: BigNumber = new BigNumber(validatorDetails.ownStash ? validatorDetails.ownStash : 0)
         const totalStakingBalance: BigNumber = new BigNumber(
           validatorDetails.totalStakingBalance ? validatorDetails.totalStakingBalance : 0
         )
 
         const displayDetails: UIWidget[] = await this.createDelegateeDisplayDetails(
-          protocol,
+          adapter,
           validatorDetails,
           nominatorDetails,
           extraNominatorDetials
@@ -185,7 +185,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         return {
           ...validatorDetails,
           name: validatorDetails.name || '',
-          status: validatorDetails.status || 'delegation-detail-substrate.status.unknown',
+          status: validatorDetails.status || 'delegation-detail-polkadot.status.unknown',
           usageDetails: {
             usage: ownStash.dividedBy(totalStakingBalance),
             current: ownStash,
@@ -198,29 +198,29 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async getAlerts(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    nominatorDetails: SubstrateNominatorDetails,
-    validatorDetails: SubstrateValidatorDetails
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    nominatorDetails: PolkadotNominatorDetails,
+    validatorDetails: PolkadotValidatorDetails
   ): Promise<UIAlert[]> {
     const alerts: UIAlert[] = []
 
     const results = await Promise.all([
-      protocol.options.nodeClient.getElectionStatus(),
-      protocol.options.accountController.getNominationStatus(nominatorDetails.address, validatorDetails.address)
+      adapter.protocolV1.getElectionStatus(),
+      adapter.protocolV1.getNominationStatus(nominatorDetails.address, validatorDetails.address)
     ])
-    const isElectionOpen: boolean = results[0] && results[0].status.value === SubstrateElectionStatus.OPEN
-    const nominationStatus: SubstrateNominationStatus | undefined = results[1]
+    const isElectionOpen: boolean = results[0] === PolkadotElectionStatus.OPEN
+    const nominationStatus: PolkadotNominationStatus | undefined = results[1]
 
-    if (protocol.identifier === MainProtocolSymbols.POLKADOT) {
+    if (adapter.identifier === MainProtocolSymbols.POLKADOT) {
       alerts.push(
         new UIAlert({
-          title: 'delegation-detail-substrate.alert.polkadot.delegation-issues.title',
-          description: 'delegation-detail-substrate.alert.polkadot.delegation-issues.description',
+          title: 'delegation-detail-polkadot.alert.polkadot.delegation-issues.title',
+          description: 'delegation-detail-polkadot.alert.polkadot.delegation-issues.description',
           icon: 'alert-circle-outline',
           color: 'warning',
           actions: [
             {
-              text: 'delegation-detail-substrate.alert.polkadot.delegation-issues.actions.open-blogpost',
+              text: 'delegation-detail-polkadot.alert.polkadot.delegation-issues.actions.open-blogpost',
               action: async () => {
                 window.open('https://polkadot.network/polkadot-staking-an-update/', '_blank')
               }
@@ -233,28 +233,28 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     if (isElectionOpen) {
       alerts.push(
         new UIAlert({
-          title: 'delegation-detail-substrate.alert.election-open.title',
-          description: 'delegation-detail-substrate.alert.election-open.description',
+          title: 'delegation-detail-polkadot.alert.election-open.title',
+          description: 'delegation-detail-polkadot.alert.election-open.description',
           icon: 'alert-circle-outline',
           color: 'warning'
         })
       )
     }
 
-    if (nominationStatus === SubstrateNominationStatus.INACTIVE) {
+    if (nominationStatus === PolkadotNominationStatus.INACTIVE) {
       alerts.push(
         new UIAlert({
-          title: 'delegation-detail-substrate.alert.nomination-inactive.title',
-          description: 'delegation-detail-substrate.alert.nomination-inactive.description',
+          title: 'delegation-detail-polkadot.alert.nomination-inactive.title',
+          description: 'delegation-detail-polkadot.alert.nomination-inactive.description',
           icon: 'alert-circle-outline',
           color: 'warning'
         })
       )
-    } else if (nominationStatus === SubstrateNominationStatus.OVERSUBSCRIBED) {
+    } else if (nominationStatus === PolkadotNominationStatus.OVERSUBSCRIBED) {
       alerts.push(
         new UIAlert({
-          title: 'delegation-detail-substrate.alert.nomination-oversubscribed.title',
-          description: 'delegation-detail-substrate.alert.nomination-oversubscribed.description',
+          title: 'delegation-detail-polkadot.alert.nomination-oversubscribed.title',
+          description: 'delegation-detail-polkadot.alert.nomination-oversubscribed.description',
           icon: 'alert-circle-outline',
           color: 'warning'
         })
@@ -262,8 +262,8 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     } else if (nominationStatus === undefined && validatorDetails.nominators > 256) {
       alerts.push(
         new UIAlert({
-          title: 'delegation-detail-substrate.alert.validator-oversubscribed.title',
-          description: 'delegation-detail-substrate.alert.validator-oversubscribed.description',
+          title: 'delegation-detail-polkadot.alert.validator-oversubscribed.title',
+          description: 'delegation-detail-polkadot.alert.validator-oversubscribed.description',
           icon: 'alert-circle-outline',
           color: 'warning'
         })
@@ -274,9 +274,9 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async createDelegateeDisplayDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    validatorDetails: SubstrateValidatorDetails,
-    nominatorDetails: SubstrateNominatorDetails,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    validatorDetails: PolkadotValidatorDetails,
+    nominatorDetails: PolkadotNominatorDetails,
     extraNominatorDetails: AirGapDelegatorDetails
   ): Promise<UIWidget[]> {
     const details = []
@@ -288,7 +288,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
       new UIIconText({
         iconName: 'logo-usd',
         text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
-        description: 'delegation-detail-substrate.commission_label'
+        description: 'delegation-detail-polkadot.commission_label'
       })
     )
 
@@ -314,14 +314,14 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         const expectedReward = new BigNumber(1).minus(commission).multipliedBy(totalPreviousReward).multipliedBy(userShare)
 
         return this.amountConverterPipe.transform(expectedReward, {
-          protocol
+          protocol: adapter
         })
       }
 
       const expectedRewardWidget = new UIIconText({
         iconName: 'logo-usd',
         text: await getExpectedReward(bonded),
-        description: 'delegation-detail-substrate.expected-reward_label'
+        description: 'delegation-detail-polkadot.expected-reward_label'
       })
 
       delegateAction.form.valueChanges.subscribe((value) => {
@@ -342,14 +342,14 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async getExtraNominatorDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    nominatorDetails: SubstrateNominatorDetails,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    nominatorDetails: PolkadotNominatorDetails,
     validators: string[]
   ): Promise<AirGapDelegatorDetails> {
     const availableActions = nominatorDetails.availableActions.filter((action) => supportedActions.includes(action.type))
 
     const delegateAction: AirGapDelegatorAction = await this.createDelegateAction(
-      protocol,
+      adapter,
       nominatorDetails.stakingDetails,
       availableActions,
       nominatorDetails.address,
@@ -358,11 +358,11 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
     const undelegateAction: AirGapDelegatorAction = this.createUndelegateAction(nominatorDetails.stakingDetails, availableActions)
     const extraActions: AirGapDelegatorAction[] = await this.createDelegatorExtraActions(
-      protocol,
+      adapter,
       nominatorDetails.stakingDetails,
       availableActions
     )
-    const displayDetails: UIWidget[] = await this.createDelegatorDisplayDetails(protocol, nominatorDetails)
+    const displayDetails: UIWidget[] = await this.createDelegatorDisplayDetails(adapter, nominatorDetails)
 
     return {
       ...nominatorDetails,
@@ -374,8 +374,8 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
   // tslint:disable-next-line: cyclomatic-complexity
   private async createDelegateAction(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    stakingDetails: SubstrateStakingDetails,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    stakingDetails: PolkadotStakingDetails,
     availableActions: DelegatorAction[],
     nominatorAddress: string,
     validators: string[]
@@ -387,17 +387,17 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     const action = actions[0]
 
     const [maxValue, minValue]: [BigNumber | undefined, BigNumber | undefined] = await Promise.all([
-      action ? this.getMaxDelegationValue(protocol, action.type, nominatorAddress) : undefined,
-      action ? this.getMinDelegationValue(protocol, action.type) : undefined
+      action ? this.getMaxDelegationValue(adapter, action.type, nominatorAddress) : undefined,
+      action ? this.getMinDelegationValue(adapter, action.type) : undefined
     ])
 
     if (action) {
       const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gte(minValue)
 
       const maxValueShifted: BigNumber | undefined =
-        maxValue !== undefined ? maxValue.integerValue().shiftedBy(-protocol.decimals) : undefined
+        maxValue !== undefined ? maxValue.integerValue().shiftedBy(-adapter.decimals) : undefined
       const minValueShifted: BigNumber | undefined =
-        minValue !== undefined ? minValue.integerValue().shiftedBy(-protocol.decimals) : undefined
+        minValue !== undefined ? minValue.integerValue().shiftedBy(-adapter.decimals) : undefined
 
       const extraValidators = []
       if (minValueShifted !== undefined) {
@@ -414,9 +414,9 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         ],
         [ArgumentName.VALUE_CONTROL]: [
           maxValueShifted ? maxValueShifted.toFixed() : minValueShifted ? minValueShifted.toFixed() : '0',
-          Validators.compose([Validators.required, DecimalValidator.validate(protocol.decimals), ...extraValidators])
+          Validators.compose([Validators.required, DecimalValidator.validate(adapter.decimals), ...extraValidators])
         ],
-        [ArgumentName.PAYEE]: [SubstratePayee.STASH]
+        [ArgumentName.PAYEE]: [PolkadotPayee.STASH]
       })
 
       if (!hasSufficientFunds) {
@@ -432,7 +432,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
             minValueShifted ? minValueShifted.toFixed() : undefined,
             {
               onValueChanged: (value: string) => {
-                form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
+                form.patchValue({ [ArgumentName.VALUE]: new BigNumber(value).shiftedBy(adapter.decimals).toFixed() })
               },
               toggleFixedValueButton:
                 maxValueShifted !== undefined && hasSufficientFunds ? 'delegation-detail.max-amount_button' : undefined,
@@ -443,7 +443,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
       }
 
       const description = await this.createDelegateActionDescription(
-        protocol,
+        adapter,
         nominatorAddress,
         action.type,
         stakingDetails ? stakingDetails.active : 0,
@@ -454,7 +454,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
       return {
         type: action.type,
-        label: 'delegation-detail-substrate.delegate.label',
+        label: 'delegation-detail-polkadot.delegate.label',
         description,
         form,
         args: argWidgets,
@@ -466,17 +466,17 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async getMaxDelegationValue(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    actionType: SubstrateStakingActionType,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    actionType: PolkadotStakingActionType,
     nominatorAddress: string
   ): Promise<BigNumber | undefined> {
     switch (actionType) {
-      case SubstrateStakingActionType.REBOND_NOMINATE:
-      case SubstrateStakingActionType.REBOND_EXTRA:
+      case PolkadotStakingActionType.REBOND_NOMINATE:
+      case PolkadotStakingActionType.REBOND_EXTRA:
         const [unlocking, maxUnlocked]: [BigNumber, BigNumber] = await Promise.all([
-          protocol.options.accountController.getUnlockingBalance(nominatorAddress).then((unlocking) => new BigNumber(unlocking)),
-          protocol
-            .estimateMaxDelegationValueFromAddress(nominatorAddress)
+          adapter.protocolV1.getUnlockingBalance(nominatorAddress).then((unlocking) => new BigNumber(unlocking.value)),
+          adapter.protocolV1
+            .getMaxDelegationValueWithAddress(nominatorAddress)
             .then((max: string) => new BigNumber(max))
             .catch(() => undefined)
         ])
@@ -487,20 +487,21 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
         return maxUnlocked.gt(0) ? maxUnlocked.plus(unlocking) : new BigNumber(0)
       default:
-        const maxValue = await protocol.estimateMaxDelegationValueFromAddress(nominatorAddress).catch(() => undefined)
+        const maxValue = await adapter.protocolV1.getMaxDelegationValueWithAddress(nominatorAddress).catch(() => undefined)
 
         return maxValue !== undefined ? new BigNumber(maxValue) : undefined
     }
   }
 
   private async getMinDelegationValue(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    actionType: SubstrateStakingActionType
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    actionType: PolkadotStakingActionType
   ): Promise<BigNumber | undefined> {
     switch (actionType) {
-      case SubstrateStakingActionType.BOND_NOMINATE:
-        return new BigNumber(await protocol.options.nodeClient.getExistentialDeposit())
-      case SubstrateStakingActionType.NOMINATE:
+      case PolkadotStakingActionType.BOND_NOMINATE:
+        const existentialDeposit = await adapter.protocolV1.getExistentialDeposit()
+        return new BigNumber(existentialDeposit.value)
+      case PolkadotStakingActionType.NOMINATE:
         return new BigNumber(0)
       default:
         return new BigNumber(1)
@@ -508,103 +509,102 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async createDelegateActionDescription(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     address: string,
-    actionType: SubstrateStakingActionType,
+    actionType: PolkadotStakingActionType,
     bonded: string | number | BigNumber,
     hasSufficientFunds: boolean,
     minValue?: string | number | BigNumber | undefined,
     maxValue?: string | number | BigNumber | undefined
   ): Promise<string | undefined> {
     if (!hasSufficientFunds) {
-      const futureTransactions = await protocol.getFutureRequiredTransactions(address, 'delegate')
-      const feeEstimation = await protocol.options.transactionController.estimateTransactionFees(address, futureTransactions)
-      const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation, { protocol })
+      const feeEstimation = await adapter.protocolV1.getFutureStakingTransactionsFee(address)
+      const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation.value, { protocol: adapter })
 
-      return this.translateService.instant('delegation-detail-substrate.delegate.unsufficient-funds_text', {
+      return this.translateService.instant('delegation-detail-polkadot.delegate.unsufficient-funds_text', {
         extra: feeEstimationFormatted,
-        symbol: protocol.marketSymbol.toLocaleUpperCase()
+        symbol: adapter.marketSymbol.toLocaleUpperCase()
       })
     }
 
     const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
-      protocol
+      protocol: adapter
     })
 
     const minValueFormatted =
       minValue !== undefined
         ? await this.amountConverterPipe.transform(minValue, {
-            protocol,
-            maxDigits: protocol.decimals
+            protocol: adapter,
+            maxDigits: adapter.decimals
           })
         : undefined
 
     const maxValueFormatted =
       maxValue !== undefined
         ? await this.amountConverterPipe.transform(maxValue, {
-            protocol,
-            maxDigits: protocol.decimals
+            protocol: adapter,
+            maxDigits: adapter.decimals
           })
         : undefined
 
     let translationKey: string
     let translationArgs: any = {}
     switch (actionType) {
-      case SubstrateStakingActionType.BOND_NOMINATE:
+      case PolkadotStakingActionType.BOND_NOMINATE:
         if (maxValueFormatted) {
-          translationKey = 'delegation-detail-substrate.delegate.bond-nominate_text'
+          translationKey = 'delegation-detail-polkadot.delegate.bond-nominate_text'
           translationArgs = {
             minDelegation: minValueFormatted,
             maxDelegation: maxValueFormatted
           }
         } else {
-          translationKey = 'delegation-detail-substrate.delegate.bond-nominate-no-max_text'
+          translationKey = 'delegation-detail-polkadot.delegate.bond-nominate-no-max_text'
         }
         break
-      case SubstrateStakingActionType.REBOND_NOMINATE:
+      case PolkadotStakingActionType.REBOND_NOMINATE:
         if (maxValueFormatted) {
-          translationKey = 'delegation-detail-substrate.delegate.rebond-nominate_text'
+          translationKey = 'delegation-detail-polkadot.delegate.rebond-nominate_text'
           translationArgs = { maxDelegation: maxValueFormatted }
         } else {
-          translationKey = 'delegation-detail-substrate.delegate.rebond-nominate-no-max_text'
+          translationKey = 'delegation-detail-polkadot.delegate.rebond-nominate-no-max_text'
         }
         break
-      case SubstrateStakingActionType.NOMINATE:
-        translationKey = 'delegation-detail-substrate.delegate.nominate_text'
+      case PolkadotStakingActionType.NOMINATE:
+        translationKey = 'delegation-detail-polkadot.delegate.nominate_text'
         translationArgs = { bonded: bondedFormatted }
         break
-      case SubstrateStakingActionType.BOND_EXTRA:
+      case PolkadotStakingActionType.BOND_EXTRA:
         if (maxValueFormatted) {
-          translationKey = 'delegation-detail-substrate.delegate.bond-extra_text'
+          translationKey = 'delegation-detail-polkadot.delegate.bond-extra_text'
           translationArgs = {
             bonded: bondedFormatted,
             maxDelegation: maxValueFormatted
           }
         } else {
-          translationKey = 'delegation-detail-substrate.delegate.bond-extra-no-max_text'
+          translationKey = 'delegation-detail-polkadot.delegate.bond-extra-no-max_text'
           translationArgs = {
             bonded: bondedFormatted,
-            symbol: protocol.marketSymbol.toLocaleUpperCase()
+            symbol: adapter.marketSymbol.toLocaleUpperCase()
           }
         }
         break
-      case SubstrateStakingActionType.REBOND_EXTRA:
+      case PolkadotStakingActionType.REBOND_EXTRA:
         if (maxValueFormatted) {
-          translationKey = 'delegation-detail-substrate.delegate.rebond-extra_text'
+          translationKey = 'delegation-detail-polkadot.delegate.rebond-extra_text'
           translationArgs = {
             bonded: bondedFormatted,
             maxDelegation: maxValueFormatted
           }
         } else {
-          translationKey = 'delegation-detail-substrate.delegate.rebond-extra-no-max_text'
+          translationKey = 'delegation-detail-polkadot.delegate.rebond-extra-no-max_text'
           translationArgs = {
             bonded: bondedFormatted,
-            symbol: protocol.marketSymbol.toLocaleUpperCase()
+            symbol: adapter.marketSymbol.toLocaleUpperCase()
           }
         }
         break
-      case SubstrateStakingActionType.CHANGE_NOMINATION:
-        translationKey = 'delegation-detail-substrate.delegate.change-nomination_text'
+      case PolkadotStakingActionType.CHANGE_NOMINATION:
+        translationKey = 'delegation-detail-polkadot.delegate.change-nomination_text'
         translationArgs = { bonded: bondedFormatted }
         break
       default:
@@ -615,7 +615,7 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private createUndelegateAction(
-    stakingDetails: SubstrateStakingDetails | null,
+    stakingDetails: PolkadotStakingDetails | null,
     availableActions: DelegatorAction[]
   ): AirGapDelegatorAction | null {
     const actions = availableActions
@@ -642,20 +642,20 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     return null
   }
 
-  private createUndelegateActionLabel(actionType: SubstrateStakingActionType): string | undefined {
+  private createUndelegateActionLabel(actionType: PolkadotStakingActionType): string | undefined {
     switch (actionType) {
-      case SubstrateStakingActionType.CANCEL_NOMINATION:
-        return 'delegation-detail-substrate.undelegate.label'
-      case SubstrateStakingActionType.UNBOND:
-        return 'delegation-detail-substrate.unbond.label'
+      case PolkadotStakingActionType.CANCEL_NOMINATION:
+        return 'delegation-detail-polkadot.undelegate.label'
+      case PolkadotStakingActionType.UNBOND:
+        return 'delegation-detail-polkadot.unbond.label'
       default:
         return undefined
     }
   }
 
   private async createDelegatorExtraActions(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    stakingDetails: SubstrateStakingDetails | undefined,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    stakingDetails: PolkadotStakingDetails | undefined,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction[]> {
     return Promise.all(
@@ -669,20 +669,20 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
 
           // tslint:disable-next-line: switch-default
           switch (action.type) {
-            case SubstrateStakingActionType.WITHDRAW_UNBONDED:
+            case PolkadotStakingActionType.WITHDRAW_UNBONDED:
               const totalUnlockedFormatted: string | undefined = stakingDetails
                 ? await this.amountConverterPipe.transform(stakingDetails.unlocked, {
-                    protocol
+                    protocol: adapter
                   })
                 : undefined
 
-              label = 'delegation-detail-substrate.withdraw-unbonded.label'
-              confirmLabel = 'delegation-detail-substrate.withdraw-unbonded.button'
+              label = 'delegation-detail-polkadot.withdraw-unbonded.label'
+              confirmLabel = 'delegation-detail-polkadot.withdraw-unbonded.button'
               description = totalUnlockedFormatted
-                ? this.translateService.instant('delegation-detail-substrate.withdraw-unbonded.text-full', {
+                ? this.translateService.instant('delegation-detail-polkadot.withdraw-unbonded.text-full', {
                     unlocked: totalUnlockedFormatted
                   })
-                : 'delegation-detail-substrate.withdraw-unbonded.text-short'
+                : 'delegation-detail-polkadot.withdraw-unbonded.text-short'
 
               break
           }
@@ -699,38 +699,38 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private async createDelegatorDisplayDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    nominatorDetails: SubstrateNominatorDetails
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    nominatorDetails: PolkadotNominatorDetails
   ): Promise<UIWidget[]> {
     const displayDetails = []
     const isDelegating = nominatorDetails.delegatees.length > 0
 
     if (nominatorDetails.stakingDetails) {
-      displayDetails.push(...(await this.createStakingDetailsWidgets(protocol, isDelegating, nominatorDetails.stakingDetails)))
+      displayDetails.push(...(await this.createStakingDetailsWidgets(adapter, isDelegating, nominatorDetails.stakingDetails)))
     }
 
     return displayDetails
   }
 
   private async createStakingDetailsWidgets(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     isNominating: boolean,
-    stakingDetails: SubstrateStakingDetails
+    stakingDetails: PolkadotStakingDetails
   ): Promise<UIWidget[]> {
     const details = []
 
-    details.push(...(await this.createBondedDetails(protocol, stakingDetails)))
+    details.push(...(await this.createBondedDetails(adapter, stakingDetails)))
 
     if (isNominating) {
-      details.push(...this.createNominationDetails(protocol, stakingDetails))
+      details.push(...this.createNominationDetails(adapter, stakingDetails))
     }
 
     return details
   }
 
   private async createDelegatorDisplayRewards(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    nominatorDetails: SubstrateNominatorDetails
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    nominatorDetails: PolkadotNominatorDetails
   ): Promise<UIRewardList | undefined> {
     if (nominatorDetails.delegatees.length === 0 || nominatorDetails.stakingDetails.rewards.length === 0) {
       return undefined
@@ -741,20 +741,20 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         nominatorDetails.stakingDetails.rewards.slice(0, 5).map(async (reward) => ({
           index: reward.eraIndex,
           amount: await this.amountConverterPipe.transform(reward.amount, {
-            protocol
+            protocol: adapter
           }),
           timestamp: reward.timestamp
         }))
       ),
-      indexColLabel: 'delegation-detail-substrate.rewards.index-col_label',
-      amountColLabel: 'delegation-detail-substrate.rewards.amount-col_label',
-      payoutColLabel: 'delegation-detail-substrate.rewards.payout-col_label'
+      indexColLabel: 'delegation-detail-polkadot.rewards.index-col_label',
+      amountColLabel: 'delegation-detail-polkadot.rewards.amount-col_label',
+      payoutColLabel: 'delegation-detail-polkadot.rewards.payout-col_label'
     })
   }
 
   private async createBondedDetails(
-    protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    stakingDetails: SubstrateStakingDetails
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    stakingDetails: PolkadotStakingDetails
   ): Promise<UIWidget[]> {
     const details = []
 
@@ -766,12 +766,12 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         new UIIconText({
           iconName: 'people-outline',
           text: await this.amountConverterPipe.transform(activeStaking, {
-            protocol
+            protocol: adapter
           }),
           description:
             stakingDetails.status === 'nominating'
-              ? 'delegation-detail-substrate.delegated_label'
-              : 'delegation-detail-substrate.bonded_label'
+              ? 'delegation-detail-polkadot.delegated_label'
+              : 'delegation-detail-polkadot.bonded_label'
         })
       )
     }
@@ -786,14 +786,14 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         new UIIconText({
           iconName: 'people-outline',
           text: await this.amountConverterPipe.transform(nextUnlockingValue, {
-            protocol
+            protocol: adapter
           }),
-          description: 'delegation-detail-substrate.locked_label'
+          description: 'delegation-detail-polkadot.locked_label'
         }),
         new UIIconText({
           iconName: 'alarm-outline',
           text: `${moment(unlockingDate).fromNow()} (${moment(unlockingDate).format('LLL')})`,
-          description: 'delegation-detail-substrate.withdraw-ready_label'
+          description: 'delegation-detail-polkadot.withdraw-ready_label'
         })
       )
     } else if (totalUnlocked.gt(0)) {
@@ -801,9 +801,9 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
         new UIIconText({
           iconName: 'people-outline',
           text: await this.amountConverterPipe.transform(totalUnlocked, {
-            protocol
+            protocol: adapter
           }),
-          description: 'delegation-detail-substrate.withdraw-ready_label'
+          description: 'delegation-detail-polkadot.withdraw-ready_label'
         })
       )
     }
@@ -812,8 +812,8 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
   }
 
   private createNominationDetails(
-    _protocol: SubstrateDelegateProtocol<SubstrateNetwork>,
-    stakingDetails: SubstrateStakingDetails
+    _adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    stakingDetails: PolkadotStakingDetails
   ): UIWidget[] {
     const details = []
 
@@ -822,13 +822,13 @@ export class SubstrateDelegationExtensions extends V0ProtocolDelegationExtension
     let nextEraLabel: string | undefined
     switch (stakingDetails.status) {
       case 'nominating':
-        nextEraLabel = 'delegation-detail-substrate.next-payout_label'
+        nextEraLabel = 'delegation-detail-polkadot.next-payout_label'
         break
       case 'nominating_waiting':
-        nextEraLabel = 'delegation-detail-substrate.becomes-active_label'
+        nextEraLabel = 'delegation-detail-polkadot.becomes-active_label'
         break
       case 'nominating_inactive':
-        nextEraLabel = 'delegation-detail-substrate.next-era_label'
+        nextEraLabel = 'delegation-detail-polkadot.next-era_label'
         break
       default:
         nextEraLabel = undefined
