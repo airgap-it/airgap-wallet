@@ -1,12 +1,4 @@
-import {
-  APP_CONFIG,
-  APP_INFO_PLUGIN,
-  APP_LAUNCHER_PLUGIN,
-  FILESYSTEM_PLUGIN,
-  ISOLATED_MODULES_PLUGIN,
-  PermissionsService,
-  WebIsolatedModules
-} from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules, ZIP_PLUGIN } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -38,6 +30,7 @@ import {
   AppLauncherMock,
   AppMock,
   ClipboardMock,
+  FilePickerMock,
   FilesystemMock,
   PermissionsMock,
   PushNotificationsMock,
@@ -68,7 +61,8 @@ export class UnitHelper {
     alertController: new AlertControllerMock(),
     loadingController: new LoadingControllerMock(),
     modalController: new ModalControllerMock(),
-    zip: new ZipMock()
+    zip: new ZipMock(),
+    filePicker: new FilePickerMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
@@ -100,6 +94,7 @@ export class UnitHelper {
       { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfo },
       { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
       { provide: FILESYSTEM_PLUGIN, useValue: this.mockRefs.filesystem },
+      { provide: ZIP_PLUGIN, useValue: this.mockRefs.zip },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules() },
       { provide: ToastController, useValue: this.mockRefs.toastController },

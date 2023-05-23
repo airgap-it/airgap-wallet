@@ -1,4 +1,5 @@
-import { ProtocolService, UIResourceStatus } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ProtocolService, UIResourceStatus } from '@airgap/angular-core'
+import { ICoinProtocol } from '@airgap/coinlib-core'
 import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Injectable } from '@angular/core'
 import { ComponentStore, tapResponse } from '@ngrx/component-store'
@@ -139,16 +140,21 @@ export class TezosSaplingContractFormStore extends ComponentStore<TezosSaplingCo
   })
 
   private async onParametersChanged(parameters: TezosSaplingContractParameters): Promise<Partial<TezosSaplingContractFormState>> {
-    const protocol = (await this.protocolService.getProtocol(
-      parameters.protocolIdentifier,
-      parameters.networkIdentifier
-    )) as TezosSaplingProtocol
-    const protocolOptions = await protocol.getOptions()
+    const protocol: ICoinProtocol = await this.protocolService.getProtocol(parameters.protocolIdentifier, parameters.networkIdentifier)
+    if (!(protocol instanceof ICoinProtocolAdapter)) {
+      throw new Error('Unsupported Sapling protocol')
+    }
+
+    const adapter: ICoinProtocolAdapter<TezosSaplingProtocol> = protocol
+    const [contractAddress, injectorUrl]: [string, string] = await Promise.all([
+      adapter.protocolV1.getContractAddress(),
+      adapter.protocolV1.getInjectorUrl()
+    ])
 
     return {
-      protocol: { status: UIResourceStatus.SUCCESS, value: protocol },
-      currentContractAddress: { status: UIResourceStatus.SUCCESS, value: protocolOptions.config.contractAddress },
-      currentInjectorUrl: { status: UIResourceStatus.SUCCESS, value: protocolOptions.config.injectorUrl },
+      protocol: { status: UIResourceStatus.SUCCESS, value: adapter },
+      currentContractAddress: { status: UIResourceStatus.SUCCESS, value: contractAddress },
+      currentInjectorUrl: { status: UIResourceStatus.SUCCESS, value: injectorUrl },
       warningDescription: undefined,
       errorDescription: undefined
     }
@@ -165,8 +171,8 @@ export class TezosSaplingContractFormStore extends ComponentStore<TezosSaplingCo
     const protocol = state.protocol
     try {
       if (protocol.status === UIResourceStatus.SUCCESS) {
-        const saplingProtocol = protocol.value as TezosSaplingProtocol
-        const isContractValid = await saplingProtocol.isContractValid(address)
+        const saplingAdapter = protocol.value as ICoinProtocolAdapter<TezosSaplingProtocol>
+        const isContractValid = await saplingAdapter.protocolV1.isContractValid(address)
 
         if (!isContractValid) {
           throw contractNotCompatibleWarning(address)

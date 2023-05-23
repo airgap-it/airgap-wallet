@@ -1,4 +1,4 @@
-package it.airgap.wallet.plugin
+package it.airgap.wallet.plugin.sapling
 
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -49,14 +49,14 @@ class SaplingNative : Plugin() {
     fun prepareSpendDescription(call: PluginCall) {
         with(call) {
             assertReceived(
-                    Param.CONTEXT,
-                    Param.SPENDING_KEY,
-                    Param.ADDRESS,
-                    Param.RCM,
-                    Param.AR,
-                    Param.VALUE,
-                    Param.ROOT,
-                    Param.MERKLE_PATH
+              Param.CONTEXT,
+              Param.SPENDING_KEY,
+              Param.ADDRESS,
+              Param.RCM,
+              Param.AR,
+              Param.VALUE,
+              Param.ROOT,
+              Param.MERKLE_PATH
             )
 
             tryResolveWithDataCatchReject {
@@ -80,11 +80,11 @@ class SaplingNative : Plugin() {
     fun preparePartialOutputDescription(call: PluginCall) {
         with(call) {
             assertReceived(
-                    Param.CONTEXT,
-                    Param.ADDRESS,
-                    Param.RCM,
-                    Param.ESK,
-                    Param.VALUE
+              Param.CONTEXT,
+              Param.ADDRESS,
+              Param.RCM,
+              Param.ESK,
+              Param.VALUE
             )
 
             tryResolveWithDataCatchReject {

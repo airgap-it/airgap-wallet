@@ -1,25 +1,22 @@
-import { IsolatedModulesPlugin, MainProtocolStoreService, ProtocolService, SubProtocolStoreService, WebIsolatedModules } from '@airgap/angular-core'
+import { ProtocolService } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
+import { TestBed } from '@angular/core/testing'
 import { BigNumber } from 'bignumber.js'
+import { UnitHelper } from 'test-config/unit-test-helper'
 
 import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'
 
 describe('CryptoToFiatPipe', () => {
   let cryptoToFiatPipe: CryptoToFiatPipe
   let protocolService: ProtocolService
-  let isolatedModules: IsolatedModulesPlugin
 
-  beforeAll(() => {
-    isolatedModules = new WebIsolatedModules()
-    protocolService = new ProtocolService(
-      new MainProtocolStoreService(isolatedModules), 
-      new SubProtocolStoreService(isolatedModules), 
-      isolatedModules
-    )
-    protocolService.init()
-  })
-
-  beforeEach(() => {
+  let unitHelper: UnitHelper
+  beforeEach(async () => {
+    unitHelper = new UnitHelper()
+    await TestBed.configureTestingModule(unitHelper.testBed({})).compileComponents()
+    
+    protocolService = TestBed.inject(ProtocolService)
+    await protocolService.init()
     cryptoToFiatPipe = new CryptoToFiatPipe(protocolService)
   })
 

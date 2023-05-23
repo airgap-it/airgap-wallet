@@ -1,5 +1,5 @@
 import { IAirGapTransaction } from '@airgap/coinlib-core'
-import { RawEthereumTransaction } from '@airgap/ethereum'
+import { EthereumTransactionSignRequest } from '@airgap/ethereum'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import BigNumber from 'bignumber.js'
@@ -16,10 +16,12 @@ export class WalletconnectFromToComponent {
   public airGapTransaction: IAirGapTransaction | undefined
 
   @Input()
-  public rawTransaction: RawEthereumTransaction | undefined
+  public rawTransaction: EthereumTransactionSignRequest['transaction'] | undefined
 
   @Output()
-  public readonly onRawTransactionUpdate: EventEmitter<RawEthereumTransaction> = new EventEmitter<RawEthereumTransaction>()
+  public readonly onRawTransactionUpdate: EventEmitter<EthereumTransactionSignRequest['transaction']> = new EventEmitter<
+    EthereumTransactionSignRequest['transaction']
+  >()
 
   constructor(private readonly formBuilder: FormBuilder) {}
 

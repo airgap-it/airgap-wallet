@@ -1,21 +1,27 @@
 import { BaseFacade, ClipboardService, UIResource } from '@airgap/angular-core'
 import { BaseNgRxFacade } from '@airgap/angular-ngrx'
-import { ICoinProtocol, ProtocolNetwork } from '@airgap/coinlib-core'
+import { ICoinProtocol } from '@airgap/coinlib-core'
+import { protocolNetworkIdentifier } from '@airgap/module-kit'
+import { TezosProtocolNetwork } from '@airgap/tezos'
 import { Injectable, InjectionToken } from '@angular/core'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { TezosFAFormStore } from './tezos-fa-form.store'
 import { TezosFAFormState, TokenDetails, TokenDetailsInput, TokenInterface } from './tezos-fa-form.types'
 
 export const TEZOS_FA_FORM_FACADE = new InjectionToken<TezosFAFormFacade>('TezosFAFormFacade')
 export type TezosFAFormFacade<T extends BaseFacade = BaseFacade> = ITezosFAFormFacade & T
+
+type EnhancedTezosProtocolNetwork = TezosProtocolNetwork & { identifier: string }
+
 export interface ITezosFAFormFacade {
   readonly tokenInterface$: Observable<UIResource<TokenInterface>>
   readonly tokenID$: Observable<UIResource<number>>
 
   readonly tokenInterfaces$: Observable<TokenInterface[]>
   readonly tokens$: Observable<TokenDetails[]>
-  readonly networks$: Observable<ProtocolNetwork[]>
+  readonly networks$: Observable<EnhancedTezosProtocolNetwork[]>
 
   readonly protocol$: Observable<UIResource<ICoinProtocol>>
 
@@ -32,7 +38,7 @@ export class TezosFAFormNgRxFacade extends BaseNgRxFacade<TezosFAFormStore> impl
 
   public readonly tokenInterfaces$: Observable<TokenInterface[]>
   public readonly tokens$: Observable<TokenDetails[]>
-  public readonly networks$: Observable<ProtocolNetwork[]>
+  public readonly networks$: Observable<EnhancedTezosProtocolNetwork[]>
 
   public readonly protocol$: Observable<UIResource<ICoinProtocol>>
 
@@ -41,11 +47,20 @@ export class TezosFAFormNgRxFacade extends BaseNgRxFacade<TezosFAFormStore> impl
   constructor(store: TezosFAFormStore, private readonly clipboardService: ClipboardService) {
     super(store)
     this.tokenInterface$ = this.store.select((state: TezosFAFormState) => state.tokenInterface)
-    this.tokenID$ = this.store.select((state: TezosFAFormState) => state.tokenID)
+    this.tokenID$ = this.store.select((state: TezosFAFormState) => state.tokenId)
 
     this.tokenInterfaces$ = this.store.select((state: TezosFAFormState) => state.tokenInterfaces)
     this.tokens$ = this.store.select((state: TezosFAFormState) => state.tokens)
-    this.networks$ = this.store.select((state: TezosFAFormState) => state.networks)
+    this.networks$ = this.store
+      .select((state: TezosFAFormState) => state.networks)
+      .pipe(
+        map((networks: TezosProtocolNetwork[]) =>
+          networks.map((network: TezosProtocolNetwork) => ({
+            ...network,
+            identifier: protocolNetworkIdentifier(network)
+          }))
+        )
+      )
 
     this.protocol$ = this.store.select((state: TezosFAFormState) => state.protocol)
     this.errorDescription$ = this.store.select((state: TezosFAFormState) => state.errorDescription)

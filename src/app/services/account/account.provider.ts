@@ -25,6 +25,7 @@ import { isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
 import { InteractionService } from '../interaction/interaction.service'
+import { WalletModulesService } from '../modules/modules.service'
 import { OperationsProvider } from '../operations/operations'
 import { PriceService } from '../price/price.service'
 import { PushProvider } from '../push/push'
@@ -100,7 +101,8 @@ export class AccountProvider {
     private readonly router: Router,
     private readonly interactionService: InteractionService,
     private readonly priceService: PriceService,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly modulesService: WalletModulesService
   ) {
     this.loadWalletsFromStorage()
       .then(() => {
@@ -301,73 +303,55 @@ export class AccountProvider {
   }
 
   private async readSerializedWallet(serializedWallet: SerializedAirGapWallet): Promise<AirGapMarketWallet | undefined> {
-    const protocol: ICoinProtocol = await this.protocolService.getProtocol(
-      serializedWallet.protocolIdentifier,
-      serializedWallet.networkIdentifier
-    )
-    if (protocol.identifier !== serializedWallet.protocolIdentifier) {
+    try {
+      const protocol: ICoinProtocol = await this.protocolService.getProtocol(
+        serializedWallet.protocolIdentifier,
+        serializedWallet.networkIdentifier
+      )
+      if (protocol.identifier !== serializedWallet.protocolIdentifier) {
+        return undefined
+      }
+      const airGapWallet: AirGapMarketWallet = new AirGapCoinWallet(
+        protocol,
+        serializedWallet.publicKey,
+        serializedWallet.isExtendedPublicKey,
+        serializedWallet.derivationPath,
+        serializedWallet.masterFingerprint || '',
+        serializedWallet.status || AirGapWalletStatus.ACTIVE,
+        this.priceService,
+        serializedWallet.addressIndex
+      )
+      // add derived addresses
+      airGapWallet.addresses = serializedWallet.addresses
+
+      return airGapWallet
+    } catch (error) {
+      console.warn(error)
+
       return undefined
     }
-    const airGapWallet: AirGapMarketWallet = new AirGapCoinWallet(
-      protocol,
-      serializedWallet.publicKey,
-      serializedWallet.isExtendedPublicKey,
-      serializedWallet.derivationPath,
-      serializedWallet.masterFingerprint || '',
-      serializedWallet.status || AirGapWalletStatus.ACTIVE,
-      this.priceService,
-      serializedWallet.addressIndex
-    )
-    // add derived addresses
-    airGapWallet.addresses = serializedWallet.addresses
-
-    return airGapWallet
   }
 
   private async initializeWallet(airGapWallet: AirGapMarketWallet): Promise<void> {
-    return new Promise<void>((resolve) => {
+    try {
+      const identifier = await airGapWallet.protocol.getIdentifier()
       // if we have no addresses, derive using webworker and sync, else just sync
-      if (airGapWallet.addresses.length === 0 || (airGapWallet.isExtendedPublicKey && airGapWallet.addresses.length < 20)) {
-        const airGapWorker = new Worker('./assets/workers/airgap-coin-lib.js')
-
-        airGapWorker.onmessage = (event) => {
-          airGapWallet.addresses = event.data.addresses
-          if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
-            airGapWallet
-              .synchronize()
-              .then(() => {
-                resolve()
-              })
-              .catch((error) => {
-                console.error(error)
-                resolve()
-              })
-          } else {
-            resolve()
-          }
+      if (
+        airGapWallet.addresses.length === 0 ||
+        (airGapWallet.isExtendedPublicKey && !identifier.startsWith(MainProtocolSymbols.ETH) && airGapWallet.addresses.length < 20)
+      ) {
+        const addresses = await this.modulesService.deriveAddresses(airGapWallet)
+        const key = `${identifier}_${airGapWallet.publicKey}`
+        airGapWallet.addresses = addresses[key]
+        if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
+          await airGapWallet.synchronize()
         }
-
-        airGapWorker.postMessage({
-          protocolIdentifier: airGapWallet.protocol.identifier,
-          publicKey: airGapWallet.publicKey,
-          isExtendedPublicKey: airGapWallet.isExtendedPublicKey,
-          derivationPath: airGapWallet.derivationPath,
-          addressIndex: airGapWallet.addressIndex
-        })
       } else if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
-        airGapWallet
-          .synchronize()
-          .then(() => {
-            resolve()
-          })
-          .catch((error) => {
-            console.error(error)
-            resolve()
-          })
-      } else {
-        resolve()
+        await airGapWallet.synchronize()
       }
-    })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   public getWalletList(): AirGapMarketWallet[] {

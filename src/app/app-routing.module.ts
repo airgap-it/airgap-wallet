@@ -250,6 +250,17 @@ const routes: Routes = [
       special: DataResolverService
     },
     loadChildren: () => import('./pages/set-contract/set-contract.module').then((m) => m.SetContractPageModule)
+  },
+  {
+    path: 'isolated-modules-list',
+    loadChildren: () => import('./pages/isolated-modules-list/isolated-modules-list.module').then((m) => m.IsolatedModulesListPageModule)
+  },
+  {
+    path: 'isolated-modules-details/:id/:intention',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () => import('./pages/isolated-modules-details/isolated-modules-details.module').then((m) => m.IsolatedModulesDetailsPageModule)
   }
 ]
 @NgModule({

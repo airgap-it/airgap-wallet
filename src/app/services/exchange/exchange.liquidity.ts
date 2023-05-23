@@ -1,5 +1,5 @@
 // tslint:disable: max-classes-per-file
-import { ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   FeeDefaults,
@@ -23,11 +23,11 @@ import * as fromExchange from '../../pages/exchange/reducer'
 import { getSelectedSlippage } from 'src/app/app.selectors'
 import { take } from 'rxjs/operators'
 import { SegmentType } from 'src/app/pages/exchange/reducer'
-import { TezosOperation } from '@airgap/tezos/v0/protocol/types/operations/TezosOperation'
-import { TezosTransactionOperation } from '@airgap/tezos/v0/protocol/types/operations/Transaction'
-import { RawTezosTransaction, TezosProtocol, TezosProtocolNetwork, TezosWrappedOperation } from '@airgap/tezos'
-import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
-import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
+import { TezosOperation, TezosOperationType, TezosProtocol, TezosTransactionOperation, TezosTransactionSignRequest, TezosWrappedOperation } from '@airgap/tezos'
+import { TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
+import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
+import { newAmount, newPublicKey, PublicKey } from '@airgap/module-kit'
+import { isHex } from '@airgap/coinlib-core/utils/hex'
 
 interface DexStorage {
   storage: {
@@ -43,7 +43,7 @@ type PartialTransactionOperation = TezosOperation & Partial<TezosTransactionOper
 
 interface LiquidityTransaction {
   details: IAirGapTransaction[]
-  unsigned: RawTezosTransaction
+  unsigned: TezosTransactionSignRequest['transaction']
 }
 
 interface LiquiditySlippageTolerance {
@@ -107,7 +107,7 @@ export class LiquidityExchange implements Exchange {
   private slippageTolerance: BigNumber
   private selectedWalletAddress: string
 
-  private readonly tezos: TezosToolkit = new TezosToolkit(new TezosProtocolNetwork().rpcUrl)
+  private readonly tezos: TezosToolkit = new TezosToolkit(TEZOS_MAINNET_PROTOCOL_NETWORK.rpcUrl)
 
   private readonly slippageDefaults: LiquiditySlippageTolerance = {
     low: 0.005, // 0.5%
@@ -352,9 +352,9 @@ export class LiquidityExchange implements Exchange {
     decimals: number
   ): Promise<FeeDefaults> {
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(decimals)
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
     const minTokenAmount: BigNumber = await this.getMinTezToTokenExchangeAmount(token, shiftedAmount, slippageTolerance)
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
     const segmentType = await this.store$
       .select((state) => state.exchange.segmentType)
@@ -367,7 +367,7 @@ export class LiquidityExchange implements Exchange {
     } else if (segmentType === SegmentType.ADD_LIQUIDITY) {
       operations = await this.prepareTezToTokenOperations(address.address, address.address, token, shiftedAmount, minTokenAmount)
     }
-    return tezosProtocol.estimateFeeDefaultsForOperations(publicKey, operations)
+    return this.estimateFeeDefaultsForOperations(tezosProtocol, publicKey, operations)
   }
 
   public async createTransaction(
@@ -443,9 +443,9 @@ export class LiquidityExchange implements Exchange {
     fee: BigNumber
   ): Promise<LiquidityTransaction> {
     try {
-      const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+      const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
 
-      const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+      const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
       const minLqtMinted = new BigNumber(
         liquidityBakingCalculations.addLiquidityLiquidityCreated(mutezAmount.toNumber(), this.xtzPool, this.lqtTotal)
@@ -471,8 +471,9 @@ export class LiquidityExchange implements Exchange {
         this.approveRequest(address.address, 0, fee)
       ]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-      const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -489,11 +490,12 @@ export class LiquidityExchange implements Exchange {
     decimals: number
   ): Promise<LiquidityTransaction> {
     try {
-      const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+      const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
       const operations = await this.prepareRemoveLiquidityOperation(publicKey, liquidityAmount, fee, decimals)
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-      const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -508,8 +510,8 @@ export class LiquidityExchange implements Exchange {
     fee: BigNumber,
     _decimals: number
   ): Promise<TezosOperation[]> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
     const [xtzOut, tokensOut] = await this.getCustomData(liquidityAmount)
 
     const removeLiquidityParams = this.liquidityBakingContract.methods
@@ -535,8 +537,8 @@ export class LiquidityExchange implements Exchange {
     fee: BigNumber
   ): Promise<LiquidityTransaction> {
     try {
-      const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
-      const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+      const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
+      const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
       let xtzToTokenParams = this.liquidityBakingContract.methods
         .xtzToToken(address.address, minTokenAmount, this.deadline())
@@ -553,8 +555,9 @@ export class LiquidityExchange implements Exchange {
         }
       ] as PartialTransactionOperation[]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-      const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -571,8 +574,8 @@ export class LiquidityExchange implements Exchange {
     fee: BigNumber
   ): Promise<LiquidityTransaction> {
     try {
-      const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
-      const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+      const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
+      const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
       let tokenToXtzParams = this.liquidityBakingContract.methods
         .tokenToXtz(address.address, tokenAmount, minMutezAmount, this.deadline())
@@ -589,8 +592,9 @@ export class LiquidityExchange implements Exchange {
         }
       ] as PartialTransactionOperation[]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-      const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -754,13 +758,13 @@ export class LiquidityExchange implements Exchange {
     return identifier ? this.protocolService.getProtocol(identifier) : undefined
   }
 
-  private async getTezosProtocol(): Promise<TezosProtocol> {
+  private async getTezosProtocol(): Promise<ICoinProtocolAdapter<TezosProtocol>> {
     const tezosProtocol: ICoinProtocol | undefined = await this.protocolService.getProtocol(MainProtocolSymbols.XTZ)
-    if (tezosProtocol === undefined) {
+    if (tezosProtocol === undefined || !(tezosProtocol instanceof ICoinProtocolAdapter)) {
       throw new Error(`${MainProtocolSymbols.XTZ} is not supported.`)
     }
 
-    return tezosProtocol as TezosProtocol
+    return tezosProtocol
   }
 
   private isTokenSupported(identifier: ProtocolSymbols): boolean {
@@ -824,6 +828,27 @@ export class LiquidityExchange implements Exchange {
       destination: transferParams.to,
       parameters: transferParams.parameter as any
     }
+  }
+
+  private async estimateFeeDefaultsForOperations(
+    tezosProtocol: ICoinProtocolAdapter<TezosProtocol>,
+    publicKey: string,
+    operations: TezosOperation[]
+  ): Promise<FeeDefaults> {
+    const [metadata, feeDefaults] = await Promise.all([
+      tezosProtocol.protocolV1.getMetadata(),
+      tezosProtocol.protocolV1.getOperationFeeDefaults(this.getV1PublicKey(publicKey), operations)
+    ])
+
+    return {
+      low: newAmount(feeDefaults.low).convert('tez', metadata.units).value,
+      medium: newAmount(feeDefaults.medium).convert('tez', metadata.units).value,
+      high: newAmount(feeDefaults.high).convert('tez', metadata.units).value
+    }
+  }
+
+  private getV1PublicKey(publicKey: string): PublicKey {
+    return newPublicKey(publicKey, isHex(publicKey) ? 'hex' : 'encoded')
   }
 
   // private async xtzToTokenPriceImpact(mutezAmount: BigNumber): Promise<BigNumber> {

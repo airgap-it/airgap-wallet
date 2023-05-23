@@ -1,11 +1,16 @@
-import { AddressService, AmountConverterPipe, ClipboardService } from '@airgap/angular-core'
+import {
+  AddressService,
+  AmountConverterPipe,
+  ClipboardService,
+  createV0EthereumProtocol,
+  createV0TezosProtocol,
+  ICoinProtocolAdapter
+} from '@airgap/angular-core'
 import { AirGapMarketWallet, AirGapNFTWallet, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { FeeDefaults } from '@airgap/coinlib-core/protocols/ICoinProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { EthereumProtocol } from '@airgap/ethereum'
 import { IACMessageType } from '@airgap/serializer'
-import { SubstrateProtocol } from '@airgap/substrate'
-import { TezosProtocol } from '@airgap/tezos'
+import { isSubstrateProtocol } from '@airgap/substrate'
 import { Component, NgZone } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -132,7 +137,7 @@ export class TransactionPreparePage {
 
     this.wallet = wallet
 
-    this.isSubstrate = wallet.protocol instanceof SubstrateProtocol
+    this.isSubstrate = wallet.protocol instanceof ICoinProtocolAdapter && isSubstrateProtocol(wallet.protocol.protocolV1)
     this.ignoreExistentialDeposit = this.isSubstrate ? true : undefined
 
     this.isSapling = wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
@@ -398,9 +403,9 @@ export class TransactionPreparePage {
 
   private async calculateFeeCurrentMarketPrice(wallet: AirGapMarketWallet): Promise<number> {
     if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-      return this.priceService.getCurrentMarketPrice(new TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+      return this.priceService.getCurrentMarketPrice(await createV0TezosProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else if (wallet.protocol.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
-      return this.priceService.getCurrentMarketPrice(new EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
+      return this.priceService.getCurrentMarketPrice(await createV0EthereumProtocol(), 'USD').then((price: BigNumber) => price.toNumber())
     } else {
       return wallet.getCurrentMarketPrice(this.collectibleID)?.toNumber() ?? 0
     }

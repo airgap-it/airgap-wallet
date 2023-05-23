@@ -1,35 +1,43 @@
-import { AmountConverterPipe, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ClipboardService } from '@airgap/angular-core'
+import { AmountConverterPipe, ClipboardService, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN } from '@airgap/angular-core'
+import { AirGapMarketWallet, IAirGapTransaction } from '@airgap/coinlib-core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
 import { NavParams, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+import { InteractionServiceMock } from 'src/app/services/interaction/interaction.mock'
+import { InteractionService } from 'src/app/services/interaction/interaction.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 import { OperationsServiceMock } from 'src/app/services/operations/operations.mock'
 
-import { ClipboardMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/plugins-mock'
+import { AccountProviderMock } from '../../../../test-config/accountProvider-mock'
 import { NavParamsMock, PlatformMock } from '../../../../test-config/mocks-ionic'
+import { ClipboardMock, SplashScreenMock, StatusBarMock } from '../../../../test-config/plugins-mock'
 import { StorageMock } from '../../../../test-config/storage-mock'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { WalletMock } from '../../../../test-config/wallet-mock'
-import { AccountProviderMock } from '../../../../test-config/accountProvider-mock'
 import { AccountProvider } from '../../services/account/account.provider'
 
 import { TransactionPreparePage } from './transaction-prepare'
-import { InteractionService } from 'src/app/services/interaction/interaction.service'
-import { InteractionServiceMock } from 'src/app/services/interaction/interaction.mock'
 
 describe('TransactionPrepare Page', () => {
-  const ethWallet = new WalletMock().ethWallet
-  const ethTransaction = new WalletMock().ethTransaction
+  let ethWallet: AirGapMarketWallet
+  let ethTransaction: IAirGapTransaction
 
-  // const btcWallet = new WalletMock().btcWallet
-  // const btcTransaction = new WalletMock().btcTransaction
+  // let btcWallet: AirGapMarketWallet
+  // let btcTransaction: IAirGapTransaction
 
   let fixture: ComponentFixture<TransactionPreparePage>
   let component: TransactionPreparePage
 
   let unitHelper: UnitHelper
-  beforeEach(() => {
+
+  beforeEach(async () => {
+    ethWallet = await new WalletMock().ethWallet()
+    ethTransaction = new WalletMock().ethTransaction
+
+    // btcWallet = await new WalletMock().btcWallet
+    // btcTransaction = new WalletMock().btcTransaction
+
     unitHelper = new UnitHelper()
 
     WalletMock.injectSecret()
@@ -54,7 +62,7 @@ describe('TransactionPrepare Page', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          { provide: AccountProvider, useClass: AccountProviderMock },
+          { provide: AccountProvider, useValue: new AccountProviderMock(ethWallet) },
           { provide: Storage, useClass: StorageMock },
           { provide: NavParams, useClass: NavParamsMock },
           { provide: CLIPBOARD_PLUGIN, useClass: ClipboardMock },
@@ -75,8 +83,7 @@ describe('TransactionPrepare Page', () => {
     )
       .compileComponents()
       .catch(console.error)
-  })
-  beforeEach(async () => {
+
     ethWallet.addresses = await ethWallet.deriveAddresses(1)
     fixture = TestBed.createComponent(TransactionPreparePage)
     component = fixture.componentInstance

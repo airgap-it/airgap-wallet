@@ -1,7 +1,7 @@
-import { ProtocolService } from '@airgap/angular-core'
-import { MainProtocolSymbols, ICoinProtocol, SubProtocolSymbols, ICoinSubProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinSubProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocol, ICoinSubProtocol, MainProtocolSymbols, ProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { TezosFAProtocol, TezosFA2Protocol } from '@airgap/tezos'
+import { isTezosFA2Protocol, isTezosFAProtocol, TezosFAProtocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
@@ -77,17 +77,18 @@ export class AccountAddPage {
         protocol.identifier !== SubProtocolSymbols.XTZ_KT
     )
 
-    const mappedGenericIdentifier = (protocol: TezosFAProtocol): string => {
+    const mappedGenericIdentifier = async (adapter: ICoinSubProtocolAdapter<TezosFAProtocol>): Promise<string> => {
       let interfaceVersion: '1.2' | '2' = '1.2'
       let tokenId = 0
-      if (protocol instanceof TezosFA2Protocol) {
+      if (isTezosFA2Protocol(adapter.protocolV1)) {
         interfaceVersion = '2'
-        tokenId = protocol.tokenID ?? 0
+        tokenId = (await adapter.protocolV1.getTokenId()) ?? 0
       }
-      return faProtocolSymbol(interfaceVersion, protocol.options.config.contractAddress, tokenId)
+
+      return faProtocolSymbol(interfaceVersion, await adapter.protocolV1.getContractAddress(), tokenId)
     }
     const xtzSubProtocols = supportedSubAccountProtocols.filter(
-      (protocol): protocol is TezosFAProtocol => protocol instanceof TezosFAProtocol
+      (protocol): protocol is ICoinSubProtocolAdapter<TezosFAProtocol> => protocol instanceof ICoinSubProtocolAdapter && isTezosFAProtocol(protocol.protocolV1)
     )
     const standardSubprotocols = xtzSubProtocols.filter((protocol) =>
       Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols)
@@ -95,9 +96,12 @@ export class AccountAddPage {
     const genericSubprotocols = xtzSubProtocols.filter(
       (protocol) => !Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols)
     )
-    const toFilter = standardSubprotocols
-      .map((protocol) => mappedGenericIdentifier(protocol))
-      .filter((identifier) => genericSubprotocols.find((protocol) => protocol.identifier === identifier) !== undefined)
+
+    const genericIdentifiers: string[] = await Promise.all(standardSubprotocols.map(async (protocol) => mappedGenericIdentifier(protocol)))
+
+    const toFilter = genericIdentifiers.filter(
+      (identifier) => genericSubprotocols.find((protocol) => protocol.identifier === identifier) !== undefined
+    )
 
     this.otherSubAccountProtocols = supportedSubAccountProtocols.filter(
       (protocol) =>

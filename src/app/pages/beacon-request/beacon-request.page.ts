@@ -1,3 +1,4 @@
+import { createV0TezosProtocol, ICoinProtocolAdapter } from '@airgap/angular-core'
 import {
   BeaconMessageType,
   BroadcastRequestOutput,
@@ -10,9 +11,11 @@ import {
   SignPayloadRequestOutput
 } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { isHex } from '@airgap/coinlib-core/utils/hex'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
+import { newPublicKey, PublicKey } from '@airgap/module-kit'
 import { generateId, IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
-import { TezosCryptoClient, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
+import { TezosCryptoClient, TezosProtocol, TezosTransactionSignRequest, TezosWrappedOperation } from '@airgap/tezos'
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
@@ -235,7 +238,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async signRequest(request: SignPayloadRequestOutput): Promise<void> {
-    const tezosProtocol: TezosProtocol = new TezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await createV0TezosProtocol()
     const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
       (wallet: AirGapMarketWallet) =>
         wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.receivingPublicAddress === request.sourceAddress
@@ -278,7 +281,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async operationRequest(request: OperationRequestOutput): Promise<void> {
-    let tezosProtocol: TezosProtocol = new TezosProtocol()
+    let tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await createV0TezosProtocol()
 
     const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
       (wallet: AirGapMarketWallet) =>
@@ -295,28 +298,36 @@ export class BeaconRequestPage implements OnInit {
     }
 
     try {
-      this.wrappedOperation = await tezosProtocol.prepareOperations(selectedWallet.publicKey, request.operationDetails as any, false) // don't override parameters
+      this.wrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+        this.getV1PublicKey(selectedWallet.publicKey),
+        request.operationDetails as any,
+        false
+      ) // don't override parameters
     } catch (error) {
       await this.dismiss()
       this.beaconService.sendInvalidTransaction(request, error)
       return
     }
-    const forgedTransaction = await tezosProtocol.forgeAndWrapOperations(this.wrappedOperation)
+
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(this.wrappedOperation)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
 
     const generatedId = generateId(8)
     await this.beaconService.addVaultRequest(request, tezosProtocol)
 
-    this.transactions = await tezosProtocol.getAirGapTxFromWrappedOperations({
-      branch: '',
-      contents: this.wrappedOperation.contents
-    })
+    this.transactions = await tezosProtocol.convertTransactionDetailsV1ToV0(
+      await tezosProtocol.protocolV1.getDetailsFromWrappedOperation({
+        branch: '',
+        contents: this.wrappedOperation.contents
+      })
+    )
 
     this.responseHandler = async () => {
-      const airGapTxs = await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction: forgedTransaction })
+      const airGapTxs = await tezosProtocol.getTransactionDetails({ publicKey: selectedWallet.publicKey, transaction })
 
       this.accountService.startInteraction(
         selectedWallet,
-        forgedTransaction,
+        transaction,
         IACMessageType.TransactionSignRequest,
         airGapTxs,
         false,
@@ -336,7 +347,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   private async broadcastRequest(request: BroadcastRequestOutput): Promise<void> {
-    let tezosProtocol: TezosProtocol = new TezosProtocol()
+    let tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await createV0TezosProtocol()
     const signedTx: string = request.signedTransaction
 
     if (request.network.type !== BeaconNetworkType.MAINNET) {
@@ -377,5 +388,9 @@ export class BeaconRequestPage implements OnInit {
 
   public ngOnDestroy(): void {
     this.subscription.unsubscribe()
+  }
+
+  private getV1PublicKey(publicKey: string): PublicKey {
+    return newPublicKey(publicKey, isHex(publicKey) ? 'hex' : 'encoded')
   }
 }

@@ -144,6 +144,10 @@ export class SettingsPage {
     this.navigate('/trading-settings')
   }
 
+  public async goToIsolatedModules() {
+    this.navigate('/isolated-modules-list')
+  }
+
   private navigate(url: string) {
     this.router.navigateByUrl(url).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
