@@ -45,7 +45,15 @@
       "confirm": "Migrate"
     },
     "no-transactions_text": "There are no transactions yet for this account.",
-    "provided_by": "Provided by"
+    "mtpelerin": {
+      "title": "Mt Pelerin",
+      "buy_label": "Buy",
+      "cash-out_label": "Cash Out",
+      "cancel_label": "Cancel",
+      "ok_label": "Ok",
+      "header": "This service is provided by Mt. Pelerin and you will be leaving AirGap Wallet. Changes can be done in the settings",
+      "note_description": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe"
+    }
   },
   "account-transaction-detail": {
     "available_label": "Available",

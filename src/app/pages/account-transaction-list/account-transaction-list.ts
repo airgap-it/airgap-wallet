@@ -12,7 +12,15 @@ import { TezosKtProtocol } from '@airgap/tezos'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, NavController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import {
+  AlertController,
+  LoadingController,
+  ModalController,
+  NavController,
+  Platform,
+  PopoverController,
+  ToastController
+} from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
 import { Subscription, timer } from 'rxjs'
@@ -34,6 +42,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeProvider } from './../../services/exchange/exchange'
+import { MtPelerinComponent } from 'src/app/components/mt-pelerin/mt-pelerin.component'
 
 export const refreshRate = 3000
 
@@ -120,7 +129,8 @@ export class AccountTransactionListPage {
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService,
-    private readonly storageService: InternalStorageService
+    private readonly storageService: InternalStorageService,
+    private readonly modalController: ModalController
   ) {
     this.isDesktop = this.platform.is('desktop')
 
@@ -425,15 +435,35 @@ export class AccountTransactionListPage {
   }
 
   // Mt Perelin
+
+  async openModal(link: string): Promise<void> {
+    return new Promise(async (resolve) => {
+      const modal: HTMLIonModalElement = await this.modalController.create({
+        component: MtPelerinComponent,
+        componentProps: {
+          url: link
+        }
+      })
+      modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+      modal.onDidDismiss().then(() => {
+        resolve()
+      })
+    })
+  }
+
   public async buyMtPerelin() {
-    this.wallet.protocol.getSymbol().then((symbol) => {
-      window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
+    this.wallet.protocol.getSymbol().then(async (symbol) => {
+      const url = `https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`
+      await this.openModal(url)
+      // window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
     })
   }
 
   public async sellMtPerelin() {
-    this.wallet.protocol.getSymbol().then((symbol) => {
-      window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
+    this.wallet.protocol.getSymbol().then(async (symbol) => {
+      const url = `https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`
+      await this.openModal(url)
+      // window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
     })
   }
 }

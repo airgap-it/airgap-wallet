@@ -43,6 +43,7 @@ import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetOptionButtonGroup } from './widget-option-button-group/widget-option-button-group'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetSelector } from './widget-selector/widget-selector'
+import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
 
 @NgModule({
   declarations: [
@@ -79,7 +80,8 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     WidgetRewardList,
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
-    ExchangeSelectionComponent
+    ExchangeSelectionComponent,
+    MtPelerinComponent
   ],
   imports: [
     IonicModule,
@@ -128,7 +130,8 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     WidgetRewardList,
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
-    ExchangeSelectionComponent
+    ExchangeSelectionComponent,
+    MtPelerinComponent
   ],
   entryComponents: [
     AccountEditPopoverComponent,
