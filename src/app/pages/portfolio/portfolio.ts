@@ -13,7 +13,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
 import { AirGapWallet, AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { map, take } from 'rxjs/operators'
-import axios from 'axios'
+import { ShopService } from 'src/app/services/shop/shop.service'
 
 interface WalletGroup {
   mainWallet: AirGapMarketWallet
@@ -49,7 +49,8 @@ export class PortfolioPage {
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
     private readonly protocolService: ProtocolService,
-    public platform: Platform
+    public platform: Platform,
+    private readonly shopService: ShopService
   ) {
     this.isDesktop = !this.platform.is('hybrid')
 
@@ -68,8 +69,7 @@ export class PortfolioPage {
     })
     this.subscriptions.push(walletChangedSub)
 
-    const url = `https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url=${encodeURI('https://airgap.it/wallet-announcement/')}`
-    axios.get<{ text: string, link: string }>(url).then(response => {
+    this.shopService.getShopData().then((response) => {
       this.shopBannerText = response.data.text
       this.shopBannerLink = response.data.link
     })
@@ -212,6 +212,8 @@ export class PortfolioPage {
   }
 
   public onClickShopBanner() {
-    if (this.shopBannerLink.length > 0) window.open(this.shopBannerLink, '_blank')
+    if (this.shopBannerLink.length > 0) {
+      window.open(this.shopBannerLink, '_blank')
+    }
   }
 }
