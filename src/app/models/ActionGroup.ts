@@ -71,6 +71,9 @@ export class ActionGroup {
     actionMap.set(MainProtocolSymbols.ICP, async () => {
       return this.getICPActions()
     })
+    actionMap.set(MainProtocolSymbols.OPTIMISM, async () => {
+      return this.getOptimismActions()
+    })
 
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
@@ -279,6 +282,37 @@ export class ActionGroup {
   private async getICPActions(): Promise<Action<any, any>[]> {
     const delegateButtonAction = this.createDelegateButtonAction()
     return [delegateButtonAction]
+  }
+
+  private getOptimismActions(): Action<any, any>[] {
+    const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
+      { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
+      () => {
+        const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
+          return new Promise<AddTokenActionContext>(async (resolve) => {
+            const info = {
+              subProtocolType: SubProtocolType.TOKEN,
+              wallet: this.callerContext.wallet,
+              actionCallback: resolve
+            }
+            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+            this.callerContext.router
+              .navigateByUrl(
+                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
+              )
+              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+          })
+        })
+        const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+        addTokenAction.onComplete = async (): Promise<void> => {
+          addTokenAction.getLinkedAction().context.location.navigateRoot('')
+        }
+
+        return addTokenAction
+      }
+    )
+
+    return [addTokenButtonAction]
   }
 
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {

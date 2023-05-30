@@ -22,6 +22,7 @@ import { ExchangeSelectionComponent } from './exchange-selection/exchange-select
 import { FeeComponent } from './fee/fee.component'
 import { FromToComponent } from './from-to/from-to.component'
 import { InteractionSelectionComponent } from './interaction-selection/interaction-selection.component'
+import { OptimismERC20Form } from './optimism-erc20-form/optimism-erc20-form.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { RemoveLiquidityComponent } from './remove-liquidity/remove-liquidity.component'
@@ -55,6 +56,7 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    OptimismERC20Form,
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,
@@ -106,6 +108,7 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    OptimismERC20Form,
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,

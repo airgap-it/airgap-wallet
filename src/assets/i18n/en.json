@@ -118,7 +118,8 @@
     "featured": "Featured",
     "others": "More Assets",
     "generic": {
-      "xtz_label": "Add Unlisted Tezos Asset"
+      "xtz_label": "Add Unlisted Tezos Asset",
+      "optimism-erc20_label": "Add Unlisted Optimism ERC-20 Token"
     }
   },
   "scan": {
@@ -387,6 +388,9 @@
     "add-button_label": "Add Asset",
     "xtz-fa": {
       "name": "Unlisted Tezos Asset"
+    },
+    "optimism-erc20": {
+      "name": "Unlisted Optimism ERC-20 Token"
     },
     "unsupported_text": "Can't add selected sub account."
   },
@@ -1060,6 +1064,15 @@
     "error": {
       "contract-invalid": "The contract address is invalid.",
       "injector-invalid": "The injector URL is invalid.",
+      "unknown": "Unkown error has occurred."
+    }
+  },
+  "optimism-erc20-form": {
+    "header": "Provide Optimism ERC-20 contract details to add an unlisted ERC-20 token.",
+    "contract-address_label": "Contract Address",
+    "paste_label": "Paste",
+    "error": {
+      "contract-not-found": "Contract not found, check if the address is correct.",
       "unknown": "Unkown error has occurred."
     }
   },

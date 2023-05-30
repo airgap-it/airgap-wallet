@@ -1,5 +1,6 @@
 import { getProtocolAndNetworkIdentifier, ProtocolService } from '@airgap/angular-core'
 import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapSerializedAnyProtocol, implementsInterface } from '@airgap/module-kit'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
@@ -54,15 +55,26 @@ export class SubAccountAddGenericPage {
 
   private async saveGenericProtocol(protocol: ICoinProtocol): Promise<void> {
     const protocolNetworkIdentifier = await getProtocolAndNetworkIdentifier(protocol)
+    // TODO: use module's `ProtocolSerializer` extension to serialize any protocol
+    const serializedProtocol = this.legacySerializationFormat(protocol) ? protocol.options : protocol.options.config
 
     await Promise.all([
       this.protocolService.addActiveSubProtocols(protocol),
       this.storage.get(WalletStorageKey.GENERIC_SUBPROTOCOLS).then((genericSubProtocols) => {
         return this.storage.set(
           WalletStorageKey.GENERIC_SUBPROTOCOLS,
-          Object.assign(genericSubProtocols, { [protocolNetworkIdentifier]: protocol.options })
+          Object.assign(genericSubProtocols, { [protocolNetworkIdentifier]: serializedProtocol })
         )
       })
     ])
+  }
+
+  private legacySerializationFormat(protocol: ICoinProtocol): boolean {
+    const config = protocol.options.config
+    if (!implementsInterface<AirGapSerializedAnyProtocol>(config, { type: 'required', identifier: 'required' })) {
+      return true
+    }
+
+    return config.type !== 'offline' && config.type !== 'online'
   }
 }

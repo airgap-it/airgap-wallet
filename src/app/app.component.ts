@@ -7,6 +7,7 @@ import {
   convertFeeDefaultsV0ToV1,
   convertNetworkTypeV0ToV1,
   convertNetworkV0ToV1,
+  createV0OptimismERC20Token,
   createV0TezosFA1p2Protocol,
   createV0TezosFA2Protocol,
   createV0TezosShieldedTezProtocol,
@@ -37,6 +38,7 @@ import { GroestlcoinModule } from '@airgap/groestlcoin'
 import { ICPModule } from '@airgap/icp'
 import { protocolNetworkIdentifier } from '@airgap/module-kit'
 import { MoonbeamModule } from '@airgap/moonbeam'
+import { OptimismModule } from '@airgap/optimism'
 import { PolkadotModule } from '@airgap/polkadot'
 import { generateId, IACMessageType } from '@airgap/serializer'
 import { TezosDomains, TezosModule, TezosProtocolNetwork, TezosSaplingExternalMethodProvider } from '@airgap/tezos'
@@ -71,6 +73,7 @@ import { WalletconnectService } from './services/walletconnect/walletconnect.ser
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
 import { HttpClient } from '@angular/common/http'
+import { SerializedERC20Token } from '@airgap/optimism/v1/protocol/erc20/ERC20Token'
 
 @Component({
   selector: 'app-root',
@@ -243,7 +246,8 @@ export class AppComponent implements AfterViewInit {
       new MoonbeamModule(),
       new AstarModule(),
       new ICPModule(),
-      new CoreumModule()
+      new CoreumModule(),
+      new OptimismModule()
     ])
     const v1Protocols = await this.modulesService.loadProtocols('online', [
       MainProtocolSymbols.XTZ_SHIELDED,
@@ -296,93 +300,110 @@ export class AppComponent implements AfterViewInit {
   // TODO: remove v0 types keeping backwards compatibility
   private async getGenericSubProtocols(): Promise<void> {
     const genericSubProtocols = await this.storageProvider.get(WalletStorageKey.GENERIC_SUBPROTOCOLS)
-    const identifiersWithOptions = Object.entries(genericSubProtocols)
-    const supportedTestNetworkIdentifiers = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ))
+    const identifiersWithSerialized = Object.entries(genericSubProtocols)
+    const supportedTezosTestNetworkIdentifiers = (await this.protocolService.getNetworksForProtocol(MainProtocolSymbols.XTZ))
       .filter((network) => network.type == NetworkType.TESTNET)
       .map((network) => network.identifier)
     const protocolsOrUndefineds = await Promise.all(
-      identifiersWithOptions.map(async ([protocolNetworkIdentifier, options]) => {
+      identifiersWithSerialized.map(([protocolNetworkIdentifier, serialized]) => {
         const [protocolIdentifier] = protocolNetworkIdentifier.split(':')
 
-        if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
-          const tezosOptions = options as TezosProtocolOptionsV0
-          const tezosProtocolNetwork = new TezosProtocolNetworkV0(
-            tezosOptions.network.name,
-            tezosOptions.network.type,
-            tezosOptions.network.rpcUrl,
-            tezosOptions.network.blockExplorer,
-            tezosOptions.network.extras
-          )
-          if (
-            tezosProtocolNetwork.type === NetworkType.TESTNET &&
-            !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)
-          ) {
-            delete genericSubProtocols[protocolNetworkIdentifier]
-            return undefined
+        try {
+          if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
+            return this.deserializeGenericTezosSubProtocol(protocolIdentifier, serialized, supportedTezosTestNetworkIdentifiers)
+          } else if (protocolIdentifier.startsWith(MainProtocolSymbols.OPTIMISM)) {
+            return this.deserializeOptimismERC20Token(serialized)
           }
-          if (protocolIdentifier.startsWith(faProtocolSymbol('1.2'))) {
-            const faOptions = tezosOptions as TezosFAProtocolOptionsV0
 
-            return createV0TezosFA1p2Protocol({
-              network: {
-                ...this.convertLegacyTezosNetwork(tezosProtocolNetwork),
-                contractAddress: faOptions.config.contractAddress,
-                tokenMetadataBigMapId: faOptions.config.tokenMetadataBigMapID
-              },
-              identifier: faOptions.config.identifier,
-              name: faOptions.config.name,
-              units: faOptions.config.symbol
-                ? {
-                    [faOptions.config.symbol]: {
-                      symbol: { value: faOptions.config.symbol, market: faOptions.config.marketSymbol },
-                      decimals: faOptions.config.decimals
-                    }
-                  }
-                : undefined,
-              mainUnit: faOptions.config.symbol,
-              feeDefaults:
-                faOptions.config.feeDefaults && faOptions.config.decimals !== undefined
-                  ? convertFeeDefaultsV0ToV1(faOptions.config.feeDefaults, faOptions.config.decimals)
-                  : undefined
-            })
-          } else if (protocolIdentifier.startsWith(faProtocolSymbol('2'))) {
-            const fa2Options = tezosOptions as TezosFA2ProtocolOptionsV0
-
-            return createV0TezosFA2Protocol({
-              network: {
-                ...this.convertLegacyTezosNetwork(tezosProtocolNetwork),
-                contractAddress: fa2Options.config.contractAddress,
-                tokenId: fa2Options.config.defaultTokenID,
-                tokenMetadataBigMapId: fa2Options.config.tokenMetadataBigMapID,
-                ledgerBigMapId: fa2Options.config.ledgerBigMapID,
-                totalSupplyBigMapId: fa2Options.config.totalSupplyBigMapID
-              },
-              identifier: fa2Options.config.identifier,
-              name: fa2Options.config.name,
-              units: fa2Options.config.symbol
-                ? {
-                    [fa2Options.config.symbol]: {
-                      symbol: { value: fa2Options.config.symbol, market: fa2Options.config.marketSymbol },
-                      decimals: fa2Options.config.decimals
-                    }
-                  }
-                : undefined,
-              mainUnit: fa2Options.config.symbol,
-              feeDefaults:
-                fa2Options.config.feeDefaults && fa2Options.config.decimals !== undefined
-                  ? convertFeeDefaultsV0ToV1(fa2Options.config.feeDefaults, fa2Options.config.decimals)
-                  : undefined
-            })
-          }
+          return undefined
+        } catch {
+          delete genericSubProtocols[protocolNetworkIdentifier]
+          return undefined
         }
-
-        return undefined
       })
     )
     const protocols = protocolsOrUndefineds.filter((protocolOrUndefined) => protocolOrUndefined !== undefined)
 
     await this.storageProvider.set(WalletStorageKey.GENERIC_SUBPROTOCOLS, genericSubProtocols)
     await this.protocolService.addActiveSubProtocols(protocols)
+  }
+
+  private async deserializeGenericTezosSubProtocol(
+    protocolIdentifier: string, 
+    serialized: any, 
+    supportedTestNetworkIdentifiers: string[]
+  ): Promise<ICoinSubProtocol | undefined> {
+    const tezosOptions = serialized as TezosProtocolOptionsV0
+    const tezosProtocolNetwork = new TezosProtocolNetworkV0(
+      tezosOptions.network.name,
+      tezosOptions.network.type,
+      tezosOptions.network.rpcUrl,
+      tezosOptions.network.blockExplorer,
+      tezosOptions.network.extras
+    )
+    if (
+      tezosProtocolNetwork.type === NetworkType.TESTNET &&
+      !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)
+    ) {
+      throw new Error()
+    }
+
+    if (protocolIdentifier.startsWith(faProtocolSymbol('1.2'))) {
+      const faOptions = tezosOptions as TezosFAProtocolOptionsV0
+
+      return createV0TezosFA1p2Protocol({
+        network: {
+          ...this.convertLegacyTezosNetwork(tezosProtocolNetwork),
+          contractAddress: faOptions.config.contractAddress,
+          tokenMetadataBigMapId: faOptions.config.tokenMetadataBigMapID
+        },
+        identifier: faOptions.config.identifier,
+        name: faOptions.config.name,
+        units: faOptions.config.symbol
+          ? {
+              [faOptions.config.symbol]: {
+                symbol: { value: faOptions.config.symbol, market: faOptions.config.marketSymbol },
+                decimals: faOptions.config.decimals
+              }
+            }
+          : undefined,
+        mainUnit: faOptions.config.symbol,
+        feeDefaults:
+          faOptions.config.feeDefaults && faOptions.config.decimals !== undefined
+            ? convertFeeDefaultsV0ToV1(faOptions.config.feeDefaults, faOptions.config.decimals)
+            : undefined
+      })
+    } else if (protocolIdentifier.startsWith(faProtocolSymbol('2'))) {
+      const fa2Options = tezosOptions as TezosFA2ProtocolOptionsV0
+
+      return createV0TezosFA2Protocol({
+        network: {
+          ...this.convertLegacyTezosNetwork(tezosProtocolNetwork),
+          contractAddress: fa2Options.config.contractAddress,
+          tokenId: fa2Options.config.defaultTokenID,
+          tokenMetadataBigMapId: fa2Options.config.tokenMetadataBigMapID,
+          ledgerBigMapId: fa2Options.config.ledgerBigMapID,
+          totalSupplyBigMapId: fa2Options.config.totalSupplyBigMapID
+        },
+        identifier: fa2Options.config.identifier,
+        name: fa2Options.config.name,
+        units: fa2Options.config.symbol
+          ? {
+              [fa2Options.config.symbol]: {
+                symbol: { value: fa2Options.config.symbol, market: fa2Options.config.marketSymbol },
+                decimals: fa2Options.config.decimals
+              }
+            }
+          : undefined,
+        mainUnit: fa2Options.config.symbol,
+        feeDefaults:
+          fa2Options.config.feeDefaults && fa2Options.config.decimals !== undefined
+            ? convertFeeDefaultsV0ToV1(fa2Options.config.feeDefaults, fa2Options.config.decimals)
+            : undefined
+      })
+    }
+
+    return undefined
   }
 
   private convertLegacyTezosNetwork(network: TezosProtocolNetworkV0): TezosProtocolNetwork {
@@ -404,6 +425,13 @@ export class AppComponent implements AfterViewInit {
       indexerApi:
         network.extras.indexerClient && network.extras.indexerClient.baseUrl ? network.extras.indexerClient.baseUrl : base.indexerApi
     }
+  }
+
+  private async deserializeOptimismERC20Token(serialized: any): Promise<ICoinSubProtocol> {
+    // TODO: use module's `deserializeOfflineProtocol` directly
+    // (currently it's easier to use `createV0OptimismERC20Token` because it wraps v1 protocol in the v0 adapter)
+    const serializedERC20Token = serialized as SerializedERC20Token
+    return createV0OptimismERC20Token(serializedERC20Token.metadata, { network: serializedERC20Token.network })
   }
 
   private async initializeTezosDomains(): Promise<void> {
