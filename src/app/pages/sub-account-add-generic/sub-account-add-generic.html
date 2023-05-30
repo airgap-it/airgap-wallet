@@ -15,6 +15,7 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container [ngSwitch]="genericSubProtocolType">
       <tezos-fa-form *ngSwitchCase="GenericSubProtocolSymbol.XTZ_FA" (protocol)="saveProtocol($event)"></tezos-fa-form>
+      <optimism-erc20-form *ngSwitchCase="GenericSubProtocolSymbol.OPTIMISM_ERC20" (protocol)="saveProtocol($event)"></optimism-erc20-form>
       <ng-container *ngSwitchDefault>
         <empty-state [text]="'add-generic-sub-account.unsupported_text' | translate" [imageName]="'no-imports.svg'"></empty-state>
       </ng-container>

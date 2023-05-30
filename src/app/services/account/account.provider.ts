@@ -7,6 +7,7 @@ import {
   ICoinProtocol,
   MainProtocolSymbols,
   ProtocolNetwork,
+  ProtocolSymbols,
   SerializedAirGapWallet
 } from '@airgap/coinlib-core'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
@@ -336,9 +337,11 @@ export class AccountProvider {
     try {
       const identifier = await airGapWallet.protocol.getIdentifier()
       // if we have no addresses, derive using webworker and sync, else just sync
+      const excludedProtocols = [MainProtocolSymbols.ETH, MainProtocolSymbols.OPTIMISM]
+      const isWalletExcluded = excludedProtocols.some((protocolSymbol: ProtocolSymbols) => identifier.startsWith(protocolSymbol))
       if (
         airGapWallet.addresses.length === 0 ||
-        (airGapWallet.isExtendedPublicKey && !identifier.startsWith(MainProtocolSymbols.ETH) && airGapWallet.addresses.length < 20)
+        (airGapWallet.isExtendedPublicKey && !isWalletExcluded && airGapWallet.addresses.length < 20)
       ) {
         const addresses = await this.modulesService.deriveAddresses(airGapWallet)
         const key = `${identifier}_${airGapWallet.publicKey}`

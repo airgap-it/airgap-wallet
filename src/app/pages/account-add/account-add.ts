@@ -37,6 +37,12 @@ export class AccountAddPage {
       identifier: GenericSubProtocolSymbol.XTZ_FA,
       symbol: 'XTZ',
       mainIdentifier: MainProtocolSymbols.XTZ
+    },
+    { 
+      name: 'account-add.generic.optimism-erc20_label',
+      identifier: GenericSubProtocolSymbol.OPTIMISM_ERC20,
+      symbol: 'ETH',
+      mainIdentifier: MainProtocolSymbols.OPTIMISM
     }
   ]
 
