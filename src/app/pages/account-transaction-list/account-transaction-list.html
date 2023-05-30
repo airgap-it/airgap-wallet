@@ -23,14 +23,6 @@
 
 <ion-content no-bounce has-bouncing="false" forceOverscroll="false">
   <ion-grid fixed="true" class="ion-no-padding action--container">
-    <tezos-delegation-card
-      *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && balance"
-      [wallet]="wallet"
-      [isDelegated]="isKtDelegated"
-      [delegateAmount]="balance"
-      (onDelegatedClick)="openDelegationDetails()"
-      (onUndelegatedClick)="openDelegationDetails()"
-    ></tezos-delegation-card>
     <card-actionable
       *ngIf="wallet.protocol.identifier === subProtocolSymbols.XTZ_KT"
       [imageLeft]="false"
