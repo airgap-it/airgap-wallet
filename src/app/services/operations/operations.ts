@@ -489,9 +489,11 @@ export class OperationsProvider {
             }],
             {
               fee: newAmount(fee.toString(10), 'blockchain')
-            }
+            },
           ),
-          wallet.publicKey
+          wallet.publicKey,
+          undefined,
+          wallet.protocol.identifier
         )
         unsignedTx = transactionSignRequest.transaction
 
@@ -504,7 +506,10 @@ export class OperationsProvider {
             publicKey: wallet.publicKey,
             transaction: unsignedTx
           },
-          { knownViewingKeys }
+          { 
+            knownViewingKeys, 
+            transactionOwner: wallet.protocol.identifier 
+          }
         )
       } else {
         if (wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED) {

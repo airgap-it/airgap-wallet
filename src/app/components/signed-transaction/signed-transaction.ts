@@ -68,7 +68,8 @@ export class SignedTransactionComponent implements OnChanges {
               if (await this.checkIfSaplingTransaction(payload, signedTx.protocol, protocolNetwork)) {
                 const saplingProtocol: ICoinProtocolAdapter<TezosSaplingProtocol> = await this.getSaplingProtocol(protocolNetwork)
                 return saplingProtocol.getTransactionDetailsFromSigned(payload, {
-                  knownViewingKeys: this.accountProvider.getKnownViewingKeys()
+                  knownViewingKeys: this.accountProvider.getKnownViewingKeys(),
+                  transactionOwner: signedTx.protocol
                 })
               } else {
                 return protocol.getTransactionDetailsFromSigned(payload)
@@ -102,8 +103,10 @@ export class SignedTransactionComponent implements OnChanges {
 
   private async checkIfSaplingTransaction(transaction: SignedTransaction, protocolIdentifier: ProtocolSymbols, network: ProtocolNetwork): Promise<boolean> {
     if (protocolIdentifier === MainProtocolSymbols.XTZ) {
-      const tezosProtocol: ICoinProtocol = await this.protocolService.getProtocol(protocolIdentifier, network)
-      const saplingProtocol: ICoinProtocolAdapter<TezosSaplingProtocol> = await this.getSaplingProtocol(network)
+      const [tezosProtocol, saplingProtocol]: [ICoinProtocol, ICoinProtocolAdapter<TezosSaplingProtocol>] = await Promise.all([
+        this.protocolService.getProtocol(protocolIdentifier, network),
+        this.getSaplingProtocol(network)
+      ]) 
 
       const txDetails: IAirGapTransaction[] = await tezosProtocol.getTransactionDetailsFromSigned(transaction)
       const recipients: string[] = txDetails

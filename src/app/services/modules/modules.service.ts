@@ -1,4 +1,5 @@
-import { BaseModulesService, IsolatedModulePreviewMetadata, ModulesController, ProtocolService, UiEventService } from '@airgap/angular-core'
+import { BaseModulesService, deriveAddressesAsync, IsolatedModulePreviewMetadata, ModulesController, partition, ProtocolService, UiEventService } from '@airgap/angular-core'
+import { AirGapWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { Inject, Injectable } from '@angular/core'
 import { FilePickerPlugin, PickFilesResult } from '@capawesome/capacitor-file-picker'
 import { FILE_PICKER_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
@@ -41,5 +42,17 @@ export class WalletModulesService extends BaseModulesService {
       loader?.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_LOADER))
       loader = undefined
     }
+  }
+
+  public async deriveAddresses(walletOrWallets: AirGapWallet | AirGapWallet[], amount?: number): Promise<Record<string, string[]>> {
+    const wallets: AirGapWallet[] = Array.isArray(walletOrWallets) ? walletOrWallets : [walletOrWallets]
+    const [saplingWallets, otherWallets]: [AirGapWallet[], AirGapWallet[]] = partition(wallets, (wallet: AirGapWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED)
+
+    const [saplingAddresses, otherAddresses]: [Record<string, string[]>, Record<string, string[]>] = await Promise.all([
+      deriveAddressesAsync(saplingWallets, amount),
+      super.deriveAddresses(otherWallets, amount)
+    ])
+
+    return Object.assign(otherAddresses, saplingAddresses)
   }
 }

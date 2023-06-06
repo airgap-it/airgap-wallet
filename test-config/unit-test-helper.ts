@@ -39,7 +39,7 @@ import {
   StatusBarMock,
   ZipMock
 } from './plugins-mock'
-import { PermissionsServiceMock } from './service-mock'
+import { PermissionsServiceMock, PushBackendProviderMock } from './service-mock'
 import { StorageMock } from './storage-mock'
 
 export class UnitHelper {
@@ -62,7 +62,8 @@ export class UnitHelper {
     loadingController: new LoadingControllerMock(),
     modalController: new ModalControllerMock(),
     zip: new ZipMock(),
-    filePicker: new FilePickerMock()
+    filePicker: new FilePickerMock(),
+    pushBackendProvider: new PushBackendProviderMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
