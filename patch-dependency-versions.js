@@ -11,8 +11,9 @@ const configFiles = [pluginConfig]
 const LEGACY_SUPPORT_V4_ID = 'androidx.legacy:legacy-support-v4'
 const APP_COMPAT_ID = 'androidx.appcompat:appcompat'
 
-function getXMLDependencyRegex(id) {
-  return RegExp(`(?<indent>.*)<framework src="(?<dependencyId>${id}):\\$ANDROIDX_VERSION" />`, 'g')
+function getXMLDependencyRegex(versions, id) {
+  const targetVersion = versions[id].replace(/\./g, '\\.')
+  return RegExp(`(?<indent>.*)<framework src="(?<dependencyId>${id}):(?!${targetVersion}).*" \/>`, 'g')
 }
 
 function patchDependencyVersion(configFile, versions) {
@@ -22,8 +23,8 @@ function patchDependencyVersion(configFile, versions) {
     }
 
     const regexes = [
-      getXMLDependencyRegex(LEGACY_SUPPORT_V4_ID), 
-      getXMLDependencyRegex(APP_COMPAT_ID)
+      getXMLDependencyRegex(versions, LEGACY_SUPPORT_V4_ID), 
+      getXMLDependencyRegex(versions, APP_COMPAT_ID)
     ]
     let result = data
     regexes.forEach(regex => {
@@ -31,6 +32,7 @@ function patchDependencyVersion(configFile, versions) {
         const indent = match.groups.indent || ''
         const dependencyId = match.groups.dependencyId
         const version = versions[dependencyId]
+
 
         if (version !== undefined) {
           result = result.replace(regex, `${indent}<framework src="${dependencyId}:${version}" />`)

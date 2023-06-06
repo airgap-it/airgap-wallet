@@ -6,18 +6,18 @@ RUN apt-get update -y && apt-get install -y \
     pkg-config  \
     libjpeg-dev \
     libcairo2-dev \
-    openjdk-11-jdk-headless
+    openjdk-17-jdk-headless
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 # create app directory
 RUN mkdir /app
 WORKDIR /app
 
-RUN npm install -g npm@7.7.6 @capacitor/core@3.2.5 @capacitor/android@3.2.5 @capacitor/cli@3.2.5
+RUN npm install -g npm@8.19.3 @capacitor/core@5.0.4 @capacitor/android@5.0.4 @capacitor/cli@5.0.4
 RUN npm cache clean -f
 RUN npm install -g n
-RUN n 15.14.0
+RUN n 16.19.1
 
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app
@@ -27,9 +27,11 @@ COPY apply-diagnostic-modules.js /app
 COPY fix-qrscanner-gradle.js /app
 COPY patch-dependency-versions.js /app
 COPY patch-coinlib.js /app
+COPY copy-builtin-modules.js /app
+COPY browserify-coinlib.js /app
 
 # install dependencies
-RUN npm i
+RUN npm i --legacy-peer-deps
 
 # copy capacitor configs and ionic configs
 COPY capacitor.config.ts /app/capacitor.config.ts

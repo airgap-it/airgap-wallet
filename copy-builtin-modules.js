@@ -46,6 +46,12 @@ const modules = [
     }
   },
   { 
+    path: path.join(rootdir, 'node_modules/@airgap/optimism'),
+    jsenv: {
+      android: 'webview'
+    }
+  },
+  { 
     path: path.join(rootdir, 'node_modules/@airgap/polkadot'),
     jsenv: {
       android: 'webview'
