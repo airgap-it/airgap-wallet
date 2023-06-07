@@ -211,7 +211,7 @@ export class WalletconnectPage implements OnInit {
   }
 
   private async operationRequest(request: JSONRPC<EthTx>): Promise<void> {
-    const wallet = this.selectableWallets.find((wallet) => wallet.addresses[0] === request.params[0].from)
+    const wallet = this.selectableWallets.find((wallet) => wallet.addresses[0].toLowerCase() === request.params[0].from.toLowerCase())
     this.setWallet(wallet)
 
     const ethereumProtocol: ICoinProtocolAdapter<EthereumProtocol> = await createV0EthereumProtocol()
@@ -230,7 +230,7 @@ export class WalletconnectPage implements OnInit {
       gasPrice: eth.gasPrice ? eth.gasPrice : `0x${new BigNumber(gasPrice.value).toString(16)}`,
       gasLimit: `0x${(300000).toString(16)}`,
       to: eth.to,
-      value: eth.value,
+      value: eth.value ?? '0x00',
       chainId: 1,
       data: eth.data
     }
