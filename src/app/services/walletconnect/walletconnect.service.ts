@@ -66,6 +66,8 @@ export class WalletconnectService {
       return
     }
 
+    this.activeConnector = connector
+
     connector.on('session_request', async (error, payload) => {
       clearTimeout(this.timeout)
 
@@ -90,7 +92,7 @@ export class WalletconnectService {
       if (error) {
         throw error
       }
-      this.activeConnector = connector
+
       this.presentModal(payload, connector)
     })
   }
