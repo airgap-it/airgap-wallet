@@ -1073,6 +1073,7 @@
     "paste_label": "Paste",
     "error": {
       "contract-not-found": "Contract not found, check if the address is correct.",
+      "token-metadata-missing": "Unable to fetch the asset metadata.",
       "unknown": "Unkown error has occurred."
     }
   },
