@@ -89,7 +89,7 @@ build-ios:
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
     - nvm use 16
-    - npm install
+    - npm install --legacy-peer-deps
     - npm run prepare-prod-build
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules
     - npx ionic build --prod
