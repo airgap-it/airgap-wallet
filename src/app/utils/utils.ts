@@ -1,3 +1,5 @@
+import { ICoinProtocol, ICoinSubProtocol } from "@airgap/coinlib-core"
+
 // https://stackoverflow.com/a/8472700/4790610
 export function generateGUID(): string {
   // tslint:disable
@@ -90,4 +92,8 @@ export function serializedDataToUrlString(data: string | string[], host: string 
 
 export function isType<T>(object: unknown, ...fields: string[]): object is T {
   return object instanceof Object && fields.every((field) => field in object)
+}
+
+export function isSubProtocol(value: ICoinProtocol): value is ICoinSubProtocol {
+  return 'isSubProtocol' in value && 'subProtocolType' in value;
 }

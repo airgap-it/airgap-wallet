@@ -22,7 +22,7 @@ import { auditTime, map, take } from 'rxjs/operators'
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
-import { isType } from '../../utils/utils'
+import { isSubProtocol, isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
 import { InteractionService } from '../interaction/interaction.service'
@@ -57,6 +57,11 @@ export interface WalletAddInfo {
 export type ImplicitWalletGroup = 'all'
 export type ActiveWalletGroup = AirGapMarketWalletGroup | ImplicitWalletGroup
 
+export interface MainWalletGroup {
+  mainWallet: AirGapMarketWallet
+  subWallets: AirGapMarketWallet[]
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -68,7 +73,8 @@ export class AccountProvider {
 
   public refreshPageSubject: Subject<void> = new Subject()
 
-  public walletGroups$: ReplaySubject<AirGapMarketWalletGroup[]> = new ReplaySubject(1)
+  public walletsGroupedByAccount$: ReplaySubject<AirGapMarketWalletGroup[]> = new ReplaySubject(1)
+  public walletsGroupedByMainWallet$: Observable<MainWalletGroup[]>;
   public wallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public allWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -112,6 +118,7 @@ export class AccountProvider {
       .catch(console.error)
     this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
     this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
+    this.walletsGroupedByMainWallet$ = this.wallets$.pipe(map(wallets => this.walletsByMainWallet(wallets)))
 
     this.pushProvider.notificationCallback = (notification: PushNotificationSchema): void => {
       // We need a timeout because otherwise routing might fail
@@ -169,6 +176,53 @@ export class AccountProvider {
     }
   }
 
+  private walletsByMainWallet(wallets: AirGapMarketWallet[]): MainWalletGroup[] {
+    const groups: MainWalletGroup[] = []
+
+    const walletMap: Map<string, MainWalletGroup> = new Map()
+
+    wallets
+      .filter((wallet: AirGapMarketWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+      .forEach((wallet: AirGapMarketWallet) => {
+        const identifier: string = isSubProtocol(wallet.protocol) ? wallet.protocol.identifier.split('-')[0] : wallet.protocol.identifier
+
+        const walletKey: string = `${wallet.publicKey}_${identifier}`
+
+        if (walletMap.has(walletKey)) {
+          const group: MainWalletGroup = walletMap.get(walletKey)
+          if (isSubProtocol(wallet.protocol)) {
+            group.subWallets.push(wallet)
+          } else {
+            group.mainWallet = wallet
+          }
+        } else {
+          if (isSubProtocol(wallet.protocol)) {
+            walletMap.set(walletKey, { mainWallet: undefined, subWallets: [wallet] })
+          } else {
+            walletMap.set(walletKey, { mainWallet: wallet, subWallets: [] })
+          }
+        }
+      })
+
+    walletMap.forEach((value: MainWalletGroup) => {
+      groups.push(value)
+    })
+
+    groups.sort((group1: MainWalletGroup, group2: MainWalletGroup) => {
+      if (group1.mainWallet && group2.mainWallet) {
+        return group1.mainWallet.protocol.symbol.localeCompare(group2.mainWallet.protocol.symbol)
+      } else if (group1.mainWallet) {
+        return -1
+      } else if (group2.mainWallet) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+
+    return groups
+  }
+
   public startInteraction(
     wallet: AirGapMarketWallet,
     interactionData: unknown,
@@ -185,8 +239,8 @@ export class AccountProvider {
     return this.activeGroup$.asObservable()
   }
 
-  public getWalletGroupsObservable(): Observable<AirGapMarketWalletGroup[]> {
-    return this.walletGroups$.asObservable().pipe(map((groups: AirGapMarketWalletGroup[]) => this.sortGroupsByLabel(groups)))
+  public getWalletsGroupedByAccountObservable(): Observable<AirGapMarketWalletGroup[]> {
+    return this.walletsGroupedByAccount$.asObservable().pipe(map((groups: AirGapMarketWalletGroup[]) => this.sortGroupsByLabel(groups)))
   }
 
   public triggerWalletChanged() {
@@ -299,7 +353,7 @@ export class AccountProvider {
     }
 
     this.setActiveGroup(this.allWalletGroups.length > 1 ? 'all' : this.allWalletGroups[0])
-    this.walletGroups$.next(this.allWalletGroups)
+    this.walletsGroupedByAccount$.next(this.allWalletGroups)
     this.pushProvider.registerWallets(this.allWallets)
   }
 
@@ -440,7 +494,7 @@ export class AccountProvider {
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
-      this.walletGroups$.next(this.allWalletGroups)
+      this.walletsGroupedByAccount$.next(this.allWalletGroups)
       return this.persist()
     }
   }
@@ -500,7 +554,7 @@ export class AccountProvider {
 
     if (resolvedOptions.updateState) {
       this.setActiveGroup(walletGroup)
-      this.walletGroups$.next(this.allWalletGroups)
+      this.walletsGroupedByAccount$.next(this.allWalletGroups)
 
       return this.persist()
     }
@@ -516,27 +570,41 @@ export class AccountProvider {
       ...options
     }
 
-    let group: AirGapMarketWalletGroup | undefined
-    const [groupId, index]: [string | undefined, number] = this.findWalletGroupIdAndIndex(walletToRemove)
-    if (this.walletGroups.has(groupId) && index > -1) {
-      group = this.walletGroups.get(groupId)
-      group.wallets[index].status = AirGapWalletStatus.DELETED
-      group.updateStatus()
+    const update = async () => {
+      let group: AirGapMarketWalletGroup | undefined
+      const [groupId, index]: [string | undefined, number] = this.findWalletGroupIdAndIndex(walletToRemove)
+      if (this.walletGroups.has(groupId) && index > -1) {
+        group = this.walletGroups.get(groupId)
+        group.wallets[index].status = AirGapWalletStatus.DELETED
+        group.updateStatus()
+      }
+
+      this.unregisterFromPushBackend(walletToRemove)
+
+      if (resolvedOptions.updateState) {
+        const activeGroup: ActiveWalletGroup =
+          group !== undefined && group.status === AirGapWalletStatus.ACTIVE
+            ? group
+            : this.allWalletGroups.length > 1
+            ? 'all'
+            : this.allWalletGroups[0]
+        this.setActiveGroup(activeGroup)
+        this.walletsGroupedByAccount$.next(this.allWalletGroups)
+
+        return this.persist()
+      }
     }
 
-    this.unregisterFromPushBackend(walletToRemove)
-
-    if (resolvedOptions.updateState) {
-      const activeGroup: ActiveWalletGroup =
-        group !== undefined && group.status === AirGapWalletStatus.ACTIVE
-          ? group
-          : this.allWalletGroups.length > 1
-          ? 'all'
-          : this.allWalletGroups[0]
-      this.setActiveGroup(activeGroup)
-      this.walletGroups$.next(this.allWalletGroups)
-
-      return this.persist()
+    if (!isSubProtocol(walletToRemove.protocol)) {
+      this.walletsGroupedByMainWallet$.pipe(take(1)).subscribe(async (mainGroups) => {
+        const mainGroup = mainGroups.find(group => this.isSameWallet(group.mainWallet, walletToRemove))
+        if (mainGroup) {
+          await Promise.all(mainGroup.subWallets.map(subWallet => this.removeWallet(subWallet, { updateState: false })))
+        }
+        await update()
+      })
+    } else {
+      await update()
     }
   }
 

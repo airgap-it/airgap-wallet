@@ -26,11 +26,12 @@
       [fullHeight]="wallet.protocol.identifier === mainProtocolSymbols.XTZ ? false : true"
     ></empty-state>
 
-    <ion-row class="ion-no-padding" *ngFor="let subAccount of displayedSubAccounts">
+    <ion-row class="ion-no-padding portfolio-item__row" *ngFor="let subAccount of displayedSubAccounts">
       <ion-col size="10" class="ion-no-padding">
         <portfolio-item
           [isToken]="subProtocolType === subProtocolTypes.TOKEN"
           [wallet]="subAccount.wallet"
+          [isSimplified]="true"
           tappable
           (click)="toggleAccount(subAccount)"
         ></portfolio-item>

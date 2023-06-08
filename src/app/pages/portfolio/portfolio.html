@@ -22,8 +22,8 @@
 
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
       <ng-container *ngIf="walletGroupsArray.length; else noItems">
-        <ion-list class="walletGroups ion-no-padding" lines="none" *ngFor="let walletGroup of walletGroupsArray">
-          <ion-card>
+        <ion-list class="walletGroups ion-no-padding" lines="none">
+          <ion-card *ngFor="let walletGroup of walletGroupsArray">
             <portfolio-item
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
@@ -34,6 +34,7 @@
             <portfolio-item
               *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async"
               [wallet]="subWallet"
+              [parentWalletName]="walletGroup.mainWallet.protocol.name"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"
             ></portfolio-item>

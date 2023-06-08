@@ -107,6 +107,7 @@ export class AccountTransactionListPage {
 
   // Mt Perelin
   public isMtPerelinActive: boolean = false
+  public parentWalletName: string | undefined
 
   constructor(
     public readonly alertCtrl: AlertController,
@@ -133,6 +134,12 @@ export class AccountTransactionListPage {
     private readonly modalController: ModalController
   ) {
     this.isDesktop = this.platform.is('desktop')
+
+    const navigation = this.router.getCurrentNavigation()
+    const state = navigation.extras.state as { parentWalletName: string | undefined }
+    if (state) {
+      this.parentWalletName = state.parentWalletName
+    }
 
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
@@ -365,12 +372,13 @@ export class AccountTransactionListPage {
   }
 
   public async presentEditPopover(event: any): Promise<void> {
+    const protocolIdentifier = await this.wallet.protocol.getIdentifier()
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
         importAccountAction:
-          this.wallet.protocol.identifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
+          protocolIdentifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }

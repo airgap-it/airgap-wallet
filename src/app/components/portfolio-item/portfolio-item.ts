@@ -1,13 +1,14 @@
-import { AmountConverterPipe, ProtocolService } from '@airgap/angular-core'
-import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { AmountConverterPipe, ProtocolService, getMainIdentifier } from '@airgap/angular-core'
+import { AirGapMarketWallet, ICoinSubProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component, Input } from '@angular/core'
 import BigNumber from 'bignumber.js'
-import { Observable, Subscription } from 'rxjs'
+import { Observable, ReplaySubject, Subscription } from 'rxjs'
 
 import { supportsDelegation } from '../../helpers/delegation'
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
+import { isSubProtocol } from 'src/app/utils/utils'
 
 @Component({
   selector: 'portfolio-item',
@@ -21,6 +22,9 @@ export class PortfolioItemComponent {
 
   @Input()
   public wallet: AirGapMarketWallet
+
+  @Input()
+  public parentWalletName: string | undefined
 
   @Input()
   public showBalances: boolean = true
@@ -46,9 +50,14 @@ export class PortfolioItemComponent {
   @Input()
   public maxDigits: number
 
+  @Input()
+  public isSimplified: boolean = false
+
   public balance: BigNumber | undefined
   public balanceFormatted: string | undefined
   public marketPrice: BigNumber | undefined
+
+  public parentProtocol: ReplaySubject<ICoinSubProtocol> = new ReplaySubject(1)
 
   public numberOfDecimalsInBalance: number = 0
   public readonly smallFontDecimalThreshold = 16
@@ -66,10 +75,12 @@ export class PortfolioItemComponent {
     this.initBalance()
     this.initMarketPrice()
     this.updateDelegationStatus()
+    this.updateParentProtocol()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
       await this.updateBalance()
       this.updateMarketPrice()
       this.updateDelegationStatus()
+      this.updateParentProtocol()
     })
   }
 
@@ -99,9 +110,8 @@ export class PortfolioItemComponent {
     if (this.wallet.getCurrentBalance() !== undefined) {
       const converter = new AmountConverterPipe(this.protocolService)
       this.balance = this.wallet.getCurrentBalance()
-      const balanceFormatted = await converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
-      this.balanceFormatted = `${balanceFormatted} ${this.wallet.protocol.symbol}`
-      const balanceSplit = balanceFormatted.split('.')
+      this.balanceFormatted = await converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
+      const balanceSplit = this.balanceFormatted.split('.')
       if (balanceSplit.length == 2) {
         const decimals = balanceSplit.pop()
         this.numberOfDecimalsInBalance = decimals.length
@@ -130,5 +140,18 @@ export class PortfolioItemComponent {
 
   public ngOnDestroy(): void {
     this.walletChanged?.unsubscribe()
+  }
+
+  private async updateParentProtocol(): Promise<void> {
+    if (this.wallet === undefined) {
+      return
+    }
+    const protocol = this.wallet.protocol
+    let parent: ICoinSubProtocol | undefined = undefined
+    if (isSubProtocol(protocol)) {
+      const mainProdocolIdentifier = getMainIdentifier((await protocol.getIdentifier()) as SubProtocolSymbols)
+      parent = await this.protocolService.getProtocol(mainProdocolIdentifier).catch(() => undefined)
+    }
+    this.parentProtocol.next(parent)
   }
 }
