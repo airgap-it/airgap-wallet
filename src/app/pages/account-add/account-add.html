@@ -20,11 +20,17 @@
           {{ 'account-add.featured' | translate }}
         </p>
       </ion-text>
-      <currency-item (click)="addAccount(protocol)" *ngFor="let protocol of filteredAccountProtocols" [protocol]="protocol"></currency-item>
+      <currency-item
+        (click)="addAccount(protocol)"
+        *ngFor="let protocol of filteredAccountProtocols"
+        [protocol]="protocol"
+        [parentName]="protocol.mainIdentifier"
+      ></currency-item>
       <currency-item
         (click)="addSubAccount(subProtocol)"
         *ngFor="let subProtocol of filteredFeaturedSubAccountProtocols"
         [protocol]="subProtocol"
+        [parentName]="subProtocol.mainIdentifier"
       ></currency-item>
 
       <ion-text color="primary" *ngIf="filteredOtherSubAccountProtocols.length > 0">
@@ -37,11 +43,13 @@
         *ngFor="let genericProtocol of filteredGenericSubAccountProtocols"
         [protocol]="genericProtocol"
         [showSymbol]="false"
+        [parentName]="genericProtocol.mainIdentifier"
       ></currency-item>
       <currency-item
         (click)="addSubAccount(subProtocol)"
         *ngFor="let subProtocol of filteredOtherSubAccountProtocols"
         [protocol]="subProtocol"
+        [parentName]="subProtocol.mainIdentifier"
       ></currency-item>
     </ion-list>
   </ion-grid>

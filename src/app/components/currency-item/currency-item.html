@@ -1,9 +1,20 @@
 <ion-item *ngIf="protocol" class="ion-no-padding" lines="none">
-  <airgap-currency-symbol class="item__image" [symbol]="protocol.symbol" [protocolIdentifier]="protocol.identifier" slot="start"></airgap-currency-symbol>
+  <airgap-currency-symbol
+    class="item__image"
+    [symbol]="protocol.symbol"
+    [protocolIdentifier]="protocol.identifier"
+    slot="start"
+  ></airgap-currency-symbol>
   <ion-label>
     <h2>
       <strong>{{ protocol.name | translate }}</strong>
       <span *ngIf="showSymbol">{{ protocol.symbol }}</span>
+
+      <ion-badge *ngIf="parentName !== undefined" color="light" style="margin-left: 10px;">
+        <div>
+          {{parentName}}
+        </div>
+      </ion-badge>
     </h2>
   </ion-label>
 

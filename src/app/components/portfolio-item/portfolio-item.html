@@ -1,77 +1,78 @@
-<ion-item *ngIf="wallet; else skeletonWallet" lines="none">
+<ion-item *ngIf="wallet; else skeletonWallet" lines="none" [ngClass]="!isSimplified ? 'ion-align-items-start' : ''">
   <ion-avatar slot="start">
-    <airgap-identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></airgap-identicon>
+    <airgap-currency-symbol [symbol]="wallet.protocol.symbol" [protocolIdentifier]="wallet.protocol.identifier"></airgap-currency-symbol>
+
     <airgap-currency-symbol
-      [symbol]="wallet.protocol.symbol"
-      [protocolIdentifier]="wallet.protocol.identifier"
-      *ngIf="isToken"
-    ></airgap-currency-symbol>
-    <airgap-currency-symbol
-      [symbol]="wallet.protocol.symbol"
-      [protocolIdentifier]="wallet.protocol.identifier"
-      *ngIf="!isToken"
+      *ngIf="(parentProtocol | async) as parent"
+      [symbol]="parent.symbol"
+      [protocolIdentifier]="parent.identifier"
       class="symbol--icon"
     ></airgap-currency-symbol>
   </ion-avatar>
-  <ion-label>
-    <h2
-      class="font--weight__bold"
-      [ngClass]="{ 'porfolio-item__margin': !isDelegated, 'font-size__regular': numberOfDecimalsInBalance > smallFontDecimalThreshold }"
-      *ngIf="balance; else syncingHeading"
-    >
-      {{ balanceFormatted }}
-    </h2>
-    <ng-template #syncingHeading>
-      <h2>
-        <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
-      </h2>
-    </ng-template>
-    <ng-container *ngIf="!isToken">
-      <ion-text color="blackLight">
-        <h3 *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono">
-          <ion-badge slot="end" color="primary" *ngIf="isActive">{{ 'portfolio-item.active' | translate }}</ion-badge>
-          {{ wallet.receivingPublicAddress | shortenString }}
-        </h3>
+  <ng-container *ngIf="!isSimplified">
+    <ion-label class="protocol__container">
+      <ion-text *ngIf="!isToken" color="black">
+        <p class="font--weight__bold" *ngIf="balance; else syncingHeading">
+          {{wallet.protocol.name}}
+        </p>
+      </ion-text>
+
+      <ng-template #syncingHeading>
+        <h2>
+          <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+        </h2>
+      </ng-template>
+      <ng-container *ngIf="!isToken">
+        <ion-text color="blackLight">
+          <p *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono d-flex ion-align-items-center">
+            <airgap-identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></airgap-identicon>
+            <ion-badge slot="end" color="primary" *ngIf="isActive">{{ 'portfolio-item.active' | translate }}</ion-badge>
+            <span class="address__span">{{ wallet.receivingPublicAddress | shortenString }}</span>
+          </p>
+        </ion-text>
+      </ng-container>
+
+      <ion-badge *ngIf="wallet.protocol.options.network.type !== networkType.MAINNET" color="danger" class="badge__margin">
+        {{ wallet.protocol.options.network.name }}
+      </ion-badge>
+
+      <ion-badge *ngIf="(isDelegated | async) !== null && !hideDelegationBadge" color="secondary">
+        {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
+      </ion-badge>
+
+      <ng-template #syncingHeadingLow>
+        <div>
+          <h3>
+            <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+          </h3>
+        </div>
+      </ng-template>
+    </ion-label>
+  </ng-container>
+
+  <div class="ion-text-right" slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
+    <ng-container *ngIf="balance; else syncingPrice">
+      <ion-text color="black">
+        <p class="font--weight__bold porfolio-item__margin">
+          {{ balanceFormatted }} {{ wallet.protocol.symbol}}
+        </p>
       </ion-text>
     </ng-container>
-
-    <ion-badge *ngIf="wallet.protocol.options.network.type !== networkType.MAINNET" color="danger" class="badge__margin">
-      {{ wallet.protocol.options.network.name }}
-    </ion-badge>
-
-    <ion-badge *ngIf="(isDelegated | async) !== null && !hideDelegationBadge" color="secondary">
-      {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
-    </ion-badge>
-
-    <ng-template #syncingHeadingLow>
-      <div>
-        <h3>
-          <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
-        </h3>
-      </div>
-    </ng-template>
-  </ion-label>
-
-  <div slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
-    <ng-container *ngIf="balance && marketPrice; else syncingBalance">
-      <p class="ion-text-right font--weight__bold porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
-        ${{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice: marketPrice } | async | number:
-        '1.2-2' }}
-      </p>
-    </ng-container>
-    <ng-template #syncingBalance>
+    <ng-template #syncingPrice>
       <p>
         <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
       </p>
     </ng-template>
-    <p *ngIf="balance; else syncingPrice">
+
+    <ng-container *ngIf="balance && marketPrice; else syncingBalance">
       <ion-text color="blackLight">
-        <span *ngIf="marketPrice && marketPrice.toNumber() > 0">
-          ${{ marketPrice.toNumber() | number: '1.2-4' }}
-        </span>
+        <p class="porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
+          ${{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice: marketPrice } | async | number:
+          '1.2-2' }}
+        </p>
       </ion-text>
-    </p>
-    <ng-template #syncingPrice>
+    </ng-container>
+    <ng-template #syncingBalance>
       <p>
         <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
       </p>
