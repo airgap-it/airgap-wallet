@@ -94,6 +94,10 @@ export class AccountProvider {
     return this.allWalletGroups.reduce((wallets: AirGapMarketWallet[], group: AirGapMarketWalletGroup) => wallets.concat(group.wallets), [])
   }
 
+  private get walletsGroupedByMainWallet(): MainWalletGroup[] {
+    return this.walletsByMainWallet(this.allWallets)
+  }
+
   constructor(
     private readonly appService: AppService,
     private readonly storageProvider: WalletStorageService,
@@ -594,16 +598,11 @@ export class AccountProvider {
     }
 
     if (!isSubProtocol(walletToRemove.protocol)) {
-      return new Promise(async (resolve) => {
-        this.walletsGroupedByMainWallet$.pipe(take(1)).subscribe(async (mainGroups) => {
-          const mainGroup = mainGroups.find(group => this.isSameWallet(group.mainWallet, walletToRemove))
-          if (mainGroup) {
-            await Promise.all(mainGroup.subWallets.map(subWallet => this.removeWallet(subWallet, { updateState: false })))
-          }
-          await update()
-          resolve()
-        })
-      })
+      const mainGroup = this.walletsGroupedByMainWallet.find(group => this.isSameWallet(group.mainWallet, walletToRemove))
+        if (mainGroup) {
+          await Promise.all(mainGroup.subWallets.map(subWallet => this.removeWallet(subWallet, { updateState: false })))
+        }
+        await update()
     } else {
       await update()
     }
