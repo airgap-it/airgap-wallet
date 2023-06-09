@@ -28,7 +28,7 @@ describe('AccountProvider', () => {
       unitHelper = new UnitHelper()
       appService = new AppService()
       appService.setReady()
-      
+
       await TestBed.configureTestingModule(
         unitHelper.testBed({
           providers: [
