@@ -1,4 +1,4 @@
-import { InternalStorageKey, InternalStorageService, ProtocolService } from '@airgap/angular-core'
+import { createV0TezosKtProtocol, ICoinSubProtocolAdapter, InternalStorageKey, InternalStorageService, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   IAirGapTransaction,
@@ -6,13 +6,21 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
+import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { TezosKtProtocol } from '@airgap/tezos'
-import { TezosKtAddressResult } from '@airgap/tezos/v0/protocol/types/kt/TezosKtAddressResult'
 import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AlertController, LoadingController, NavController, Platform, PopoverController, ToastController } from '@ionic/angular'
+import {
+  AlertController,
+  LoadingController,
+  ModalController,
+  NavController,
+  Platform,
+  PopoverController,
+  ToastController
+} from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
 import { Subscription, timer } from 'rxjs'
@@ -34,6 +42,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeProvider } from './../../services/exchange/exchange'
+import { MtPelerinComponent } from 'src/app/components/mt-pelerin/mt-pelerin.component'
 
 export const refreshRate = 3000
 
@@ -98,6 +107,7 @@ export class AccountTransactionListPage {
 
   // Mt Perelin
   public isMtPerelinActive: boolean = false
+  public parentWalletName: string | undefined
 
   constructor(
     public readonly alertCtrl: AlertController,
@@ -120,9 +130,16 @@ export class AccountTransactionListPage {
     private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService,
-    private readonly storageService: InternalStorageService
+    private readonly storageService: InternalStorageService,
+    private readonly modalController: ModalController
   ) {
     this.isDesktop = this.platform.is('desktop')
+
+    const navigation = this.router.getCurrentNavigation()
+    const state = navigation.extras.state as { parentWalletName: string | undefined }
+    if (state) {
+      this.parentWalletName = state.parentWalletName
+    }
 
     this.publicKey = this.route.snapshot.params.publicKey
     this.protocolID = this.route.snapshot.params.protocolID
@@ -355,12 +372,13 @@ export class AccountTransactionListPage {
   }
 
   public async presentEditPopover(event: any): Promise<void> {
+    const protocolIdentifier = await this.wallet.protocol.getIdentifier()
     const popover = await this.popoverCtrl.create({
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
         importAccountAction:
-          this.wallet.protocol.identifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
+          protocolIdentifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }
@@ -381,12 +399,12 @@ export class AccountTransactionListPage {
   }
 
   public async getKtAddresses(): Promise<string[]> {
-    const protocol: TezosKtProtocol = new TezosKtProtocol()
-    const ktAddresses: TezosKtAddressResult[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
+    const protocol: ICoinSubProtocolAdapter<TezosKtProtocol> = await createV0TezosKtProtocol()
+    const ktAddresses: IAirGapAddressResult[] = await protocol.getAddressesFromPublicKey(this.wallet.publicKey)
     // const action = ktAddresses.length > 0 ? this.getStatusAction(ktAddresses) : this.getDelegateAction()
     // this.replaceAction(ActionType.DELEGATE, action)
 
-    return ktAddresses.map((address: TezosKtAddressResult) => address.address)
+    return ktAddresses.map((address: IAirGapAddressResult) => address.address)
   }
 
   public async openDelegationDetails(): Promise<void> {
@@ -425,15 +443,35 @@ export class AccountTransactionListPage {
   }
 
   // Mt Perelin
+
+  async openModal(link: string): Promise<void> {
+    return new Promise(async (resolve) => {
+      const modal: HTMLIonModalElement = await this.modalController.create({
+        component: MtPelerinComponent,
+        componentProps: {
+          url: link
+        }
+      })
+      modal.present().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
+      modal.onDidDismiss().then(() => {
+        resolve()
+      })
+    })
+  }
+
   public async buyMtPerelin() {
-    this.wallet.protocol.getSymbol().then((symbol) => {
-      window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
+    this.wallet.protocol.getSymbol().then(async (symbol) => {
+      const url = `https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`
+      await this.openModal(url)
+      // window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
     })
   }
 
   public async sellMtPerelin() {
-    this.wallet.protocol.getSymbol().then((symbol) => {
-      window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
+    this.wallet.protocol.getSymbol().then(async (symbol) => {
+      const url = `https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`
+      await this.openModal(url)
+      // window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
     })
   }
 }

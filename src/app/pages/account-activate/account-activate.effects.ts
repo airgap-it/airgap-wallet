@@ -21,7 +21,7 @@ export class AccountActivateEffects {
   public initialData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.viewWillEnter),
-      withLatestFrom(this.accountProvider.getWalletGroupsObservable()),
+      withLatestFrom(this.accountProvider.getWalletsGroupedByAccountObservable()),
       switchMap(([action, walletGroups]) =>
         concat(of(actions.initialDataLoaded({ walletGroups })), from(this.loadNavigationData(action.routeParams)).pipe(first()))
       )

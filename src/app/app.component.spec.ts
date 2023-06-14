@@ -1,10 +1,10 @@
-import { APP_INFO_PLUGIN, APP_PLUGIN, CLIPBOARD_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ZIP_PLUGIN } from '@airgap/angular-core'
+import { APP_INFO_PLUGIN, APP_PLUGIN, CLIPBOARD_PLUGIN, FILESYSTEM_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ZIP_PLUGIN } from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'
 
 import { AppComponent } from './app.component'
-import { SAPLING_PLUGIN } from './capacitor-plugins/injection-tokens'
+import { FILE_PICKER_PLUGIN, SAPLING_PLUGIN } from './capacitor-plugins/injection-tokens'
 
 describe('AppComponent', () => {
   let unitHelper: UnitHelper
@@ -20,7 +20,9 @@ describe('AppComponent', () => {
           { provide: STATUS_BAR_PLUGIN, useValue: unitHelper.mockRefs.statusBar },
           { provide: SPLASH_SCREEN_PLUGIN, useValue: unitHelper.mockRefs.splashScreen },
           { provide: CLIPBOARD_PLUGIN, useValue: unitHelper.mockRefs.clipboard },
-          { provide: ZIP_PLUGIN, useValue: unitHelper.mockRefs.zip }
+          { provide: ZIP_PLUGIN, useValue: unitHelper.mockRefs.zip },
+          { provide: FILE_PICKER_PLUGIN, useValue: unitHelper.mockRefs.filePicker },
+          { provide: FILESYSTEM_PLUGIN, useValue: unitHelper.mockRefs.filesystem }
         ],
         declarations: [AppComponent]
       })

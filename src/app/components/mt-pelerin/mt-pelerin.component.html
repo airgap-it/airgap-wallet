@@ -1,0 +1,31 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>{{ 'account-transaction-list.mtpelerin.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" color="secondary">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" forceOverflow="false">
+  <ion-row class="ion-padding-top ion-align-items-center">
+    <ion-col style="justify-content: center; text-align: center;" size="5">
+      <img src="https://www.mtpelerin.com/images/logo.svg" />
+    </ion-col>
+    <h5>{{ 'account-transaction-list.mtpelerin.header' | translate }}</h5>
+    <p>
+      {{ 'account-transaction-list.mtpelerin.note_description' | translate }}
+    </p>
+  </ion-row>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-button shape="round" color="primary" (click)="dismiss()">
+      {{ 'account-transaction-list.mtpelerin.cancel_label' | translate }}
+    </ion-button>
+    <ion-button shape="round" color="secondary" (click)="openMtPelerinLink()">
+      {{ 'account-transaction-list.mtpelerin.ok_label' | translate }}
+    </ion-button>
+  </ion-fab>
+</ion-content>

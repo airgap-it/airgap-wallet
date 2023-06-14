@@ -1,18 +1,21 @@
 import { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: "it.airgap.wallet",
-  appName: "AirGap Wallet",
+  appId: 'it.airgap.wallet',
+  appName: 'AirGap Wallet',
   bundledWebRuntime: false,
-  webDir: "www",
+  webDir: 'www',
   plugins: {
     PushNotifications: {
-      presentationOptions: ["alert"]
+      presentationOptions: ['alert']
     },
     SplashScreen: {
       launchAutoHide: false,
-      androidSplashResourceName: "screen"
+      androidSplashResourceName: 'screen'
     }
+  },
+  server: {
+    androidScheme: 'http'
   },
   android: {
     allowMixedContent: true

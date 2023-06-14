@@ -1,4 +1,4 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules } from '@airgap/angular-core'
+import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules, ZIP_PLUGIN } from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
@@ -15,7 +15,6 @@ import { appConfig } from 'src/app/config/app-config'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
-import { DrawChartService } from '../src/app/services/draw-chart/draw-chart.service'
 
 import {
   AlertControllerMock,
@@ -31,6 +30,7 @@ import {
   AppLauncherMock,
   AppMock,
   ClipboardMock,
+  FilePickerMock,
   FilesystemMock,
   PermissionsMock,
   PushNotificationsMock,
@@ -39,7 +39,7 @@ import {
   StatusBarMock,
   ZipMock
 } from './plugins-mock'
-import { PermissionsServiceMock } from './service-mock'
+import { PermissionsServiceMock, PushBackendProviderMock } from './service-mock'
 import { StorageMock } from './storage-mock'
 
 export class UnitHelper {
@@ -61,7 +61,9 @@ export class UnitHelper {
     alertController: new AlertControllerMock(),
     loadingController: new LoadingControllerMock(),
     modalController: new ModalControllerMock(),
-    zip: new ZipMock()
+    zip: new ZipMock(),
+    filePicker: new FilePickerMock(),
+    pushBackendProvider: new PushBackendProviderMock()
   }
 
   public testBed(testBed: TestModuleMetadata, useIonicOnlyTestBed: boolean = false): TestModuleMetadata {
@@ -85,7 +87,6 @@ export class UnitHelper {
       StoreModule.forRoot({})
     ]
     const mandatoryProviders: any[] = [
-      DrawChartService,
       { provide: Storage, useClass: StorageMock },
       { provide: NavController, useClass: NavControllerMock },
       { provide: Platform, useValue: this.mockRefs.platform },
@@ -94,6 +95,7 @@ export class UnitHelper {
       { provide: APP_INFO_PLUGIN, useValue: this.mockRefs.appInfo },
       { provide: APP_LAUNCHER_PLUGIN, useValue: this.mockRefs.appLauncher },
       { provide: FILESYSTEM_PLUGIN, useValue: this.mockRefs.filesystem },
+      { provide: ZIP_PLUGIN, useValue: this.mockRefs.zip },
       { provide: APP_CONFIG, useValue: appConfig },
       { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules() },
       { provide: ToastController, useValue: this.mockRefs.toastController },

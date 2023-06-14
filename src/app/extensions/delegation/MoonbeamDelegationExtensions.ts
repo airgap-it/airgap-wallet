@@ -1,10 +1,12 @@
-import { AmountConverterPipe } from '@airgap/angular-core'
+import { AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core'
-import { MoonbeamProtocol } from '@airgap/moonbeam'
-import { MoonbeamCollatorDetails } from '@airgap/moonbeam/v0/protocol/moonbeam/data/staking/MoonbeamCollatorDetails'
-import { MoonbeamDelegationDetails } from '@airgap/moonbeam/v0/protocol/moonbeam/data/staking/MoonbeamDelegationDetails'
-import { MoonbeamDelegatorDetails } from '@airgap/moonbeam/v0/protocol/moonbeam/data/staking/MoonbeamDelegatorDetails'
-import { MoonbeamStakingActionType } from '@airgap/moonbeam/v0/protocol/moonbeam/data/staking/MoonbeamStakingActionType'
+import {
+  MoonbeamBaseProtocol,
+  MoonbeamCollatorDetails,
+  MoonbeamDelegationDetails,
+  MoonbeamDelegatorDetails,
+  MoonbeamStakingActionType
+} from '@airgap/moonbeam'
 import { DecimalPipe } from '@angular/common'
 import { FormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -22,7 +24,7 @@ import { UIInputWidget } from '../../models/widgets/UIInputWidget'
 import { UIWidget } from '../../models/widgets/UIWidget'
 import { DecimalValidator } from '../../validators/DecimalValidator'
 
-import { V0ProtocolDelegationExtensions } from './base/V0ProtocolDelegationExtensions'
+import { V1ProtocolDelegationExtensions } from './base/V1ProtocolDelegationExtensions'
 
 enum ArgumentName {
   COLLATOR = 'collator',
@@ -35,7 +37,7 @@ enum ArgumentName {
   LESS_CONTROL = 'lessControl'
 }
 
-export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions<MoonbeamProtocol> {
+export class MoonbeamDelegationExtensions extends V1ProtocolDelegationExtensions<MoonbeamBaseProtocol> {
   public static create(
     formBuilder: FormBuilder,
     decimalPipe: DecimalPipe,
@@ -58,25 +60,25 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
   public delegateeLabelPlural: string = 'delegation-detail-moonbeam.delegatee-label-plural'
   public supportsMultipleDelegations: boolean = true
 
-  public airGapDelegatee(_protocol: MoonbeamProtocol): string | undefined {
+  public airGapDelegatee(_adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>): string | undefined {
     return undefined
   }
 
   public async getExtraDelegationDetailsFromAddress(
-    protocol: MoonbeamProtocol,
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
     _publicKey: string,
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
     const delegationsDetails = await Promise.all(
-      delegatees.map((validator) => protocol.getDelegationDetailsFromAddress(delegator, [validator]))
+      delegatees.map((validator) => adapter.getDelegationDetailsFromAddress(delegator, [validator]))
     )
 
     return Promise.all(
       delegationsDetails.map(async (details) => {
         const [delegator, collator] = await Promise.all([
-          this.getExtraDelegatorDetails(protocol, details.delegator, details.delegatees[0].address),
-          this.getExtraCollatorDetails(protocol, details.delegatees[0])
+          this.getExtraDelegatorDetails(adapter, details.delegator, details.delegatees[0].address),
+          this.getExtraCollatorDetails(adapter, details.delegatees[0])
         ])
 
         return {
@@ -89,17 +91,17 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
   }
 
   private async getExtraDelegatorDetails(
-    protocol: MoonbeamProtocol,
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
     delegatorDetails: DelegatorDetails,
     collator: string
   ): Promise<AirGapDelegatorDetails & { alerts?: UIAlert[] }> {
-    const delegationDetails = await protocol.options.accountController.getDelegationDetails(delegatorDetails.address, collator)
+    const delegationDetails = await adapter.protocolV1.getStakingDetails(delegatorDetails.address, collator)
 
     const results = await Promise.all([
-      this.createDelegateAction(protocol, delegationDetails, collator),
-      this.createUndelegateAction(protocol, delegationDetails, collator),
-      this.createDisplayDetails(protocol, delegationDetails),
-      this.createDelegationAlerts(protocol, delegationDetails)
+      this.createDelegateAction(adapter, delegationDetails, collator),
+      this.createUndelegateAction(adapter, delegationDetails, collator),
+      this.createDisplayDetails(adapter, delegationDetails),
+      this.createDelegationAlerts(adapter, delegationDetails)
     ])
 
     const delegateAction = results[0]
@@ -118,13 +120,16 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     }
   }
 
-  private async getExtraCollatorDetails(protocol: MoonbeamProtocol, delegateeDetails: DelegateeDetails): Promise<AirGapDelegateeDetails> {
-    const collatorDetails = await protocol.options.accountController.getCollatorDetails(delegateeDetails.address)
+  private async getExtraCollatorDetails(
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
+    delegateeDetails: DelegateeDetails
+  ): Promise<AirGapDelegateeDetails> {
+    const collatorDetails = await adapter.protocolV1.getCollatorDetails(delegateeDetails.address)
 
     const ownBond = new BigNumber(collatorDetails.ownStakingBalance)
     const totalBond = new BigNumber(collatorDetails.totalStakingBalance)
 
-    const displayDetails = await this.createCollatorDisplayDetails(protocol, collatorDetails)
+    const displayDetails = await this.createCollatorDisplayDetails(adapter, collatorDetails)
 
     return {
       ...delegateeDetails,
@@ -137,7 +142,10 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     }
   }
 
-  private async createCollatorDisplayDetails(_protocol: MoonbeamProtocol, collatorDetails: MoonbeamCollatorDetails): Promise<UIWidget[]> {
+  private async createCollatorDisplayDetails(
+    _adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
+    collatorDetails: MoonbeamCollatorDetails
+  ): Promise<UIWidget[]> {
     const details: UIWidget[] = []
 
     details.push(
@@ -160,24 +168,26 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
   }
 
   private async createDelegateAction(
-    protocol: MoonbeamProtocol,
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
     delegationDetails: MoonbeamDelegationDetails,
     collator: string
   ): Promise<AirGapDelegatorAction | null> {
     const { delegatorDetails } = delegationDetails
-    const maxDelegationAmount = await protocol
-      .estimateMaxDelegationValueFromAddress(delegatorDetails.address)
+    const maxDelegationAmount = await adapter.protocolV1
+      .getMaxDelegationValueWithAddress(delegatorDetails.address)
       .then((value) => new BigNumber(value))
-    const minDelegationAmount = new BigNumber(await protocol.getMinDelegationAmount(delegationDetails.delegatorDetails.address))
+    const minDelegationAmount = new BigNumber(
+      await adapter.protocolV1.getMinDelegationAmountWithAddress(delegationDetails.delegatorDetails.address)
+    )
     const delegatedAmount = new BigNumber(delegationDetails.bond)
     const delegatedFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
-      protocol,
-      maxDigits: protocol.decimals
+      protocol: adapter,
+      maxDigits: adapter.decimals
     })
 
     const maxDelegationFormatted = await this.amountConverterPipe.transform(maxDelegationAmount, {
-      protocol,
-      maxDigits: protocol.decimals
+      protocol: adapter,
+      maxDigits: adapter.decimals
     })
 
     const hasDelegated = delegatedAmount.gt(0)
@@ -196,7 +206,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
       : ''
 
     return this.createMainDelegatorAction(
-      protocol,
+      adapter,
       delegatorDetails.availableActions,
       collator,
       [hasDelegated ? MoonbeamStakingActionType.BOND_MORE : MoonbeamStakingActionType.DELEGATE],
@@ -208,7 +218,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
   }
 
   private async createUndelegateAction(
-    protocol: MoonbeamProtocol,
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
     delegationDetails: MoonbeamDelegationDetails,
     collator: string
   ): Promise<AirGapDelegatorAction | null> {
@@ -234,7 +244,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     const getDescription = async (action: DelegatorAction) => {
       if (action.type === MoonbeamStakingActionType.SCHEDULE_BOND_LESS || action.type === MoonbeamStakingActionType.SCHEDULE_UNDELEGATE) {
         const delegatedAmountFormatted = await this.amountConverterPipe.transform(delegatedAmount, {
-          protocol
+          protocol: adapter
         })
 
         return this.translateService.instant('delegation-detail-moonbeam.undelegate.schedule.text', {
@@ -244,7 +254,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
 
       if (action.type === MoonbeamStakingActionType.EXECUTE_BOND_LESS || action.type === MoonbeamStakingActionType.EXECUTE_UNDELEGATE) {
         const amountFormatted = delegationDetails.pendingRequest
-          ? await this.amountConverterPipe.transform(delegationDetails.pendingRequest.amount, { protocol })
+          ? await this.amountConverterPipe.transform(delegationDetails.pendingRequest.amount, { protocol: adapter })
           : undefined
 
         return this.translateService.instant(
@@ -259,7 +269,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
 
       if (action.type === MoonbeamStakingActionType.CANCEL_BOND_LESS || action.type === MoonbeamStakingActionType.CANCEL_UNDELEGATE) {
         const amountFormatted = delegationDetails.pendingRequest
-          ? await this.amountConverterPipe.transform(delegationDetails.pendingRequest.amount, { protocol })
+          ? await this.amountConverterPipe.transform(delegationDetails.pendingRequest.amount, { protocol: adapter })
           : undefined
         const executableIn = delegationDetails.pendingRequest?.executableIn
 
@@ -280,7 +290,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     }
 
     return this.createMainDelegatorAction(
-      protocol,
+      adapter,
       delegatorDetails.availableActions,
       collator,
       [
@@ -327,7 +337,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
   }
 
   private async createMainDelegatorAction(
-    protocol: MoonbeamProtocol,
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
     availableActions: DelegatorAction[],
     collator: string,
     types: MoonbeamStakingActionType[],
@@ -339,9 +349,9 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     const action = availableActions.find((action) => types.includes(action.type))
 
     if (action && maxAmount.gte(minAmount)) {
-      const maxAmountFormatted = maxAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
+      const maxAmountFormatted = maxAmount.shiftedBy(-adapter.decimals).decimalPlaces(adapter.decimals).toFixed()
 
-      const minAmountFormatted = minAmount.shiftedBy(-protocol.decimals).decimalPlaces(protocol.decimals).toFixed()
+      const minAmountFormatted = minAmount.shiftedBy(-adapter.decimals).decimalPlaces(adapter.decimals).toFixed()
 
       const { address: collatorArgName, amount: amountArgName, amountControl: amountControlArgName } = this.resolveMainArgumentNames(
         action.type
@@ -361,14 +371,14 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
               Validators.required,
               Validators.min(new BigNumber(minAmountFormatted).toNumber()),
               Validators.max(new BigNumber(maxAmountFormatted).toNumber()),
-              DecimalValidator.validate(protocol.decimals)
+              DecimalValidator.validate(adapter.decimals)
             ])
           ]
         })
         inputWidgets.push(
           this.createAmountWidget(amountControlArgName, maxAmountFormatted, minAmountFormatted, {
             onValueChanged: (value: string) => {
-              form.patchValue({ [amountArgName]: new BigNumber(value).shiftedBy(protocol.decimals).toFixed() })
+              form.patchValue({ [amountArgName]: new BigNumber(value).shiftedBy(adapter.decimals).toFixed() })
             }
           })
         )
@@ -438,11 +448,14 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     }
   }
 
-  private async createDisplayDetails(protocol: MoonbeamProtocol, delegationDetails: MoonbeamDelegationDetails): Promise<UIWidget[]> {
-    const details = []
-    const bond = new BigNumber(delegationDetails.bond)
+  private async createDisplayDetails(
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
+    delegationDetails: MoonbeamDelegationDetails
+  ): Promise<UIWidget[]> {
+    const details: UIWidget[] = []
+    const bond: BigNumber = new BigNumber(delegationDetails.bond)
 
-    const maxDelegations = await protocol.options.nodeClient.getMaxDelegationsPerDelegator()
+    const maxDelegations: string | undefined = await adapter.protocolV1.getMaxDelegationsPerDelegator()
 
     if (delegationDetails.delegatorDetails.status) {
       details.push(
@@ -459,7 +472,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
         new UIIconText({
           iconName: 'logo-usd',
           text: await this.amountConverterPipe.transform(bond, {
-            protocol
+            protocol: adapter
           }),
           description: 'delegation-detail-moonbeam.currently-delegated_label'
         })
@@ -470,7 +483,7 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
       details.push(
         new UIIconText({
           iconName: 'people-outline',
-          text: `${delegationDetails.delegatorDetails.delegatees.length}/${maxDelegations.toString()}`,
+          text: `${delegationDetails.delegatorDetails.delegatees.length}/${maxDelegations}`,
           description: 'delegation-detail-moonbeam.collators_label'
         })
       )
@@ -479,24 +492,27 @@ export class MoonbeamDelegationExtensions extends V0ProtocolDelegationExtensions
     return details
   }
 
-  private async createDelegationAlerts(protocol: MoonbeamProtocol, delegationDetails: MoonbeamDelegationDetails): Promise<UIAlert[]> {
+  private async createDelegationAlerts(
+    adapter: ICoinDelegateProtocolAdapter<MoonbeamBaseProtocol>,
+    delegationDetails: MoonbeamDelegationDetails
+  ): Promise<UIAlert[]> {
     const alerts: UIAlert[] = []
 
-    const maxTopDelegations = await protocol.options.nodeClient.getMaxTopDelegationsPerCandidate()
+    const maxTopDelegations: string = await adapter.protocolV1.getMaxTopDelegationsPerCandidate()
 
     if (
       maxTopDelegations &&
-      maxTopDelegations.lt(delegationDetails.collatorDetails.delegators) &&
+      new BigNumber(maxTopDelegations).lt(delegationDetails.collatorDetails.delegators) &&
       new BigNumber(delegationDetails.bond).lte(delegationDetails.collatorDetails.minEligibleBalance)
     ) {
       alerts.push(
         new UIAlert({
           title: 'delegation-detail-moonbeam.alert.collator-oversubscribed.title',
-          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', {
-            maxTopDelegations: maxTopDelegations.toString(),
+          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', { 
+            maxTopDelegations,
             minStakingAmount: await this.amountConverterPipe.transform(delegationDetails.collatorDetails.minEligibleBalance, {
-              protocol,
-              maxDigits: protocol.decimals
+              protocol: adapter,
+              maxDigits: adapter.decimals
             })
           }),
           icon: 'alert-circle-outline',

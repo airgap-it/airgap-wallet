@@ -45,7 +45,15 @@
       "confirm": "Migrate"
     },
     "no-transactions_text": "There are no transactions yet for this account.",
-    "provided_by": "Provided by"
+    "mtpelerin": {
+      "title": "Mt Pelerin",
+      "buy_label": "Buy",
+      "cash-out_label": "Cash Out",
+      "cancel_label": "Cancel",
+      "ok_label": "Ok",
+      "header": "This service is provided by Mt. Pelerin and you will be leaving AirGap Wallet. Changes can be done in the settings",
+      "note_description": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe"
+    }
   },
   "account-transaction-detail": {
     "available_label": "Available",
@@ -110,7 +118,8 @@
     "featured": "Featured",
     "others": "More Assets",
     "generic": {
-      "xtz_label": "Add Unlisted Tezos Asset"
+      "xtz_label": "Add Unlisted Tezos Asset",
+      "optimism-erc20_label": "Add Unlisted Optimism ERC-20 Token"
     }
   },
   "scan": {
@@ -183,6 +192,10 @@
       "label": "Trading",
       "text": "Advanced Trading Settings",
       "mtpelerin": "Use Mt Pelerin"
+    },
+    "add-ons_settings": {
+      "label": "Add-ons",
+      "isolated-modules_text": "Isolated Modules"
     }
   },
   "mtpelerin": {
@@ -375,6 +388,9 @@
     "add-button_label": "Add Asset",
     "xtz-fa": {
       "name": "Unlisted Tezos Asset"
+    },
+    "optimism-erc20": {
+      "name": "Unlisted Optimism ERC-20 Token"
     },
     "unsupported_text": "Can't add selected sub account."
   },
@@ -612,7 +628,7 @@
       "payout-col_label": "Earliest Payout"
     }
   },
-  "delegation-detail-substrate": {
+  "delegation-detail-polkadot": {
     "delegatee-label": "Validator",
     "delegatee-label-plural": "Validators",
     "status": {
@@ -1049,6 +1065,68 @@
       "contract-invalid": "The contract address is invalid.",
       "injector-invalid": "The injector URL is invalid.",
       "unknown": "Unkown error has occurred."
+    }
+  },
+  "optimism-erc20-form": {
+    "header": "Provide Optimism ERC-20 contract details to add an unlisted ERC-20 token.",
+    "contract-address_label": "Contract Address",
+    "paste_label": "Paste",
+    "error": {
+      "contract-not-found": "Contract not found, check if the address is correct.",
+      "token-metadata-missing": "Unable to fetch the asset metadata.",
+      "unknown": "Unkown error has occurred."
+    }
+  },
+  "isolated-modules": {
+    "loader_message": "Loading..."
+  },
+  "isolated-modules-list-page": {
+    "title": "Isolated Modules",
+    "items": {
+      "search_placeholder": "Search isolated modules"
+    },
+    "alert": {
+      "add": {
+        "failed": {
+          "header": "Add Module Failed",
+          "message": "Something went wrong! Please try again.",
+          "ok_label": "Ok"
+        }
+      }
+    }
+  },
+  "isolated-modules-details-page": {
+    "button": {
+      "install_label": "Install",
+      "update_label": "Update"
+    },
+    "popover": {
+      "remove_label": "Remove"
+    },
+    "alert": {
+      "remove": {
+        "header": "Remove Module",
+        "message": "Are you sure that you want to remove this module?",
+        "cancel_label": "Cancel",
+        "proceed_label": "Remove"
+      },
+      "update": {
+        "generic": {
+          "header": "Update Module Failed",
+          "message": "Something went wrong! The module couldn't be updated.",
+          "ok_label": "Ok"
+        },
+        "load-failed": {
+          "header": "Update Module Failed",
+          "message": "Something went wrong! The new module couldn't be loaded.",
+          "ok_label": "Ok"
+        },
+        "different-public-key": {
+          "header": "Update Module Failed",
+          "message": "You can't update this module with the selected package, the authors (public keys) are different.",
+          "ok_label": "Ok"
+        }
+      }
     }
   }
 }

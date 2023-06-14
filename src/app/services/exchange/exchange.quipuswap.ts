@@ -1,5 +1,5 @@
 // tslint:disable: max-classes-per-file
-import { ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   FeeDefaults,
@@ -10,21 +10,21 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { AirGapTransactionStatus, IAirGapTransaction } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { RawTezosTransaction, TezosProtocol, TezosWrappedOperation } from '@airgap/tezos'
-import { TezosOperation } from '@airgap/tezos/v0/protocol/types/operations/TezosOperation'
-import { TezosTransactionOperation, TezosTransactionParameters } from '@airgap/tezos/v0/protocol/types/operations/Transaction'
-import { TezosAddressResult } from '@airgap/tezos/v0/protocol/types/TezosAddressResult'
-import { TezosOperationType } from '@airgap/tezos/v0/protocol/types/TezosOperationType'
+import { isHex } from '@airgap/coinlib-core/utils/hex'
+import { TezosOperation, TezosOperationType, TezosProtocol, TezosTransactionOperation, TezosTransactionParameters, TezosTransactionSignRequest, TezosWrappedOperation } from '@airgap/tezos'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { Schema } from '@taquito/michelson-encoder'
 import { Contract, TezosToolkit, TransferParams } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
+
 import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
 import { UIWidget } from '../../models/widgets/UIWidget'
 import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 import * as fromRoot from '../../app.reducers'
 import { getSelectedSlippage } from 'src/app/app.selectors'
+import { newAmount, newPublicKey, PublicKey } from '@airgap/module-kit'
+import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
 
 interface DexStorage {
   storage: {
@@ -40,7 +40,7 @@ type PartialTransactionOperation = TezosOperation & Partial<TezosTransactionOper
 
 interface QuipuswapTransaction {
   details: IAirGapTransaction[]
-  unsigned: RawTezosTransaction
+  unsigned: TezosTransactionSignRequest['transaction']
 }
 
 interface QuipuswapSlippageTolerance {
@@ -295,10 +295,10 @@ export class QuipuswapExchange implements Exchange {
     mutezAmount: BigNumber,
     slippageTolerance: BigNumber
   ): Promise<FeeDefaults> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
 
     const minTokenAmount: BigNumber = await this.getMinTezToTokenExchangeAmount(token, mutezAmount, slippageTolerance)
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
     const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
       address.address,
@@ -308,7 +308,7 @@ export class QuipuswapExchange implements Exchange {
       minTokenAmount
     )
 
-    return tezosProtocol.estimateFeeDefaultsForOperations(publicKey, operations)
+    return this.estimateFeeDefaultsForOperations(tezosProtocol, publicKey, operations)
   }
 
   private async estimateTokenToTezTransactionFee(
@@ -317,10 +317,10 @@ export class QuipuswapExchange implements Exchange {
     tokenAmount: BigNumber,
     slippageTolerance: BigNumber
   ): Promise<FeeDefaults> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
 
     const minTezAmount: BigNumber = await this.getMinTokenToTezExchangeAmount(token, tokenAmount, slippageTolerance)
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
     const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
       address.address,
@@ -330,7 +330,7 @@ export class QuipuswapExchange implements Exchange {
       minTezAmount
     )
 
-    return tezosProtocol.estimateFeeDefaultsForOperations(publicKey, operations)
+    return this.estimateFeeDefaultsForOperations(tezosProtocol, publicKey, operations)
   }
 
   public async createTransaction(
@@ -399,9 +399,9 @@ export class QuipuswapExchange implements Exchange {
     minTokenAmount: BigNumber,
     fee?: BigNumber
   ): Promise<QuipuswapTransaction> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
 
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
     const operations: TezosOperation[] = await this.prepareTezToTokenOperations(
       address.address,
       recipient,
@@ -410,8 +410,13 @@ export class QuipuswapExchange implements Exchange {
       minTokenAmount,
       fee
     )
-    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-    const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+      this.getV1PublicKey(publicKey),
+      operations,
+      false
+    )
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
     const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
     return { details, unsigned: transaction }
@@ -448,9 +453,9 @@ export class QuipuswapExchange implements Exchange {
     minTezAmount: BigNumber,
     fee?: BigNumber
   ): Promise<QuipuswapTransaction> {
-    const tezosProtocol: TezosProtocol = await this.getTezosProtocol()
+    const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
 
-    const address: TezosAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
+    const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
     const operations: TezosOperation[] = await this.prepareTokenToTezOperations(
       address.address,
       recipient,
@@ -460,11 +465,9 @@ export class QuipuswapExchange implements Exchange {
       fee
     )
 
-
-    console.log(publicKey)
-    console.log(JSON.stringify(operations, null, 2))
-    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.prepareOperations(publicKey, operations, false)
-    const transaction: RawTezosTransaction = await tezosProtocol.forgeAndWrapOperations(wrappedOperations)
+    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
     const baseDetails: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
     const extendedDetails: IAirGapTransaction[] = await this.getExtendedTokenTransactionDetails(tokenProtocol, baseDetails)
 
@@ -711,13 +714,13 @@ export class QuipuswapExchange implements Exchange {
     return identifier ? this.protocolService.getProtocol(identifier) : undefined
   }
 
-  private async getTezosProtocol(): Promise<TezosProtocol> {
+  private async getTezosProtocol(): Promise<ICoinProtocolAdapter<TezosProtocol>> {
     const tezosProtocol: ICoinProtocol | undefined = await this.protocolService.getProtocol(MainProtocolSymbols.XTZ)
-    if (tezosProtocol === undefined) {
+    if (tezosProtocol === undefined || !(tezosProtocol instanceof ICoinProtocolAdapter)) {
       throw new Error(`${MainProtocolSymbols.XTZ} is not supported.`)
     }
 
-    return tezosProtocol as TezosProtocol
+    return tezosProtocol
   }
 
   private isTokenSupported(identifier: ProtocolSymbols): boolean {
@@ -781,6 +784,27 @@ export class QuipuswapExchange implements Exchange {
       destination: transferParams.to,
       parameters: transferParams.parameter as any
     }
+  }
+
+  private async estimateFeeDefaultsForOperations(
+    tezosProtocol: ICoinProtocolAdapter<TezosProtocol>,
+    publicKey: string,
+    operations: TezosOperation[]
+  ): Promise<FeeDefaults> {
+    const [metadata, feeDefaults] = await Promise.all([
+      tezosProtocol.protocolV1.getMetadata(),
+      tezosProtocol.protocolV1.getOperationFeeDefaults(this.getV1PublicKey(publicKey), operations)
+    ])
+
+    return {
+      low: newAmount(feeDefaults.low).convert('tez', metadata.units).value,
+      medium: newAmount(feeDefaults.medium).convert('tez', metadata.units).value,
+      high: newAmount(feeDefaults.high).convert('tez', metadata.units).value
+    }
+  }
+
+  private getV1PublicKey(publicKey: string): PublicKey {
+    return newPublicKey(publicKey, isHex(publicKey) ? 'hex' : 'encoded')
   }
 
   private isFA1p2(contract: Contract): boolean {

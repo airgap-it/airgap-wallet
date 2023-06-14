@@ -11,7 +11,9 @@
 <ion-content fullscreen="true">
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="activeWallets | async as walletsArray">
-      <chart *ngIf="walletsArray.length > 0" [total]="total"></chart>
+      <ion-row *ngIf="walletsArray.length > 0" class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
+        <h1 class="ion-no-margin">${{ total | number: '1.2-2' }}</h1>
+      </ion-row>
     </ng-container>
     <ion-toolbar color="translucent">
       <current-wallet-group></current-wallet-group>
@@ -20,8 +22,8 @@
 
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
       <ng-container *ngIf="walletGroupsArray.length; else noItems">
-        <ion-list class="walletGroups ion-no-padding" lines="none" *ngFor="let walletGroup of walletGroupsArray">
-          <ion-card>
+        <ion-list class="walletGroups ion-no-padding" lines="none">
+          <ion-card *ngFor="let walletGroup of walletGroupsArray">
             <portfolio-item
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
@@ -32,6 +34,7 @@
             <portfolio-item
               *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async"
               [wallet]="subWallet"
+              [parentWalletName]="walletGroup.mainWallet.protocol.name"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"
             ></portfolio-item>

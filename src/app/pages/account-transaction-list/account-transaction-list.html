@@ -11,7 +11,9 @@
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-row style="display: block;"><portfolio-item [wallet]="wallet" [maxDigits]="0"></portfolio-item></ion-row>
+    <ion-row style="display: block;">
+      <portfolio-item [wallet]="wallet" [maxDigits]="0" [parentWalletName]="parentWalletName"></portfolio-item>
+    </ion-row>
     <ion-row class="ion-padding-top ion-padding-horizontal action--container">
       <ion-button *ngFor="let action of actions" color="secondary" (click)="action.start()" shape="round" size="small" fill="outline">
         <ion-icon slot="start" [name]="action.context.icon"></ion-icon>
@@ -23,14 +25,6 @@
 
 <ion-content no-bounce has-bouncing="false" forceOverscroll="false">
   <ion-grid fixed="true" class="ion-no-padding action--container">
-    <tezos-delegation-card
-      *ngIf="wallet.protocol.identifier === mainProtocolSymbols.XTZ && balance"
-      [wallet]="wallet"
-      [isDelegated]="isKtDelegated"
-      [delegateAmount]="balance"
-      (onDelegatedClick)="openDelegationDetails()"
-      (onUndelegatedClick)="openDelegationDetails()"
-    ></tezos-delegation-card>
     <card-actionable
       *ngIf="wallet.protocol.identifier === subProtocolSymbols.XTZ_KT"
       [imageLeft]="false"
@@ -109,39 +103,36 @@
     </ion-infinite-scroll>
   </ion-grid>
   <ion-fab vertical="bottom" slot="fixed">
-    <ng-container *ngIf="isMtPerelinActive">
-      <ion-row>
-        <ion-col>
-          <ion-button class="mt-perelin-button" expand="full" size="default" color="white" (click)="buyMtPerelin()" shape="round">
-            {{ 'swap.buy_label' | translate }}
-            <div>
-              {{ 'account-transaction-list.provided_by' | translate }}
-              <img src="https://www.mtpelerin.com/images/logo.svg" />
-            </div>
-          </ion-button>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>
-          <ion-button class="mt-perelin-button" expand="full" size="default" color="white" (click)="sellMtPerelin()" shape="round">
-            {{ 'swap.sell_label' | translate }}
-            <div>
-              {{ 'account-transaction-list.provided_by' | translate }}
-              <img src="https://www.mtpelerin.com/images/logo.svg" />
-            </div>
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ng-container>
-
     <ion-row>
       <ion-col>
+        <ion-button
+          *ngIf="isMtPerelinActive"
+          class="mt-perelin-button"
+          expand="full"
+          size="default"
+          color="white"
+          (click)="buyMtPerelin()"
+          shape="round"
+        >
+          {{ 'account-transaction-list.mtpelerin.buy_label' | translate }}
+        </ion-button>
         <ion-button id="receive" expand="full" size="default" color="primary" (click)="openReceivePage()" shape="round">
           <ion-icon slot="start" src="./assets/custom-ion-icons/md-call_received.svg"></ion-icon>
           {{ 'account-transaction-list.receive_label' | translate }}
         </ion-button>
       </ion-col>
       <ion-col>
+        <ion-button
+          *ngIf="isMtPerelinActive"
+          class="mt-perelin-button"
+          expand="full"
+          size="default"
+          color="white"
+          (click)="sellMtPerelin()"
+          shape="round"
+        >
+          {{ 'account-transaction-list.mtpelerin.cash-out_label' | translate }}
+        </ion-button>
         <ion-button
           id="send"
           expand="full"

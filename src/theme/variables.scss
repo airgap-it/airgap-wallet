@@ -440,8 +440,18 @@ page-account-address {
 }
 
 portfolio-item {
+  .item-inner {
+    align-items: flex-start;
+  }
   div[slot='end'] {
     margin-inline-start: 8px;
+  }
+  ion-avatar {
+    min-width: 40px;
+    min-height: 40px;
+    img {
+      width: 100%;
+    }
   }
 }
 page-portfolio {

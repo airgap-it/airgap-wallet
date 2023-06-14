@@ -7,13 +7,11 @@ import { IonicModule } from '@ionic/angular'
 import { ReactiveComponentModule } from '@ngrx/component'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
-import { ChartsModule } from 'ng2-charts'
 import { MomentModule } from 'ngx-moment'
 import { PipesModule } from '../pipes/pipes.module'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
 import { AmountComponent } from './amount/amount.component'
 import { CardActionableComponent } from './card-actionable/card-actionable'
-import { ChartComponent } from './chart/chart.component'
 import { CurrencyItemComponent } from './currency-item/currency-item'
 import { CurrentWalletGroupComponent } from './current-wallet-group/current-wallet-group.component'
 import { DappPeerComponent } from './dapp-peer/dapp-peer.component'
@@ -24,6 +22,7 @@ import { ExchangeSelectionComponent } from './exchange-selection/exchange-select
 import { FeeComponent } from './fee/fee.component'
 import { FromToComponent } from './from-to/from-to.component'
 import { InteractionSelectionComponent } from './interaction-selection/interaction-selection.component'
+import { OptimismERC20Form } from './optimism-erc20-form/optimism-erc20-form.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
 import { RemoveLiquidityComponent } from './remove-liquidity/remove-liquidity.component'
@@ -45,11 +44,11 @@ import { WidgetInputText } from './widget-input-text/widget-input-text'
 import { WidgetOptionButtonGroup } from './widget-option-button-group/widget-option-button-group'
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetSelector } from './widget-selector/widget-selector'
+import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
 
 @NgModule({
   declarations: [
     PortfolioItemComponent,
-    ChartComponent,
     SwapComponent,
     AccountEditPopoverComponent,
     AmountComponent,
@@ -57,6 +56,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    OptimismERC20Form,
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,
@@ -82,7 +82,8 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     WidgetRewardList,
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
-    ExchangeSelectionComponent
+    ExchangeSelectionComponent,
+    MtPelerinComponent
   ],
   imports: [
     IonicModule,
@@ -93,7 +94,6 @@ import { WidgetSelector } from './widget-selector/widget-selector'
 
     PipesModule,
     MomentModule,
-    ChartsModule,
     TranslateModule,
     QRCodeModule,
     AirGapAngularCoreModule,
@@ -101,7 +101,6 @@ import { WidgetSelector } from './widget-selector/widget-selector'
   ],
   exports: [
     PortfolioItemComponent,
-    ChartComponent,
     AmountComponent,
     SwapComponent,
     AccountEditPopoverComponent,
@@ -109,6 +108,7 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     EmptyStateComponent,
     SignedTransactionComponent,
     TezosDelegationCard,
+    OptimismERC20Form,
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,
@@ -133,7 +133,8 @@ import { WidgetSelector } from './widget-selector/widget-selector'
     WidgetRewardList,
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
-    ExchangeSelectionComponent
+    ExchangeSelectionComponent,
+    MtPelerinComponent
   ],
   entryComponents: [
     AccountEditPopoverComponent,

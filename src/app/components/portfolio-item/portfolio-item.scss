@@ -18,6 +18,7 @@ ion-label {
   margin: 0;
 }
 ion-badge {
+  font-size: 10px;
   margin: 4px 0 0 0;
 }
 .badge__margin {
@@ -29,13 +30,26 @@ ion-badge {
 }
 .symbol--icon {
   position: absolute;
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
   left: 40px;
-  top: 40px;
+  top: 32px;
 }
+
+.typography--mono {
+  font-size: 12px;
+  padding: 4px 0;
+}
+.address__span {
+  padding-left: 4px;
+}
+.font--weight__bold {
+  font-size: 13px;
+}
+.protocol__container {
+  min-height: 52px;
+}
+
 ion-avatar {
-  margin: 8px 16px 8px 0;
   min-height: 48px;
-  min-width: 48px;
 }

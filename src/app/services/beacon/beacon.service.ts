@@ -1,4 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { createV0TezosProtocol, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AppMetadata,
   BeaconErrorType,
@@ -15,14 +15,14 @@ import {
   WalletClient
 } from '@airgap/beacon-sdk'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
-import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { RawEthereumTransaction } from '@airgap/ethereum'
-import { TezosBlockExplorer, TezosProtocol, TezosProtocolNetwork, TezosProtocolOptions } from '@airgap/tezos'
+import { EthereumTransactionSignRequest } from '@airgap/ethereum'
+import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
+import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController, ToastController } from '@ionic/angular'
-import { BeaconRequestPage } from 'src/app/pages/beacon-request/beacon-request.page'
-import { ErrorPage } from 'src/app/pages/error/error.page'
 
+import { BeaconRequestPage } from '../../pages/beacon-request/beacon-request.page'
+import { ErrorPage } from '../../pages/error/error.page'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
 @Injectable({
@@ -78,7 +78,7 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    request: BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: number },
+    request: BeaconRequestOutputMessage | { transaction: EthereumTransactionSignRequest['transaction']; id: number },
     protocol: ICoinProtocol
   ): Promise<void> {
     const network = (request as OperationRequest).network
@@ -298,7 +298,9 @@ export class BeaconService {
     } as any)
   }
 
-  public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<TezosProtocol> {
+  public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<ICoinProtocolAdapter<TezosProtocol>> {
+
+
     const configs: {
       [key in Exclude<
         BeaconNetworkType,
@@ -314,52 +316,25 @@ export class BeaconService {
         | BeaconNetworkType.DAILYNET
       >]: TezosProtocolNetwork
     } = {
-      [BeaconNetworkType.MAINNET]: {
-        identifier: undefined,
-        name: undefined,
-        type: undefined,
-        rpcUrl: undefined,
-        blockExplorer: undefined,
-        extras: {
-          network: undefined,
-          indexerClient: undefined
-        }
-      },
+      [BeaconNetworkType.MAINNET]: TEZOS_MAINNET_PROTOCOL_NETWORK,
       [BeaconNetworkType.GHOSTNET]: {
-        identifier: undefined,
-        name: network.name || 'Ghostnet',
-        type: NetworkType.TESTNET,
-        rpcUrl: network.rpcUrl || 'https://tezos-ghostnet-node.prod.gke.papers.tech',
-        blockExplorer: new TezosBlockExplorer('https://ghostnet.tzkt.io'),
-        extras: {
-          network: undefined,
-          indexerClient: undefined
-        }
+        ...TEZOS_GHOSTNET_PROTOCOL_NETWORK,
+        name: network.name || TEZOS_GHOSTNET_PROTOCOL_NETWORK.name,
+        rpcUrl: network.rpcUrl || TEZOS_GHOSTNET_PROTOCOL_NETWORK.rpcUrl
       },
       [BeaconNetworkType.CUSTOM]: {
-        identifier: undefined,
         name: network.name || 'Custom Network',
-        type: NetworkType.CUSTOM,
+        type: 'custom',
         rpcUrl: network.rpcUrl || '',
-        blockExplorer: new TezosBlockExplorer(''),
-        extras: {
-          network: undefined,
-          indexerClient: undefined
-        }
+        network: undefined,
+        blockExplorerUrl: '',
+        blockExplorerType: 'tzkt',
+        indexerApi: '',
+        indexerType: 'tzkt'
       }
     }
 
-    return new TezosProtocol(
-      new TezosProtocolOptions(
-        new TezosProtocolNetwork(
-          configs[network.type].name,
-          configs[network.type].type,
-          configs[network.type].rpcUrl,
-          configs[network.type].blockExplorer,
-          configs[network.type].extras
-        )
-      )
-    )
+    return createV0TezosProtocol({ network: configs[network.type] })
   }
 
   public getResponseByRequestType(requestType: BeaconMessageType) {

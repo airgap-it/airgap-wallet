@@ -1,5 +1,6 @@
-import { APP_PLUGIN } from '@airgap/angular-core'
+import { APP_PLUGIN, FILESYSTEM_PLUGIN, ZIP_PLUGIN } from '@airgap/angular-core'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
+import { FILE_PICKER_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
@@ -18,7 +19,12 @@ describe('CurrentWalletGroupComponent', () => {
       TestBed.configureTestingModule(
         unitHelper.testBed({
           declarations: [CurrentWalletGroupComponent],
-          providers: [{ provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app }]
+          providers: [
+            { provide: APP_PLUGIN, useValue: unitHelper.mockRefs.app },
+            { provide: ZIP_PLUGIN, useValue: unitHelper.mockRefs.zip },
+            { provide: FILE_PICKER_PLUGIN, useValue: unitHelper.mockRefs.filePicker },
+            { provide: FILESYSTEM_PLUGIN, useValue: unitHelper.mockRefs.filesystem }
+          ]
         })
       )
         .compileComponents()

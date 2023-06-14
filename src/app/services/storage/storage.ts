@@ -34,7 +34,8 @@ export enum WalletStorageKey {
   PENDING_REQUEST = 'PENDING_REQUEST',
   GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS',
   CONTRACT_ADDRESSES = 'CONTRACT_ADDRESSES',
-  THEME = 'theme'
+  THEME = 'theme',
+  ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED'
 }
 
 interface IBroadcastTransaction {
@@ -59,7 +60,8 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
   [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
-  [WalletStorageKey.THEME]: themeOptions
+  [WalletStorageKey.THEME]: themeOptions,
+  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: boolean
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -80,7 +82,8 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.PENDING_REQUEST]: [],
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {},
   [WalletStorageKey.CONTRACT_ADDRESSES]: {},
-  [WalletStorageKey.THEME]: undefined
+  [WalletStorageKey.THEME]: undefined,
+  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false
 }
 
 @Injectable({

@@ -1,4 +1,4 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { createV0EthereumProtocol, createV0TezosProtocol, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
   AirGapWalletStatus,
@@ -10,7 +10,7 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { EthereumProtocol } from '@airgap/ethereum'
+import { IACMessageType } from '@airgap/serializer'
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject, Observable, OperatorFunction, pipe, Subject, UnaryFunction } from 'rxjs'
 import { debounceTime, filter, first, take, takeUntil } from 'rxjs/operators'
+
 import { UIWidget } from '../../models/widgets/UIWidget'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
@@ -28,12 +29,11 @@ import { ExchangeTransaction, ExchangeUI } from '../../services/exchange/exchang
 import { PriceService } from '../../services/price/price.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
-import * as fromExchange from './reducer'
-import { getFromWallet, getToWallet } from './selectors'
+
 import * as actions from './actions'
+import * as fromExchange from './reducer'
 import { SegmentType } from './reducer'
-import { TezosProtocol } from '@airgap/tezos'
-import { IACMessageType } from '@airgap/serializer'
+import { getFromWallet, getToWallet } from './selectors'
 
 export function filterNullish<T>(): UnaryFunction<Observable<T | null | undefined>, Observable<T>> {
   return pipe(filter((x) => x != null) as OperatorFunction<T | null | undefined, T>)
@@ -355,11 +355,11 @@ export class ExchangePage implements OnInit, OnDestroy {
       let feeCurrentMarketPrice
       if (this.selectedFromProtocol?.identifier.startsWith(SubProtocolSymbols.ETH_ERC20)) {
         feeCurrentMarketPrice = await this.priceService
-          .getCurrentMarketPrice(new EthereumProtocol(), 'USD')
+          .getCurrentMarketPrice(await createV0EthereumProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
       } else if (this.selectedFromProtocol?.identifier === SubProtocolSymbols.XTZ_BTC) {
         feeCurrentMarketPrice = await this.priceService
-          .getCurrentMarketPrice(new TezosProtocol(), 'USD')
+          .getCurrentMarketPrice(await createV0TezosProtocol(), 'USD')
           .then((price: BigNumber) => price.toNumber())
       } else {
         feeCurrentMarketPrice = (await this.priceService.getCurrentMarketPrice(this.selectedFromProtocol, 'USD')).toNumber()

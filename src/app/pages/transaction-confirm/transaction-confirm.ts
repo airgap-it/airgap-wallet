@@ -2,15 +2,15 @@ import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { RawEthereumTransaction } from '@airgap/ethereum'
+import { EthereumTransactionSignRequest } from '@airgap/ethereum'
 import { ICPActionType, ICPModule, ICPProtocol, ICPSignedTransaction } from '@airgap/icp'
+import { newPublicKey } from '@airgap/module-kit'
 import { IACMessageDefinitionObject, IACMessageType } from '@airgap/serializer'
 import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AlertController, LoadingController, Platform, ToastController } from '@ionic/angular'
 import { AlertButton } from '@ionic/core'
-import BigNumber from 'bignumber.js'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
@@ -35,7 +35,11 @@ const TIMEOUT_TRANSACTION_QUEUED: number = SECOND * 20
 export class TransactionConfirmPage {
   public messageDefinitionObjects: IACMessageDefinitionObject[]
 
-  public txInfos: [string, ICoinProtocol, BeaconRequestOutputMessage | { transaction: RawEthereumTransaction; id: string }][] = []
+  public txInfos: [
+    string,
+    ICoinProtocol,
+    BeaconRequestOutputMessage | { transaction: EthereumTransactionSignRequest['transaction']; id: string }
+  ][] = []
   public protocols: ICoinProtocol[] = []
   public wallet: AirGapMarketWallet | undefined
 
@@ -95,10 +99,10 @@ export class TransactionConfirmPage {
   public async broadcastTransaction() {
     if (this.protocols.length === 1 && this.protocols[0].identifier === MainProtocolSymbols.XTZ_SHIELDED) {
       // temporary
-      const saplingProtocol = this.protocols[0] as TezosSaplingProtocol
-      const injectorUrl = (await saplingProtocol.getOptions()).config.injectorUrl
+      const saplingProtocol = this.protocols[0] as ICoinProtocolAdapter<TezosSaplingProtocol>
+      const injectorUrl = await saplingProtocol.protocolV1.getInjectorUrl()
       if (injectorUrl === undefined) {
-        await this.wrapInTezosOperation(this.protocols[0] as TezosSaplingProtocol, this.txInfos[0][0])
+        await this.wrapInTezosOperation(saplingProtocol, this.txInfos[0][0])
         return
       }
     }
@@ -276,15 +280,14 @@ export class TransactionConfirmPage {
       .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
-  private async wrapInTezosOperation(protocol: TezosSaplingProtocol, transaction: string): Promise<void> {
+  private async wrapInTezosOperation(protocol: ICoinProtocolAdapter<TezosSaplingProtocol>, transaction: string): Promise<void> {
     this.selectTezosTzAccount(protocol, async (wallet) => {
       try {
-        const unsignedTx = await protocol.wrapSaplingTransactions(
-          wallet.publicKey,
-          transaction,
-          new BigNumber(wallet.protocol.feeDefaults.medium).shiftedBy(wallet.protocol.feeDecimals).toString(),
-          true
+        const transactionSignRequest = await protocol.convertUnsignedTransactionV1ToV0(
+          await protocol.protocolV1.wrapSaplingTransactions(newPublicKey(wallet.publicKey, 'hex'), transaction),
+          wallet.publicKey
         )
+        const unsignedTx = transactionSignRequest.transaction
 
         const airGapTxs = await protocol.getTransactionDetails(
           {

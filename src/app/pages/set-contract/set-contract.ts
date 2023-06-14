@@ -1,4 +1,4 @@
-import { getProtocolAndNetworkIdentifier, ProtocolService } from '@airgap/angular-core'
+import { getProtocolAndNetworkIdentifier, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { hasConfigurableContract, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
@@ -48,14 +48,17 @@ export class SetContractPage {
     }
 
     const protocol = await this.protocolService.getProtocol(this.protocolID, this.networkID)
-    if (!hasConfigurableContract(protocol)) {
+    if (!(protocol instanceof ICoinProtocolAdapter)) {
+      throw new Error('Invalid protocol')
+    }
+    if (!hasConfigurableContract(protocol.protocolV1)) {
       return
     }
 
     const protocolAndNetworkIdentifier = await getProtocolAndNetworkIdentifier(protocol)
 
     await Promise.all([
-      protocol.setContractAddress(contractAddress, configuration),
+      protocol.protocolV1.setContractAddress(contractAddress, configuration),
       this.storage.get(WalletStorageKey.CONTRACT_ADDRESSES).then((contractAddresses) => {
         return this.storage.set(
           WalletStorageKey.CONTRACT_ADDRESSES,

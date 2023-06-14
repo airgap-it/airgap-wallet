@@ -1,7 +1,7 @@
-import { RawAeternityTransaction } from '@airgap/aeternity'
-import { ProtocolService } from '@airgap/angular-core'
+import { AeternityTransactionSignRequest } from '@airgap/aeternity'
+import { ICoinProtocolAdapter, ICoinSubProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
-import { RawBitcoinTransaction } from '@airgap/bitcoin'
+import { BitcoinTransactionSignRequest } from '@airgap/bitcoin'
 import {
   AirGapMarketWallet,
   DelegateeDetails,
@@ -12,15 +12,15 @@ import {
   ICoinDelegateProtocol,
   ICoinProtocol,
   MainProtocolSymbols,
+  ProtocolErrorType,
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
-import { ProtocolErrorType } from '@airgap/coinlib-core/errors'
-import { CosmosTransaction } from '@airgap/cosmos'
-import { RawEthereumTransaction } from '@airgap/ethereum'
+import { CosmosTransactionSignRequest } from '@airgap/cosmos-core/v1/serializer/v3/schemas/definitions/transaction-sign-request-cosmos'
+import { EthereumTransactionSignRequest } from '@airgap/ethereum'
+import { newAmount, newPublicKey } from '@airgap/module-kit'
 import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
-import { RawSubstrateTransaction } from '@airgap/substrate'
-import { RawTezosTransaction, TezosBTC, TezosKtProtocol, TezosSaplingProtocol } from '@airgap/tezos'
-import { TezosSaplingAddress } from '@airgap/tezos/v0/protocol/sapling/TezosSaplingAddress'
+import { SubstrateTransactionSignRequest } from '@airgap/substrate'
+import { TezosKtProtocol, TezosSaplingAddress, TezosShieldedTezProtocol, TezosTransactionSignRequest, TzBTCProtocol } from '@airgap/tezos'
 import { Injectable } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
@@ -41,13 +41,14 @@ import { UIRewardList } from '../../models/widgets/display/UIRewardList'
 import { UIInputText } from '../../models/widgets/input/UIInputText'
 import { SaplingService } from '../sapling/sapling.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
-export type SerializableTx =
-  | RawTezosTransaction
-  | RawEthereumTransaction
-  | RawBitcoinTransaction
-  | RawAeternityTransaction
-  | CosmosTransaction
-  | RawSubstrateTransaction
+export type SerializableTx = (
+  | TezosTransactionSignRequest
+  | EthereumTransactionSignRequest
+  | BitcoinTransactionSignRequest
+  | AeternityTransactionSignRequest
+  | CosmosTransactionSignRequest
+  | SubstrateTransactionSignRequest
+)['transaction']
 
 @Injectable({
   providedIn: 'root'
@@ -426,24 +427,38 @@ export class OperationsProvider {
       // TODO: This is an UnsignedTransaction, not an IAirGapTransaction
       let airGapTxs: IAirGapTransaction[]
       if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_KT) {
-        const tezosKtProtocol = new TezosKtProtocol()
-        unsignedTx = await tezosKtProtocol.migrateKtContract(wallet.publicKey, wallet.receivingPublicAddress) // TODO change this
+        if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
+          throw new Error('Invalid Tezos KT protocol')
+        }
+        const tezosKtAdapter: ICoinProtocolAdapter<TezosKtProtocol> = wallet.protocol
+        const transactionSignRequest = await tezosKtAdapter.convertUnsignedTransactionV1ToV0(
+          await tezosKtAdapter.protocolV1.migrateKtContract(newPublicKey(wallet.publicKey, 'hex'), wallet.receivingPublicAddress), // TODO change this
+          wallet.publicKey
+        )
+        unsignedTx = transactionSignRequest.transaction
         airGapTxs = await wallet.protocol.getTransactionDetails({
           publicKey: wallet.publicKey,
           transaction: unsignedTx
         })
       } else if (wallet.protocol.identifier === SubProtocolSymbols.XTZ_BTC) {
-        const protocol = new TezosBTC()
+        if (!(wallet.protocol instanceof ICoinSubProtocolAdapter)) {
+          throw new Error('Invalid TzBTC protocol')
+        }
+        const tzBTCAdapter: ICoinProtocolAdapter<TzBTCProtocol> = wallet.protocol
 
-        unsignedTx = await protocol.transfer(
-          wallet.addresses[0],
-          address,
-          amount.toString(10),
-          fee.toString(10), // TODO calculate how high a fee we have to set for the TezosBTC contract
+        const transactionSignRequest = await tzBTCAdapter.convertUnsignedTransactionV1ToV0(
+          await tzBTCAdapter.protocolV1.transfer(
+            wallet.addresses[0],
+            address,
+            newAmount(amount.toString(10), 'blockchain'),
+            newAmount(fee.toString(10), 'blockchain'), // TODO calculate how high a fee we have to set for the TezosBTC contract
+            newPublicKey(wallet.publicKey, 'hex')
+          ),
           wallet.publicKey
         )
+        unsignedTx = transactionSignRequest.transaction
 
-        airGapTxs = await wallet.protocol.getTransactionDetails({
+        airGapTxs = await tzBTCAdapter.getTransactionDetails({
           publicKey: wallet.publicKey,
           transaction: unsignedTx
         })
@@ -458,27 +473,43 @@ export class OperationsProvider {
           throw new Error('More than 1 sapling protocol is supported')
         }
 
-        const protocol: ICoinProtocol = protocols[0]
-
-        if (!(protocol instanceof TezosSaplingProtocol)) {
+        const protocol = protocols[0]
+        if (!(protocol instanceof ICoinProtocolAdapter)) {
           throw new Error('Invalid sapling protocol')
         }
+        const shieldedTezAdapter: ICoinProtocolAdapter<TezosShieldedTezProtocol> = protocol
 
         await this.saplingService.initSapling()
-        unsignedTx = await protocol.prepareShieldTransaction(wallet.publicKey, address, amount.toString(10), fee.toString(10), {
-          overrideFees: true
-        })
+        const transactionSignRequest = await shieldedTezAdapter.convertUnsignedTransactionV1ToV0(
+          await shieldedTezAdapter.protocolV1.prepareShieldTransaction(
+            newPublicKey(wallet.publicKey, 'hex'),
+            [{
+                to: address,
+                amount: newAmount(amount.toString(10), 'blockchain')
+            }],
+            {
+              fee: newAmount(fee.toString(10), 'blockchain')
+            },
+          ),
+          wallet.publicKey,
+          undefined,
+          wallet.protocol.identifier
+        )
+        unsignedTx = transactionSignRequest.transaction
 
         const knownViewingKeys: string[] = knownWallets
           .filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === protocol.identifier)
           .map((wallet: AirGapMarketWallet) => wallet.publicKey)
 
-        airGapTxs = await protocol.getTransactionDetails(
+        airGapTxs = await shieldedTezAdapter.getTransactionDetails(
           {
             publicKey: wallet.publicKey,
             transaction: unsignedTx
           },
-          { knownViewingKeys }
+          { 
+            knownViewingKeys, 
+            transactionOwner: wallet.protocol.identifier 
+          }
         )
       } else {
         if (wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED) {

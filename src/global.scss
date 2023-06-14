@@ -211,13 +211,13 @@ page-scan {
 /* Common Components styling */
 
 // identicon.component
-portfolio-item,
 transaction-item {
   airgap-identicon {
     height: 48px;
     width: 48px;
   }
 }
+
 airgap-currency-symbol {
   img {
     border-radius: 50%;
@@ -228,5 +228,23 @@ page-sub-account-add {
     img {
       width: 100%;
     }
+  }
+}
+
+portfolio-item {
+  airgap-identicon {
+    height: 16px;
+    width: 16px;
+    .identicon {
+      min-height: unset !important;
+      min-width: unset !important;
+      border-radius: 4px !important;
+    }
+  }
+}
+
+page-portfolio {
+  portfolio-item:not(.mainWallet) ion-item {
+    padding-top: 12px;
   }
 }
