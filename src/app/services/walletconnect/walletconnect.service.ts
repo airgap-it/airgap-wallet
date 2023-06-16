@@ -136,7 +136,7 @@ export class WalletconnectService {
       component: WalletconnectPage,
       componentProps: {
         request,
-        connector: connector,
+        connector,
         walletConnectService: this
       }
     })

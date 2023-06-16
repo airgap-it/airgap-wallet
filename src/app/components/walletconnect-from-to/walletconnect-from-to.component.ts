@@ -1,8 +1,14 @@
 import { IAirGapTransaction } from '@airgap/coinlib-core'
-import { EthereumTransactionSignRequest } from '@airgap/ethereum'
+import { implementsInterface } from '@airgap/module-kit'
+import { TransactionSignRequest } from '@airgap/serializer'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import BigNumber from 'bignumber.js'
+
+interface UnsignedTransactionWithGas {
+  gasLimit: string
+  gasPrice: string
+}
 
 @Component({
   selector: 'walletconnect-from-to',
@@ -16,28 +22,28 @@ export class WalletconnectFromToComponent {
   public airGapTransaction: IAirGapTransaction | undefined
 
   @Input()
-  public rawTransaction: EthereumTransactionSignRequest['transaction'] | undefined
+  public rawTransaction: TransactionSignRequest['transaction'] | undefined
 
   @Output()
-  public readonly onRawTransactionUpdate: EventEmitter<EthereumTransactionSignRequest['transaction']> = new EventEmitter<
-    EthereumTransactionSignRequest['transaction']
-  >()
+  public readonly onRawTransactionUpdate: EventEmitter<TransactionSignRequest['transaction']> = new EventEmitter<TransactionSignRequest['transaction']>()
 
   constructor(private readonly formBuilder: FormBuilder) {}
 
   public advanced: boolean = false
 
   public async initForms() {
-    const gasLimitValue = this.hexToDecimal(this.rawTransaction.gasLimit)
-    const gasPriceValue = new BigNumber(this.hexToDecimal(this.rawTransaction.gasPrice)).shiftedBy(-9).toNumber()
+    if (this.hasGas(this.rawTransaction)) {
+      const gasLimitValue = this.hexToDecimal(this.rawTransaction.gasLimit)
+      const gasPriceValue = new BigNumber(this.hexToDecimal(this.rawTransaction.gasPrice)).shiftedBy(-9).toNumber()
 
-    const gasPriceControl = this.formBuilder.control(gasPriceValue, [Validators.required, Validators.min(0)])
-    const gasLimitControl = this.formBuilder.control(gasLimitValue, [Validators.required, Validators.min(0)])
+      const gasPriceControl = this.formBuilder.control(gasPriceValue, [Validators.required, Validators.min(0)])
+      const gasLimitControl = this.formBuilder.control(gasLimitValue, [Validators.required, Validators.min(0)])
 
-    this.formGroup = this.formBuilder.group({
-      gasPrice: gasPriceControl,
-      gasLimit: gasLimitControl
-    })
+      this.formGroup = this.formBuilder.group({
+        gasPrice: gasPriceControl,
+        gasLimit: gasLimitControl
+      })
+    }
   }
 
   private hexToDecimal(hex: string): number {
@@ -48,14 +54,22 @@ export class WalletconnectFromToComponent {
   }
 
   public async updateRawTransaction() {
-    const gasPriceValue = this.decimalToHex(new BigNumber(this.formGroup.controls.gasPrice.value).shiftedBy(9).toNumber())
+    if (this.hasGas(this.rawTransaction)) {
+      const gasPriceValue = this.decimalToHex(new BigNumber(this.formGroup.controls.gasPrice.value).shiftedBy(9).toNumber())
 
-    this.rawTransaction = {
-      ...this.rawTransaction,
-      gasPrice: gasPriceValue,
-      gasLimit: this.decimalToHex(this.formGroup.controls.gasLimit.value)
+      const rawTransaction: UnsignedTransactionWithGas = {
+        ...this.rawTransaction,
+        gasPrice: gasPriceValue,
+        gasLimit: this.decimalToHex(this.formGroup.controls.gasLimit.value)
+      }
+
+      this.rawTransaction = rawTransaction
+      this.onRawTransactionUpdate.emit(this.rawTransaction)
+      this.advanced = false
     }
-    this.onRawTransactionUpdate.emit(this.rawTransaction)
-    this.advanced = false
+  }
+
+  private hasGas(transaction: TransactionSignRequest['transaction']): transaction is UnsignedTransactionWithGas {
+    return implementsInterface<UnsignedTransactionWithGas>(transaction, { gasLimit: 'required', gasPrice: 'required' })
   }
 }
