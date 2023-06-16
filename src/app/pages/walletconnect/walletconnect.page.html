@@ -8,12 +8,13 @@
 
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">
+    <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST || request.method === requestMethod.WALLET_SWITCH_ETHEREUM_CHAIN">
       <permission-request
         [address]="address"
+        [protocolIdentifier]="protocolIdentifier"
         [requesterName]="requesterName"
         [icon]="icon"
-        [targetProtocolSymbol]="'eth'"
+        [targetProtocolSymbol]="targetProtocolSymbol"
         (walletSetEmitter)="setWallet($event)"
       ></permission-request>
     </ng-container>

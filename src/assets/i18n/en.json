@@ -953,6 +953,7 @@
     "connection_request": "WalletConnect - Connection Request",
     "new_transaction": "WalletConnect - New Transaction",
     "sign_request": "WalletConnect - Sign Request",
+    "switch_ethereum_chain": "WalletConnect - Switch Ethereum Chain",
     "sign_typed_data": "WalletConnect - Sign Typed Data",
     "wait": "Waiting for WalletConnect",
     "alert": {

@@ -15,7 +15,7 @@ import {
   WalletClient
 } from '@airgap/beacon-sdk'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
-import { EthereumTransactionSignRequest } from '@airgap/ethereum'
+import { UnsignedTransaction } from '@airgap/module-kit'
 import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
 import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
 import { Injectable } from '@angular/core'
@@ -78,7 +78,7 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    request: BeaconRequestOutputMessage | { transaction: EthereumTransactionSignRequest['transaction']; id: number },
+    request: BeaconRequestOutputMessage | { transaction: UnsignedTransaction; id: number },
     protocol: ICoinProtocol
   ): Promise<void> {
     const network = (request as OperationRequest).network
