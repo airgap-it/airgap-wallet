@@ -31,7 +31,7 @@ export interface StorageObject {
   providedIn: 'root'
 })
 export class CachingService {
-  constructor(private readonly storage: WalletStorageService) {}
+  public constructor(private readonly storage: WalletStorageService) {}
 
   public async cachePriceData(marketSymbols: string[], value: any, timeInterval: TimeInterval): Promise<any> {
     const uniqueId = `${marketSymbols.sort().join()}_${timeInterval}_${CachingServiceKey.PRICEDATA}`

@@ -1,5 +1,12 @@
 import { ICoinProtocolAdapter, ProtocolService, SerializerService } from '@airgap/angular-core'
-import { IAirGapTransaction, ICoinProtocol, MainProtocolSymbols, ProtocolNetwork, ProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
+import {
+  IAirGapTransaction,
+  ICoinProtocol,
+  MainProtocolSymbols,
+  ProtocolNetwork,
+  ProtocolSymbols,
+  SignedTransaction
+} from '@airgap/coinlib-core'
 import { IACMessageDefinitionObject } from '@airgap/serializer'
 import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component, Input, OnChanges } from '@angular/core'
@@ -36,7 +43,7 @@ export class SignedTransactionComponent implements OnChanges {
 
   public rawTxData: SignedTransaction
 
-  constructor(
+  public constructor(
     private readonly serializerService: SerializerService,
     private readonly protocolService: ProtocolService,
     private readonly accountProvider: AccountProvider
@@ -56,7 +63,7 @@ export class SignedTransactionComponent implements OnChanges {
 
     // TODO: Handle multiple messages
     if (this.signedTxs) {
-      let protocol: ICoinProtocol =
+      const protocol: ICoinProtocol =
         this.protocols && this.protocols[0] ? this.protocols[0] : await this.protocolService.getProtocol(this.signedTxs[0].protocol)
 
       try {
@@ -101,12 +108,16 @@ export class SignedTransactionComponent implements OnChanges {
     }
   }
 
-  private async checkIfSaplingTransaction(transaction: SignedTransaction, protocolIdentifier: ProtocolSymbols, network: ProtocolNetwork): Promise<boolean> {
+  private async checkIfSaplingTransaction(
+    transaction: SignedTransaction,
+    protocolIdentifier: ProtocolSymbols,
+    network: ProtocolNetwork
+  ): Promise<boolean> {
     if (protocolIdentifier === MainProtocolSymbols.XTZ) {
       const [tezosProtocol, saplingProtocol]: [ICoinProtocol, ICoinProtocolAdapter<TezosSaplingProtocol>] = await Promise.all([
         this.protocolService.getProtocol(protocolIdentifier, network),
         this.getSaplingProtocol(network)
-      ]) 
+      ])
 
       const txDetails: IAirGapTransaction[] = await tezosProtocol.getTransactionDetailsFromSigned(transaction)
       const recipients: string[] = txDetails

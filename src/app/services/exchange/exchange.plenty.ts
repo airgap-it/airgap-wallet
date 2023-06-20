@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
@@ -22,7 +22,7 @@ import {
   TezosTransactionSignRequest,
   TezosWrappedOperation
 } from '@airgap/tezos'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { Schema } from '@taquito/michelson-encoder'
 import { Contract, TezosToolkit, TransferParams } from '@taquito/taquito'
@@ -59,7 +59,7 @@ interface PlentySlippageTolerance {
 }
 
 class PlentyTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  constructor(public readonly status: string) { }
+  public constructor(public readonly status: string) {}
 
   public isPending(): boolean {
     switch (this.status) {
@@ -132,7 +132,7 @@ export class PlentyExchange implements Exchange {
     SubProtocolSymbols.XTZ_USD,
     SubProtocolSymbols.XTZ_ETHTZ,
     SubProtocolSymbols.XTZ_QUIPU,
-    SubProtocolSymbols.XTZ_BTC,
+    SubProtocolSymbols.XTZ_BTC
   ]
 
   private get supportedFromCurrencies(): ProtocolSymbols[] {
@@ -149,9 +149,9 @@ export class PlentyExchange implements Exchange {
 
   private slippageTolerance: BigNumber
 
-  constructor(
+  public constructor(
     private readonly protocolService: ProtocolService,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly store$: Store<fromRoot.State>
   ) {
     this.initIdentifierMappings(this.supportedTokens)
@@ -273,7 +273,7 @@ export class PlentyExchange implements Exchange {
     }
     const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromProtocol.decimals)
 
-    let minAmount: BigNumber = await this.getMinExchangeAmount(
+    const minAmount: BigNumber = await this.getMinExchangeAmount(
       fromProtocol.identifier,
       toProtocol.identifier,
       shiftedAmount,
@@ -296,13 +296,13 @@ export class PlentyExchange implements Exchange {
     const contractKey = this.dexContractKey([fromIdentifier, toIdentifier])
     const pools = DEX_CONTRACTS[contractKey]
       ? {
-        in: 'token1_pool',
-        out: 'token2_pool'
-      }
+          in: 'token1_pool',
+          out: 'token2_pool'
+        }
       : {
-        in: 'token2_pool',
-        out: 'token1_pool'
-      }
+          in: 'token2_pool',
+          out: 'token1_pool'
+        }
 
     const storage: DexStorage | undefined = await this.getDexStorage([fromIdentifier, toIdentifier])
     if (storage === undefined) {
@@ -439,7 +439,11 @@ export class PlentyExchange implements Exchange {
       fee
     )
 
-    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+      this.getV1PublicKey(publicKey),
+      operations,
+      false
+    )
     const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
     const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
     const baseDetails: IAirGapTransaction[] = await toProtocol.getTransactionDetails({ publicKey, transaction })
@@ -661,7 +665,7 @@ export class PlentyExchange implements Exchange {
     const valueToControlValue = (value: string) => new BigNumber(value).multipliedBy(100).toFixed()
     const controlValueToValue = (controlValue: string) => new BigNumber(controlValue).dividedBy(100).toFixed()
 
-    const form: FormGroup = this.formBuilder.group({
+    const form: UntypedFormGroup = this.formBuilder.group({
       [ControlId.SLIPPAGE_TOLERANCE]: [defaultValue, Validators.required],
       [ControlId.SLIPPAGE_TOLERANCE_CONTROL]: [valueToControlValue(defaultValue), Validators.required]
     })

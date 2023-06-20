@@ -44,7 +44,7 @@ export class TezosFAFormNgRxFacade extends BaseNgRxFacade<TezosFAFormStore> impl
 
   public readonly errorDescription$: Observable<string>
 
-  constructor(store: TezosFAFormStore, private readonly clipboardService: ClipboardService) {
+  public constructor(store: TezosFAFormStore, private readonly clipboardService: ClipboardService) {
     super(store)
     this.tokenInterface$ = this.store.select((state: TezosFAFormState) => state.tokenInterface)
     this.tokenID$ = this.store.select((state: TezosFAFormState) => state.tokenId)
@@ -80,7 +80,7 @@ export class TezosFAFormNgRxFacade extends BaseNgRxFacade<TezosFAFormStore> impl
     try {
       return this.clipboardService.paste()
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(`Error: ${error}`)
 
       return undefined

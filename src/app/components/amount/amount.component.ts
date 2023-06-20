@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 
@@ -11,7 +11,7 @@ import { DecimalValidator } from '../../validators/DecimalValidator'
   styleUrls: ['./amount.component.scss']
 })
 export class AmountComponent {
-  public delegationForm: FormGroup
+  public delegationForm: UntypedFormGroup
   public amount: number = 0
   public sendMaxAmount: boolean = false
   public amountControl
@@ -27,7 +27,7 @@ export class AmountComponent {
   @Output()
   public readonly amountEmitter: EventEmitter<BigNumber> = new EventEmitter<BigNumber>()
 
-  constructor(public formBuilder: FormBuilder) {
+  public constructor(public formBuilder: UntypedFormBuilder) {
     this.delegationForm = this.formBuilder.group({
       amount: [this.amount, Validators.compose([Validators.required])]
     })

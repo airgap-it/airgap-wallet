@@ -4,16 +4,16 @@ import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { forkJoin, from, Observable, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
-import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
-import { AccountProvider, MainWalletGroup } from '../../services/account/account.provider'
-import { DataServiceKey } from '../../services/data/data.service'
-import { OperationsProvider } from '../../services/operations/operations'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from 'bignumber.js'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { map, take } from 'rxjs/operators'
 import { ShopService } from 'src/app/services/shop/shop.service'
+import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
+import { AccountProvider, MainWalletGroup } from '../../services/account/account.provider'
+import { DataServiceKey } from '../../services/data/data.service'
+import { OperationsProvider } from '../../services/operations/operations'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 @Component({
   selector: 'page-portfolio',
@@ -39,7 +39,7 @@ export class PortfolioPage {
   public shopBannerText: string = ''
   public shopBannerLink: string = ''
 
-  constructor(
+  public constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,

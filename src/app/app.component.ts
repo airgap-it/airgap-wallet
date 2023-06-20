@@ -39,6 +39,7 @@ import { ICPModule } from '@airgap/icp'
 import { protocolNetworkIdentifier } from '@airgap/module-kit'
 import { MoonbeamModule } from '@airgap/moonbeam'
 import { OptimismModule } from '@airgap/optimism'
+import { SerializedERC20Token } from '@airgap/optimism/v1/protocol/erc20/ERC20Token'
 import { PolkadotModule } from '@airgap/polkadot'
 import { generateId, IACMessageType } from '@airgap/serializer'
 import { TezosDomains, TezosModule, TezosProtocolNetwork, TezosSaplingExternalMethodProvider } from '@airgap/tezos'
@@ -50,13 +51,15 @@ import {
   TezosProtocolOptions as TezosProtocolOptionsV0
 } from '@airgap/tezos/v0'
 import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
+import { HttpClient } from '@angular/common/http'
 import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
 import { SplashScreenPlugin } from '@capacitor/splash-screen'
-import { Config, Platform } from '@ionic/angular'
+import { Platform } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { Subscription } from 'rxjs'
+import { register } from 'swiper/element/bundle'
 
 import { AccountProvider } from './services/account/account.provider'
 import { AppService } from './services/app/app.service'
@@ -72,8 +75,9 @@ import { WalletStorageKey, WalletStorageService } from './services/storage/stora
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
-import { HttpClient } from '@angular/common/http'
-import { SerializedERC20Token } from '@airgap/optimism/v1/protocol/erc20/ERC20Token'
+
+// Swiper
+register()
 
 @Component({
   selector: 'app-root',
@@ -83,7 +87,7 @@ export class AppComponent implements AfterViewInit {
   public isMobile: boolean = false
   public isElectron: boolean = false
 
-  constructor(
+  public constructor(
     private readonly appSerivce: AppService,
     private readonly platform: Platform,
     private readonly translate: TranslateService,
@@ -98,7 +102,6 @@ export class AppComponent implements AfterViewInit {
     private readonly walletconnectService: WalletconnectService,
     private readonly router: Router,
     private readonly dataService: DataService,
-    private readonly config: Config,
     private readonly ngZone: NgZone,
     private readonly saplingNativeService: SaplingNativeService,
     private readonly themeService: ThemeService,
@@ -173,7 +176,12 @@ export class AppComponent implements AfterViewInit {
     if (this.platform.is('ios')) {
       this.translate.get(['back-button']).subscribe((translated: { [key: string]: string | undefined }) => {
         const back: string = translated['back-button']
-        this.config.set('backButtonText', back)
+
+        // Since Ionic v6 `Config.set` is no longer part of the API and it's recommended to make the per-platform configuration
+        // with `IonicModule.forRoot` (https://ionicframework.com/docs/developing/config#per-platform-config).
+        // The recommended way, however, doesn't support translations, hence we need the workaround below.
+        const config = (window as any) /* as IonicWindow */.Ionic.config as Map<string, string>
+        config.set('backButtonText', back)
       })
     }
     if (this.platform.is('hybrid')) {
@@ -329,8 +337,8 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async deserializeGenericTezosSubProtocol(
-    protocolIdentifier: string, 
-    serialized: any, 
+    protocolIdentifier: string,
+    serialized: any,
     supportedTestNetworkIdentifiers: string[]
   ): Promise<ICoinSubProtocol | undefined> {
     const tezosOptions = serialized as TezosProtocolOptionsV0
@@ -341,10 +349,7 @@ export class AppComponent implements AfterViewInit {
       tezosOptions.network.blockExplorer,
       tezosOptions.network.extras
     )
-    if (
-      tezosProtocolNetwork.type === NetworkType.TESTNET &&
-      !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)
-    ) {
+    if (tezosProtocolNetwork.type === NetworkType.TESTNET && !supportedTestNetworkIdentifiers.includes(tezosProtocolNetwork.identifier)) {
       throw new Error()
     }
 

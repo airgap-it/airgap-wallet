@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms'
 
 import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
 
@@ -13,11 +13,11 @@ export class WidgetOptionButtonGroup implements OnInit {
   public widget: UIOptionButtonGroup
 
   @Input()
-  public widgetForm: FormGroup
+  public widgetForm: UntypedFormGroup
 
   public customInputControl: string = 'customInput'
 
-  constructor(private readonly formBuilder: FormBuilder) {}
+  public constructor(private readonly formBuilder: UntypedFormBuilder) {}
 
   public ngOnInit(): void {
     this.setupForm()

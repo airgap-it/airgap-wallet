@@ -50,18 +50,24 @@
         </ng-container>
       </ion-card-content>
     </ion-card>
-    <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
+    <swiper-container 
+      #slides 
+      [modules]="swiperModules" 
+      [initialSlide]="0"
+      [speed]="400"
+      [pagination]="slidePagination"
+      (slidechangetransitionend)="onSlideChange()">
       <ng-container *ngIf="protocol">
-        <ion-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
+        <swiper-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
           <div class="slide-zoom">
             <img [src]="'./assets/img/' + slide[0]" />
             <ion-text>
               <p class="ion-text-left" [innerHTML]="slide[1] | translate: { protocolName: protocol.name }"></p>
             </ion-text>
           </div>
-        </ion-slide>
+        </swiper-slide>
       </ng-container>
-    </ion-slides>
+    </swiper-container>
   </ion-grid>
 </ion-content>
 

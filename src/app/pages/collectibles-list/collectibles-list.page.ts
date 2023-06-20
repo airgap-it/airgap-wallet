@@ -24,7 +24,7 @@ export class CollectiblesListPage extends BaseComponent<CollectiblesListFacade> 
 
   private infiniteScollActive: boolean = false
 
-  constructor(@Inject(COLLECTIBLES_LIST_FACADE) facade: CollectiblesListFacade, private readonly platform: Platform) {
+  public constructor(@Inject(COLLECTIBLES_LIST_FACADE) facade: CollectiblesListFacade, private readonly platform: Platform) {
     super(facade)
 
     this.isDesktop = this.platform.is('desktop')

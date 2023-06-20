@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms'
+import { UntypedFormGroup } from '@angular/forms'
 import { SafeUrl } from '@angular/platform-browser'
 import { ICoinDelegateProtocol } from '@airgap/coinlib-core'
 import { DelegateeDetails, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
@@ -19,7 +19,7 @@ export interface AirGapDelegateeUsageDetails {
 
 export interface AirGapDelegatorAction {
   type: any
-  form?: FormGroup
+  form?: UntypedFormGroup
   label: string
   confirmLabel?: string
   iconName?: string

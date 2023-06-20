@@ -22,7 +22,13 @@ import {
   Zip,
   ZIP_PLUGIN
 } from '@airgap/angular-core'
-import { AirGapAngularNgRxModule, currencySymbolNgRxFacade, isolatedModulesDetailsNgRxFacade, isolatedModulesListNgRxFacade, isolatedModulesListPageNgRxFacade } from '@airgap/angular-ngrx'
+import {
+  AirGapAngularNgRxModule,
+  currencySymbolNgRxFacade,
+  isolatedModulesDetailsNgRxFacade,
+  isolatedModulesListNgRxFacade,
+  isolatedModulesListPageNgRxFacade
+} from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
@@ -42,29 +48,33 @@ import { StatusBar } from '@capacitor/status-bar'
 import { FilePicker } from '@capawesome/capacitor-file-picker'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
-import { IonicStorageModule } from '@ionic/storage'
+import { Drivers } from '@ionic/storage'
+import { IonicStorageModule } from '@ionic/storage-angular'
 import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
+import CordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
 import { MomentModule } from 'ngx-moment'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { metaReducers, ROOT_REDUCERS } from './app.reducers'
 import { SaplingNative } from './capacitor-plugins/definitions'
-import { BROWSER_PLUGIN, FILE_PICKER_PLUGIN, PUSH_NOTIFICATIONS_PLUGIN, SAPLING_PLUGIN, SHARE_PLUGIN } from './capacitor-plugins/injection-tokens'
+import {
+  BROWSER_PLUGIN,
+  FILE_PICKER_PLUGIN,
+  PUSH_NOTIFICATIONS_PLUGIN,
+  SAPLING_PLUGIN,
+  SHARE_PLUGIN
+} from './capacitor-plugins/injection-tokens'
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
-import { BeaconRequestPage } from './pages/beacon-request/beacon-request.page'
 import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
-import { ExchangeSelectPage } from './pages/exchange-select/exchange-select.page'
 import { ExchangeEffects } from './pages/exchange/effects'
-import { IntroductionPushPage } from './pages/introduction-push/introduction-push'
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { IsolatedModulesOnboardingPageModule } from './pages/isolated-modules-onboarding/isolated-modules-onboarding.module'
-import { ProtocolSelectPage } from './pages/protocol-select/protocol-select'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
 import { PipesModule } from './pipes/pipes.module'
 import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
@@ -94,7 +104,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [ProtocolSelectPage, IntroductionPushPage, BeaconRequestPage, ExchangeSelectPage],
   exports: [],
   imports: [
     BrowserModule,
@@ -134,7 +143,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     }),
     IonicStorageModule.forRoot({
       name: '__airgap_storage',
-      driverOrder: ['sqlite', 'localstorage']
+      driverOrder: [CordovaSQLiteDriver._driver, Drivers.LocalStorage]
     }),
     PipesModule,
     ComponentsModule,
@@ -142,7 +151,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     BeaconRequestPageModule,
     ExchangeSelectPageModule,
     IntroductionPushPageModule,
-    IsolatedModulesOnboardingPageModule,
+    IsolatedModulesOnboardingPageModule
   ],
   providers: [
     { provide: APP_PLUGIN, useValue: App },

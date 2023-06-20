@@ -16,9 +16,9 @@ enum ElectronProcessMessage {
 
 export class ElectronProcess {
   private pid: number | null = null
-  private ipcDeferred: Map<string, Deferred<any>> = new Map()
+  private readonly ipcDeferred: Map<string, Deferred<any>> = new Map()
 
-  constructor(private readonly name: string) {
+  public constructor(private readonly name: string) {
     if (window.require) {
       const electron = window.require('electron')
       initElectronDeps(electron)

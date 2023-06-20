@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { FormGroup } from '@angular/forms'
+import { UntypedFormGroup } from '@angular/forms'
 import { AirGapMarketWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
 
 @Component({
@@ -12,7 +12,7 @@ export class FeeComponent {
   public enableMemo: boolean = false
 
   @Input()
-  set wallet(value: AirGapMarketWallet) {
+  public set wallet(value: AirGapMarketWallet) {
     this._wallet = value
     this.checkEnableMemo(value)
   }
@@ -21,9 +21,9 @@ export class FeeComponent {
   public state: any
 
   @Input()
-  public form: FormGroup
+  public form: UntypedFormGroup
 
-  constructor() {}
+  public constructor() {}
 
   private checkEnableMemo(wallet: AirGapMarketWallet) {
     this.enableMemo = wallet?.protocol.identifier === MainProtocolSymbols.COSMOS

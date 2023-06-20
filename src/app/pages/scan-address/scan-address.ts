@@ -19,7 +19,7 @@ export class ScanAddressPage extends ScanBasePage {
   @ViewChild('addressScanner')
   public zxingScanner?: ZXingScannerComponent
 
-  constructor(
+  public constructor(
     protected readonly platform: Platform,
     protected readonly scanner: QrScannerService,
     protected readonly permissionsProvider: PermissionsService,

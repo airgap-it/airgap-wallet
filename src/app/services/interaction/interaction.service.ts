@@ -13,12 +13,12 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
   providedIn: 'root'
 })
 export class InteractionService {
-  constructor(
+  public constructor(
     private readonly dataService: DataService,
     private readonly deeplinkService: DeeplinkService,
     private readonly operationsProvider: OperationsProvider,
     private readonly router: Router
-  ) { }
+  ) {}
 
   public startInteraction(
     group: AirGapMarketWalletGroup,
@@ -67,10 +67,10 @@ export class InteractionService {
       data: interactionData,
       type,
       isRelay,
-      generatedId,
+      generatedId
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
-    this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/interaction-selection/${DataServiceKey.INTERACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async offlineDeviceSign(
@@ -89,7 +89,7 @@ export class InteractionService {
       interactionData
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
-    this.router.navigateByUrl('/transaction-qr/' + DataServiceKey.TRANSACTION).catch((err) => console.error(err))
+    this.router.navigateByUrl(`/transaction-qr/${DataServiceKey.TRANSACTION}`).catch((err) => console.error(err))
   }
 
   public async sameDeviceSign(
@@ -115,7 +115,7 @@ export class InteractionService {
       data
     }
     this.dataService.setData(DataServiceKey.TRANSACTION, info)
-    this.router.navigateByUrl('/ledger-sign/' + DataServiceKey.TRANSACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/ledger-sign/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private async prepareQRData(

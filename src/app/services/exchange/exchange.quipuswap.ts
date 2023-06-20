@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
@@ -11,20 +11,28 @@ import {
 } from '@airgap/coinlib-core'
 import { AirGapTransactionStatus, IAirGapTransaction } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
-import { TezosOperation, TezosOperationType, TezosProtocol, TezosTransactionOperation, TezosTransactionParameters, TezosTransactionSignRequest, TezosWrappedOperation } from '@airgap/tezos'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import {
+  TezosOperation,
+  TezosOperationType,
+  TezosProtocol,
+  TezosTransactionOperation,
+  TezosTransactionParameters,
+  TezosTransactionSignRequest,
+  TezosWrappedOperation
+} from '@airgap/tezos'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { Schema } from '@taquito/michelson-encoder'
 import { Contract, TezosToolkit, TransferParams } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 
-import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
-import { UIWidget } from '../../models/widgets/UIWidget'
-import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
-import * as fromRoot from '../../app.reducers'
 import { getSelectedSlippage } from 'src/app/app.selectors'
 import { newAmount, newPublicKey, PublicKey } from '@airgap/module-kit'
 import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
+import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
+import { UIWidget } from '../../models/widgets/UIWidget'
+import * as fromRoot from '../../app.reducers'
+import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
 interface DexStorage {
   storage: {
@@ -50,7 +58,7 @@ interface QuipuswapSlippageTolerance {
 }
 
 class QuipuswapTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  constructor(public readonly status: string) { }
+  public constructor(public readonly status: string) {}
 
   public isPending(): boolean {
     switch (this.status) {
@@ -118,9 +126,9 @@ export class QuipuswapExchange implements Exchange {
 
   private slippageTolerance: BigNumber
 
-  constructor(
+  public constructor(
     private readonly protocolService: ProtocolService,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly store$: Store<fromRoot.State>
   ) {
     this.initIdentifierMappings(this.supportedTokens)
@@ -465,7 +473,11 @@ export class QuipuswapExchange implements Exchange {
       fee
     )
 
-    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
+    const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+      this.getV1PublicKey(publicKey),
+      operations,
+      false
+    )
     const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
     const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
     const baseDetails: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
@@ -669,7 +681,7 @@ export class QuipuswapExchange implements Exchange {
     const valueToControlValue = (value: string) => new BigNumber(value).multipliedBy(100).toFixed()
     const controlValueToValue = (controlValue: string) => new BigNumber(controlValue).dividedBy(100).toFixed()
 
-    const form: FormGroup = this.formBuilder.group({
+    const form: UntypedFormGroup = this.formBuilder.group({
       [ControlId.SLIPPAGE_TOLERANCE]: [defaultValue, Validators.required],
       [ControlId.SLIPPAGE_TOLERANCE_CONTROL]: [valueToControlValue(defaultValue), Validators.required]
     })

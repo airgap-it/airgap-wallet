@@ -53,12 +53,12 @@ export class BeaconRequestPage implements OnInit {
   public modalRef: HTMLIonModalElement | undefined
 
   public blake2bHash: string | undefined
-  private subscription: Subscription
+  private readonly subscription: Subscription
 
   public responseHandler: (() => Promise<void>) | undefined
   private readonly beaconService: BeaconService | undefined
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly accountService: AccountProvider,
     private readonly dataService: DataService,
@@ -382,7 +382,7 @@ export class BeaconRequestPage implements OnInit {
     }
   }
 
-  async setWallet(wallet: AirGapMarketWallet) {
+  public async setWallet(wallet: AirGapMarketWallet) {
     this.selectedWallet = wallet
   }
 

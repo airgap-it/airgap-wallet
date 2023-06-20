@@ -75,5 +75,5 @@ export class LedgerConnectionBrowser implements LedgerConnection {
     }
   }
 
-  private constructor(readonly type: LedgerConnectionType, readonly transport: Transport) {}
+  private constructor(public readonly type: LedgerConnectionType, public readonly transport: Transport) {}
 }

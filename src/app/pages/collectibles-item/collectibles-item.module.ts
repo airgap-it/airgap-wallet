@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
-import { ReactiveComponentModule } from '@ngrx/component'
+import { LetDirective } from '@ngrx/component'
 import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
 import { TranslateModule } from '@ngx-translate/core'
@@ -22,7 +22,7 @@ import * as fromCollectiblesItem from './collectibles-item.reducers'
     FormsModule,
     IonicModule,
     TranslateModule,
-    ReactiveComponentModule,
+    LetDirective,
     PipesModule,
     CollectiblesItemPageRoutingModule,
     AirGapAngularCoreModule,

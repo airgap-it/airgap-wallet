@@ -51,8 +51,8 @@ export enum TezosSaplingContractFormErrorType {
   UNKNOWN = 'unknown'
 }
 
-export interface ContractInvalidError extends TezosSaplingContractFormTypedBase<TezosSaplingContractFormErrorType.CONTRACT_INVALID> {}
-export interface InjectorInvalidError extends TezosSaplingContractFormTypedBase<TezosSaplingContractFormErrorType.INJECTOR_INVALID> {}
+export type ContractInvalidError = TezosSaplingContractFormTypedBase<TezosSaplingContractFormErrorType.CONTRACT_INVALID>
+export type InjectorInvalidError = TezosSaplingContractFormTypedBase<TezosSaplingContractFormErrorType.INJECTOR_INVALID>
 export interface UnknownError extends TezosSaplingContractFormTypedBase<TezosSaplingContractFormErrorType.UNKNOWN> {
   error?: any
 }

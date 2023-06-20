@@ -1,4 +1,12 @@
-import { BaseModulesService, deriveAddressesAsync, IsolatedModulePreviewMetadata, ModulesController, partition, ProtocolService, UiEventService } from '@airgap/angular-core'
+import {
+  BaseModulesService,
+  deriveAddressesAsync,
+  IsolatedModulePreviewMetadata,
+  ModulesController,
+  partition,
+  ProtocolService,
+  UiEventService
+} from '@airgap/angular-core'
 import { AirGapWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { Inject, Injectable } from '@angular/core'
 import { FilePickerPlugin, PickFilesResult } from '@capawesome/capacitor-file-picker'
@@ -9,7 +17,7 @@ import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry
   providedIn: 'root'
 })
 export class WalletModulesService extends BaseModulesService {
-  constructor(
+  public constructor(
     modulesController: ModulesController,
     protocolService: ProtocolService,
     private readonly uiEventService: UiEventService,
@@ -23,7 +31,7 @@ export class WalletModulesService extends BaseModulesService {
     let loader: HTMLIonLoadingElement | undefined
 
     try {
-      const { files }: PickFilesResult = await this.filePicker.pickFiles({ 
+      const { files }: PickFilesResult = await this.filePicker.pickFiles({
         multiple: false,
         readData: false
       })
@@ -46,7 +54,10 @@ export class WalletModulesService extends BaseModulesService {
 
   public async deriveAddresses(walletOrWallets: AirGapWallet | AirGapWallet[], amount?: number): Promise<Record<string, string[]>> {
     const wallets: AirGapWallet[] = Array.isArray(walletOrWallets) ? walletOrWallets : [walletOrWallets]
-    const [saplingWallets, otherWallets]: [AirGapWallet[], AirGapWallet[]] = partition(wallets, (wallet: AirGapWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED)
+    const [saplingWallets, otherWallets]: [AirGapWallet[], AirGapWallet[]] = partition(
+      wallets,
+      (wallet: AirGapWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+    )
 
     const [saplingAddresses, otherAddresses]: [Record<string, string[]>, Record<string, string[]>] = await Promise.all([
       deriveAddressesAsync(saplingWallets, amount),

@@ -2,7 +2,7 @@ import { FeeConverterPipe, ProtocolService } from '@airgap/angular-core'
 import { IAirGapTransaction, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TezosWrappedOperation } from '@airgap/tezos'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 
 @Component({
   selector: 'beacon-from-to',
@@ -10,7 +10,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
   styleUrls: ['./from-to.component.scss']
 })
 export class FromToComponent {
-  public formGroup: FormGroup | undefined
+  public formGroup: UntypedFormGroup | undefined
 
   @Input()
   public transactions: IAirGapTransaction[] | undefined
@@ -21,19 +21,19 @@ export class FromToComponent {
   @Output()
   public readonly onWrappedOperationUpdate: EventEmitter<TezosWrappedOperation> = new EventEmitter<TezosWrappedOperation>()
 
-  constructor(
-    private readonly formBuilder: FormBuilder,
+  public constructor(
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly protocolService: ProtocolService,
     private readonly feeConverterPipe: FeeConverterPipe
   ) {}
 
   public advanced: boolean = false
 
-  public get operationControls(): FormArray | undefined {
+  public get operationControls(): UntypedFormArray | undefined {
     if (this.formGroup === undefined) {
       return undefined
     }
-    return this.formGroup.controls.operations as FormArray
+    return this.formGroup.controls.operations as UntypedFormArray
   }
 
   public async initForms() {
@@ -72,7 +72,7 @@ export class FromToComponent {
 
     this.wrappedOperation.contents = await Promise.all(
       this.wrappedOperation.contents.map(async (operation, index) => {
-        const group = (this.formGroup.controls.operations as FormArray).controls[index] as FormGroup
+        const group = (this.formGroup.controls.operations as UntypedFormArray).controls[index] as UntypedFormGroup
         const fee = await this.feeConverterPipe.transform(group.controls.fee.value, { protocol, dropSymbol: true, reverse: true })
 
         return {

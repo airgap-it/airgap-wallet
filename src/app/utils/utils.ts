@@ -1,8 +1,8 @@
-import { ICoinProtocol, ICoinSubProtocol } from "@airgap/coinlib-core"
+import { ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
 
 // https://stackoverflow.com/a/8472700/4790610
 export function generateGUID(): string {
-  // tslint:disable
+  /* eslint-disable */
   if (typeof window.crypto !== 'undefined' && typeof window.crypto.getRandomValues !== 'undefined') {
     // If we have a cryptographically secure PRNG, use that
     // https://stackoverflow.com/questions/6906916/collisions-when-generating-uuids-in-javascript
@@ -28,7 +28,7 @@ export function generateGUID(): string {
       return v.toString(16)
     })
   }
-  // tslint:enable
+  /* eslint-enable */
 }
 
 export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]> {
@@ -95,5 +95,5 @@ export function isType<T>(object: unknown, ...fields: string[]): object is T {
 }
 
 export function isSubProtocol(value: ICoinProtocol): value is ICoinSubProtocol {
-  return 'isSubProtocol' in value && 'subProtocolType' in value;
+  return 'isSubProtocol' in value && 'subProtocolType' in value
 }

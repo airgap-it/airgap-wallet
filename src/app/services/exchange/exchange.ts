@@ -2,7 +2,7 @@ import { ProtocolService } from '@airgap/angular-core'
 import { AirGapMarketWallet, FeeDefaults, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { FormBuilder } from '@angular/forms'
+import { UntypedFormBuilder } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { BigNumber } from 'bignumber.js'
 import { BehaviorSubject, Observable } from 'rxjs'
@@ -11,13 +11,13 @@ import { take, tap } from 'rxjs/operators'
 import { OperationsProvider } from '../operations/operations'
 import { WalletStorageKey, WalletStorageService } from '../storage/storage'
 
+import * as fromExchange from '../../pages/exchange/reducer'
+import * as actions from '../../app.actions'
 import { ChangellyExchange } from './exchange.changelly'
 import { ChangeNowExchange } from './exchange.changenow'
 import { Exchange, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 import { LiquidityExchange } from './exchange.liquidity'
 import { QuipuswapExchange } from './exchange.quipuswap'
-import * as fromExchange from '../../pages/exchange/reducer'
-import * as actions from '../../app.actions'
 import { PlentyExchange } from './exchange.plenty'
 
 export enum SwapExchangeEnum {
@@ -68,19 +68,19 @@ export class ExchangeProvider implements Exchange {
 
   private pendingTransactions: ExchangeTransactionDetails[] = []
 
-  constructor(
+  public constructor(
     public http: HttpClient,
     private readonly storageService: WalletStorageService,
     private readonly protocolService: ProtocolService,
     private readonly operationsProvider: OperationsProvider,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     protected readonly store$: Store<fromExchange.State>
   ) {
     this.loadPendingTranscationsFromStorage()
 
     this.exchangeObservable = this.exchangeSubject.pipe(
       tap((exchange: ExchangeEnum) => {
-        // tslint:disable-next-line: switch-default
+        // eslint-disable-next-line default-case
         switch (exchange) {
           case SwapExchangeEnum.CHANGELLY:
             this.exchange = new ChangellyExchange(this.operationsProvider, this.http)
@@ -249,9 +249,7 @@ export class ExchangeProvider implements Exchange {
   }
 
   private async loadPendingTranscationsFromStorage() {
-    const pendingTransactions = (await this.storageService.get(
-      WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS
-    )) as ExchangeTransactionDetails[]
+    const pendingTransactions = await this.storageService.get(WalletStorageKey.PENDING_EXCHANGE_TRANSACTIONS)
     this.pendingTransactions = pendingTransactions ? pendingTransactions : []
     return
   }

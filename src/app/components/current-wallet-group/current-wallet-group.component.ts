@@ -15,7 +15,7 @@ export class CurrentWalletGroupComponent {
   public readonly groups$: Observable<ActiveWalletGroup[]>
   public readonly currentGroup$: Observable<ActiveWalletGroup>
 
-  constructor(private readonly accountProvider: AccountProvider) {
+  public constructor(private readonly accountProvider: AccountProvider) {
     this.groups$ = this.accountProvider.getWalletsGroupedByAccountObservable().pipe(
       map((groups: AirGapMarketWalletGroup[]) => {
         const activeGroups: AirGapMarketWalletGroup[] = groups.filter(

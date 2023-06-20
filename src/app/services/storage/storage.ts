@@ -3,7 +3,8 @@ import { Network } from '@airgap/beacon-sdk'
 import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
 import { ProtocolOptions } from '@airgap/coinlib-core/utils/ProtocolOptions'
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage'
+import { Storage } from '@ionic/storage-angular'
+import CordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
 
 import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
 import { ExchangeTransactionDetails } from '../exchange/exchange'
@@ -60,7 +61,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.PENDING_REQUEST]: SerializedBeaconRequest[]
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
   [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
-  [WalletStorageKey.THEME]: themeOptions,
+  [WalletStorageKey.THEME]: themeOptions
   [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: boolean
 }
 
@@ -90,19 +91,17 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   providedIn: 'root'
 })
 export class WalletStorageService extends BaseStorage<WalletStorageKey, WalletStorageKeyReturnType> {
-  constructor(storage: Storage) {
-    super(storage, defaultValues)
+  public constructor(storage: Storage) {
+    super(storage, defaultValues, [CordovaSQLiteDriver])
   }
 
   public async getCache<T>(key: string): Promise<T> {
-    await this.storage.ready()
-
-    return this.storage.get(`cache-${key}`)
+    const storage = await this.getStorage()
+    return storage.get(`cache-${key}`)
   }
 
   public async setCache<T>(key: string, value: T): Promise<T> {
-    await this.storage.ready()
-
-    return this.storage.set(`cache-${key}`, value)
+    const storage = await this.getStorage()
+    return storage.set(`cache-${key}`, value)
   }
 }

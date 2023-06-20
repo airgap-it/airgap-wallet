@@ -50,7 +50,7 @@ export class AirGapMarketWalletGroup {
     return this._status
   }
 
-  constructor(
+  public constructor(
     public readonly id: string | undefined,
     label: string | undefined,
     interactionSetting: InteractionSetting | undefined,

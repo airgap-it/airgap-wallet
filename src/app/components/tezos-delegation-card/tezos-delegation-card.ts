@@ -16,10 +16,10 @@ export class TezosDelegationCard {
   public delegateAmount: number = 0
 
   @Output()
-  public onDelegatedClick: EventEmitter<void> = new EventEmitter<void>()
+  public readonly onDelegatedClick: EventEmitter<void> = new EventEmitter<void>()
 
   @Output()
-  public onUndelegatedClick: EventEmitter<void> = new EventEmitter<void>()
+  public readonly onUndelegatedClick: EventEmitter<void> = new EventEmitter<void>()
 
   public delegatedClick() {
     this.onDelegatedClick.emit()

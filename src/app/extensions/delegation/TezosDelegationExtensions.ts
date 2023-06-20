@@ -3,7 +3,7 @@ import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coi
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { TezosDelegatorAction, TezosProtocol } from '@airgap/tezos'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -32,7 +32,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     shortenStringPipe: ShortenStringPipe,
     translateService: TranslateService,
     addressService: AddressService,
-    formBuilder: FormBuilder
+    formBuilder: UntypedFormBuilder
   ): Promise<TezosDelegationExtensions> {
     if (!TezosDelegationExtensions.instance) {
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
@@ -70,7 +70,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly addressService: AddressService,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: UntypedFormBuilder
   ) {
     super()
   }
@@ -87,7 +87,10 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     return [extraDetails]
   }
 
-  public async createDelegateesSummary(_adapter: ICoinDelegateProtocolAdapter<TezosProtocol>, delegatees: string[]): Promise<UIAccountSummary[]> {
+  public async createDelegateesSummary(
+    _adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    delegatees: string[]
+  ): Promise<UIAccountSummary[]> {
     const knownBakers: TezosBakerCollection = await this.getKnownBakers()
 
     type BakerDetails = Partial<TezosBakerDetails> & Record<'address', string>
@@ -250,7 +253,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     availableActions: DelegatorAction[],
     types: TezosDelegatorAction[],
     label: string,
-    form?: FormGroup
+    form?: UntypedFormGroup
   ): AirGapDelegatorAction | null {
     const action = availableActions.find((action) => types.includes(action.type))
 

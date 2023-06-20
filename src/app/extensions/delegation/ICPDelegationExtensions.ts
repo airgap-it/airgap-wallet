@@ -4,7 +4,7 @@ import { ICPProtocol, ICPStakingActionType, ICPUnits } from '@airgap/icp'
 import { ICPDelegateeDetails, ICPDelegatorDetails, Neuron } from '@airgap/icp/v1/types/governance'
 import { Amount, newAmount, newPublicKey, ProtocolMetadata } from '@airgap/module-kit'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as humanizeDuration from 'humanize-duration'
@@ -39,7 +39,7 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
   private static instance: ICPDelegationExtensions
 
   public static create(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
@@ -63,7 +63,7 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
   public supportsMultipleDelegations: boolean = true
 
   private constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     public readonly shortenStringPipe: ShortenStringPipe,
@@ -142,7 +142,7 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
         {
           label: 'account-transaction-detail.delegated_label',
           text: `${await this.amountConverterPipe.transformValueOnly(lockedBalance, adapter, 0)} ${adapter.symbol}`
-        },
+        }
       ]
     })
   }
@@ -241,7 +241,7 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
 
   private async getExtraFolloweeDetails(
     adapter: ICoinDelegateProtocolAdapter<ICPProtocol>,
-    followeeDetails: ICPDelegateeDetails,
+    followeeDetails: ICPDelegateeDetails
   ): Promise<AirGapDelegateeDetails | undefined> {
     const currentUsage = new BigNumber(0)
     const totalUsage = new BigNumber(0)
@@ -303,19 +303,13 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
     const startDissolvingAction = results[5]
     const stopDissolvingAction = results[6]
 
-
     const displayDetails = await this.createDisplayDetails(adapter, delegatorDetails)
 
     return {
       ...delegatorDetails,
-      mainActions: [
-        stakeAction, 
-        followAction,
-        increaseDissolveDelayAction,
-        moreDetailsAction,
-        stopDissolvingAction,
-        disburseAction
-      ].filter((action) => !!action),
+      mainActions: [stakeAction, followAction, increaseDissolveDelayAction, moreDetailsAction, stopDissolvingAction, disburseAction].filter(
+        (action) => !!action
+      ),
       secondaryActions: [startDissolvingAction].filter((action) => !!action),
       displayDetails
     }
@@ -336,7 +330,9 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
       if (action.type === ICPStakingActionType.STAKE_AND_FOLLOW) {
         if (!isStaking && !isFollowing) {
           return this.translateService.instant('delegation-detail-icp.stake-and-follow.not-staking-not-following_text', {
-            minStake: await this.amountConverterPipe.transform(newAmount<ICPUnits>(1, 'ICP').blockchain(metadata.units).value, { protocol: adapter }),
+            minStake: await this.amountConverterPipe.transform(newAmount<ICPUnits>(1, 'ICP').blockchain(metadata.units).value, {
+              protocol: adapter
+            }),
             maxStake: await this.amountConverterPipe.transform(newAmount(maxStake).blockchain(metadata.units).value, { protocol: adapter })
           })
         }
@@ -446,11 +442,12 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
       delegatorDetails.availableActions ?? [],
       [ICPStakingActionType.INCREASE_DISSOLVE_DELAY],
       async (_) => 'delegation-detail-icp.increase-dissolve-delay.label',
-      async (_) => this.translateService.instant('delegation-detail-icp.increase-dissolve-delay.text', {
-        dissolveDelay: humanizedDissolveDelay,
-        maxDissolveDelay: humanizedMaxDissolveDelay
-      }),
-      { 
+      async (_) =>
+        this.translateService.instant('delegation-detail-icp.increase-dissolve-delay.text', {
+          dissolveDelay: humanizedDissolveDelay,
+          maxDissolveDelay: humanizedMaxDissolveDelay
+        }),
+      {
         minDelay: new BigNumber(delegatorDetails.dissolveDelay ?? 0),
         maxDelay: maxDissolveDelay
       }
@@ -523,13 +520,14 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
       delegatorDetails.availableActions ?? [],
       [ICPStakingActionType.STOP_DISSOLVING],
       async (_) => 'delegation-detail-icp.stop-dissolving.label',
-      async (_) => this.translateService.instant('delegation-detail-icp.stop-dissolving.text', {
-        dissolveDelay: humanizedDissolveDelay
-      })
+      async (_) =>
+        this.translateService.instant('delegation-detail-icp.stop-dissolving.text', {
+          dissolveDelay: humanizedDissolveDelay
+        })
     )
   }
 
-  // tslint:disable-next-line: cyclomatic-complexity
+  // eslint-disable-next-line complexity
   private async createMainDelegatorAction(
     adapter: ICoinDelegateProtocolAdapter<ICPProtocol>,
     metadata: ProtocolMetadata<ICPUnits>,
@@ -554,9 +552,9 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
       return null
     }
 
-    const { 
-      followee: neuronIdArgName, 
-      amount: amountArgName, 
+    const {
+      followee: neuronIdArgName,
+      amount: amountArgName,
       amountControl: amountControlArgName,
       delay: delayArgName,
       delayControl: delayControlArgName
@@ -771,7 +769,9 @@ export class ICPDelegationExtensions extends V1ProtocolDelegationExtensions<ICPP
     }
   }
 
-  private resolveMainArgumentNames(mainAction: ICPStakingActionType): { followee?: string; amount?: string; amountControl?: string; delay?: string; delayControl?: string } {
+  private resolveMainArgumentNames(
+    mainAction: ICPStakingActionType
+  ): { followee?: string; amount?: string; amountControl?: string; delay?: string; delayControl?: string } {
     switch (mainAction) {
       case ICPStakingActionType.STAKE_AND_FOLLOW:
         return {

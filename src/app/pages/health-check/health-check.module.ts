@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
+import { TranslateModule } from '@ngx-translate/core'
 import { HealthCheckPageRoutingModule } from './health-check-routing.module'
 
 import { HealthCheckPage } from './health-check.page'
-import { TranslateModule } from '@ngx-translate/core'
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, TranslateModule, HealthCheckPageRoutingModule],

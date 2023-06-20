@@ -24,9 +24,9 @@ const paths: { path: string; prevPath: string }[] = [
   providedIn: 'root'
 })
 export class NavigationService {
-  constructor(private readonly router: Router) {}
+  public constructor(private readonly router: Router) {}
 
-  handleBackNavigation(currentPath: string) {
+  public handleBackNavigation(currentPath: string) {
     if (currentPath === rootPath) {
       App.exitApp()
       return

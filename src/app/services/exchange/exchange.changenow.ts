@@ -6,7 +6,7 @@ import { OperationsProvider } from '../operations/operations'
 
 import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
-// tslint:disable:max-classes-per-file
+/* eslint-disable max-classes-per-file */
 
 export interface CurrencyDetailResponse {
   ticker: string
@@ -60,7 +60,7 @@ export interface ChangeNowTransactionStatus {
 export class ChangeNowTransactionStatusResponse implements ExchangeTransactionStatusResponse {
   public status: string
 
-  constructor(json: ChangeNowTransactionStatus) {
+  public constructor(json: ChangeNowTransactionStatus) {
     this.status = json.status
   }
 
@@ -81,7 +81,7 @@ class ChangeNowApi {
   private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
   private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(
+  public constructor(
     protected readonly operationsProvider: OperationsProvider,
     protected readonly http: HttpClient,
     protected readonly baseURL: string = 'https://changenow.io/api/v1'
@@ -325,7 +325,7 @@ class ChangeNowApi {
 }
 
 export class ChangeNowExchange extends ChangeNowApi implements Exchange {
-  constructor(operationsProvider: OperationsProvider, http: HttpClient) {
+  public constructor(operationsProvider: OperationsProvider, http: HttpClient) {
     super(operationsProvider, http)
   }
 

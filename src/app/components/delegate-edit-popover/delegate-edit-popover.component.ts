@@ -17,7 +17,7 @@ export class DelegateEditPopoverComponent {
   private readonly protocolIdentifier: ProtocolSymbols
   private readonly networkIdentifier: string
 
-  constructor(
+  public constructor(
     private readonly alertController: AlertController,
     private readonly popoverController: PopoverController,
     private readonly navParams: NavParams,

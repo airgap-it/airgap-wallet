@@ -6,7 +6,7 @@ import { OperationsProvider } from '../operations/operations'
 
 import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
-// tslint:disable:max-classes-per-file
+/* eslint-disable max-classes-per-file */
 
 export interface CreateTransactionResponse {
   amountExpectedFrom: string
@@ -48,7 +48,7 @@ interface JsonRpcReturnWrapper<T> {
 export class ChangellyTransactionStatusResponse implements ExchangeTransactionStatusResponse {
   public status: string
 
-  constructor(status: string) {
+  public constructor(status: string) {
     this.status = status
   }
 
@@ -69,7 +69,7 @@ class ChangellyApi {
   private readonly identifierExchangeToAirGapMap: Map<ExchangeIdentifier, ProtocolSymbols> = new Map<ExchangeIdentifier, ProtocolSymbols>()
   private readonly identifierAirGapToExchangeMap: Map<ProtocolSymbols, ExchangeIdentifier> = new Map<ProtocolSymbols, ExchangeIdentifier>()
 
-  constructor(
+  public constructor(
     protected readonly operationsProvider: OperationsProvider,
     protected readonly http: HttpClient,
     protected readonly baseURL: string = 'https://swap.airgap.prod.gke.papers.tech/'
@@ -277,7 +277,7 @@ class ChangellyApi {
 }
 
 export class ChangellyExchange extends ChangellyApi implements Exchange {
-  constructor(operationsProvider: OperationsProvider, http: HttpClient) {
+  public constructor(operationsProvider: OperationsProvider, http: HttpClient) {
     super(operationsProvider, http)
   }
 

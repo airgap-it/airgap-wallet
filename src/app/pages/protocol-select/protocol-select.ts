@@ -13,7 +13,7 @@ export class ProtocolSelectPage {
   public protocols: ICoinProtocol[]
   public filteredProtocols: ICoinProtocol[]
 
-  constructor(public navParams: NavParams, public viewCtrl: ModalController) {
+  public constructor(public navParams: NavParams, public viewCtrl: ModalController) {
     this.selectedProtocol = this.navParams.get('selectedProtocol')
     this.protocols = this.navParams.get('protocols')
     this.searchTermChanged()

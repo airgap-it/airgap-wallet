@@ -21,7 +21,7 @@ export class SelectWalletPage {
   private address: string | undefined
   private callback: ((wallet: AirGapMarketWallet) => void) | undefined
 
-  constructor(public accountProvider: AccountProvider, private readonly router: Router, private readonly route: ActivatedRoute) {}
+  public constructor(public accountProvider: AccountProvider, private readonly router: Router, private readonly route: ActivatedRoute) {}
 
   public async ionViewWillEnter() {
     if (this.route.snapshot.data.special) {

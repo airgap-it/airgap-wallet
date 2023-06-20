@@ -10,7 +10,6 @@ export class ShopService {
   public corsUrl: string = 'https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url='
   public shopBannerText: string = ''
   public shopBannerLink: string = ''
-  constructor() {}
 
   private async fetchData(url: string) {
     const data = await axios.get<{ text: string; link: string }>(url)
@@ -21,7 +20,7 @@ export class ShopService {
     return `${this.corsUrl}${encodeURI(this.shopJSONUrl)}`
   }
 
-  async getShopData(): Promise<
+  public async getShopData(): Promise<
     AxiosResponse<{
       text: string
       link: string

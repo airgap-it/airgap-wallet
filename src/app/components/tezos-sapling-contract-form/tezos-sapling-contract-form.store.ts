@@ -38,7 +38,7 @@ const initialState: TezosSaplingContractFormState = {
 
 @Injectable()
 export class TezosSaplingContractFormStore extends ComponentStore<TezosSaplingContractFormState> {
-  constructor(private readonly protocolService: ProtocolService) {
+  public constructor(private readonly protocolService: ProtocolService) {
     super(initialState)
   }
 
@@ -103,16 +103,18 @@ export class TezosSaplingContractFormStore extends ComponentStore<TezosSaplingCo
     return this.select((state) => state[key])
   }
 
-  private updateWithValue = this.updater((state: TezosSaplingContractFormState, partialState: Partial<TezosSaplingContractFormState>) => {
-    return {
-      ...state,
-      ...partialState,
-      warningDescription: undefined,
-      errorDescription: undefined
+  private readonly updateWithValue = this.updater(
+    (state: TezosSaplingContractFormState, partialState: Partial<TezosSaplingContractFormState>) => {
+      return {
+        ...state,
+        ...partialState,
+        warningDescription: undefined,
+        errorDescription: undefined
+      }
     }
-  })
+  )
 
-  private updateWithErrorOrWarning = this.updater((state: TezosSaplingContractFormState, errorOrWarning: unknown) => {
+  private readonly updateWithErrorOrWarning = this.updater((state: TezosSaplingContractFormState, errorOrWarning: unknown) => {
     const warning = isTezosSaplingContractFormWarning(errorOrWarning) ? errorOrWarning : undefined
     const error =
       warning === undefined ? (isTezosSaplingContractFormError(errorOrWarning) ? errorOrWarning : unknownError(errorOrWarning)) : undefined

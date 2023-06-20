@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { WalletStorageService } from '../storage/storage'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AccountSync } from 'src/app/types/AccountSync'
+import { WalletStorageService } from '../storage/storage'
 
 export enum DataServiceKey {
   SYNC_ACCOUNTS = 'sync-accounts',
@@ -20,9 +20,9 @@ export enum DataServiceKey {
 })
 export class DataService {
   private readonly data = []
-  private accountSyncs$: BehaviorSubject<AccountSync[] | null> = new BehaviorSubject(null)
+  private readonly accountSyncs$: BehaviorSubject<AccountSync[] | null> = new BehaviorSubject(null)
 
-  constructor(private readonly storage: WalletStorageService) {}
+  public constructor(private readonly storage: WalletStorageService) {}
 
   public getAccountSyncs(): Observable<AccountSync[] | null> {
     return this.accountSyncs$.asObservable()

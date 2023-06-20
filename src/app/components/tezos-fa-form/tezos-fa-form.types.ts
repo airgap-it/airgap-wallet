@@ -11,7 +11,7 @@ export interface TokenDetails {
   name: string
 }
 
-export interface TokenDetailsInput { 
+export interface TokenDetailsInput {
   address: string
   networkIdentifier: string
   tokenInterface?: TokenInterface
@@ -45,11 +45,11 @@ interface TezosFAFormBaseError<T extends TezosFAFormErrorType> {
   type: T
 }
 
-export interface ContractNotFoundError extends TezosFAFormBaseError<TezosFAFormErrorType.CONTRACT_NOT_FOUND> {}
+export type ContractNotFoundError = TezosFAFormBaseError<TezosFAFormErrorType.CONTRACT_NOT_FOUND>
 export interface InterfaceUnknownError extends TezosFAFormBaseError<TezosFAFormErrorType.INTERFACE_UNKNOWN> {
   tokenInterfaces: TokenInterface[]
 }
-export interface TokenMetadataMissingError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING> {}
+export type TokenMetadataMissingError = TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_METADATA_MISSING>
 export interface TokenVagueError extends TezosFAFormBaseError<TezosFAFormErrorType.TOKEN_VAGUE> {
   tokens: TokenDetails[]
 }

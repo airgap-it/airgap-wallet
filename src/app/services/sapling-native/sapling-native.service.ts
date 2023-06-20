@@ -10,7 +10,7 @@ import { SAPLING_PLUGIN } from '../../capacitor-plugins/injection-tokens'
   providedIn: 'root'
 })
 export class SaplingNativeService {
-  constructor(@Inject(SAPLING_PLUGIN) private readonly sapling: SaplingNativePlugin, private readonly platform: Platform) {}
+  public constructor(@Inject(SAPLING_PLUGIN) private readonly sapling: SaplingNativePlugin, private readonly platform: Platform) {}
 
   public async createExternalMethodProvider(): Promise<TezosSaplingExternalMethodProvider | undefined> {
     const isSupported = this.platform.is('capacitor') && !this.platform.is('electron') && (await this.sapling.isSupported()).isSupported

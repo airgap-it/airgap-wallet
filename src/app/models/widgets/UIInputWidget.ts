@@ -1,6 +1,6 @@
-import { UIWidget, UIWidgetConfig } from './UIWidget'
 import { AbstractControl, ValidatorFn } from '@angular/forms'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { UIWidget, UIWidgetConfig } from './UIWidget'
 
 export interface UIInputWidgetConfig extends UIWidgetConfig {
   id: string
@@ -22,7 +22,7 @@ export abstract class UIInputWidget<T> extends UIWidget {
 
   protected onValueChangedCallback?: (value: T, widget: UIInputWidget<T>) => void
 
-  constructor(config: UIInputWidgetConfig) {
+  public constructor(config: UIInputWidgetConfig) {
     super(config)
 
     this.validators = config.validators

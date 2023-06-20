@@ -29,7 +29,7 @@ export abstract class V1ProtocolDelegationExtensions<
   }
 
   private static extend(target: any, owner: any, ...keys: [string, 'property' | 'function'][]) {
-    for (let [key, type] of keys) {
+    for (const [key, type] of keys) {
       switch (type) {
         case 'property':
           target[key] = owner[key]

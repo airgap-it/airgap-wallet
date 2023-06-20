@@ -14,7 +14,7 @@ export interface PushAddressRequest {
   providedIn: 'root'
 })
 export class PushBackendProvider {
-  constructor(private readonly http: HttpClient) {}
+  public constructor(private readonly http: HttpClient) {}
 
   public async registerPushMany(pushRequests: PushAddressRequest[]): Promise<string> {
     return this.http

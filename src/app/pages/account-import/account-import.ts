@@ -31,7 +31,7 @@ export class AccountImportPage implements OnDestroy {
 
   private readonly ngDestroyed$: Subject<void> = new Subject()
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     private readonly loadingCtrl: LoadingController,
     private readonly navController: NavController,

@@ -12,7 +12,7 @@ import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { IACMessageType } from '@airgap/serializer'
 import { isSubstrateProtocol } from '@airgap/substrate'
 import { Component, NgZone } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController } from '@ionic/angular'
 import { BigNumber } from 'bignumber.js'
@@ -69,8 +69,8 @@ export class TransactionPreparePage {
   public readonly networkType: typeof NetworkType = NetworkType
 
   public wallet: AirGapMarketWallet
-  public transactionForm: FormGroup
-  public amountForm: FormGroup
+  public transactionForm: UntypedFormGroup
+  public amountForm: UntypedFormGroup
 
   // temporary field until we figure out how to handle Substrate fee/tip model
   public readonly isSubstrate: boolean
@@ -82,16 +82,16 @@ export class TransactionPreparePage {
   private _state: TransactionPrepareState
   private readonly state$: BehaviorSubject<TransactionPrepareState>
 
-  private publicKey: string
-  private protocolID: string
-  private addressIndex: number | undefined
+  private readonly publicKey: string
+  private readonly protocolID: string
+  private readonly addressIndex: number | undefined
 
   public collectibleID: string | undefined
   public collectibleAddress: string | undefined
 
-  constructor(
+  public constructor(
     public loadingCtrl: LoadingController,
-    public formBuilder: FormBuilder,
+    public formBuilder: UntypedFormBuilder,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly _ngZone: NgZone,
@@ -326,7 +326,7 @@ export class TransactionPreparePage {
     }
   }
 
-  // tslint:disable-next-line: cyclomatic-complexity
+  // eslint-disable-next-line complexity
   private reduceState(currentState: TransactionPrepareState, newState: Partial<TransactionPrepareState>): TransactionPrepareState {
     const state = {
       availableBalance: newState.availableBalance !== undefined ? newState.availableBalance : currentState.availableBalance,
@@ -526,7 +526,7 @@ export class TransactionPreparePage {
       callback
     }
     this.dataService.setData(DataServiceKey.SCAN, info)
-    this.router.navigateByUrl('/scan-address/' + DataServiceKey.SCAN).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/scan-address/${DataServiceKey.SCAN}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async toggleMaxAmount(): Promise<void> {
@@ -602,7 +602,7 @@ export class TransactionPreparePage {
         this.transactionForm.controls.receiver.setValue(receiverAddress, { onlySelf: false, emitEvent: true })
       },
       (err: string) => {
-        console.error('Error: ' + err)
+        console.error(`Error: ${err}`)
       }
     )
   }

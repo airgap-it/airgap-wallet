@@ -14,7 +14,7 @@ export class DappConfirmPage {
   public id: string | undefined
   public result: string | undefined
 
-  constructor(private readonly modalController: ModalController) {}
+  public constructor(private readonly modalController: ModalController) {}
 
   public async approveRequest() {
     this.connector.approveRequest({

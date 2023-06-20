@@ -1,4 +1,12 @@
-import { APP_INFO_PLUGIN, APP_PLUGIN, CLIPBOARD_PLUGIN, FILESYSTEM_PLUGIN, SPLASH_SCREEN_PLUGIN, STATUS_BAR_PLUGIN, ZIP_PLUGIN } from '@airgap/angular-core'
+import {
+  APP_INFO_PLUGIN,
+  APP_PLUGIN,
+  CLIPBOARD_PLUGIN,
+  FILESYSTEM_PLUGIN,
+  SPLASH_SCREEN_PLUGIN,
+  STATUS_BAR_PLUGIN,
+  ZIP_PLUGIN
+} from '@airgap/angular-core'
 import { TestBed } from '@angular/core/testing'
 
 import { UnitHelper } from '../../test-config/unit-test-helper'

@@ -36,7 +36,7 @@ import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
   providedIn: 'root'
 })
 export class IACService extends BaseIACService {
-  constructor(
+  public constructor(
     uiEventElementsService: UiEventElementsService,
     public beaconService: BeaconService,
     public readonly deeplinkService: DeeplinkService,
@@ -74,7 +74,7 @@ export class IACService extends BaseIACService {
       isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
-    this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/interaction-selection/${DataServiceKey.INTERACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async handleWalletSync(

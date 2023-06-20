@@ -28,7 +28,7 @@ export class AccountEditPopoverComponent implements OnInit {
 
   public networks: ProtocolNetwork[] = []
 
-  constructor(
+  public constructor(
     private readonly alertCtrl: AlertController,
     private readonly navParams: NavParams,
     private readonly walletsProvider: AccountProvider,

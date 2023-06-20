@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
+import { TranslateModule } from '@ngx-translate/core'
 import { DappConfirmPageRoutingModule } from './dapp-confirm-routing.module'
 
 import { DappConfirmPage } from './dapp-confirm.page'
-import { TranslateModule } from '@ngx-translate/core'
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, TranslateModule, DappConfirmPageRoutingModule],

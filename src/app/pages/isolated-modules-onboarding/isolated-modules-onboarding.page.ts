@@ -9,15 +9,16 @@ import { WalletStorageKey, WalletStorageService } from 'src/app/services/storage
   styleUrls: ['./isolated-modules-onboarding.page.scss']
 })
 export class IsolatedModulesOnboardingPage {
-  constructor(private readonly storageSerivce: WalletStorageService, private readonly modalController: ModalController) {
-  }
+  public constructor(private readonly storageSerivce: WalletStorageService, private readonly modalController: ModalController) {}
 
   public back() {
     this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }
 
   public async acknowledge() {
-    await this.storageSerivce.set(WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    await this.storageSerivce
+      .set(WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED, true)
+      .catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.IONIC_MODAL))
   }
