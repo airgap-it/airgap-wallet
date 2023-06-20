@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AirGapMarketWallet,
@@ -10,24 +10,31 @@ import {
   SubProtocolSymbols
 } from '@airgap/coinlib-core'
 import { AirGapTransactionStatus, IAirGapTransaction } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { Contract, ContractAbstraction, ContractProvider, TezosToolkit, TransferParams } from '@taquito/taquito'
 import { MichelsonV1ExpressionBase, MichelsonV1ExpressionExtended } from '@taquito/rpc'
 import BigNumber from 'bignumber.js'
-import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
-import { UIWidget } from '../../models/widgets/UIWidget'
-import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
-import * as liquidityBakingCalculations from './liquidity-baking-calculations'
 import { Store } from '@ngrx/store'
-import * as fromExchange from '../../pages/exchange/reducer'
 import { getSelectedSlippage } from 'src/app/app.selectors'
 import { take } from 'rxjs/operators'
 import { SegmentType } from 'src/app/pages/exchange/reducer'
-import { TezosOperation, TezosOperationType, TezosProtocol, TezosTransactionOperation, TezosTransactionSignRequest, TezosWrappedOperation } from '@airgap/tezos'
+import {
+  TezosOperation,
+  TezosOperationType,
+  TezosProtocol,
+  TezosTransactionOperation,
+  TezosTransactionSignRequest,
+  TezosWrappedOperation
+} from '@airgap/tezos'
 import { TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
 import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
 import { newAmount, newPublicKey, PublicKey } from '@airgap/module-kit'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
+import * as fromExchange from '../../pages/exchange/reducer'
+import { UIWidget } from '../../models/widgets/UIWidget'
+import { UIOptionButtonGroup } from '../../models/widgets/input/UIOptionButtonGroup'
+import * as liquidityBakingCalculations from './liquidity-baking-calculations'
+import { Exchange, ExchangeIdentifier, ExchangeTransaction, ExchangeTransactionStatusResponse, ExchangeUI } from './exchange.interface'
 
 interface DexStorage {
   storage: {
@@ -53,7 +60,7 @@ interface LiquiditySlippageTolerance {
 }
 
 class LiquidityTransactionStatusResponse implements ExchangeTransactionStatusResponse {
-  constructor(public readonly status: string) {}
+  public constructor(public readonly status: string) {}
 
   public isPending(): boolean {
     switch (this.status) {
@@ -95,9 +102,9 @@ export class LiquidityExchange implements Exchange {
     return [MainProtocolSymbols.XTZ]
   }
 
-  private liquidityTokenContractAddress = 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo'
-  private liquidityBakingContractAddress = 'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5'
-  private tokenContractAddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
+  private readonly liquidityTokenContractAddress = 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo'
+  private readonly liquidityBakingContractAddress = 'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5'
+  private readonly tokenContractAddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
   private liquidityTokenContract: ContractAbstraction<ContractProvider>
   private liquidityBakingContract: ContractAbstraction<ContractProvider>
   private tokenContract: ContractAbstraction<ContractProvider>
@@ -115,9 +122,9 @@ export class LiquidityExchange implements Exchange {
     high: 0.03 // 3%
   }
 
-  constructor(
+  public constructor(
     private readonly protocolService: ProtocolService,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly store$: Store<fromExchange.State>
   ) {
     this.store$.select(getSelectedSlippage).subscribe((slippage) => {
@@ -133,7 +140,7 @@ export class LiquidityExchange implements Exchange {
     this.initIdentifierMappings(this.supportedTokens)
   }
 
-  async initContracts() {
+  public async initContracts() {
     if (this.tezos && this.liquidityBakingContract && this.liquidityTokenContract && this.tokenContract) {
       return
     }
@@ -235,7 +242,7 @@ export class LiquidityExchange implements Exchange {
       return undefined
     }
 
-    let shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromProtocol.decimals)
+    const shiftedAmount: BigNumber = new BigNumber(amount).shiftedBy(fromProtocol.decimals)
 
     const segmentType = await this.store$
       .select((state) => state.exchange.segmentType)
@@ -254,7 +261,7 @@ export class LiquidityExchange implements Exchange {
     return minAmount.shiftedBy(-toProtocol.decimals).toFixed()
   }
 
-  async getExpectedTokenIn(mutezAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
+  public async getExpectedTokenIn(mutezAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
     await this.initContracts()
 
     const priceImpact = await this.xtzToTokenPriceImpact(mutezAmount)
@@ -264,7 +271,7 @@ export class LiquidityExchange implements Exchange {
       .integerValue(BigNumber.ROUND_DOWN)
   }
 
-  async getExpectedMinimumReceivedToken(mutezAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedToken(mutezAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
     await this.initContracts()
 
     const priceImpact = await this.xtzToTokenPriceImpact(mutezAmount)
@@ -275,7 +282,7 @@ export class LiquidityExchange implements Exchange {
       .integerValue(BigNumber.ROUND_DOWN)
   }
 
-  async getExpectedMinimumReceivedTez(tokenAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedTez(tokenAmount: BigNumber, slippageTolerance: BigNumber): Promise<BigNumber> {
     await this.initContracts()
 
     const priceImpact = await this.tokenToXtzPriceImpact(tokenAmount)
@@ -471,9 +478,13 @@ export class LiquidityExchange implements Exchange {
         this.approveRequest(address.address, 0, fee)
       ]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
-    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
-    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+        this.getV1PublicKey(publicKey),
+        operations,
+        false
+      )
+      const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+      const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -493,9 +504,13 @@ export class LiquidityExchange implements Exchange {
       const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
       const operations = await this.prepareRemoveLiquidityOperation(publicKey, liquidityAmount, fee, decimals)
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
-    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
-    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+        this.getV1PublicKey(publicKey),
+        operations,
+        false
+      )
+      const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+      const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -540,7 +555,7 @@ export class LiquidityExchange implements Exchange {
       const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
       const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
-      let xtzToTokenParams = this.liquidityBakingContract.methods
+      const xtzToTokenParams = this.liquidityBakingContract.methods
         .xtzToToken(address.address, minTokenAmount, this.deadline())
         .toTransferParams()
 
@@ -555,9 +570,13 @@ export class LiquidityExchange implements Exchange {
         }
       ] as PartialTransactionOperation[]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
-    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
-    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+        this.getV1PublicKey(publicKey),
+        operations,
+        false
+      )
+      const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+      const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -577,7 +596,7 @@ export class LiquidityExchange implements Exchange {
       const tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await this.getTezosProtocol()
       const address: IAirGapAddressResult = await tezosProtocol.getAddressFromPublicKey(publicKey)
 
-      let tokenToXtzParams = this.liquidityBakingContract.methods
+      const tokenToXtzParams = this.liquidityBakingContract.methods
         .tokenToXtz(address.address, tokenAmount, minMutezAmount, this.deadline())
         .toTransferParams()
 
@@ -592,9 +611,13 @@ export class LiquidityExchange implements Exchange {
         }
       ] as PartialTransactionOperation[]
 
-      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(this.getV1PublicKey(publicKey), operations, false)
-    const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
-    const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
+      const wrappedOperations: TezosWrappedOperation = await tezosProtocol.protocolV1.prepareOperations(
+        this.getV1PublicKey(publicKey),
+        operations,
+        false
+      )
+      const forgedTransaction: string = await tezosProtocol.protocolV1.forgeOperation(wrappedOperations)
+      const transaction: TezosTransactionSignRequest['transaction'] = { binaryTransaction: forgedTransaction }
       const details: IAirGapTransaction[] = await tokenProtocol.getTransactionDetails({ publicKey, transaction })
 
       return { details, unsigned: transaction }
@@ -685,7 +708,7 @@ export class LiquidityExchange implements Exchange {
     const valueToControlValue = (value: string) => new BigNumber(value).multipliedBy(100).toFixed()
     const controlValueToValue = (controlValue: string) => new BigNumber(controlValue).dividedBy(100).toFixed()
 
-    const form: FormGroup = this.formBuilder.group({
+    const form: UntypedFormGroup = this.formBuilder.group({
       [ControlId.SLIPPAGE_TOLERANCE]: [defaultValue, Validators.required],
       [ControlId.SLIPPAGE_TOLERANCE_CONTROL]: [valueToControlValue(defaultValue), Validators.required]
     })
@@ -733,7 +756,7 @@ export class LiquidityExchange implements Exchange {
     return [tezOut, tokensOut]
   }
 
-  async getLiquidityBurnXtzOut(lqtBurned: string): Promise<BigNumber> {
+  public async getLiquidityBurnXtzOut(lqtBurned: string): Promise<BigNumber> {
     await this.initContracts()
 
     return new BigNumber(liquidityBakingCalculations.removeLiquidityXtzOut(lqtBurned, this.lqtTotal, this.xtzPool)).multipliedBy(
@@ -741,7 +764,7 @@ export class LiquidityExchange implements Exchange {
     )
   }
 
-  async getLiquidityBurnTokensOut(lqtBurned: string): Promise<BigNumber> {
+  public async getLiquidityBurnTokensOut(lqtBurned: string): Promise<BigNumber> {
     await this.initContracts()
     return new BigNumber(liquidityBakingCalculations.removeLiquidityTokenOut(lqtBurned, this.lqtTotal, this.tokenPool)).multipliedBy(
       this.slippageTolerance.minus(1).abs()

@@ -2,7 +2,7 @@ import { IAirGapTransaction } from '@airgap/coinlib-core'
 import { implementsInterface } from '@airgap/module-kit'
 import { TransactionSignRequest } from '@airgap/serializer'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import BigNumber from 'bignumber.js'
 
 interface UnsignedTransactionWithGas {
@@ -16,7 +16,7 @@ interface UnsignedTransactionWithGas {
   styleUrls: ['./walletconnect-from-to.component.scss']
 })
 export class WalletconnectFromToComponent {
-  public formGroup: FormGroup | undefined
+  public formGroup: UntypedFormGroup | undefined
 
   @Input()
   public airGapTransaction: IAirGapTransaction | undefined
@@ -25,9 +25,11 @@ export class WalletconnectFromToComponent {
   public rawTransaction: TransactionSignRequest['transaction'] | undefined
 
   @Output()
-  public readonly onRawTransactionUpdate: EventEmitter<TransactionSignRequest['transaction']> = new EventEmitter<TransactionSignRequest['transaction']>()
+  public readonly onRawTransactionUpdate: EventEmitter<TransactionSignRequest['transaction']> = new EventEmitter<
+    TransactionSignRequest['transaction']
+  >()
 
-  constructor(private readonly formBuilder: FormBuilder) {}
+  public constructor(private readonly formBuilder: UntypedFormBuilder) {}
 
   public advanced: boolean = false
 

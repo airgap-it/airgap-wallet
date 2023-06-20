@@ -14,7 +14,7 @@ export class UIAccountExtendedDetails extends UIWidget {
 
   public items: UIAccountExtendedDetailsItem[]
 
-  constructor(config: UIAccountExtendedDetailsConfig) {
+  public constructor(config: UIAccountExtendedDetailsConfig) {
     super(config)
     this.items = config.items
   }

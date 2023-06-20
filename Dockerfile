@@ -1,4 +1,4 @@
-FROM node:16.13.1
+FROM node:16.19.1
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential libxtst6
@@ -36,7 +36,7 @@ COPY copy-builtin-modules.js /app
 COPY browserify-coinlib.js /app
 
 # install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # install static webserver
 RUN npm install node-static -g
@@ -49,9 +49,6 @@ RUN npm run browserify-coinlib
 
 # set to production
 RUN export NODE_ENV=production
-
-# post-install hook, to be safe if it got cached
-RUN node config/patch_crypto.js
 
 # build
 RUN npm run build:prod

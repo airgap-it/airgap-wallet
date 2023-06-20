@@ -1,13 +1,12 @@
 import { Component, Input } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
 import { Observable, Subject } from 'rxjs'
-import * as fromExchange from '../../pages/exchange/reducer'
 import { Store } from '@ngrx/store'
 import { getSelectedSlippage } from 'src/app/app.selectors'
-import { FormControl } from '@angular/forms'
+import { UntypedFormControl } from '@angular/forms'
+import * as fromExchange from '../../pages/exchange/reducer'
 
 @Component({
   selector: 'remove-liquidity',
@@ -19,7 +18,7 @@ export class RemoveLiquidityComponent {
   public readonly currentlyNotSupported: boolean = false
 
   @Input()
-  public amountControl: FormControl
+  public amountControl: UntypedFormControl
 
   @Input()
   public readonly swapSell: boolean = true
@@ -54,7 +53,7 @@ export class RemoveLiquidityComponent {
   public expandWalletSelection: boolean = false
   public selectedSlippage$: Observable<BigNumber>
 
-  constructor(
+  public constructor(
     public alertCtrl: AlertController,
     public modalController: ModalController,
     private readonly store$: Store<fromExchange.State>

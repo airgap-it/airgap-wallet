@@ -1,10 +1,11 @@
-import { createV0TezosKtProtocol, ICoinSubProtocolAdapter, InternalStorageKey, InternalStorageService, ProtocolService } from '@airgap/angular-core'
 import {
-  AirGapMarketWallet,
-  IAirGapTransaction,
-  MainProtocolSymbols,
-  SubProtocolSymbols
-} from '@airgap/coinlib-core'
+  createV0TezosKtProtocol,
+  ICoinSubProtocolAdapter,
+  InternalStorageKey,
+  InternalStorageService,
+  ProtocolService
+} from '@airgap/angular-core'
+import { AirGapMarketWallet, IAirGapTransaction, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
 import { IAirGapTransactionResult, IProtocolTransactionCursor } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
@@ -30,6 +31,7 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
 import { ExtensionsService } from 'src/app/services/extensions/extensions.service'
 import { InteractionService } from 'src/app/services/interaction/interaction.service'
 
+import { MtPelerinComponent } from 'src/app/components/mt-pelerin/mt-pelerin.component'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise'
 import { ActionGroup } from '../../models/ActionGroup'
@@ -42,7 +44,6 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
 import { WalletStorageService } from '../../services/storage/storage'
 
 import { ExchangeProvider } from './../../services/exchange/exchange'
-import { MtPelerinComponent } from 'src/app/components/mt-pelerin/mt-pelerin.component'
 
 export const refreshRate = 3000
 
@@ -55,8 +56,8 @@ export class AccountTransactionListPage {
   public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
   public subProtocolSymbols: typeof SubProtocolSymbols = SubProtocolSymbols
 
-  private timer$ = timer(0, refreshRate)
-  private subscription: Subscription = new Subscription()
+  private readonly timer$ = timer(0, refreshRate)
+  private readonly subscription: Subscription = new Subscription()
 
   public isRefreshing: boolean = false
   public initialTransactionsLoaded: boolean = false
@@ -101,15 +102,15 @@ export class AccountTransactionListPage {
 
   private readonly walletChanged: Subscription
 
-  private publicKey: string
-  private protocolID: string
-  private addressIndex
+  private readonly publicKey: string
+  private readonly protocolID: string
+  private readonly addressIndex
 
   // Mt Perelin
   public isMtPerelinActive: boolean = false
   public parentWalletName: string | undefined
 
-  constructor(
+  public constructor(
     public readonly alertCtrl: AlertController,
     public readonly navController: NavController,
     public readonly router: Router,
@@ -377,8 +378,7 @@ export class AccountTransactionListPage {
       component: AccountEditPopoverComponent,
       componentProps: {
         wallet: this.wallet,
-        importAccountAction:
-          protocolIdentifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
+        importAccountAction: protocolIdentifier === MainProtocolSymbols.XTZ ? this.actionGroup.getImportAccountsAction() : undefined,
         onDelete: (): void => {
           this.navController.pop()
         }
@@ -444,7 +444,7 @@ export class AccountTransactionListPage {
 
   // Mt Perelin
 
-  async openModal(link: string): Promise<void> {
+  public async openModal(link: string): Promise<void> {
     return new Promise(async (resolve) => {
       const modal: HTMLIonModalElement = await this.modalController.create({
         component: MtPelerinComponent,

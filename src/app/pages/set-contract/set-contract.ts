@@ -22,7 +22,7 @@ export class SetContractPage {
   public contractAddress: string | undefined
   public configuration: any | undefined
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     private readonly navController: NavController,
     private readonly protocolService: ProtocolService,

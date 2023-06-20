@@ -13,7 +13,7 @@ import { CollectiblesItem } from './collectibles-item.types'
 export class CollectiblesItemPage extends BaseComponent<CollectiblesItemFacade> {
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
-  constructor(@Inject(COLLECTIBLES_ITEM_FACADE) facade: CollectiblesItemFacade) {
+  public constructor(@Inject(COLLECTIBLES_ITEM_FACADE) facade: CollectiblesItemFacade) {
     super(facade)
   }
 

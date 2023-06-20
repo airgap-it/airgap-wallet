@@ -1,4 +1,9 @@
-import { IsolatedModuleMetadata, IsolatedModulesListPageFacade, ISOLATED_MODULES_LIST_PAGE_FACADE, UiEventService } from '@airgap/angular-core'
+import {
+  IsolatedModuleMetadata,
+  IsolatedModulesListPageFacade,
+  ISOLATED_MODULES_LIST_PAGE_FACADE,
+  UiEventService
+} from '@airgap/angular-core'
 import { Component, Inject, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { ModalController, ViewWillEnter, ViewWillLeave } from '@ionic/angular'
@@ -15,7 +20,7 @@ import { IsolatedModulesOnboardingPage } from '../isolated-modules-onboarding/is
   styleUrls: ['./isolated-modules-list.page.scss']
 })
 export class IsolatedModulesListPage implements OnInit, ViewWillEnter, ViewWillLeave {
-  constructor(
+  public constructor(
     @Inject(ISOLATED_MODULES_LIST_PAGE_FACADE) public readonly facade: IsolatedModulesListPageFacade,
     private readonly router: Router,
     private readonly dataService: DataService,
@@ -50,21 +55,25 @@ export class IsolatedModulesListPage implements OnInit, ViewWillEnter, ViewWillL
         metadata,
         mode: IsolatedModulesDetailsMode.INSTALL
       })
-      this.router.navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${IsolatedModulesDetailsMode.INSTALL}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      this.router
+        .navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${IsolatedModulesDetailsMode.INSTALL}`)
+        .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     } catch (e) {
-      this.uiEventService.showTranslatedAlert({
-        header: `isolated-modules-list-page.alert.add.failed.header`,
-        message: `isolated-modules-list-page.alert.add.failed.message`,
-        buttons: [
-          {
-            text: `isolated-modules-list-page.alert.add.failed.ok_label`,
-            role: 'cancel'
-          }
-        ]
-      }).catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+      this.uiEventService
+        .showTranslatedAlert({
+          header: `isolated-modules-list-page.alert.add.failed.header`,
+          message: `isolated-modules-list-page.alert.add.failed.message`,
+          buttons: [
+            {
+              text: `isolated-modules-list-page.alert.add.failed.ok_label`,
+              role: 'cancel'
+            }
+          ]
+        })
+        .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
     }
   }
-  
+
   public filterModules(event: any) {
     function isValidQuery(data: unknown): data is string {
       return data && typeof data === 'string' && data !== ''
@@ -79,7 +88,9 @@ export class IsolatedModulesListPage implements OnInit, ViewWillEnter, ViewWillL
       metadata,
       mode: IsolatedModulesDetailsMode.VIEW_INSTALLED
     })
-    this.router.navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${IsolatedModulesDetailsMode.INSTALL}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router
+      .navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${IsolatedModulesDetailsMode.INSTALL}`)
+      .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private async goToOnboardingPage(): Promise<void> {

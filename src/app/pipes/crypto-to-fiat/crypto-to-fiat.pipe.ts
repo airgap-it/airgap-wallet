@@ -1,14 +1,13 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Pipe, PipeTransform } from '@angular/core'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
-import { ICoinProtocol } from '@airgap/coinlib-core'
 
 @Pipe({
   name: 'cryptoToFiat'
 })
 export class CryptoToFiatPipe implements PipeTransform {
-  constructor(private readonly protocolService: ProtocolService) {}
+  public constructor(private readonly protocolService: ProtocolService) {}
 
   public async transform(value: BigNumber, args: { protocolIdentifier: ProtocolSymbols; currentMarketPrice: BigNumber }): Promise<string> {
     if (

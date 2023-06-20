@@ -3,7 +3,7 @@ import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coi
 import { CoreumProtocol } from '@airgap/coreum'
 import { CosmosDelegationActionType, CosmosUnbondingDelegation, CosmosValidator } from '@airgap/cosmos-core'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -33,7 +33,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
   private static instance: CoreumDelegationExtensions
 
   public static create(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
@@ -57,7 +57,7 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
   public supportsMultipleDelegations: boolean = true
 
   private constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -69,7 +69,6 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
   public airGapDelegatee(_protocol: ICoinDelegateProtocolAdapter<CoreumProtocol>): string | undefined {
     return 'corevaloper1xprcq3xdcuht0a8p082l3srgtwfgl57h2avmsq'
   }
-
 
   public async getExtraDelegationDetailsFromAddress(
     adapter: ICoinDelegateProtocolAdapter<CoreumProtocol>,
@@ -239,12 +238,12 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
     details.push(
       new UIIconText({
         iconName: 'logo-usd',
-        text: this.decimalPipe.transform(commission.times(100).toString()) + '%',
+        text: `${this.decimalPipe.transform(commission.times(100).toString())}%`,
         description: 'delegation-detail-cosmos.commission_label'
       }),
       new UIIconText({
         iconName: 'sync-outline',
-        text: this.decimalPipe.transform(votingPower.times(100).toString(), '1.0-2') + '%',
+        text: `${this.decimalPipe.transform(votingPower.times(100).toString(), '1.0-2')}%`,
         description: 'delegation-detail-cosmos.voting-power_label'
       })
     )
@@ -320,10 +319,10 @@ export class CoreumDelegationExtensions extends V1ProtocolDelegationExtensions<C
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(0)
 
-    const baseDescription = hasDelegated
+    const baseDescription: string = hasDelegated
       ? this.translateService.instant('delegation-detail-cosmos.delegate.has-delegated_text', { delegated: delegatedFormatted })
       : this.translateService.instant('delegation-detail-cosmos.delegate.not-delegated_text')
-    const extraDescription = canDelegate
+    const extraDescription: string = canDelegate
       ? ` ${this.translateService.instant(
           hasDelegated
             ? 'delegation-detail-cosmos.delegate.can-delegate-has-delegated_text'

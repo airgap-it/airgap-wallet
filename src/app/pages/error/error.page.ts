@@ -13,10 +13,10 @@ export class ErrorPage implements AfterViewInit {
   public data: unknown
   public parsedData: string
 
-  constructor(private readonly clipboardService: ClipboardService, private readonly modalController: ModalController) {}
+  public constructor(private readonly clipboardService: ClipboardService, private readonly modalController: ModalController) {}
 
-  ngAfterViewInit() {
-    this.parsedData = typeof this.data === 'object' ? JSON.stringify(this.data, null, 2) : this.data + ''
+  public ngAfterViewInit() {
+    this.parsedData = typeof this.data === 'object' ? JSON.stringify(this.data, null, 2) : `${this.data}`
   }
 
   public async dismiss(): Promise<void> {

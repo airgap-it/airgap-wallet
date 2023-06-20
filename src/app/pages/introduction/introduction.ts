@@ -13,7 +13,7 @@ export class IntroductionPage {
   public security: string = 'highest'
   public isDesktop: boolean = false
 
-  constructor(public platform: Platform, public modalController: ModalController) {
+  public constructor(public platform: Platform, public modalController: ModalController) {
     this.isDesktop = !this.platform.is('hybrid')
   }
 

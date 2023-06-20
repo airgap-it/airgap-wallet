@@ -15,8 +15,8 @@ import { isType } from 'src/app/utils/utils'
   styleUrls: ['./delegation-list.page.scss']
 })
 export class DelegationListPage {
-  private static DEFAULT_ITEM_LOADING_STEP = 10
-  private static DESKTOP_ITEM_LOADING_STEP = 30
+  private static readonly DEFAULT_ITEM_LOADING_STEP = 10
+  private static readonly DESKTOP_ITEM_LOADING_STEP = 30
 
   public wallet: AirGapMarketWallet
 
@@ -43,7 +43,7 @@ export class DelegationListPage {
     return this.isDesktop ? DelegationListPage.DESKTOP_ITEM_LOADING_STEP : DelegationListPage.DEFAULT_ITEM_LOADING_STEP
   }
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     private readonly navController: NavController,
     private readonly operations: OperationsProvider,
@@ -54,7 +54,7 @@ export class DelegationListPage {
     this.isDesktop = this.platform.is('desktop')
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.wallet = info.wallet
@@ -63,7 +63,7 @@ export class DelegationListPage {
       this.areMultipleDelegationsSupported = info.areMultipleDelegationsSupported
       this.callback = info.callback
 
-      // tslint:disable-next-line: no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.operations.getDelegateesSummary(this.wallet, info.currentDelegatees).then((summary: UIAccountSummary[]) => {
         this.currentDelegatees = summary.filter(
           (summary) => summary.address !== undefined && info.currentDelegatees.includes(summary.address)

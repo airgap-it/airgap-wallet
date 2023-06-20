@@ -43,7 +43,7 @@ export abstract class UIWidget {
 
   private readonly state$: BehaviorSubject<number> = new BehaviorSubject(WidgetState.UNKNOWN)
 
-  constructor(config: UIWidgetConfig) {
+  public constructor(config: UIWidgetConfig) {
     this.id = config.id
     this.isVisible = config.isVisible !== undefined ? config.isVisible : true
 

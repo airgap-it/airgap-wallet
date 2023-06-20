@@ -9,7 +9,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   styleUrls: ['./introduction-push.scss']
 })
 export class IntroductionPushPage {
-  constructor(public viewCtrl: ModalController) {}
+  public constructor(public viewCtrl: ModalController) {}
 
   public dismiss(askForPermissions: boolean = false) {
     this.viewCtrl.dismiss(askForPermissions).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

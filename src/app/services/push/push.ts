@@ -21,7 +21,7 @@ export class PushProvider {
   private readonly registrationId: ReplaySubject<string> = new ReplaySubject(1)
   private registerCalled: boolean = false
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     private readonly translate: TranslateService,
     private readonly pushBackendProvider: PushBackendProvider,

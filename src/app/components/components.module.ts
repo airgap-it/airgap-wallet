@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common'
 import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
-import { ReactiveComponentModule } from '@ngrx/component'
+import { LetDirective, PushPipe } from '@ngrx/component'
 import { TranslateModule } from '@ngx-translate/core'
 import { QRCodeModule } from 'angularx-qrcode'
 import { MomentModule } from 'ngx-moment'
@@ -45,6 +45,7 @@ import { WidgetOptionButtonGroup } from './widget-option-button-group/widget-opt
 import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetSelector } from './widget-selector/widget-selector'
 import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
+import { CurrencyItemLabelComponent } from './currency-item/label/currency-item-label'
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,
+    CurrencyItemLabelComponent,
     DelegateActionPopoverComponent,
     DelegateEditPopoverComponent,
     PermissionRequestComponent,
@@ -90,14 +92,14 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ReactiveComponentModule,
-
     PipesModule,
     MomentModule,
     TranslateModule,
     QRCodeModule,
     AirGapAngularCoreModule,
-    AirGapAngularNgRxModule
+    AirGapAngularNgRxModule,
+    LetDirective,
+    PushPipe
   ],
   exports: [
     PortfolioItemComponent,
@@ -112,6 +114,7 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     TezosFAForm,
     TezosSaplingContractForm,
     CurrencyItemComponent,
+    CurrencyItemLabelComponent,
     DelegateEditPopoverComponent,
     PermissionRequestComponent,
     CurrentWalletGroupComponent,
@@ -135,13 +138,6 @@ import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
     RemoveLiquidityComponent,
     ExchangeSelectionComponent,
     MtPelerinComponent
-  ],
-  entryComponents: [
-    AccountEditPopoverComponent,
-    DelegateEditPopoverComponent,
-    DappPeerComponent,
-    RemoveLiquidityComponent,
-    ExchangeSelectionComponent
   ]
 })
 export class ComponentsModule {}

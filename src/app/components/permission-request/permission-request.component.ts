@@ -53,7 +53,7 @@ export class PermissionRequestComponent implements OnChanges {
   @Output()
   public readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter<AirGapMarketWallet>()
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly alertController: AlertController,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -61,7 +61,7 @@ export class PermissionRequestComponent implements OnChanges {
     private readonly accountService: AccountProvider
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+  public ngOnChanges(changes: SimpleChanges): void {
     if (changes.targetProtocolSymbol?.currentValue !== changes.targetProtocolSymbol?.previousValue) {
       const allWallets = this.accountService.getActiveWalletList()
       const targetProtocolSymbol = changes.targetProtocolSymbol.currentValue

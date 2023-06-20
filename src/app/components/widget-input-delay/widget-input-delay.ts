@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { FormGroup } from '@angular/forms'
+import { UntypedFormGroup } from '@angular/forms'
 import BigNumber from 'bignumber.js'
 import { Subscription } from 'rxjs'
 import { UIInputDelay } from 'src/app/models/widgets/input/UIInputDelay'
@@ -14,7 +14,7 @@ export class WidgetInputDelay implements OnChanges {
   public widget: UIInputDelay
 
   @Input()
-  public widgetForm: FormGroup
+  public widgetForm: UntypedFormGroup
 
   public value: string | undefined
 
@@ -26,7 +26,7 @@ export class WidgetInputDelay implements OnChanges {
 
     if (changes.widgetForm.previousValue !== changes.widgetForm.currentValue) {
       this.valueSubscription?.unsubscribe()
-      const currentWidgetForm = changes.widgetForm.currentValue as FormGroup
+      const currentWidgetForm = changes.widgetForm.currentValue as UntypedFormGroup
       this.valueSubscription = currentWidgetForm.get(this.widget.id).valueChanges.subscribe((value) => {
         const control = currentWidgetForm.get(this.widget.id)
         if (control.dirty && control.valid && new BigNumber(value).gte(currentWidget.fixedMinValue)) {

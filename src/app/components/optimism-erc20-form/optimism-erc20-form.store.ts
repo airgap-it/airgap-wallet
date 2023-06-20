@@ -1,4 +1,10 @@
-import { convertNetworkV0ToV1, createV0OptimismERC20Token, ICoinSubProtocolAdapter, ProtocolService, UIResourceStatus } from '@airgap/angular-core'
+import {
+  convertNetworkV0ToV1,
+  createV0OptimismERC20Token,
+  ICoinSubProtocolAdapter,
+  ProtocolService,
+  UIResourceStatus
+} from '@airgap/angular-core'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { ERC20TokenMetadata } from '@airgap/ethereum'
 import { protocolNetworkIdentifier } from '@airgap/module-kit'
@@ -11,11 +17,7 @@ import { repeat, switchMap, withLatestFrom } from 'rxjs/operators'
 import { optimismERC20ProtocolSymbol } from 'src/app/types/GenericProtocolSymbols'
 
 import { OptimismERC20FormErrorType, OptimismERC20FormState, TokenDetailsInput } from './optimism-erc20-form.types'
-import {
-  isOptimismERC20FormError,
-  tokenMetadataMissingError,
-  unknownError
-} from './optimism-erc20-form.utils'
+import { isOptimismERC20FormError, tokenMetadataMissingError, unknownError } from './optimism-erc20-form.utils'
 
 const initialState: OptimismERC20FormState = {
   networks: [],
@@ -26,8 +28,7 @@ const initialState: OptimismERC20FormState = {
 
 @Injectable()
 export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormState> {
-
-  constructor(private readonly protocolService: ProtocolService) {
+  public constructor(private readonly protocolService: ProtocolService) {
     super(initialState)
   }
 
@@ -59,7 +60,7 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
     return this.select((state) => state[key])
   }
 
-  private updateWithValue = this.updater((state: OptimismERC20FormState, partialState: Partial<OptimismERC20FormState>) => {
+  private readonly updateWithValue = this.updater((state: OptimismERC20FormState, partialState: Partial<OptimismERC20FormState>) => {
     return {
       ...state,
       ...partialState,
@@ -67,7 +68,7 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
     }
   })
 
-  private updateWithError = this.updater((state: OptimismERC20FormState, error: unknown) => {
+  private readonly updateWithError = this.updater((state: OptimismERC20FormState, error: unknown) => {
     const optimismERC20FormError = isOptimismERC20FormError(error) ? error : unknownError(error)
 
     if (optimismERC20FormError.type === OptimismERC20FormErrorType.UNKNOWN && optimismERC20FormError.error) {
@@ -91,7 +92,7 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
 
   private fetchTokenDetails(state: OptimismERC20FormState, inputDetails: TokenDetailsInput): Observable<Partial<OptimismERC20FormState>> {
     return new Observable((subscriber: Subscriber<Partial<OptimismERC20FormState>>) => {
-      // tslint:disable-next-line: no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       new Promise<void>(async (resolve, reject) => {
         try {
           this.emitLoading(subscriber)
@@ -104,7 +105,9 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
             return
           }
 
-          const network = state.networks.find((network: OptimismProtocolNetwork) => protocolNetworkIdentifier(network) === inputDetails.networkIdentifier)
+          const network = state.networks.find(
+            (network: OptimismProtocolNetwork) => protocolNetworkIdentifier(network) === inputDetails.networkIdentifier
+          )
           const protocol: ICoinSubProtocolAdapter<ERC20Token> = await this.getERC20TokenDetails(inputDetails.address, network)
 
           this.emitProtocol(protocol, subscriber)
@@ -135,7 +138,10 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
     return alreadySupportedProtocols[0]
   }
 
-  private async getERC20TokenDetails(contractAddress: string, network: OptimismProtocolNetwork): Promise<ICoinSubProtocolAdapter<ERC20Token>> {
+  private async getERC20TokenDetails(
+    contractAddress: string,
+    network: OptimismProtocolNetwork
+  ): Promise<ICoinSubProtocolAdapter<ERC20Token>> {
     const genericERC20Token: ICoinSubProtocolAdapter<ERC20Token> = await createV0OptimismERC20Token(
       {
         contractAddress,
@@ -165,12 +171,12 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
   }
 
   private async getERC20TokenMetadata(protocol: ERC20Token): Promise<ERC20TokenMetadata | undefined> {
-    const [contractAddress, name, symbol, decimals]: [string, string | undefined, string | undefined, number | undefined] = await Promise.all([
-      protocol.getContractAddress(),
-      protocol.name(),
-      protocol.symbol(),
-      protocol.decimals()
-    ])
+    const [contractAddress, name, symbol, decimals]: [
+      string,
+      string | undefined,
+      string | undefined,
+      number | undefined
+    ] = await Promise.all([protocol.getContractAddress(), protocol.name(), protocol.symbol(), protocol.decimals()])
 
     if (name === undefined || symbol === undefined || decimals === undefined) {
       return undefined
@@ -192,10 +198,7 @@ export class OptimismERC20FormStore extends ComponentStore<OptimismERC20FormStat
     })
   }
 
-  private emitProtocol(
-    protocol: ICoinProtocol,
-    subscriber: Subscriber<Partial<OptimismERC20FormState>>
-  ): void {
+  private emitProtocol(protocol: ICoinProtocol, subscriber: Subscriber<Partial<OptimismERC20FormState>>): void {
     subscriber.next({
       protocol: { status: UIResourceStatus.SUCCESS, value: protocol }
     })

@@ -1,5 +1,5 @@
-import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 import { DelegatorReward } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 
 export interface UIRewardListConfig extends UIWidgetConfig {
   rewards: DelegatorReward[]

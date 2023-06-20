@@ -1,21 +1,19 @@
 import { InternalStorageKey, InternalStorageService } from '@airgap/angular-core'
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 
 @Component({
   selector: 'app-trading-settings',
   templateUrl: './trading-settings.page.html',
   styleUrls: ['./trading-settings.page.scss']
 })
-export class TradingSettingsPage implements OnInit {
+export class TradingSettingsPage {
   public useMtPerelin: boolean = false
 
-  constructor(private readonly storageService: InternalStorageService) {
+  public constructor(private readonly storageService: InternalStorageService) {
     this.storageService.get(InternalStorageKey.SETTINGS_TRADING_USE_MTPELERIN).then((value) => {
       this.useMtPerelin = value
     })
   }
-
-  ngOnInit() {}
 
   public async toggleUseMtPerelin(event: any) {
     const value = event.detail.checked

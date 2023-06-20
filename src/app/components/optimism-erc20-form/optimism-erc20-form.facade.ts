@@ -32,7 +32,7 @@ export class OptimismERC20FormNgRxFacade extends BaseNgRxFacade<OptimismERC20For
 
   public readonly errorDescription$: Observable<string>
 
-  constructor(store: OptimismERC20FormStore, private readonly clipboardService: ClipboardService) {
+  public constructor(store: OptimismERC20FormStore, private readonly clipboardService: ClipboardService) {
     super(store)
     this.networks$ = this.store
       .select((state: OptimismERC20FormState) => state.networks)
@@ -62,7 +62,7 @@ export class OptimismERC20FormNgRxFacade extends BaseNgRxFacade<OptimismERC20For
     try {
       return this.clipboardService.paste()
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(`Error: ${error}`)
 
       return undefined

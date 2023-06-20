@@ -12,7 +12,7 @@ import {
 } from '@airgap/polkadot'
 import { PolkadotBaseProtocol } from '@airgap/polkadot/v1/protocol/PolkadotBaseProtocol'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -60,7 +60,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   private static instance: PolkadotDelegationExtensions
 
   public static create(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
@@ -88,7 +88,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   public supportsMultipleDelegations: boolean = true
 
   private constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -287,7 +287,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     details.push(
       new UIIconText({
         iconName: 'logo-usd',
-        text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
+        text: commission ? `${this.decimalPipe.transform(commission.multipliedBy(100).toString())}%` : '-',
         description: 'delegation-detail-polkadot.commission_label'
       })
     )
@@ -372,7 +372,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     }
   }
 
-  // tslint:disable-next-line: cyclomatic-complexity
+  // eslint-disable-next-line complexity
   private async createDelegateAction(
     adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     stakingDetails: PolkadotStakingDetails,
@@ -667,7 +667,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
           let description: string
           let args: UIInputWidget<any>[]
 
-          // tslint:disable-next-line: switch-default
+          // eslint-disable-next-line default-case
           switch (action.type) {
             case PolkadotStakingActionType.WITHDRAW_UNBONDED:
               const totalUnlockedFormatted: string | undefined = stakingDetails

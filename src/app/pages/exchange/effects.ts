@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
-import * as actions from './actions'
-import * as fromExchange from './reducer'
 import { Store } from '@ngrx/store'
 import BigNumber from 'bignumber.js'
 import { ExchangeProvider } from 'src/app/services/exchange/exchange'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { from, Observable, of, OperatorFunction, pipe, UnaryFunction } from 'rxjs'
+import * as fromExchange from './reducer'
+import * as actions from './actions'
 import { SegmentType } from './reducer'
 
 export function filterNullish<T>(): UnaryFunction<Observable<T | null | undefined>, Observable<T>> {
@@ -16,35 +16,35 @@ export function filterNullish<T>(): UnaryFunction<Observable<T | null | undefine
 
 @Injectable()
 export class ExchangeEffects {
-  onSetFromWalletLoadBalance$ = createEffect(() =>
+  public onSetFromWalletLoadBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setFromWallet),
       map(() => actions.loadFromWalletBalance())
     )
   )
 
-  onSetToWalletLoadBalance$ = createEffect(() =>
+  public onSetToWalletLoadBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setToWallet),
       map(() => actions.loadToWalletBalance())
     )
   )
 
-  onSetFromWalletLoadFiatInputAmount$ = createEffect(() =>
+  public onSetFromWalletLoadFiatInputAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setFromWallet),
       map(() => actions.loadFiatInputAmount())
     )
   )
 
-  onLoadExchangeAmountSucceededLoadFiatExchangeAmount$ = createEffect(() =>
+  public onLoadExchangeAmountSucceededLoadFiatExchangeAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExchangeAmountSucceeded),
       map(() => actions.loadFiatExchangeAmount())
     )
   )
 
-  onLoadExchangeAmountSucceededCheckLiquidityButton$ = createEffect(() =>
+  public onLoadExchangeAmountSucceededCheckLiquidityButton$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExchangeAmountSucceeded),
       withLatestFrom(this.store$.select((state) => state.exchange.segmentType)),
@@ -58,7 +58,7 @@ export class ExchangeEffects {
       })
     )
   )
-  onSetAmount$ = createEffect(() =>
+  public onSetAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setAmount),
       withLatestFrom(this.store$.select((state) => state.exchange.segmentType)),
@@ -71,7 +71,7 @@ export class ExchangeEffects {
     )
   )
 
-  onSetAmountCheckButtonDisabled$ = createEffect(() =>
+  public onSetAmountCheckButtonDisabled$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setAmount),
       withLatestFrom(this.store$.select((state) => state.exchange.segmentType)),
@@ -84,7 +84,7 @@ export class ExchangeEffects {
     )
   )
 
-  setButtonDisabledSwap$ = createEffect(() =>
+  public setButtonDisabledSwap$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.checkButtonDisabledSwap),
       withLatestFrom(
@@ -104,7 +104,7 @@ export class ExchangeEffects {
     )
   )
 
-  setButtonDisabledAddLiquidity$ = createEffect(() =>
+  public setButtonDisabledAddLiquidity$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.checkButtonDisabledAddLiquidity),
       withLatestFrom(
@@ -126,7 +126,7 @@ export class ExchangeEffects {
     )
   )
 
-  setButtonDisabledRemoveLiquidity$ = createEffect(() =>
+  public setButtonDisabledRemoveLiquidity$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.checkButtonDisabledRemoveLiquidity),
       withLatestFrom(
@@ -142,7 +142,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadFromWalletBalance$ = createEffect(() =>
+  public loadFromWalletBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadFromWalletBalance),
       withLatestFrom(this.store$.select((state) => state.exchange.fromWallet)),
@@ -154,7 +154,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadToWalletBalance$ = createEffect(() =>
+  public loadToWalletBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadToWalletBalance),
       withLatestFrom(this.store$.select((state) => state.exchange.toWallet)),
@@ -166,7 +166,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadExchangeData$ = createEffect(() =>
+  public loadExchangeData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExchangeData),
       withLatestFrom(
@@ -188,7 +188,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadMinExchangeAmount$ = createEffect(() =>
+  public loadMinExchangeAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExchangeData),
       withLatestFrom(
@@ -210,7 +210,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadFiatInputAmount$ = createEffect(() =>
+  public loadFiatInputAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadFiatInputAmount),
       withLatestFrom(
@@ -225,7 +225,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadFiatExchangeAmount$ = createEffect(() =>
+  public loadFiatExchangeAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadFiatExchangeAmount),
       withLatestFrom(
@@ -240,7 +240,7 @@ export class ExchangeEffects {
     )
   )
 
-  onSetAmountSetFiatAmount$ = createEffect(() =>
+  public onSetAmountSetFiatAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.setAmount),
       withLatestFrom(this.store$.select((state) => state.exchange.fromWallet)),
@@ -252,7 +252,7 @@ export class ExchangeEffects {
     )
   )
 
-  loadRemoveLiquidityBalance$ = createEffect(() =>
+  public loadRemoveLiquidityBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadRemoveLiquidityData),
       switchMap(() => {
@@ -267,7 +267,7 @@ export class ExchangeEffects {
       })
     )
   )
-  loadMinCurrencyLiquidated$ = createEffect(() =>
+  public loadMinCurrencyLiquidated$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadRemoveLiquidityData),
       withLatestFrom(this.store$.select((state) => state.exchange.amount)),
@@ -294,7 +294,7 @@ export class ExchangeEffects {
   private async getMinAmountForCurrency(fromWallet: AirGapMarketWallet, toWallet: AirGapMarketWallet): Promise<BigNumber> {
     return new BigNumber(await this.exchangeProvider.getMinAmountForCurrency(fromWallet.protocol.identifier, toWallet.protocol.identifier))
   }
-  constructor(
+  public constructor(
     private readonly actions$: Actions,
     private readonly store$: Store<fromExchange.State>,
     private readonly exchangeProvider: ExchangeProvider

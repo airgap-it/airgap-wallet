@@ -26,13 +26,15 @@ export class FundAccountAction extends Action<void, FundAccountActionContext> {
 
   protected async perform(): Promise<void> {
     const wallets: AirGapMarketWallet[] = this.context.accountProvider.getActiveWalletList()
-    const compatibleWallets = wallets.filter((wallet: AirGapMarketWallet) => wallet.publicKey !== this.context.wallet.publicKey && this.isCompatible(wallet))
+    const compatibleWallets = wallets.filter(
+      (wallet: AirGapMarketWallet) => wallet.publicKey !== this.context.wallet.publicKey && this.isCompatible(wallet)
+    )
     const info = {
       actionType: 'fund-account',
       targetIdentifier: this.context.wallet.protocol.identifier,
       address: this.context.wallet.receivingPublicAddress,
       compatibleWallets,
-      incompatibleWallets: [],
+      incompatibleWallets: []
     }
     this.context.dataService.setData(DataServiceKey.ACCOUNTS, info)
     this.context.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))

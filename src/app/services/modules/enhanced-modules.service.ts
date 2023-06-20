@@ -9,10 +9,7 @@ import { WalletModulesService } from './modules.service'
   providedIn: 'root'
 })
 export class WalletEnhancedModulesService {
-  constructor(
-    public readonly base: WalletModulesService,
-    private readonly accountProvider: AccountProvider,
-  ) {}
+  public constructor(public readonly base: WalletModulesService, private readonly accountProvider: AccountProvider) {}
 
   public async removeInstalledModule(metadata: IsolatedModuleInstalledMetadata, keepAccounts: boolean = false) {
     await this.base.removeInstalledModules([metadata.module.identifier])
@@ -30,8 +27,6 @@ export class WalletEnhancedModulesService {
       .filter(([_, protocolIdentifier]: [AirGapMarketWallet, string]) => removedProtocols.has(protocolIdentifier))
       .map(([wallet, _]: [AirGapMarketWallet, string]) => wallet)
 
-    await Promise.all(
-      toRemoveWallets.map((wallet: AirGapMarketWallet) => this.accountProvider.removeWallet(wallet))
-    )
+    await Promise.all(toRemoveWallets.map((wallet: AirGapMarketWallet) => this.accountProvider.removeWallet(wallet)))
   }
 }

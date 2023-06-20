@@ -14,7 +14,7 @@ describe('CryptoToFiatPipe', () => {
   beforeEach(async () => {
     unitHelper = new UnitHelper()
     await TestBed.configureTestingModule(unitHelper.testBed({})).compileComponents()
-    
+
     protocolService = TestBed.inject(ProtocolService)
     await protocolService.init()
     cryptoToFiatPipe = new CryptoToFiatPipe(protocolService)

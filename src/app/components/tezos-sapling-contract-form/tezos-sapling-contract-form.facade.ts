@@ -49,8 +49,8 @@ export class TezosSaplingContractFormNgRxFacade extends BaseNgRxFacade<TezosSapl
   public readonly warningDescription$: Observable<string>
   public readonly errorDescription$: Observable<string>
 
-  constructor(
-    store: TezosSaplingContractFormStore, 
+  public constructor(
+    store: TezosSaplingContractFormStore,
     private readonly clipboardService: ClipboardService,
     private readonly browserService: BrowserService
   ) {
@@ -89,7 +89,7 @@ export class TezosSaplingContractFormNgRxFacade extends BaseNgRxFacade<TezosSapl
     try {
       return this.clipboardService.paste()
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(`Error: ${error}`)
 
       return undefined

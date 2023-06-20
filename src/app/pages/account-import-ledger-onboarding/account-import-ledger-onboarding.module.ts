@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { NgModule } from '@angular/core'
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
@@ -18,6 +18,7 @@ import { AccountImportLedgerOnboardingPage } from './account-import-ledger-onboa
     TranslateModule,
     RouterModule.forChild([{ path: '', component: AccountImportLedgerOnboardingPage }])
   ],
-  declarations: [AccountImportLedgerOnboardingPage]
+  declarations: [AccountImportLedgerOnboardingPage],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AccountImportLedgerOnboardingPageModule {}

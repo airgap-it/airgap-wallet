@@ -24,7 +24,7 @@ export class TabsPage {
 
   public isMobile = false
 
-  constructor(
+  public constructor(
     public modalController: ModalController,
     private readonly storageProvider: WalletStorageService,
     private readonly platform: Platform
@@ -65,11 +65,11 @@ export class TabsPage {
     }
   }
 
-  tabChange(tabsRef: IonTabs) {
+  public tabChange(tabsRef: IonTabs) {
     this.activeTab = tabsRef.outlet.activatedView.element
   }
 
-  ionViewWillEnter() {
+  public ionViewWillEnter() {
     this.propagateToActiveTab('ionViewWillEnter')
   }
 

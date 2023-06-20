@@ -74,7 +74,7 @@ export class AccountProvider {
   public refreshPageSubject: Subject<void> = new Subject()
 
   public walletsGroupedByAccount$: ReplaySubject<AirGapMarketWalletGroup[]> = new ReplaySubject(1)
-  public walletsGroupedByMainWallet$: Observable<MainWalletGroup[]>;
+  public walletsGroupedByMainWallet$: Observable<MainWalletGroup[]>
   public wallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public allWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
   public subWallets$: ReplaySubject<AirGapMarketWallet[]> = new ReplaySubject(1)
@@ -82,7 +82,7 @@ export class AccountProvider {
 
   private readonly walletChangedBehaviour: Subject<void> = new Subject()
 
-  get walletChangedObservable() {
+  public get walletChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
   }
 
@@ -98,7 +98,7 @@ export class AccountProvider {
     return this.walletsByMainWallet(this.allWallets)
   }
 
-  constructor(
+  public constructor(
     private readonly appService: AppService,
     private readonly storageProvider: WalletStorageService,
     private readonly pushProvider: PushProvider,
@@ -122,7 +122,7 @@ export class AccountProvider {
       .catch(console.error)
     this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
     this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
-    this.walletsGroupedByMainWallet$ = this.wallets$.pipe(map(wallets => this.walletsByMainWallet(wallets)))
+    this.walletsGroupedByMainWallet$ = this.wallets$.pipe(map((wallets) => this.walletsByMainWallet(wallets)))
 
     this.pushProvider.notificationCallback = (notification: PushNotificationSchema): void => {
       // We need a timeout because otherwise routing might fail
@@ -440,8 +440,8 @@ export class AccountProvider {
   }
 
   public async addWallets(walletAddInfos: WalletAddInfo[]): Promise<void> {
-    let existingWallets = []
-    for (let walletAddInfo of walletAddInfos) {
+    const existingWallets = []
+    for (const walletAddInfo of walletAddInfos) {
       const defaultOptions = {
         override: false,
         updateState: true
@@ -598,11 +598,11 @@ export class AccountProvider {
     }
 
     if (!isSubProtocol(walletToRemove.protocol)) {
-      const mainGroup = this.walletsGroupedByMainWallet.find(group => this.isSameWallet(group.mainWallet, walletToRemove))
-        if (mainGroup) {
-          await Promise.all(mainGroup.subWallets.map(subWallet => this.removeWallet(subWallet, { updateState: false })))
-        }
-        await update()
+      const mainGroup = this.walletsGroupedByMainWallet.find((group) => this.isSameWallet(group.mainWallet, walletToRemove))
+      if (mainGroup) {
+        await Promise.all(mainGroup.subWallets.map((subWallet) => this.removeWallet(subWallet, { updateState: false })))
+      }
+      await update()
     } else {
       await update()
     }

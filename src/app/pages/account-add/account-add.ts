@@ -38,7 +38,7 @@ export class AccountAddPage {
       symbol: 'XTZ',
       mainIdentifier: MainProtocolSymbols.XTZ
     },
-    { 
+    {
       name: 'account-add.generic.optimism-erc20_label',
       identifier: GenericSubProtocolSymbol.OPTIMISM_ERC20,
       symbol: 'ETH',
@@ -51,14 +51,14 @@ export class AccountAddPage {
   public filteredOtherSubAccountProtocols: ICoinProtocol[] = []
   public filteredGenericSubAccountProtocols: GenericSubProtocol[] = []
 
-  private featuredSubProtocols: SubProtocolSymbols[] = [
+  private readonly featuredSubProtocols: SubProtocolSymbols[] = [
     SubProtocolSymbols.XTZ_YOU,
     SubProtocolSymbols.XTZ_UUSD,
     SubProtocolSymbols.XTZ_UDEFI,
     SubProtocolSymbols.XTZ_UBTC
   ]
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     private readonly accountProvider: AccountProvider,
     private readonly protocolService: ProtocolService,
@@ -94,7 +94,8 @@ export class AccountAddPage {
       return faProtocolSymbol(interfaceVersion, await adapter.protocolV1.getContractAddress(), tokenId)
     }
     const xtzSubProtocols = supportedSubAccountProtocols.filter(
-      (protocol): protocol is ICoinSubProtocolAdapter<TezosFAProtocol> => protocol instanceof ICoinSubProtocolAdapter && isTezosFAProtocol(protocol.protocolV1)
+      (protocol): protocol is ICoinSubProtocolAdapter<TezosFAProtocol> =>
+        protocol instanceof ICoinSubProtocolAdapter && isTezosFAProtocol(protocol.protocolV1)
     )
     const standardSubprotocols = xtzSubProtocols.filter((protocol) =>
       Object.values(SubProtocolSymbols).includes(protocol.identifier.toLowerCase() as SubProtocolSymbols)

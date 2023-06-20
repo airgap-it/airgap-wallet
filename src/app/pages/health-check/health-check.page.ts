@@ -29,12 +29,12 @@ interface CheckItem {
   styleUrls: ['./health-check.page.scss']
 })
 export class HealthCheckPage {
-  items: CheckItem[]
+  public items: CheckItem[]
   private loadingElement: HTMLIonLoadingElement
 
   public apiHealth: ApiHealth[]
 
-  constructor(
+  public constructor(
     private readonly coinlibService: CoinlibService,
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService

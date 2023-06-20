@@ -55,7 +55,7 @@ describe('AccountProvider', () => {
     expect(accountProvider instanceof AccountProvider).toBe(true)
   })
 
-  it('should successfully add and persist ETH wallets', async (done) => {
+  it('should successfully add and persist ETH wallets', async () => {
     const currentLength = accountProvider.getWalletList().length
     const wallet = new AirGapCoinWallet(
       await createV0EthereumProtocol(),
@@ -74,10 +74,9 @@ describe('AccountProvider', () => {
 
     await accountProvider.addWallets(walletAddInfo)
     expect(accountProvider.getWalletList().length).toEqual(currentLength + 1)
-    done()
   })
 
-  it('should be able to compare wallets', async (done) => {
+  it('should be able to compare wallets', async () => {
     const wallet1 = new AirGapCoinWallet(
       await createV0EthereumProtocol(),
       '028ac261d61169c25398de21b5e7189daa0ed040baa17922dccc58cb6564d0c996',
@@ -112,10 +111,9 @@ describe('AccountProvider', () => {
     expect(accountProvider.isSameWallet(wallet1, undefined)).toEqual(false)
     expect(accountProvider.isSameWallet(wallet1, 'test' as any)).toEqual(false)
     expect(accountProvider.isSameWallet(wallet1, wallet1Plain)).toEqual(false)
-    done()
   })
 
-  it('should successfully add and persist BTC wallets', async (done) => {
+  it('should successfully add and persist BTC wallets', async () => {
     const wallet: AirGapMarketWallet = new AirGapCoinWallet(
       await createV0BitcoinProtocol(),
       'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
@@ -134,42 +132,45 @@ describe('AccountProvider', () => {
     ]
     await accountProvider.addWallets(walletAddInfo)
     expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
-    done()
   })
 
-  it('should update wallet observalbe when adding a wallet', async (done) => {
-    const wallet: AirGapMarketWallet = new AirGapCoinWallet(
-      await createV0BitcoinProtocol(),
-      'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
-      true,
-      `m/44'/0'/0'`,
-      '',
-      AirGapWalletStatus.ACTIVE,
-      new PriceServiceMock()
-    )
+  it('should update wallet observalbe when adding a wallet', (done) => {
+    new Promise<void>(async (resolve) => {
+      const wallet: AirGapMarketWallet = new AirGapCoinWallet(
+        await createV0BitcoinProtocol(),
+        'xpub6EWbRuGLw9bTVVU9HE2MqT5QQ7zm9G64QgeZ5SY7qPWbciM7FyyG9BP2id1ewqZipXVWx2racXMMRvF1jB8S4syc1RzYRjnBhuq425KKYx5',
+        true,
+        `m/44'/0'/0'`,
+        '',
+        AirGapWalletStatus.ACTIVE,
+        new PriceServiceMock()
+      )
 
-    let numOfTimesCalled: number = 0
-    accountProvider.wallets$.subscribe(() => {
-      numOfTimesCalled++
-      if (numOfTimesCalled >= 3) {
-        // Needs to be 3 times
-        // 1. Initial value
-        // 2. Remove wallet
-        // 3. Add wallet
-        done()
-      }
+      let numOfTimesCalled: number = 0
+      accountProvider.wallets$.subscribe(() => {
+        numOfTimesCalled++
+        if (numOfTimesCalled >= 3) {
+          // Needs to be 3 times
+          // 1. Initial value
+          // 2. Remove wallet
+          // 3. Add wallet
+          done()
+          resolve()
+        }
+      })
+
+      await accountProvider.removeWallet(wallet)
+      expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
+
+      const walletAddInfo = [
+        {
+          walletToAdd: wallet
+        }
+      ]
+      await accountProvider.addWallets(walletAddInfo)
+      expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
+      done()
+      resolve()
     })
-
-    await accountProvider.removeWallet(wallet)
-    expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(0)
-
-    const walletAddInfo = [
-      {
-        walletToAdd: wallet
-      }
-    ]
-    await accountProvider.addWallets(walletAddInfo)
-    expect(accountProvider.getWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE).length).toEqual(1)
-    done()
   })
 })

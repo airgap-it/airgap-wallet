@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { ExchangeCustomPage } from './exchange-custom.page'
 import { ComponentsModule } from 'src/app/components/components.module'
 import { TranslateModule } from '@ngx-translate/core'
 import { PipesModule } from 'src/app/pipes/pipes.module'
 import { MomentModule } from 'ngx-moment'
 import { RouterModule } from '@angular/router'
+import { ExchangeCustomPage } from './exchange-custom.page'
 
 @NgModule({
   imports: [

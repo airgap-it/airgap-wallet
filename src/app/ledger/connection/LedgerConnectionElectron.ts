@@ -1,7 +1,7 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file */
+import { EventEmitter } from 'events'
 import Transport from '@ledgerhq/hw-transport'
 import { DeviceModel } from '@ledgerhq/hw-transport/node_modules/@ledgerhq/devices'
-import { EventEmitter } from 'events'
 
 import {
   ExchangeMessageReply,
@@ -14,13 +14,13 @@ import {
 import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from './LedgerConnection'
 
 class TransportElectron implements Transport {
-  exchangeTimeout = 30000
-  unresponsiveTimeout = 15000
-  deviceModel: DeviceModel | null | undefined = null
-  _events = new EventEmitter()
-  _appAPIlock: string | null = null
+  public exchangeTimeout = 30000
+  public unresponsiveTimeout = 15000
+  public deviceModel: DeviceModel | null | undefined = null
+  public _events = new EventEmitter()
+  public _appAPIlock: string | null = null
 
-  constructor(private readonly id: string, private readonly bridge: LedgerElectronBridge) {}
+  public constructor(private readonly id: string, private readonly bridge: LedgerElectronBridge) {}
 
   public async send(cla: number, ins: number, p1: number, p2: number, data?: Buffer, _statusList?: readonly number[]): Promise<Buffer> {
     const { response }: SendMessageReply = await this.bridge.sendToLedger(
@@ -166,5 +166,5 @@ export class LedgerConnectionElectron implements LedgerConnection {
     return new LedgerConnectionElectron(connectionType, transport)
   }
 
-  private constructor(readonly type: LedgerConnectionType, readonly transport: TransportElectron) {}
+  private constructor(public readonly type: LedgerConnectionType, public readonly transport: TransportElectron) {}
 }

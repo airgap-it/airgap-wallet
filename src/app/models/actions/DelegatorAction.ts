@@ -21,7 +21,7 @@ export interface AirGapDelegatorActionContext {
 export class AirGapDelegatorAction extends Action<void, AirGapDelegatorActionContext> {
   private loader: HTMLIonLoadingElement | undefined
 
-  public constructor(readonly context: AirGapDelegatorActionContext) {
+  public constructor(public readonly context: AirGapDelegatorActionContext) {
     super(context)
   }
 

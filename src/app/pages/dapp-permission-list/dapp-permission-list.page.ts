@@ -14,7 +14,7 @@ export class DappPermissionListPage {
 
   public beaconPermissions: PermissionInfo[] = []
 
-  constructor(
+  public constructor(
     private readonly beaconService: BeaconService,
     private readonly alertController: AlertController,
     private readonly translate: TranslateService

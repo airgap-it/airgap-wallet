@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { IsolatedModulesOnboardingPage } from './isolated-modules-onboarding.page'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { RouterModule, Routes } from '@angular/router'
 import { ComponentsModule } from '../../components/components.module'
+import { IsolatedModulesOnboardingPage } from './isolated-modules-onboarding.page'
 
 const routes: Routes = [
   {
@@ -20,8 +20,8 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
     TranslateModule,

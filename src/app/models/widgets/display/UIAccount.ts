@@ -1,5 +1,5 @@
-import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 import { SafeUrl } from '@angular/platform-browser'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 
 export interface UIAccountConfig extends UIWidgetConfig {
   name?: string
@@ -24,7 +24,7 @@ export class UIAccount extends UIWidget {
     return this.name !== undefined && this.name !== null
   }
 
-  constructor(config: UIAccountConfig) {
+  public constructor(config: UIAccountConfig) {
     super(config)
 
     this.name = config.name

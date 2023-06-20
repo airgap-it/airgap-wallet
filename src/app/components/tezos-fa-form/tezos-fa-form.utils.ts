@@ -45,14 +45,16 @@ export function hasTokenInterface(metadata: TezosContractMetadata, tokenInterfac
     return false
   }
 
-  return metadata.interfaces?.some((value: string) => {
-    const tzip = getTzipStandard(value)
-    if (tzip === undefined) {
-      return false
-    }
+  return (
+    metadata.interfaces?.some((value: string) => {
+      const tzip = getTzipStandard(value)
+      if (tzip === undefined) {
+        return false
+      }
 
-    return tzip === targetTzip
-  }) ?? false
+      return tzip === targetTzip
+    }) ?? false
+  )
 }
 
 export function getTzipStandard(value: string): number | undefined {

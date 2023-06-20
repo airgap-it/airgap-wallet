@@ -88,7 +88,7 @@ export class WalletconnectPage implements OnInit {
   private responseHandler: (() => Promise<void>) | undefined
   private readonly connector: WalletConnect | undefined
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly accountService: AccountProvider,
     private readonly alertCtrl: AlertController,
@@ -347,11 +347,11 @@ export class WalletconnectPage implements OnInit {
     alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
-  async setWallet(wallet: AirGapMarketWallet) {
+  public async setWallet(wallet: AirGapMarketWallet) {
     this.selectedWallet = wallet
   }
 
-  async setTargetProtocolSymbol(wallets: AirGapMarketWallet[]) {
+  public async setTargetProtocolSymbol(wallets: AirGapMarketWallet[]) {
     const protocolIdentifiers: ProtocolSymbols[] = await Promise.all(
       wallets.map((wallet: AirGapMarketWallet) => wallet.protocol.getIdentifier())
     )
@@ -362,7 +362,10 @@ export class WalletconnectPage implements OnInit {
     this.subscription.unsubscribe()
   }
 
-  private async prepareWalletConnectTransaction(wallet: AirGapMarketWallet, request: EthTx): Promise<TransactionSignRequest['transaction']> {
+  private async prepareWalletConnectTransaction(
+    wallet: AirGapMarketWallet,
+    request: EthTx
+  ): Promise<TransactionSignRequest['transaction']> {
     if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
       throw new Error('Unexpected protocol instance.')
     }

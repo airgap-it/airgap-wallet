@@ -16,16 +16,16 @@ export class InteractionSelectionSettingsPage implements OnInit {
   public selectedSetting: InteractionSetting | undefined
   public activeWalletGroups: AirGapMarketWalletGroup[] | undefined
 
-  constructor(private readonly accountService: AccountProvider, private readonly modalController: ModalController) {}
+  public constructor(private readonly accountService: AccountProvider, private readonly modalController: ModalController) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     this.activeWalletGroups = this.accountService.allWalletGroups.filter((walletGroup) => walletGroup.status === AirGapWalletStatus.ACTIVE)
     if (this.activeWalletGroups.length === 1) {
       this.select(this.activeWalletGroups[0], true)
     }
   }
 
-  async select(walletGroup: AirGapMarketWalletGroup, onlyOneGroupPresent: boolean = false): Promise<void> {
+  public async select(walletGroup: AirGapMarketWalletGroup, onlyOneGroupPresent: boolean = false): Promise<void> {
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: InteractionSelectionComponent,
       componentProps: {

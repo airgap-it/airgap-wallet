@@ -1,5 +1,5 @@
-import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 import { SafeUrl } from '@angular/platform-browser'
+import { UIWidget, UIWidgetType, UIWidgetConfig } from '../UIWidget'
 
 export interface UIAccountSummaryConfig extends UIWidgetConfig {
   address: string
@@ -16,7 +16,7 @@ export class UIAccountSummary extends UIWidget {
   public header: [string, string]
   public description: [string, string]
 
-  constructor(config: UIAccountSummaryConfig) {
+  public constructor(config: UIAccountSummaryConfig) {
     super(config)
 
     this.address = config.address

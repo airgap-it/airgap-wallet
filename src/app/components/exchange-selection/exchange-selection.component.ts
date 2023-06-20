@@ -1,6 +1,6 @@
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { FormGroup } from '@angular/forms'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { UntypedFormGroup } from '@angular/forms'
 import { ModalController } from '@ionic/angular'
 import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ExchangeSelectPage } from 'src/app/pages/exchange-select/exchange-select.page'
@@ -13,7 +13,7 @@ import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-
   templateUrl: './exchange-selection.component.html',
   styleUrls: ['./exchange-selection.component.scss']
 })
-export class ExchangeSelectionComponent implements OnInit {
+export class ExchangeSelectionComponent {
   public ExchangeEnum: typeof SwapExchangeEnum = SwapExchangeEnum
   public LiquidityExchangeEnum: typeof LiquidityExchangeEnum = LiquidityExchangeEnum
 
@@ -36,16 +36,14 @@ export class ExchangeSelectionComponent implements OnInit {
   public state: ExchangeState
 
   @Input()
-  public exchangeForm: FormGroup
+  public exchangeForm: UntypedFormGroup
 
   @Output()
   private readonly setupEmitter: EventEmitter<void> = new EventEmitter()
 
-  constructor(private readonly modalController: ModalController) {}
+  public constructor(private readonly modalController: ModalController) {}
 
-  ngOnInit() {}
-
-  async doRadio(): Promise<void> {
+  public async doRadio(): Promise<void> {
     const modal: HTMLIonModalElement = await this.modalController.create({
       component: ExchangeSelectPage,
       componentProps: {

@@ -5,10 +5,10 @@ import { Component, Input } from '@angular/core'
 import BigNumber from 'bignumber.js'
 import { Observable, ReplaySubject, Subscription } from 'rxjs'
 
+import { isSubProtocol } from 'src/app/utils/utils'
 import { supportsDelegation } from '../../helpers/delegation'
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
-import { isSubProtocol } from 'src/app/utils/utils'
 
 @Component({
   selector: 'portfolio-item',
@@ -65,7 +65,7 @@ export class PortfolioItemComponent {
 
   private walletChanged?: Subscription
 
-  constructor(
+  public constructor(
     private readonly operationsProvider: OperationsProvider,
     public accountProvider: AccountProvider,
     private readonly protocolService: ProtocolService

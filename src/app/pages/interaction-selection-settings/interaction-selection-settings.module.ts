@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { InteractionSelectionSettingsPage } from './interaction-selection-settings.page'
 import { TranslateModule } from '@ngx-translate/core'
 import { ComponentsModule } from '@airgap/angular-core'
 import { RouterModule } from '@angular/router'
+import { InteractionSelectionSettingsPage } from './interaction-selection-settings.page'
 
 @NgModule({
   imports: [

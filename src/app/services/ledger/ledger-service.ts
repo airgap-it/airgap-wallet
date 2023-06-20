@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 
+import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 import { LedgerApp } from '../../ledger/app/LedgerApp'
 import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'
 import { PolkadotLedgerApp } from '../../ledger/app/substrate/PolkadotLedgerApp'
@@ -10,7 +11,6 @@ import { ReturnCode } from '../../ledger/ReturnCode'
 import { isType } from '../../utils/utils'
 import { PriceService } from '../price/price.service'
 import { LedgerConnectionProvider } from './ledger-connection-provider'
-import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 
 const MAX_RETRIES = 1
 
@@ -27,7 +27,7 @@ export class LedgerService {
   private readonly openConnections: Map<string, LedgerConnection> = new Map()
   private readonly runningApps: Map<string, LedgerApp> = new Map()
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     private readonly connectionProvider: LedgerConnectionProvider,
     private readonly priceService: PriceService

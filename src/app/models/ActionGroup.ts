@@ -31,7 +31,7 @@ export interface WalletActionInfo {
 }
 
 export class ActionGroup {
-  constructor(private readonly callerContext: AccountTransactionListPage) {}
+  public constructor(private readonly callerContext: AccountTransactionListPage) {}
 
   public async getActions(): Promise<Action<any, any>[]> {
     const actionMap: Map<string, () => Promise<Action<any, any>[]>> = new Map()
@@ -125,7 +125,10 @@ export class ActionGroup {
     const importButtonAction: ButtonAction<string[], TezosImportKtAccountActionContext> = new ButtonAction(
       { name: 'account-transaction-list.import-accounts_label', icon: 'add-outline', identifier: 'import-accounts' },
       () => {
-        const importAccountAction: TezosImportKtAccountAction = new TezosImportKtAccountAction({ publicKey: this.callerContext.wallet.publicKey, protocolService: this.callerContext.protocolService })
+        const importAccountAction: TezosImportKtAccountAction = new TezosImportKtAccountAction({
+          publicKey: this.callerContext.wallet.publicKey,
+          protocolService: this.callerContext.protocolService
+        })
         importAccountAction.onComplete = async (ktAddresses: string[]): Promise<void> => {
           if (ktAddresses.length === 0) {
             this.callerContext.showToast('No accounts to import.')

@@ -17,8 +17,8 @@
           </span>
         </ng-container>
       </ion-label>
-      <ion-input *ngIf="swapSell" type="number" id="buy-input" [formControl]="amountControl" placeholder="0.0"></ion-input>
-      <ion-input *ngIf="!swapSell" [disabled]="true" type="number" id="sell-input" [(ngModel)]="amount" placeholder="0.0"></ion-input>
+      <ion-input *ngIf="swapSell" legacy type="number" id="buy-input" [formControl]="amountControl" placeholder="0.0"></ion-input>
+      <ion-input *ngIf="!swapSell" legacy [disabled]="true" type="number" id="sell-input" [(ngModel)]="amount" placeholder="0.0"></ion-input>
     </ion-item>
     <ion-text color="blackLight" *ngIf="!liquidity">
       <p class="ion-no-margin">

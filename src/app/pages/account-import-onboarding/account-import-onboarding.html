@@ -27,8 +27,14 @@
       *ngIf="protocol && subProtocol"
     ></p>
 
-    <ion-slides pager="true" [options]="slideOpts" #slides (ionSlideDidChange)="ionSlideDidChange()">
-      <ion-slide class="ion-padding-horizontal" *ngIf="protocol && subProtocol">
+    <swiper-container 
+      #slides 
+      [modules]="swiperModules" 
+      [initialSlide]="0"
+      [speed]="400"
+      [pagination]="slidePagination"
+      (slidechangetransitionend)="onSlideChange()">
+      <swiper-slide class="ion-padding-horizontal" *ngIf="protocol && subProtocol">
         <div class="slide-zoom">
           <ion-row class="ion-align-items-center on-padding-bottom ion-margin-bottom sub-protocol__container">
             <ion-col size="5">
@@ -56,8 +62,8 @@
             ></p>
           </ion-text>
         </div>
-      </ion-slide>
-      <ion-slide class="ion-padding-horizontal">
+      </swiper-slide>
+      <swiper-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide1" />
           <ion-text>
@@ -67,21 +73,21 @@
             <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-1.description' | translate"></p>
           </ion-text>
         </div>
-      </ion-slide>
-      <ion-slide class="ion-padding-horizontal">
+      </swiper-slide>
+      <swiper-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide2" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-2_text' | translate"></p>
         </div>
-      </ion-slide>
-      <ion-slide class="ion-padding-horizontal">
+      </swiper-slide>
+      <swiper-slide class="ion-padding-horizontal">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide3" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.text' | translate"></p>
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-3.description' | translate"></p>
         </div>
-      </ion-slide>
-      <ion-slide class="ion-padding-horizontal" *ngIf="protocol">
+      </swiper-slide>
+      <swiper-slide class="ion-padding-horizontal" *ngIf="protocol">
         <div class="slide-zoom">
           <img [src]="'./assets/img/' + slide4" />
           <p class="ion-text-left" [innerHTML]="'account-import-onboarding.slides.slide-4.text' | translate"></p>
@@ -90,21 +96,21 @@
             [innerHTML]="'account-import-onboarding.slides.slide-4.description' | translate: { protocolName: protocol.name }"
           ></p>
         </div>
-      </ion-slide>
-    </ion-slides>
+      </swiper-slide>
+    </swiper-container>
   </ion-grid>
 </ion-content>
 <ion-footer class="ion-no-border">
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-toolbar class="ion-no-padding">
       <ion-buttons *ngIf="!isBegin" slot="end">
-        <ion-button fill="clear" color="primary" (click)="slides.slidePrev()">
+        <ion-button fill="clear" color="primary" (click)="showPrevSlide()">
           <ion-icon name="arrow-back"></ion-icon>
           {{ 'account-import-onboarding.back' | translate }}
         </ion-button>
       </ion-buttons>
       <ion-buttons *ngIf="!isEnd" slot="end">
-        <ion-button fill="clear" color="primary" (click)="slides.slideNext()">
+        <ion-button fill="clear" color="primary" (click)="showNextSlide()">
           {{ 'account-import-onboarding.next' | translate }}
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>

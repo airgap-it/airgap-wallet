@@ -45,14 +45,10 @@ RUN ionic info
 # Bundle app source
 COPY . /app
 
-# post-install hook, to be safe if it got cached
-RUN node config/patch_crypto.js
-
 # set version code
 ARG BUILD_NR
 RUN sed -i -e "s/versionCode 1/versionCode $BUILD_NR/g" /app/android/app/build.gradle
 
-# disable pure getters due to https://github.com/angular/angular-cli/issues/11439
 # configure mangle (keep_fnames) for bitcoinjs https://github.com/bitcoinjs/bitcoinjs-lib/issues/959
 RUN npm run prepare-prod-build
 

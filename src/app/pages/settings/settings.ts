@@ -9,10 +9,9 @@ import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
 
+import { ShopService } from 'src/app/services/shop/shop.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
-
-import { ShopService } from 'src/app/services/shop/shop.service'
 
 @Component({
   selector: 'page-settings',
@@ -25,7 +24,7 @@ export class SettingsPage {
   // Shop banner
   public shopLink: string = ''
 
-  constructor(
+  public constructor(
     public readonly alertCtrl: AlertController,
     public readonly serializerService: SerializerService,
     public readonly themeService: ThemeService,
@@ -74,7 +73,7 @@ export class SettingsPage {
         console.log(`Share completed: ${result}`)
       })
       .catch((error) => {
-        console.log('Sharing failed with error: ' + error)
+        console.log(`Sharing failed with error: ${error}`)
       })
   }
 
@@ -167,7 +166,7 @@ export class SettingsPage {
         this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch((error) => console.error(error))
       },
       (err: string) => {
-        console.error('Error: ' + err)
+        console.error(`Error: ${err}`)
       }
     )
   }

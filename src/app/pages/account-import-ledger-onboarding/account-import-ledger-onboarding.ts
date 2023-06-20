@@ -1,14 +1,15 @@
 import { ProtocolService } from '@airgap/angular-core'
-import { Component, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { IonSlides } from '@ionic/angular'
 import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
 import { ProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
+import { Component, ElementRef, ViewChild } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { IonicSlides } from '@ionic/angular'
+
 import { promiseRetry } from '../../helpers/promise'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AccountSync } from 'src/app/types/AccountSync'
+import { AccountSync } from '../../types/AccountSync'
 
 @Component({
   selector: 'page-account-import-ledger-onboarding',
@@ -17,18 +18,15 @@ import { AccountSync } from 'src/app/types/AccountSync'
 })
 export class AccountImportLedgerOnboardingPage {
   public slideAssets: [string, string][] = []
+  public readonly swiperModules = [IonicSlides]
 
-  @ViewChild(IonSlides, { static: true })
-  public slides: IonSlides
-  public slideOpts = {
-    initialSlide: 0,
-    speed: 400,
-    pagination: {
-      el: '.swiper-pagination',
-      type: 'custom',
-      renderCustom: (_swiper, current, total): string => {
-        return this.customProgressBar(current, total)
-      }
+  @ViewChild('slides', { static: true })
+  public slidesRef: ElementRef | undefined
+  public slidePagination = {
+    el: '.swiper-pagination',
+    type: 'custom',
+    renderCustom: (_swiper, current, total): string => {
+      return this.customProgressBar(current, total)
     }
   }
 
@@ -44,7 +42,7 @@ export class AccountImportLedgerOnboardingPage {
 
   private importPromise?: Promise<void>
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly protocolService: ProtocolService,
@@ -55,26 +53,22 @@ export class AccountImportLedgerOnboardingPage {
   }
 
   public async showPrevSlide(): Promise<void> {
-    await this.slides.slidePrev()
+    await this.slidesRef?.nativeElement.swiper.slidePrev()
   }
 
   public async showNextSlide(): Promise<void> {
-    await this.slides.slideNext()
+    await this.slidesRef?.nativeElement.swiper.slideNext()
   }
 
-  public ionSlideDidChange(): void {
-    this.slides
-      .getActiveIndex()
-      .then((val: number) => {
-        const isEnd = val === this.slideAssets.length - 1
+  public onSlideChange(): void {
+    const activeIndex = this.slidesRef?.nativeElement.swiper.activeIndex ?? -1
+    const isEnd = activeIndex === this.slideAssets.length - 1
 
-        this.canSlidePrev = val > 0
-        this.canSlideNext = !isEnd
-        this.canFinish = isEnd
+    this.canSlidePrev = activeIndex > 0
+    this.canSlideNext = !isEnd
+    this.canFinish = isEnd
 
-        this.importFromLedger()
-      })
-      .catch(handleErrorSentry(ErrorCategory.OTHER))
+    this.importFromLedger()
   }
 
   public retry(): void {
@@ -90,9 +84,8 @@ export class AccountImportLedgerOnboardingPage {
   private customProgressBar(current: number, total: number): string {
     const ratio: number = current / total
 
-    const progressBarStyle: string =
-      "style='transform: translate3d(0px, 0px, 0px) scaleX(" + ratio + ") scaleY(1); transition-duration: 300ms;'"
-    const progressBar: string = "<span class='swiper-pagination-progressbar-fill' " + progressBarStyle + '></span>'
+    const progressBarStyle: string = `style='transform: translate3d(0px, 0px, 0px) scaleX(${ratio}) scaleY(1); transition-duration: 300ms;'`
+    const progressBar: string = `<span class='swiper-pagination-progressbar-fill' ${progressBarStyle}></span>`
 
     let progressBarContainer: string =
       "<div class='swiper-pagination-progressbar' style='height: 4px; top: 6px; width: calc(100% - 32px);left: 16px;'>"

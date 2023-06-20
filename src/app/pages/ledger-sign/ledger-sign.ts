@@ -27,7 +27,7 @@ export class LedgerSignPage {
 
   private loader: HTMLIonLoadingElement | undefined
 
-  constructor(
+  public constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly dataService: DataService,

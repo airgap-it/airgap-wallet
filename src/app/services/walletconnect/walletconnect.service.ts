@@ -3,11 +3,11 @@ import { LoadingController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import WalletConnect from '@walletconnect/client'
 import { DappConfirmPage } from 'src/app/pages/dapp-confirm/dapp-confirm.page'
-import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
-import { getAllValidWalletConnectSessions, clientMeta } from './helpers'
 import { mapValues, isEmpty } from 'lodash'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 import { UiEventService } from '@airgap/angular-core'
+import { WalletconnectPage } from '../../pages/walletconnect/walletconnect.page'
+import { getAllValidWalletConnectSessions, clientMeta } from './helpers'
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +17,7 @@ export class WalletconnectService {
 
   private timeout: NodeJS.Timeout | undefined
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
     private readonly translateService: TranslateService,
@@ -36,7 +36,7 @@ export class WalletconnectService {
   }
 
   public async connect(uri: string): Promise<void> {
-    let connector = new WalletConnect({
+    const connector = new WalletConnect({
       uri,
       clientMeta
     })
@@ -54,7 +54,7 @@ export class WalletconnectService {
     }, 1008)
   }
 
-  async presentLoading() {
+  public async presentLoading() {
     this.loading = await this.loadingController.create({
       message: this.translateService.instant('walletconnect.wait'),
       backdropDismiss: true
@@ -118,7 +118,7 @@ export class WalletconnectService {
     this.presentConfirmationModal(id, result)
   }
 
-  async presentConfirmationModal(id: string, result: string) {
+  public async presentConfirmationModal(id: string, result: string) {
     const modal = await this.modalController.create({
       component: DappConfirmPage,
       componentProps: {
@@ -131,7 +131,7 @@ export class WalletconnectService {
     return modal.present()
   }
 
-  async presentModal(request: any, connector: WalletConnect) {
+  public async presentModal(request: any, connector: WalletConnect) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,
       componentProps: {

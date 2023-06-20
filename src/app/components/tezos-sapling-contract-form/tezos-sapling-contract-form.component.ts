@@ -1,7 +1,7 @@
 import { BaseComponent, UIResourceStatus } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { Component, EventEmitter, Inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { combineLatest } from 'rxjs'
 import { debounceTime, takeUntil } from 'rxjs/operators'
 
@@ -18,6 +18,7 @@ import { TezosSaplingContractFormStore } from './tezos-sapling-contract-form.sto
   styleUrls: ['tezos-sapling-contract-form.component.scss'],
   providers: [{ provide: TEZOS_SAPLING_CONTRACT_FORM_FACADE, useClass: TezosSaplingContractFormNgRxFacade }, TezosSaplingContractFormStore]
 })
+// eslint-disable-next-line @angular-eslint/component-class-suffix
 export class TezosSaplingContractForm extends BaseComponent<TezosSaplingContractFormFacade> implements OnChanges {
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
@@ -30,11 +31,11 @@ export class TezosSaplingContractForm extends BaseComponent<TezosSaplingContract
   @Output()
   public readonly contractAddress: EventEmitter<{ address: string; configuration?: any } | undefined> = new EventEmitter()
 
-  public readonly formGroup: FormGroup
+  public readonly formGroup: UntypedFormGroup
 
-  constructor(
+  public constructor(
     @Inject(TEZOS_SAPLING_CONTRACT_FORM_FACADE) facade: TezosSaplingContractFormFacade,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: UntypedFormBuilder
   ) {
     super(facade)
     this.formGroup = this.formBuilder.group({
@@ -100,10 +101,12 @@ export class TezosSaplingContractForm extends BaseComponent<TezosSaplingContract
   }
 
   public async openInjectorLink(): Promise<void> {
-    await this.facade.openUrl('https://github.com/airgap-it/sapling-injector')  
+    await this.facade.openUrl('https://github.com/airgap-it/sapling-injector')
   }
 
   public async openSaplingLink(): Promise<void> {
-    await this.facade.openUrl('https://gitlab.com/tezos/tezos/-/blob/master/src/proto_alpha/lib_protocol/test/integration/michelson/contracts/sapling_contract.tz')
+    await this.facade.openUrl(
+      'https://gitlab.com/tezos/tezos/-/blob/master/src/proto_alpha/lib_protocol/test/integration/michelson/contracts/sapling_contract.tz'
+    )
   }
 }

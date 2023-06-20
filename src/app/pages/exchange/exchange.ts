@@ -12,7 +12,7 @@ import {
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { IACMessageType } from '@airgap/serializer'
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { Store } from '@ngrx/store'
@@ -88,7 +88,7 @@ export class ExchangePage implements OnInit, OnDestroy {
   public removeLiquiditySymbol: string
   public activeExchange$: BehaviorSubject<ExchangeEnum | undefined> = new BehaviorSubject(undefined)
   public activeExchange: ExchangeEnum
-  public exchangeForm: FormGroup
+  public exchangeForm: UntypedFormGroup
   public removeLiquidityBalance$: Observable<BigNumber>
   public fiatInputAmount$: Observable<BigNumber>
   public fiatExchangeAmount$: Observable<BigNumber>
@@ -118,10 +118,10 @@ export class ExchangePage implements OnInit, OnDestroy {
 
   public segmentType: string = SegmentType.SWAP
   public segmentTypeInner: string = SegmentType.ADD_LIQUIDITY
-  public formGroup: FormGroup
+  public formGroup: UntypedFormGroup
 
-  constructor(
-    public formBuilder: FormBuilder,
+  public constructor(
+    public formBuilder: UntypedFormBuilder,
     private readonly router: Router,
     private readonly exchangeProvider: ExchangeProvider,
     private readonly storageProvider: WalletStorageService,
@@ -140,7 +140,7 @@ export class ExchangePage implements OnInit, OnDestroy {
     })
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.fromWallet$ = this.store$.select(getFromWallet)
     this.fromWallet$.pipe(filterNullish(), takeUntil(this.ngDestroyed$)).subscribe((wallet) => (this.fromWallet = wallet))
     this.toWallet$ = this.store$.select(getToWallet)
@@ -541,7 +541,7 @@ export class ExchangePage implements OnInit, OnDestroy {
     return this.filterSupportedProtocols(toProtocols, false)
   }
 
-  async setFromProtocol(protocol: ICoinProtocol, retry: number = 0): Promise<void> {
+  public async setFromProtocol(protocol: ICoinProtocol, retry: number = 0): Promise<void> {
     this.selectedFromProtocol = protocol
     this.supportedProtocolsTo = await this.getSupportedToProtocols(protocol.identifier)
     const maxRetry = this.exchangeProvider.numberOfAvailableSwapExchanges() - 1
@@ -579,7 +579,7 @@ export class ExchangePage implements OnInit, OnDestroy {
     this.updateFeeEstimate()
   }
 
-  async setToProtocol(protocol: ICoinProtocol): Promise<void> {
+  public async setToProtocol(protocol: ICoinProtocol): Promise<void> {
     this.selectedToProtocol = protocol
     this.loadWalletsForSelectedToProtocol()
     this.loadDataFromExchange()
@@ -626,7 +626,7 @@ export class ExchangePage implements OnInit, OnDestroy {
     )
   }
 
-  async setFromWallet(fromWallet: AirGapMarketWallet, setToWallet: boolean = false) {
+  public async setFromWallet(fromWallet: AirGapMarketWallet, setToWallet: boolean = false) {
     if (!fromWallet) {
       return
     }
@@ -647,7 +647,7 @@ export class ExchangePage implements OnInit, OnDestroy {
     this.accountProvider.triggerWalletChanged()
   }
 
-  async setToWallet(toWallet: AirGapMarketWallet) {
+  public async setToWallet(toWallet: AirGapMarketWallet) {
     this.store$.dispatch(actions.setToWallet({ toWallet }))
 
     this.loadDataFromExchange()
@@ -670,7 +670,7 @@ export class ExchangePage implements OnInit, OnDestroy {
       })
   }
 
-  async startExchange(liquidity: boolean = false) {
+  public async startExchange(liquidity: boolean = false) {
     const transaction: ExchangeTransaction = await this.exchangeProvider.createTransaction(
       this.fromWallet,
       this.toWallet,
@@ -705,10 +705,10 @@ export class ExchangePage implements OnInit, OnDestroy {
       }
 
       this.dataService.setData(DataServiceKey.EXCHANGE, info)
-      this.router.navigateByUrl('/exchange-confirm/' + DataServiceKey.EXCHANGE).catch(handleErrorSentry(ErrorCategory.STORAGE))
+      this.router.navigateByUrl(`/exchange-confirm/${DataServiceKey.EXCHANGE}`).catch(handleErrorSentry(ErrorCategory.STORAGE))
 
       const txId = transaction.id
-      let txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
+      const txStatus: string = (await this.exchangeProvider.getStatus(txId)).status
 
       const exchangeTxInfo: ExchangeTransactionDetails = {
         receivingAddress: this.toWallet.addresses[0],
@@ -719,7 +719,7 @@ export class ExchangePage implements OnInit, OnDestroy {
         amountExpectedTo: transaction.amountExpectedTo,
         fee: transaction.fee,
         status: txStatus,
-        exchange: this.activeExchange as ExchangeEnum,
+        exchange: this.activeExchange,
         id: txId,
         timestamp: new BigNumber(Date.now()).toNumber()
       }
@@ -732,12 +732,12 @@ export class ExchangePage implements OnInit, OnDestroy {
     }
   }
 
-  dismissExchangeOnboarding() {
+  public dismissExchangeOnboarding() {
     this.setup()
     this.storageProvider.set(WalletStorageKey.EXCHANGE_INTEGRATION, true).catch(handleErrorSentry(ErrorCategory.STORAGE))
   }
 
-  goToAddCoinPage() {
+  public goToAddCoinPage() {
     this.router.navigateByUrl('/account-add')
   }
 

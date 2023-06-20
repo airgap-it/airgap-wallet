@@ -48,7 +48,7 @@ export class SubAccountAddPage {
   public protocolID: string
   public addressIndex: undefined
 
-  constructor(
+  public constructor(
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,

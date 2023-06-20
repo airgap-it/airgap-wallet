@@ -5,18 +5,11 @@
     [protocolIdentifier]="protocol.identifier"
     slot="start"
   ></airgap-currency-symbol>
-  <ion-label>
-    <h2>
-      <strong>{{ protocol.name | translate }}</strong>
-      <span *ngIf="showSymbol">{{ protocol.symbol }}</span>
-
-      <ion-badge *ngIf="parentName !== undefined" color="light" style="margin-left: 10px;">
-        <div>
-          {{parentName}}
-        </div>
-      </ion-badge>
-    </h2>
+  <ion-label *ngIf="!radioList">
+    <currency-item-label [protocol]="protocol" [showSymbol]="showSymbol" [parentName]="parentName"></currency-item-label>
   </ion-label>
 
-  <ion-radio *ngIf="radioList" [value]="protocol.identifier" slot="end"></ion-radio>
+  <ion-radio *ngIf="radioList" [value]="protocol.identifier" justify="space-between" labelPlacement="start">
+    <currency-item-label [protocol]="protocol" [showSymbol]="showSymbol" [parentName]="parentName"></currency-item-label>
+  </ion-radio>
 </ion-item>

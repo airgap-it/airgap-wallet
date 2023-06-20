@@ -13,7 +13,7 @@ export class TransactionDetailPage implements OnInit {
   public transaction: IAirGapTransaction
   public lottieConfig: any
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     public readonly dataService: DataService,
     private readonly browserService: BrowserService,

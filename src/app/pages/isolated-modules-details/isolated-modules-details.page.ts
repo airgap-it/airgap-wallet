@@ -24,7 +24,7 @@ export class IsolatedModulesDetailsPage {
 
   public readonly mode: IsolatedModulesDetailsMode
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dataService: DataService,
@@ -87,40 +87,44 @@ export class IsolatedModulesDetailsPage {
     } catch (e) {
       const alertType = typeof e === 'object' && 'type' in e ? e.type : 'generic'
 
-      this.uiEventService.showTranslatedAlert({
-        header: `isolated-modules-details-page.alert.update.${alertType}.header`,
-        message: `isolated-modules-details-page.alert.update.${alertType}.message`,
-        buttons: [
-          {
-            text: `isolated-modules-details-page.alert.update.${alertType}.ok_label`,
-            role: 'cancel'
-          }
-        ]
-      }).catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+      this.uiEventService
+        .showTranslatedAlert({
+          header: `isolated-modules-details-page.alert.update.${alertType}.header`,
+          message: `isolated-modules-details-page.alert.update.${alertType}.message`,
+          buttons: [
+            {
+              text: `isolated-modules-details-page.alert.update.${alertType}.ok_label`,
+              role: 'cancel'
+            }
+          ]
+        })
+        .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
     }
   }
 
   public removeModule() {
-    this.uiEventService.showTranslatedAlert({
-      header: 'isolated-modules-details.alert.remove.header',
-      message: 'isolated-modules-details.alert.remove.message',
-      buttons: [
-        {
-          text: 'isolated-modules-details.alert.remove.cancel_label',
-          role: 'cancel'
-        },
-        {
-          text: 'isolated-modules-details.alert.remove.proceed_label',
-          handler: async (): Promise<void> => {
-            if (this.metadata && this.metadata.type === 'installed') {
-              await this.modulesService.removeInstalledModule(this.metadata)
+    this.uiEventService
+      .showTranslatedAlert({
+        header: 'isolated-modules-details.alert.remove.header',
+        message: 'isolated-modules-details.alert.remove.message',
+        buttons: [
+          {
+            text: 'isolated-modules-details.alert.remove.cancel_label',
+            role: 'cancel'
+          },
+          {
+            text: 'isolated-modules-details.alert.remove.proceed_label',
+            handler: async (): Promise<void> => {
+              if (this.metadata && this.metadata.type === 'installed') {
+                await this.modulesService.removeInstalledModule(this.metadata)
+              }
+
+              this.router.navigateByUrl('/isolated-modules-list', { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
             }
-        
-            this.router.navigateByUrl('/isolated-modules-list', { replaceUrl: true }).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
           }
-        }
-      ]
-    }).catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+        ]
+      })
+      .catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
   }
 
   public onIsVerified(isVerified) {

@@ -25,7 +25,7 @@ export class AccountActivatePage {
   public readonly createAccountId: typeof createAccountId = createAccountId
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
-  constructor(private readonly store: Store<fromAccountActivate.State>, private readonly route: ActivatedRoute) {
+  public constructor(private readonly store: Store<fromAccountActivate.State>, private readonly route: ActivatedRoute) {
     this.protocolName$ = this.store.select(fromAccountActivate.selectProtocolName)
     this.inactiveAccounts$ = this.store.select(fromAccountActivate.selectInactiveAccounts)
     this.isChecked$ = this.store.select(fromAccountActivate.selectIsAccountChecked)

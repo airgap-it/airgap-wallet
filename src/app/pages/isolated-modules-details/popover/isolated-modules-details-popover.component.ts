@@ -10,7 +10,7 @@ import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-
 export class IsolatedModulesDetailsPopoverComponent {
   private readonly onRemove: Function
 
-  constructor(private readonly popoverController: PopoverController) {}
+  public constructor(private readonly popoverController: PopoverController) {}
 
   public removeModule(): void {
     if (this.onRemove) {

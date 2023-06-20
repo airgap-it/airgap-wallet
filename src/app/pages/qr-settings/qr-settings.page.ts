@@ -6,5 +6,5 @@ import { Component } from '@angular/core'
   styleUrls: ['./qr-settings.page.scss']
 })
 export class QrSettingsPage {
-  constructor() {}
+  public constructor() {}
 }

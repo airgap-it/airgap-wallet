@@ -19,7 +19,7 @@ interface Payload {
 export class AddressHandler extends IACSinglePartHandler<Payload> {
   public readonly name: string = 'AddressHandler'
 
-  constructor(
+  public constructor(
     private readonly accountProvider: AccountProvider,
     private readonly dataService: DataService,
     private readonly router: Router,

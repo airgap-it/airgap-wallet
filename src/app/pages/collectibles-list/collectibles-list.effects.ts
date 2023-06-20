@@ -76,7 +76,7 @@ export class CollectiblesListEffects {
 
       return actions.collectiblesLoadingSuccess({ collectibles: cursor.collectibles, hasNext: cursor.hasNext })
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(error)
 
       return actions.collectiblesLoadingFailure({ error })
@@ -101,7 +101,7 @@ export class CollectiblesListEffects {
 
       return actions.handled()
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(error)
 
       return actions.showDetailsFailed({ error })

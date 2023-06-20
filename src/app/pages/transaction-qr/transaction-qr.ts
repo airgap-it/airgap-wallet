@@ -26,7 +26,7 @@ export class TransactionQrPage {
       }
     | undefined
 
-  constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly platform: Platform) {
+  public constructor(private readonly router: Router, private readonly route: ActivatedRoute, private readonly platform: Platform) {
     if (this.route.snapshot.data.special) {
       const info = this.route.snapshot.data.special
       this.airGapTxs = info.airGapTxs

@@ -1,5 +1,6 @@
 import {
-  /* FilesystemService, */ 
+  /* FilesystemService, */
+
   convertNetworkV0ToV1,
   createV0TezosFA1p2Protocol,
   createV0TezosFA2Protocol,
@@ -60,7 +61,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
   private readonly contractMetadata: Record<string, TezosContractMetadata> = {}
   private readonly tokenMetadata: Record<string, Record<number, TezosFATokenMetadata>> = {}
 
-  constructor(private readonly protocolService: ProtocolService /*, private readonly filesystemService: FilesystemService */) {
+  public constructor(private readonly protocolService: ProtocolService /*, private readonly filesystemService: FilesystemService */) {
     super(initialState)
   }
 
@@ -92,7 +93,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     return this.select((state) => state[key])
   }
 
-  private updateWithValue = this.updater((state: TezosFAFormState, partialState: Partial<TezosFAFormState>) => {
+  private readonly updateWithValue = this.updater((state: TezosFAFormState, partialState: Partial<TezosFAFormState>) => {
     return {
       ...state,
       ...partialState,
@@ -100,7 +101,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     }
   })
 
-  private updateWithError = this.updater((state: TezosFAFormState, error: unknown) => {
+  private readonly updateWithError = this.updater((state: TezosFAFormState, error: unknown) => {
     const tezosFAFormError = isTezosFAFormError(error) ? error : unknownError(error)
 
     if (tezosFAFormError.type === TezosFAFormErrorType.UNKNOWN && tezosFAFormError.error) {
@@ -146,7 +147,7 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
 
   private fetchTokenDetails(state: TezosFAFormState, inputDetails: TokenDetailsInput): Observable<Partial<TezosFAFormState>> {
     return new Observable((subscriber: Subscriber<Partial<TezosFAFormState>>) => {
-      // tslint:disable-next-line: no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       new Promise<void>(async (resolve, reject) => {
         try {
           this.emitLoading(subscriber)
@@ -202,7 +203,11 @@ export class TezosFAFormStore extends ComponentStore<TezosFAFormState> {
     })
   }
 
-  private async alreadySupported(address: string, networkIdentifier: string, tokenID?: number): Promise<ICoinSubProtocolAdapter<TezosFAProtocol> | undefined> {
+  private async alreadySupported(
+    address: string,
+    networkIdentifier: string,
+    tokenID?: number
+  ): Promise<ICoinSubProtocolAdapter<TezosFAProtocol> | undefined> {
     const subProtocols = await this.protocolService.getSubProtocols(MainProtocolSymbols.XTZ)
     const alreadySupportedProtocols = subProtocols.filter((protocol): protocol is ICoinSubProtocolAdapter<TezosFAProtocol> => {
       return (

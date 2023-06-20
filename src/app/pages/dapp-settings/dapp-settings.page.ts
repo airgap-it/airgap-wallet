@@ -12,7 +12,7 @@ export class DappSettingsPage implements OnInit {
   public connectedPeers: P2PPairingRequest[] = []
   public connectedServer: string = ''
 
-  constructor(private readonly beaconService: BeaconService, private readonly uiEventService: UiEventService) {}
+  public constructor(private readonly beaconService: BeaconService, private readonly uiEventService: UiEventService) {}
 
   public async ngOnInit(): Promise<void> {
     await this.loadPeers()

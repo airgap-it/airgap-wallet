@@ -1,10 +1,9 @@
-import { AirGapMarketWallet, AirGapWalletPriceService, SubProtocolSymbols, TimeInterval } from '@airgap/coinlib-core'
-import axios from '../../../../node_modules/axios'
+import { AirGapMarketWallet, AirGapWalletPriceService, SubProtocolSymbols, ICoinProtocol, TimeInterval } from '@airgap/coinlib-core'
+import axios from 'axios'
 import { Injectable } from '@angular/core'
-import { ICoinProtocol } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
-import { CachingService, CachingServiceKey, StorageObject } from '../caching/caching.service'
 import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
+import { CachingService, CachingServiceKey, StorageObject } from '../caching/caching.service'
 
 export interface CryptoPrices {
   time: number
@@ -19,7 +18,7 @@ export class PriceService implements AirGapWalletPriceService {
   private readonly baseURL: string = 'https://crypto-prices-api.prod.gke.papers.tech'
   private readonly pendingMarketPriceRequests: { [key: string]: Promise<BigNumber> } = {}
 
-  constructor(private readonly cachingService: CachingService) {}
+  public constructor(private readonly cachingService: CachingService) {}
 
   public async fetchPriceData(marketSymbols: string[], timeInterval: TimeInterval): Promise<CryptoPrices[]> {
     const cachedPriceData: StorageObject = await this.cachingService.getPriceData(marketSymbols, timeInterval)

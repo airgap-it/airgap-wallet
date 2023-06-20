@@ -14,7 +14,7 @@ const isBeaconMessage: (obj: unknown) => obj is P2PPairingRequest = (obj: unknow
 
 const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promise<boolean> => {
   try {
-    // tslint:disable-next-line: no-unused-expression
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     new URL(url)
   } catch {
     return false
@@ -26,7 +26,7 @@ const isValidUrl: (url: string) => Promise<boolean> = async (url: string): Promi
 export class BeaconHandler extends IACSinglePartHandler<P2PPairingRequest> {
   public readonly name: string = 'BeaconHandler'
 
-  constructor(private readonly beaconService: BeaconService) {
+  public constructor(private readonly beaconService: BeaconService) {
     super()
   }
 

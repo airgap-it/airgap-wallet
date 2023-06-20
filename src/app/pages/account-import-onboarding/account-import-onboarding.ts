@@ -1,7 +1,7 @@
 import { DeeplinkService, ProtocolService } from '@airgap/angular-core'
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { IonSlides, Platform } from '@ionic/angular'
+import { IonicSlides, Platform } from '@ionic/angular'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -14,22 +14,20 @@ const DEEPLINK_VAULT_ADD_ACCOUNT: string = `airgap-vault://add-account/`
   styleUrls: ['./account-import-onboarding.scss']
 })
 export class AccountImportOnboardingPage implements OnInit {
+  public readonly swiperModules = [IonicSlides]
+
   public slide1: string = 'account-import-onboarding-slide_1.png'
   public slide2: string = 'account-import-onboarding-slide_2.png'
   public slide3: string = 'account-import-onboarding-slide_3.png'
   public slide4: string = 'account-import-onboarding-slide_4.png'
 
-  @ViewChild(IonSlides, { static: true })
-  public slides: IonSlides
-  public slideOpts = {
-    initialSlide: 0,
-    speed: 400,
-    pagination: {
-      el: '.swiper-pagination',
-      type: 'custom',
-      renderCustom: (_swiper, current, total): string => {
-        return this.customProgressBar(current, total)
-      }
+  @ViewChild('slides', { static: true })
+  public slidesRef: ElementRef | undefined
+  public slidePagination = {
+    el: '.swiper-pagination',
+    type: 'custom',
+    renderCustom: (_swiper, current, total): string => {
+      return this.customProgressBar(current, total)
     }
   }
   public protocol: ICoinProtocol | undefined
@@ -39,7 +37,7 @@ export class AccountImportOnboardingPage implements OnInit {
   public isEnd: boolean = false
   private indexEndingSlide: number
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     public platform: Platform,
     private readonly deeplinkService: DeeplinkService,
@@ -70,14 +68,18 @@ export class AccountImportOnboardingPage implements OnInit {
     }
   }
 
-  public ionSlideDidChange(): void {
-    this.slides
-      .getActiveIndex()
-      .then((val: number) => {
-        this.isBegin = val === 0
-        this.isEnd = val === this.indexEndingSlide
-      })
-      .catch(handleErrorSentry(ErrorCategory.OTHER))
+  public async showPrevSlide(): Promise<void> {
+    await this.slidesRef?.nativeElement.swiper.slidePrev()
+  }
+
+  public async showNextSlide(): Promise<void> {
+    await this.slidesRef?.nativeElement.swiper.slideNext()
+  }
+
+  public onSlideChange(): void {
+    const activeIndex = this.slidesRef?.nativeElement.swiper.activeIndex ?? -1
+    this.isBegin = activeIndex === 0
+    this.isEnd = activeIndex === this.indexEndingSlide
   }
 
   public openVault(): void {
@@ -89,9 +91,8 @@ export class AccountImportOnboardingPage implements OnInit {
   private customProgressBar(current: number, total: number): string {
     const ratio: number = current / total
 
-    const progressBarStyle: string =
-      "style='transform: translate3d(0px, 0px, 0px) scaleX(" + ratio + ") scaleY(1); transition-duration: 300ms;'"
-    const progressBar: string = "<span class='swiper-pagination-progressbar-fill' " + progressBarStyle + '></span>'
+    const progressBarStyle: string = `style='transform: translate3d(0px, 0px, 0px) scaleX(${ratio}) scaleY(1); transition-duration: 300ms;'`
+    const progressBar: string = `<span class='swiper-pagination-progressbar-fill' ${progressBarStyle}></span>`
 
     let progressBarContainer: string =
       "<div class='swiper-pagination-progressbar' style='height: 4px; top: 6px; width: calc(100% - 32px);left: 16px;'>"

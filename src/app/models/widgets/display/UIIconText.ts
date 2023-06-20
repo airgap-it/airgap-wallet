@@ -19,7 +19,7 @@ export class UIIconText extends UIWidget {
   public description?: string
   public descriptionHTML?: string
 
-  constructor(config: UIIconTextConfig) {
+  public constructor(config: UIIconTextConfig) {
     super(config)
 
     this.iconName = config.iconName

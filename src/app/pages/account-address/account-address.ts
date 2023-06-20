@@ -17,7 +17,7 @@ export class AccountAddressPage {
   public protocolID: string
   public addressIndex: number
 
-  constructor(
+  public constructor(
     private readonly navController: NavController,
     private readonly route: ActivatedRoute,
 
