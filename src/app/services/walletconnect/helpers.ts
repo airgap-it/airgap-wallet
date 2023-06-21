@@ -5,13 +5,13 @@ interface Dictionary<WalletconnectSession> {
   [Key: string]: WalletconnectSession
 }
 
-export const getAllValidWalletConnectSessions = async (): Promise<Dictionary<WalletconnectSession>> => {
-  const allSessions = await getAllWalletConnectSessions()
+export const getAllValidWalletConnectV1Sessions = async (): Promise<Dictionary<WalletconnectSession>> => {
+  const allSessions = await getAllWalletConnectV1Sessions()
   const now = Date.now()
   return pickBy(allSessions, (value) => value.connected && now < value.expirationDate)
 }
 
-export const getAllWalletConnectSessions = async (): Promise<Dictionary<WalletconnectSession>> => {
+export const getAllWalletConnectV1Sessions = async (): Promise<Dictionary<WalletconnectSession>> => {
   const local = localStorage ? await localStorage.getItem(WALLETCONNECT) : null
 
   let sessions = null
@@ -26,16 +26,16 @@ export const getAllWalletConnectSessions = async (): Promise<Dictionary<Walletco
   return sessions
 }
 
-export const saveWalletConnectSession = async (peerId, session) => {
-  const allSessions = await getAllValidWalletConnectSessions()
+export const saveWalletConnectV1Session = async (peerId, session) => {
+  const allSessions = await getAllValidWalletConnectV1Sessions()
   const expirationDate = Date.now() + 24 * 60 * 60 * 1000
   session = { ...session, expirationDate }
   allSessions[peerId] = session
   await localStorage.setItem(WALLETCONNECT, JSON.stringify(allSessions))
 }
 
-export const removeWalletConnectSessions = async (sessionIds) => {
-  const allSessions = await getAllWalletConnectSessions()
+export const removeWalletConnectV1Sessions = async (sessionIds) => {
+  const allSessions = await getAllWalletConnectV1Sessions()
   const resultingSessions = omit(allSessions, sessionIds)
   await localStorage.setItem(WALLETCONNECT, resultingSessions)
 }

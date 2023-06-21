@@ -78,7 +78,7 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    request: BeaconRequestOutputMessage | { transaction: UnsignedTransaction; id: number },
+    request: BeaconRequestOutputMessage | { transaction: UnsignedTransaction; id: string },
     protocol: ICoinProtocol
   ): Promise<void> {
     const network = (request as OperationRequest).network
