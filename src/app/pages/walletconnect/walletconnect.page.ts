@@ -1,4 +1,4 @@
-import { getBytesFormatV1FromV0, ICoinProtocolAdapter } from '@airgap/angular-core'
+import { assertNever, getBytesFormatV1FromV0, ICoinProtocolAdapter } from '@airgap/angular-core'
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
@@ -16,52 +16,39 @@ import { generateId, IACMessageType, TransactionSignRequest } from '@airgap/seri
 import { Component, OnInit } from '@angular/core'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import WalletConnect from '@walletconnect/client'
-import BigNumber from 'bignumber.js'
+
 import { Subscription } from 'rxjs'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
-import { saveWalletConnectSession } from 'src/app/services/walletconnect/helpers'
+import { WalletconnectV1Handler, WalletconnectV1HandlerContext } from './handler/walletconnect-v1.handler'
+import { WalletconnectV2Handler, WalletconnectV2HandlerContext } from './handler/walletconnect-v2.handler'
+import {
+  EthMethods,
+  EthTx,
+  Namespace,
+  SwitchEthereumChain,
+  WalletconnectSignRequest,
+  WalletconnectMessage,
+  WalletconnectPermissionRequest,
+  WalletconnectSwitchAccountRequest
+} from './walletconnect.types'
 
-enum Methods {
-  SESSION_REQUEST = 'session_request',
-  ETH_SENDTRANSACTION = 'eth_sendTransaction',
-  PERSONAL_SIGN_REQUEST = 'personal_sign',
-  ETH_SIGN_TYPED_DATA = 'eth_signTypedData',
-  WALLET_SWITCH_ETHEREUM_CHAIN = 'wallet_switchEthereumChain'
+export interface WalletconnectV1Context extends WalletconnectV1HandlerContext {
+  version: 1
 }
 
-interface JSONRPC<T = unknown> {
-  id: number
-  jsonrpc: string
-  method: Methods
-  params: T[]
+export interface WalletconnectV2Context extends WalletconnectV2HandlerContext {
+  version: 2
 }
 
-interface EthTx {
-  from: string
-  to: string
-  data: string
-  gasLimit: string
-  gasPrice: string
-  value: string
-  nonce: string
-}
+export type WalletconnectContext = WalletconnectV1Context | WalletconnectV2Context
 
-interface SessionRequest {
-  chainId?: number
-  peerId: string
-  peerMeta: {
-    name: string
-    description: string
-    icons: string[]
-    url: string
-  }
-}
-
-interface SwitchEthereumChain {
-  chainId: string
+enum Mode {
+  PERMISSION_REQUEST = 'permissionRequest',
+  SIGN_TRANSACTION = 'signTransaction',
+  SIGN_MESSAGE = 'signMessage',
+  SWITCH_ACCOUNT = 'switchAccount'
 }
 
 @Component({
@@ -70,23 +57,32 @@ interface SwitchEthereumChain {
   styleUrls: ['./walletconnect.page.scss']
 })
 export class WalletconnectPage implements OnInit {
+  public context: WalletconnectContext
+  public message: WalletconnectMessage
+
+  private readonly handlers = {
+    v1: new WalletconnectV1Handler(),
+    v2: new WalletconnectV2Handler()
+  }
+
   public title: string = ''
   public requesterName: string = ''
   public description: string = ''
   public url: string = ''
   public icon: string = ''
   public beaconRequest: any
-  public request: JSONRPC
+
+  public mode: Mode | undefined
+  public readonly Mode: typeof Mode = Mode
+
   public selectableWallets: AirGapMarketWallet[] = []
   public airGapTransactions: IAirGapTransaction[] | undefined
   public rawTransaction: TransactionSignRequest['transaction']
-  public readonly requestMethod: typeof Methods = Methods
 
   private subscription: Subscription
   private selectedWallet: AirGapMarketWallet | undefined
   public targetProtocolSymbol: ProtocolSymbol | ProtocolSymbols[] | undefined
   private responseHandler: (() => Promise<void>) | undefined
-  private readonly connector: WalletConnect | undefined
 
   public constructor(
     private readonly modalController: ModalController,
@@ -123,28 +119,67 @@ export class WalletconnectPage implements OnInit {
           supportsWalletConnect(wallet.protocol.protocolV1)
       )
     })
-    if (this.request && this.request.method === Methods.SESSION_REQUEST) {
+
+    if (!this.context) {
+      return
+    }
+
+    switch (this.context.version) {
+      case 1:
+        this.message = await this.handlers['v1'].readMessage(this.context)
+        break
+      case 2:
+        this.message = await this.handlers['v2'].readMessage(this.context)
+        break
+      default:
+        assertNever('context', this.context)
+    }
+
+    if (!this.message) {
+      return
+    }
+
+    if (this.message.type === 'permissionRequest') {
+      this.mode = Mode.PERMISSION_REQUEST
       this.title = this.translateService.instant('walletconnect.connection_request')
-      await this.permissionRequest(this.request as JSONRPC<SessionRequest>)
+      await this.permissionRequest(this.message)
     }
 
-    if (this.request && this.request.method === Methods.ETH_SENDTRANSACTION) {
+    if (
+      this.message.type === 'signRequest' &&
+      this.message.namespace === Namespace.ETH &&
+      this.message.request.method === EthMethods.ETH_SENDTRANSACTION
+    ) {
+      this.mode = Mode.SIGN_TRANSACTION
       this.title = this.translateService.instant('walletconnect.new_transaction')
-      await this.operationRequest(this.request as JSONRPC<EthTx>)
+      await this.operationRequest(this.message as WalletconnectSignRequest<EthTx>)
     }
 
-    if (this.request && this.request.method === Methods.PERSONAL_SIGN_REQUEST) {
+    if (
+      this.message.type === 'signRequest' &&
+      this.message.namespace === Namespace.ETH &&
+      this.message.request.method === EthMethods.PERSONAL_SIGN_REQUEST
+    ) {
+      this.mode = Mode.SIGN_MESSAGE
       this.title = this.translateService.instant('walletconnect.sign_request')
-      await this.signRequest(this.request as JSONRPC<string>)
+      await this.signRequest(this.message as WalletconnectSignRequest<string>)
     }
 
-    if (this.request && this.request.method === Methods.WALLET_SWITCH_ETHEREUM_CHAIN) {
+    if (
+      this.message.type === 'switchAccountRequest' &&
+      this.message.namespace === Namespace.ETH &&
+      this.message.request.method === EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN
+    ) {
+      this.mode = Mode.SWITCH_ACCOUNT
       this.title = this.translateService.instant('walletconnect.switch_ethereum_chain')
-      await this.switchEthereumChain(this.request as JSONRPC<SwitchEthereumChain>)
+      await this.switchEthereumChain(this.message as WalletconnectSwitchAccountRequest<SwitchEthereumChain>)
     }
 
-    if (this.request && this.request.method === Methods.ETH_SIGN_TYPED_DATA) {
-      this.title = this.translateService.instant('walletconnect.sign_typed_data')
+    if (this.message.type === 'unsupported') {
+      if (this.message.namespace === Namespace.ETH && this.message.method === EthMethods.ETH_SIGN_TYPED_DATA) {
+        this.mode = Mode.SIGN_MESSAGE
+        this.title = this.translateService.instant('walletconnect.sign_typed_data')
+      }
       await this.notSupportedAlert()
     }
   }
@@ -182,18 +217,18 @@ export class WalletconnectPage implements OnInit {
     await this.dismissModal()
   }
 
-  private async signRequest(request: JSONRPC<string>) {
-    const message = request.params[0]
-    const address = request.params[1]
+  private async signRequest(request: WalletconnectSignRequest<string>) {
+    const message = request.request.params[0]
+    const address = request.request.params[1]
 
-    const selectableWallets = await this.filterWallets(this.selectableWallets, this.connector?.chainId, address)
+    const selectableWallets = await this.filterWallets(this.selectableWallets, request.chain, address)
     const wallet = selectableWallets[0]
     await this.setWallet(wallet)
 
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
-    const requestId = new BigNumber(request.id).toString()
+    const requestId = `${request.version}:${request.request.id}`
     const generatedId = generateId(8)
     const protocol = this.selectedWallet.protocol
 
@@ -221,38 +256,37 @@ export class WalletconnectPage implements OnInit {
     }
   }
 
-  private async permissionRequest(request: JSONRPC<SessionRequest>): Promise<void> {
-    this.description = request.params[0].peerMeta.description ? request.params[0].peerMeta.description : ''
-    this.url = request.params[0].peerMeta.url ? request.params[0].peerMeta.url : ''
-    this.icon = request.params[0].peerMeta.icons ? request.params[0].peerMeta.icons[0] : ''
-    this.requesterName = request.params[0].peerMeta.name ? request.params[0].peerMeta.name : ''
-    const chainId = request.params[0].chainId ?? 1
+  private async permissionRequest(request: WalletconnectPermissionRequest): Promise<void> {
+    this.description = request.dAppMetadata.description ?? ''
+    this.url = request.dAppMetadata.url ?? ''
+    this.icon = request.dAppMetadata.icon ?? ''
+    this.requesterName = request.dAppMetadata.name ?? ''
 
-    const selectableWallets = await this.filterWallets(this.selectableWallets, chainId)
+    const selectableWallets = await this.filterWallets(this.selectableWallets, request.chains)
     const wallet = selectableWallets[0]
-    await Promise.all([this.setTargetProtocolSymbol(this.selectableWallets), this.setWallet(wallet)])
+    await Promise.all([
+      this.setTargetProtocolSymbol(request.canOverrideChain ? this.selectableWallets : selectableWallets),
+      this.setWallet(wallet)
+    ])
 
     if (!this.selectedWallet) {
       throw new Error('no wallet found!')
     }
 
     this.responseHandler = async (): Promise<void> => {
-      const protocolChainId = this.selectedWallet ? await this.getWalletConnectChainId(this.selectedWallet) : undefined
-      // Approve Session
-      const approveData = {
-        chainId: protocolChainId ?? chainId,
-        accounts: [this.address]
-      }
-      if (this.connector) {
-        this.connector.approveSession(approveData)
-        saveWalletConnectSession(this.connector.peerId, this.connector.session)
+      const protocolChain = this.selectedWallet ? await this.getWalletConnectChain(this.selectedWallet) : undefined
+      const chains = protocolChain ? [protocolChain] : request.chains ?? [':']
+      const accounts = chains.map((chain: string) => `${chain}:${this.address}`)
+
+      if (request.approve) {
+        request.approve(accounts)
       }
     }
   }
 
-  private async operationRequest(request: JSONRPC<EthTx>): Promise<void> {
-    const eth = request.params[0]
-    const selectableWallets = await this.filterWallets(this.selectableWallets, this.connector?.chainId, eth.from)
+  private async operationRequest(request: WalletconnectSignRequest<EthTx>): Promise<void> {
+    const eth = request.request.params[0]
+    const selectableWallets = await this.filterWallets(this.selectableWallets, request.chain, eth.from)
     const wallet = selectableWallets[0]
     await this.setWallet(wallet)
 
@@ -264,7 +298,7 @@ export class WalletconnectPage implements OnInit {
 
     const walletConnectRequest = {
       transaction: this.rawTransaction,
-      id: request.id
+      id: `${request.version}:${request.request.id}`
     }
 
     const protocol = this.selectedWallet.protocol
@@ -286,15 +320,15 @@ export class WalletconnectPage implements OnInit {
     }
   }
 
-  private async switchEthereumChain(request: JSONRPC<SwitchEthereumChain>): Promise<void> {
-    const address = this.connector.accounts[0]
-    this.description = this.connector.peerMeta.description
-    this.url = this.connector.peerMeta.url
-    this.icon = this.connector.peerMeta.icons[0] ?? ''
-    this.requesterName = this.connector.peerMeta.name
-    const chainId = parseInt(request.params[0].chainId, isHex(request.params[0].chainId) ? 16 : 10)
+  private async switchEthereumChain(request: WalletconnectSwitchAccountRequest<SwitchEthereumChain>): Promise<void> {
+    const address = request.account
+    this.description = request.dAppMetadata.description ?? ''
+    this.url = request.dAppMetadata.url ?? ''
+    this.icon = request.dAppMetadata.icon ?? ''
+    this.requesterName = request.dAppMetadata.name ?? ''
+    const chainId = parseInt(request.request.params[0].chainId, isHex(request.request.params[0].chainId) ? 16 : 10)
 
-    const selectableWallets = await this.filterWallets(this.selectableWallets, chainId, address)
+    const selectableWallets = await this.filterWallets(this.selectableWallets, `${Namespace.ETH}:${chainId}`, address)
     const wallet = selectableWallets[0]
     await Promise.all([this.setTargetProtocolSymbol([]), this.setWallet(wallet)])
 
@@ -303,11 +337,9 @@ export class WalletconnectPage implements OnInit {
     }
 
     this.responseHandler = async (): Promise<void> => {
-      this.connector?.updateSession({
-        chainId,
-        accounts: this.connector.accounts
-      })
-      await saveWalletConnectSession(this.connector.peerId, this.connector.session)
+      if (request.respond) {
+        await request.respond(chainId)
+      }
     }
   }
 
@@ -317,16 +349,12 @@ export class WalletconnectPage implements OnInit {
 
   public async dismiss(): Promise<void> {
     this.dismissModal()
-    this.rejectRequest(this.request.id)
-  }
-
-  public async rejectRequest(id: number) {
-    this.connector.rejectRequest({
-      id: id,
-      error: {
-        message: 'USER_REJECTION' // optional
-      }
-    })
+    if (this.message.type === 'permissionRequest' && this.message.reject) {
+      this.message.reject()
+    }
+    if (this.message.type === 'signRequest' || (this.message.type === 'switchAccountRequest' && this.message.cancel)) {
+      this.message.cancel()
+    }
   }
 
   private async notSupportedAlert() {
@@ -391,7 +419,7 @@ export class WalletconnectPage implements OnInit {
     return v0Transaction.transaction
   }
 
-  private async getWalletConnectChainId(wallet: AirGapMarketWallet): Promise<number | undefined> {
+  private async getWalletConnectChain(wallet: AirGapMarketWallet): Promise<string | undefined> {
     if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
       return undefined
     }
@@ -401,23 +429,28 @@ export class WalletconnectPage implements OnInit {
       return undefined
     }
 
-    return protocol.protocolV1.getWalletConnectChainId()
+    return protocol.protocolV1.getWalletConnectChain()
   }
 
-  private async filterWallets(wallets: AirGapMarketWallet[], chainId?: number, address?: string): Promise<AirGapMarketWallet[]> {
-    if (chainId === undefined && address === undefined) {
+  private async filterWallets(
+    wallets: AirGapMarketWallet[],
+    chainOrChains: string | string[],
+    address?: string
+  ): Promise<AirGapMarketWallet[]> {
+    const chains: Set<string> = new Set(typeof chainOrChains === 'string' ? [chainOrChains] : chainOrChains)
+    if (chains.size === 0 && address === undefined) {
       return wallets
     }
 
     const selectableWallets = await Promise.all(
       wallets.map(async (wallet) => {
         const isAddressMatching = address ? wallet.receivingPublicAddress.toLowerCase() === address.toLowerCase() : true
-        if (chainId === undefined) {
+        if (chains.size === 0) {
           return isAddressMatching ? wallet : undefined
         }
 
-        const protocolChainId = await this.getWalletConnectChainId(wallet)
-        return isAddressMatching && protocolChainId !== undefined && protocolChainId === chainId ? wallet : undefined
+        const protocolChain = await this.getWalletConnectChain(wallet)
+        return isAddressMatching && protocolChain !== undefined && chains.has(protocolChain) ? wallet : undefined
       })
     )
 

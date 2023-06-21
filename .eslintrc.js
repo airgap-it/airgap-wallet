@@ -89,7 +89,8 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': [
           'error',
           {
-            'argsIgnorePattern': '^_'
+            'argsIgnorePattern': '^_',
+            'varsIgnorePattern': '^_'
           }
         ],
         '@typescript-eslint/no-use-before-define': 'off',
@@ -137,7 +138,7 @@ module.exports = {
         'new-parens': 'off',
         'newline-per-chained-call': 'off',
         'no-duplicate-case': 'error',
-        'no-duplicate-imports': 'error',
+        'no-duplicate-imports': 'warn',
         'no-empty': 'off',
         'no-extra-semi': 'off',
         'no-invalid-this': 'error',
