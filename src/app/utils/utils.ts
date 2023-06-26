@@ -1,4 +1,5 @@
-import { ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
+import { getProtocolAndNetworkIdentifier as _getProtocolAndNetworkIdentifier, RuntimeMode } from '@airgap/angular-core'
+import { ICoinProtocol, ICoinSubProtocol, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
 
 // https://stackoverflow.com/a/8472700/4790610
 export function generateGUID(): string {
@@ -96,4 +97,11 @@ export function isType<T>(object: unknown, ...fields: string[]): object is T {
 
 export function isSubProtocol(value: ICoinProtocol): value is ICoinSubProtocol {
   return 'isSubProtocol' in value && 'subProtocolType' in value
+}
+
+export function getProtocolAndNetworkIdentifier(
+  protocol: ICoinProtocol | ProtocolSymbols,
+  network?: ProtocolNetwork | string
+): Promise<string> {
+  return _getProtocolAndNetworkIdentifier(RuntimeMode.ONLINE, protocol, network)
 }

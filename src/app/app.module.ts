@@ -6,13 +6,14 @@ import {
   APP_INFO_PLUGIN,
   APP_LAUNCHER_PLUGIN,
   APP_PLUGIN,
+  BaseEnvironmentService,
   BaseModulesService,
   ClipboardService,
   CLIPBOARD_PLUGIN,
   DeeplinkService,
   FeeConverterPipe,
   FILESYSTEM_PLUGIN,
-  IsolatedModules,
+  isolatedModules,
   ISOLATED_MODULES_PLUGIN,
   PermissionsService,
   QrScannerService,
@@ -47,7 +48,7 @@ import { SplashScreen } from '@capacitor/splash-screen'
 import { StatusBar } from '@capacitor/status-bar'
 import { FilePicker } from '@capawesome/capacitor-file-picker'
 import { Diagnostic } from '@ionic-native/diagnostic/ngx'
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
+import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular'
 import { Drivers } from '@ionic/storage'
 import { IonicStorageModule } from '@ionic/storage-angular'
 import { EffectsModule } from '@ngrx/effects'
@@ -81,6 +82,7 @@ import { ShortenStringPipe } from './pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from './services/account/account.provider'
 import { ThemeService } from './services/appearance/theme.service'
 import { CoinlibService } from './services/coinlib/coinlib.service'
+import { WalletEnvironmentService } from './services/environment/wallet-environment.service'
 import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
@@ -166,10 +168,11 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     { provide: SPLASH_SCREEN_PLUGIN, useValue: SplashScreen },
     { provide: STATUS_BAR_PLUGIN, useValue: StatusBar },
     { provide: APP_CONFIG, useValue: appConfig },
-    { provide: ISOLATED_MODULES_PLUGIN, useValue: IsolatedModules },
+    { provide: ISOLATED_MODULES_PLUGIN, useFactory: isolatedModules, deps: [Platform] },
     { provide: ZIP_PLUGIN, useValue: Zip },
     { provide: FILE_PICKER_PLUGIN, useValue: FilePicker },
     { provide: BaseModulesService, useClass: WalletModulesService },
+    { provide: BaseEnvironmentService, useClass: WalletEnvironmentService },
     DecimalPipe,
     ShortenStringPipe,
     MarketDataService,

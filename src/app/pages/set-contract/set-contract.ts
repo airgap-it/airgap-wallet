@@ -1,9 +1,10 @@
-import { getProtocolAndNetworkIdentifier, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { hasConfigurableContract, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
 import { AccountProvider } from 'src/app/services/account/account.provider'
+import { getProtocolAndNetworkIdentifier } from 'src/app/utils/utils'
 
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
