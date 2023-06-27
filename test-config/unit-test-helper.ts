@@ -2,6 +2,7 @@ import {
   APP_CONFIG,
   APP_INFO_PLUGIN,
   APP_LAUNCHER_PLUGIN,
+  BaseEnvironmentService,
   FILESYSTEM_PLUGIN,
   ISOLATED_MODULES_PLUGIN,
   PermissionsService,
@@ -20,6 +21,7 @@ import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-tran
 import { MomentModule } from 'ngx-moment'
 import { PUSH_NOTIFICATIONS_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { appConfig } from 'src/app/config/app-config'
+import { WalletEnvironmentService } from 'src/app/services/environment/wallet-environment.service'
 
 import { ComponentsModule } from '../src/app/components/components.module'
 import { PipesModule } from '../src/app/pipes/pipes.module'
@@ -108,7 +110,8 @@ export class UnitHelper {
       { provide: ISOLATED_MODULES_PLUGIN, useValue: new WebIsolatedModules() },
       { provide: ToastController, useValue: this.mockRefs.toastController },
       { provide: AlertController, useValue: this.mockRefs.alertController },
-      { provide: LoadingController, useValue: this.mockRefs.loadingController }
+      { provide: LoadingController, useValue: this.mockRefs.loadingController },
+      { provide: BaseEnvironmentService, useClass: WalletEnvironmentService }
     ]
 
     if (!useIonicOnlyTestBed) {
