@@ -19,14 +19,14 @@ export class InteractionSelectionPage {
   public isLedgerSupported: boolean = false
   public isRelay: boolean = false
   public interactionData: any
-  private generatedId: number | undefined = undefined
+  private readonly generatedId: number | undefined = undefined
 
   private readonly group: AirGapMarketWalletGroup
   private readonly wallet: AirGapMarketWallet
   private readonly airGapTxs: IAirGapTransaction[]
   private readonly type: IACMessageType
 
-  constructor(
+  public constructor(
     public readonly platform: Platform,
     private readonly route: ActivatedRoute,
     private readonly interactionService: InteractionService,
@@ -69,7 +69,7 @@ export class InteractionSelectionPage {
     this.interactionService.ledgerSign(this.wallet, this.airGapTxs, this.interactionData)
   }
 
-  async select(selectedSetting: InteractionSetting): Promise<void> {
+  public async select(selectedSetting: InteractionSetting): Promise<void> {
     return new Promise(async (resolve) => {
       const modal: HTMLIonModalElement = await this.modalController.create({
         component: InteractionSelectionComponent,

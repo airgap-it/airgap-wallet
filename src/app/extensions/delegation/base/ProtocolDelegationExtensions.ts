@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { AirGapMarketWallet, ICoinDelegateProtocol } from '@airgap/coinlib-core'
 import BigNumber from 'bignumber.js'
 
@@ -74,7 +74,12 @@ export class DefaultProtocolDelegationExtensions<T extends ICoinDelegateProtocol
     )
   }
 
-  public async createAccountExtendedDetails(_protocol: T, _publicKey: string, _address: string, _data?: any): Promise<UIAccountExtendedDetails> {
+  public async createAccountExtendedDetails(
+    _protocol: T,
+    _publicKey: string,
+    _address: string,
+    _data?: any
+  ): Promise<UIAccountExtendedDetails> {
     // default implementation provides no details
     return new UIAccountExtendedDetails({
       items: []

@@ -37,7 +37,7 @@ export const initialState: FeatureState = {
     value: undefined
   },
 
-  toast:  undefined
+  toast: undefined
 }
 
 export const reducer = createReducer(

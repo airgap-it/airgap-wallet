@@ -11,7 +11,7 @@ import { Platform } from '@ionic/angular'
 export class SaplingService {
   private isInitialized: boolean = false
 
-  constructor(
+  public constructor(
     private readonly protocolService: ProtocolService,
     private readonly platform: Platform,
     private readonly httpClient: HttpClient

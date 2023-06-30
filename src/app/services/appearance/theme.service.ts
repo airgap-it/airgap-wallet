@@ -1,9 +1,9 @@
 import { Platform } from '@ionic/angular'
-import { WalletStorageService, themeOptions, WalletStorageKey } from './../storage/storage'
 import { STATUS_BAR_PLUGIN } from '@airgap/angular-core'
 import { Inject, Injectable } from '@angular/core'
 import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Subject } from 'rxjs'
+import { WalletStorageService, themeOptions, WalletStorageKey } from './../storage/storage'
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +12,7 @@ export class ThemeService {
 
   public readonly supportsSystemPref = CSS.supports('color-scheme', 'dark')
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     private readonly storage: WalletStorageService,
     @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin

@@ -10,7 +10,7 @@ import { BROWSER_PLUGIN } from '../../capacitor-plugins/injection-tokens'
   providedIn: 'root'
 })
 export class BrowserService {
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     @Inject(APP_LAUNCHER_PLUGIN) private readonly appLauncher: AppLauncherPlugin,
     @Inject(BROWSER_PLUGIN) private readonly browser: BrowserPlugin

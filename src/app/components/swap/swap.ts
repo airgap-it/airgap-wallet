@@ -2,12 +2,11 @@ import { ProtocolService } from '@airgap/angular-core'
 import { animate, style, transition, trigger } from '@angular/animations'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
-import { AirGapMarketWallet, ICoinProtocol } from '@airgap/coinlib-core'
-import { ProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { BigNumber } from 'bignumber.js'
+import { UntypedFormControl } from '@angular/forms'
 import { ProtocolSelectPage } from '../../pages/protocol-select/protocol-select'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { FormControl } from '@angular/forms'
 
 @Component({
   selector: 'swap',
@@ -30,7 +29,7 @@ export class SwapComponent {
   public expandWalletSelection: boolean = false
 
   @Input()
-  public amountControl: FormControl
+  public amountControl: UntypedFormControl
 
   @Input()
   public readonly liquidity: boolean = false
@@ -79,7 +78,7 @@ export class SwapComponent {
   @Output()
   private readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter()
 
-  constructor(
+  public constructor(
     public alertCtrl: AlertController,
     public modalController: ModalController,
     private readonly protocolService: ProtocolService

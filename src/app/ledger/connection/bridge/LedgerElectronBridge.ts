@@ -1,5 +1,5 @@
-import { LedgerConnectionDetails, LedgerConnectionType } from '../LedgerConnection'
 import { ElectronProcess } from 'src/app/models/ElectronProcess'
+import { LedgerConnectionDetails, LedgerConnectionType } from '../LedgerConnection'
 
 export enum LedgerProcessMessageType {
   GET_DEVICES = 'get-devices',
@@ -135,7 +135,7 @@ export class LedgerElectronBridge {
 
   private readonly messagePromises: Map<string, Promise<any>> = new Map()
 
-  private constructor(private electronProcess: ElectronProcess) {}
+  private constructor(private readonly electronProcess: ElectronProcess) {}
 
   public async sendToLedger<T extends LedgerProcessMessageType>(
     type: T,

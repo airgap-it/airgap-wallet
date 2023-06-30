@@ -25,9 +25,6 @@ COPY . /app
 # set to production
 RUN export NODE_ENV=production
 
-# post-install hook, to be safe if it got cached
-RUN node config/patch_crypto.js
-
 # build
 RUN npx ionic build --prod
 

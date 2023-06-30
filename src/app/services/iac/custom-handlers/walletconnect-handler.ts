@@ -7,7 +7,7 @@ import { WalletconnectService } from '../../walletconnect/walletconnect.service'
 export class WalletConnectHandler extends IACSinglePartHandler<string> {
   public readonly name: string = 'WalletConnectHandler'
 
-  constructor(private readonly walletConnectService: WalletconnectService) {
+  public constructor(private readonly walletConnectService: WalletconnectService) {
     super()
   }
 

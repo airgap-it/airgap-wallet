@@ -95,7 +95,7 @@ export class CollectiblesService {
 
       return protocol
     } catch (error) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.error(error)
 
       return undefined

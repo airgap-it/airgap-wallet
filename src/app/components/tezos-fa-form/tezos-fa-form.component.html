@@ -25,10 +25,13 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-item class="ion-no-padding">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-          {{ 'tezos-fa-form.contract-address_label' | translate }}
-        </ion-label>
-        <ion-input type="text" placeholder="KT1..." formControlName="address"></ion-input>
+        <ion-input 
+          label="{{ 'tezos-fa-form.contract-address_label' | translate }}" 
+          labelPlacement="stacked"
+          type="text" 
+          placeholder="KT1..." 
+          formControlName="address"
+        ></ion-input>
       </ion-item>
       <ion-button class="paste--button" fill="outline" size="small" color="secondary" shape="round" (click)="pasteFromClipboard()">
         {{ 'tezos-fa-form.paste_label' | translate }}
@@ -37,12 +40,17 @@
   </ion-row>
   <ng-container *ngrxLet="facade.networks$ as networks">
     <ion-row>
-      <ion-item class="ion-no-padding" lines="none">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ 'tezos-fa-form.network_label' | translate }}</ion-label>
-        <ion-select formControlName="network">
-          <ion-select-option *ngFor="let network of networks" [value]="network.identifier">{{ network.name }}</ion-select-option>
-        </ion-select>
-      </ion-item>
+      <ion-col size="6">
+        <ion-item class="ion-no-padding" lines="none">
+          <ion-select 
+            label="{{ 'tezos-fa-form.network_label' | translate }}" 
+            labelPlacement="stacked"
+            formControlName="network"
+          >
+            <ion-select-option *ngFor="let network of networks" [value]="network.identifier">{{ network.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
     </ion-row>
   </ng-container>
   <ng-container *ngrxLet="facade.tokenInterfaces$ as tokenInterfaces">
@@ -55,8 +63,7 @@
           <ion-item class="ion-no-padding" lines="none">
             <ion-radio-group formControlName="tokenInterface">
               <ion-item *ngFor="let tokenInterface of tokenInterfaces" class="ion-no-padding" lines="none" mode="md">
-                <ion-label>{{ tokenInterfaceDescription[tokenInterface] }}</ion-label>
-                <ion-radio slot="start" [value]="tokenInterface"></ion-radio>
+                <ion-radio slot="start" [value]="tokenInterface">{{ tokenInterfaceDescription[tokenInterface] }}</ion-radio>
               </ion-item>
             </ion-radio-group>
           </ion-item>
@@ -75,8 +82,7 @@
             <ion-item class="ion-no-padding" lines="none">
               <ion-radio-group *ngIf="tokens.length <= 3" formControlName="tokenID">
                 <ion-item *ngFor="let token of tokens" class="ion-no-padding" lines="none" mode="md">
-                  <ion-label>{{ token.name }}</ion-label>
-                  <ion-radio slot="start" [value]="token.id"></ion-radio>
+                  <ion-radio slot="start" [value]="token.id">{{ token.name }}</ion-radio>
                 </ion-item>
               </ion-radio-group>
               <ion-select

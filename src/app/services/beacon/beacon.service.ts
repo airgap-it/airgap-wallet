@@ -15,7 +15,7 @@ import {
   WalletClient
 } from '@airgap/beacon-sdk'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
-import { EthereumTransactionSignRequest } from '@airgap/ethereum'
+import { UnsignedTransaction } from '@airgap/module-kit'
 import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
 import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
 import { Injectable } from '@angular/core'
@@ -34,7 +34,7 @@ export class BeaconService {
   public loader: HTMLIonLoadingElement | undefined
   public toast: HTMLIonToastElement | undefined
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
@@ -64,7 +64,7 @@ export class BeaconService {
     })
   }
 
-  async presentModal(request: BeaconRequestOutputMessage) {
+  public async presentModal(request: BeaconRequestOutputMessage) {
     const modal = await this.modalController.create({
       component: BeaconRequestPage,
       componentProps: {
@@ -78,7 +78,7 @@ export class BeaconService {
   }
 
   public async addVaultRequest(
-    request: BeaconRequestOutputMessage | { transaction: EthereumTransactionSignRequest['transaction']; id: number },
+    request: BeaconRequestOutputMessage | { transaction: UnsignedTransaction; id: string },
     protocol: ICoinProtocol
   ): Promise<void> {
     const network = (request as OperationRequest).network
@@ -92,7 +92,7 @@ export class BeaconService {
   }
 
   public async getVaultRequest(): Promise<[BeaconRequestOutputMessage, ICoinProtocol] | []> {
-    let cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(
+    const cachedRequest: [BeaconRequestOutputMessage, MainProtocolSymbols, string] = await this.storage.getCache(
       WalletStorageKey.PENDING_REQUEST
     )
     const result: [BeaconRequestOutputMessage, ICoinProtocol] = [undefined, undefined]
@@ -190,7 +190,7 @@ export class BeaconService {
     if (message === 'TEZOS(NETWORK)') {
       message = 'The simulation of your transaction failed. Please make sure all the values in your transaction are valid.'
     }
-    let data = error.data ? error.data : error.stack
+    const data = error.data ? error.data : error.stack
     // TODO: Parse contents and show info (eg. failwith)
     // if (error.data) {
     //   if ((error.data as any).contents) {
@@ -299,8 +299,6 @@ export class BeaconService {
   }
 
   public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<ICoinProtocolAdapter<TezosProtocol>> {
-
-
     const configs: {
       [key in Exclude<
         BeaconNetworkType,
@@ -348,7 +346,7 @@ export class BeaconService {
   }
 
   public async getConnectedServer(): Promise<string> {
-    return await (<any>this.client).storage.get(StorageKey.MATRIX_SELECTED_NODE)
+    return (<any>this.client).storage.get(StorageKey.MATRIX_SELECTED_NODE)
   }
 
   private getClient(): WalletClient {

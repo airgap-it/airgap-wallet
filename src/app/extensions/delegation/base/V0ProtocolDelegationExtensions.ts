@@ -27,7 +27,7 @@ export abstract class V0ProtocolDelegationExtensions<T extends ICoinDelegateProt
   }
 
   private static extend(target: any, extensions: any, ...keys: [string, 'property' | 'function'][]) {
-    for (let [key, type] of keys) {
+    for (const [key, type] of keys) {
       let extendMethod: (target: any, owner: any, key: string) => void
       switch (type) {
         case 'property':
@@ -88,7 +88,12 @@ export abstract class V0ProtocolDelegationExtensions<T extends ICoinDelegateProt
     return this.defaults.createDelegateesSummary(protocol, delegatees, data)
   }
 
-  public async createAccountExtendedDetails(protocol: T, publicKey: string, address: string, data?: any): Promise<UIAccountExtendedDetails> {
+  public async createAccountExtendedDetails(
+    protocol: T,
+    publicKey: string,
+    address: string,
+    data?: any
+  ): Promise<UIAccountExtendedDetails> {
     return this.defaults.createAccountExtendedDetails(protocol, publicKey, address, data)
   }
 }

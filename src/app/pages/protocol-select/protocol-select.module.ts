@@ -19,7 +19,6 @@ import { ProtocolSelectPage } from './protocol-select'
     RouterModule.forChild([{ path: '', component: ProtocolSelectPage }])
   ],
   declarations: [ProtocolSelectPage],
-  exports: [],
-  entryComponents: [ProtocolSelectPage]
+  exports: []
 })
 export class ProtocolSelectPageModule {}

@@ -8,7 +8,7 @@ import {
   MoonbeamStakingActionType
 } from '@airgap/moonbeam'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
 
@@ -39,7 +39,7 @@ enum ArgumentName {
 
 export class MoonbeamDelegationExtensions extends V1ProtocolDelegationExtensions<MoonbeamBaseProtocol> {
   public static create(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     translateService: TranslateService
@@ -48,7 +48,7 @@ export class MoonbeamDelegationExtensions extends V1ProtocolDelegationExtensions
   }
 
   private constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly translateService: TranslateService
@@ -193,10 +193,10 @@ export class MoonbeamDelegationExtensions extends V1ProtocolDelegationExtensions
     const hasDelegated = delegatedAmount.gt(0)
     const canDelegate = maxDelegationAmount.gt(minDelegationAmount)
 
-    const baseDescription = hasDelegated
+    const baseDescription: string = hasDelegated
       ? this.translateService.instant('delegation-detail-moonbeam.delegate.has-delegated_text', { delegated: delegatedFormatted })
       : this.translateService.instant('delegation-detail-moonbeam.delegate.not-delegated_text')
-    const extraDescription = canDelegate
+    const extraDescription: string = canDelegate
       ? ` ${this.translateService.instant(
           hasDelegated
             ? 'delegation-detail-moonbeam.delegate.can-delegate-has-delegated_text'
@@ -508,7 +508,7 @@ export class MoonbeamDelegationExtensions extends V1ProtocolDelegationExtensions
       alerts.push(
         new UIAlert({
           title: 'delegation-detail-moonbeam.alert.collator-oversubscribed.title',
-          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', { 
+          description: this.translateService.instant('delegation-detail-moonbeam.alert.collator-oversubscribed.description', {
             maxTopDelegations,
             minStakingAmount: await this.amountConverterPipe.transform(delegationDetails.collatorDetails.minEligibleBalance, {
               protocol: adapter,

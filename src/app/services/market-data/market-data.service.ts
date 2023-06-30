@@ -16,7 +16,7 @@ export interface ValueAtTimestamp {
 
 @Injectable()
 export class MarketDataService {
-  constructor(private readonly priceService: PriceService) {}
+  public constructor(private readonly priceService: PriceService) {}
 
   public async fetchAllValues(interval: TimeInterval, wallets: AirGapMarketWallet[]): Promise<ValueAtTimestamp[]> {
     return new Promise<ValueAtTimestamp[]>(async (resolve) => {

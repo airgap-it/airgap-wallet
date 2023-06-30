@@ -13,7 +13,7 @@ export class IntroductionDownloadPage {
   public playStoreText: string = 'iOS-device-android_text'
   public isIOS: boolean = true
 
-  constructor(
+  public constructor(
     private readonly platform: Platform,
     public viewController: ModalController,
     private readonly translateService: TranslateService

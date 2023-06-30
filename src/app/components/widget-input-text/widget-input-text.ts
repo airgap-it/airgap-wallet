@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { FormGroup } from '@angular/forms'
+import { UntypedFormGroup } from '@angular/forms'
 import { UIInputText } from 'src/app/models/widgets/input/UIInputText'
 
 @Component({
@@ -12,5 +12,5 @@ export class WidgetInputText {
   public widget: UIInputText
 
   @Input()
-  public widgetForm: FormGroup
+  public widgetForm: UntypedFormGroup
 }

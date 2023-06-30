@@ -24,7 +24,7 @@ export class SubAccountAddGenericPage {
 
   public protocol: ICoinProtocol | undefined
 
-  constructor(
+  public constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly protocolService: ProtocolService,
@@ -49,7 +49,9 @@ export class SubAccountAddGenericPage {
     await this.saveGenericProtocol(this.protocol)
 
     this.router
-      .navigateByUrl(`/sub-account-import/${DataServiceKey.PROTOCOL}/${this.protocol.identifier}/${this.protocol.options.network.identifier}`)
+      .navigateByUrl(
+        `/sub-account-import/${DataServiceKey.PROTOCOL}/${this.protocol.identifier}/${this.protocol.options.network.identifier}`
+      )
       .catch((err) => console.error(err))
   }
 

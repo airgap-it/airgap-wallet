@@ -14,7 +14,7 @@ export enum AccountImportInteractionType {
 export class AccountInteractionSelectionPage {
   private callback: (interactionType: AccountImportInteractionType) => void
 
-  constructor(private readonly route: ActivatedRoute) {}
+  public constructor(private readonly route: ActivatedRoute) {}
 
   public ionViewWillEnter() {
     if (this.route.snapshot.data.special) {

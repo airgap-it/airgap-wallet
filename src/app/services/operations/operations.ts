@@ -22,7 +22,7 @@ import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer
 import { SubstrateTransactionSignRequest } from '@airgap/substrate'
 import { TezosKtProtocol, TezosSaplingAddress, TezosShieldedTezProtocol, TezosTransactionSignRequest, TzBTCProtocol } from '@airgap/tezos'
 import { Injectable } from '@angular/core'
-import { FormBuilder } from '@angular/forms'
+import { UntypedFormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
@@ -56,10 +56,10 @@ export type SerializableTx = (
 export class OperationsProvider {
   private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
-  constructor(
+  public constructor(
     private readonly loadingController: LoadingController,
     private readonly toastController: ToastController,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly protocolService: ProtocolService,
     private readonly saplingService: SaplingService
   ) {}
@@ -483,13 +483,15 @@ export class OperationsProvider {
         const transactionSignRequest = await shieldedTezAdapter.convertUnsignedTransactionV1ToV0(
           await shieldedTezAdapter.protocolV1.prepareShieldTransaction(
             newPublicKey(wallet.publicKey, 'hex'),
-            [{
+            [
+              {
                 to: address,
                 amount: newAmount(amount.toString(10), 'blockchain')
-            }],
+              }
+            ],
             {
               fee: newAmount(fee.toString(10), 'blockchain')
-            },
+            }
           ),
           wallet.publicKey,
           undefined,
@@ -506,9 +508,9 @@ export class OperationsProvider {
             publicKey: wallet.publicKey,
             transaction: unsignedTx
           },
-          { 
-            knownViewingKeys, 
-            transactionOwner: wallet.protocol.identifier 
+          {
+            knownViewingKeys,
+            transactionOwner: wallet.protocol.identifier
           }
         )
       } else {

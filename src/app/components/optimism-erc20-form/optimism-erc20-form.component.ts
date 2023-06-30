@@ -1,7 +1,7 @@
 import { BaseComponent, UIResourceStatus } from '@airgap/angular-core'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 import { Component, EventEmitter, Inject, Output } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { debounceTime, takeUntil } from 'rxjs/operators'
 
 import { OptimismERC20FormFacade, OptimismERC20FormNgRxFacade, OPTIMISM_ERC20_FORM_FACADE } from './optimism-erc20-form.facade'
@@ -17,11 +17,14 @@ export class OptimismERC20Form extends BaseComponent<OptimismERC20FormFacade> {
   public readonly UIResourceStatus: typeof UIResourceStatus = UIResourceStatus
 
   @Output()
-  public protocol: EventEmitter<ICoinProtocol> = new EventEmitter()
+  public readonly protocol: EventEmitter<ICoinProtocol> = new EventEmitter()
 
-  public readonly formGroup: FormGroup
+  public readonly formGroup: UntypedFormGroup
 
-  constructor(@Inject(OPTIMISM_ERC20_FORM_FACADE) facade: OptimismERC20FormFacade, private readonly formBuilder: FormBuilder) {
+  public constructor(
+    @Inject(OPTIMISM_ERC20_FORM_FACADE) facade: OptimismERC20FormFacade,
+    private readonly formBuilder: UntypedFormBuilder
+  ) {
     super(facade)
     this.formGroup = this.formBuilder.group({
       address: ['', Validators.compose([Validators.required, Validators.pattern(/^0x[a-fA-F0-9]{40}$/)])],

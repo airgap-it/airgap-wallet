@@ -10,8 +10,7 @@
 </ion-header>
 <ion-content>
   <ion-item>
-    {{ 'settings.trading_settings.mtpelerin' | translate }}
-    <ion-toggle [checked]="useMtPerelin" (ionChange)="toggleUseMtPerelin($event)" slot="end"></ion-toggle>
+    <ion-toggle [checked]="useMtPerelin" (ionChange)="toggleUseMtPerelin($event)" slot="end">{{ 'settings.trading_settings.mtpelerin' | translate }}</ion-toggle>
   </ion-item>
 
   <div class="mtpelerin-wrapper">

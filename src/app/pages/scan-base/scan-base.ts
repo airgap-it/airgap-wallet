@@ -1,6 +1,7 @@
 import { PermissionsService, PermissionStatus, PermissionTypes, QrScannerService } from '@airgap/angular-core'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
+import { Observable, ReplaySubject } from 'rxjs'
 
 export class ScanBasePage {
   public zxingScanner?: ZXingScannerComponent
@@ -9,13 +10,14 @@ export class ScanBasePage {
 
   public hasCameras: boolean = false
 
-  public hasCameraPermission: boolean = false
+  private readonly _hasCameraPermission: ReplaySubject<boolean> = new ReplaySubject()
+  public readonly hasCameraPermission: Observable<boolean> = this._hasCameraPermission.asObservable()
 
   public readonly isMobile: boolean
   public readonly isElectron: boolean
   public readonly isBrowser: boolean
 
-  constructor(protected platform: Platform, protected scanner: QrScannerService, protected permissionsProvider: PermissionsService) {
+  public constructor(protected platform: Platform, protected scanner: QrScannerService, protected permissionsProvider: PermissionsService) {
     this.isMobile = this.platform.is('hybrid')
     this.isElectron = this.platform.is('electron')
     this.isBrowser = !(this.isMobile || this.isElectron)
@@ -42,14 +44,16 @@ export class ScanBasePage {
 
     if (permission === PermissionStatus.GRANTED) {
       document.body.style.backgroundColor = 'transparent' // We need this for the background to be transparent when using dark mode
-      this.hasCameraPermission = true
+      this._hasCameraPermission.next(true)
       this.startScan()
+    } else {
+      this._hasCameraPermission.next(false)
     }
   }
 
   public ionViewDidEnter(): void {
     if (this.isBrowser || this.isElectron) {
-      this.hasCameraPermission = true
+      this._hasCameraPermission.next(true)
       this.startScanBrowser()
     }
   }

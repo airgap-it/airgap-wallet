@@ -1,5 +1,5 @@
-import { UIWidgetType } from '../UIWidget'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
+import { UIWidgetType } from '../UIWidget'
 import { UIInputWidgetConfig, UIInputWidget } from '../UIInputWidget'
 
 type InputType = 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url'
@@ -40,7 +40,7 @@ export class UIInputText extends UIInputWidget<string> {
 
   public isValueFixed: boolean = false
 
-  constructor(config: UIInputTextConfig) {
+  public constructor(config: UIInputTextConfig) {
     super(config)
 
     this.inputType = config.inputType || 'text'

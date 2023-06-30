@@ -25,10 +25,13 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-item class="ion-no-padding">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-          {{ 'optimism-erc20-form.contract-address_label' | translate }}
-        </ion-label>
-        <ion-input type="text" placeholder="0xabc..." formControlName="address"></ion-input>
+        <ion-input 
+          label="{{ 'optimism-erc20-form.contract-address_label' | translate }}"
+          labelPlacement="stacked"
+          type="text" 
+          placeholder="0xabc..." 
+          formControlName="address"
+        ></ion-input>
       </ion-item>
       <ion-button class="paste--button" fill="outline" size="small" color="secondary" shape="round" (click)="pasteFromClipboard()">
         {{ 'optimism-erc20-form.paste_label' | translate }}
@@ -38,8 +41,7 @@
   <ng-container *ngrxLet="facade.networks$ as networks">
     <ion-row *ngIf="networks.length > 1">
       <ion-item class="ion-no-padding" lines="none">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">{{ 'tezos-fa-form.network_label' | translate }}</ion-label>
-        <ion-select formControlName="network">
+        <ion-select label="{{ 'tezos-fa-form.network_label' | translate }}" labelPlacement="stacked" formControlName="network">
           <ion-select-option *ngFor="let network of networks" [value]="network.identifier">{{ network.name }}</ion-select-option>
         </ion-select>
       </ion-item>

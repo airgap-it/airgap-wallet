@@ -11,7 +11,11 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
   styleUrls: ['./transaction-list.component.scss']
 })
 export class TransactionListComponent {
-  constructor(public readonly dataService: DataService, public readonly router: Router, private readonly browserService: BrowserService) {}
+  public constructor(
+    public readonly dataService: DataService,
+    public readonly router: Router,
+    private readonly browserService: BrowserService
+  ) {}
 
   @Input()
   public transactions: IAirGapTransaction[] = []

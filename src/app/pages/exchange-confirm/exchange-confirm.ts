@@ -40,7 +40,7 @@ export class ExchangeConfirmPage {
   public airGapTxs?: IAirGapTransaction[]
   public unsignedTransaction?: UnsignedTransaction
 
-  constructor(
+  public constructor(
     private readonly exchangeProvider: ExchangeProvider,
     private readonly route: ActivatedRoute,
     private readonly operationsProvider: OperationsProvider,

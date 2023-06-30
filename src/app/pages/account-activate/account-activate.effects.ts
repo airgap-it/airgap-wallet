@@ -46,7 +46,7 @@ export class AccountActivateEffects {
     { dispatch: false }
   )
 
-  constructor(
+  public constructor(
     private readonly actions$: Actions,
     private readonly store: Store<fromAccountActivate.State>,
     private readonly router: Router,

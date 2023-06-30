@@ -1,5 +1,5 @@
 import { AirGapMarketWallet, FeeDefaults, IAirGapTransaction, ProtocolSymbols, UnsignedTransaction } from '@airgap/coinlib-core'
-import { FormGroup } from '@angular/forms'
+import { UntypedFormGroup } from '@angular/forms'
 
 import { UIWidget } from '../../models/widgets/UIWidget'
 
@@ -27,7 +27,7 @@ export interface ExchangeTransaction {
 }
 
 export interface ExchangeUI {
-  form?: FormGroup
+  form?: UntypedFormGroup
   widgets: UIWidget[]
 }
 

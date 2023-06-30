@@ -12,7 +12,7 @@ export class DelegateActionPopoverComponent {
   public readonly delegateeLabel: string
   public readonly secondaryDelegatorActions: AirGapDelegatorAction[]
 
-  constructor(private readonly popoverController: PopoverController, private readonly navParams: NavParams) {
+  public constructor(private readonly popoverController: PopoverController, private readonly navParams: NavParams) {
     const hideAirGap: boolean | undefined = this.navParams.get('hideAirGap')
     const delegateeLabel: string | undefined = this.navParams.get('delegateeLabel')
     const secondaryDelegatorActions: AirGapDelegatorAction[] | undefined = this.navParams.get('secondaryDelegatorActions')

@@ -30,7 +30,7 @@ export class UIAlert extends UIWidget {
 
   public readonly onClick?: () => void
 
-  constructor(config: UIAlertConfig) {
+  public constructor(config: UIAlertConfig) {
     super(config)
 
     this.title = config.title

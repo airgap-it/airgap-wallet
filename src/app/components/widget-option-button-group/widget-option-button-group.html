@@ -3,10 +3,11 @@
     <ion-row *ngIf="widget.label" class="label">
       <ion-col size="12" class="ion-no-padding">
         <ion-item lines="none" class="ion-no-padding">
-          <ion-text class="ion-no-margin" color="blackLight">
-            <ion-label>{{ widget.label | translate }}</ion-label>
-          </ion-text>
-          <ion-toggle *ngIf="widget.customInput" slot="end" mode="md" [formControlName]="customInputControl"></ion-toggle>
+          <ion-toggle *ngIf="widget.customInput" slot="end" mode="md" [formControlName]="customInputControl">
+            <ion-text class="ion-no-margin" color="blackLight">
+              <ion-label>{{ widget.label | translate }}</ion-label>
+            </ion-text>
+          </ion-toggle>
         </ion-item>
       </ion-col>
     </ion-row>

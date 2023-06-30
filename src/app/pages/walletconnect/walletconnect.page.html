@@ -8,17 +8,18 @@
 
 <ion-content class="ion-padding">
   <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">
+    <ng-container *ngIf="mode === Mode.PERMISSION_REQUEST || mode === Mode.SWITCH_ACCOUNT">
       <permission-request
         [address]="address"
+        [protocolIdentifier]="protocolIdentifier"
         [requesterName]="requesterName"
         [icon]="icon"
-        [targetProtocolSymbol]="'eth'"
+        [targetProtocolSymbol]="targetProtocolSymbol"
         (walletSetEmitter)="setWallet($event)"
       ></permission-request>
     </ng-container>
 
-    <div *ngIf="request.method === requestMethod.ETH_SENDTRANSACTION" class="ion-padding-bottom ion-margin-bottom">
+    <div *ngIf="mode === Mode.SIGN_TRANSACTION" class="ion-padding-bottom ion-margin-bottom">
       <div *ngFor="let airGapTransaction of airGapTransactions">
         <walletconnect-from-to
           [rawTransaction]="rawTransaction"
@@ -28,7 +29,7 @@
       </div>
     </div>
 
-    <div *ngIf="request.method === requestMethod.PERSONAL_SIGN_REQUEST || request.method === requestMethod.ETH_SIGN_TYPED_DATA">
+    <div *ngIf="mode === Mode.SIGN_MESSAGE">
       <ion-row class="rawdata--container">
         <ion-col class="ion-no-padding">
           <pre class="ion-no-margin">{{ beaconRequest | json }}</pre>
@@ -41,10 +42,10 @@
     <ion-button shape="round" color="secondary" (click)="dismiss()">{{ 'beacon-request.cancel_label' | translate }}</ion-button>
 
     <ion-button shape="round" color="primary" (click)="done()">
-      <ng-container *ngIf="request.method !== requestMethod.SESSION_REQUEST">
+      <ng-container *ngIf="mode !== Mode.PERMISSION_REQUEST">
         {{ 'beacon-request.continue_label' | translate }}
       </ng-container>
-      <ng-container *ngIf="request.method === requestMethod.SESSION_REQUEST">{{ 'beacon-request.connect_label' | translate }}</ng-container>
+      <ng-container *ngIf="mode === Mode.PERMISSION_REQUEST">{{ 'beacon-request.connect_label' | translate }}</ng-container>
     </ion-button>
   </ion-fab>
 </ion-content>

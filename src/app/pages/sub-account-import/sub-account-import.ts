@@ -1,14 +1,20 @@
 import { ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, ICoinProtocol, /*NetworkType, */ProtocolSymbols } from '@airgap/coinlib-core'
+import {
+  AirGapCoinWallet,
+  AirGapMarketWallet,
+  AirGapWalletStatus,
+  ICoinProtocol,
+  /*NetworkType, */ ProtocolSymbols
+} from '@airgap/coinlib-core'
 import { map } from 'rxjs/operators'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { PriceService } from 'src/app/services/price/price.service'
 
+import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 import { AccountProvider } from '../../services/account/account.provider'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
-import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 
 @Component({
   selector: 'page-sub-account-import',
@@ -23,7 +29,7 @@ export class SubAccountImportPage {
 
   public typeLabel: string = ''
 
-  constructor(
+  public constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,

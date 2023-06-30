@@ -12,8 +12,6 @@ import { IACService } from 'src/app/services/iac/iac.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
 
-import { ShopService } from 'src/app/services/shop/shop.service'
-
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html'
@@ -25,7 +23,7 @@ export class SettingsPage {
   // Shop banner
   public shopLink: string = ''
 
-  constructor(
+  public constructor(
     public readonly alertCtrl: AlertController,
     public readonly serializerService: SerializerService,
     public readonly themeService: ThemeService,
@@ -34,13 +32,8 @@ export class SettingsPage {
     private readonly clipboardProvider: ClipboardService,
     private readonly iacService: IACService,
     private readonly browserService: BrowserService,
-    private readonly shopService: ShopService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
-  ) {
-    this.shopService.getShopData().then((response) => {
-      this.shopLink = response.data.link
-    })
-  }
+  ) {}
 
   public async onThemeSelection(event) {
     this.themeService.themeSubject.next(event.detail.value)
@@ -74,7 +67,7 @@ export class SettingsPage {
         console.log(`Share completed: ${result}`)
       })
       .catch((error) => {
-        console.log('Sharing failed with error: ' + error)
+        console.log(`Sharing failed with error: ${error}`)
       })
   }
 
@@ -127,7 +120,7 @@ export class SettingsPage {
   }
 
   public airgapShop(): void {
-    this.browserService.openUrl(this.shopLink)
+    this.browserService.openUrl('https://shop.airgap.it/?ref=AirGapWallet-Settings')
   }
 
   public faq(): void {
@@ -167,7 +160,7 @@ export class SettingsPage {
         this.iacService.handleRequest(text, IACMessageTransport.PASTE).catch((error) => console.error(error))
       },
       (err: string) => {
-        console.error('Error: ' + err)
+        console.error(`Error: ${err}`)
       }
     )
   }

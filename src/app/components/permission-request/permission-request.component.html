@@ -45,7 +45,7 @@
 
   <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
 
-  <ion-item *ngIf="wallets.length > 1" lines="none" class="ion-no-padding">
+  <ion-item *ngIf="totalWalletsLength > 1" lines="none" class="ion-no-padding">
     <ion-avatar slot="start">
       <airgap-identicon [address]="address"></airgap-identicon>
     </ion-avatar>

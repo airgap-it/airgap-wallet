@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { ModalController } from '@ionic/angular'
 import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
@@ -7,18 +7,16 @@ import { handleErrorSentry, ErrorCategory } from 'src/app/services/sentry-error-
   templateUrl: './mt-pelerin.component.html',
   styleUrls: ['./mt-pelerin.component.scss']
 })
-export class MtPelerinComponent implements OnInit {
-  url: string
+export class MtPelerinComponent {
+  public url: string
 
-  constructor(public modalController: ModalController) {}
-
-  ngOnInit() {}
+  public constructor(public modalController: ModalController) {}
 
   public dismiss() {
     this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  openMtPelerinLink() {
+  public openMtPelerinLink() {
     if (this.url) {
       window.open(this.url, '_blank')
     }

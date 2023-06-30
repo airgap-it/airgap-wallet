@@ -2,7 +2,7 @@ import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter, Prot
 import { ICoinDelegateProtocol, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core'
-import { FormBuilder } from '@angular/forms'
+import { UntypedFormBuilder } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import { CoreumDelegationExtensions } from 'src/app/extensions/delegation/CoreumDelegationExtensions'
 import { ICPDelegationExtensions } from 'src/app/extensions/delegation/ICPDelegationExtensions'
@@ -21,8 +21,7 @@ import { CoinlibService } from '../coinlib/coinlib.service'
 })
 export class ExtensionsService {
   private extensionsLoaded: boolean = false
-  
-  private v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = []
+  private readonly v0Extensions: [new () => ICoinDelegateProtocol, () => Promise<V0ProtocolDelegationExtensions<any>>][] = []
 
   private readonly v1Extensions: [ProtocolSymbols, () => Promise<V1ProtocolDelegationExtensions<any>>][] = [
     [
@@ -96,7 +95,6 @@ export class ExtensionsService {
         )
     ],
     [
-      
       MainProtocolSymbols.ICP,
       async () =>
         ICPDelegationExtensions.create(
@@ -110,7 +108,7 @@ export class ExtensionsService {
   ]
 
   public constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -125,10 +123,7 @@ export class ExtensionsService {
       return
     }
 
-    await Promise.all([
-      this.loadV0Extensions(),
-      this.loadV1Extensions()
-    ])
+    await Promise.all([this.loadV0Extensions(), this.loadV1Extensions()])
 
     this.extensionsLoaded = true
   }

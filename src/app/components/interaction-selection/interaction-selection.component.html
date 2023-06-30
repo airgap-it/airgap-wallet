@@ -24,20 +24,24 @@
   <ion-list lines="none" class="ion-padding-vertical">
     <ion-radio-group [ngModel]="selectedSetting" (ngModelChange)="onSelectedSettingChange($event)">
       <ion-item>
-        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.always' | translate }}</ion-label>
-        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.ALWAYS_ASK"></ion-radio>
+        <ion-radio class="ion-no-margin" justify="space-between" labelPlacement="start" [value]="interactionSetting.ALWAYS_ASK">
+          <ion-label color="secondary">{{ 'interaction-selection-settings.selector.always' | translate }}</ion-label>
+        </ion-radio>
       </ion-item>
       <ion-item *ngIf="isMobile">
-        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.same-device' | translate }}</ion-label>
-        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.SAME_DEVICE"></ion-radio>
+        <ion-radio class="ion-no-margin" justify="space-between" labelPlacement="start" [value]="interactionSetting.SAME_DEVICE">
+          <ion-label color="secondary">{{ 'interaction-selection-settings.selector.same-device' | translate }}</ion-label>
+        </ion-radio>
       </ion-item>
       <ion-item>
-        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.offline-device' | translate }}</ion-label>
-        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.OFFLINE_DEVICE"></ion-radio>
+        <ion-radio class="ion-no-margin" justify="space-between" labelPlacement="start" [value]="interactionSetting.OFFLINE_DEVICE">
+          <ion-label color="secondary">{{ 'interaction-selection-settings.selector.offline-device' | translate }}</ion-label>
+        </ion-radio>
       </ion-item>
       <ion-item *ngIf="!isMobile">
-        <ion-label color="secondary">{{ 'interaction-selection-settings.selector.ledger' | translate }}</ion-label>
-        <ion-radio class="ion-no-margin" slot="end" [value]="interactionSetting.LEDGER"></ion-radio>
+        <ion-radio class="ion-no-margin" justify="space-between" labelPlacement="start" [value]="interactionSetting.LEDGER">
+          <ion-label color="secondary">{{ 'interaction-selection-settings.selector.ledger' | translate }}</ion-label>
+        </ion-radio>
       </ion-item>
     </ion-radio-group>
   </ion-list>

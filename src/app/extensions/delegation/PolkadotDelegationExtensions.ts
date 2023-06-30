@@ -1,8 +1,8 @@
 import { AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { DelegatorAction } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
+import { Amount } from '@airgap/module-kit'
 import {
-  PolkadotElectionStatus,
   PolkadotNominationStatus,
   PolkadotNominatorDetails,
   PolkadotPayee,
@@ -12,7 +12,7 @@ import {
 } from '@airgap/polkadot'
 import { PolkadotBaseProtocol } from '@airgap/polkadot/v1/protocol/PolkadotBaseProtocol'
 import { DecimalPipe } from '@angular/common'
-import { FormBuilder, Validators } from '@angular/forms'
+import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -60,7 +60,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   private static instance: PolkadotDelegationExtensions
 
   public static create(
-    formBuilder: FormBuilder,
+    formBuilder: UntypedFormBuilder,
     decimalPipe: DecimalPipe,
     amountConverterPipe: AmountConverterPipe,
     shortenStringPipe: ShortenStringPipe,
@@ -88,7 +88,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   public supportsMultipleDelegations: boolean = true
 
   private constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly decimalPipe: DecimalPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -103,12 +103,22 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     delegator: string,
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
-    const [nominatorDetails, validatorsDetails]: [PolkadotNominatorDetails, PolkadotValidatorDetails[]] = await Promise.all([
+    const [nominatorDetails, validatorsDetails, minNominatorBond]: [
+      PolkadotNominatorDetails,
+      PolkadotValidatorDetails[],
+      Amount
+    ] = await Promise.all([
       adapter.protocolV1.getNominatorDetails(delegator, delegatees),
-      Promise.all(delegatees.map((validator: string) => adapter.protocolV1.getValidatorDetails(validator)))
+      Promise.all(delegatees.map((validator: string) => adapter.protocolV1.getValidatorDetails(validator))),
+      adapter.protocolV1.getMinNominatorBond()
     ])
 
-    const extraNominatorDetails: AirGapDelegatorDetails = await this.getExtraNominatorDetails(adapter, nominatorDetails, delegatees)
+    const extraNominatorDetails: AirGapDelegatorDetails = await this.getExtraNominatorDetails(
+      adapter,
+      nominatorDetails,
+      new BigNumber(minNominatorBond.value),
+      delegatees
+    )
     const extraValidatorsDetails: AirGapDelegateeDetails[] = await this.getExtraValidatorsDetails(
       adapter,
       validatorsDetails,
@@ -204,12 +214,10 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   ): Promise<UIAlert[]> {
     const alerts: UIAlert[] = []
 
-    const results = await Promise.all([
-      adapter.protocolV1.getElectionStatus(),
-      adapter.protocolV1.getNominationStatus(nominatorDetails.address, validatorDetails.address)
-    ])
-    const isElectionOpen: boolean = results[0] === PolkadotElectionStatus.OPEN
-    const nominationStatus: PolkadotNominationStatus | undefined = results[1]
+    const nominationStatus: PolkadotNominationStatus | undefined = await adapter.protocolV1.getNominationStatus(
+      nominatorDetails.address,
+      validatorDetails.address
+    )
 
     if (adapter.identifier === MainProtocolSymbols.POLKADOT) {
       alerts.push(
@@ -226,17 +234,6 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
               }
             }
           ]
-        })
-      )
-    }
-
-    if (isElectionOpen) {
-      alerts.push(
-        new UIAlert({
-          title: 'delegation-detail-polkadot.alert.election-open.title',
-          description: 'delegation-detail-polkadot.alert.election-open.description',
-          icon: 'alert-circle-outline',
-          color: 'warning'
         })
       )
     }
@@ -287,7 +284,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     details.push(
       new UIIconText({
         iconName: 'logo-usd',
-        text: commission ? this.decimalPipe.transform(commission.multipliedBy(100).toString()) + '%' : '-',
+        text: commission ? `${this.decimalPipe.transform(commission.multipliedBy(100).toString())}%` : '-',
         description: 'delegation-detail-polkadot.commission_label'
       })
     )
@@ -344,6 +341,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   private async getExtraNominatorDetails(
     adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
     nominatorDetails: PolkadotNominatorDetails,
+    minNominatorBond: BigNumber,
     validators: string[]
   ): Promise<AirGapDelegatorDetails> {
     const availableActions = nominatorDetails.availableActions.filter((action) => supportedActions.includes(action.type))
@@ -351,6 +349,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     const delegateAction: AirGapDelegatorAction = await this.createDelegateAction(
       adapter,
       nominatorDetails.stakingDetails,
+      minNominatorBond,
       availableActions,
       nominatorDetails.address,
       validators
@@ -372,10 +371,11 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     }
   }
 
-  // tslint:disable-next-line: cyclomatic-complexity
+  // eslint-disable-next-line complexity
   private async createDelegateAction(
     adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
-    stakingDetails: PolkadotStakingDetails,
+    stakingDetails: PolkadotStakingDetails | undefined,
+    minNominatorBond: BigNumber,
     availableActions: DelegatorAction[],
     nominatorAddress: string,
     validators: string[]
@@ -388,11 +388,12 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
 
     const [maxValue, minValue]: [BigNumber | undefined, BigNumber | undefined] = await Promise.all([
       action ? this.getMaxDelegationValue(adapter, action.type, nominatorAddress) : undefined,
-      action ? this.getMinDelegationValue(adapter, action.type) : undefined
+      action ? this.getMinDelegationValue(action.type, stakingDetails, minNominatorBond) : undefined
     ])
 
     if (action) {
       const hasSufficientFunds: boolean = maxValue === undefined || minValue === undefined || maxValue.gte(minValue)
+      const hasEnoughBonded: boolean = minNominatorBond.lte(stakingDetails?.active ?? 0)
 
       const maxValueShifted: BigNumber | undefined =
         maxValue !== undefined ? maxValue.integerValue().shiftedBy(-adapter.decimals) : undefined
@@ -447,14 +448,19 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
         nominatorAddress,
         action.type,
         stakingDetails ? stakingDetails.active : 0,
+        minNominatorBond,
         hasSufficientFunds,
+        hasEnoughBonded,
         minValue,
         maxValue
       )
 
       return {
         type: action.type,
-        label: 'delegation-detail-polkadot.delegate.label',
+        label:
+          !hasEnoughBonded && action.type === PolkadotStakingActionType.BOND_EXTRA
+            ? 'delegation-detail-polkadot.delegate.bond-more_label'
+            : 'delegation-detail-polkadot.delegate.label',
         description,
         form,
         args: argWidgets,
@@ -474,7 +480,9 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
       case PolkadotStakingActionType.REBOND_NOMINATE:
       case PolkadotStakingActionType.REBOND_EXTRA:
         const [unlocking, maxUnlocked]: [BigNumber, BigNumber] = await Promise.all([
-          adapter.protocolV1.getUnlockingBalance(nominatorAddress).then((unlocking) => new BigNumber(unlocking.value)),
+          adapter.protocolV1
+            .getStakingBalance(nominatorAddress)
+            .then((stakingBalance) => new BigNumber(stakingBalance?.unlocking?.value ?? 0)),
           adapter.protocolV1
             .getMaxDelegationValueWithAddress(nominatorAddress)
             .then((max: string) => new BigNumber(max))
@@ -494,15 +502,18 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
   }
 
   private async getMinDelegationValue(
-    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
-    actionType: PolkadotStakingActionType
+    actionType: PolkadotStakingActionType,
+    stakingDetails: PolkadotStakingDetails | undefined,
+    minNominatorBond: BigNumber
   ): Promise<BigNumber | undefined> {
     switch (actionType) {
       case PolkadotStakingActionType.BOND_NOMINATE:
-        const existentialDeposit = await adapter.protocolV1.getExistentialDeposit()
-        return new BigNumber(existentialDeposit.value)
+        return minNominatorBond
       case PolkadotStakingActionType.NOMINATE:
         return new BigNumber(0)
+      case PolkadotStakingActionType.BOND_EXTRA:
+        const alreadyBonded = new BigNumber(stakingDetails?.active ?? 0)
+        return alreadyBonded.gte(minNominatorBond) ? new BigNumber(1) : minNominatorBond.minus(alreadyBonded)
       default:
         return new BigNumber(1)
     }
@@ -513,18 +524,22 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     address: string,
     actionType: PolkadotStakingActionType,
     bonded: string | number | BigNumber,
+    minNominatorBond: BigNumber,
     hasSufficientFunds: boolean,
+    hasEnoughBonded: boolean,
     minValue?: string | number | BigNumber | undefined,
     maxValue?: string | number | BigNumber | undefined
   ): Promise<string | undefined> {
     if (!hasSufficientFunds) {
-      const feeEstimation = await adapter.protocolV1.getFutureStakingTransactionsFee(address)
-      const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation.value, { protocol: adapter })
-
-      return this.translateService.instant('delegation-detail-polkadot.delegate.unsufficient-funds_text', {
-        extra: feeEstimationFormatted,
-        symbol: adapter.marketSymbol.toLocaleUpperCase()
-      })
+      return this.createInsufficientFundsDelegateActionDescription(
+        adapter,
+        address,
+        actionType,
+        bonded,
+        minNominatorBond,
+        hasEnoughBonded,
+        maxValue
+      )
     }
 
     const bondedFormatted = await this.amountConverterPipe.transform(bonded, {
@@ -614,6 +629,52 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
     return this.translateService.instant(translationKey, translationArgs)
   }
 
+  private async createInsufficientFundsDelegateActionDescription(
+    adapter: ICoinDelegateProtocolAdapter<PolkadotBaseProtocol>,
+    address: string,
+    actionType: PolkadotStakingActionType,
+    bonded: string | number | BigNumber,
+    minNominatorBond: BigNumber,
+    hasEnoughBonded: boolean,
+    maxValue?: string | number | BigNumber | undefined
+  ): Promise<string | undefined> {
+    switch (actionType) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      case PolkadotStakingActionType.BOND_NOMINATE:
+        if (!hasEnoughBonded) {
+          const extra = minNominatorBond.minus(maxValue ?? 0)
+          const extraFormatted = await this.amountConverterPipe.transform(extra, { protocol: adapter })
+
+          return this.translateService.instant('delegation-detail-polkadot.delegate.insufficient-funds-to-nominate_text', {
+            extra: extraFormatted,
+            symbol: adapter.marketSymbol.toLocaleUpperCase()
+          })
+        }
+      case PolkadotStakingActionType.NOMINATE:
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      case PolkadotStakingActionType.BOND_EXTRA:
+        if (!hasEnoughBonded) {
+          const extra = minNominatorBond.minus(bonded)
+          const extraFormatted = await this.amountConverterPipe.transform(extra, { protocol: adapter })
+
+          return this.translateService.instant('delegation-detail-polkadot.delegate.min-nominator-bond-not-reached_text', {
+            extra: extraFormatted,
+            symbol: adapter.marketSymbol.toLocaleUpperCase()
+          })
+        }
+      default:
+        const feeEstimation = await adapter.protocolV1.getFutureStakingTransactionsFee(address)
+        const feeEstimationFormatted = await this.amountConverterPipe.transform(feeEstimation.value, { protocol: adapter })
+
+        return this.translateService.instant('delegation-detail-polkadot.delegate.insufficient-funds-to-cover-fees_text', {
+          extra: feeEstimationFormatted,
+          symbol: adapter.marketSymbol.toLocaleUpperCase()
+        })
+    }
+  }
+
   private createUndelegateAction(
     stakingDetails: PolkadotStakingDetails | null,
     availableActions: DelegatorAction[]
@@ -667,7 +728,7 @@ export class PolkadotDelegationExtensions extends V1ProtocolDelegationExtensions
           let description: string
           let args: UIInputWidget<any>[]
 
-          // tslint:disable-next-line: switch-default
+          // eslint-disable-next-line default-case
           switch (action.type) {
             case PolkadotStakingActionType.WITHDRAW_UNBONDED:
               const totalUnlockedFormatted: string | undefined = stakingDetails

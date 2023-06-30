@@ -83,7 +83,7 @@ export interface AeFirstVote {
   providedIn: 'root'
 })
 export class CoinlibService {
-  constructor(private readonly httpClient: HttpClient) {}
+  public constructor(private readonly httpClient: HttpClient) {}
 
   public async getKnownTezosBakers(): Promise<TezosBakerCollection> {
     const bakersResponse: TezosBakerCollection = await this.httpClient

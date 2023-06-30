@@ -5,8 +5,7 @@
   <ion-row class="rawdata--container ion-padding-bottom ion-margin-bottom">
     <ion-col class="ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
-        <ion-label>Change Fees</ion-label>
-        <ion-toggle [(ngModel)]="advanced" slot="end" (ngModelChange)="initForms()"></ion-toggle>
+        <ion-toggle [(ngModel)]="advanced" slot="end" (ngModelChange)="initForms()">Change Fees</ion-toggle>
       </ion-item>
 
       <ng-container *ngIf="advanced && formGroup !== undefined">
@@ -14,14 +13,12 @@
           <ion-row class="padding-top">
             <ion-col size="6">
               <ion-item mode="md" color="light">
-                <ion-label class="ion-no-margin" position="stacked">Gas Price</ion-label>
-                <ion-input type="text" formControlName="gasPrice" id="gasPrice"></ion-input>
+                <ion-input label="Gas Price" labelPlacement="stacked" type="text" formControlName="gasPrice" id="gasPrice"></ion-input>
               </ion-item>
             </ion-col>
             <ion-col size="6">
               <ion-item mode="md" color="light">
-                <ion-label class="ion-no-margin" position="stacked">Gas Limit</ion-label>
-                <ion-input type="text" formControlName="gasLimit" id="gasLimit"></ion-input>
+                <ion-input label="Gas Limit" labelPlacement="stacked" type="text" formControlName="gasLimit" id="gasLimit"></ion-input>
               </ion-item>
             </ion-col>
           </ion-row>

@@ -10,7 +10,7 @@ export class ExchangeSelectPage {
   public selectedExchange: ExchangeEnum
   public ExchangeEnum: typeof SwapExchangeEnum = SwapExchangeEnum
   public LiquidityExchangeEnum: typeof LiquidityExchangeEnum = LiquidityExchangeEnum
-  constructor(public navParams: NavParams, public viewCtrl: ModalController, private readonly exchangeProvider: ExchangeProvider) {
+  public constructor(public navParams: NavParams, public viewCtrl: ModalController, private readonly exchangeProvider: ExchangeProvider) {
     this.selectedExchange = this.navParams.get('activeExchange')
   }
   public async dismiss(): Promise<void> {

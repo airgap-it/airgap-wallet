@@ -5,11 +5,11 @@ import { AlertController, LoadingController, PopoverController, ToastController 
 import { DataService } from 'src/app/services/data/data.service'
 import { OperationsProvider } from 'src/app/services/operations/operations'
 
+import { AccountProvider } from 'src/app/services/account/account.provider'
+import { TezosDelegatorAction } from '@airgap/tezos'
 import { WalletActionInfo } from '../ActionGroup'
 
 import { AirGapDelegatorAction } from './DelegatorAction'
-import { AccountProvider } from 'src/app/services/account/account.provider'
-import { TezosDelegatorAction } from '@airgap/tezos'
 
 export interface DelegateAlertActionContext {
   isAccepted?: boolean
@@ -37,7 +37,7 @@ export class DelegateAlertAction extends Action<void, DelegateAlertActionContext
   }
   private readonly delegateAction: AirGapDelegatorAction
 
-  constructor(context: DelegateAlertActionContext) {
+  public constructor(context: DelegateAlertActionContext) {
     super(context)
     this.delegateAction = new AirGapDelegatorAction({
       type: TezosDelegatorAction.DELEGATE,

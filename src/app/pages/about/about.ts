@@ -1,8 +1,8 @@
 import { AndroidFlavor, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Capacitor } from '@capacitor/core'
-import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import type { IpcRenderer } from 'electron'
+import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 
 declare global {
   interface Window {
@@ -31,7 +31,7 @@ export class AboutPage {
     productFlavor?: AndroidFlavor
   }
 
-  constructor(@Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin) {
+  public constructor(@Inject(APP_INFO_PLUGIN) private readonly appInfoPlugin: AppInfoPlugin) {
     this.updateVersions().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
   }
 

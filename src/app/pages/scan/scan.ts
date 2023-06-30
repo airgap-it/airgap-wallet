@@ -25,7 +25,7 @@ export class ScanPage extends ScanBasePage {
 
   public isMultiQr: boolean = false
 
-  constructor(
+  public constructor(
     protected platform: Platform,
     protected scanner: QrScannerService,
     protected permissionsProvider: PermissionsService,

@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms'
 
 import { IonicModule } from '@ionic/angular'
 
-import { IsolatedModulesDetailsPage as IsolatedModulesDetailsPage } from './isolated-modules-details.page'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { AirGapAngularCoreModule } from '@airgap/angular-core'
 import { RouterModule, Routes } from '@angular/router'
 import { ComponentsModule } from '../../components/components.module'
+import { IsolatedModulesDetailsPage } from './isolated-modules-details.page'
 import { IsolatedModulesDetailsPopoverComponent } from './popover/isolated-modules-details-popover.component'
 
 const routes: Routes = [
@@ -20,19 +20,15 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  entryComponents: [IsolatedModulesDetailsPopoverComponent],
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
     TranslateModule,
     ComponentsModule,
     AirGapAngularCoreModule
   ],
-  declarations: [
-    IsolatedModulesDetailsPage,
-    IsolatedModulesDetailsPopoverComponent
-  ]
+  declarations: [IsolatedModulesDetailsPage, IsolatedModulesDetailsPopoverComponent]
 })
 export class IsolatedModulesDetailsPageModule {}

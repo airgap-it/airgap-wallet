@@ -2,7 +2,7 @@ import { UIResource } from '@airgap/angular-core'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 import { OptimismProtocolNetwork } from '@airgap/optimism'
 
-export interface TokenDetailsInput { 
+export interface TokenDetailsInput {
   address: string
   networkIdentifier: string
 }
@@ -10,7 +10,7 @@ export interface TokenDetailsInput {
 export interface OptimismERC20FormState {
   networks: OptimismProtocolNetwork[]
   protocol: UIResource<ICoinProtocol>
-  
+
   errorDescription: string | undefined
 }
 
@@ -26,13 +26,10 @@ interface OptimismERC20FormBaseError<T extends OptimismERC20FormErrorType> {
   type: T
 }
 
-export interface ContractNotFoundError extends OptimismERC20FormBaseError<OptimismERC20FormErrorType.CONTRACT_NOT_FOUND> {}
-export interface TokenMetadataMissingError extends OptimismERC20FormBaseError<OptimismERC20FormErrorType.TOKEN_METADATA_MISSING> {}
+export type ContractNotFoundError = OptimismERC20FormBaseError<OptimismERC20FormErrorType.CONTRACT_NOT_FOUND>
+export type TokenMetadataMissingError = OptimismERC20FormBaseError<OptimismERC20FormErrorType.TOKEN_METADATA_MISSING>
 export interface UnknownError extends OptimismERC20FormBaseError<OptimismERC20FormErrorType.UNKNOWN> {
   error?: any
 }
 
-export type OptimismERC20FormError = 
-  | ContractNotFoundError 
-  | TokenMetadataMissingError 
-  | UnknownError
+export type OptimismERC20FormError = ContractNotFoundError | TokenMetadataMissingError | UnknownError

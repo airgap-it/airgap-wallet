@@ -121,8 +121,7 @@
         <ion-row class="rawdata--container" *ngIf="isSubstrate && !state.disableSendMaxAmount">
           <ion-col class="ion-no-padding">
             <ion-item class="ion-no-padding" lines="none">
-              <ion-label>{{ 'transaction-prepare.existential_deposit' | translate }}</ion-label>
-              <ion-toggle [checked]="ignoreExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end"></ion-toggle>
+              <ion-toggle [checked]="ignoreExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end">{{ 'transaction-prepare.existential_deposit' | translate }}</ion-toggle>
             </ion-item>
           </ion-col>
         </ion-row>

@@ -15,7 +15,7 @@ export class SubAccountSelectPage {
   public protocol: ICoinProtocol
   public subWallets: AirGapMarketWallet[]
 
-  constructor(
+  public constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly accountProvider: AccountProvider,
@@ -37,6 +37,6 @@ export class SubAccountSelectPage {
       wallet: subWallet
     }
     this.dataService.setData(DataServiceKey.DETAIL, info)
-    this.router.navigateByUrl('/delegation-baker-detail/' + DataServiceKey.DETAIL).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/delegation-baker-detail/${DataServiceKey.DETAIL}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

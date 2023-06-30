@@ -7,9 +7,9 @@ import { BrowserService } from 'src/app/services/browser/browser.service'
   styleUrls: ['./exchange-custom.page.scss']
 })
 export class ExchangeCustomPage {
-  constructor(private readonly browserService: BrowserService) {}
+  public constructor(private readonly browserService: BrowserService) {}
 
-  getTZBTC(gatekeeper: string) {
+  public getTZBTC(gatekeeper: string) {
     switch (gatekeeper) {
       case 'bitcoin-suisse':
         this.browserService.openUrl('https://login.bitcoinsuisse.com/Account/Register')

@@ -1,12 +1,20 @@
-import { APP_CONFIG, APP_INFO_PLUGIN, APP_LAUNCHER_PLUGIN, FILESYSTEM_PLUGIN, ISOLATED_MODULES_PLUGIN, PermissionsService, WebIsolatedModules, ZIP_PLUGIN } from '@airgap/angular-core'
+import {
+  APP_CONFIG,
+  APP_INFO_PLUGIN,
+  APP_LAUNCHER_PLUGIN,
+  FILESYSTEM_PLUGIN,
+  ISOLATED_MODULES_PLUGIN,
+  PermissionsService,
+  WebIsolatedModules,
+  ZIP_PLUGIN
+} from '@airgap/angular-core'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { AlertController, IonicModule, LoadingController, NavController, Platform, ToastController } from '@ionic/angular'
-import { Storage } from '@ionic/storage'
-import { IonicStorageModule } from '@ionic/storage'
+import { IonicStorageModule, Storage } from '@ionic/storage-angular'
 import { StoreModule } from '@ngrx/store'
 import { TranslateFakeLoader, TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { MomentModule } from 'ngx-moment'

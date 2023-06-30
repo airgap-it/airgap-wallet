@@ -37,10 +37,13 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-item class="ion-no-padding">
-        <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-          {{ 'tezos-sapling-contract-form.contract-address_label' | translate }}
-        </ion-label>
-        <ion-input type="text" placeholder="KT1..." formControlName="address"></ion-input>
+        <ion-input 
+          label="{{ 'tezos-sapling-contract-form.contract-address_label' | translate }}"
+          labelPlacement="stacked"
+          type="text"
+          placeholder="KT1..."
+          formControlName="address"
+        ></ion-input>
       </ion-item>
       <ion-button class="paste--button" fill="outline" size="small" color="secondary" shape="round" (click)="pasteFromClipboard('address')">
         {{ 'tezos-sapling-contract-form.paste_label' | translate }}
@@ -52,14 +55,14 @@
   <ion-row class="ion-padding-bottom">
     <ion-col size="12">
       <ion-item class="ion-no-padding">
-        <ion-label class="ion-text-wrap">
-          {{ 'tezos-sapling-contract-form.include-injector_label' | translate }}
-          <p class="ion-padding-top">
-            {{ 'tezos-sapling-contract-form.include-injector_text' | translate }}
-          </p>
-        </ion-label>
-
-        <ion-toggle slot="end" formControlName="injector"></ion-toggle>
+        <ion-toggle slot="end" formControlName="injector">
+          <ion-label class="ion-text-wrap">
+            {{ 'tezos-sapling-contract-form.include-injector_label' | translate }}
+            <p class="ion-padding-top">
+              {{ 'tezos-sapling-contract-form.include-injector_text' | translate }}
+            </p>
+          </ion-label>
+        </ion-toggle>
       </ion-item>
     </ion-col>
   </ion-row>
@@ -67,10 +70,13 @@
     <ion-row *ngIf="includeInjector" class="ion-padding-bottom">
       <ion-col size="12">
         <ion-item class="ion-no-padding">
-          <ion-label color="blackLight" class="ion-no-margin" position="stacked">
-            {{ 'tezos-sapling-contract-form.injector-url_label' | translate }}
-          </ion-label>
-          <ion-input type="text" placeholder="https://" formControlName="injectorUrl"></ion-input>
+          <ion-input 
+            label="{{ 'tezos-sapling-contract-form.injector-url_label' | translate }}"
+            labelPlacement="stacked" 
+            type="text" 
+            placeholder="https://" 
+            formControlName="injectorUrl"
+          ></ion-input>
         </ion-item>
         <ion-button
           class="paste--button"

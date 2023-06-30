@@ -2,7 +2,7 @@ import { AmountConverterPipe, UIResource, UIResourceStatus } from '@airgap/angul
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { IACMessageType } from '@airgap/serializer'
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoadingController, NavController, PopoverController, ToastController, ViewWillEnter } from '@ionic/angular'
 import { OverlayEventDetail } from '@ionic/core'
@@ -40,7 +40,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
 
   public showOverflowMenu: boolean
 
-  public delegationForms: Map<string, FormGroup> = new Map()
+  public delegationForms: Map<string, UntypedFormGroup> = new Map()
   public delegationAlertWidgets: UIResource<UIAlert[]> = { status: UIResourceStatus.IDLE, value: undefined }
 
   public delegateeLabel: string
@@ -95,7 +95,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
   private protocolID: string
   private addressIndex
 
-  private data$: BehaviorSubject<any>
+  private readonly data$: BehaviorSubject<any>
 
   private _ngDestroyed$: Subject<void> | undefined
   private get ngDestroyed$(): Subject<void> {
@@ -106,7 +106,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
     return this._ngDestroyed$
   }
 
-  constructor(
+  public constructor(
     private readonly router: Router,
     private readonly navController: NavController,
     private readonly dataService: DataService,
@@ -116,7 +116,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
     private readonly popoverController: PopoverController,
     private readonly toastController: ToastController,
     private readonly route: ActivatedRoute,
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: UntypedFormBuilder,
     private readonly amountConverter: AmountConverterPipe,
     public readonly accountProvider: AccountProvider
   ) {
@@ -246,7 +246,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
 
     this.dataService.setData(DataServiceKey.DETAIL, info)
     this.router
-      .navigateByUrl('/delegation-list/' + DataServiceKey.DETAIL, { skipLocationChange: true })
+      .navigateByUrl(`/delegation-list/${DataServiceKey.DETAIL}`, { skipLocationChange: true })
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
@@ -265,7 +265,7 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
 
     this.subscribeObservables()
 
-    // tslint:disable-next-line: no-floating-promises
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.operations.getCurrentDelegatees(this.wallet, data).then((addresses) => {
       if (addresses) {
         this.delegateeAddress$.next(addresses[0])
@@ -302,7 +302,8 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
 
     this.delegatorDetails$.pipe(takeUntil(this.ngDestroyed$)).subscribe(async (details) => {
       this.showOverflowMenu =
-        !(this.isAirGapDelegatee || this.hideAirGapOverflow) || (details && details.value?.secondaryActions && details.value?.secondaryActions.length > 0)
+        !(this.isAirGapDelegatee || this.hideAirGapOverflow) ||
+        (details && details.value?.secondaryActions && details.value?.secondaryActions.length > 0)
 
       this.delegatorBalanceWidget = {
         status: details.status,
@@ -330,13 +331,13 @@ export class DelegationDetailPage implements OnInit, OnDestroy, ViewWillEnter {
     this.updateDisplayedDetails({ status: UIResourceStatus.LOADING, value: undefined })
     this.updateDisplayedRewards({ status: UIResourceStatus.LOADING, value: undefined })
 
-    // tslint:disable-next-line: no-floating-promises
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.operations.getDelegationDetails(this.wallet, [address], data).then((details) => {
       if (details && details.length > 0) {
         this.updateDisplayedDetails({ status: UIResourceStatus.SUCCESS, value: details })
       }
     })
-    // tslint:disable-next-line: no-floating-promises
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.operations.getRewardDisplayDetails(this.wallet, [address], data).then((rewards) => {
       this.hasRewardDetails = rewards !== undefined
       if (rewards) {

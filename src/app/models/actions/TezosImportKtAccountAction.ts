@@ -8,7 +8,7 @@ export interface TezosImportKtAccountActionContext {
 }
 
 export class TezosImportKtAccountAction extends Action<string[], TezosImportKtAccountActionContext> {
-  get identifier(): string {
+  public get identifier(): string {
     return 'tezos-import-account-action'
   }
 

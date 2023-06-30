@@ -1,7 +1,7 @@
 import { BaseComponent, UIResourceStatus } from '@airgap/angular-core'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 import { Component, EventEmitter, Inject, Output } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { debounceTime, takeUntil } from 'rxjs/operators'
 
 import { TezosFAFormFacade, TezosFAFormNgRxFacade, TEZOS_FA_FORM_FACADE } from './tezos-fa-form.facade'
@@ -28,11 +28,11 @@ export class TezosFAForm extends BaseComponent<TezosFAFormFacade> {
   }
 
   @Output()
-  public protocol: EventEmitter<ICoinProtocol> = new EventEmitter()
+  public readonly protocol: EventEmitter<ICoinProtocol> = new EventEmitter()
 
-  public readonly formGroup: FormGroup
+  public readonly formGroup: UntypedFormGroup
 
-  constructor(@Inject(TEZOS_FA_FORM_FACADE) facade: TezosFAFormFacade, private readonly formBuilder: FormBuilder) {
+  public constructor(@Inject(TEZOS_FA_FORM_FACADE) facade: TezosFAFormFacade, private readonly formBuilder: UntypedFormBuilder) {
     super(facade)
     this.formGroup = this.formBuilder.group({
       address: ['', Validators.compose([Validators.required, Validators.pattern(/^KT1[1-9A-Za-z]{33}$/)])],

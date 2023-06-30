@@ -1,6 +1,7 @@
+import { flattened } from '@airgap/angular-core'
 import { PermissionScope } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
-import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { AlertController, ModalController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
@@ -21,14 +22,18 @@ export interface CheckboxInput {
   templateUrl: './permission-request.component.html',
   styleUrls: ['./permission-request.component.scss']
 })
-export class PermissionRequestComponent implements OnInit {
+export class PermissionRequestComponent implements OnChanges {
   public modalRef: HTMLIonModalElement | undefined
   public readonly networkType: typeof NetworkType = NetworkType
 
-  public wallets: AirGapMarketWallet[] = []
+  public wallets: Partial<Record<ProtocolSymbols, AirGapMarketWallet[]>> = {}
+  public totalWalletsLength: number = 0
 
   @Input()
   public address: string = ''
+
+  @Input()
+  public protocolIdentifier: ProtocolSymbols | undefined
 
   @Input()
   public network: ProtocolNetwork | undefined
@@ -43,12 +48,12 @@ export class PermissionRequestComponent implements OnInit {
   public inputs: CheckboxInput[] = []
 
   @Input()
-  public targetProtocolSymbol: ProtocolSymbols | undefined
+  public targetProtocolSymbol: ProtocolSymbols | ProtocolSymbols[] | undefined
 
   @Output()
   public readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter<AirGapMarketWallet>()
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly alertController: AlertController,
     private readonly shortenStringPipe: ShortenStringPipe,
@@ -56,28 +61,50 @@ export class PermissionRequestComponent implements OnInit {
     private readonly accountService: AccountProvider
   ) {}
 
-  ngOnInit() {
-    const allWallets = this.accountService.getActiveWalletList()
-    this.wallets = allWallets.filter(
-      (wallet: AirGapMarketWallet) =>
-        wallet.protocol.identifier === this.targetProtocolSymbol
-    )
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes.targetProtocolSymbol?.currentValue !== changes.targetProtocolSymbol?.previousValue) {
+      const allWallets = this.accountService.getActiveWalletList()
+      const targetProtocolSymbol = changes.targetProtocolSymbol.currentValue
+      const targetProtocolSymbols = new Set(Array.isArray(targetProtocolSymbol) ? targetProtocolSymbol : [targetProtocolSymbol])
+
+      this.wallets = allWallets.reduce((obj: Partial<Record<ProtocolSymbols, AirGapMarketWallet[]>>, wallet: AirGapMarketWallet) => {
+        const protocolIdentifier = wallet.protocol.identifier
+        if (!targetProtocolSymbols.has(wallet.protocol.identifier)) {
+          return obj
+        }
+
+        const wallets = obj[wallet.protocol.identifier] ?? []
+        wallets.push(wallet)
+
+        return Object.assign(obj, { [protocolIdentifier]: wallets })
+      }, {})
+      this.totalWalletsLength = Object.values(this.wallets)
+        .map((wallets) => wallets.length)
+        .reduce((acc, next) => acc + next, 0)
+    }
   }
 
   public async changeAccount(): Promise<void> {
     this.modalRef = await this.modalController.getTop()
 
     return new Promise(async () => {
-      if (this.wallets.length === 1) {
+      if (Object.entries(this.wallets).length === 1 && Object.entries(this.wallets)[0][1].length === 1) {
         return
       }
+      const groupedWallets: [number, AirGapMarketWallet][] = flattened(
+        Object.values(this.wallets).map((wallets, index) => wallets.map((wallet) => [index, wallet]))
+      )
+
       const alert = await this.alertController.create({
         header: this.translateService.instant('beacon-request.select-account.alert'),
-        inputs: this.wallets.map((wallet) => ({
-          label: this.shortenStringPipe.transform(wallet.receivingPublicAddress),
+        inputs: groupedWallets.map(([index, wallet]) => ({
+          tabindex: index,
+          label: `${this.shortenStringPipe.transform(wallet.receivingPublicAddress)} (${wallet.protocol.name})`,
           type: 'radio',
           value: wallet,
-          checked: wallet.receivingPublicAddress === this.address
+          checked:
+            wallet.receivingPublicAddress === this.address &&
+            (this.protocolIdentifier ? wallet.protocol.identifier === this.protocolIdentifier : true)
         })),
         buttons: [
           {

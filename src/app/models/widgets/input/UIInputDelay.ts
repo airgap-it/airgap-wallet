@@ -37,7 +37,7 @@ export class UIInputDelay extends UIInputWidget<string> {
   public createExtraLabel?: (value: string) => string
   public errorLabel?: string
 
-  constructor(config: UIInputDelayConfig) {
+  public constructor(config: UIInputDelayConfig) {
     super(config)
 
     this.inputType = config.inputType ?? 'milliseconds'
@@ -52,7 +52,6 @@ export class UIInputDelay extends UIInputWidget<string> {
     this.createExtraLabel = config.createExtraLabel ? (value: string) => config.createExtraLabel(value, this.wallet) : undefined
     this.extraLabel = config.extraLabel || this.createExtraLabel ? this.createExtraLabel(this.value) : undefined
     this.errorLabel = config.errorLabel
-
   }
 
   public onValueChanged() {

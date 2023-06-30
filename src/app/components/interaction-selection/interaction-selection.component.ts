@@ -18,14 +18,14 @@ export class InteractionSelectionComponent implements OnInit {
   public dismissOnly: boolean = false
   public isMobile: boolean = false
 
-  constructor(
+  public constructor(
     private readonly modalController: ModalController,
     private readonly accountService: AccountProvider,
     private readonly platform: Platform,
     private readonly router: Router
   ) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     this.selectedSetting = this.selectedSetting
       ? this.selectedSetting
       : this.walletGroup.interactionSetting && this.walletGroup.interactionSetting !== InteractionSetting.UNDETERMINED
@@ -35,7 +35,7 @@ export class InteractionSelectionComponent implements OnInit {
     this.isMobile = this.platform.is('mobile')
   }
 
-  onSelectedSettingChange(selectedSetting: InteractionSetting) {
+  public onSelectedSettingChange(selectedSetting: InteractionSetting) {
     this.walletGroup.interactionSetting = selectedSetting
     this.accountService.updateWalletGroup(this.walletGroup)
   }

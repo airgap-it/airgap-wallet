@@ -6,12 +6,14 @@ import {
   DeeplinkService,
   IACMessageTransport,
   IACMessageWrapper,
+  ICoinProtocolAdapter,
   ProtocolService,
   RelayMessage,
   UiEventElementsService
 } from '@airgap/angular-core'
 import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
+import { isOnlineProtocol, supportsWalletConnect } from '@airgap/module-kit'
 import { AccountShareResponse, IACMessageDefinitionObjectV3, IACMessageType, MessageSignResponse } from '@airgap/serializer'
 import { Inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
@@ -34,7 +36,7 @@ import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
   providedIn: 'root'
 })
 export class IACService extends BaseIACService {
-  constructor(
+  public constructor(
     uiEventElementsService: UiEventElementsService,
     public beaconService: BeaconService,
     public readonly deeplinkService: DeeplinkService,
@@ -72,7 +74,7 @@ export class IACService extends BaseIACService {
       isRelay: true
     }
     this.dataService.setData(DataServiceKey.INTERACTION, info)
-    this.router.navigateByUrl('/interaction-selection/' + DataServiceKey.INTERACTION).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    this.router.navigateByUrl(`/interaction-selection/${DataServiceKey.INTERACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async handleWalletSync(
@@ -137,18 +139,28 @@ export class IACService extends BaseIACService {
     const cachedRequest = await this.beaconService.getVaultRequest()
 
     const messageSignResponse = messageWrapper.result[0].payload as MessageSignResponse
-    const protocol: ProtocolSymbols = messageWrapper.result[0].protocol
+    const protocolIdentifier: ProtocolSymbols = messageWrapper.result[0].protocol
     const response: SignPayloadResponseInput = {
       type: BeaconMessageType.SignPayloadResponse,
       id: cachedRequest[0]?.id,
       signature: messageSignResponse.signature,
       signingType: SigningType.RAW
     }
-    if (protocol === MainProtocolSymbols.XTZ) {
+    if (protocolIdentifier === MainProtocolSymbols.XTZ) {
       await this.beaconService.respond(response, cachedRequest[0])
-    } else if (protocol === MainProtocolSymbols.ETH) {
+    } else {
+      const protocol = await this.protocolService.getProtocol(protocolIdentifier)
+      if (!(protocol instanceof ICoinProtocolAdapter)) {
+        return false
+      }
+
+      if (!(isOnlineProtocol(protocol.protocolV1) && supportsWalletConnect(protocol.protocolV1))) {
+        return false
+      }
+
       await this.walletConnectService.approveRequest(response.id, response.signature)
     }
+
     return false
   }
 }

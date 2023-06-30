@@ -6,8 +6,7 @@
   <ion-row class="rawdata--container ion-padding-bottom ion-margin-bottom">
     <ion-col class="ion-no-padding">
       <ion-item class="ion-no-padding" lines="none">
-        <ion-label>Change Fees</ion-label>
-        <ion-toggle [(ngModel)]="advanced" slot="end" (ngModelChange)="initForms()"></ion-toggle>
+        <ion-toggle [(ngModel)]="advanced" slot="end" (ngModelChange)="initForms()">Change Fees</ion-toggle>
       </ion-item>
 
       <ng-container *ngIf="advanced && formGroup !== undefined && operationControls !== undefined">
@@ -19,20 +18,17 @@
             <ion-row class="padding-top">
               <ion-col size="4">
                 <ion-item mode="md" color="light">
-                  <ion-label class="ion-no-margin" position="stacked">Fee</ion-label>
-                  <ion-input type="text" formControlName="fee" id="fee"></ion-input>
+                  <ion-input label="Fee" labelPlacement="stacked" type="text" formControlName="fee" id="fee"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size="4">
                 <ion-item mode="md" color="light">
-                  <ion-label class="ion-no-margin" position="stacked">Gas Limit</ion-label>
-                  <ion-input mode="md" type="number" formControlName="gasLimit" id="gas_limit"></ion-input>
+                  <ion-input mode="md" label="Gas Limit" labelPlacement="stacked" type="number" formControlName="gasLimit" id="gas_limit"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size="4">
                 <ion-item mode="md" color="light">
-                  <ion-label class="ion-no-margin" position="stacked">Storage Limit</ion-label>
-                  <ion-input mode="md" type="number" formControlName="storageLimit" id="storage_limit"></ion-input>
+                  <ion-input mode="md" label="Storage Limit" labelPlacement="stacked" type="number" formControlName="storageLimit" id="storage_limit"></ion-input>
                 </ion-item>
               </ion-col>
             </ion-row>

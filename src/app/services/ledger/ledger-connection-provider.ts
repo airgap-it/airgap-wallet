@@ -8,7 +8,7 @@ import { LedgerConnectionBrowser } from 'src/app/ledger/connection/LedgerConnect
   providedIn: 'root'
 })
 export class LedgerConnectionProvider {
-  constructor(private readonly platform: Platform) {}
+  public constructor(private readonly platform: Platform) {}
 
   public async getConnectedDevices(protocolIdentifier: string, connectionType: LedgerConnectionType): Promise<LedgerConnectionDetails[]> {
     if (this.platform.is('electron')) {

@@ -1,12 +1,12 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router'
+import { ActivatedRouteSnapshot, Router } from '@angular/router'
 import { ICoinProtocol } from '@airgap/coinlib-core'
 import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
 
 @Injectable()
-export class ProtocolGuard implements CanActivate {
-  constructor(public readonly router: Router, private readonly protocolService: ProtocolService) {}
+export class ProtocolGuard {
+  public constructor(public readonly router: Router, private readonly protocolService: ProtocolService) {}
 
   public async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
     const protocolID: string = route.params.protocolID

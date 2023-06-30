@@ -1,3 +1,5 @@
+@import '../../../theme/variables.scss';
+
 ion-content {
   --background: none transparent;
 }
@@ -7,7 +9,7 @@ ion-content {
 }
 
 p {
-  background: rgba(var(--ion-color-primary-rgb), 0.5);
+  background: var(--ion-color-primary);
 }
 
 .row--height__100 {
@@ -28,4 +30,8 @@ p {
     margin-top: 3em;
     max-height: 50%;
   }
+}
+
+ion-grid {
+  height: 100%;
 }

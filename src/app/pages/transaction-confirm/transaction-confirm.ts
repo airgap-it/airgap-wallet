@@ -43,7 +43,7 @@ export class TransactionConfirmPage {
   public protocols: ICoinProtocol[] = []
   public wallet: AirGapMarketWallet | undefined
 
-  constructor(
+  public constructor(
     private readonly loadingCtrl: LoadingController,
     private readonly toastCtrl: ToastController,
     private readonly router: Router,
@@ -72,7 +72,7 @@ export class TransactionConfirmPage {
     }
 
     // TODO: Multi messages
-    // tslint:disable-next-line:no-unnecessary-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     this.messageDefinitionObjects.forEach(async (messageObject) => {
       const protocol = await this.protocolService.getProtocol(messageObject.protocol)
 
@@ -162,7 +162,7 @@ export class TransactionConfirmPage {
           }
           // TODO: Remove once we introduce pending transaction handling
           // TODO: Multi messages
-          // tslint:disable-next-line:no-unnecessary-type-assertion
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
           const signedTxWrapper = this.messageDefinitionObjects[index].payload as SignedTransaction
           const lastTx: {
             protocol: string
@@ -226,7 +226,7 @@ export class TransactionConfirmPage {
             this.toastCtrl
               .create({
                 duration: TOAST_ERROR_DURATION,
-                message: 'Transaction broadcasting failed: ' + error,
+                message: `Transaction broadcasting failed: ${error}`,
                 buttons: [
                   {
                     text: 'Ok',
@@ -246,7 +246,12 @@ export class TransactionConfirmPage {
   }
 
   private async showTransactionSuccessfulAlert(protocol: ICoinProtocol, transactionHash: string, fromAddress: string): Promise<void> {
-    const blockexplorer: string | undefined = transactionHash && transactionHash.length > 0 ? await protocol.getBlockExplorerLinkForTxId(transactionHash) : fromAddress && fromAddress.length > 0 ? await protocol.getBlockExplorerLinkForAddress(fromAddress) : undefined
+    const blockexplorer: string | undefined =
+      transactionHash && transactionHash.length > 0
+        ? await protocol.getBlockExplorerLinkForTxId(transactionHash)
+        : fromAddress && fromAddress.length > 0
+        ? await protocol.getBlockExplorerLinkForAddress(fromAddress)
+        : undefined
     let buttons: AlertButton[] = [
       {
         text: 'Ok',
@@ -272,7 +277,7 @@ export class TransactionConfirmPage {
       .create({
         header: 'Transaction broadcasted!',
         message: 'Your transaction has been successfully broadcasted',
-        buttons,
+        buttons
       })
       .then((alert: HTMLIonAlertElement) => {
         alert.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
@@ -302,7 +307,7 @@ export class TransactionConfirmPage {
         this.toastCtrl
           .create({
             duration: TOAST_ERROR_DURATION,
-            message: 'Failed to prepare tezos operation: ' + error,
+            message: `Failed to prepare tezos operation: ${error}`,
             buttons: [
               {
                 text: 'Ok',
@@ -321,16 +326,20 @@ export class TransactionConfirmPage {
 
   private selectTezosTzAccount(protocol: ICoinProtocol, onSelected: (wallet: AirGapMarketWallet) => void): void {
     const wallets: AirGapMarketWallet[] = this.accountService.getActiveWalletList()
-      const compatibleWallets = wallets.filter((wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.protocol.options.network.identifier === protocol.options.network.identifier)
-      const info = {
-        actionType: 'broadcast',
-        targetIdentifier: protocol.identifier,
-        compatibleWallets,
-        incompatibleWallets: [],
-        callback: onSelected
-      }
-      this.dataService.setData(DataServiceKey.ACCOUNTS, info)
-      this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    const compatibleWallets = wallets.filter(
+      (wallet: AirGapMarketWallet) =>
+        wallet.protocol.identifier === MainProtocolSymbols.XTZ &&
+        wallet.protocol.options.network.identifier === protocol.options.network.identifier
+    )
+    const info = {
+      actionType: 'broadcast',
+      targetIdentifier: protocol.identifier,
+      compatibleWallets,
+      incompatibleWallets: [],
+      callback: onSelected
+    }
+    this.dataService.setData(DataServiceKey.ACCOUNTS, info)
+    this.router.navigateByUrl(`/select-wallet/${DataServiceKey.ACCOUNTS}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private async interceptICPTransaction(protocol: ICoinProtocol, transaction: string): Promise<boolean /* handled */> {
@@ -338,7 +347,10 @@ export class TransactionConfirmPage {
 
     const icpModule = new ICPModule()
     const v3SerializerCompanion = await icpModule.createV3SerializerCompanion()
-    const signedTransaction = await v3SerializerCompanion.fromTransactionSignResponse(adapter.identifier, { transaction, accountIdentifier: '' }) as ICPSignedTransaction
+    const signedTransaction = (await v3SerializerCompanion.fromTransactionSignResponse(adapter.identifier, {
+      transaction,
+      accountIdentifier: ''
+    })) as ICPSignedTransaction
     if (signedTransaction.transactions.some(({ actionType }) => actionType === ICPActionType.GET_NEURON_INFO)) {
       return this.loadICPFullNeuron(adapter, signedTransaction)
     }
@@ -361,7 +373,10 @@ export class TransactionConfirmPage {
     }
     this.dataService.setData(DataServiceKey.DETAIL, info)
     this.router
-      .navigateByUrl(`/delegation-detail/${DataServiceKey.DETAIL}/${this.wallet.publicKey}/${adapter.identifier}/${this.wallet.addressIndex}`, { replaceUrl: true })
+      .navigateByUrl(
+        `/delegation-detail/${DataServiceKey.DETAIL}/${this.wallet.publicKey}/${adapter.identifier}/${this.wallet.addressIndex}`,
+        { replaceUrl: true }
+      )
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
 
     return true
