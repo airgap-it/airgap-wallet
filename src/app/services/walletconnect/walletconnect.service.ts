@@ -52,7 +52,7 @@ export class WalletconnectService {
     }
 
     const core = new Core({
-      projectId: '66e0a75e89433a663fd16e2bf0c6ac6d' // TODO: replace with a production project ID, preferrably read from the environment
+      projectId: '24469fd0a06df227b6e5f7dc7de0ff4f' // TODO: replace with a production project ID, preferrably read from the environment
     })
 
     this.v2Client = await Web3Wallet.init({

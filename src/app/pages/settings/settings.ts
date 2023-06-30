@@ -9,7 +9,6 @@ import { SHARE_PLUGIN } from 'src/app/capacitor-plugins/injection-tokens'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { IACService } from 'src/app/services/iac/iac.service'
 
-import { ShopService } from 'src/app/services/shop/shop.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
 
@@ -33,13 +32,8 @@ export class SettingsPage {
     private readonly clipboardProvider: ClipboardService,
     private readonly iacService: IACService,
     private readonly browserService: BrowserService,
-    private readonly shopService: ShopService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
-  ) {
-    this.shopService.getShopData().then((response) => {
-      this.shopLink = response.data.link
-    })
-  }
+  ) {}
 
   public async onThemeSelection(event) {
     this.themeService.themeSubject.next(event.detail.value)
@@ -126,7 +120,7 @@ export class SettingsPage {
   }
 
   public airgapShop(): void {
-    this.browserService.openUrl(this.shopLink)
+    this.browserService.openUrl('https://shop.airgap.it/?ref=AirGapWallet-Settings')
   }
 
   public faq(): void {
