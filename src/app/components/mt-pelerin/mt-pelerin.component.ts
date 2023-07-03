@@ -19,6 +19,7 @@ export class MtPelerinComponent {
   public openMtPelerinLink() {
     if (this.url) {
       window.open(this.url, '_blank')
+      this.dismiss()
     }
   }
 }
