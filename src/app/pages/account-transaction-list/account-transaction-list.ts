@@ -461,9 +461,9 @@ export class AccountTransactionListPage {
 
   public async buyMtPerelin() {
     this.wallet.protocol.getSymbol().then(async (symbol) => {
-      const url = `https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`
+      const url = `https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&rfr=bcH4RmHm`
       await this.openModal(url)
-      // window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&addr=${this.wallet.addresses[0]}&rfr=bcH4RmHm`, '_blank')
+      // window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&rfr=bcH4RmHm`, '_blank')
     })
   }
 
