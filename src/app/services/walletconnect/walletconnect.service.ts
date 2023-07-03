@@ -7,11 +7,19 @@ import { parseUri } from '@walletconnect/utils'
 import { Web3Wallet } from '@walletconnect/web3wallet'
 import V2Client from '@walletconnect/web3wallet'
 
-import { DappConfirmPage } from 'src/app/pages/dapp-confirm/dapp-confirm.page'
 import { mapValues, isEmpty } from 'lodash'
 import { ErrorPage } from 'src/app/pages/error/error.page'
 import { UiEventService } from '@airgap/angular-core'
-import { WalletconnectPage, WalletconnectV1Context, WalletconnectV2Context } from '../../pages/walletconnect/walletconnect.page'
+import {
+  DappConfirmPage,
+  WalletconnectV1Context as WalletconnectDappConfirmV1Context,
+  WalletconnectV2Context as WalletconnectDappConfirmV2Context
+} from '../../pages/dapp-confirm/dapp-confirm.page'
+import {
+  WalletconnectPage,
+  WalletconnectV1Context as WalletconnectPageV1Context,
+  WalletconnectV2Context as WalletconnectPageV2Context
+} from '../../pages/walletconnect/walletconnect.page'
 import { getAllValidWalletConnectV1Sessions, clientMeta } from './helpers'
 
 @Injectable({
@@ -185,52 +193,62 @@ export class WalletconnectService {
     })
   }
 
-  public async approveRequest(id: string, result: string) {
+  public async approveRequest(id: string, result: string, showModal: boolean = true) {
     const [version, requestId, ...rest] = id.split(':')
     // eslint-disable-next-line default-case
     switch (version) {
       case '1':
-        return this.presentV1ConfirmationModal(requestId, result, this.v1Connector)
+        return this.approveV1Request(requestId, result, this.v1Connector, showModal)
       case '2':
         const topic = rest[0]
-        return this.presentV2ConfirmationModal(requestId, topic, result, this.v2Client)
+        return this.approveV2Request(requestId, topic, result, this.v2Client, showModal)
     }
   }
 
-  private async presentV1ConfirmationModal(id: string, result: string, connector: WalletConnect) {
-    const modal = await this.modalController.create({
-      component: DappConfirmPage,
-      componentProps: {
-        context: {
-          version: 1,
-          id: parseInt(id, 10),
-          result,
-          connector
+  private async approveV1Request(id: string, result: string, connector: WalletConnect, showModal: boolean) {
+    const context: WalletconnectDappConfirmV1Context = {
+      version: 1,
+      id: parseInt(id, 10),
+      result,
+      connector
+    }
+    if (showModal) {
+      const modal = await this.modalController.create({
+        component: DappConfirmPage,
+        componentProps: {
+          context
         }
-      }
-    })
+      })
 
-    return modal.present()
+      return modal.present()
+    } else {
+      DappConfirmPage.approveRequest(context)
+    }
   }
 
-  private async presentV2ConfirmationModal(id: string, topic: string, result: string, client: V2Client) {
-    const modal = await this.modalController.create({
-      component: DappConfirmPage,
-      componentProps: {
-        context: {
-          version: 2,
-          id: parseInt(id, 10),
-          topic,
-          result,
-          client
+  private async approveV2Request(id: string, topic: string, result: string, client: V2Client, showModal: boolean) {
+    const context: WalletconnectDappConfirmV2Context = {
+      version: 2,
+      id: parseInt(id, 10),
+      topic,
+      result,
+      client
+    }
+    if (showModal) {
+      const modal = await this.modalController.create({
+        component: DappConfirmPage,
+        componentProps: {
+          context
         }
-      }
-    })
+      })
 
-    return modal.present()
+      return modal.present()
+    } else {
+      DappConfirmPage.approveRequest(context)
+    }
   }
 
-  private async presentV1Modal(request: WalletconnectV1Context['request'], connector: WalletConnect) {
+  private async presentV1Modal(request: WalletconnectPageV1Context['request'], connector: WalletConnect) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,
       componentProps: {
@@ -246,7 +264,7 @@ export class WalletconnectService {
     return modal.present()
   }
 
-  private async presentV2Modal(message: WalletconnectV2Context['message'], client: V2Client) {
+  private async presentV2Modal(message: WalletconnectPageV2Context['message'], client: V2Client) {
     const modal = await this.modalController.create({
       component: WalletconnectPage,
       componentProps: {

@@ -108,8 +108,12 @@ export class BeaconService {
     return result ? result : []
   }
 
-  public async respond(response: BeaconResponseInputMessage, request: BeaconRequestOutputMessage): Promise<void> {
+  public async clearVaultRequest(): Promise<void> {
     await this.storage.setCache(WalletStorageKey.PENDING_REQUEST, [])
+  }
+
+  public async respond(response: BeaconResponseInputMessage, request: BeaconRequestOutputMessage): Promise<void> {
+    await this.clearVaultRequest()
     await this.client.respond(response).catch((err) => console.error(err))
     await this.showToast('response-sent', request.appMetadata)
   }
