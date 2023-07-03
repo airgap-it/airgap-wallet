@@ -16,6 +16,11 @@ export interface WalletconnectV2Context extends WalletconnectV2HandlerContext {
 
 export type WalletconnectContext = WalletconnectV1Context | WalletconnectV2Context
 
+interface WalletconnectHandlerRegistry {
+  v1: WalletconnectV1Handler
+  v2: WalletconnectV2Handler
+}
+
 @Component({
   selector: 'app-dapp-confirm',
   templateUrl: './dapp-confirm.page.html',
@@ -25,12 +30,30 @@ export class DappConfirmPage implements OnInit {
   public context: WalletconnectContext
   public result: string
 
-  private readonly handlers = {
-    v1: new WalletconnectV1Handler(),
-    v2: new WalletconnectV2Handler()
+  public constructor(private readonly modalController: ModalController) {}
+
+  public static async approveRequest(context: WalletconnectContext) {
+    await DappConfirmPage.getHandler(context).approveRequest(context)
   }
 
-  public constructor(private readonly modalController: ModalController) {}
+  private static handlers: WalletconnectHandlerRegistry | undefined = undefined
+  private static getHandler(context: WalletconnectContext): WalletconnectHandler<any> {
+    if (DappConfirmPage.handlers === undefined) {
+      DappConfirmPage.handlers = {
+        v1: new WalletconnectV1Handler(),
+        v2: new WalletconnectV2Handler()
+      }
+    }
+
+    switch (context.version) {
+      case 1:
+        return DappConfirmPage.handlers['v1']
+      case 2:
+        return DappConfirmPage.handlers['v2']
+      default:
+        assertNever('context', context)
+    }
+  }
 
   public async ngOnInit(): Promise<void> {
     this.result = await this.getHandler().readResult(this.context)
@@ -51,13 +74,6 @@ export class DappConfirmPage implements OnInit {
   }
 
   private getHandler(): WalletconnectHandler<any> {
-    switch (this.context.version) {
-      case 1:
-        return this.handlers['v1']
-      case 2:
-        return this.handlers['v2']
-      default:
-        assertNever('context', this.context)
-    }
+    return DappConfirmPage.getHandler(this.context)
   }
 }

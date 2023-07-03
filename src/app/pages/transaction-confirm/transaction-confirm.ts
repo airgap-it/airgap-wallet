@@ -146,7 +146,8 @@ export class TransactionConfirmPage {
           if (request) {
             // TODO: Type
             if (request['transaction']) {
-              this.walletConnectService.approveRequest(request.id, txId)
+              await this.walletConnectService.approveRequest(request.id, txId, false)
+              this.beaconService.clearVaultRequest()
             } else {
               const response = {
                 id: request.id,
