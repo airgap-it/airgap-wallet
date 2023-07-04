@@ -36,4 +36,4 @@ logs, and code as it's tough to read otherwise. --->
 /estimate
 
 <!--- these standard labels will be added to this issue>--->
-/label ~"type::bug" ~"proj::airgap"
+/label ~"type::bug" ~"proj::airgap" ~"community"
