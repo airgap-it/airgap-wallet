@@ -3,11 +3,11 @@
 **User reported issue here** (link to post if available): 
 
 
-OS used (Android/iOS):
+****OS used** (Android/iOS):
 
-Device used (Model):
+**Device used** (Model):
 
-Version (Wallet and/or Vault, eg 3.28.0):
+**Version** (Wallet and/or Vault, eg 3.28.0):
 
 ## What the user did:
 
