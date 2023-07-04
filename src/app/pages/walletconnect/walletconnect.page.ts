@@ -1,17 +1,8 @@
-import { assertNever, getBytesFormatV1FromV0, ICoinProtocolAdapter } from '@airgap/angular-core'
+import { assertNever, ICoinProtocolAdapter } from '@airgap/angular-core'
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
-import {
-  isBip32Protocol,
-  isOnlineProtocol,
-  isSubProtocol,
-  newExtendedPublicKey,
-  newPublicKey,
-  ProtocolSymbol,
-  supportsWalletConnect,
-  UnsignedTransaction
-} from '@airgap/module-kit'
+import { isOnlineProtocol, isSubProtocol, ProtocolSymbol, supportsWalletConnect, UnsignedTransaction } from '@airgap/module-kit'
 import { generateId, IACMessageType, TransactionSignRequest } from '@airgap/serializer'
 import { Component, OnInit } from '@angular/core'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
@@ -21,6 +12,7 @@ import { Subscription } from 'rxjs'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
+import { stripV1Wallet } from 'src/app/utils/utils'
 import { WalletconnectV1Handler, WalletconnectV1HandlerContext } from './handler/walletconnect-v1.handler'
 import { WalletconnectV2Handler, WalletconnectV2HandlerContext } from './handler/walletconnect-v2.handler'
 import {
@@ -394,42 +386,30 @@ export class WalletconnectPage implements OnInit {
     wallet: AirGapMarketWallet,
     request: EthTx
   ): Promise<TransactionSignRequest['transaction']> {
-    if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
-      throw new Error('Unexpected protocol instance.')
+    const { adapter, publicKey } = stripV1Wallet(wallet)
+
+    if (!supportsWalletConnect(adapter.protocolV1)) {
+      throw new Error(`Protocol ${adapter.identifier} doesn't support WalletConnect.`)
     }
 
-    const protocol: ICoinProtocolAdapter = wallet.protocol
-    if (!(isOnlineProtocol(protocol.protocolV1) && supportsWalletConnect(protocol.protocolV1))) {
-      throw new Error(`Protocol ${protocol.identifier} doesn't support WalletConnect.`)
-    }
-    if (wallet.isExtendedPublicKey && !isBip32Protocol(protocol.protocolV1)) {
-      throw new Error(`Protocol ${protocol.identifier} doesn't support extended keys.`)
-    }
-
-    const createPublicKey = wallet.isExtendedPublicKey ? newExtendedPublicKey : newPublicKey
-    const publicKey = createPublicKey(wallet.publicKey, getBytesFormatV1FromV0(wallet.publicKey))
-
-    const v1Transaction: UnsignedTransaction = await protocol.protocolV1.prepareWalletConnectTransactionWithPublicKey(
-      publicKey as any /* force the type as we've already checked if the protocol supports extended keys (isBip32Protocol) */,
-      request
-    )
-
-    const v0Transaction: TransactionSignRequest = await protocol.convertUnsignedTransactionV1ToV0(v1Transaction, wallet.publicKey)
+    const v1Transaction: UnsignedTransaction = await adapter.protocolV1.prepareWalletConnectTransactionWithPublicKey(publicKey, request)
+    const v0Transaction: TransactionSignRequest = await adapter.convertUnsignedTransactionV1ToV0(v1Transaction, wallet.publicKey)
 
     return v0Transaction.transaction
   }
 
   private async getWalletConnectChain(wallet: AirGapMarketWallet): Promise<string | undefined> {
-    if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
+    try {
+      const { adapter } = stripV1Wallet(wallet)
+      if (!supportsWalletConnect(adapter.protocolV1)) {
+        return undefined
+      }
+
+      return adapter.protocolV1.getWalletConnectChain()
+    } catch (error) {
+      console.warn(error)
       return undefined
     }
-
-    const protocol: ICoinProtocolAdapter = wallet.protocol
-    if (!(isOnlineProtocol(protocol.protocolV1) && supportsWalletConnect(protocol.protocolV1))) {
-      return undefined
-    }
-
-    return protocol.protocolV1.getWalletConnectChain()
   }
 
   private async filterWallets(

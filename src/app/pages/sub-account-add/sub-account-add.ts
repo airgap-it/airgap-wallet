@@ -1,12 +1,15 @@
-import { ProtocolService } from '@airgap/angular-core'
+import { ICoinProtocolAdapter, ICoinSubProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { AirGapCoinWallet, AirGapMarketWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { ICoinSubProtocol, SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
 import { assertNever } from '@airgap/coinlib-core/utils/assert'
+import { AirGapOnlineProtocol, Amount, canGetTokenBalances, isSingleTokenSubProtocol, TokenDetails } from '@airgap/module-kit'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
+import BigNumber from 'bignumber.js'
 import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 import { PriceService } from 'src/app/services/price/price.service'
+import { stripV1Wallet } from 'src/app/utils/utils'
 
 import { AddTokenActionContext } from '../../models/actions/AddTokenAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -105,9 +108,12 @@ export class SubAccountAddPage {
   }
 
   private async loadSubAccounts(subProtocols: ICoinSubProtocol[]) {
+    const subProtocolsWithTokenDetails: [ICoinSubProtocol, TokenDetails | undefined][] = await this.getTokenDetails(subProtocols)
+    const balances: Record<string, Amount> = await this.getTokenBalances(subProtocolsWithTokenDetails)
+
     const accounts: IAccountWrapper[] = (
       await Promise.all(
-        subProtocols.map(async (subProtocol) => {
+        subProtocolsWithTokenDetails.map(async ([subProtocol, tokenDetails]) => {
           const walletGroup: AirGapMarketWalletGroup = this.accountProvider.findWalletGroup(this.wallet)
           const wallet: AirGapMarketWallet = new AirGapCoinWallet(
             subProtocol,
@@ -122,7 +128,11 @@ export class SubAccountAddPage {
             return undefined
           }
           wallet.addresses = this.wallet.addresses
-          await wallet.synchronize()
+          if (tokenDetails && balances[tokenDetails.identifier]) {
+            wallet.setCurrentBalance(new BigNumber(balances[tokenDetails.identifier].value))
+          } else {
+            await wallet.synchronize()
+          }
 
           return {
             wallet,
@@ -180,5 +190,52 @@ export class SubAccountAddPage {
     }
     await this.loadDisplayedAccounts()
     event.target.complete()
+  }
+
+  private async getTokenDetails(subProtocols: ICoinSubProtocol[]): Promise<[ICoinSubProtocol, TokenDetails | undefined][]> {
+    if (!(this.wallet.protocol instanceof ICoinProtocolAdapter) || !canGetTokenBalances(this.wallet.protocol.protocolV1)) {
+      return subProtocols.map((subProtocol: ICoinSubProtocol) => [subProtocol, undefined])
+    }
+
+    return Promise.all(
+      subProtocols.map(async (subProtocol: ICoinSubProtocol) => {
+        if (!(subProtocol instanceof ICoinSubProtocolAdapter)) {
+          return [subProtocol, undefined]
+        }
+
+        const subProtocolV1: AirGapOnlineProtocol = subProtocol.protocolV1
+        let tokenDetails: TokenDetails | undefined
+        if (isSingleTokenSubProtocol(subProtocolV1)) {
+          const contractAddress: string = await subProtocolV1.getContractAddress()
+          tokenDetails = {
+            type: 'single',
+            identifier: contractAddress,
+            contractAddress
+          }
+        } /* else if (isMultiTokenSubProtocol(subProtocolV1)) { ... } - not supported */
+
+        return [subProtocol, tokenDetails]
+      })
+    )
+  }
+
+  private async getTokenBalances(
+    subProtocolsWithTokenDetails: [ICoinSubProtocol, TokenDetails | undefined][]
+  ): Promise<Record<string, Amount>> {
+    const { adapter, publicKey } = stripV1Wallet(this.wallet)
+
+    if (!canGetTokenBalances(adapter.protocolV1)) {
+      return {}
+    }
+
+    const tokenDetails: TokenDetails[] = subProtocolsWithTokenDetails
+      .map(([_, tokenDetails]) => tokenDetails)
+      .filter((tokenDetails) => tokenDetails !== undefined)
+
+    if (tokenDetails.length === 0) {
+      return {}
+    }
+
+    return adapter.protocolV1.getTokenBalancesOfPublicKey(publicKey, tokenDetails)
   }
 }
