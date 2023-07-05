@@ -50,7 +50,7 @@ export class BeaconRequestPage implements OnInit {
   public selectableWallets: AirGapMarketWallet[] = []
   private selectedWallet: AirGapMarketWallet | undefined
 
-  public modalRef: HTMLIonModalElement | undefined
+  public modal: HTMLIonModalElement | undefined
 
   public blake2bHash: string | undefined
   private readonly subscription: Subscription
@@ -84,8 +84,6 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
-    this.modalRef = await this.modalController.getTop()
-
     this.requesterName = this.request.appMetadata.name
     this.network = await this.getNetworkFromRequest(this.request)
     if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
@@ -126,7 +124,7 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async dismiss(): Promise<boolean | void> {
-    return this.modalRef.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    return this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   public async done(): Promise<void> {

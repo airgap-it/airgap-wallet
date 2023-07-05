@@ -12,7 +12,7 @@
 <ion-content class="ion-padding-horizontal ion-padding-bottom">
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="request">
-      <ng-container *ngIf="request.type != 'permission_request'">
+      <ng-container *ngIf="request.type !== 'permission_request'">
         <ion-card class="ion-margin-bottom">
           <ion-item lines="none">
             <ion-avatar slot="start">
