@@ -1,4 +1,14 @@
-import { ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
+import { getBytesFormatV1FromV0, ICoinProtocolAdapter } from '@airgap/angular-core'
+import { AirGapMarketWallet, ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
+import {
+  AirGapOnlineProtocol,
+  Bip32Extension,
+  ExtendedPublicKey,
+  isBip32Protocol,
+  newExtendedPublicKey,
+  newPublicKey,
+  PublicKey
+} from '@airgap/module-kit'
 
 // https://stackoverflow.com/a/8472700/4790610
 export function generateGUID(): string {
@@ -96,4 +106,37 @@ export function isType<T>(object: unknown, ...fields: string[]): object is T {
 
 export function isSubProtocol(value: ICoinProtocol): value is ICoinSubProtocol {
   return 'isSubProtocol' in value && 'subProtocolType' in value
+}
+
+// A v0 Wallet holds an untyped public key, the only way to determine if it supports
+// extended public keys is by checking `isExtendedPublicKey` at runtime.
+// With these util type and function we map this runtime behaviour into statically checked typing
+// by saying that if `stripV1Wallet` returns a value, it is safe to assume that an `adapter`
+// coming from a `wallet` has full support of a `publicKey` comming from the same `wallet`,
+// regardless of whether the key is extended or not. If this statement wasn't true, the function would fail with an error.
+// However, there's no implication that the returned `adapter` is extended with the `Bip32` interface
+// and should be properly checked with `isBip32Protocol` before intentional use with extended public keys.
+type ICoinProtocolEnhancedAdapter<T extends AirGapOnlineProtocol> = ICoinProtocolAdapter<
+  T & Omit<Bip32Extension<T>, Exclude<keyof Bip32Extension<T>, keyof T>>
+>
+
+export function stripV1Wallet<T extends AirGapOnlineProtocol>(
+  wallet: AirGapMarketWallet
+): { adapter: ICoinProtocolEnhancedAdapter<T>; publicKey: PublicKey | ExtendedPublicKey } {
+  if (!(wallet.protocol instanceof ICoinProtocolAdapter)) {
+    throw new Error('Unexpected protocol instance.')
+  }
+
+  const adapter: ICoinProtocolEnhancedAdapter<T> = wallet.protocol
+  const bytesFormat = getBytesFormatV1FromV0(wallet.publicKey)
+
+  const publicKey = wallet.isExtendedPublicKey
+    ? newExtendedPublicKey(wallet.publicKey, bytesFormat)
+    : newPublicKey(wallet.publicKey, bytesFormat)
+
+  if (publicKey.type === 'xpub' && !isBip32Protocol(adapter.protocolV1)) {
+    throw new Error(`Protocol ${adapter.identifier} doesn't support extended keys.`)
+  }
+
+  return { adapter, publicKey }
 }

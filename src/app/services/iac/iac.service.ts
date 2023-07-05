@@ -159,6 +159,7 @@ export class IACService extends BaseIACService {
       }
 
       await this.walletConnectService.approveRequest(response.id, response.signature)
+      await this.beaconService.clearVaultRequest()
     }
 
     return false

@@ -16,7 +16,7 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
   }
 
   public async approveRequest(context: WalletconnectV2HandlerContext): Promise<void> {
-    context.client.respondSessionRequest({
+    await context.client.respondSessionRequest({
       topic: context.topic,
       response: {
         id: context.id,
@@ -27,7 +27,7 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
   }
 
   public async rejectRequest(context: WalletconnectV2HandlerContext): Promise<void> {
-    context.client.respondSessionRequest({
+    await context.client.respondSessionRequest({
       topic: context.topic,
       response: {
         id: context.id,
