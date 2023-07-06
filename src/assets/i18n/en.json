@@ -645,6 +645,7 @@
     "next-payout_label": "Next Payout",
     "delegate": {
       "label": "Delegate",
+      "bond-more_label": "Bond More",
       "bond-nominate_text": "Select the amount you want to delegate. You can delegate at least <span class=\"style__strong color__primary\">{{ minDelegation }}</span> up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
       "bond-nominate-no-max_text": "Select the amount you want to delegate.",
       "rebond-nominate_text": "Select the amount you want to delegate. You can delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
@@ -655,7 +656,9 @@
       "rebond-extra_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can additionally delegate up to <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (after transaction fees).",
       "rebond-extra-no-max_text": "You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated. You can delegate additional {{ symbol }}s.",
       "change-nomination_text": "Change your delegation. You have currently <span class=\"style__strong color__primary\">{{ bonded }}</span> delegated.",
-      "unsufficient-funds_text": "You don't have enough {{ symbol }} to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
+      "insufficient-funds-to-cover-fees_text": "You don't have enough {{ symbol }} to cover the transaction fees, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required.",
+      "insufficient-funds-to-nominate_text": "You don't have enough {{ symbol }} to delegate, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required.",
+      "min-nominator-bond-not-reached_text": "You don't have enough {{ symbol }} bonded to delegate, additional <span class=\"style__strong color__primary\">{{ extra }}</span> are required."
     },
     "undelegate": {
       "label": "Undelegate"

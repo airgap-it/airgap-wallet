@@ -23,7 +23,6 @@ export interface CheckboxInput {
   styleUrls: ['./permission-request.component.scss']
 })
 export class PermissionRequestComponent implements OnChanges {
-  public modalRef: HTMLIonModalElement | undefined
   public readonly networkType: typeof NetworkType = NetworkType
 
   public wallets: Partial<Record<ProtocolSymbols, AirGapMarketWallet[]>> = {}
@@ -85,8 +84,6 @@ export class PermissionRequestComponent implements OnChanges {
   }
 
   public async changeAccount(): Promise<void> {
-    this.modalRef = await this.modalController.getTop()
-
     return new Promise(async () => {
       if (Object.entries(this.wallets).length === 1 && Object.entries(this.wallets)[0][1].length === 1) {
         return
@@ -129,6 +126,6 @@ export class PermissionRequestComponent implements OnChanges {
   }
 
   public async dismiss(): Promise<boolean | void> {
-    return this.modalRef.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    return this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 }

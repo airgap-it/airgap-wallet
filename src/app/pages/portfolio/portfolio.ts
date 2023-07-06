@@ -64,8 +64,17 @@ export class PortfolioPage {
     this.subscriptions.push(walletChangedSub)
 
     this.shopService.getShopData().then((response) => {
-      this.shopBannerText = response.data.text
-      this.shopBannerLink = response.data.link
+      this.shopBannerText = ''
+      this.shopBannerLink = ''
+
+      if (typeof response.data === 'object') {
+        if (typeof response.data.text === 'string') {
+          this.shopBannerText = response.data.text
+        }
+        if (typeof response.data.link === 'string') {
+          this.shopBannerLink = response.data.link
+        }
+      }
     })
   }
 
