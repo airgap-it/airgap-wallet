@@ -1,8 +1,7 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, Router } from '@angular/router'
-import { ICoinProtocol } from '@airgap/coinlib-core'
-import { MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core/utils/ProtocolSymbols'
+import { ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
 
 @Injectable()
 export class ProtocolGuard {
@@ -10,29 +9,19 @@ export class ProtocolGuard {
 
   public async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
     const protocolID: string = route.params.protocolID
-    let mainProtocolID: string
-    const protocolIDComponents: string[] = protocolID.split('-')
-    if (protocolIDComponents.length > 1) {
-      mainProtocolID = protocolIDComponents[0]
-    }
 
-    const mainSymbols: string[] = Object.values(MainProtocolSymbols).map((p: MainProtocolSymbols) => p.toString())
-    let subSymbols: string[] = Object.values(SubProtocolSymbols).map((p: SubProtocolSymbols) => p.toString())
+    const [mainProtocols, subProtocols]: [ICoinProtocol[], ICoinSubProtocol[]] = await Promise.all([
+      this.protocolService.getSupportedProtocols(),
+      this.protocolService.getSupportedSubProtocols().then((subProtocolsMap) => {
+        const innerMap = Object.values(subProtocolsMap)
 
-    if (mainProtocolID !== undefined) {
-      if (
-        mainProtocolID === MainProtocolSymbols.ETH ||
-        mainProtocolID === MainProtocolSymbols.OPTIMISM ||
-        mainProtocolID === MainProtocolSymbols.XTZ
-      ) {
-        subSymbols = (await this.protocolService.getAllSubProtocols(mainProtocolID)).map((protocol: ICoinProtocol) =>
-          protocol.identifier.toString()
-        )
-      }
+        return innerMap.flatMap((obj) => Object.values(obj))
+      })
+    ])
 
-      return subSymbols.includes(protocolID)
-    } else {
-      return mainSymbols.includes(protocolID) || subSymbols.includes(protocolID)
-    }
+    const mainSymbols: Set<string> = new Set(mainProtocols.map((protocol: ICoinProtocol) => protocol.identifier.toString()))
+    const subSymbols: Set<string> = new Set(subProtocols.map((protocol: ICoinSubProtocol) => protocol.identifier.toString()))
+
+    return mainSymbols.has(protocolID) || subSymbols.has(protocolID)
   }
 }
