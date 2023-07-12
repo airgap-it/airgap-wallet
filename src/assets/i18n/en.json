@@ -196,7 +196,11 @@
     "add-ons_settings": {
       "label": "Add-ons",
       "isolated-modules_text": "Isolated Modules"
-    }
+    },
+    "knox-text_pt1": "Turn your device into a true hardware wallet",
+    "knox-text_pt2": "AirGap Knox enforces a true offline mode and allows only the Vault to run on your device",
+    "knox-button_label": "Explore Knox Now"
+
   },
   "mtpelerin": {
     "header1": "Buy & sell crypto with Mt Pelerin – The Swiss gateway to the crypto world",
