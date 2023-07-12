@@ -36,7 +36,8 @@ export enum WalletStorageKey {
   GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS',
   CONTRACT_ADDRESSES = 'CONTRACT_ADDRESSES',
   THEME = 'theme',
-  ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED'
+  ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED',
+  KNOX_BANNER_DISABLED = 'KNOX_BANNER_DISABLED'
 }
 
 interface IBroadcastTransaction {
@@ -63,6 +64,7 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
   [WalletStorageKey.THEME]: themeOptions
   [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: boolean
+  [WalletStorageKey.KNOX_BANNER_DISABLED]: boolean
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -84,7 +86,8 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {},
   [WalletStorageKey.CONTRACT_ADDRESSES]: {},
   [WalletStorageKey.THEME]: undefined,
-  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false
+  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false,
+  [WalletStorageKey.KNOX_BANNER_DISABLED]: false
 }
 
 @Injectable({
