@@ -109,6 +109,10 @@
           <ion-select-option value="dark">{{ 'settings.select-theme.dark' | translate }}</ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-item (click)="goToLanguagesSettings()" detail="true">
+        <ion-icon name="language-outline" slot="start"></ion-icon>
+        {{ 'settings.preferred-language_label' | translate }}
+      </ion-item>
     </ion-list>
     <ion-list lines="none">
       <ion-list-header class="ion-no-margin" lines="none">

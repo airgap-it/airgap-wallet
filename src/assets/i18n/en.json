@@ -148,6 +148,7 @@
       "light": "Light Theme",
       "dark": "Dark Theme"
     },
+    "preferred-language_label": "Preferred Language",
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
@@ -327,6 +328,20 @@
     "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
     "ledger_label": "Ledger",
     "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
+  },
+  "language-selection-settings": {
+    "title": "Language Selection",
+    "heading": "Please choose your preferred language",
+    "selector": {
+      "device": "Your Device Language",
+      "en": "English",
+      "de": "German",
+      "es": "Spanish",
+      "pt_BR": "Portuguese (Brazil)",
+      "zh_CN": "Chinese (China)"
+    },
+    "continue_label": "Continue",
+    "description": "You can always change your preference in the settings"
   },
   "wallet-address": {
     "title": "Account Address",
