@@ -176,6 +176,10 @@ export class SettingsPage implements OnInit {
     )
   }
 
+  public goToLanguagesSettings(): void {
+    this.navigate('/languages-selection-settings')
+  }
+
   private async isKnoxBannerEnabled(): Promise<boolean> {
     return !(await this.walletStorageService.get(WalletStorageKey.KNOX_BANNER_DISABLED))
   }

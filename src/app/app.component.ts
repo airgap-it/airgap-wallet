@@ -14,7 +14,6 @@ import {
   ExternalAliasResolver,
   getProtocolAndNetworkIdentifier,
   IACMessageTransport,
-  LanguageService,
   ProtocolService,
   SerializerService,
   SPLASH_SCREEN_PLUGIN
@@ -71,7 +70,7 @@ import { NavigationService } from './services/navigation/navigation.service'
 import { PushProvider } from './services/push/push'
 import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
-import { WalletStorageKey, WalletStorageService } from './services/storage/storage'
+import { LanguagesType, WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID } from './utils/utils'
@@ -91,7 +90,8 @@ export class AppComponent implements AfterViewInit {
     private readonly appSerivce: AppService,
     private readonly platform: Platform,
     private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
+    private readonly translateService: TranslateService,
+    private readonly storageService: WalletStorageService,
     private readonly iacService: IACService,
     private readonly protocolService: ProtocolService,
     private readonly storageProvider: WalletStorageService,
@@ -233,10 +233,13 @@ export class AppComponent implements AfterViewInit {
   }
 
   private async initializeTranslations(): Promise<void> {
-    return this.languageService.init({
-      supportedLanguages: ['en', 'de', 'zh'],
-      defaultLanguage: 'en'
-    })
+    this.translateService.setDefaultLang(LanguagesType.EN)
+
+    const savedLanguage = await this.storageService.get(WalletStorageKey.LANGUAGE_TYPE)
+    const deviceLanguage = this.translateService.getBrowserLang()
+    const currentLanguage = savedLanguage || (deviceLanguage as LanguagesType)
+
+    await this.translateService.use(currentLanguage).toPromise()
   }
   private async initializeWalletConnect(): Promise<void> {
     this.walletconnectService.initWalletConnect()
