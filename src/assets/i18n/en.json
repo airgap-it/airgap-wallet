@@ -148,6 +148,7 @@
       "light": "Light Theme",
       "dark": "Dark Theme"
     },
+    "preferred-language_label": "Preferred Language",
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
@@ -196,7 +197,11 @@
     "add-ons_settings": {
       "label": "Add-ons",
       "isolated-modules_text": "Isolated Modules"
-    }
+    },
+    "knox-text_pt1": "Turn your device into a true hardware wallet",
+    "knox-text_pt2": "AirGap Knox enforces a true offline mode and allows only the Vault to run on your device",
+    "knox-button_label": "Explore Knox Now"
+
   },
   "mtpelerin": {
     "header1": "Buy & sell crypto with Mt Pelerin – The Swiss gateway to the crypto world",
@@ -323,6 +328,20 @@
     "vault_info": "AirGap Vault is installed on an offline device, scan the QR code with AirGap Wallet.",
     "ledger_label": "Ledger",
     "ledger_info": "Ledger has multiple types of hardware wallets that are connected to your device to securely sign transactions."
+  },
+  "language-selection-settings": {
+    "title": "Language Selection",
+    "heading": "Please choose your preferred language",
+    "selector": {
+      "device": "Your Device Language",
+      "en": "English",
+      "de": "German",
+      "es": "Spanish",
+      "pt_BR": "Portuguese (Brazil)",
+      "zh_CN": "Chinese (China)"
+    },
+    "continue_label": "Continue",
+    "description": "You can always change your preference in the settings"
   },
   "wallet-address": {
     "title": "Account Address",

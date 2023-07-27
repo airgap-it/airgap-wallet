@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { App } from '@capacitor/app'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+import { Location } from '@angular/common'
 
 const rootPath: string = '/tabs/portfolio'
 
@@ -24,7 +25,7 @@ const paths: { path: string; prevPath: string }[] = [
   providedIn: 'root'
 })
 export class NavigationService {
-  public constructor(private readonly router: Router) {}
+  public constructor(private readonly router: Router, private readonly location: Location) {}
 
   public handleBackNavigation(currentPath: string) {
     if (currentPath === rootPath) {
@@ -36,5 +37,8 @@ export class NavigationService {
     if (prevpath) {
       this.router.navigateByUrl(prevpath.prevPath).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     }
+  }
+  public back(): void {
+    this.location.back()
   }
 }

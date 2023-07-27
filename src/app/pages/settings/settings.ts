@@ -1,5 +1,5 @@
 import { ClipboardService, SerializerService, IACMessageTransport } from '@airgap/angular-core'
-import { Component, Inject } from '@angular/core'
+import { Component, Inject, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Capacitor } from '@capacitor/core'
 import { SharePlugin } from '@capacitor/share'
@@ -11,17 +11,18 @@ import { IACService } from 'src/app/services/iac/iac.service'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
+import { WalletStorageKey, WalletStorageService } from 'src/app/services/storage/storage'
 
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html'
 })
-export class SettingsPage {
+export class SettingsPage implements OnInit {
   public readonly platform: string = Capacitor.getPlatform()
   public readonly getTheme = this.themeService.getTheme()
+  public showKnoxBanner: boolean
 
-  // Shop banner
-  public shopLink: string = ''
+  private readonly knoxLink: string = 'https://shop.airgap.it/product/airgap-knox/?ref=Wallet-Settings-Knox'
 
   public constructor(
     public readonly alertCtrl: AlertController,
@@ -32,8 +33,18 @@ export class SettingsPage {
     private readonly clipboardProvider: ClipboardService,
     private readonly iacService: IACService,
     private readonly browserService: BrowserService,
-    @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin
+    @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin,
+    private readonly walletStorageService: WalletStorageService
   ) {}
+
+  async ngOnInit() {
+    this.showKnoxBanner = await this.isKnoxBannerEnabled()
+  }
+
+  async dismissKnoxBanner() {
+    this.showKnoxBanner = false
+    await this.setKnoxBannerEnabled(false)
+  }
 
   public async onThemeSelection(event) {
     this.themeService.themeSubject.next(event.detail.value)
@@ -163,5 +174,21 @@ export class SettingsPage {
         console.error(`Error: ${err}`)
       }
     )
+  }
+
+  public goToLanguagesSettings(): void {
+    this.navigate('/languages-selection-settings')
+  }
+
+  private async isKnoxBannerEnabled(): Promise<boolean> {
+    return !(await this.walletStorageService.get(WalletStorageKey.KNOX_BANNER_DISABLED))
+  }
+
+  private async setKnoxBannerEnabled(value: boolean) {
+    await this.walletStorageService.set(WalletStorageKey.KNOX_BANNER_DISABLED, !value)
+  }
+
+  openKnoxPage() {
+    window.open(this.knoxLink, '_blank')
   }
 }

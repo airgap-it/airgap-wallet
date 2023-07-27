@@ -12,6 +12,14 @@ import { ExchangeTransactionDetails } from '../exchange/exchange'
 export type BeaconRequest = [string, any, ICoinProtocol]
 export type themeOptions = 'light' | 'dark' | 'system'
 
+export enum LanguagesType {
+  EN = 'en',
+  DE = 'de',
+  // ES = 'es',
+  PT_BR = 'pt_BR',
+  ZH_CN = 'zh_CN'
+}
+
 export interface SerializedBeaconRequest {
   messageId: string
   payload: any
@@ -36,7 +44,9 @@ export enum WalletStorageKey {
   GENERIC_SUBPROTOCOLS = 'GENERIC_SUBPROTOCOLS',
   CONTRACT_ADDRESSES = 'CONTRACT_ADDRESSES',
   THEME = 'theme',
-  ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED'
+  LANGUAGE_TYPE = 'LANGUAGE_TYPE',
+  ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED',
+  KNOX_BANNER_DISABLED = 'KNOX_BANNER_DISABLED'
 }
 
 interface IBroadcastTransaction {
@@ -62,7 +72,9 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: Record<string, ProtocolOptions>
   [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
   [WalletStorageKey.THEME]: themeOptions
+  [WalletStorageKey.LANGUAGE_TYPE]: LanguagesType | undefined
   [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: boolean
+  [WalletStorageKey.KNOX_BANNER_DISABLED]: boolean
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -84,7 +96,9 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.GENERIC_SUBPROTOCOLS]: {},
   [WalletStorageKey.CONTRACT_ADDRESSES]: {},
   [WalletStorageKey.THEME]: undefined,
-  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false
+  [WalletStorageKey.LANGUAGE_TYPE]: undefined,
+  [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false,
+  [WalletStorageKey.KNOX_BANNER_DISABLED]: false
 }
 
 @Injectable({
