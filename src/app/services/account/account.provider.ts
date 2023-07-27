@@ -395,11 +395,12 @@ export class AccountProvider {
     try {
       const identifier = await airGapWallet.protocol.getIdentifier()
       // if we have no addresses, derive using webworker and sync, else just sync
-      const excludedProtocols = [MainProtocolSymbols.ETH, MainProtocolSymbols.OPTIMISM]
-      const isWalletExcluded = excludedProtocols.some((protocolSymbol: ProtocolSymbols) => identifier.startsWith(protocolSymbol))
+      // TODO: configure it on the protocol level
+      const includedProtocols = [MainProtocolSymbols.BTC, MainProtocolSymbols.BTC_SEGWIT, MainProtocolSymbols.GRS]
+      const isWalletIncluded = includedProtocols.some((protocolSymbol: ProtocolSymbols) => identifier.startsWith(protocolSymbol))
       if (
         airGapWallet.addresses.length === 0 ||
-        (airGapWallet.isExtendedPublicKey && !isWalletExcluded && airGapWallet.addresses.length < 20)
+        (airGapWallet.isExtendedPublicKey && isWalletIncluded && airGapWallet.addresses.length < 20)
       ) {
         const addresses = await this.modulesService.deriveAddresses(airGapWallet)
         const key = `${identifier}_${airGapWallet.publicKey}`
