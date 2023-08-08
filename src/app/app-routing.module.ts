@@ -262,6 +262,16 @@ const routes: Routes = [
     },
     loadChildren: () =>
       import('./pages/isolated-modules-details/isolated-modules-details.module').then((m) => m.IsolatedModulesDetailsPageModule)
+  },
+  {
+    path: 'languages-selection-settings',
+    resolve: {
+      special: DataResolverService
+    },
+    loadChildren: () =>
+      import('./pages/languages-selection-settings-page/languages-selection-settings.module').then(
+        (m) => m.LanguagesSelectionSettingsPageModule
+      )
   }
 ]
 @NgModule({
