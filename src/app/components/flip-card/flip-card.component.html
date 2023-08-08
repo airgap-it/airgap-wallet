@@ -1,0 +1,16 @@
+<div class="container">
+  <div [ngClass]="toggleProperty ? 'flipped' : ''" class="card">
+    <div class="front">
+      <ng-content select="flip-card-front"></ng-content>
+      <div class="arrow-icon" (click)="toggle()">
+        <ion-icon name="sync-outline"></ion-icon>
+      </div>
+    </div>
+    <div class="back">
+      <ng-content select="flip-card-back"></ng-content>
+      <div class="arrow-icon" (click)="toggle()">
+        <ion-icon name="sync-outline"></ion-icon>
+      </div>
+    </div>
+  </div>
+</div>
