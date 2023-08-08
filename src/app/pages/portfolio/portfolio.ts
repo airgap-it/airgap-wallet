@@ -21,7 +21,7 @@ import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-ha
   styleUrls: ['./portfolio.scss']
 })
 export class PortfolioPage {
-  public isVisible = 'hidden'
+  public isVisible: boolean = false
 
   public total: number = 0
   public changePercentage: number = 0
@@ -38,6 +38,11 @@ export class PortfolioPage {
   // Shop banner
   public shopBannerText: string = ''
   public shopBannerLink: string = ''
+
+  // knox flip-card
+  public knoxFlipCardLine1: string = ''
+  public knoxFlipCardLine2: string = ''
+  public knoxFlipCardLink: string = ''
 
   public constructor(
     private readonly router: Router,
@@ -73,6 +78,24 @@ export class PortfolioPage {
         }
         if (typeof response.data.link === 'string') {
           this.shopBannerLink = response.data.link
+        }
+      }
+    })
+
+    this.shopService.getKnoxData().then((response) => {
+      this.knoxFlipCardLine1 = ''
+      this.knoxFlipCardLine2 = ''
+      this.knoxFlipCardLink = ''
+
+      if (typeof response.data === 'object') {
+        if (typeof response.data.line1 === 'string') {
+          this.knoxFlipCardLine1 = response.data.line1
+        }
+        if (typeof response.data.line2 === 'string') {
+          this.knoxFlipCardLine2 = response.data.line2
+        }
+        if (typeof response.data.link === 'string') {
+          this.knoxFlipCardLink = response.data.link
         }
       }
     })
@@ -125,6 +148,7 @@ export class PortfolioPage {
   }
 
   public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
+    this.isVisible = false
     const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
     wallets = wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
     this.total = (
@@ -144,7 +168,7 @@ export class PortfolioPage {
       refresher.complete()
     }
 
-    this.isVisible = 'visible'
+    this.isVisible = true
   }
 
   public ngOnDestroy(): void {
@@ -154,9 +178,9 @@ export class PortfolioPage {
     this.subscriptions = []
   }
 
-  public onClickShopBanner() {
-    if (this.shopBannerLink.length > 0) {
-      window.open(this.shopBannerLink, '_blank')
+  public onClickLink(link: string) {
+    if (link.length > 0) {
+      window.open(link, '_blank')
     }
   }
 }
