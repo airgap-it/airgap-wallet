@@ -112,7 +112,11 @@
     "shop_banner": "Gain an extra layer of security - Get the AirGap Recovery Plate",
     "empty-state_text": "Start by adding coins to AirGap Wallet, you will also need the <span class=\"style__strong color__primary\">AirGap Vault</span> application where your secret is securely stored.",
     "empty-state_desktop_text": "Start by adding coins to AirGap Wallet, you can either do this with the <span class=\"style__strong color__primary\">AirGap Vault</span> application or for selected coins with a <span class=\"style__strong color__primary\">Ledger hardware wallet.</span>",
-    "add-coins_label": "Add Coins"
+    "add-coins_label": "Add Coins",
+    "flip-card": {
+      "front-title": "Total Balance",
+      "back-title": "Turn your device into a true hardware wallet"
+    }
   },
   "account-add": {
     "featured": "Featured",
@@ -201,7 +205,6 @@
     "knox-text_pt1": "Turn your device into a true hardware wallet",
     "knox-text_pt2": "AirGap Knox enforces a true offline mode and allows only the Vault to run on your device",
     "knox-button_label": "Explore Knox Now"
-
   },
   "mtpelerin": {
     "header1": "Buy & sell crypto with Mt Pelerin – The Swiss gateway to the crypto world",

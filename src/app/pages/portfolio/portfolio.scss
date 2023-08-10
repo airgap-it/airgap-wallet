@@ -81,3 +81,45 @@ ion-card {
     margin: 0px;
   }
 }
+
+.promo-container {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.promo-container p:first-child {
+  font-size: large;
+  font-weight: normal;
+  margin-left: 5%;
+  margin-bottom: 5px;
+}
+
+.promo-container p:last-child {
+  font-size: large;
+  font-weight: normal;
+  margin-left: 5%;
+  margin-top: 0px;
+  opacity: 70%;
+}
+flip-card {
+  margin-bottom: 15px;
+  margin-top: -20px;
+}
+
+flip-card span {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+.large-font {
+  margin-top: 0px;
+  font-size: 43px;
+  font-weight: 350;
+}
+
+.small-font {
+  margin-top: 0px;
+  font-size: 30px;
+  font-weight: 350;
+}

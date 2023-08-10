@@ -46,6 +46,9 @@ import { WidgetRewardList } from './widget-reward-list/widget-reward-list'
 import { WidgetSelector } from './widget-selector/widget-selector'
 import { MtPelerinComponent } from './mt-pelerin/mt-pelerin.component'
 import { CurrencyItemLabelComponent } from './currency-item/label/currency-item-label'
+import { FlipCardComponent } from './flip-card/flip-card.component'
+import { FlipCardFrontComponent } from './flip-card/flip-card-front'
+import { FlipCardBackComponent } from './flip-card/flip-card-back'
 
 @NgModule({
   declarations: [
@@ -85,7 +88,10 @@ import { CurrencyItemLabelComponent } from './currency-item/label/currency-item-
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
     ExchangeSelectionComponent,
-    MtPelerinComponent
+    MtPelerinComponent,
+    FlipCardComponent,
+    FlipCardFrontComponent,
+    FlipCardBackComponent
   ],
   imports: [
     IonicModule,
@@ -137,7 +143,10 @@ import { CurrencyItemLabelComponent } from './currency-item/label/currency-item-
     WidgetOptionButtonGroup,
     RemoveLiquidityComponent,
     ExchangeSelectionComponent,
-    MtPelerinComponent
+    MtPelerinComponent,
+    FlipCardComponent,
+    FlipCardFrontComponent,
+    FlipCardBackComponent
   ]
 })
 export class ComponentsModule {}
