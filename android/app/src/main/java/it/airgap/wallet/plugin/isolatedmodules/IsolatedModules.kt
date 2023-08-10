@@ -225,7 +225,7 @@ class IsolatedModules : Plugin() {
                                 JSObject("""
                                     {
                                         "type": "success",
-                                        "value": ${value.get("value")}
+                                        "value": ${value.get("value").serialize()}
                                     }
                                 """.trimIndent())
                             } catch (e: Exception) {

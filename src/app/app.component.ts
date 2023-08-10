@@ -12,7 +12,6 @@ import {
   createV0TezosFA2Protocol,
   createV0TezosShieldedTezProtocol,
   ExternalAliasResolver,
-  getProtocolAndNetworkIdentifier,
   IACMessageTransport,
   ProtocolService,
   SerializerService,
@@ -73,7 +72,7 @@ import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } fro
 import { LanguagesType, WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
-import { generateGUID } from './utils/utils'
+import { generateGUID, getProtocolAndNetworkIdentifier } from './utils/utils'
 
 // Swiper
 register()
