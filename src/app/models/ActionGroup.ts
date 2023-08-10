@@ -3,7 +3,7 @@ import { AirGapCoinWallet, AirGapMarketWallet, ICoinProtocol, MainProtocolSymbol
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { LinkedAction } from '@airgap/coinlib-core/actions/LinkedAction'
 import { SimpleAction } from '@airgap/coinlib-core/actions/SimpleAction'
-import { SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
+import { ICoinSubProtocol, SubProtocolType } from '@airgap/coinlib-core/protocols/ICoinSubProtocol'
 import { CosmosDelegationActionType } from '@airgap/cosmos-core'
 import { TezosShieldedTezProtocol } from '@airgap/tezos'
 
@@ -75,6 +75,22 @@ export class ActionGroup {
       return this.getOptimismActions()
     })
 
+    const currentIdentifier = await this.callerContext.wallet.protocol.getIdentifier()
+    const currentMainIdentifier = currentIdentifier.split('-')[0]
+
+    if (!actionMap.has(currentMainIdentifier)) {
+      const subProtocols = await this.callerContext.protocolService.getAllSubProtocols(currentMainIdentifier as MainProtocolSymbols)
+      const tokenSubProtocols = Object.values(subProtocols)
+        .flatMap((subProtocol: ICoinSubProtocol) => subProtocol.subProtocolType)
+        .filter((type: SubProtocolType) => type === SubProtocolType.TOKEN)
+
+      if (tokenSubProtocols.length > 0) {
+        actionMap.set(currentMainIdentifier, async () => {
+          return [this.getAddTokensAction()]
+        })
+      }
+    }
+
     const actionFunction: () => Promise<Action<any, any>[]> | undefined = actionMap.get(this.callerContext.protocolIdentifier)
 
     return actionFunction ? actionFunction() : []
@@ -91,32 +107,7 @@ export class ActionGroup {
     )
 
     //TODO: Move logic to sub-account-add.ts
-    const addTokenButtonAction = new ButtonAction(
-      { name: 'account-transaction-list.add-tokens_label', icon: 'add', identifier: 'add-tokens' },
-      () => {
-        const prepareAddTokenActionContext = new SimpleAction(() => {
-          return new Promise<AddTokenActionContext>(async (resolve) => {
-            const info = {
-              subProtocolType: SubProtocolType.TOKEN,
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
-              )
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-        const addTokenAction = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
-        addTokenAction.onComplete = async (): Promise<void> => {
-          addTokenAction.getLinkedAction().context.location.navigateRoot('')
-        }
-
-        return addTokenAction
-      }
-    )
+    const addTokenButtonAction: Action<void, void> = this.getAddTokensAction()
 
     return [delegateButtonAction, collectiblesButton, addTokenButtonAction]
   }
@@ -234,32 +225,7 @@ export class ActionGroup {
   }
 
   private getEthereumActions(): Action<any, any>[] {
-    const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
-      () => {
-        const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
-          return new Promise<AddTokenActionContext>(async (resolve) => {
-            const info = {
-              subProtocolType: SubProtocolType.TOKEN,
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
-              )
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-        const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
-        addTokenAction.onComplete = async (): Promise<void> => {
-          addTokenAction.getLinkedAction().context.location.navigateRoot('')
-        }
-
-        return addTokenAction
-      }
-    )
+    const addTokenButtonAction: Action<void, void> = this.getAddTokensAction()
 
     return [addTokenButtonAction]
   }
@@ -288,34 +254,35 @@ export class ActionGroup {
   }
 
   private getOptimismActions(): Action<any, any>[] {
-    const addTokenButtonAction: ButtonAction<void, void> = new ButtonAction(
-      { name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' },
-      () => {
-        const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
-          return new Promise<AddTokenActionContext>(async (resolve) => {
-            const info = {
-              subProtocolType: SubProtocolType.TOKEN,
-              wallet: this.callerContext.wallet,
-              actionCallback: resolve
-            }
-            this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
-            this.callerContext.router
-              .navigateByUrl(
-                `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
-              )
-              .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
-          })
-        })
-        const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
-        addTokenAction.onComplete = async (): Promise<void> => {
-          addTokenAction.getLinkedAction().context.location.navigateRoot('')
-        }
-
-        return addTokenAction
-      }
-    )
+    const addTokenButtonAction: Action<void, void> = this.getAddTokensAction()
 
     return [addTokenButtonAction]
+  }
+
+  private getAddTokensAction(): Action<any, any> {
+    return new ButtonAction({ name: 'account-transaction-list.add-tokens_label', icon: 'add-outline', identifier: 'add-tokens' }, () => {
+      const prepareAddTokenActionContext: SimpleAction<AddTokenActionContext> = new SimpleAction(() => {
+        return new Promise<AddTokenActionContext>(async (resolve) => {
+          const info = {
+            subProtocolType: SubProtocolType.TOKEN,
+            wallet: this.callerContext.wallet,
+            actionCallback: resolve
+          }
+          this.callerContext.dataService.setData(DataServiceKey.DETAIL, info)
+          this.callerContext.router
+            .navigateByUrl(
+              `/sub-account-add/${DataServiceKey.DETAIL}/${info.wallet.publicKey}/${info.wallet.protocol.identifier}/${info.wallet.addressIndex}/${info.subProtocolType}`
+            )
+            .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+        })
+      })
+      const addTokenAction: LinkedAction<void, AddTokenActionContext> = new LinkedAction(prepareAddTokenActionContext, AddTokenAction)
+      addTokenAction.onComplete = async (): Promise<void> => {
+        addTokenAction.getLinkedAction().context.location.navigateRoot('')
+      }
+
+      return addTokenAction
+    })
   }
 
   private async addKtAddress(xtzWallet: AirGapMarketWallet, index: number, ktAddresses: string[]): Promise<AirGapMarketWallet> {
