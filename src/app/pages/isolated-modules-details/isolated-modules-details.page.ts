@@ -105,15 +105,15 @@ export class IsolatedModulesDetailsPage {
   public removeModule() {
     this.uiEventService
       .showTranslatedAlert({
-        header: 'isolated-modules-details.alert.remove.header',
-        message: 'isolated-modules-details.alert.remove.message',
+        header: 'isolated-modules-details-page.alert.remove.header',
+        message: 'isolated-modules-details-page.alert.remove.message',
         buttons: [
           {
-            text: 'isolated-modules-details.alert.remove.cancel_label',
+            text: 'isolated-modules-details-page.alert.remove.cancel_label',
             role: 'cancel'
           },
           {
-            text: 'isolated-modules-details.alert.remove.proceed_label',
+            text: 'isolated-modules-details-page.alert.remove.proceed_label',
             handler: async (): Promise<void> => {
               if (this.metadata && this.metadata.type === 'installed') {
                 await this.modulesService.removeInstalledModule(this.metadata)

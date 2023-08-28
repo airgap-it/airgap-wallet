@@ -1,5 +1,6 @@
+import { getProtocolAndNetworkIdentifier as _getProtocolAndNetworkIdentifier, RuntimeMode } from '@airgap/angular-core'
 import { getBytesFormatV1FromV0, ICoinProtocolAdapter } from '@airgap/angular-core'
-import { AirGapMarketWallet, ICoinProtocol, ICoinSubProtocol } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, ICoinProtocol, ICoinSubProtocol, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
 import {
   AirGapOnlineProtocol,
   Bip32Extension,
@@ -106,6 +107,13 @@ export function isType<T>(object: unknown, ...fields: string[]): object is T {
 
 export function isSubProtocol(value: ICoinProtocol): value is ICoinSubProtocol {
   return 'isSubProtocol' in value && 'subProtocolType' in value
+}
+
+export function getProtocolAndNetworkIdentifier(
+  protocol: ICoinProtocol | ProtocolSymbols,
+  network?: ProtocolNetwork | string
+): Promise<string> {
+  return _getProtocolAndNetworkIdentifier(RuntimeMode.ONLINE, protocol, network)
 }
 
 // A v0 Wallet holds an untyped public key, the only way to determine if it supports

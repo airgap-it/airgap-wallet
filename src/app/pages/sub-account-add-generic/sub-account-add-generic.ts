@@ -1,8 +1,9 @@
-import { getProtocolAndNetworkIdentifier, ProtocolService } from '@airgap/angular-core'
+import { ProtocolService } from '@airgap/angular-core'
 import { ICoinProtocol, ProtocolSymbols } from '@airgap/coinlib-core'
 import { AirGapSerializedAnyProtocol, implementsInterface } from '@airgap/module-kit'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { getProtocolAndNetworkIdentifier } from 'src/app/utils/utils'
 
 import { DataServiceKey } from '../../services/data/data.service'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
