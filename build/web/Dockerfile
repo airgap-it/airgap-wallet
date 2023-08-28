@@ -1,4 +1,4 @@
-FROM node:16.13.1 as build
+FROM node:16.19.1 as build
 
 # create app directory
 RUN mkdir /app
@@ -12,9 +12,11 @@ COPY apply-diagnostic-modules.js /app
 COPY fix-qrscanner-gradle.js /app
 COPY patch-dependency-versions.js /app
 COPY patch-coinlib.js /app
+COPY copy-builtin-modules.js /app
+COPY browserify-coinlib.js /app
 
 # install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # browserify coin-lib
 RUN npm run browserify-coinlib

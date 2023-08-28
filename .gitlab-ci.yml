@@ -15,7 +15,7 @@ variables:
 stages:
   - build
   - test
-  - qa
+  # - qa
   - platform_build
   - publish
   - deploy
@@ -101,60 +101,60 @@ build-ios:
   tags:
     - ios
 
-build-mac:
-  stage: platform_build
-  when: manual
-  script:
-    - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
-    - nvm use 16
-    - npm install
-    - npm run prepare-prod-build
-    - npm --prefix electron/ install
-    - npm run build:electron:prod
-    - npx cap sync electron
-    - npm --prefix electron/ run build:mac
-  artifacts:
-    name: 'electron_macos'
-    paths:
-      - electron/build/airgap-wallet-$VERSION.dmg
-      - electron/build/airgap-wallet-$VERSION.dmg.blockmap
-      - electron/build/airgap-wallet-$VERSION-mac.zip
-  tags:
-    - ios
+# build-mac:
+#   stage: platform_build
+#   when: manual
+#   script:
+#     - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
+#     - nvm use 16
+#     - npm install
+#     - npm run prepare-prod-build
+#     - npm --prefix electron/ install
+#     - npm run build:electron:prod
+#     - npx cap sync electron
+#     - npm --prefix electron/ run build:mac
+#   artifacts:
+#     name: 'electron_macos'
+#     paths:
+#       - electron/build/airgap-wallet-$VERSION.dmg
+#       - electron/build/airgap-wallet-$VERSION.dmg.blockmap
+#       - electron/build/airgap-wallet-$VERSION-mac.zip
+#   tags:
+#     - ios
 
-build-linux:
-  stage: platform_build
-  when: manual
-  variables:
-    LOCAL_LINUX: 'linux-$CI_PIPELINE_ID'
-  script:
-    - docker build -f build/electron/linux/Dockerfile -t $GOOGLE_TAG_ELECTRON_LINUX_CURRENT --build-arg VERSION="$VERSION" .
-    - docker run --name $LOCAL_LINUX $GOOGLE_TAG_ELECTRON_LINUX_CURRENT echo "container ran."
-    - docker cp $LOCAL_LINUX:/app/electron/build/airgap-wallet-$VERSION.AppImage electron/airgap-wallet-$VERSION.AppImage
-  after_script:
-    - docker rm -f $LOCAL_LINUX || true
-  artifacts:
-    name: 'electron_linux'
-    paths:
-      - electron/airgap-wallet-$VERSION.AppImage
+# build-linux:
+#   stage: platform_build
+#   when: manual
+#   variables:
+#     LOCAL_LINUX: 'linux-$CI_PIPELINE_ID'
+#   script:
+#     - docker build -f build/electron/linux/Dockerfile -t $GOOGLE_TAG_ELECTRON_LINUX_CURRENT --build-arg VERSION="$VERSION" .
+#     - docker run --name $LOCAL_LINUX $GOOGLE_TAG_ELECTRON_LINUX_CURRENT echo "container ran."
+#     - docker cp $LOCAL_LINUX:/app/electron/build/airgap-wallet-$VERSION.AppImage electron/airgap-wallet-$VERSION.AppImage
+#   after_script:
+#     - docker rm -f $LOCAL_LINUX || true
+#   artifacts:
+#     name: 'electron_linux'
+#     paths:
+#       - electron/airgap-wallet-$VERSION.AppImage
 
-build-windows:
-  stage: platform_build
-  when: manual
-  variables:
-    LOCAL_WINDOWS: 'windows-$CI_PIPELINE_ID'
-  script:
-    - docker build -f build/electron/windows/Dockerfile -t $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT --build-arg VERSION="$VERSION" .
-    - docker run --name $LOCAL_WINDOWS $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT echo "container ran."
-    - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe electron/airgap-wallet-$VERSION.exe
-    - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe.blockmap electron/airgap-wallet-$VERSION.exe.blockmap
-  after_script:
-    - docker rm -f $LOCAL_WINDOWS || true
-  artifacts:
-    name: 'electron_windows'
-    paths:
-      - electron/airgap-wallet-$VERSION.exe
-      - electron/airgap-wallet-$VERSION.exe.blockmap
+# build-windows:
+#   stage: platform_build
+#   when: manual
+#   variables:
+#     LOCAL_WINDOWS: 'windows-$CI_PIPELINE_ID'
+#   script:
+#     - docker build -f build/electron/windows/Dockerfile -t $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT --build-arg VERSION="$VERSION" .
+#     - docker run --name $LOCAL_WINDOWS $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT echo "container ran."
+#     - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe electron/airgap-wallet-$VERSION.exe
+#     - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe.blockmap electron/airgap-wallet-$VERSION.exe.blockmap
+#   after_script:
+#     - docker rm -f $LOCAL_WINDOWS || true
+#   artifacts:
+#     name: 'electron_windows'
+#     paths:
+#       - electron/airgap-wallet-$VERSION.exe
+#       - electron/airgap-wallet-$VERSION.exe.blockmap
 
 build-web:
   stage: platform_build
@@ -167,6 +167,8 @@ build-web:
 publish-ios:
   stage: publish
   when: manual
+  needs:
+    - build-ios
   before_script:
     - echo "$IOS_EXPORT_OPTIONS" > exportOptions.plist
   script:
@@ -180,8 +182,6 @@ publish-web-dev:
   stage: publish
   extends: .publish-dev
   when: manual
-  only:
-    - develop
   needs:
     - build-web
 
@@ -189,8 +189,12 @@ publish-web-dev:
 publish-web-prod:
   stage: publish
   extends: .publish-prod
+  when: manual
   needs:
     - build-web
+  only:
+    - master
+    - main
 
 deploy-web-dev:
   stage: deploy
@@ -221,3 +225,6 @@ deploy-web-prod:
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/production/ --recursive
     - kubectl apply -f k8s/airgap-wallet/common/ --recursive
+  only:
+    - master
+    - main
