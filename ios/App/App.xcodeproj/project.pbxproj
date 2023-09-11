@@ -23,8 +23,9 @@
 		88BD9D1325F0CE4800780458 /* PluginCall+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
 		A35472FF29EDA1F700AFD5A7 /* Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35472FE29EDA1F700AFD5A7 /* Hex.swift */; };
+		A3BD9A0F2AA5EB9000666155 /* Dictionary+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3BD9A0E2AA5EB9000666155 /* Dictionary+Additions.swift */; };
 		A3FCA8F329E5B5500012FE3C /* JSValue+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */; };
-		A3FCA8F529E5B5680012FE3C /* WK_Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */; };
+		A3FCA8F529E5B5680012FE3C /* WK+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F429E5B5680012FE3C /* WK+Additions.swift */; };
 		A3FCA8F729E5B57C0012FE3C /* Sequence+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */; };
 		A3FCA8F929E5B5870012FE3C /* JS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8F829E5B5870012FE3C /* JS.swift */; };
 		A3FCA8FB29E5B5980012FE3C /* Filesystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FCA8FA29E5B5980012FE3C /* Filesystem.swift */; };
@@ -59,8 +60,9 @@
 		88BD9D0D25F0CDF900780458 /* SaplingNative.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SaplingNative.m; sourceTree = "<group>"; };
 		88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PluginCall+Additions.swift"; sourceTree = "<group>"; };
 		A35472FE29EDA1F700AFD5A7 /* Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hex.swift; sourceTree = "<group>"; };
+		A3BD9A0E2AA5EB9000666155 /* Dictionary+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Additions.swift"; sourceTree = "<group>"; };
 		A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSValue+Additions.swift"; sourceTree = "<group>"; };
-		A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WK_Additions.swift; sourceTree = "<group>"; };
+		A3FCA8F429E5B5680012FE3C /* WK+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WK+Additions.swift"; sourceTree = "<group>"; };
 		A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Additions.swift"; sourceTree = "<group>"; };
 		A3FCA8F829E5B5870012FE3C /* JS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JS.swift; sourceTree = "<group>"; };
 		A3FCA8FA29E5B5980012FE3C /* Filesystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filesystem.swift; sourceTree = "<group>"; };
@@ -184,8 +186,9 @@
 			children = (
 				88BD9D1225F0CE4800780458 /* PluginCall+Additions.swift */,
 				A3FCA8F229E5B5500012FE3C /* JSValue+Additions.swift */,
-				A3FCA8F429E5B5680012FE3C /* WK_Additions.swift */,
+				A3FCA8F429E5B5680012FE3C /* WK+Additions.swift */,
 				A3FCA8F629E5B57C0012FE3C /* Sequence+Additions.swift */,
+				A3BD9A0E2AA5EB9000666155 /* Dictionary+Additions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -363,10 +366,11 @@
 				A3FCA90C29E5C2A40012FE3C /* JSModule.swift in Sources */,
 				881CF03124530A4D007A5381 /* AppInfo.swift in Sources */,
 				A3FCA90129E5C2890012FE3C /* IsolatedModules.swift in Sources */,
+				A3BD9A0F2AA5EB9000666155 /* Dictionary+Additions.swift in Sources */,
 				A3FCA8F329E5B5500012FE3C /* JSValue+Additions.swift in Sources */,
 				A3FCA8F729E5B57C0012FE3C /* Sequence+Additions.swift in Sources */,
 				88BD9D0E25F0CDF900780458 /* SaplingNative.m in Sources */,
-				A3FCA8F529E5B5680012FE3C /* WK_Additions.swift in Sources */,
+				A3FCA8F529E5B5680012FE3C /* WK+Additions.swift in Sources */,
 				88BD9D1325F0CE4800780458 /* PluginCall+Additions.swift in Sources */,
 				A3FCA8F929E5B5870012FE3C /* JS.swift in Sources */,
 				A3FCA90029E5C2890012FE3C /* FileExplorer.swift in Sources */,

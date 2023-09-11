@@ -84,12 +84,13 @@ export class IsolatedModulesListPage implements OnInit, ViewWillEnter, ViewWillL
   }
 
   public async onModuleSelected(metadata: IsolatedModuleMetadata): Promise<void> {
+    const mode = metadata.type === 'asset' ? IsolatedModulesDetailsMode.VIEW_ASSET : IsolatedModulesDetailsMode.VIEW_INSTALLED
     this.dataService.setData(DataServiceKey.DETAIL, {
       metadata,
-      mode: IsolatedModulesDetailsMode.VIEW_INSTALLED
+      mode
     })
     this.router
-      .navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${IsolatedModulesDetailsMode.INSTALL}`)
+      .navigateByUrl(`/isolated-modules-details/${DataServiceKey.DETAIL}/${mode}`)
       .catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
