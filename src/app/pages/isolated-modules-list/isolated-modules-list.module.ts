@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { Injector, NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
-import { PushPipe } from '@ngrx/component'
+import { LetDirective, PushPipe } from '@ngrx/component'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
@@ -18,6 +18,7 @@ import { IsolatedModulesListPage } from './isolated-modules-list.page'
     IonicModule,
     IsolatedModulesListPageRoutingModule,
     TranslateModule,
+    LetDirective,
     PushPipe,
     ComponentsModule,
     AirGapAngularCoreModule
