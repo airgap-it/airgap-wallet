@@ -139,14 +139,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/scan-address/scan-address.module').then((m) => m.ScanAddressPageModule)
   },
   {
-    path: 'exchange-confirm/:id',
-    resolve: {
-      special: DataResolverService
-    },
-    canActivate: [ServiceKeyGuard],
-    loadChildren: () => import('./pages/exchange-confirm/exchange-confirm.module').then((m) => m.ExchangeConfirmPageModule)
-  },
-  {
     path: 'transaction-confirm/:id',
     resolve: {
       special: DataResolverService
@@ -173,14 +165,6 @@ const routes: Routes = [
     },
     canActivate: [ServiceKeyGuard],
     loadChildren: () => import('./pages/delegation-list/delegation-list.module').then((m) => m.DelegationListPageModule)
-  },
-  {
-    path: 'exchange-select',
-    loadChildren: () => import('./pages/exchange-select/exchange-select.module').then((m) => m.ExchangeSelectPageModule)
-  },
-  {
-    path: 'exchange-custom',
-    loadChildren: () => import('./pages/exchange-custom/exchange-custom.module').then((m) => m.ExchangeCustomPageModule)
   },
   {
     path: 'ledger-sign/:id',

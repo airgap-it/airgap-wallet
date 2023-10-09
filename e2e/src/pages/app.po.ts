@@ -15,10 +15,6 @@ export class AppPage extends PageObjectBase {
     return this.clickButton('#tab-button-scan')
   }
 
-  public async clickExchangeTab(): Promise<void> {
-    return this.clickButton('#tab-button-exchange')
-  }
-
   public async clickSettingsTab(): Promise<void> {
     return this.clickButton('#tab-button-settings')
   }

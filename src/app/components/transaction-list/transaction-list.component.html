@@ -12,12 +12,6 @@
   </ion-col>
 </ion-row>
 
-<ion-row class="ion-padding-horizontal" *ngIf="transactionType === 'exchangeTransaction' && hasExchangeTransactions">
-  <ion-text class="font--weight__bold" color="primary">
-    <p>{{ 'account-transaction-list.pending-exchange-transactions.label' | translate }}</p>
-  </ion-text>
-</ion-row>
-
 <ion-list lines="none" class="ion-padding-bottom" *ngIf="transactions !== undefined && transactions.length > 0">
   <ng-container *ngFor="let tx of transactions">
     <transaction-item [tx]="tx" [transactionType]="transactionType" (click)="openTransactionDetailPage(tx)"></transaction-item>

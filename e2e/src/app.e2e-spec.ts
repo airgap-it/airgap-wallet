@@ -79,14 +79,6 @@ describe('AirGap Wallet', () => {
     await page.takeScreenshot('scan')
   })
 
-  it('should open exchange page', async () => {
-    await page.clickDismissButton()
-
-    await page.clickExchangeTab()
-
-    await page.takeScreenshot('exchange')
-  })
-
   it('should open settings page', async () => {
     await page.clickDismissButton()
 

@@ -24,7 +24,7 @@ import {
 } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
 import { BigNumber } from 'bignumber.js'
-import { Subscription, timer } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { BrowserService } from 'src/app/services/browser/browser.service'
@@ -43,8 +43,6 @@ import { PushBackendProvider } from '../../services/push-backend/push-backend'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageService } from '../../services/storage/storage'
 
-import { ExchangeProvider } from './../../services/exchange/exchange'
-
 export const refreshRate = 3000
 
 @Component({
@@ -56,7 +54,7 @@ export class AccountTransactionListPage {
   public mainProtocolSymbols: typeof MainProtocolSymbols = MainProtocolSymbols
   public subProtocolSymbols: typeof SubProtocolSymbols = SubProtocolSymbols
 
-  private readonly timer$ = timer(0, refreshRate)
+  // private readonly timer$ = timer(0, refreshRate)
   private readonly subscription: Subscription = new Subscription()
 
   public isRefreshing: boolean = false
@@ -78,12 +76,6 @@ export class AccountTransactionListPage {
 
   public get hasPendingTransactions(): boolean {
     return this.pendingTransactions.length > 0
-  }
-
-  public formattedExchangeTransactions: IAirGapTransaction[] = []
-
-  public get hasExchangeTransactions(): boolean {
-    return this.formattedExchangeTransactions.length > 0
   }
 
   public accountExtendedDetails: UIAccountExtendedDetails
@@ -128,7 +120,6 @@ export class AccountTransactionListPage {
     private readonly platform: Platform,
     private readonly storageProvider: WalletStorageService,
     private readonly pushBackendProvider: PushBackendProvider,
-    private readonly exchangeProvider: ExchangeProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService,
     private readonly storageService: InternalStorageService,
@@ -159,15 +150,6 @@ export class AccountTransactionListPage {
     this.walletChanged = accountProvider.walletChangedObservable.subscribe(() => {
       this.loadInitialTransactions(true)
       this.updateExtendedDetails()
-    })
-
-    this.subscription = this.timer$.subscribe(async () => {
-      if (this.hasExchangeTransactions) {
-        this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-          this.wallet.protocol.identifier,
-          this.wallet.addresses[0]
-        )
-      }
     })
 
     this.protocolIdentifier = this.wallet.protocol.identifier
@@ -329,11 +311,6 @@ export class AccountTransactionListPage {
     try {
       this.pendingTransactions = (await this.pushBackendProvider.getPendingTxs(addr, this.protocolIdentifier)) as IAirGapTransaction[]
     } catch (err) {}
-
-    this.formattedExchangeTransactions = await this.exchangeProvider.getExchangeTransactionsByProtocol(
-      this.wallet.protocol.identifier,
-      this.wallet.addresses[0]
-    )
 
     // remove duplicates from pendingTransactions
     const txHashes: string[] = this.transactions.map((value) => value.hash)
