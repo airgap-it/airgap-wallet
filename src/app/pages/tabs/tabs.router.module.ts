@@ -27,15 +27,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'exchange',
-        children: [
-          {
-            path: '',
-            loadChildren: () => import('../exchange/exchange.module').then((m) => m.ExchangePageModule)
-          }
-        ]
-      },
-      {
         path: 'settings',
         children: [
           {

@@ -30,9 +30,6 @@ export class TransactionListComponent {
   public hasPendingTransactions: boolean = false
 
   @Input()
-  public hasExchangeTransactions: boolean = false
-
-  @Input()
   public initialTransactionsLoaded: boolean = false
 
   @Input()

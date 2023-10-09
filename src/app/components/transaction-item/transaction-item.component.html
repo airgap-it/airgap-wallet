@@ -1,12 +1,7 @@
 <ion-item>
-  <ion-avatar slot="start" *ngIf="transactionType !== 'exchangeTransaction'">
+  <ion-avatar slot="start">
     <airgap-identicon *ngIf="tx.isInbound" [address]="tx.from[0]"></airgap-identicon>
     <airgap-identicon *ngIf="!tx.isInbound" [address]="tx.to[0]"></airgap-identicon>
-  </ion-avatar>
-
-  <ion-avatar slot="start" *ngIf="transactionType === 'exchangeTransaction'">
-    <airgap-identicon *ngIf="tx.isInbound" [address]="tx.to[0]"></airgap-identicon>
-    <airgap-identicon *ngIf="!tx.isInbound" [address]="tx.from[0]"></airgap-identicon>
   </ion-avatar>
   <ion-label>
     <h2>
@@ -22,28 +17,17 @@
         {{ tx.status }}
       </ion-badge>
       <ng-container *ngIf="!tx.status || tx.status === 'applied'">
-        <h3 class="typography--mono" *ngIf="transactionType !== 'exchangeTransaction'">
+        <h3 class="typography--mono">
           <ng-container *ngIf="tx.isInbound">
             {{ tx.from[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
           </ng-container>
           <ng-container *ngIf="!tx.isInbound">
             {{ tx.to[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
-          </ng-container>
-        </h3>
-        <h3 class="typography--mono" *ngIf="transactionType === 'exchangeTransaction'">
-          <ng-container *ngIf="tx.isInbound">
-            {{ tx.to[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
-          </ng-container>
-          <ng-container *ngIf="!tx.isInbound">
-            {{ tx.from[0] | shortenString: { ifMatches: protocol?.addressValidationPattern } }}
           </ng-container>
         </h3>
       </ng-container>
     </ion-text>
   </ion-label>
-  <p slot="end" *ngIf="transactionType === 'exchangeTransaction'">
-    {{ tx.extra }}
-  </p>
   <ion-row class="items--right" slot="end" *ngIf="transactionType === 'normalTransaction'">
     <ion-col class="ion-no-padding">
       <ion-row class="ion-justify-content-end">

@@ -2,7 +2,6 @@ import { InjectionToken } from '@angular/core'
 import { ActionReducer, ActionReducerMap, MetaReducer } from '@ngrx/store'
 import { environment } from 'src/environments/environment'
 import * as fromApp from '../app/app.reducer'
-import * as fromExchange from '../app/pages/exchange/reducer'
 
 export interface State {
   app: fromApp.State
@@ -27,7 +26,6 @@ export const metaReducers: MetaReducer<State>[] = !environment.production ? [log
 
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State>>('Root reducers token', {
   factory: () => ({
-    app: fromApp.reducer,
-    exchange: fromExchange.reducer
+    app: fromApp.reducer
   })
 })

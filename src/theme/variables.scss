@@ -127,15 +127,6 @@
     --max-width: calc(100% - 32px);
   }
 
-  /* no padding and margin for small buttons */
-  page-exchange {
-    .button-small {
-      --padding-start: 0;
-      --padding-end: 0;
-      margin: 0;
-    }
-  }
-
   ion-split-pane {
     --side-max-width: 10vw;
   }
@@ -147,7 +138,6 @@
   page-account-address,
   page-transaction-qr,
   page-beacon-request,
-  page-exchange-custom,
   page-transaction-qr,
   page-collectibles-list,
   page-collectibles-item {

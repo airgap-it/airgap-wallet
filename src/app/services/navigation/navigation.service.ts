@@ -8,7 +8,6 @@ const rootPath: string = '/tabs/portfolio'
 
 const paths: { path: string; prevPath: string }[] = [
   { path: '/tabs/settings', prevPath: rootPath },
-  { path: '/tabs/exchange', prevPath: rootPath },
   { path: '/tabs/scan', prevPath: rootPath },
   { path: '/about', prevPath: '/tabs/settings' },
   { path: '/health-check', prevPath: '/tabs/settings' },
