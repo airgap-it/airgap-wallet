@@ -18,6 +18,9 @@
     <p>
       {{ 'account-transaction-list.mtpelerin.note_description' | translate }}
     </p>
+    <span>
+      <a (click)="navigate('https://developers.mtpelerin.com/service-information/supported-countries')">{{ 'mtpelerin.noteLink1' | translate }}</a>, <a (click)="navigate('https://www.mtpelerin.com/terms-conditions')">{{ 'mtpelerin.noteLink2' | translate }}</a>
+    </span>
   </ion-row>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
