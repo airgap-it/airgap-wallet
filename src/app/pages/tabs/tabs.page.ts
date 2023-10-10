@@ -3,7 +3,6 @@ import { IonTabs, ModalController, Platform } from '@ionic/angular'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
-import { ExchangePage } from '../exchange/exchange'
 import { IntroductionPage } from '../introduction/introduction'
 import { PortfolioPage } from '../portfolio/portfolio'
 import { ScanPage } from '../scan/scan'
@@ -19,7 +18,6 @@ export class TabsPage {
 
   public tab1Root = PortfolioPage
   public tab2Root = ScanPage
-  public tab3Root = ExchangePage
   public tab4Root = SettingsPage
 
   public isMobile = false

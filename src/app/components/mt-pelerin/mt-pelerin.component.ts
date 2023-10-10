@@ -22,4 +22,8 @@ export class MtPelerinComponent {
       this.dismiss()
     }
   }
+
+  public navigate(path: string) {
+    window.open(path, '_blank')
+  }
 }

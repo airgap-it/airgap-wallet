@@ -51,7 +51,6 @@ import { Diagnostic } from '@ionic-native/diagnostic/ngx'
 import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular'
 import { Drivers } from '@ionic/storage'
 import { IonicStorageModule } from '@ionic/storage-angular'
-import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { ZXingScannerModule } from '@zxing/ngx-scanner'
@@ -72,8 +71,6 @@ import {
 import { ComponentsModule } from './components/components.module'
 import { appConfig } from './config/app-config'
 import { BeaconRequestPageModule } from './pages/beacon-request/beacon-request.module'
-import { ExchangeSelectPageModule } from './pages/exchange-select/exchange-select.module'
-import { ExchangeEffects } from './pages/exchange/effects'
 import { IntroductionPushPageModule } from './pages/introduction-push/introduction-push.module'
 import { IsolatedModulesOnboardingPageModule } from './pages/isolated-modules-onboarding/isolated-modules-onboarding.module'
 import { ProtocolSelectPageModule } from './pages/protocol-select/protocol-select.module'
@@ -83,7 +80,6 @@ import { AccountProvider } from './services/account/account.provider'
 import { ThemeService } from './services/appearance/theme.service'
 import { CoinlibService } from './services/coinlib/coinlib.service'
 import { WalletEnvironmentService } from './services/environment/wallet-environment.service'
-import { ExchangeProvider } from './services/exchange/exchange'
 import { ExtensionsService } from './services/extensions/extensions.service'
 import { ProtocolGuard } from './services/guard/protocol.guard'
 import { ServiceKeyGuard } from './services/guard/serviceKey.guard'
@@ -130,7 +126,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
         strictActionImmutability: false
       }
     }),
-    EffectsModule.forRoot([ExchangeEffects]),
     ZXingScannerModule,
     MomentModule,
     IonicModule.forRoot(),
@@ -151,7 +146,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     ComponentsModule,
     ProtocolSelectPageModule,
     BeaconRequestPageModule,
-    ExchangeSelectPageModule,
     IntroductionPushPageModule,
     IsolatedModulesOnboardingPageModule
   ],
@@ -187,7 +181,6 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     DeeplinkService,
     OperationsProvider,
     ExtensionsService,
-    ExchangeProvider,
     CoinlibService,
     PushProvider,
     PushBackendProvider,

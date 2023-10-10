@@ -20,9 +20,6 @@
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",
       "open-blockexplorer_label": "Open Blockexplorer"
     },
-    "pending-exchange-transactions": {
-      "label": "Pending Exchange Transactions"
-    },
     "receive_label": "Receive",
     "send_label": "Send",
     "tx_not_loading": "The transactions can currently not be loaded, please refer to the block explorer to view the latest transactions",
@@ -211,11 +208,13 @@
     "paragraph1": "Invest in Bitcoin, Ether and the most popular assets on multiple chains in a few clicks, at the best prices on the market and no KYC required. Withdraw them at any time in 14 currencies back on your bank account in 171 countries.",
     "header2": "Simple and transparent",
     "lineItem1": "No identification required",
-    "lineItem2": "Live, transparent exchange rate",
+    "lineItem2": "Live, transparent rates",
     "lineItem3": "Make a payment, get crypto directly on AirGap",
     "button1": "Learn more about buying",
     "button2": "Learn more about selling",
-    "note": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe."
+    "note": "Note – Mt. Pelerin accepts clients from all countries, except US and Russian persons, and residents of: Afghanistan, Belarus, Burundi, Central African Republic, Cuba, Democratic Republic of the Congo, Guinea, Guinea-Bissau, Iran, Iraq, Lebanon, Libya, Mainland China (Hong Kong and Taiwan accepted), Mali, Myanmar, Nicaragua, North Korea, Russia, Somalia, Sudan, South Sudan, Syria, Venezuela, Yemen, Zimbabwe.",
+    "noteLink1": "Further information",
+    "noteLink2": "Terms & Conditions"
   },
   "qr-settings-page": {
     "title": "QR Settings"
@@ -387,8 +386,7 @@
     "wallets": "Accounts",
     "scan": "Scan QRs",
     "ledger_import": "Ledger Import",
-    "settings": "Settings",
-    "exchange": "Exchange"
+    "settings": "Settings"
   },
   "add-account": {
     "title": "Add Coins"
@@ -476,102 +474,12 @@
     "empty_text": "You have added all <strong>{{tokenName}}</strong> accounts for all your accounts",
     "import-all_label": "Import All"
   },
-  "exchange": {
-    "title": "Exchange",
-    "exchange_label": "Exchange",
-    "liquidity": {
-      "add_label": "Add Liquidity",
-      "remove_label": "Remove Liquidity",
-      "swap_label": "Swap"
-    },
-    "powered-by_label": "powered by",
-    "switch-exchange_label": "Exchange",
-    "onboarding": {
-      "heading": "You can exchange your <span class=\"style__strong color__primary\">Ethereum</span> to <span class=\"style__strong color__primary\">Bitcoin</span> and do other exchanges.",
-      "description": "Easily swap all supported crypto currencies directly inside AirGap.",
-      "exchange_label": "Start Exchanging"
-    },
-    "no-currencies": {
-      "heading": "In order to exchange, you need at least two currencies in AirGap like <span class=\"style__strong color__primary\">Ethereum</span> and <span class=\"style__strong color__primary\">Bitcoin</span>.",
-      "description": "Before you can easily swap currencies in AirGap you need to add at least two different ones.",
-      "exchange_label": "Add Coins"
-    },
-    "no-currencies-liquidity": {
-      "heading": "To provide liquidity to the Tezos Liquidity Baking, you need both <span class=\"style__strong color__primary\">Tez</span> and <span class=\"style__strong color__primary\">tzBTC</span> in AirGap.",
-      "description": "Before you can provide or remove liquidty in AirGap you need to add both Tez and tzBTC",
-      "exchange_label": "Add Coins"
-    },
-    "loading": {
-      "setup": "Setting up exchange...",
-      "header": "Loading Error",
-      "message": "It seems that no exchange could currently be set up, please excuse the inconvenience and try again later. <span class=\"style__strong color__secondary\">Note that you need to first add an account of the respective tokens you want to swap</span>"
-    }
-  },
-  "swap": {
-    "min-amount_label": "(min. {{minExchangeAmount}})",
-    "available_label": "{{minExchangeAmount}} ",
-    "sell_label": "Sell",
-    "buy_label": "Buy",
-    "currently_not_supported": "The selected trading pair is currently not supported",
-    "min-amount-error_label": "The minimum amount is {{minExchangeAmount}}",
-    "amount-higher-than-balance-error_label": "The amount you entered is higher than your account balance {{accountBalance}}"
-  },
   "remove-liquidity": {
     "receive": "You receive"
   },
   "protocol-select": {
     "title": "Select Coin",
     "swap_info": "In order to swap tokens of a certain kind, you need to first add an account of the respective token"
-  },
-  "exchange-select": {
-    "title": "Select Exchange"
-  },
-  "exchange-confirm": {
-    "title": "Confirm Exchange",
-    "confirm-exchange_label": "Confirm Exchange",
-    "heading": "This is your Exchange summary, you need to sign it with <span class=\"style__strong color__primary\">AirGap Vault</span> to complete the exchange.",
-    "sell_label": "From",
-    "sell-amount_label": "Amount",
-    "fee_label": "Fee",
-    "exchange-address_label": "Exchange Address",
-    "buy-amount_label": "Buy Amount",
-    "receiving-to_label": "Receiving to",
-    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-    "changelly_disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-    "changenow_disclaimer": "Exchange services provided by ChangeNow. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">ChangeNow AML/KYC</span>."
-  },
-  "exchange-custom": {
-    "title": "Select a Gatekeeper",
-    "text": "Exchange to tzBTC is not directly supported in AirGap yet but you can swap at one of the following Gatekeepers.",
-    "confirm-exchange_label": "Confirm Exchange",
-    "heading": "In-App tzBTC swap not yet supported",
-    "bitcoin-suisse": {
-      "title": "Bitcoin Suisse",
-      "text": "Founded in 2013, Bitcoin Suisse has been a pioneer in providing crypto-financial services. Bitcoin Suisse has helped to shape the crypto-and blockchain-ecosystem in Switzerland. To receive TZBTC, you need to be fully onboarded as customer incl. all KYC /AML documentation. The minimum amount for trading with Bitcoin Suisse is 1 BTC or 1 TZBTC. Trading fees apply for each transaction."
-    },
-    "bity": {
-      "title": "Bity",
-      "text": "Founded in 2014, Bity SA is a leading crypto-financial services provider. It was founded on the conviction that blockchains, and other technologies for decentralization, will have some of the most profound social implications in history. As a regulated Swiss financial intermediary, Bity offers crypto-financial services and products for individuals and businesses globally, empowering people to always be in complete control of their own funds."
-    },
-    "sygnum": {
-      "title": "Sygnum",
-      "text": "Sygnum is the world's first digital asset bank, and a digital asset specialist with global reach. Sygnum offers a portfolio of regulated banking services which seamlessly integrates traditional and digital assets into one account, including major national currencies, Bitcoin, Ethereum, a Digital CHF and asset tokens. Founded on Swiss and Singapore heritage, Sygnum empowers institutional clients to invest in the digital asset economy with complete trust."
-    },
-    "taurus": {
-      "title": "Taurus",
-      "text": "Taurus Group SA is a leading Swiss company in digital assets and blockchain. It was founded by senior executives with a background in banking, IT, cybersecurity and regulation. Taurus offers enterprise-grade financial market infrastructure solutions for digital assets as well as financial services to institutional clients."
-    },
-    "woorton": {
-      "title": "Woorton",
-      "text": "Woorton provides 24/7 cryptocurrency liquidity via API or voice trading. Their bank-grade trading infrastructure allows them to deploy capital on exchanges with proprietary trading algorithms and enhance the liquidity of all types of assets. They offer seamless access to digital assets and provide investors, brokerage desks and payments providers around the world. Woorton provides liquidity in tzBTC against 20 currencies including BTC, ETH, USD, EUR, CHF, GBP, stablecoins and more."
-    },
-    "disclaimer": "Exchange services provided by Changelly. By clicking Confirm Exchange, I acknowledge and understand that my transaction may trigger AML/KYC verification according to <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-    "get-tzbtc": "Get tzBTC From {{Gatekeeper}}"
-  },
-  "exchange-quipuswap": {
-    "slippage-tolerance": {
-      "label": "Slippage tolerance"
-    }
   },
   "delegation-detail": {
     "title": "{{ delegateeLabel }} Detail",

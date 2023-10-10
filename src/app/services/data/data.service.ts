@@ -9,7 +9,6 @@ export enum DataServiceKey {
   PROTOCOL = 'protocol',
   DETAIL = 'detail',
   INTERACTION = 'interaction',
-  EXCHANGE = 'exchange',
   TRANSACTION = 'transaction',
   SCAN = 'scan',
   WALLET = 'wallet'

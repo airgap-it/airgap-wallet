@@ -18,16 +18,13 @@ import { DappPeerComponent } from './dapp-peer/dapp-peer.component'
 import { DelegateActionPopoverComponent } from './delegate-action-popover/delegate-action-popover.component'
 import { DelegateEditPopoverComponent } from './delegate-edit-popover/delegate-edit-popover.component'
 import { EmptyStateComponent } from './empty-state/empty-state'
-import { ExchangeSelectionComponent } from './exchange-selection/exchange-selection.component'
 import { FeeComponent } from './fee/fee.component'
 import { FromToComponent } from './from-to/from-to.component'
 import { InteractionSelectionComponent } from './interaction-selection/interaction-selection.component'
 import { OptimismERC20Form } from './optimism-erc20-form/optimism-erc20-form.component'
 import { PermissionRequestComponent } from './permission-request/permission-request.component'
 import { PortfolioItemComponent } from './portfolio-item/portfolio-item'
-import { RemoveLiquidityComponent } from './remove-liquidity/remove-liquidity.component'
 import { SignedTransactionComponent } from './signed-transaction/signed-transaction'
-import { SwapComponent } from './swap/swap'
 import { TezosDelegationCard } from './tezos-delegation-card/tezos-delegation-card'
 import { TezosFAForm } from './tezos-fa-form/tezos-fa-form.component'
 import { TezosSaplingContractForm } from './tezos-sapling-contract-form/tezos-sapling-contract-form.component'
@@ -53,7 +50,6 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
 @NgModule({
   declarations: [
     PortfolioItemComponent,
-    SwapComponent,
     AccountEditPopoverComponent,
     AmountComponent,
     CardActionableComponent,
@@ -86,8 +82,6 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
     WidgetInputText,
     WidgetRewardList,
     WidgetOptionButtonGroup,
-    RemoveLiquidityComponent,
-    ExchangeSelectionComponent,
     MtPelerinComponent,
     FlipCardComponent,
     FlipCardFrontComponent,
@@ -110,7 +104,6 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
   exports: [
     PortfolioItemComponent,
     AmountComponent,
-    SwapComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,
     EmptyStateComponent,
@@ -141,8 +134,6 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
     WidgetInputText,
     WidgetRewardList,
     WidgetOptionButtonGroup,
-    RemoveLiquidityComponent,
-    ExchangeSelectionComponent,
     MtPelerinComponent,
     FlipCardComponent,
     FlipCardFrontComponent,
