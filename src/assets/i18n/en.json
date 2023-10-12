@@ -190,11 +190,6 @@
       "label": "Interaction Setting",
       "text": "Vault and Wallet Interaction Settings"
     },
-    "trading_settings": {
-      "label": "Trading",
-      "text": "Advanced Trading Settings",
-      "mtpelerin": "Use Mt Pelerin"
-    },
     "add-ons_settings": {
       "label": "Add-ons",
       "isolated-modules_text": "Isolated Modules"

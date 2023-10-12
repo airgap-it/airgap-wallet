@@ -1,10 +1,4 @@
-import {
-  createV0TezosKtProtocol,
-  ICoinSubProtocolAdapter,
-  InternalStorageKey,
-  InternalStorageService,
-  ProtocolService
-} from '@airgap/angular-core'
+import { createV0TezosKtProtocol, ICoinSubProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import { AirGapMarketWallet, IAirGapTransaction, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { Action } from '@airgap/coinlib-core/actions/Action'
 import { IAirGapAddressResult } from '@airgap/coinlib-core/interfaces/IAirGapAddress'
@@ -122,7 +116,6 @@ export class AccountTransactionListPage {
     private readonly pushBackendProvider: PushBackendProvider,
     private readonly extensionsService: ExtensionsService,
     private readonly browserService: BrowserService,
-    private readonly storageService: InternalStorageService,
     private readonly modalController: ModalController
   ) {
     this.isDesktop = this.platform.is('desktop')
@@ -165,18 +158,6 @@ export class AccountTransactionListPage {
     this.actionGroup = new ActionGroup(this)
     this.actionGroup.getActions().then((actions) => {
       this.actions = actions
-    })
-
-    // Mt Perelin
-    this.storageService.get(InternalStorageKey.SETTINGS_TRADING_USE_MTPELERIN).then((active) => {
-      if (active) {
-        this.storageProvider.getCache('mtperelin-currencies').then((savedCurrencies) => {
-          this.wallet.protocol.getSymbol().then((symbol) => {
-            const validCurrency = Object.values(savedCurrencies).find((currency) => currency.symbol === symbol)
-            this.isMtPerelinActive = !!active && !!validCurrency
-          })
-        })
-      }
     })
   }
 
@@ -433,22 +414,6 @@ export class AccountTransactionListPage {
       modal.onDidDismiss().then(() => {
         resolve()
       })
-    })
-  }
-
-  public async buyMtPerelin() {
-    this.wallet.protocol.getSymbol().then(async (symbol) => {
-      const url = `https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&rfr=bcH4RmHm`
-      await this.openModal(url)
-      // window.open(`https://buy.mtpelerin.com/?type=direct-link&bdc=${symbol}&rfr=bcH4RmHm`, '_blank')
-    })
-  }
-
-  public async sellMtPerelin() {
-    this.wallet.protocol.getSymbol().then(async (symbol) => {
-      const url = `https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`
-      await this.openModal(url)
-      // window.open(`https://sell.mtpelerin.com/?type=direct-link&tab=sell&ssc=${symbol}&rfr=bcH4RmHm`, '_blank')
     })
   }
 }
