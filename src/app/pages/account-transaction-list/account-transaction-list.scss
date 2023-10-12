@@ -27,21 +27,3 @@ ion-fab {
 svg {
   stroke: none;
 }
-
-.mt-perelin-button {
-  border: 1px solid gray;
-  border-radius: 100px;
-  
-  div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-    font-size: 12px;
-    color: rgb(83, 83, 83);
-
-    img {
-      height: 18px;
-    }
-  }
-}
