@@ -61,6 +61,7 @@
   },
   "introduction": {
     "title": "Self custody made simple and secure",
+    "title_mobile":"Interaction with the Vault",
     "highest": {
       "label": "Highest Security",
       "text": "With the AirGap <b>two device approach</b> secure key handling becomes more accessible.",
@@ -82,7 +83,11 @@
     },
     "communication": {
       "highest_text": "One-way communication with QR codes.",
-      "medium_text": "Secure communication through app switching."
+      "medium_text": "Secure communication through app switching.",
+      "highest_heading": "Two Device approach",
+      "medium_heading": "Same Device Approach",
+      "highest_expanded_text": "Sign transactions completely offline on a device without any network connectivity with the AirGap knox or AirGap Vault application and broadcast them with your everyday smartphone with the AirGap Wallet app. The communication between the two devices happens via transparent QR codes.",
+      "medium_expanded_text": "Instead of installing AirGap Vault on an offline device, you can also install AirGap Vault and AirGap Wallet on your everyday smartphone(same device) and profit from added security through application sandboxing and app switching for communication. "
     },
     "vault-install_label": "Install AirGap Vault",
     "continue_label": "Let's Go"
