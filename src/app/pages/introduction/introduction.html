@@ -1,6 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>{{ 'introduction.title' | translate }}</ion-title>
+    <ion-title *ngIf="isDesktop">{{ 'introduction.title' | translate }}</ion-title>
+    <h3 *ngIf="!isDesktop" style="margin-left: 10px;">{{ 'introduction.title_mobile' | translate }}</h3>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()" color="secondary">
         <ion-icon name="close-outline"></ion-icon>
@@ -19,37 +20,20 @@
     </ion-segment-button>
   </ion-segment>
 
-  <ng-container *ngIf="security === 'highest'">
+  <ng-container *ngIf="isDesktop">
     <ion-row>
-      <p [innerHTML]="'introduction.highest.text' | translate" *ngIf="!isDesktop"></p>
       <p [innerHTML]="'introduction.highest.desktop_text' | translate" *ngIf="isDesktop"></p>
     </ion-row>
 
     <ion-row class="ion-padding-top ion-align-items-center">
       <ion-col size="5" *ngIf="isDesktop"><img src="./assets/img/airgap_onboarding_wallet-notebook.svg" /></ion-col>
-      <ion-col size="5" *ngIf="!isDesktop"><img src="./assets/img/airgap_onboarding_wallet.svg" /></ion-col>
+
       <ion-col size="7">
         <h5>{{ 'introduction.wallet.heading' | translate }}</h5>
         <p [innerHTML]="'introduction.wallet.text' | translate"></p>
       </ion-col>
     </ion-row>
 
-    <ng-container *ngIf="!isDesktop">
-      <ion-row class="ion-padding-vertical ion-align-items-center">
-        <ion-col size="5" class="ion-text-center"><img class="connector--img" src="./assets/img/qrcode.svg" /></ion-col>
-        <ion-col size="7">
-          <strong>{{ 'introduction.communication.highest_text' | translate }}</strong>
-        </ion-col>
-      </ion-row>
-
-      <ion-row class="ion-align-items-center">
-        <ion-col size="5"><img src="./assets/img/airgap_onboarding_vault.svg" /></ion-col>
-        <ion-col size="7">
-          <h5>{{ 'introduction.vault.heading' | translate }}</h5>
-          <p [innerHTML]="'introduction.vault.text' | translate"></p>
-        </ion-col>
-      </ion-row>
-    </ng-container>
     <ng-container *ngIf="isDesktop">
       <ion-row class="ion-align-items-center">
         <ion-col size="5"><img src="./assets/img/signer-vault-ledger-desktop.svg" /></ion-col>
@@ -61,33 +45,16 @@
     </ng-container>
   </ng-container>
 
-  <ng-container *ngIf="security === 'medium'">
-    <ion-row>
-      <p [innerHTML]="'introduction.medium.text' | translate"></p>
-    </ion-row>
+  <ng-container *ngIf=" security === 'highest' && !isDesktop">
+    <h5>{{ 'introduction.communication.highest_heading' | translate }}</h5>
+    <p [innerHTML]="'introduction.communication.highest_expanded_text' | translate"></p>
+    <img src="./assets/img/airgap_onboarding_wallet_highest.svg" />
+  </ng-container>
 
-    <ion-row class="ion-padding-top ion-align-items-center">
-      <ion-col size="5"><img src="./assets/img/airgap_onboarding_wallet.svg" /></ion-col>
-      <ion-col size="7">
-        <h5>{{ 'introduction.wallet.heading' | translate }}</h5>
-        <p [innerHTML]="'introduction.wallet.text' | translate"></p>
-      </ion-col>
-    </ion-row>
-
-    <ion-row class="ion-padding-vertical ion-align-items-center">
-      <ion-col size="5" class="ion-text-center"><img class="connector--img" src="./assets/img/clone.svg" /></ion-col>
-      <ion-col size="7">
-        <strong>{{ 'introduction.communication.medium_text' | translate }}</strong>
-      </ion-col>
-    </ion-row>
-
-    <ion-row class="ion-align-items-center">
-      <ion-col size="5"><img src="./assets/img/airgap_onboarding_vault.svg" /></ion-col>
-      <ion-col size="7">
-        <h5>{{ 'introduction.vault.heading' | translate }}</h5>
-        <p [innerHTML]="'introduction.vault.text' | translate"></p>
-      </ion-col>
-    </ion-row>
+  <ng-container *ngIf="security === 'medium' && !isDesktop">
+    <h5>{{ 'introduction.communication.medium_heading' | translate }}</h5>
+    <p [innerHTML]="'introduction.communication.medium_expanded_text' | translate"></p>
+    <img src="./assets/img/airgap_onboarding_wallet_medium.svg" />
   </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
