@@ -157,6 +157,7 @@ export class AccountTransactionListPage {
 
     this.actionGroup = new ActionGroup(this)
     this.actionGroup.getActions().then((actions) => {
+      console.log('constructor', actions)
       this.actions = actions
     })
   }

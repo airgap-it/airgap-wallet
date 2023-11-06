@@ -28,7 +28,8 @@ import * as fromCollectiblesItem from './collectibles-item.reducers'
     AirGapAngularCoreModule,
     AirGapAngularNgRxModule,
     StoreModule.forFeature('collectiblesItem', fromCollectiblesItem.reducer),
-    EffectsModule.forFeature([CollectiblesItemEffects])
+    EffectsModule.forFeature([CollectiblesItemEffects]),
+    EffectsModule.forRoot([])
   ],
   declarations: [CollectiblesItemPage]
 })
