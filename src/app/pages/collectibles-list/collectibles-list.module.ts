@@ -30,7 +30,8 @@ import * as fromCollectiblesList from './collectibles-list.reducers'
     AirGapAngularNgRxModule,
     PipesModule,
     StoreModule.forFeature('collectiblesList', fromCollectiblesList.reducer),
-    EffectsModule.forFeature([CollectiblesListEffects])
+    EffectsModule.forFeature([CollectiblesListEffects]),
+    EffectsModule.forRoot([])
   ],
   declarations: [CollectiblesListPage]
 })
