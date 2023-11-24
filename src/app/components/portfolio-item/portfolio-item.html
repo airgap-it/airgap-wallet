@@ -11,7 +11,7 @@
   </ion-avatar>
   <ng-container *ngIf="!isSimplified">
     <ion-label class="protocol__container">
-      <ion-text *ngIf="!isToken" color="black">
+      <ion-text color="black">
         <p class="font--weight__bold" *ngIf="balance; else syncingHeading">
           {{wallet.protocol.name}}
         </p>
