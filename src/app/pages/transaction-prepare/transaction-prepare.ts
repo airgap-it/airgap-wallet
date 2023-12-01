@@ -172,7 +172,7 @@ export class TransactionPreparePage {
           receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
           disablePrepareButton:
-            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lt(0)
         })
         this.updateFeeEstimate()
       })
@@ -182,13 +182,14 @@ export class TransactionPreparePage {
       .valueChanges.pipe(debounceTime(500))
       .subscribe((value: string) => {
         const amount = new BigNumber(value)
+
         this.updateState({
           sendMaxAmount: false,
           amount: {
             value: amount.isNaN() ? '' : amount.toFixed(),
             dirty: true
           },
-          disablePrepareButton: this.transactionForm.invalid || amount.isNaN() || amount.lte(0)
+          disablePrepareButton: this.transactionForm.invalid || amount.isNaN() || amount.lt(0)
         })
         this.updateFeeEstimate()
       })
@@ -198,12 +199,13 @@ export class TransactionPreparePage {
       .valueChanges.pipe(debounceTime(500))
       .subscribe((value: string) => {
         const fee = new BigNumber(value)
+
         this.updateState({
           fee: {
             value: fee.isNaN() ? '' : fee.toFixed(),
             dirty: true
           },
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
         })
 
         if (this._state.sendMaxAmount) {
@@ -213,6 +215,7 @@ export class TransactionPreparePage {
 
     this.transactionForm.get('feeLevel').valueChanges.subscribe((value: number) => {
       const fee = new BigNumber(this.getFeeFromLevel(value))
+
       this.updateState(
         {
           fee: {
@@ -223,7 +226,7 @@ export class TransactionPreparePage {
             value,
             dirty: true
           },
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
         },
         false
       )
@@ -240,7 +243,7 @@ export class TransactionPreparePage {
             value,
             dirty: true
           },
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
         },
         false
       )
@@ -253,7 +256,7 @@ export class TransactionPreparePage {
             value,
             dirty: true
           },
-          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+          disablePrepareButton: this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
         },
         false
       )
@@ -460,7 +463,7 @@ export class TransactionPreparePage {
           dirty: false
         },
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount.value).lte(0)
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
       })
     }
   }
@@ -469,7 +472,7 @@ export class TransactionPreparePage {
     const amount = new BigNumber(this._state.amount.value).shiftedBy(this.wallet.protocol.decimals)
 
     const isAddressValid = this.transactionForm.controls.receiver.valid
-    const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gt(0)
+    const isAmountValid = this.transactionForm.controls.amount.valid && !amount.isNaN() && amount.gte(0)
 
     return isAddressValid && isAmountValid && this._state.receiverAddress
       ? this.operationsProvider.estimateFees(this.wallet, this._state.receiverAddress, amount, { assetID: this.collectibleID })
@@ -575,7 +578,7 @@ export class TransactionPreparePage {
           value: formAmount,
           dirty: false
         },
-        disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lte(0)
+        disablePrepareButton: this.transactionForm.invalid || maxAmount.isNaN() || maxAmount.lt(0)
       })
     }
   }
@@ -597,7 +600,7 @@ export class TransactionPreparePage {
           receiverAddress: receiverAddress !== undefined ? receiverAddress : '',
           disableSendMaxAmount: false,
           disablePrepareButton:
-            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lte(0)
+            this.transactionForm.invalid || receiverAddress === undefined || new BigNumber(this._state.amount.value).lt(0)
         })
         this.transactionForm.controls.receiver.setValue(receiverAddress, { onlySelf: false, emitEvent: true })
       },
