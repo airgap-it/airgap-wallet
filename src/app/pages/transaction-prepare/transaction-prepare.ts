@@ -522,6 +522,7 @@ export class TransactionPreparePage {
           value: address,
           dirty: false
         },
+        disableSendMaxAmount: false,
         receiverAddress: receiverAddress !== undefined ? receiverAddress : ''
       })
     }
