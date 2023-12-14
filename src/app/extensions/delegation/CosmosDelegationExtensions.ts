@@ -72,7 +72,7 @@ export class CosmosDelegationExtensions extends V1ProtocolDelegationExtensions<C
   }
 
   public airGapDelegatee(_adapter: ICoinDelegateProtocolAdapter<CosmosProtocol>): string {
-    return 'cosmosvaloper1n3f5lm7xtlrp05z9ud2xk2cnvk2xnzkm2he6er'
+    return undefined
   }
 
   // TODO: add translations
