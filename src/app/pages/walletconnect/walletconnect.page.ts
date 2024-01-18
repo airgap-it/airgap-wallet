@@ -40,7 +40,9 @@ enum Mode {
   PERMISSION_REQUEST = 'permissionRequest',
   SIGN_TRANSACTION = 'signTransaction',
   SIGN_MESSAGE = 'signMessage',
-  SWITCH_ACCOUNT = 'switchAccount'
+  SWITCH_ACCOUNT = 'switchAccount',
+  ETH_SIGN_TYPED_DATA = 'eth_signTypedData',
+  ETH_SIGN = 'eth_sign'
 }
 
 @Component({
@@ -137,24 +139,35 @@ export class WalletconnectPage implements OnInit {
       await this.permissionRequest(this.message)
     }
 
-    if (
-      this.message.type === 'signRequest' &&
-      this.message.namespace === Namespace.ETH &&
-      this.message.request.method === EthMethods.ETH_SENDTRANSACTION
-    ) {
-      this.mode = Mode.SIGN_TRANSACTION
-      this.title = this.translateService.instant('walletconnect.new_transaction')
-      await this.operationRequest(this.message as WalletconnectSignRequest<EthTx>)
-    }
+    if (this.message.type === 'signRequest' && this.message.namespace === Namespace.ETH) {
+      if (this.message.request.method === EthMethods.ETH_SENDTRANSACTION) {
+        this.mode = Mode.SIGN_TRANSACTION
+        this.title = this.translateService.instant('walletconnect.new_transaction')
+        await this.operationRequest(this.message as WalletconnectSignRequest<EthTx>)
+      }
 
-    if (
-      this.message.type === 'signRequest' &&
-      this.message.namespace === Namespace.ETH &&
-      this.message.request.method === EthMethods.PERSONAL_SIGN_REQUEST
-    ) {
-      this.mode = Mode.SIGN_MESSAGE
-      this.title = this.translateService.instant('walletconnect.sign_request')
-      await this.signRequest(this.message as WalletconnectSignRequest<string>)
+      if (this.message.request.method === EthMethods.PERSONAL_SIGN_REQUEST) {
+        this.mode = Mode.SIGN_MESSAGE
+        this.title = this.translateService.instant('walletconnect.sign_request')
+        await this.signRequest(this.message as WalletconnectSignRequest<string>)
+      }
+
+      if (this.message.request.method === EthMethods.PERSONAL_SIGN_REQUEST) {
+        this.mode = Mode.SIGN_MESSAGE
+        this.title = this.translateService.instant('walletconnect.sign_request')
+        await this.signRequest(this.message as WalletconnectSignRequest<string>)
+      }
+
+      if (this.message.request.method === EthMethods.ETH_SIGN_TYPED_DATA) {
+        this.mode = Mode.ETH_SIGN_TYPED_DATA
+        this.title = this.translateService.instant('walletconnect.sign_request')
+        await this.signRequest(this.message as WalletconnectSignRequest<string>)
+      }
+      if (this.message.request.method === EthMethods.ETH_SIGN) {
+        this.mode = Mode.ETH_SIGN
+        this.title = this.translateService.instant('walletconnect.sign_request')
+        await this.signRequest(this.message as WalletconnectSignRequest<string>)
+      }
     }
 
     if (
