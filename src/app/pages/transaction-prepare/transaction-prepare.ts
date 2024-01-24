@@ -58,6 +58,7 @@ interface TransactionPrepareState {
   fee: TransactionFormState<string>
   isAdvancedMode: TransactionFormState<boolean>
   memo: TransactionFormState<string>
+  showFeeWarning: boolean
 }
 
 @Component({
@@ -302,7 +303,8 @@ export class TransactionPreparePage {
       memo: {
         value: this.transactionForm.controls.memo.value,
         dirty: false
-      }
+      },
+      showFeeWarning: false
     }
     this.state = this._state
 
@@ -361,7 +363,12 @@ export class TransactionPreparePage {
       feeLevel: newState.feeLevel || currentState.feeLevel,
       fee: newState.fee || currentState.fee,
       isAdvancedMode: newState.isAdvancedMode || currentState.isAdvancedMode,
-      memo: newState.memo || currentState.memo
+      memo: newState.memo || currentState.memo,
+      showFeeWarning:
+        this.transactionForm.valid &&
+        (newState.fee !== undefined && (newState.feeDefaults || currentState.feeDefaults)
+          ? new BigNumber(newState.fee.value).lt(newState.feeDefaults ? newState.feeDefaults.medium : currentState.feeDefaults.medium)
+          : false)
     }
 
     return {
@@ -463,7 +470,9 @@ export class TransactionPreparePage {
           dirty: false
         },
         disableFeeSlider: !feeDefaults,
-        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0)
+        disablePrepareButton: !feeDefaults || this.transactionForm.invalid || new BigNumber(this._state.amount.value).lt(0),
+        showFeeWarning:
+          this.transactionForm.valid && (feeDefaults !== undefined ? new BigNumber(this.state.fee.value).lt(feeDefaults.medium) : false)
       })
     }
   }

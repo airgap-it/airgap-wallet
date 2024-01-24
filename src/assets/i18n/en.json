@@ -277,6 +277,7 @@
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
     "balance_label": "Balance:",
+    "warning": "low fee may cause delays or transaction failure",
     "fee": {
       "label": "Fee",
       "slow_label": "slow & cheap",
