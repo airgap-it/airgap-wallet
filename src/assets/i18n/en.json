@@ -126,7 +126,8 @@
     "generic": {
       "xtz_label": "Add Unlisted Tezos Asset",
       "optimism-erc20_label": "Add Unlisted Optimism ERC-20 Token"
-    }
+    },
+    "isolated-module": "Can't find your favourite coin? Create an Isolated Module to integrate it"
   },
   "scan": {
     "title": "Scan QR",
