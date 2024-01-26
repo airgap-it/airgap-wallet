@@ -74,7 +74,10 @@ export enum EthMethods {
   ETH_SENDTRANSACTION = 'eth_sendTransaction',
   PERSONAL_SIGN_REQUEST = 'personal_sign',
   ETH_SIGN_TYPED_DATA = 'eth_signTypedData',
-  WALLET_SWITCH_ETHEREUM_CHAIN = 'wallet_switchEthereumChain'
+  ETH_SIGN_TYPED_DATA_V3 = 'eth_signTypedData_v3',
+  ETH_SIGN_TYPED_DATA_V4 = 'eth_signTypedData_v4',
+  WALLET_SWITCH_ETHEREUM_CHAIN = 'wallet_switchEthereumChain',
+  ETH_SIGN = 'eth_sign'
 }
 
 export interface EthTx {

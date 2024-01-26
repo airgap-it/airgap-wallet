@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div *ngIf="mode === Mode.SIGN_MESSAGE">
+    <div *ngIf="mode === Mode.SIGN_MESSAGE || mode === Mode.ETH_SIGN_TYPED_DATA || mode === Mode.ETH_SIGN">
       <ion-row class="rawdata--container">
         <ion-col class="ion-no-padding">
           <pre class="ion-no-margin">{{ beaconRequest | json }}</pre>
