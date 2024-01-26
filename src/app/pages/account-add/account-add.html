@@ -53,7 +53,21 @@
       ></currency-item>
     </ion-list>
   </ion-grid>
+
+  <ion-card class="ion-padding" color="secondary">
+    <ion-row>
+      <ion-col>
+        <ion-icon style="zoom: 4;" src="assets/img/shapes.svg"></ion-icon>
+      </ion-col>
+      <ion-col size="9">
+        <ion-label class="ion-text-wrap">
+          <h2 style="color: white;">{{ "account-add.isolated-module" | translate }}</h2>
+        </ion-label>
+      </ion-col>
+    </ion-row>
+  </ion-card>
 </ion-content>
+
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
   <ion-fab-button id="add-more-coins-button" color="secondary" (click)="navigateToScan()">
     <ion-icon name="barcode-outline"></ion-icon>
