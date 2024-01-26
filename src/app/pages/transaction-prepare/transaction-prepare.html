@@ -121,7 +121,9 @@
         <ion-row class="rawdata--container" *ngIf="isSubstrate && !state.disableSendMaxAmount">
           <ion-col class="ion-no-padding">
             <ion-item class="ion-no-padding" lines="none">
-              <ion-toggle [checked]="ignoreExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end">{{ 'transaction-prepare.existential_deposit' | translate }}</ion-toggle>
+              <ion-toggle [checked]="ignoreExistentialDeposit" (ionChange)="toggleExcludeExistentialDeposit()" slot="end">
+                {{ 'transaction-prepare.existential_deposit' | translate }}
+              </ion-toggle>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -206,6 +208,16 @@
 
       <fee [wallet]="wallet" [state]="state" [form]="transactionForm"></fee>
     </form>
+
+    <ion-row *ngIf="this.state.showFeeWarning" class="ion-align-items-center ion-padding-horizontal">
+      <ion-col>
+        <ion-item lines="none" class="ion-margin-vertical" color="warning">
+          <ion-label>
+            <p>{{ "transaction-prepare.warning" | translate }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
