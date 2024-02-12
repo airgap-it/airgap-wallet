@@ -1,0 +1,45 @@
+.mtpelerin-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  .buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  img {
+    height: 48px;
+    width: fit-content;
+  }
+
+  h3 {
+    color: white;
+    margin-top: 32px;
+    margin-bottom: 0px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  p {
+    margin-top: 12px;
+    margin-bottom: 0px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  ul {
+    margin-top: 12px;
+    margin-bottom: 32px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  span {
+    margin-top: 12px;
+    margin-bottom: 0px;
+    font-size: 12px;
+    font-weight: 400;
+    color: gray;
+  }
+}

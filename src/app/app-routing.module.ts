@@ -211,6 +211,10 @@ const routes: Routes = [
       )
   },
   {
+    path: 'trading-settings',
+    loadChildren: () => import('./pages/trading-settings/trading-settings.module').then((m) => m.TradingSettingsPageModule)
+  },
+  {
     path: 'collectibles-list/:id/:publicKey/:protocolID/:addressIndex',
     resolve: {
       special: DataResolverService
