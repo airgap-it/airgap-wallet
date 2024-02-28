@@ -63,11 +63,11 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
           }
 
           // eslint-disable-next-line prettier/prettier
-          const requiredEthNamespace: Web3WalletTypes.SessionProposal['params']['requiredNamespaces'][string] = 
-            (proposal.params.requiredNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
+          const requiredEthNamespace: Web3WalletTypes.SessionProposal['params']['requiredNamespaces'][string] = (proposal.params
+            .requiredNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
           // eslint-disable-next-line prettier/prettier
-          const optionalEthNamespace: Web3WalletTypes.SessionProposal['params']['optionalNamespaces'][string] =
-            (proposal.params.optionalNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
+          const optionalEthNamespace: Web3WalletTypes.SessionProposal['params']['optionalNamespaces'][string] = (proposal.params
+            .optionalNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
 
           // for now, let's use the selected account for all required chains
           if (ethAccounts.length === 1) {
@@ -147,9 +147,51 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
       case EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN:
         return this.readWalletSwitchEthereumChain(request, client)
       case EthMethods.ETH_SIGN_TYPED_DATA:
-        return { type: 'unsupported', namespace: Namespace.ETH, method: EthMethods.ETH_SIGN_TYPED_DATA }
+      case EthMethods.ETH_SIGN_TYPED_DATA_V3:
+      case EthMethods.ETH_SIGN_TYPED_DATA_V4:
+        return this.readEthSignTypedData(request, client)
+      case EthMethods.ETH_SIGN:
+        return this.readEthSign(request, client)
+      // return { type: 'unsupported', namespace: Namespace.ETH, method: EthMethods.ETH_SIGN_TYPED_DATA }
       default:
         return { type: 'unsupported', namespace: Namespace.ETH }
+    }
+  }
+
+  private readEthSign(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    request.params.request.params = [request.params.request.params[1], request.params.request.params[0]]
+    return {
+      type: 'signRequest',
+      version: 2,
+      namespace: Namespace.ETH,
+      chain: request.params.chainId,
+      request: {
+        id: `${request.id}:${request.topic}`,
+        method: EthMethods.ETH_SIGN,
+        params: request.params.request.params
+      },
+      cancel: async (): Promise<void> => {
+        rejectRequest(client, request.id, request.topic)
+      }
+    }
+  }
+
+  private readEthSignTypedData(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    request.params.request.params = [request.params.request.params[1], request.params.request.params[0]]
+
+    return {
+      type: 'signRequest',
+      version: 2,
+      namespace: Namespace.ETH,
+      chain: request.params.chainId,
+      request: {
+        id: `${request.id}:${request.topic}`,
+        method: EthMethods.ETH_SIGN_TYPED_DATA,
+        params: request.params.request.params
+      },
+      cancel: async (): Promise<void> => {
+        rejectRequest(client, request.id, request.topic)
+      }
     }
   }
 

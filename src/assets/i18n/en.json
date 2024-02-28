@@ -126,7 +126,8 @@
     "generic": {
       "xtz_label": "Add Unlisted Tezos Asset",
       "optimism-erc20_label": "Add Unlisted Optimism ERC-20 Token"
-    }
+    },
+    "isolated-module": "Can't find your favourite coin? Create an Isolated Module to integrate it"
   },
   "scan": {
     "title": "Scan QR",
@@ -194,6 +195,11 @@
     "interaction": {
       "label": "Interaction Setting",
       "text": "Vault and Wallet Interaction Settings"
+    },
+    "trading_settings": {
+      "label": "Trading",
+      "text": "Advanced Trading Settings",
+      "mtpelerin": "Use Mt Pelerin"
     },
     "add-ons_settings": {
       "label": "Add-ons",
@@ -277,6 +283,7 @@
     "to-address-scan_label": "Scan QR",
     "amount_label": "Amount",
     "balance_label": "Balance:",
+    "warning": "low fee may cause delays or transaction failure",
     "fee": {
       "label": "Fee",
       "slow_label": "slow & cheap",
