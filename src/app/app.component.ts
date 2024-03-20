@@ -19,6 +19,8 @@ import {
 } from '@airgap/angular-core'
 import { AstarModule } from '@airgap/astar'
 import { BitcoinModule } from '@airgap/bitcoin'
+import { AcurastModule } from '@airgap/acurast'
+
 import {
   AirGapMarketWallet,
   IAirGapTransaction,
@@ -257,7 +259,8 @@ export class AppComponent implements AfterViewInit {
       new AstarModule(),
       new ICPModule(),
       new CoreumModule(),
-      new OptimismModule()
+      new OptimismModule(),
+      new AcurastModule()
     ])
     const v1Protocols = await this.modulesService.loadProtocols('online', [
       MainProtocolSymbols.XTZ_SHIELDED,
