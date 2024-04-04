@@ -57,17 +57,23 @@ const modules = [
   {
     namespace: 'tezos',
     import: '../../../node_modules/@airgap/tezos'
+  },
+  {
+    namespace: 'acurast',
+    import: '../../../node_modules/@airgap/acurast'
   }
 ]
 
 function browserifyModules(modules) {
   const outputDir = path.join(assetsdir, `libs`)
   const combinedSourceFile = 'coinlib-all.js'
-  const combinedSource = modules.map((module) => 
-    module.namespace
-      ? `import * as ${module.namespace} from '${module.import}';\nexport { ${module.namespace} };`
-      : `export * from '${module.import}';`
-  ).join('\n')
+  const combinedSource = modules
+    .map((module) =>
+      module.namespace
+        ? `import * as ${module.namespace} from '${module.import}';\nexport { ${module.namespace} };`
+        : `export * from '${module.import}';`
+    )
+    .join('\n')
 
   fs.mkdirSync(outputDir, { recursive: true })
   fs.writeFileSync(path.join(outputDir, combinedSourceFile), combinedSource, 'utf-8')
@@ -77,6 +83,5 @@ function browserifyModules(modules) {
     .bundle()
     .pipe(fs.createWriteStream(path.join(outputDir, 'airgap-coin-lib.browserify.js')))
 }
-
 
 browserifyModules(modules)
