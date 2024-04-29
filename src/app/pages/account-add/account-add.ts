@@ -6,6 +6,7 @@ import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 
+import { BrowserService } from 'src/app/services/browser/browser.service'
 import { AccountProvider } from '../../services/account/account.provider'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
@@ -64,7 +65,8 @@ export class AccountAddPage {
     private readonly protocolService: ProtocolService,
     private readonly router: Router,
     private readonly ledgerService: LedgerService,
-    private readonly dataService: DataService
+    private readonly dataService: DataService,
+    private readonly browserService: BrowserService
   ) {}
 
   public async ionViewWillEnter() {
@@ -234,5 +236,9 @@ export class AccountAddPage {
 
   public navigateToScan() {
     this.router.navigateByUrl('/tabs/scan').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  }
+
+  public isolatedModuleDoc(): void {
+    this.browserService.openUrl('https://support.airgap.it/isolated-module/')
   }
 }
