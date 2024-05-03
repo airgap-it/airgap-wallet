@@ -1,165 +1,1075 @@
 {
-  "account-transaction-list.title": "Konto",
-  "account-transaction-list.transactions_label": "Transaktionen",
-  "account-transaction-list.no-transactions_text": "Es wurden noch keine Transaktionen mit diesem Konto durchgeführt.",
-  "account-transaction-list.receive_label": "Empfangen",
-  "account-transaction-list.send_label": "Versenden",
-  "account-transaction-list.add-tokens_label": "Tokens hinzufügen",
+  "account-transaction-list": {
+    "title": "Konto",
+    "transactions_label": "Transaktionen",
+    "add-tokens_label": "Token hinzufügen",
+    "collectibles_label": "Sammlerstücke",
+    "import-accounts_label": "Konten importieren",
+    "delegate_label": "Delegation",
+    "undelegate_label": "Aufheben der Delegation",
+    "claim_rewards_label": "Belohnung entgegennehmen",
+    "vote_label": "Wählen",
+    "migrate_label": "Guthaben migrieren",
+    "delegation-status_label": "Delegation",
+    "set-contract_label": "Vertrag festlegen",
+    "change-contract_label": "Vertrag ändern",
+    "fund_label": "Fondskonto",
+    "load_more": "Mehr laden",
+    "pending-transactions": {
+      "label": "ausstehende Transaktionen",
+      "text": "Ausstehende Transaktionen sind derzeit nicht aktiviert, bitte beachten Sie den Blockexplorer.",
+      "open-blockexplorer_label": "Öffnen Sie Blockexplorer"
+    },
+    "receive_label": "Erhalten",
+    "send_label": "Schicken",
+    "tx_not_loading": "Die Transaktionen können derzeit nicht geladen werden. Bitte schauen Sie im Block-Explorer nach, um die neuesten Transaktionen anzuzeigen.",
+    "has-delegated_card": {
+      "heading": "<strong>{{amount}}</strong> Delegiert",
+      "text": "Ihre XTZ werden delegiert und gebacken, Sie können Ihre Belohnungen für jeden Zyklus überprüfen."
+    },
+    "not-delegated_card": {
+      "heading": "Delegieren Sie Tezos",
+      "text": "Sie haben <strong>{{amount}}</strong> nicht delegiert. Wenn Sie jetzt delegieren, können Sie in jedem Zyklus einen Anteil verdienen."
+    },
+    "migrate-babylon_card": {
+      "heading": "Kontomigration",
+      "text": "Delegierbare <strong>kt-Konten</strong> sind veraltet. Um die Übertragung Ihrer XTZs erneut auf Ihr <strong>tz-Konto</strong> zu delegieren, müssen Sie die Übertragung erneut delegieren."
+    },
+    "migrate-alert": {
+      "header": "KT-Guthabenmigration",
+      "message": "Möchten Sie <strong>{{amount}}</strong> von dieser KT-Adresse an die entsprechende XTZ-Adresse übertragen?",
+      "cancel": "Stornieren",
+      "confirm": "Wandern"
+    },
+    "no-transactions_text": "Für dieses Konto liegen noch keine Transaktionen vor.",
+    "mtpelerin": {
+      "title": "Berg Pelerin",
+      "buy_label": "Kaufen",
+      "cash-out_label": "Auszahlen",
+      "cancel_label": "Stornieren",
+      "ok_label": "OK",
+      "header": "Dieser Service wird von Mt. Pelerin bereitgestellt und Sie verlassen AirGap Wallet. Änderungen können in den Einstellungen vorgenommen werden",
+      "note_description": "Hinweis – Mt. Pelerin akzeptiert Kunden aus allen Ländern, außer US-Bürgern und Russen, sowie Einwohner von: Afghanistan, Weißrussland, Burundi, Zentralafrikanische Republik, Kuba, Demokratische Republik Kongo, Guinea, Guinea-Bissau, Iran, Irak, Libanon, Libyen, Festlandchina (Hongkong und Taiwan werden akzeptiert), Mali, Myanmar, Nicaragua, Nordkorea, Russland, Somalia, Sudan, Südsudan, Syrien, Venezuela, Jemen, Simbabwe"
+    }
+  },
+  "account-transaction-detail": {
+    "available_label": "Verfügbar",
+    "delegated_label": "Delegiert",
+    "unbonding_label": "Vollständige Entbindung",
+    "reward_label": "Nicht beanspruchte Belohnungen",
+    "unbonding_completion": "Abschluss der Entbindung"
+  },
+  "introduction": {
+    "title": "Selbstverwahrung einfach und sicher gemacht",
+    "title_mobile":"Interaktion mit dem Tresor",
+    "highest": {
+      "label": "Höchste Sicherheit",
+      "text": "Mit dem AirGap-<b>Zwei-Geräte-Ansatz</b> wird die sichere Schlüsselverwaltung einfacher.",
+      "desktop_text": "AirGap verfügt über einen <b>Zwei-Geräte-Ansatz</b>, bei dem das Geheimnis entweder im <b>AirGap Vault</b> oder – für ausgewählte Coins – in einem <b>Ledger-Hardware-Wallet</b> gespeichert wird."
+    },
+    "medium": {
+      "label": "Mittlere Sicherheit",
+      "text": "Mit dem AirGap-<b>Zwei-App-Ansatz</b> wird die sichere Schlüsselverwaltung einfacher."
+    },
+    "vault": {
+      "heading": "AirGap-Tresor",
+      "text": "Der private Schlüssel wird generiert und mit der AirGap Vault-App sicher auf einem anderen Gerät gespeichert. <b>Sie müssen AirGap Vault installieren, um AirGap Wallet verwenden zu können</b>",
+      "desktop_heading": "AirGap Tresor und Ledger",
+      "desktop_text": "Der private Schlüssel wird generiert und mit der AirGap Vault-App oder in einem Ledger-Hardware-Wallet sicher auf einem anderen Gerät gespeichert. <br><b>Installieren Sie AirGap Vault auf einem Mobilgerät oder verbinden Sie ein Ledger, um AirGap Wallet zu verwenden</b>"
+    },
+    "wallet": {
+      "heading": "AirGap-Geldbörse",
+      "text": "<b>Dies ist die AirGap Wallet-Anwendung</b>, die nur öffentliche Informationen verarbeitet und für die Übertragung von Transaktionen an die Blockchain verantwortlich ist."
+    },
+    "communication": {
+      "highest_text": "Einwegkommunikation mit QR-Codes.",
+      "medium_text": "Sichere Kommunikation durch App-Umschaltung.",
+      "highest_heading": "Zwei-Geräte-Ansatz",
+      "medium_heading": "Ansatz mit gleichem Gerät",
+      "highest_expanded_text": "Unterzeichnen Sie Transaktionen komplett offline auf einem Gerät ohne Netzwerkverbindung mit der AirGap Knox- oder AirGap Vault-Anwendung und übertragen Sie sie mit Ihrem alltäglichen Smartphone mit der AirGap Wallet-App. Die Kommunikation zwischen den beiden Geräten erfolgt über transparente QR-Codes.",
+      "medium_expanded_text": "Anstatt AirGap Vault auf einem Offline-Gerät zu installieren, können Sie AirGap Vault und AirGap Wallet auch auf Ihrem alltäglichen Smartphone (dasselbe Gerät) installieren und von zusätzlicher Sicherheit durch Anwendungs-Sandboxing und App-Switching für die Kommunikation profitieren."
+    },
+    "vault-install_label": "AirGap Vault installieren",
+    "continue_label": "Lass uns gehen"
+  },
+  "introduction-download": {
+    "title": "AirGap Vault installieren",
+    "heading": "Lassen Sie uns AirGap Vault installieren!",
+    "description": "Sie sind sich nicht sicher, wie und wo Sie AirGap Vault und AirGap Wallet installieren sollen? Wir haben eine detaillierte Schritt-für-Schritt-Anleitung mit allen Anweisungen.",
+    "guide-link_label": "Leitfaden anzeigen",
+    "text": "Es gibt mehrere Möglichkeiten, AirGap Vault zu installieren. Wählen Sie die für Sie am besten geeignete aus.",
+    "android": "Android",
+    "play-store_text": "Installieren Sie AirGap Vault direkt aus dem Google Play Store für dieses oder ein dediziertes Gerät.",
+    "iOS": "iOS",
+    "app-store_text": "Installieren Sie AirGap Vault direkt aus dem App Store für dieses oder ein dediziertes Gerät.",
+    "iOS-device-iOS_text": "Installieren Sie AirGap Vault aus dem App Store auf diesem Gerät.",
+    "iOS-device-android_text": "Installieren Sie AirGap Vault aus dem Play Store auf einem dedizierten Gerät.",
+    "android-device-iOS_text": "Installieren Sie AirGap Vault aus dem App Store auf einem dedizierten Gerät.",
+    "android-device-android_text": "Installieren Sie AirGap Vault aus dem Play Store auf diesem Gerät.",
+    "linux-distro_label": "Linux-Distribution",
+    "install-distro_text": "Installieren Sie die AirGap Vault Distribution auf einem dedizierten Computer, um Transaktionen per Air Gap zu signieren.",
+    "go_label": "Lass uns gehen"
+  },
+  "portfolio": {
+    "shop_banner": "Holen Sie sich eine zusätzliche Sicherheitsebene – Holen Sie sich die AirGap Recovery Plate",
+    "empty-state_text": "Beginnen Sie, indem Sie Münzen zum AirGap Wallet hinzufügen. Sie benötigen außerdem die Anwendung <span class=\"style__strong color__primary\">AirGap Vault</span>, in der Ihr Geheimnis sicher gespeichert ist.",
+    "empty-state_desktop_text": "Beginnen Sie, indem Sie Münzen zum AirGap Wallet hinzufügen. Dies können Sie entweder mit der Anwendung <span class=\"style__strong color__primary\">AirGap Vault</span> oder für ausgewählte Münzen mit einem <span class=\"style__strong color__primary\">Ledger-Hardware-Wallet</span> tun.",
+    "add-coins_label": "Füge Münzen hinzu",
+    "flip-card": {
+      "front-title": "Gesamtsaldo",
+      "back-title": "Verwandeln Sie Ihr Gerät in eine echte Hardware-Wallet"
+    }
+  },
+  "account-add": {
+    "featured": "Empfohlen",
+    "others": "Weitere Assets",
+    "generic": {
+      "xtz_label": "Nicht gelistetes Tezos-Asset hinzufügen",
+      "optimism-erc20_label": "Nicht gelisteten Optimism ERC-20-Token hinzufügen"
+    },
+    "isolated-module": "Sie können Ihre Lieblingsmünze nicht finden? Erstellen Sie ein isoliertes Modul, um sie zu integrieren"
+  },
+  "scan": {
+    "title": "QR scannen",
+    "text": "Scannen Sie einen Synchronisierungs-QR, um ein Konto hinzuzufügen, oder scannen Sie einen Transaktions-QR, um es zu bestätigen und zu senden.",
+    "multi-qr_text": "Diese Transaktion besteht aus mehreren QR-Codes. Halten Sie Ihre Kamera auf die wechselnden QRs gerichtet und warten Sie, bis alle Codes gescannt sind.",
+    "empty-state_heading": "Zum Scannen von QR-Codes benötigt AirGap Wallet die <span class=\"style__strong color__primary\">Kameraberechtigung</span>.",
+    "grant-permission_label": "Erteilen der Berechtigung"
+  },
+  "scan-address": {
+    "title": "Kontoadresse scannen",
+    "text": "Scannen Sie den QR-Code einer Kontoadresse."
+  },
+  "scan-sync": {
+    "title": "Kontodaten synchronisieren",
+    "text": "Öffnen Sie AirGap Vault, wählen Sie ein <span ion-text color='white'>Konto</span> und dann <span ion-text color='white'>Sync</span>, scannen Sie den Sync-QR-Code mit AirGap Wallet.",
+    "description": "Während dieses Vorgangs werden keine privaten Schlüssel oder nicht öffentliche Daten weitergegeben.",
+    "scan_label": "Scannen und synchronisieren Sie den QR-Code"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "appearance_label": "Aussehen",
+    "theme_label": "Thema",
+    "select-theme": {
+      "system": "Gerätedesign",
+      "light": "Lichtthema",
+      "dark": "Dunkles Thema"
+    },
+    "preferred-language_label": "Bevorzugte Sprache",
+    "help_label": "Hilfe Unterstützung",
+    "introduction_label": "Einführung",
+    "faq_label": "FAQ",
+    "discord_label": "Treten Sie Discord bei",
+    "share_label": "AirGap teilen",
+    "information_label": "Mehr",
+    "airgap_website": "AirGap Website",
+    "airgap_shop": "AirGap Shop",
+    "github_label": "GitHub-Repository",
+    "other_label": "Andere",
+    "paste-from-clipboard_label": "Code aus der Zwischenablage einfügen",
+    "about_label": "Um",
+    "alert_title": "Wählen Sie einen Kanal",
+    "alert_cancel": "stornieren",
+    "channel": {
+      "international": "International",
+      "chinese": "Chinesisch"
+    },
+    "select-account": {
+      "title": "Konto auswählen",
+      "text": "Wählen Sie ein Konto für die Chrome-Erweiterung"
+    },
+    "qr": {
+      "settings_label": "QR-Einstellungen",
+      "enable-new-serializer_label": "Neuen Serialisierer aktivieren",
+      "page-time_label": "QR-Seitenzeit",
+      "page-size_label": "QR Max Größe"
+    },
+    "dapp": {
+      "label": "Dapps",
+      "settings_label": "Dapp-Einstellungen",
+      "about_label": "Über Beacon",
+      "permission-list_label": "Dapp-Berechtigungen"
+    },
+    "qr-advanced-settings_label": "Erweiterte QR-Einstellungen",
+    "health-check": "API-Integritätsprüfung",
+    "interaction": {
+      "label": "Interaktionseinstellung",
+      "text": "Tresor- und Wallet-Interaktionseinstellungen"
+    },
+    "trading_settings": {
+      "label": "Handel",
+      "text": "Erweiterte Handelseinstellungen",
+      "mtpelerin": "Benutze Mt. Pelerin"
+    },
+    "add-ons_settings": {
+      "label": "Add-ons",
+      "isolated-modules_text": "Isolierte Module"
+    },
+    "knox-text_pt1": "Verwandeln Sie Ihr Gerät in eine echte Hardware-Wallet",
+    "knox-text_pt2": "AirGap Knox erzwingt einen echten Offline-Modus und lässt nur den Vault auf Ihrem Gerät laufen",
+    "knox-button_label": "Entdecken Sie Knox jetzt"
+  },
+  "mtpelerin": {
+    "header1": "Krypto kaufen und verkaufen mit Mt Pelerin – Das Schweizer Tor zur Kryptowelt",
+    "paragraph1": "Investieren Sie mit wenigen Klicks in Bitcoin, Ether und die beliebtesten Assets auf mehreren Ketten, zu den besten Preisen auf dem Markt und ohne KYC-Anforderung. Sie können sie jederzeit in 14 Währungen auf Ihr Bankkonto in 171 Ländern zurücküberweisen.",
+    "header2": "Einfach und transparent",
+    "lineItem1": "Kein Ausweis erforderlich",
+    "lineItem2": "Aktuelle und transparente Tarife",
+    "lineItem3": "Tätigen Sie eine Zahlung und erhalten Sie Kryptowährung direkt auf AirGap",
+    "button1": "Erfahren Sie mehr über den Kauf",
+    "button2": "Erfahren Sie mehr über den Verkauf",
+    "note": "Hinweis – Mt. Pelerin akzeptiert Kunden aus allen Ländern außer US-Amerikanern und Russen sowie Einwohner von: Afghanistan, Weißrussland, Burundi, Zentralafrikanische Republik, Kuba, Demokratische Republik Kongo, Guinea, Guinea-Bissau, Iran, Irak, Libanon, Libyen, Festlandchina (Hongkong und Taiwan akzeptiert), Mali, Myanmar, Nicaragua, Nordkorea, Russland, Somalia, Sudan, Südsudan, Syrien, Venezuela, Jemen, Simbabwe.",
+    "noteLink1": "Weitere Informationen",
+    "noteLink2": "Terms & amp; Bedingungen"
+  },
+  "qr-settings-page": {
+    "title": "QR-Einstellungen"
+  },
+  "select-wallet": {
+    "title": "Konto auswählen",
+    "scanned-address": {
+      "text": "Sie haben eine Adresse gescannt. Wählen Sie zum Senden eines der folgenden Konten aus."
+    },
+    "fund-account": {
+      "xtz_shielded": {
+        "text": "Wählen Sie eines der folgenden Konten aus, um Geld auf Ihr Shielded Tez-Konto einzuzahlen."
+      }
+    },
+    "broadcast": {
+      "xtz_shielded": {
+        "text": "Die Sapling-Transaktion muss von einem Tezos-Konto gesendet werden. Wählen Sie ein Tezos-Konto aus, um die Transaktion im Vault zu signieren und die Sapling-Transaktion schließlich zu senden."
+      }
+    },
+    "compatible_label": "Diese Konten scheinen kompatibel zu sein",
+    "incompatible_label": "Diese Konten scheinen nicht kompatibel zu sein"
+  },
+  "web-extension-disclaimer": {
+    "heading": "Dies ist eine <span class=\"style__strong color__primary\">ALPHA</span>-Version. Nur mit kleinen Geldbeträgen verwenden.",
+    "text": "Die Erweiterung wurde aktuell getestet mit.",
+    "list": {
+      "item-1_text": "MeinEtherWallet",
+      "item-2_text": "MeineKrypto"
+    },
+    "description": "Andere Plattformen oder Dapps könnten funktionieren, wir wären für jeden Input, Problembericht oder Funktionswunsch sehr dankbar.",
+    "accept_label": "Ich verstehe"
+  },
+  "about": {
+    "title": "Um"
+  },
+  "transaction-confirm": {
+    "title": "Transaktion bestätigen",
+    "decline_label": "Abfall",
+    "confirm_label": "Bestätigen",
+    "qr-data-too-big_warning": "Der QR-Code konnte nicht erstellt werden, die Daten der Transaktion sind zu groß"
+  },
+  "transaction-detail": {
+    "title": "Transaktionsdetails",
+    "open-blockexplorer_label": "Öffnen Sie Blockexplorer",
+    "tx-broadcasting": {
+      "heading": "Status: Wird gesendet..",
+      "text": "Ihre Transaktion wird gesendet. Dies kann einige Sekunden dauern."
+    },
+    "tx-pending": {
+      "heading": "Status: Ausstehend..",
+      "text": "Abhängig von der von Ihnen festgelegten Gebühr kann es einige Minuten dauern, bis die Transaktion bestätigt wird."
+    },
+    "tx-success": {
+      "heading": "Status: Erfolgreich!"
+    }
+  },
+  "transaction-prepare": {
+    "title": "Senden {{title}}",
+    "to-address_label": "Empfänger",
+    "to-address-scan_label": "QR scannen",
+    "amount_label": "Menge",
+    "balance_label": "Gleichgewicht:",
+    "warning": "Niedrige Gebühren können zu Verzögerungen oder Transaktionsfehlern führen",
+    "fee": {
+      "label": "Gebühr",
+      "slow_label": "langsam & günstig",
+      "fast_label": "schnell & teuer",
+      "max_label": "MAX"
+    },
+    "advanced": "Fortschrittlich",
+    "memo": "Memo",
+    "paste_label": "Paste",
+    "existential_deposit": "Existenzielle Einzahlung ignorieren",
+    "create-transaction": "Transaktion erstellen",
+    "error": {
+      "amount_label": "Bitte geben Sie eine gültige Nummer ein",
+      "address_label": "Scheint ein falsches Adressformat zu sein, es sollte mit <strong>{{addressPlaceholder}}</strong> beginnen."
+    }
+  },
+  "transaction-qr": {
+    "title": "Transaktions-QR",
+    "text": "Öffnen Sie <span class=\"style__strong color__primary\">AirGap Vault</span> und scannen Sie diese Transaktion, um sie zu unterzeichnen.",
+    "scan_qr_label": "QR scannen",
+    "done_label": "Erledigt",
+    "details": "Details anzeigen"
+  },
+  "interaction-selection": {
+    "title": "Tresor-Interaktion",
+    "heading": "Wie möchten Sie mit <span class=\"style__strong color__primary\">AirGap Vault</span> interagieren?",
+    "same-device_label": "Dasselbe Gerät",
+    "same-device_info": "AirGap Vault und AirGap Wallet sind auf demselben Gerät installiert.",
+    "offline-device_label": "Offline-Gerät",
+    "offline-device_info": "AirGap Vault ist auf einem Offline-Gerät installiert. Scannen Sie den QR-Code mit AirGap Wallet."
+  },
+  "interaction-selection-settings": {
+    "title": "Wallet-Interaktion",
+    "same-device_heading": "Sieht aus, als ob Sie <span class=\"style__strong color__primary\">AirGap Vault</span> und AirGap Wallet auf demselben <span class=\"style__strong color__primary\">Gerät</span> verwenden.",
+    "offline-device_heading": "Sieht aus, als ob Sie <span class=\"style__strong color__primary\">AirGap Vault</span> auf einem <span class=\"style__strong color__primary\">Offline-Gerät</span> verwenden.",
+    "text": "Sie können festlegen, wo Sie AirGap Wallet installiert haben, um die Interaktion mit dem Vault etwas einfacher zu gestalten.",
+    "selector": {
+      "always": "Immer fragen",
+      "same-device": "Vault und Wallet auf demselben Gerät",
+      "offline-device": "Vault ist ein Offline-Gerät",
+      "ledger": "Wallet-Paare mit Ledger"
+    },
+    "confirm_label": "Bestätigen",
+    "description": "Sie können Ihre Einstellungen jederzeit auf der Registerkarte „Einstellungen“ ändern.",
+    "button_text": "Bearbeiten"
+  },
+  "interaction-selection-desktop": {
+    "title": "Unterzeichneroption auswählen",
+    "heading": "Wählen Sie das Gerät aus, um diese Transaktion zu signieren",
+    "vault_label": "AirGap-Tresor",
+    "vault_info": "AirGap Vault ist auf einem Offline-Gerät installiert. Scannen Sie den QR-Code mit AirGap Wallet.",
+    "ledger_label": "Hauptbuch",
+    "ledger_info": "Ledger verfügt über mehrere Arten von Hardware-Wallets, die mit Ihrem Gerät verbunden sind, um Transaktionen sicher zu signieren."
+  },
+  "language-selection-settings": {
+    "title": "Sprachauswahl",
+    "heading": "Bitte wählen Sie Ihre bevorzugte Sprache",
+    "selector": {
+      "device": "Die Sprache Ihres Geräts",
+      "en": "Englisch",
+      "de": "Deutsch (KI übersetzt)",
+      "es": "Spanisch (KI übersetzt)",
+      "fr": "französisch (KI übersetzt)",
+      "ru":"Russisch",
+      "pt_BR": "Portugiesisch (Brasilien)",
+      "zh_CN": "Chinesisch (China)"
+    },
+    "continue_label": "Weitermachen",
+    "description": "Sie können Ihre Präferenzen jederzeit in den Einstellungen ändern."
+  },
+  "wallet-address": {
+    "title": "Kontoadresse",
+    "address_label": "Adresse",
+    "done_label": "Erledigt"
+  },
+  "account-import": {
+    "title": "Import bestätigen",
+    "import-text": "Möchten Sie folgende Konten importieren?",
+    "warning": "Sie haben dieses Konto bereits in AirGap hinzugefügt.",
+    "syncing_label": "Synchronisieren...",
+    "cancel_label": "Stornieren",
+    "import_label": "Importieren"
+  },
+  "account-activate": {
+    "title": "Konten hinzufügen",
+    "message": "Wählen Sie zum Hinzufügen <strong>{{ protocol }}</strong> Konten aus.",
+    "add-accounts_label": "Konten hinzufügen"
+  },
+  "signed-transaction": {
+    "transaction-unreadable": "Wir konnten aus dieser Transaktion keine Informationen extrahieren. Dies bedeutet nicht, dass die Transaktion ungültig ist. Bitte stellen Sie sicher, dass Sie wissen, was Sie tun, und dass Sie überprüfen können, ob diese Transaktion die richtigen Daten enthält."
+  },
   "back-button": "Zurück",
-  "introduction.title": "Eigene Krypto Aufbewahrung einfach gemacht",
-  "introduction.highest.label": "Höchste Sicherheit",
-  "introduction.highest.text": "Mit dem AirGap <b>zwei-Geräte Ansatz</b> wird der sicher Umgang mit Geheimschlüssel zugänglicher.</p>",
-  "introduction.medium.label": "Mittlere Sicherheit",
-  "introduction.medium.text": "Mit dem AirGap <b>zwei-App Ansatz</b> wird der sicher Umgang mit Geheimschlüssel zugänglicher.",
-  "introduction.vault.heading": "AirGap Vault",
-  "introduction.vault.text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App. <b>AirGap Vault muss instaliert und mit AirGap Wallet verwendet werden.</b>",
-  "introduction.vault.desktop_heading": "AirGap Vault & Ledger",
-  "introduction.vault.desktop_text": "Der Geheimschlüssel wird generiert und sicher aufbewahrt in der AirGap Vault App oder auf einer Ledger Hardware Wallet.<br> <b>Installieren Sie AirGap Vault auf einem mobilen Gerät oder verbinden Sie Ihre Ledger Hardware wallet mit AirGap Wallet.</b>",
-  "introduction.wallet.heading": "AirGap Wallet",
-  "introduction.wallet.text": "Die Wallet App kommt nur in Kontakt mit öffentlichen Informationen und ist für die Übermittlung von Transaktionen an die Blockchain zuständig.",
-  "introduction.communication.highest_text": "Einweg-Kommunikation mit QR Codes.",
-  "introduction.communication.medium_text": "Sichere Kommunikation mit App-Wechsel.",
-  "introduction.wallet_install_label": "AirGap Wallet installieren",
-  "introduction.continue_label": "Loslegen",
-  "introduction-download.title": "AirGap Vault Installieren",
-  "introduction-download.description": "Unklar wie AirGap Vault oder AirGap Wallet installiert werden sollten? Wir haben eine detailierte Anleitungen mit einer Schritt für Schritt Anleitung.",
-  "introduction-download.guide-link_label": "Anleitung anzeigen",
-  "introduction-download.heading": "AirGap Vault Aufsetzen",
-  "introduction-download.text": "Es gibt mehrere Möglichkeiten wie AirGap Vault installiert werden kann, wählen Sie diejenige aus die am besten auf Sie zutrifft.",
-  "introduction-download.play-store_text": "Installieren Sie AirGap Vault direkt aus dem Google Play Store für dieses oder auf einem dedizierten Gerät.",
-  "introduction-download.app-store_text": "Installieren Sie AirGap Vualt direkt über den App Store für dieses oder auf einem dedizierten Gerät.",
-  "introduction-download.linux-distro_label": "Linux Distribution",
-  "introduction-download.install-distro_text": "Installieren Sie AirGap Vault auf einem dedizierten Computer um Transaktionen offline zu signieren.",
-  "introduction-download.go_label": "Loslegen",
-  "portfolio.empty-state_text": "Fügen Sie neue Währungen zu AirGap Wallet hinzu, Sie benötigen dazu die <strong>AirGap Vault</strong> Applikation, welche für Ihren Geheimschlüssel zuständig ist.",
-  "portfolio.empty-state_desktop_text": "Fügen Sie neue Währungen zu AirGap Wallet hinzu, Sie benötigen dazu die <strong>AirGap Vault</strong> Applikation oder für ausgewählte Währungen eine <span class=\"style__strong color__primary\">Ledger Hardware Wallet</span>.",
-  "portfolio.add-coins_label": "Währungen hinzufügen",
-  "scan.title": "QR Code einlesen",
-  "scan.text": "Lesen Sie einen Synchronisierungs QR Code ein um ein Konto hinzuzufügen, oder lesen Sie einen Transaktions QR Code ein um eine Transaktion zu bestätigen.",
-  "scan.empty-state_heading": "Un QR Codes einlesen zu können, benötigt AirGap Wallet die <span class=\"style__strong color__primary\">Kamera Berechtigung</span>.",
-  "scan.grant-permission_label": "Berechtigung erteilen",
-  "scan-address.title": "Kontoadresse einlesen",
-  "scan-address.text": "QR einer Wallet Adresse einlesen.",
-  "scan-sync.title": "Sync Wallet Data",
-  "scan-sync.text": "Öffne AirGap Vault und wähle eine <span ion-text color='white'>Wallet</span>, dann drücke <span ion-text color='white'>Sync</span>, dann lies den Sync QR mit AirGap Wallet ein.",
-  "scan-sync.description": "Während diesem Vorgang werden keine Geheimschlüssel oder private Date geteilt.",
-  "scan-sync.scan_label": "Sync QR Code einlesen",
-  "settings.title": "Einstellungen",
-  "settings.help_label": "Hilfe & Support",
-  "settings.introduction_label": "Einführung",
-  "settings.faq_label": "FAQ",
-  "settings.discord_label": "Discord beitreten",
-  "settings.share_label": "AirGap teilen",
-  "settings.information_label": "Informationen",
-  "settings.github_label": "GitHub Repository",
-  "settings.about_label": "Über AirGap",
-  "settings.alert_title": "Wähle einen Kanal",
-  "settings.alert_cancel": "Abbrechen",
-  "settings.channel.international": "International",
-  "settings.channel.chinese": "Chinesisch",
-  "about.title": "Über AirGap",
-  "transaction-confirm.title": "Transaktion bestätigen",
-  "transaction-confirm.decline_label": "Ablehnen",
-  "transaction-confirm.confirm_label": "Bestätigen",
-  "transaction-detail.title": "Transaktionsdetails",
-  "transaction-detail.open-blockexplorer_label": "Blockexplorer öffnen",
-  "account-detail.title": "{{protocolName}}",
-  "transaction-prepare.title": "{{title}} Versenden",
-  "transaction-prepare.to-address_label": "Empfangsadresse",
-  "transaction-prepare.to-address_scan": "QR Code einlesen",
-  "transaction-prepare.amount_label": "BETRAG",
-  "transaction-prepare.fee.label": "GEBÜHR",
-  "transaction-prepare.fee.slow_label": "langsam & günstig",
-  "transaction-prepare.fee.fast_label": "schnell & teuer",
-  "transaction-prepare.fee.max_label": "MAX",
-  "transaction-prepare.paste_label": "Einfügen",
-  "transaction-prepare.create-transaction": "Transaktion erstellen",
-  "transaction-prepare.balance_label": "Balance:",
-  "transaction-qr.title": "Transaktions QR",
-  "transaction-qr.text": "Öffnen Sie AirGap Vault und lesen Sie diesen Transaktions QR Code ein um die Transaktion zu signieren.",
-  "transaction-qr.sign-on-device_label": "gleiches-Gerät Signierung",
-  "transaction-qr.done_label": "Fertig",
-  "interaction-selection.title": "Transaktion signieren",
-  "interaction-selection.heading": "Wie möchten Sie die Transaktion mit <span class=\"style__strong color__primary\">AirGap Vault</span> signieren?",
-  "interaction-selection.same-device_label": "Gleiches Gerät",
-  "interaction-selection.same-device_info": "AirGap Vault und AirGap Wallet sind auf dem gleichen Gerät installiert.",
-  "interaction-selection.offline-device_label": "Offline Gerät",
-  "interaction-selection.offline-device_info": "AirGap Vault ist auf einem offline Gerät installiert, lesen Sie den QR Code mit AirGap Vault ein.",
-  "wallet-address.title": "Kontoadresse",
-  "wallet-address.address_label": "Addresse",
-  "wallet-address.done_label": "Fertig",
-  "wallet-import.title": "Importierung bestätigen",
-  "wallet-import.text": "Möchten Sie das folgende Konto importieren?",
-  "wallet-import.warning": "Dieses Konto wurde bereits zu AirGap hinzugefügt.",
-  "wallet-import.syncing_label": "Synchronisieren...",
-  "wallet-import.cancel_label": "Abbrechen",
-  "wallet-import.import_label": "Importieren",
-  "from-to.type": "Transaktionstyp",
-  "from-to.amount_label": "Betrag",
-  "from-to.fee_label": "Gebühr",
-  "from-to.time_label": "ZEIT",
-  "from-to.from_label": "Von",
-  "from-to.to_label": "Zu",
-  "signed-transaction.transaction-unreadable": "Wir konnten die Daten in dieser Transaktion nicht lesen. Dies bedeutet nicht, dass sie nicht gültig ist - Allerdings solltest du diese Transaktion nur bestätigen falls du dir über die Risiken und deren Inhalt im klaren bist.",
-  "wallet-edit-popover-component.settings_label": "Kontoeinstellungen",
-  "wallet-edit-popover-component.copy-address_label": "Addresse kopieren",
-  "wallet-edit-popover-component.delete_label": "Entfernen",
-  "tabs.wallets": "Konten",
-  "tabs.scan": "QRs einlesen",
-  "tabs.settings": "Einstellungen",
-  "introduction.vault-install_label": "AirGap Vault installieren",
-  "transaction-detail.tx-broadcasting.heading": "Status: wird übermittelt..",
-  "transaction-detail.tx-broadcasting.text": "Ihre Transaktion wird übermittelt, dies kann einige Sekunden in Anspruch nehmen.",
-  "transaction-detail.tx-pending.heading": "Status: Ausstehend..",
-  "transaction-detail.tx-pending.text": "Je nach festgelegter Gebühr, kann es einige Minuten dauern, bis die Transaktion bestätigt wird.",
-  "transaction-detail.tx-success.heading": "Status: Erfolgreich!",
-  "transaction-prepare.to-address-scan_label": "QR einlesen",
-  "account-import.title": "Import bestätigen",
-  "account-import.text": "Möchten Sie das folgende Konto importieren?",
-  "account-import.warning": "Dieses Konto wurde bereits hinzugefügt.",
-  "account-import.syncing_label": "Synchronisierung..",
-  "account-import.cancel_label": "Abbrechen",
-  "account-import.import_label": "Importieren",
-  "wallet-edit-popover-component.delegate_label": "Delegieren",
-  "wallet-edit-popover-component.undelegate_label": "Undelegieren",
-  "add-account.title": "Währungen hinzufügen",
-  "add-sub-account.title": "{{ typeLabel }} hinzufügen",
-  "add-sub-account.tokens_label": "Tokens",
-  "add-sub-account.accounts_label": "Konto",
-  "add-sub-account.add-account_card.heading": "Konto erstellen",
-  "add-sub-account.add-account_card.text": "Um ein neues Tezos Konto hinzuzufügen, muss eine Gebühr von <strong>~0.260 XTZ</strong> bezahlt werden.",
-  "add-sub-account.add-accounts_label": "{{ typeLabel }} hinzufügen",
-  "add-sub-account.no-imports_text": "Kein {{ typeLabel }} zum importieren gefunden.",
-  "sub-account-select.title": "Konto auswählen",
-  "sub-account-select.text": "<strong>Konto</strong> auswählen, welches Sie delegieren möchten. Um die Delegierung zu bestätigen, müssen Sie eine Transaktion signieren.",
-  "sub-account-select.accounts_label": "Konten",
-  "account-detail.tokens_label": "Tokens",
-  "account-detail.accounts_label": "Konten",
-  "account-detail.add-tokens_label": "Tokens hinzufügen",
-  "account-detail.add-accounts_label": "Kontos hinzufügen",
-  "account-detail.send_label": "{{protocolSymbol}} Versenden",
-  "account-detail.receive_label": "Empfangen",
-  "account-detail.details_label": "Details",
-  "account-detail.no-accounts_text": "Noch kein {{ label }} vorhanden, bestehende {{ label }} erstellen oder importieren.",
-  "account-detail.delegate_card.heading": "Tezos Delegieren",
-  "account-detail.delegate_card.text": "<strong>{{amount}}</strong> undelegiert. Jetzt delegieren und einen Anteil pro Zyklus erhalten.",
-  "account-import-onboarding.title": "{{protocolName}} hinzufügen",
-  "account-import-onboarding.text": "Sie benötigen Die AirGap Vault Ap­pli­ka­ti­on um <strong>{{protocolName}}</strong> hinzuzufügen. Folgen Sie dazu den nächsten Schritten.",
-  "account-import-onboarding.slides.slide-1.text": "Öffnen Sie Ihre <strong>AirGap Vault</strong> Applikation auf dem gleichen oder auf dem offline Gerät.",
-  "account-import-onboarding.slides.slide-1.description": "Im <strong>“Konto”</strong> Tab <strong>“Account hinzufügen”</strong> auswählen.",
-  "account-import-onboarding.slides.slide-2_text": "Wählen Sie das erstellte Konto aus und auf der Seite \"Kontoadresse\" wählen Sie <strong>\"Account Synchronisieren\"</strong>.",
-  "account-import-onboarding.slides.slide-3.text": "Sie müssen das Konto von AirGap Vault nach AirGap Wallet synchronisieren.",
-  "account-import-onboarding.slides.slide-3.description": "¬ Wenn AirGap Vault auf einem <strong>offline Gerät</strong> ist, lesen Sie den <strong>QR Code</strong> ein auf der nächsten Seite.<br>¬ Wenn AirGap Vault auf dem <strong>gleichen Gerät</strong> ist, benutzen Sie den Button <strong>gleiches Gerät</strong>.",
-  "account-import-onboarding.slides.slide-4.text": "Das Konto kann jetzt nach AirGap Wallet importiert werden.",
-  "account-import-onboarding.slides.slide-4.description": "Sie sind jetzt bereit <strong>{{protocolName}}</strong> Transaktionen mit AirGap Vault und AirGap Wallet zu erstellen.",
-  "sub-account-import.title": "Konto auswählen",
-  "sub-account-import.text": "Wählen Sie das Konto aus welches Sie für <strong>{{subProtocolName}}</strong> hinzufügen möchten.",
-  "sub-account-import.empty_text": "Sie haben alle <strong>{{tokenName}}</strong> Kontos hinzugefügt.",
-  "sub-account-import.import-all_label": "Alle importieren",
-  "deep-link.not-supported-alert.title": "Hoppla",
-  "deep-link.not-supported-alert.message": "Deeplinking ist nur unterstützt auf mobilen Geräten.",
-  "deep-link.not-supported-alert.ok": "Verstanden",
-  "deep-link.app-not-found.title": "Hoppla",
-  "deep-link.app-not-found.message": "Es sieht so aus als ob Sie {{otherAppName}} nicht auf diesem Gerät installiert haben.",
-  "deep-link.app-not-found.ok": "Verstanden"
+  "wallet-edit-popover-component": {
+    "delegate_label": "Delegieren",
+    "undelegate_label": "Aufheben der Delegation",
+    "settings_label": "Account Einstellungen",
+    "copy-address_label": "Adresse kopieren",
+    "delete_label": "Entfernen",
+    "block-explorer_label": "Öffnen Sie Blockexplorer",
+    "change-network_label": "Netzwerk ändern"
+  },
+  "account-edit-popover-component": {
+    "header": "Kontoentfernung bestätigen",
+    "message": "Möchten Sie dieses Konto entfernen? Sie können es jederzeit erneut aus Ihrem Tresor synchronisieren.",
+    "delete": "Entfernen",
+    "cancel": "Stornieren"
+  },
+  "tabs": {
+    "wallets": "Konten",
+    "scan": "QRs scannen",
+    "ledger_import": "Hauptbuchimport",
+    "settings": "Einstellungen"
+  },
+  "add-account": {
+    "title": "Füge Münzen hinzu"
+  },
+  "add-sub-account": {
+    "title": "{{ typeLabel }} hinzufügen",
+    "delegation_heading": "Um Ihre XTZ zu <span class=\"style__strong color__primary\">delegieren</span>, müssen Sie zuerst ein neues Konto importieren oder erstellen, bevor Sie delegieren können.",
+    "tokens_label": "Token",
+    "accounts_label": "Konten",
+    "add-account_card": {
+      "heading": "Benutzerkonto erstellen",
+      "text": "Wenn Sie ein neues Tezos-Konto hinzufügen möchten, muss eine Gebühr von <strong>~0,260 XTZ</strong> bezahlt werden."
+    },
+    "add-accounts_label": "{{ typeLabel }} hinzufügen",
+    "no-imports_text": "Kein {{ typeLabel }} zum Importieren gefunden."
+  },
+  "add-generic-sub-account": {
+    "title": "{{ genericSubProtocolName }} hinzufügen",
+    "add-button_label": "Asset hinzufügen",
+    "xtz-fa": {
+      "name": "Nicht gelisteter Tezos-Vermögenswert"
+    },
+    "optimism-erc20": {
+      "name": "Nicht gelisteter Optimism ERC-20-Token"
+    },
+    "unsupported_text": "Ausgewähltes Unterkonto kann nicht hinzugefügt werden."
+  },
+  "sub-account-select": {
+    "title": "Konto auswählen",
+    "text": "Wählen Sie das <strong>Konto</strong> aus, das Sie delegieren möchten. Sie müssen eine Transaktion unterzeichnen, um die Delegierung zu bestätigen.",
+    "accounts_label": "Konten"
+  },
+  "account-import-onboarding": {
+    "title": "{{protocolName}} hinzufügen",
+    "text": "Sie benötigen die AirGap Vault-Anwendung, um <strong>{{protocolName}}</strong> hinzuzufügen. Folgen Sie den Anweisungen in den nächsten Schritten.",
+    "sub-protocol_text": "<strong>{{subProtocol}}</strong> kann nicht ohne ein <strong>{{protocol}}</strong>-Konto hinzugefügt werden.",
+    "slides": {
+      "slide-0": {
+        "text": "<strong>{{protocol}}</strong> hat viele Token. Um eines davon zu verwenden, müssen Sie zuerst ein <strong>{{protocol}}</strong>-Konto von AirGap Vault hinzufügen.",
+        "description": "Befolgen Sie die Anweisungen in den nächsten Schritten, um ein <strong>{{protocol}}</strong>-Konto hinzuzufügen, bevor Sie fortfahren können"
+      },
+      "slide-1": {
+        "text": "Öffnen Sie Ihre <strong>AirGap Vault</strong>-Anwendung auf demselben Gerät oder auf Ihrem Offline-Gerät.",
+        "description": "Gehen Sie zur Registerkarte <strong>„Konten“</strong> und wählen Sie <strong>„Konto hinzufügen“</strong>."
+      },
+      "slide-2_text": "Wählen Sie das erstellte Konto aus und wählen Sie auf der Seite „Kontoadresse“ <strong>„Konto synchronisieren“</strong>.",
+      "slide-3": {
+        "text": "Sie müssen das Konto von AirGap Vault mit AirGap Wallet synchronisieren.",
+        "description": "¬ Wenn sich AirGap Vault auf einem <strong>Offline-Gerät</strong> befindet, scannen Sie den <strong>QR-Code</strong> auf der nächsten Seite.<br>¬ Wenn sich AirGap Vault auf dem <strong>gleichen Gerät</strong> befindet, verwenden Sie dasselbe Gerät <strong>Synchronisierungsschaltfläche</strong>."
+      },
+      "slide-4": {
+        "text": "Das Konto kann jetzt in AirGap Wallet importiert werden.",
+        "description": "Sie können jetzt <strong>{{protocolName}}</strong>-Transaktionen mit AirGap Vault und AirGap Wallet erstellen."
+      }
+    },
+    "back": "Zurück",
+    "next": "Nächste",
+    "open_vault": "Tresor öffnen"
+  },
+  "account-import-ledger-onboarding": {
+    "title": "{{protocolName}} hinzufügen",
+    "text": "Sie benötigen ein Ledger-Gerät mit installierter Anwendung {{protocolName}}, um <strong>{{protocolName}}</strong> hinzuzufügen. Folgen Sie den Anweisungen in den nächsten Schritten.",
+    "slides": {
+      "slide-1": "Verbinden Sie Ihren Ledger mit Ihrem Computer und entsperren Sie ihn durch Eingabe des PIN-Codes.",
+      "slide-2": "Öffnen Sie die {{protocolName}}-App in Ihrem Ledger.",
+      "slide-3": "Bestätigen Sie, dass Sie Ihre {{protocolName}}-Adresse mit AirGap Wallet teilen möchten."
+    },
+    "status-card": {
+      "connecting": "Verbindung zum Ledger wird hergestellt ...",
+      "error": {
+        "header": "Verbindung zum Ledger konnte nicht hergestellt werden.",
+        "message": "Bitte stellen Sie sicher, dass Ihr Ledger an den Computer angeschlossen, entsperrt und die {{protocolName}}-App geöffnet ist."
+      },
+      "success": "Erfolgreich mit Ledger verbunden",
+      "redirecting": "Umleitung...",
+      "retry_button": "Wiederholen"
+    },
+    "back_button": "Zurück",
+    "next_button": "Nächste",
+    "done_button": "Erledigt"
+  },
+  "sub-account-import": {
+    "title": "Wählen Sie Konten",
+    "text": "Wählen Sie das Konto aus, das Sie für <strong>{{subProtocolName}}</strong> hinzufügen möchten.",
+    "empty_text": "Sie haben alle <strong>{{tokenName}}</strong>-Konten für alle Ihre Konten hinzugefügt",
+    "import-all_label": "Alles importieren"
+  },
+  "remove-liquidity": {
+    "receive": "Du erhältst"
+  },
+  "protocol-select": {
+    "title": "Münze auswählen",
+    "swap_info": "Um Token einer bestimmten Art zu tauschen, müssen Sie zunächst ein Konto des jeweiligen Tokens hinzufügen"
+  },
+  "delegation-detail": {
+    "title": "{{ delegateeLabel }} Detail",
+    "default-delegatee-label": "Delegation",
+    "default-delegatee-label-plural": "Delegationen",
+    "change-delegatee_label": "Ändern {{ delegateeLabel }}",
+    "your-delegation_label": "Ihre Delegation",
+    "your-balance_label": "Dein Kontostand",
+    "your-rewards_label": "Ihre Belohnungen",
+    "done_button": "Erledigt",
+    "amount_label": "Menge",
+    "max-amount_button": "MAX",
+    "invalid-value_error": "Ungültiger Wert",
+    "delegate_label": "Delegieren",
+    "undelegate_label": "Aufheben der Delegation",
+    "rewards": {
+      "index-col_label": "Index",
+      "amount-col_label": "Belohnen",
+      "payout-col_label": "Auszahlung"
+    }
+  },
+  "delegation-list": {
+    "title": "{{ delegateeLabelPlural }} Liste",
+    "your-delegatees_label": "Ihr {{ delegateeLabelPlural }}",
+    "known-delegatees_label": "Bekannt {{ delegateeLabelPlural }}",
+    "load-more_label": "Mehr laden",
+    "not-supported_text": "Derzeit wird die Liste {{ delegateeLabelPlural }} noch nicht unterstützt, Sie können jedoch mit „Validator ändern“ im Drei-Punkte-Menü manuell an eine Adresse delegieren."
+  },
+  "delegation-detail-cosmos": {
+    "delegatee-label": "Prüfer",
+    "delegatee-label-plural": "Validierer",
+    "commission_label": "Kommission",
+    "voting-power_label": "Stimmrecht",
+    "currently-delegated_label": "Derzeit delegiert",
+    "unbonding_label": "Entbindung",
+    "unclaimed-rewards_label": "Nicht beanspruchte Belohnungen",
+    "delegate": {
+      "label": "Delegieren",
+      "has-delegated_text": "Sie haben aktuell <span class=\"style__strong color__primary\">{{ delegiert }}</span> an diesen Validierer delegiert.",
+      "not-delegated_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten.",
+      "can-delegate-has-delegated_text": "Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren).",
+      "can-delegate-not-delegated_text": "Sie können bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren)."
+    },
+    "undelegate": {
+      "label": "Aufheben der Delegation",
+      "text": "Sie haben aktuell an diesen Validierer delegiert. Sie können die Delegation bis zu <span class=\"style__strong color__primary\">{{ delegated }}</span> aufheben."
+    },
+    "rewards": {
+      "label": "Belohnung",
+      "button": "Belohnung entgegennehmen",
+      "text": "Sie können bis zu <span class=\"style__strong color__primary\">{{ Belohnungen }}</span> an Belohnungen für diese Delegation beanspruchen."
+    }
+  },
+  "delegation-detail-tezos": {
+    "delegatee-label": "Bäcker",
+    "delegatee-label-plural": "Bäcker",
+    "status": {
+      "accepts-delegation": "Akzeptiert Delegation",
+      "reached-full-capacity": "Volle Kapazität erreicht",
+      "deactivated": "Deaktiviert"
+    },
+    "fee_label": "Gebühr",
+    "payout-schedule-every-cycle-last-rewards_text": "Alle {{ payoutTime }} <small>Jeder Zyklus, Belohnungen vom letzten Zyklus</small>",
+    "payout-schedule-every-cycle-delayed-rewards_text": "Alle {{ payoutTime }} <small>Jeden Zyklus, Belohnungen von {{ payoutDelay }} Zyklen zuvor</small>",
+    "payout-schedule-every-n-cycle_text": "Alle {{ payoutTime }} <small>Jeden {{ cycles }} Zyklus</small>",
+    "payout-schedule_label": "Auszahlungsplan",
+    "next-payout_label": "Nächste Auszahlung",
+    "first-payout_label": "Erste Auszahlung",
+    "return-per-cycle_label": "Geschätzte Rendite pro Zyklus",
+    "delegate_label": "Delegieren",
+    "undelegate_label": "Aufheben der Delegation",
+    "unknown": "Unbekannt",
+    "rewards": {
+      "index-col_label": "Zyklus",
+      "amount-col_label": "Erwartete Belohnung",
+      "payout-col_label": "Früheste Auszahlung"
+    }
+  },
+  "delegation-detail-polkadot": {
+    "delegatee-label": "Prüfer",
+    "delegatee-label-plural": "Validierer",
+    "status": {
+      "unknown": "Unbekannt"
+    },
+    "commission_label": "Kommission",
+    "expected-reward_label": "Erwartete Belohnung",
+    "delegated_label": "Delegiert",
+    "bonded_label": "Verbunden",
+    "locked_label": "Entbindung",
+    "withdraw-ready_label": "Bereit zum Rückzug",
+    "next-era_label": "Nächste Ära",
+    "becomes-active_label": "Wird aktiv",
+    "next-payout_label": "Nächste Auszahlung",
+    "delegate": {
+      "label": "Delegieren",
+      "bond-more_label": "Mehr binden",
+      "bond-nominate_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten. Sie können mindestens <span class=\"style__strong color__primary\">{{ minDelegation }}</span> bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (nach Abzug der Transaktionsgebühren) delegieren.",
+      "bond-nominate-no-max_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten.",
+      "rebond-nominate_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten. Sie können bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren).",
+      "rebond-nominate-no-max_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten.",
+      "nominate_text": "Delegieren Sie an diesen Validierer. Sie sind derzeit <span class=\"style__strong color__primary\">{{ gebunden }}</span> gebunden.",
+      "bond-extra_text": "Sie haben aktuell <span class=\"style__strong color__primary\">{{ bonded }}</span> delegiert. Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren).",
+      "bond-extra-no-max_text": "Sie haben aktuell <span class=\"style__strong color__primary\">{{ gebunden }}</span> delegiert. Sie können weitere {{ symbol }}s delegieren.",
+      "rebond-extra_text": "Sie haben aktuell <span class=\"style__strong color__primary\">{{ bonded }}</span> delegiert. Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren).",
+      "rebond-extra-no-max_text": "Sie haben aktuell <span class=\"style__strong color__primary\">{{ gebunden }}</span> delegiert. Sie können weitere {{ symbol }}s delegieren.",
+      "change-nomination_text": "Ändern Sie Ihre Delegation. Sie haben derzeit <span class=\"style__strong color__primary\">{{ gebunden }}</span> delegiert.",
+      "insufficient-funds-to-cover-fees_text": "Sie verfügen nicht über genügend {{ symbol }}, um die Transaktionsgebühren zu decken. Zusätzliche <span class=\"style__strong color__primary\">{{ extra }}</span> sind erforderlich.",
+      "insufficient-funds-to-nominate_text": "Sie haben nicht genügend {{ symbol }} zum Delegieren. Zusätzliche <span class=\"style__strong color__primary\">{{ extra }}</span> sind erforderlich.",
+      "min-nominator-bond-not-reached_text": "Sie haben nicht genügend {{ symbol }} zum Delegieren gebunden, zusätzliche <span class=\"style__strong color__primary\">{{ extra }}</span> sind erforderlich."
+    },
+    "undelegate": {
+      "label": "Aufheben der Delegation"
+    },
+    "unbond": {
+      "label": "Bindung lösen"
+    },
+    "withdraw-unbonded": {
+      "label": "Unerklärlich zurückziehen",
+      "button": "Zurückziehen",
+      "text-full": "Sie können <span class=\"style__strong color__primary\">{{ unlocked }}</span> an ungebundenen Mitteln abheben.",
+      "text-short": "Sie können ungebundene Gelder abheben."
+    },
+    "rewards": {
+      "index-col_label": "Epoche",
+      "amount-col_label": "Belohnen",
+      "payout-col_label": "Auszahlung"
+    },
+    "alert": {
+      "polkadot": {
+        "delegation-issues": {
+          "title": "Delegationen zu Polkadot",
+          "description": "Um derzeit für Polkadot-Belohnungen in Frage zu kommen, ist eine dynamische Mindestmenge an DOT erforderlich. Die Menge ändert sich täglich. Weitere Informationen finden Sie im Polkadot-Blogpost.",
+          "actions": {
+            "open-blogpost": "Blogpost öffnen"
+          }
+        }
+      },
+      "election-open": {
+        "title": "Delegationsvorgänge derzeit nicht verfügbar",
+        "description": "Aufgrund der wahlzeitlichen Einschränkungen ist der Delegationsbetrieb derzeit nicht möglich."
+      },
+      "nomination-inactive": {
+        "title": "Ihre Delegation an diesen Validierer ist inaktiv",
+        "description": "Der Prüfer wurde in den Prüfersatz aufgenommen. Ihre Nominierung wurde jedoch nicht für die aktive Teilnahme in diesem Zeitraum ausgewählt und Sie erhalten keine Belohnungen."
+      },
+      "nomination-oversubscribed": {
+        "title": "Dieser Validator ist überzeichnet",
+        "description": "Validatoren können pro Ära nur an 256 Nominatoren auszahlen. Wenn mehr als 256 Nominatoren denselben Validator nominieren, ist dieser „überzeichnet“ und nur die 256 Nominatoren mit den höchsten Einsätzen erhalten Belohnungen. In dieser Ära erhalten Sie keine Belohnungen."
+      },
+      "validator-oversubscribed": {
+        "title": "Dieser Validator ist überzeichnet",
+        "description": "Validatoren können pro Ära nur an 256 Nominatoren auszahlen. Wenn mehr als 256 Nominatoren denselben Validator nominieren, ist dieser „überzeichnet“ und nur die 256 Nominatoren mit den höchsten Einsätzen erhalten Belohnungen."
+      }
+    }
+  },
+  "delegation-detail-moonbeam": {
+    "delegatee-label": "Kollator",
+    "delegatee-label-plural": "Kollatoren",
+    "commission_label": "Kommission",
+    "delegators_label": "Delegierer",
+    "collators_label": "Kollatoren",
+    "currently-delegated_label": "Derzeit delegiert",
+    "delegator-status": {
+      "label": "Status",
+      "active_label": "Aktiv",
+      "leaving_label": "Aufheben der Delegation",
+      "ready-to-leave_label": "Bereit zur Rückdelegation",
+      "unknown_label": "Unbekannt"
+    },
+    "delegate": {
+      "label": "Delegieren",
+      "has-delegated_text": "Sie haben derzeit <span class=\"style__strong color__primary\">{{ delegiert }}</span> an diesen Collator delegiert.",
+      "not-delegated_text": "Wählen Sie den Betrag aus, den Sie delegieren möchten.",
+      "can-delegate-has-delegated_text": "Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren).",
+      "can-delegate-not-delegated_text": "Sie können bis zu <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> delegieren (nach Abzug der Transaktionsgebühren)."
+    },
+    "undelegate": {
+      "schedule": {
+        "label": "Zeitplan undelegieren",
+        "text": "Sie haben aktuell an diesen Collator delegiert. Sie können die Delegation bis zu <span class=\"style__strong color__primary\">{{ delegated }}</span> aufheben."
+      },
+      "execute": {
+        "label": "Ausführen der Undelegate-Aktion",
+        "text": "Ihre Anfrage zur Rücknahme der Delegation von <span class=\"style__strong color__primary\">{{ amount }}</span> kann jetzt ausgeführt werden.",
+        "text-unknown-request": "Ihr Antrag auf Aufhebung der Delegation kann nun ausgeführt werden."
+      },
+      "cancel": {
+        "label": "Abbrechen Aufheben der Delegation",
+        "text": "Ihre Anfrage zur Rücknahme der Delegation von <span class=\"style__strong color__primary\">{{ amount }}</span> kann in {{ executableIn }} Runden ausgeführt werden. Bis dahin können Sie sie stornieren.",
+        "text-single-round": "Ihre Anfrage zur Rücknahme der Delegation von <span class=\"style__strong color__primary\">{{ amount }}</span> kann in einer Runde ausgeführt werden. Bis dahin können Sie sie stornieren.",
+        "text-unknown-request": "Ihre Anfrage zur Rücknahme der Delegation steht noch aus. Sie können sie abbrechen, bis sie ausführbar ist."
+      }
+    },
+    "undelegate-all": {
+      "schedule": {
+        "label": "Zeitplan – Alle delegieren"
+      },
+      "execute": {
+        "label": "Ausführen undelegate für alle"
+      },
+      "cancel": {
+        "label": "Abbrechen Alle delegieren"
+      }
+    },
+    "alert": {
+      "collator-oversubscribed": {
+        "title": "Dieser Collator ist überzeichnet",
+        "description": "Kollatoren können pro Runde nur an {{ maxTopDelegations }} Delegatoren auszahlen. Wenn mehr als {{ maxTopDelegations }} Delegatoren denselben Kollator delegieren, werden nur die Delegatoren mit den höchsten {{ maxTopDelegations }} Einsätzen belohnt. Derzeit beträgt der Mindesteinsatzbetrag, der für Belohnungen von diesem Kollator in Frage kommt, <span class=\"style__strong\">{{ minStakingAmount }}</span>."
+      }
+    }
+  },
+  "delegation-detail-icp": {
+    "delegatee-label": "Gefolgter",
+    "delegatee-label-plural": "Gefolgte",
+    "voting-power_label": "Stimmrecht",
+    "neuron-balance_label": "Neuron-Unterkontostand",
+    "staked_label": "Abgesteckt",
+    "maturity_label": "Reife",
+    "age_label": "Alter",
+    "dissolve-delay_label": "Verzögerung auflösen",
+    "followee-status": {
+      "unknown": "Unbekannt (weitere Details laden)",
+      "followed": "Gefolgt",
+      "not-followed": "Nicht befolgt"
+    },
+    "stake-and-follow": {
+      "label": "Folgen",
+      "not-staking-not-following_text": "Folgen Sie diesem Neuron und delegieren Sie Ihren Einsatz.<br><br>Derzeit setzen Sie keinen Einsatz. Wählen Sie den Betrag aus, den Sie einsetzen möchten. Sie können von <span class=\"style__strong color__primary\">{{ minStake }}</span> bis zu <span class=\"style__strong color__primary\">{{ maxStake }}</span> (nach Transaktionsgebühren) einsetzen.",
+      "staking-not-following_text": "Folgen Sie diesem Neuron und delegieren Sie Ihren Einsatz.<br><br>Sie haben aktuell <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> eingesetzt. Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxStake }}</span> einsetzen (nach Transaktionsgebühren).",
+      "staking-following_text": "Sie folgen diesem Neuron. Erhöhen Sie Ihren Einsatz, um mehr Stimmrecht zu erlangen.<br><br>Sie haben aktuell <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> eingesetzt. Sie können zusätzlich bis zu <span class=\"style__strong color__primary\">{{ maxStake }}</span> einsetzen (nach Transaktionsgebühren)."
+    },
+    "follow": {
+      "label": "Folgen",
+      "text": "Folgen Sie diesem Neuron."
+    },
+    "increase-dissolve-delay": {
+      "label": "Eingestellten Verzögerung",
+      "text": "Die <span class=\"style__strong color__primary\">Auflösungsverzögerung</span> bestimmt, wie viel Stimmrecht Sie haben und wie lange Sie warten müssen, bis Ihre Mittel freigegeben werden, sobald Sie mit der Auflösung Ihres Neurons beginnen. Ihre aktuelle Auflösungsverzögerung ist auf <span class=\"style__strong color__primary\">{{ solvedDelay }}</span> eingestellt und Sie können sie auf bis zu <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span> erhöhen."
+    },
+    "more-details": {
+      "label": "Mehr Details",
+      "text": "Vollständige Neuronendetails sind privat, daher ist zum Abrufen der Zugriff auf einen privaten Schlüssel erforderlich. Erstellen und signieren Sie eine Abfragetransaktion, um weitere Daten zu laden."
+    },
+    "disburse": {
+      "label": "Auszahlen",
+      "text": "Dein Neuron hat sich aufgelöst, ziehe die freigeschalteten Token ab."
+    },
+    "start-dissolving": {
+      "label": "Beginnen Sie mit dem Auflösen"
+    },
+    "stop-dissolving": {
+      "label": "Aufhören aufzulösen",
+      "text": "Ihr Neuron löst sich gerade auf. Ihre Guthaben werden in <span class=\"style__strong color__primary\">{{ solvedDelay }}</span> freigegeben. Beenden Sie die Auflösung, um den Vorgang abzubrechen."
+    },
+    "form": {
+      "dissolve-delay": {
+        "label": "Auflösungsverzögerung (in Tagen)",
+        "extra-label": "{{ duration }} (Stimmrecht {{ votingPower }}x)",
+        "extra-label-no-rewards": "{{ duration }} (Stimmrecht {{ votingPower }}x)<br><br>Warnung: Die Auflösungsverzögerung sollte nicht niedriger als {{ minDelay }} sein, sonst erhalten Sie keine Belohnungen.",
+        "invalid-state": "Die Auflösungsverzögerung darf nicht niedriger als {{ minDelay }} sein, sonst erhältst du keine Belohnungen. Die maximale Verzögerung beträgt {{ maxDelay }}.",
+        "invalid-decrease": "Ungültige Auflösungsverzögerung, der Wert kann nur erhöht werden, darf also nicht unter den aktuellen Wert ({{ minDelay }}) fallen und darf {{ maxDelay }} nicht überschreiten."
+      }
+    }
+  },
+  "introduction-push": {
+    "title": "Mitteilungen",
+    "heading": "Sie können Push-Benachrichtigungen erhalten, wenn Ihre Konten Transaktionen empfangen.",
+    "description": "Zuerst müssen Sie AirGap Wallet die Berechtigung für Push-Benachrichtigungen erteilen.",
+    "grant-permission_label": "Berechtigung erteilen"
+  },
+  "portfolio-item": {
+    "active": "aktiv"
+  },
+  "current-wallet-group": {
+    "label": "Gruppe"
+  },
+  "voting": {
+    "title": "Wählen",
+    "heading": "Block Reward Initiative (BRI)",
+    "text": "Um Aeternity in eine sich selbst tragende Plattform umzuwandeln, schlagen wir die Block Reward Initiative (BRI) vor, durch die etwa 0–20 % der Miner-Belohnungen für die Entwicklung bereitgestellt werden.",
+    "your-vote_label": "Ihre Stimme: {{ votePercentage }}%",
+    "voting-period_label": "Stimmen Sie ab von <strong>{{startDate}}</strong> bis <strong>{{endDate}}</strong>",
+    "further-information": {
+      "heading": "Weitere Informationen",
+      "blog-post_label": "Detaillierte Erklärung im Blogbeitrag",
+      "forum_label": "Community-Diskussion im Forum",
+      "result_label": "Um Ihre Stimme zu überprüfen, besuchen Sie bitte <a href=\"https://aeternity.com\"> die offizielle Abstimmungsseite</a>"
+    },
+    "vote-no_label": "Sie haben abgestimmt: Ich unterstütze die BRI NICHT",
+    "vote-percentage_label": "Sie haben abgestimmt: {{ oldVotePercentage }}%",
+    "vote-disabled_label": "Die Abstimmung ist derzeit deaktiviert",
+    "vote_label": "Abstimmung",
+    "change-vote_label": "Abstimmung ändern",
+    "done_label": "Erledigt"
+  },
+  "delegate-action-popover": {
+    "delegation-settings_label": "Delegierungseinstellungen",
+    "change-to-airgap-delegatee_label": "Wechseln Sie zu AirGap {{ delegateeLabel }}"
+  },
+  "delegate-edit-popover": {
+    "delegation-settings_label": "Delegierungseinstellungen",
+    "change-delegatee_label": "Ändern {{ delegateeLabel }}",
+    "change-alert": {
+      "text": "Geben Sie die Adresse ein, die Sie vom {{ delegateeLabel }} erhalten haben.",
+      "placeholder_text": "{{ delegateeLabel }} Adresse",
+      "delegatee-address_label": "Baker-Adresse",
+      "cancel_label": "Stornieren",
+      "set-delegatee_label": "Setzen Sie {{ delegateeLabel }}"
+    }
+  },
+  "delegation-validator-list": {
+    "title": "Validator-Liste",
+    "your-validators_label": "Ihre Validierer",
+    "validators_label": "Validierer",
+    "sort_label": "Validierer sortieren",
+    "no_validators_found_label": "Es wurden keine Validatoren gefunden, die Ihrer Suche entsprechen."
+  },
+  "action-alert-tip": {
+    "heading": "Vielen Dank, dass Sie AirGap verwenden!",
+    "text": "Wir haben gesehen, dass Sie AirGap in letzter Zeit häufig verwenden. Möchten Sie die Entwicklung unserer App mit einem Trinkgeld unterstützen?",
+    "cancel_label": "NEIN",
+    "ok_label": "Jetzt Trinkgeld geben"
+  },
+  "action-alert-delegation": {
+    "heading": "Vielen Dank, dass Sie AirGap verwenden!",
+    "text": "Wir haben festgestellt, dass Sie XTZ-Gelder besitzen, die nicht delegiert sind. Durch die Delegierung Ihrer Gelder können Sie bis zu 7 % Zinsen pro Jahr verdienen! Möchten Sie Ihre Gelder jetzt delegieren?",
+    "cancel_label": "NEIN",
+    "ok_label": "Jetzt delegieren"
+  },
+  "ledger-sign": {
+    "title": "{{title}} Transaktionsdetails",
+    "text": "Verbinden Sie das Ledger-Gerät und unterzeichnen Sie die Transaktion.",
+    "confirm_label": "Zeichen",
+    "error-alert": {
+      "header": "Fehler",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten. Versuchen Sie, Ihr Gerät erneut zu verbinden.",
+      "confirm": "Okay"
+    }
+  },
+  "account-import-interaction-selection": {
+    "title": "Unterzeichneroption auswählen",
+    "airgap-vault": {
+      "label": "AirGap-Tresor",
+      "text": "AirGap Vault kann auf einem Offline-Smartphone oder auf demselben Gerät installiert werden, um Transaktionen sicher zu signieren."
+    },
+    "ledger": {
+      "label": "Hauptbuch",
+      "text": "Ledger verfügt über mehrere Arten von Hardware-Wallets, die mit Ihrem Gerät verbunden sind, um Transaktionen sicher zu signieren."
+    }
+  },
+  "beacon-request": {
+    "sign-data_label": "Möchten Sie folgende Daten unterschreiben?",
+    "blake2b_hash": "Ledger Blake2b-Hash der Nachricht",
+    "request": {
+      "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> möchte eine Verbindung zu Ihrem Konto herstellen.",
+      "text": "Diese Website fordert die folgenden Berechtigungen an. Stellen Sie immer sicher, dass Sie den Websites, mit denen Sie interagieren, vertrauen."
+    },
+    "connect_label": "Verbinden",
+    "continue_label": "Weitermachen",
+    "cancel_label": "Stornieren",
+    "request-by-dapp_label": "Beacon-Anfrage per DApp",
+    "title": {
+      "permission-request": "Erlaubnisanfrage",
+      "sign-payload-request": "Nutzlastanforderung signieren",
+      "operation-request": "Vorgangsanforderung",
+      "broadcast-request": "Erlaubnisanfrage"
+    },
+    "permission": {
+      "sign-transactions": "Transaktionen signieren",
+      "operation-request": "Vorgangsanfrage",
+      "threshold": "Schwelle"
+    },
+    "select-account": {
+      "alert": "Wählen Sie ein Konto zum Koppeln aus",
+      "button": "Account wechseln"
+    }
+  },
+  "dapp-permission-list": {
+    "title": "Dapp-Berechtigungen",
+    "connected-dapps": "Verbundene DApps",
+    "remove_label": "Entfernen",
+    "no-permissions": "Es wurden keine Berechtigungen erteilt.",
+    "delete-permission-alert": {
+      "header": "Berechtigung löschen?",
+      "message": "Möchten Sie diese Berechtigung wirklich löschen? Die DApp kann keine Vorgänge mehr ausführen, bis neue Berechtigungen erteilt werden.",
+      "cancel_label": "Stornieren",
+      "yes_label": "Ja"
+    }
+  },
+  "dapp-settings": {
+    "title": "Dapp-Einstellungen",
+    "remove-all_label": "Alles entfernen",
+    "delete_label": "Löschen",
+    "no-peers": "Mit keinen Peers verbunden",
+    "reset": "Zurücksetzen",
+    "alert": {
+      "heading": "Alles entfernen",
+      "message": "Möchten Sie wirklich alle Peers entfernen?",
+      "cancel": "Stornieren",
+      "confirm": "Bestätigen"
+    }
+  },
+  "walletconnect": {
+    "connection_request": "WalletConnect - Verbindungsanfrage",
+    "new_transaction": "WalletConnect – Neue Transaktion",
+    "sign_request": "WalletConnect - Anfrage unterzeichnen",
+    "switch_ethereum_chain": "WalletConnect - Ethereum-Kette wechseln",
+    "sign_typed_data": "WalletConnect - Typisierte Daten signieren",
+    "wait": "Warten auf WalletConnect",
+    "alert": {
+      "title": "Nicht unterstützt",
+      "message": "eth_signTypedData wird derzeit nicht unterstützt"
+    },
+    "timeout": {
+      "title": "Verbindungsfehler",
+      "message": "Es scheint, als ob die Verbindung über WalletConnect nicht hergestellt werden kann"
+    },
+    "connection_error": "Beim Verbinden mit WalletConnect ist ein Problem aufgetreten"
+  },
+  "health-check": {
+    "title": "Gesundheitskontrolle",
+    "message": "Überprüfen der API-Integrität"
+  },
+  "group-label": {
+    "all": "Alle",
+    "ungrouped": "Andere"
+  },
+  "dapp-confirm": {
+    "title": "Walletconnect-Anfrage bestätigen",
+    "text": "Möchten Sie die Walletconnect-Anfrage bestätigen?"
+  },
+  "tezos-fa-form": {
+    "header": "Geben Sie die Tezos-Vertragsdetails an, um einen nicht aufgeführten Tezos-Vermögenswert hinzuzufügen.",
+    "contract-address_label": "Vertragsadresse",
+    "network_label": "Netzwerk",
+    "token-interface_label": "FA-Norm",
+    "token": {
+      "label": "Vermögenswert",
+      "placeholder": "Anlage auswählen"
+    },
+    "paste_label": "Paste",
+    "error": {
+      "contract-not-found": "Vertrag nicht gefunden, prüfen Sie, ob Adresse und Netz korrekt sind.",
+      "interface-unknown": "Die Schnittstelle des Vertrags konnte nicht ermittelt werden. Bitte geben Sie eine an.",
+      "token-metadata-missing": "Die Asset-Metadaten können nicht abgerufen werden.",
+      "token-vague": "Bei der Adresse handelt es sich um einen Multi-Asset-Vertrag. Bitte geben Sie das Asset an, das Sie hinzufügen möchten.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    }
+  },
+  "collectibles-list": {
+    "title": "Sammlerstücke",
+    "load-more_label": "Mehr laden",
+    "empty-state_text": "Ohh … <br>Sieht so aus, als hätten Sie noch keine Sammlerstücke. Gehen Sie zu <strong><a href='https://objkt.com' target='blank'>objkt.com</a></strong> und beginnen Sie mit dem Sammeln.",
+    "error": {
+      "loading": {
+        "message": "Sammlerstücke können nicht geladen werden"
+      },
+      "show-details": {
+        "message": "Details zum Sammlerstück können nicht angezeigt werden"
+      },
+      "unknown": {
+        "message": "Unbekannter Fehler"
+      }
+    }
+  },
+  "collectibles-item": {
+    "title": "Sammlerstücke Details",
+    "details_label": "Einzelheiten",
+    "amount_label": "Menge",
+    "more-details_label": "Mehr Details",
+    "send-button_label": "Schicken",
+    "address": {
+      "contract_label": "Zugehöriger Vertrag"
+    },
+    "error": {
+      "loading": {
+        "message": "Die Details des Sammlerstücks konnten nicht geladen werden"
+      },
+      "open-url": {
+        "message": "URL kann nicht geöffnet werden"
+      },
+      "send": {
+        "message": "Die Überweisung kann nicht vorbereitet werden"
+      },
+      "unknown": {
+        "message": "Unbekannter Fehler"
+      }
+    }
+  },
+  "objkt-collectible-explorer": {
+    "more-details": {
+      "view-on": "Auf objkt.com anzeigen"
+    }
+  },
+  "set-contract": {
+    "title": "Legen Sie den {{ protocolName }}-Vertrag fest",
+    "xtz_shielded": {
+      "name": "Setzling"
+    },
+    "set-button_label": "Adresse festlegen",
+    "unsupported_text": "Die Vertragsadresse für das ausgewählte Protokoll kann nicht festgelegt werden."
+  },
+  "tezos-sapling-contract-form": {
+    "header": "Geben Sie die Details des Tezos Sapling-Vertrags an.",
+    "contract-address_label": "Vertragsadresse",
+    "contract-address_text": "AirGap ist mit der Referenzimplementierung des Sapling-Smart-Contracts kompatibel, die auf <a href='' target='_blank'>Tezos GitLab</a> verfügbar ist.",
+    "injector-url_label": "Injektor-URL",
+    "injector-url_text": "AirGap ist mit der Referenzimplementierung des Injector-Dienstes kompatibel, die auf <a href='' target='_blank'>AirGap GitHub</a> verfügbar ist.",
+    "paste_label": "Paste",
+    "include-injector_label": "Injektor Service",
+    "include-injector_text": "Datenschutzerhaltung und Verbesserung der Benutzerfreundlichkeit mit dem Injectors-Dienst. Sapling-Transaktionen müssen in AirGap nur einmal signiert werden, statt wie bei diesem Dienst zweimal.",
+    "warning": {
+      "contract-not-compatible": "Der Vertrag scheint nicht kompatibel zu sein. Sie können ihn trotzdem verwenden, wenn Sie sicher sind, dass er funktioniert.",
+      "contract-cannot-assess-compatibility": "Die Vertragsadresse konnte nicht verifiziert werden. Sie können sie dennoch verwenden, wenn Sie sicher sind, dass sie funktioniert."
+    },
+    "error": {
+      "contract-invalid": "Die Vertragsadresse ist ungültig.",
+      "injector-invalid": "Die Injektor-URL ist ungültig.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    }
+  },
+  "optimism-erc20-form": {
+    "header": "Geben Sie die Optimism ERC-20-Vertragsdetails an, um ein nicht aufgeführtes ERC-20-Token hinzuzufügen.",
+    "contract-address_label": "Vertragsadresse",
+    "paste_label": "Paste",
+    "error": {
+      "contract-not-found": "Vertrag nicht gefunden, prüfen Sie, ob die Adresse korrekt ist.",
+      "token-metadata-missing": "Die Asset-Metadaten können nicht abgerufen werden.",
+      "unknown": "Es ist ein unbekannter Fehler aufgetreten."
+    }
+  },
+  "isolated-modules": {
+    "loader_message": "Wird geladen..."
+  },
+  "isolated-modules-list-page": {
+    "title": "Isolierte Module",
+    "items": {
+      "search_placeholder": "Suche nach isolierten Modulen"
+    },
+    "alert": {
+      "add": {
+        "failed": {
+          "header": "Hinzufügen des Moduls fehlgeschlagen",
+          "message": "Etwas ist schief gelaufen. Bitte versuche es erneut.",
+          "ok_label": "OK"
+        }
+      }
+    }
+  },
+  "isolated-modules-details-page": {
+    "button": {
+      "install_label": "Installieren",
+      "update_label": "Aktualisieren"
+    },
+    "popover": {
+      "remove_label": "Entfernen"
+    },
+    "alert": {
+      "remove": {
+        "header": "Modul entfernen",
+        "message": "Möchten Sie dieses Modul wirklich entfernen?",
+        "cancel_label": "Stornieren",
+        "proceed_label": "Entfernen"
+      },
+      "update": {
+        "generic": {
+          "header": "Modulaktualisierung fehlgeschlagen",
+          "message": "Etwas ist schiefgelaufen! Das Modul konnte nicht aktualisiert werden.",
+          "ok_label": "OK"
+        },
+        "load-failed": {
+          "header": "Modulaktualisierung fehlgeschlagen",
+          "message": "Es ist ein Fehler aufgetreten! Das neue Modul konnte nicht geladen werden.",
+          "ok_label": "OK"
+        },
+        "different-public-key": {
+          "header": "Modulaktualisierung fehlgeschlagen",
+          "message": "Sie können dieses Modul mit dem ausgewählten Paket nicht aktualisieren, da die Autoren (öffentliche Schlüssel) unterschiedlich sind.",
+          "ok_label": "OK"
+        }
+      }
+    }
+  }
 }
