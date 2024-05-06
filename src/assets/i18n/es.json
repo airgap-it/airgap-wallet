@@ -3,7 +3,6 @@
     "title": "Cuenta",
     "transactions_label": "Transacciones",
     "add-tokens_label": "Añadir Token",
-    "change-contract_label": "Cambiar Contrato",
     "collectibles_label": "NFTs",
     "import-accounts_label": "Importar Cuentas",
     "delegate_label": "Delegación",
@@ -12,6 +11,8 @@
     "vote_label": "Votación",
     "migrate_label": "Migrar Saldo",
     "delegation-status_label": "Delegación",
+    "set-contract_label": "Establecer Contrato",
+    "change-contract_label": "Cambiar Contrato",
     "fund_label": "Añadir Fondos",
     "load_more": "Cargar más",
     "pending-transactions": {
@@ -19,21 +20,8 @@
       "text": "Las transacciones pendientes no están habilitadas en este momento, por favor consulte el blockexplorer",
       "open-blockexplorer_label": "Abrir Explorador de Bloques"
     },
-    "pending-exchange-transactions": {
-      "label": "Transacciones pendientes"
-    },
-    "mtpelerin": {
-      "buy_label": "Comprar",
-      "cancel_label": "Cancelar",
-      "cash-out_label": "Retirar efectivo",
-      "header": "Este servicio es proporcionado por Mt. Pelerin y abandonará la billetera AirGap. Los cambios se pueden realizar en la configuración",
-      "note_description": "Nota - Mt. Pelerin acepta clientes de todos los países, excepto ciudadanos de EE. UU. y Rusia, y residentes de: Afganistán, Bielorrusia, Burundi, República Centroafricana, Cuba, República Democrática del Congo, Guinea, Guinea-Bisáu, Irán, Iraq, Líbano, Libia, China continental (se aceptan Hong Kong y Taiwán), Malí, Myanmar, Nicaragua, Corea del Norte, Rusia, Somalia, Sudán, Sudán del Sur, Siria, Venezuela, Yemen, Zimbabue",
-      "ok_label": "Aceptar",
-      "title": "Mt Pelerin"
-  },
     "receive_label": "Recibir",
     "send_label": "Enviar",
-    "set-contract_label": "Establecer Contrato",
     "tx_not_loading": "La transacciones no pueden cargarse en este momento, por favor revisa el explorador de bloques para ver las últimas transacciones",
     "has-delegated_card": {
       "heading": "<strong>{{amount}}</strong> Delegada",
@@ -53,7 +41,16 @@
       "cancel": "Cancelar",
       "confirm": "Migrar"
     },
-    "no-transactions_text": "Aún no hay transacciones para esta cuenta."
+    "no-transactions_text": "Aún no hay transacciones para esta cuenta.",
+    "mtpelerin": {
+      "title": "Mt Pelerin",
+      "buy_label": "Comprar",
+      "cash-out_label": "Retirar efectivo",
+      "cancel_label": "Cancelar",
+      "ok_label": "Aceptar",
+      "header": "Este servicio es proporcionado por Mt. Pelerin y abandonará la billetera AirGap. Los cambios se pueden realizar en la configuración",
+      "note_description": "Nota - Mt. Pelerin acepta clientes de todos los países, excepto ciudadanos de EE. UU. y Rusia, y residentes de: Afganistán, Bielorrusia, Burundi, República Centroafricana, Cuba, República Democrática del Congo, Guinea, Guinea-Bisáu, Irán, Iraq, Líbano, Libia, China continental (se aceptan Hong Kong y Taiwán), Malí, Myanmar, Nicaragua, Corea del Norte, Rusia, Somalia, Sudán, Sudán del Sur, Siria, Venezuela, Yemen, Zimbabue"
+    }
   },
   "account-transaction-detail": {
     "available_label": "Disponible",
@@ -64,6 +61,7 @@
   },
   "introduction": {
     "title": "El nuevo estandar de billetera crypto",
+    "title_mobile":"Interacción con el Vault",
     "highest": {
       "label": "Seguridad alta",
       "text": "Con el <b>enfoque de dos dispositivos</b> de AirGap el manejo seguro de claves se vuelve más accesible.</p>",
@@ -86,12 +84,11 @@
     "communication": {
       "highest_text": "Comunicación de unico sentido con códigos QR.",
       "medium_text": "Comunicación segura a través de cambio de aplicación.",
+      "highest_heading": "Enfoque de dos dispositivos",
+      "medium_heading": "Enfoque del mismo dispositivo",
       "highest_expanded_text": "Firma transacciones completamente fuera de línea en un dispositivo sin ninguna conectividad de red con la aplicación AirGap Knox o AirGap Vault y transmítelas con tu teléfono inteligente cotidiano con la aplicación AirGap Wallet. La comunicación entre los dos dispositivos se realiza a través de códigos QR transparentes.",
-        "highest_heading": "Enfoque de dos dispositivos",
-        "medium_expanded_text": "En lugar de instalar AirGap Vault en un dispositivo fuera de línea, también puedes instalar AirGap Vault y AirGap Wallet en tu teléfono inteligente cotidiano (mismo dispositivo) y obtener seguridad adicional a través del aislamiento de aplicaciones y el cambio de aplicaciones para la comunicación.",
-        "medium_heading": "Enfoque del mismo dispositivo"
+      "medium_expanded_text": "En lugar de instalar AirGap Vault en un dispositivo fuera de línea, también puedes instalar AirGap Vault y AirGap Wallet en tu teléfono inteligente cotidiano (mismo dispositivo) y obtener seguridad adicional a través del aislamiento de aplicaciones y el cambio de aplicaciones para la comunicación."
     },
-    "title_mobile": "Interacción con el Vault",
     "vault-install_label": "Instalar AirGap Vault",
     "continue_label": "Vamos"
   },
@@ -114,23 +111,23 @@
     "go_label": "Vamos"
   },
   "portfolio": {
+    "shop_banner": "Obtenga una capa adicional de seguridad: obtenga la placa de recuperación AirGap",
     "empty-state_text": "Para utilizar la aplicación AirGap Wallet, debes <strong>sincronizar con AirGap Vault</strong>. Seleccione la cuenta en AirGap Vault y visualice el código QR de sincronización. Escanea este código con AirGap Wallet.",
     "empty-state_desktop_text": "Comience agregando monedas a AirGap Wallet, puede hacerlo con la <span class=\"style__strong color__primary\">aplicación AirGap Vault</span> o, para algunas monedas seleccionadas, con una <span class=\"style__strong color__primary\">cartera de hardware Ledger</span>.",
     "add-coins_label": "Añadir monedas.",
-    "flip-card":{
-      "back-title": "Convierte tu dispositivo en una verdadera cartera de hardware",
-      "front-title": "Saldo Total"
-    ,
-    "shop_banner": "Obtén una capa adicional de seguridad - Obtén la AirGap Recovery Plate"}  
+    "flip-card": {
+      "front-title": "Saldo Total",
+      "back-title": "Convierte tu dispositivo en una verdadera cartera de hardware"
+    }
   },
   "account-add": {
     "featured": "Destacados",
     "others": "Más Activos",
-    "isolated-module": "¿No encuentras tu moneda favorita? Crea un Módulo Aislado para integrarla",
     "generic": {
-      "optimism-erc20_label": "Agregar Token ERC-20 de Optimism no listado",
-      "xtz_label": "Añadir Activo Tezos no listado"
-    }
+      "xtz_label": "Añadir Activo Tezos no listado",
+      "optimism-erc20_label": "Agregar Token ERC-20 de Optimism no listado"
+    },
+    "isolated-module": "¿No encuentras tu moneda favorita? Crea un Módulo Aislado para integrarla"
   },
   "scan": {
     "title": "Escanear QR",
@@ -153,36 +150,20 @@
     "title": "Ajustes",
     "appearance_label": "Apariencia",
     "theme_label": "Tema",
-    "languages-label": "Idiomas",
-    "app-language-label": "Idioma de la Aplicación",
     "select-theme": {
       "system": "Tema del Dispositivo",
       "light": "Tema Diurno",
       "dark": "Tema Nocturno"
     },
-    "add-ons_settings": {
-      "isolated-modules_text": "Módulos Aislados",
-      "label": "Complementos"
-  },
-  "airgap_shop": "Tienda AirGap",
-  "airgap_website": "Sitio web de AirGap",
-  "knox-button_label": "Explora Knox Ahora",
-  "knox-text_pt1": "Convierte tu dispositivo en una verdadera cartera de hardware",
-  "knox-text_pt2": "AirGap Knox impone un verdadero modo fuera de línea y solo permite que se ejecute el Vault en tu dispositivo",
-  "preferred-language_label": "Idioma Preferido",
-    "select-language": {
-      "en": "Inglés",
-      "de": "Alemán",
-      "es": "Español",
-      "pt_BR": "Portugués (Brasil)",
-      "zh_CN": "Chino (China)"
-    },
+    "preferred-language_label": "Idioma Preferido",
     "help_label": "Ayuda y Soporte",
     "introduction_label": "Introducción",
     "faq_label": "FAQ",
     "discord_label": "Unete a Discord",
     "share_label": "Compartir AirGap",
     "information_label": "Información",
+    "airgap_website": "Sitio web de AirGap",
+    "airgap_shop": "Tienda AirGap",
     "github_label": "Repositorio de GitHub",
     "other_label": "Otros",
     "paste-from-clipboard_label": "Pegar desde el portapapeles",
@@ -214,12 +195,32 @@
     "interaction": {
       "label": "Preferencias de interacción",
       "text": "Ajustes Interacción entre Bóveda y Wallet"
-    }
+    },
+    "trading_settings": {
+      "label": "Comercio",
+      "text": "Configuración comercial avanzada",
+      "mtpelerin": "Utilice el Monte Pelerin"
+    },
+    "add-ons_settings": {
+      "label": "Complementos",
+      "isolated-modules_text": "Módulos Aislados"
+    },
+    "knox-text_pt1": "Convierte tu dispositivo en una verdadera cartera de hardware",
+    "knox-text_pt2": "AirGap Knox impone un verdadero modo fuera de línea y solo permite que se ejecute el Vault en tu dispositivo",
+    "knox-button_label": "Explora Knox Ahora"
   },
-  "trading_settings": {
-    "label": "Trading",
-    "mtpelerin": "Usar Mt Pelerin",
-    "text": "Configuración Avanzada de Trading"
+  "mtpelerin": {
+    "header1": "Compra y vende criptomonedas con Mt Pelerin – La puerta de entrada suiza al mundo de las criptomonedas",
+    "paragraph1": "Invierta en Bitcoin, Ether y los activos más populares en múltiples cadenas en unos pocos clics, a los mejores precios del mercado y sin necesidad de KYC. Retírelos en cualquier momento en 14 monedas en su cuenta bancaria en 171 países.",
+    "header2": "Simple y transparente",
+    "lineItem1": "No se requiere identificación",
+    "lineItem2": "Tarifas en vivo y transparentes",
+    "lineItem3": "Haga un pago, reciba criptomonedas directamente en AirGap",
+    "button1": "Más información sobre la compra",
+    "button2": "Más información sobre la venta",
+    "note": "Nota: Mt. Pelerin acepta clientes de todos los países, excepto personas de EE. UU. y Rusia, y residentes de: Afganistán, Bielorrusia, Burundi, República Centroafricana, Cuba, República Democrática del Congo, Guinea, Guinea-Bisáu, Irán, Irak, Líbano, Libia, China continental (se aceptan Hong Kong y Taiwán), Malí, Myanmar, Nicaragua, Corea del Norte, Rusia, Somalia, Sudán, Sudán del Sur, Siria, Venezuela, Yemen, Zimbabue.",
+    "noteLink1": "Más información",
+    "noteLink2": "Términos y condiciones"
   },
   "qr-settings-page": {
     "title": "Ajustes QR"
@@ -306,20 +307,6 @@
     "done_label": "Hecho",
     "details": "Mostrar detalles"
   },
-  "language-selection": {
-    "title": "Selección de Idioma",
-    "heading": "Por favor elige tu idioma preferido",
-    "selector": {
-      "device": "Idioma del Dispositivo",
-      "en": "Inglés",
-      "de": "Alemán",
-      "es": "Español",
-      "pt_BR": "Portugués (Brasil)",
-      "zh_CN": "Chino (China)"
-    },
-    "continue_label": "Continuar",
-    "description": "Siempre puedes cambiar tus preferencias en Ajustes."
-  },
   "interaction-selection": {
     "title": "Interacción con la Bóveda",
     "heading": "¿Cómo te gustaría interactuar con <span class=\"style__strong color__primary\">AirGap Vault</span>?",
@@ -350,6 +337,22 @@
     "vault_info": "AirGap Vault está instalado en un dispositivo sin conexión a Internet, escanea el código QR con AirGap Wallet.",
     "ledger_label": "Ledger",
     "ledger_info": "Ledger tiene varios tipos de carteras de hardware que se conectan a su dispositivo para firmar transacciones de forma segura."
+  },
+  "language-selection-settings": {
+    "title": "Selección de Idioma",
+    "heading": "Por favor, elige tu idioma preferido",
+    "selector": {
+      "device": "Idioma de tu dispositivo",
+      "en": "Inglés",
+      "de": "Alemán (AI traducido)",
+      "es": "Español (AI traducido)",
+      "fr": "francés (AI traducido)",
+      "ru":"ruso",
+      "pt_BR": "Portugués (Brasil)",
+      "zh_CN": "Chino (China)"
+    },
+    "continue_label": "Continuar",
+    "description": "Siempre puedes cambiar tu preferencia en la configuración"
   },
   "wallet-address": {
     "title": "Direccion de cuenta",
@@ -392,8 +395,7 @@
     "wallets": "Cuentas",
     "scan": "Escanear QRs",
     "ledger_import": "Importar Ledger",
-    "settings": "Ajustes",
-    "exchange": "Exchange"
+    "settings": "Ajustes"
   },
   "add-account": {
     "title": "Añadir monedas."
@@ -413,11 +415,11 @@
   "add-generic-sub-account": {
     "title": "Añadir {{ genericSubProtocolName }}",
     "add-button_label": "Añadir Activo",
-    "optimism-erc20": {
-      "name": "Token ERC-20 do Optimism não listado"
-  },
     "xtz-fa": {
       "name": "Activo Tezos no listado"
+    },
+    "optimism-erc20": {
+      "name": "Token ERC-20 do Optimism não listado"
     },
     "unsupported_text": "No se puede agregar la subcuenta seleccionada."
   },
@@ -481,87 +483,12 @@
     "empty_text": "Has agregado todas las cuentas de <strong>{{tokenName}}</strong> para todas tus cuentas.",
     "import-all_label": "Importar todo"
   },
-  "exchange": {
-    "title": "Exchange",
-    "exchange_label": "Exchange",
-    "powered-by_label": "Impulsado por",
-    "switch-exchange_label": "Exchange",
-    "onboarding": {
-      "heading": "Puedes intercambiar <span class=\"style__strong color__primary\">Ethereum</span> por <span class=\"style__strong color__primary\">Bitcoin</span> y hacer otros intercambios.",
-      "description": "Intercambia fácilmente todas las criptomonedas compatibles directamente dentro de AirGap",
-      "exchange_label": "Comenzar intercambio."
-    },
-    "no-currencies": {
-      "heading": "Para intercambiar, necesitas al menos dos monedas en AirGap, como <span class=\"style__strong color__primary\">Ethereum</span> y <span class=\"style__strong color__primary\">Bitcoin</span>.",
-      "description": "Antes de poder intercambiar fácilmente criptomonedas en AirGap, debes agregar al menos dos diferentes",
-      "exchange_label": "Añadir monedas."
-    },
-    "loading": {
-      "setup": "Configurando intercambio...",
-      "header": "Cargando error",
-      "message": "Parece que no se puede configurar ningún intercambio en este momento, por favor, disculpa las molestias e intenta de nuevo más tarde"
-    }
-  },
-  "swap": {
-    "min-amount_label": "(min. {{minExchangeAmount}})",
-    "sell_label": "Vender",
-    "buy_label": "Comprar",
-    "currently_not_supported": "El par de trading seleccionado no es compatible en este momento",
-    "min-amount-error_label": "\"La cantidad mínima es {{minExchangeAmount}}\"",
-    "amount-higher-than-balance-error_label": "\"La cantidad que ingresaste es mayor que el saldo de tu cuenta {{accountBalance}}\""
+  "remove-liquidity": {
+    "receive": "Recibes"
   },
   "protocol-select": {
-    "title": "Selecciona moneda"
-  },
-  "exchange-select": {
-    "title": "Selecciona Exchange"
-  },
-  "exchange-confirm": {
-    "title": "Confirmar Exchange",
-    "confirm-exchange_label": "Confirmar Exchange",
-    "heading": "Este es el resumen de tu intercambio. Necesitas firmarlo con <span class=\"style__strong color__primary\">AirGap Vault</span> para completar el intercambio.",
-    "sell_label": "De",
-    "sell-amount_label": "Cantidad",
-    "fee_label": "Tarifa",
-    "exchange-address_label": "Dirección de intercambio.",
-    "buy-amount_label": "Cantidad a comprar",
-    "receiving-to_label": "Recibiendo de",
-    "disclaimer": "Servicios de intercambio proporcionados por Changelly. Al hacer clic en Confirmar Intercambio, reconozco y entiendo que mi transacción puede desencadenar la verificación AML/KYC de acuerdo con las políticas de <span class=\"style__strong color__primary\">AML/KYC de Changelly</span>.",
-    "changelly_disclaimer": "Servicios de intercambio proporcionados por Changelly. Al hacer clic en \"Confirmar Intercambio\", reconozco y entiendo que mi transacción puede activar una verificación AML/KYC de acuerdo con las políticas de<span class=\"style__strong color__primary\"> AML/KYC de Changelly</span>.",
-    "changenow_disclaimer": "Los servicios de intercambio son proporcionados por ChangeNow. Al hacer clic en \"Confirmar intercambio\", reconozco y entiendo que mi transacción puede desencadenar una verificación AML/KYC de acuerdo con <span class=\"style__strong color__primary\">AML/KYC de ChangeNow</span>"
-  },
-  "exchange-custom": {
-    "title": "Selecciona Guardian",
-    "text": "El intercambio a tzBTC todavía no es compatible directamente en AirGap, pero puedes intercambiar en uno de los siguientes Guardianes.",
-    "confirm-exchange_label": "Confirma intercambio",
-    "heading": "Swap no soportado",
-    "bitcoin-suisse": {
-      "title": "Bitcoin Suisse",
-      "text": "Fundada en 2013, Bitcoin Suisse ha sido un pionero en la provisión de servicios cripto-financieros. Bitcoin Suisse ha ayudado a dar forma al ecosistema cripto y de blockchain en Suiza. Para recibir TZBTC, debes estar completamente registrado como cliente, incluyendo toda la documentación KYC/AML. El monto mínimo para operar con Bitcoin Suisse es de 1 BTC o 1 TZBTC. Se aplican tarifas de operación por cada transacción."
-    },
-    "bity": {
-      "title": "Bity",
-      "text": "Fundada en 2014, Bity SA es un proveedor líder de servicios cripto-financieros. Fue fundada con la convicción de que las blockchains y otras tecnologías para la descentralización tendrán algunas de las implicaciones sociales más profundas de la historia. Como intermediario financiero suizo regulado, Bity ofrece servicios y productos cripto-financieros para particulares y empresas en todo el mundo, permitiendo a las personas siempre estar en completo control de sus propios fondos."
-    },
-    "sygnum": {
-      "title": "Sygnum",
-      "text": "Sygnum es el primer banco de activos digitales del mundo y un especialista en activos digitales con alcance global. Sygnum ofrece una cartera de servicios bancarios regulados que integra de manera fluida activos tradicionales y digitales en una cuenta, incluyendo importantes monedas nacionales, Bitcoin, Ethereum, un CHF digital y tokens de activos. Fundada sobre el patrimonio suizo y singapurense, Sygnum permite a los clientes institucionales invertir en la economía de activos digitales con completa confianza."
-    },
-    "taurus": {
-      "title": "Taurus",
-      "text": "Taurus Group SA es una empresa líder en Suiza en activos digitales y blockchain. Fue fundada por ejecutivos senior con experiencia en banca, tecnología de la información, ciberseguridad y regulación. Taurus ofrece soluciones de infraestructura de mercado financiero de grado empresarial para activos digitales, así como servicios financieros a clientes institucionales."
-    },
-    "woorton": {
-      "title": "Woorton",
-      "text": "Woorton ofrece liquidez de criptomonedas las 24 horas del día, los 7 días de la semana, a través de API o de trading por voz. Su infraestructura de trading de grado bancario les permite desplegar capital en intercambios con algoritmos de trading propietarios y mejorar la liquidez de todo tipo de activos. Ofrecen acceso sin problemas a activos digitales y brindan servicios a inversores, escritorios de corretaje y proveedores de pagos en todo el mundo. Woorton ofrece liquidez en tzBTC contra 20 monedas, incluyendo BTC, ETH, USD, EUR, CHF, GBP, stablecoins y más."
-    },
-    "disclaimer": "Servicios de intercambio proporcionados por Changelly. Al hacer clic en Confirmar intercambio, reconozco y entiendo que mi transacción puede desencadenar la verificación AML/KYC de acuerdo con la política de <span class=\"style__strong color__primary\">AML/KYC de Changelly</span>.",
-    "get-tzbtc": "Consigue tzBTC de {{Gatekeeper}}"
-  },
-  "exchange-quipuswap": {
-    "slippage-tolerance": {
-      "label": "Tolerancia permitida"
-    }
+    "title": "Selecciona moneda",
+    "swap_info": "Para intercambiar tokens de un determinado tipo, primero debe agregar una cuenta del token respectivo."
   },
   "delegation-detail": {
     "title": "{{ delegateeLabel }} Detalle",
@@ -640,7 +567,7 @@
       "payout-col_label": "Pago más próximo"
     }
   },
-  "delegation-detail-substrate": {
+  "delegation-detail-polkadot": {
     "delegatee-label": "Validador",
     "delegatee-label-plural": "Validadores",
     "status": {
@@ -649,68 +576,71 @@
     "commission_label": "Comisión",
     "expected-reward_label": "Recompensa esperada",
     "delegated_label": "Delegado",
-    "bonded_label": "Bloqueado",
-    "locked_label": "Retirando",
-    "withdraw-ready_label": "Listo pare retirar",
-    "next-era_label": "Siguiente era",
-    "becomes-active_label": "Vuelve a estar activo",
-    "next-payout_label": "Próximo pago.",
+    "bonded_label": "Garantizado",
+    "locked_label": "Desvinculación",
+    "withdraw-ready_label": "Listo para retirarse",
+    "next-era_label": "Próxima era",
+    "becomes-active_label": "Se vuelve activo",
+    "next-payout_label": "Próximo pago",
     "delegate": {
       "label": "Delegar",
-      "bond-nominate_text": "Seleccione la cantidad que desea delegar. Puedes delegar al menos<span class=\"style__strong color__primary\"> {{ minDelegation }}</span> hasta un máximo de <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las comisiones de transacción).",
-      "bond-nominate-no-max_text": "Seleccione la cantidad que desea delegar.",
-      "rebond-nominate_text": "Seleccione la cantidad que desea delegar. Puede delegar hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las comisiones de transacción).",
-      "rebond-nominate-no-max_text": "Seleccione la cantidad que desea delegar.",
-      "nominate_text": "Delega a este validador. Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> fondos bloqueados.",
-      "bond-extra_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> fondos delegados. Además, puedes delegar hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> adicionales (después de las comisiones de transacción).",
-      "bond-extra-no-max_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> fondos delegados. Puedes delegar {{ symbol }} adicionales.",
-      "rebond-extra_text": "Actualmente has delegado <span class=\"style__strong color__primary\">{{ bonded }}</span>. Puedes delegar adicionalmente hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las comisiones de transacción).",
-      "rebond-extra-no-max_text": "Actualmente has delegado <span class=\"style__strong color__primary\">{{ bonded }}</span>. Puedes delegar {{ symbol }} adicionales.",
-      "change-nomination_text": "Cambia tu delegación. Actualmente has delegado <span class=\"style__strong color__primary\">{{ bonded }}</span>.",
-      "unsufficient-funds_text": "No tienes suficientes {{ symbol }} para cubrir las comisiones de transacción, se requieren <span class=\"style__strong color__primary\">{{ extra }}</span> adicionales."
+      "bond-more_label": "Enlace más",
+      "bond-nominate_text": "Selecciona el monto que deseas delegar. Puedes delegar al menos <span class=\"style__strong color__primary\">{{ minDelegation }}</span> hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las tarifas de transacción).",
+      "bond-nominate-no-max_text": "Selecciona el monto que deseas delegar.",
+      "rebond-nominate_text": "Selecciona el monto que deseas delegar. Puedes delegar hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las tarifas de transacción).",
+      "rebond-nominate-no-max_text": "Selecciona el monto que deseas delegar.",
+      "nominate_text": "Delegar en este validador. Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> vinculado.",
+      "bond-extra_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> delegado. Además, puedes delegar hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las tarifas de transacción).",
+      "bond-extra-no-max_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> delegado. Puede delegar {{ símbolo }} adicionales.",
+      "rebond-extra_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> delegado. Además, puedes delegar hasta <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (después de las tarifas de transacción).",
+      "rebond-extra-no-max_text": "Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> delegado. Puede delegar {{ símbolo }} adicionales.",
+      "change-nomination_text": "Cambia tu delegación. Actualmente tienes <span class=\"style__strong color__primary\">{{ bonded }}</span> delegado.",
+      "insufficient-funds-to-cover-fees_text": "No tienes suficientes {{ symbol }} para cubrir las tarifas de transacción, <span class=\"style__strong color__primary\">{{ extra }}</span> adicionales requerido.",
+      "insufficient-funds-to-nominate_text": "No tienes suficientes {{ symbol }} para delegar, se requieren <span class=\"style__strong color__primary\">{{ extra }}</span> adicionales.",
+      "min-nominator-bond-not-reached_text": "No tienes suficientes {{ symbol }} vinculados para delegar, se requieren <span class=\"style__strong color__primary\">{{ extra }}</span> adicionales."
     },
     "undelegate": {
-      "label": "Desdelegar"
+      "label": "Delegar"
     },
     "unbond": {
-      "label": "Desbloquear"
+      "label": "Desvinculado"
     },
     "withdraw-unbonded": {
-      "label": "Retirar desbloqueo",
+      "label": "Retirarse sin intención",
       "button": "Retirar",
-      "text-full": "Puedes retirar <span class=\"style__strong color__primary\">{{ unlocked }}</span> de fondos desvinculados.",
-      "text-short": "Puedes retirar los fondos no bloqueados."
+      "text-full": "Puede retirar <span class=\"style__strong color__primary\">{{ unlocked }}</span> de fondos no vinculados.",
+      "text-short": "Puede retirar fondos no vinculados."
     },
     "rewards": {
       "index-col_label": "Era",
-      "amount-col_label": "Recompensa",
-      "payout-col_label": "Pago"
+      "amount-col_label": "Premio",
+      "payout-col_label": "Pagar"
     },
     "alert": {
       "polkadot": {
         "delegation-issues": {
           "title": "Delegaciones en Polkadot",
-          "description": "Actualmente se requiere una cantidad mínima dinámica de DOT para ser elegible para recibir recompensas en Polkadot. El monto cambia diariamente. Por favor, lee el post en el blog de Polkadot para obtener más información.",
+          "description": "Actualmente, se requiere una cantidad mínima dinámica de DOT para ser elegible para recibir recompensas en Polkadot. La cantidad cambia todos los días. Por favor, lee el artículo del blog de Polkadot para obtener más información.",
           "actions": {
-            "open-blogpost": "Abrir Blogpost"
+            "open-blogpost": "Abrir artículo del blog"
           }
         }
       },
       "election-open": {
-        "title": "Actualmente las operaciones de delegación no están disponibles.",
-        "description": "Debido a las restricciones del período de votaciones, actualmente las operaciones de delegación no están disponibles."
+        "title": "Operaciones de delegación actualmente no disponibles",
+        "description": "Debido a las restricciones del período de elecciones, las operaciones de delegación no están disponibles actualmente."
       },
       "nomination-inactive": {
-        "title": "Tu delegación a este validador está inactiva.",
-        "description": "El validador ha sido elegido para formar parte del conjunto de validadores, sin embargo, su nominación no ha sido seleccionada para estar activa en esta era y no obtendrá ninguna recompensa."
+        "title": "Tu delegación a este validador está inactiva",
+        "description": "El validador ha sido elegido para formar parte del conjunto de validadores, sin embargo, tu nominación no ha sido seleccionada para estar activa en esta era y no recibirás ninguna recompensa."
       },
       "nomination-oversubscribed": {
-        "title": "Este validador está sobresuscrito.",
-        "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, se considera \"sobresuscrito\" y solo se pagan recompensas a los 256 mejores nominadores con fondos. No obtendrás ninguna recompensa en esta era."
+        "title": "Este validador está sobre-suscripto",
+        "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, está \"sobre-suscripto\", y solo los 256 nominadores con más participación reciben recompensas. No recibirás ninguna recompensa en esta era."
       },
       "validator-oversubscribed": {
-        "title": "Este validador está sobresuscrito.",
-        "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, se considera \"sobresuscrito\" y solo los 256 mejores nominadores con apuestas son recompensados."
+        "title": "Este validador está sobre-suscripto",
+        "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, está \"sobre-suscripto\", y solo los 256 nominadores con más participación reciben recompensas."
       }
     }
   },
@@ -770,78 +700,64 @@
       }
     }
   },
+  "delegation-detail-icp": {
+    "delegatee-label": "Delegado",
+    "delegatee-label-plural": "Delegados",
+    "voting-power_label": "Poder de Voto",
+    "neuron-balance_label": "Saldo de Subcuenta de Neurona",
+    "staked_label": "Participación",
+    "maturity_label": "Madurez",
+    "age_label": "Edad",
+    "dissolve-delay_label": "Retraso de disolución",
+    "followee-status": {
+      "unknown": "Desconocido (cargar más detalles)",
+      "followed": "Seguido",
+      "not-followed": "No Seguido"
+    },
+    "stake-and-follow": {
+      "label": "Seguir",
+      "not-staking-not-following_text": "Sigue esta neurona y delega tu participación.<br><br>Actualmente no estás participando, selecciona la cantidad que deseas participar. Puedes participar desde <span class=\"style__strong color__primary\">{{ minStake }}</span> hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción).",
+      "staking-not-following_text": "Sigue esta neurona y delega tu participación.<br><br>Tienes actualmente <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> participando. Puedes participar adicionalmente hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción).",
+      "staking-following_text": "Estás siguiendo esta neurona. Aumenta tu participación para obtener más poder de voto.<br><br>Tienes actualmente <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> participando. Puedes participar adicionalmente hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción)."
+    },
+    "follow": {
+      "label": "Seguir",
+      "text": "Sigue esta neurona."
+    },
+    "increase-dissolve-delay": {
+      "label": "Establecer Retraso",
+      "text": "La <span class=\"style__strong color__primary\">Retraso de Disolución</span> determina cuánto poder de voto tienes y cuánto tiempo esperarás que se desbloqueen tus fondos una vez que comiences a disolver tu neurona. Tu Retraso de Disolución actual está establecido en <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span> y puedes aumentarlo hasta <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
+    },
+    "more-details": {
+      "label": "Más Detalles",
+      "text": "Los detalles completos de la neurona están destinados a ser privados, por lo tanto, se requiere acceso a una clave privada para obtenerlos. Crea y firma una transacción de consulta para cargar más datos."
+    },
+    "disburse": {
+      "label": "Distribuir",
+      "text": "Tu neurona ha sido disuelta, retira los tokens desbloqueados."
+    },
+    "start-dissolving": {
+      "label": "Comenzar a Disolver"
+    },
+    "stop-dissolving": {
+      "label": "Detener Disolución",
+      "text": "Tu neurona está actualmente disolviéndose, tus fondos se desbloquearán en <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Detén la disolución para cancelar el proceso."
+    },
+    "form": {
+      "dissolve-delay": {
+        "label": "Retraso de Disolución (en días)",
+        "extra-label": "{{ duration }} (Poder de Voto {{ votingPower }}x)",
+        "extra-label-no-rewards": "{{ duration }} (Poder de Voto {{ votingPower }}x)<br><br>Advertencia: el Retraso de Disolución no debe ser inferior a {{ minDelay }} de lo contrario no recibirás ninguna recompensa.",
+        "invalid-state": "El Retraso de Disolución no debe ser inferior a {{ minDelay }} de lo contrario no recibirás ninguna recompensa. El retraso máximo es {{ maxDelay }}.",
+        "invalid-decrease": "Retraso de Disolución Inválido, el valor solo puede aumentarse, por lo tanto no puede ser inferior al valor actual ({{ minDelay }}) y no puede exceder {{ maxDelay }}."
+      }
+    }
+  },
   "introduction-push": {
     "title": "Notificaciones Push",
     "heading": "Puedes recibir notificaciones push si tus cuentas reciben transacciones.",
     "description": "Primero debes otorgar a AirGap Wallet el permiso de notificación push.",
     "grant-permission_label": "Dar permiso"
-  },
-  "isolated-modules": {
-    "loader_message": "Cargando..."
-  },
-  "isolated-modules-details-page":{
-    "alert": {
-        "remove": {
-            "cancel_label": "Cancelar",
-            "header": "Eliminar módulo",
-            "message": "¿Estás seguro de que quieres eliminar este módulo?",
-            "proceed_label": "Eliminar"
-        },
-        "update": {
-            "different-public-key": {
-                "header": "Error al actualizar el módulo",
-                "message": "No puedes actualizar este módulo con el paquete seleccionado, los autores (claves públicas) son diferentes.",
-                "ok_label": "Aceptar"
-            },
-            "generic": {
-                "header": "Error al actualizar el módulo",
-                "message": "¡Algo salió mal! No se pudo actualizar el módulo.",
-                "ok_label": "Aceptar"
-            },
-            "load-failed": {
-                "header": "Error al actualizar el módulo",
-                "message": "¡Algo salió mal! No se pudo cargar el nuevo módulo.",
-                "ok_label": "Aceptar"
-            }
-        }
-    },
-    "button": {
-        "install_label": "Instalar",
-        "update_label": "Actualizar"
-    },
-    "popover": {
-        "remove_label": "Eliminar"
-    }
-  },
-  "isolated-modules-list-page": {
-    "alert": {
-        "add": {
-            "failed": {
-                "header": "Error al agregar el módulo",
-                "message": "¡Algo salió mal! Por favor, inténtalo de nuevo.",
-                "ok_label": "Aceptar"
-            }
-        }
-    },
-    "items": {
-        "search_placeholder": "Buscar módulos aislados"
-    },
-    "title": "Módulos Aislados"
-  },
-  "language-selection-settings":{
-    "continue_label": "Continuar",
-    "description": "Siempre puedes cambiar tu preferencia en la configuración",
-    "heading": "Por favor, elige tu idioma preferido",
-    "selector": {
-        "de": "Alemán",
-        "device": "Idioma de tu dispositivo",
-        "en": "Inglés",
-        "es": "Español",
-        "pt_BR": "Portugués (Brasil)",
-        "ru": "Ruso",
-        "zh_CN": "Chino (China)"
-    },
-    "title": "Selección de Idioma"
   },
   "portfolio-item": {
     "active": "activo"
@@ -979,9 +895,9 @@
     "connection_request": "WalletConnect - Solicitud de conexión",
     "new_transaction": "WalletConnect - Nueva transacción",
     "sign_request": "WalletConnect - Solicitud de firma",
+    "switch_ethereum_chain": "WalletConnect - Cambiar Cadena Ethereum",
     "sign_typed_data": "WalletConnect - Firma de datos",
     "wait": "Esperando a WalletConnect",
-    "switch_ethereum_chain": "WalletConnect - Cambiar Cadena Ethereum",    
     "alert": {
       "title": "No compatible",
       "message": "eth_signTypedData actualmente no es compatible"
@@ -1067,136 +983,93 @@
       "view-on": "Ver en objkt.com"
     }
   },
-  "optimism-erc20-form": {
-    "contract-address_label": "Dirección del Contrato",
-    "error": {
-        "contract-not-found": "Contrato no encontrado, verifique si la dirección es correcta.",
-        "token-metadata-missing": "No se pudo obtener los metadatos del activo.",
-        "unknown": "Ha ocurrido un error desconocido."
+  "set-contract": {
+    "title": "Establecer Contrato {{ protocolName }}",
+    "xtz_shielded": {
+      "name": "Sapling"
     },
-    "header": "Proporcione los detalles del contrato Optimism ERC-20 para agregar un token ERC-20 no listado.",
-    "paste_label": "Pegar"
-},
-  "mtpelerin":{
-    "button1": "Más información sobre la compra",
-    "button2": "Más información sobre la venta",
-    "header1": "Compra y vende criptomonedas con Mt Pelerin – La puerta de entrada suiza al mundo de las criptomonedas",
-    "header2": "Simple y transparente",
-    "lineItem1": "No se requiere identificación",
-    "lineItem2": "Tarifas en vivo y transparentes",
-    "lineItem3": "Haga un pago, reciba criptomonedas directamente en AirGap",
-    "note": "Nota: Mt. Pelerin acepta clientes de todos los países, excepto personas de EE. UU. y Rusia, y residentes de: Afganistán, Bielorrusia, Burundi, República Centroafricana, Cuba, República Democrática del Congo, Guinea, Guinea-Bisáu, Irán, Irak, Líbano, Libia, China continental (se aceptan Hong Kong y Taiwán), Malí, Myanmar, Nicaragua, Corea del Norte, Rusia, Somalia, Sudán, Sudán del Sur, Siria, Venezuela, Yemen, Zimbabue.",
-    "noteLink1": "Más información",
-    "noteLink2": "Términos y condiciones",
-    "paragraph1": "Invierta en Bitcoin, Ether y los activos más populares en múltiples cadenas en unos pocos clics, a los mejores precios del mercado y sin necesidad de KYC. Retírelos en cualquier momento en 14 monedas en su cuenta bancaria en 171 países."
-  },
-"delegation-detail-icp": {
-        "age_label": "Edad",
-        "delegatee-label": "Delegado",
-        "delegatee-label-plural": "Delegados",
-        "disburse": {
-            "label": "Distribuir",
-            "text": "Tu neurona ha sido disuelta, retira los tokens desbloqueados."
-        },
-        "dissolve-delay_label": "Retraso de disolución",
-        "follow": {
-            "label": "Seguir",
-            "text": "Sigue esta neurona."
-        },
-        "followee-status": {
-            "followed": "Seguido",
-            "not-followed": "No Seguido",
-            "unknown": "Desconocido (cargar más detalles)"
-        },
-        "form": {
-            "dissolve-delay": {
-                "extra-label": "{{ duration }} (Poder de Voto {{ votingPower }}x)",
-                "extra-label-no-rewards": "{{ duration }} (Poder de Voto {{ votingPower }}x)<br><br>Advertencia: el Retraso de Disolución no debe ser inferior a {{ minDelay }} de lo contrario no recibirás ninguna recompensa.",
-                "invalid-decrease": "Retraso de Disolución Inválido, el valor solo puede aumentarse, por lo tanto no puede ser inferior al valor actual ({{ minDelay }}) y no puede exceder {{ maxDelay }}.",
-                "invalid-state": "El Retraso de Disolución no debe ser inferior a {{ minDelay }} de lo contrario no recibirás ninguna recompensa. El retraso máximo es {{ maxDelay }}.",
-                "label": "Retraso de Disolución (en días)"
-            }
-        },
-        "increase-dissolve-delay": {
-            "label": "Establecer Retraso",
-            "text": "La <span class=\"style__strong color__primary\">Retraso de Disolución</span> determina cuánto poder de voto tienes y cuánto tiempo esperarás que se desbloqueen tus fondos una vez que comiences a disolver tu neurona. Tu Retraso de Disolución actual está establecido en <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span> y puedes aumentarlo hasta <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
-        },
-        "maturity_label": "Madurez",
-        "more-details": {
-            "label": "Más Detalles",
-            "text": "Los detalles completos de la neurona están destinados a ser privados, por lo tanto, se requiere acceso a una clave privada para obtenerlos. Crea y firma una transacción de consulta para cargar más datos."
-        },
-        "neuron-balance_label": "Saldo de Subcuenta de Neurona",
-        "stake-and-follow": {
-            "label": "Seguir",
-            "not-staking-not-following_text": "Sigue esta neurona y delega tu participación.<br><br>Actualmente no estás participando, selecciona la cantidad que deseas participar. Puedes participar desde <span class=\"style__strong color__primary\">{{ minStake }}</span> hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción).",
-            "staking-following_text": "Estás siguiendo esta neurona. Aumenta tu participación para obtener más poder de voto.<br><br>Tienes actualmente <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> participando. Puedes participar adicionalmente hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción).",
-            "staking-not-following_text": "Sigue esta neurona y delega tu participación.<br><br>Tienes actualmente <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> participando. Puedes participar adicionalmente hasta <span class=\"style__strong color__primary\">{{ maxStake }}</span> (después de las tarifas de transacción)."
-        },
-        "staked_label": "Participación",
-        "start-dissolving": {
-            "label": "Comenzar a Disolver"
-        },
-        "stop-dissolving": {
-            "label": "Detener Disolución",
-            "text": "Tu neurona está actualmente disolviéndose, tus fondos se desbloquearán en <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Detén la disolución para cancelar el proceso."
-        },
-        "voting-power_label": "Poder de Voto"
-    },
-  "delegation-detail-polkadot": {
-        "alert": {
-            "election-open": {
-                "description": "Debido a las restricciones del período de elecciones, las operaciones de delegación no están disponibles actualmente.",
-                "title": "Operaciones de delegación actualmente no disponibles"
-            },
-            "nomination-inactive": {
-                "description": "El validador ha sido elegido para formar parte del conjunto de validadores, sin embargo, tu nominación no ha sido seleccionada para estar activa en esta era y no recibirás ninguna recompensa.",
-                "title": "Tu delegación a este validador está inactiva"
-            },
-            "nomination-oversubscribed": {
-                "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, está \"sobre-suscripto\", y solo los 256 nominadores con más participación reciben recompensas. No recibirás ninguna recompensa en esta era.",
-                "title": "Este validador está sobre-suscripto"
-            },
-            "polkadot": {
-                "delegation-issues": {
-                    "actions": {
-                        "open-blogpost": "Abrir artículo del blog"
-                    },
-                    "description": "Actualmente, se requiere una cantidad mínima dinámica de DOT para ser elegible para recibir recompensas en Polkadot. La cantidad cambia todos los días. Por favor, lee el artículo del blog de Polkadot para obtener más información.",
-                    "title": "Delegaciones en Polkadot"
-                }
-            },
-            "validator-oversubscribed": {
-                "description": "Los validadores solo pueden pagar a 256 nominadores por era. Si más de 256 nominadores nominan al mismo validador, está \"sobre-suscripto\", y solo los 256 nominadores con más participación reciben recompensas.",
-                "title": "Este validador está sobre-suscripto"
-            }
-        }
-    },
-    "set-contract": {
-      "set-button_label": "Establecer Dirección",
-      "title": "Establecer Contrato {{ protocolName }}",
-      "unsupported_text": "No se puede establecer la dirección del contrato para el protocolo seleccionado.",
-      "xtz_shielded": {
-          "name": "Sapling"
-      }
+    "set-button_label": "Establecer Dirección",
+    "unsupported_text": "No se puede establecer la dirección del contrato para el protocolo seleccionado."
   },
   "tezos-sapling-contract-form": {
+    "header": "Proporcione detalles del contrato Tezos Sapling.",
     "contract-address_label": "Dirección del Contrato",
     "contract-address_text": " AirGap es compatible con la implementación de referencia del contrato inteligente Sapling disponible en <a href='' target='_blank'>Tezos GitLab</a>.",
-    "error": {
-        "contract-invalid": "La dirección del contrato no es válida.",
-        "injector-invalid": "La URL del inyector no es válida.",
-        "unknown": "Ha ocurrido un error desconocido."
-    },
-    "header": "Proporcione detalles del contrato Tezos Sapling.",
-    "include-injector_label": "Servicio de Inyector",
-    "include-injector_text": "Preservación de la privacidad y mejora de la usabilidad con el servicio de inyección. Las transacciones Sapling solo necesitan firmarse una vez en AirGap, en lugar de dos veces con este servicio.",
     "injector-url_label": "URL del Inyector",
     "injector-url_text": " AirGap es compatible con la implementación de referencia del servicio de inyección disponible en <a href='' target='_blank'>GitHub AirGap</a>.",
     "paste_label": "Pegar",
+    "include-injector_label": "Servicio de Inyector",
+    "include-injector_text": "Preservación de la privacidad y mejora de la usabilidad con el servicio de inyección. Las transacciones Sapling solo necesitan firmarse una vez en AirGap, en lugar de dos veces con este servicio.",
     "warning": {
-        "contract-cannot-assess-compatibility": "No se pudo verificar la dirección del contrato, aún puede usarlo si está seguro de que funcionará.",
-        "contract-not-compatible": "El contrato parece no ser compatible, aún puede usarlo si está seguro de que funcionará."
+      "contract-not-compatible": "El contrato parece no ser compatible, aún puede usarlo si está seguro de que funcionará.",
+      "contract-cannot-assess-compatibility": "No se pudo verificar la dirección del contrato, aún puede usarlo si está seguro de que funcionará."
+    },
+    "error": {
+      "contract-invalid": "La dirección del contrato no es válida.",
+      "injector-invalid": "La URL del inyector no es válida.",
+      "unknown": "Ha ocurrido un error desconocido."
+    }
+  },
+  "optimism-erc20-form": {
+    "header": "Proporcione los detalles del contrato Optimism ERC-20 para agregar un token ERC-20 no listado.",
+    "contract-address_label": "Dirección del Contrato",
+    "paste_label": "Pegar",
+    "error": {
+      "contract-not-found": "Contrato no encontrado, verifique si la dirección es correcta.",
+      "token-metadata-missing": "No se pudo obtener los metadatos del activo.",
+      "unknown": "Ha ocurrido un error desconocido."
+    }
+  },
+  "isolated-modules": {
+    "loader_message": "Cargando..."
+  },
+  "isolated-modules-list-page": {
+    "title": "Módulos Aislados",
+    "items": {
+      "search_placeholder": "Buscar módulos aislados"
+    },
+    "alert": {
+      "add": {
+        "failed": {
+          "header": "Error al agregar el módulo",
+          "message": "¡Algo salió mal! Por favor, inténtalo de nuevo.",
+          "ok_label": "Aceptar"
+        }
+      }
+    }
+  },
+  "isolated-modules-details-page": {
+    "button": {
+      "install_label": "Instalar",
+      "update_label": "Actualizar"
+    },
+    "popover": {
+      "remove_label": "Eliminar"
+    },
+    "alert": {
+      "remove": {
+        "header": "Eliminar módulo",
+        "message": "¿Estás seguro de que quieres eliminar este módulo?",
+        "cancel_label": "Cancelar",
+        "proceed_label": "Eliminar"
+      },
+      "update": {
+        "generic": {
+          "header": "Error al actualizar el módulo",
+          "message": "¡Algo salió mal! No se pudo actualizar el módulo.",
+          "ok_label": "Aceptar"
+        },
+        "load-failed": {
+          "header": "Error al actualizar el módulo",
+          "message": "¡Algo salió mal! No se pudo cargar el nuevo módulo.",
+          "ok_label": "Aceptar"
+        },
+        "different-public-key": {
+          "header": "Error al actualizar el módulo",
+          "message": "No puedes actualizar este módulo con el paquete seleccionado, los autores (claves públicas) son diferentes.",
+          "ok_label": "Aceptar"
+        }
+      }
     }
   }
 }

@@ -1,1203 +1,1075 @@
 {
-    "account-transaction-list": {
-      "title": "Аккаунт",
-      "transactions_label": "Транзакции",
-      "add-tokens_label": "Добавить токены",
-      "change-contract_label": "Изменить контракт",
-      "collectibles_label": "Коллекционное",
-      "import-accounts_label": "Импорт аккаунтов",
-      "delegate_label": "Делегация",
-      "undelegate_label": "Отменить делегацию",
-      "claim_rewards_label": "Забрать награду",
-      "vote_label": "Голосование",
-      "migrate_label": "Мигрировать баланс",
-      "delegation-status_label": "Делегация",
-      "fund_label": "Счет фонда",
-      "load_more": "Загрузить больше",
-      "pending-transactions": {
-        "label": "Отложенные транзакции",
-        "text": "Отложенные транзакции в настоящее время не включены, пожалуйста, обратитесь к Blockexplorer.",
-        "open-blockexplorer_label": "Открыть Blockexplorer"
-      },
-      "mtpelerin": {
-        "button1": "Узнать больше о покупке",
-        "button2": "Узнать больше о продаже",
-        "header1": "Покупайте и продавайте криптовалюту с Mt Pelerin – Швейцарский шлюз в мир криптовалют",
-        "header2": "Просто и прозрачно",
-        "lineItem1": "Без необходимости идентификации",
-        "lineItem2": "Живые, прозрачные курсы",
-        "lineItem3": "Оплатите, получите криптовалюту напрямую в AirGap",
-        "note": "Примечание – Mt. Pelerin принимает клиентов из всех стран, кроме граждан США и России, а также резидентов: Афганистан, Беларусь, Бурунди, Центрально-Африканская Республика, Куба, Демократическая Республика Конго, Гвинея, Гвинея-Бисау, Иран, Ирак, Ливан, Ливия, Материковый Китай (Гонконг и Тайвань принимаются), Мали, Мьянма, Никарагуа, Северная Корея, Россия, Сомали, Судан, Южный Судан, Сирия, Венесуэла, Йемен, Зимбабве.",
-        "noteLink1": "Дополнительная информация",
-        "noteLink2": "Условия и положения",
-        "paragraph1": "Инвестируйте в биткоин, эфир и самые популярные активы на нескольких цепях за несколько кликов, по лучшим ценам на рынке и без необходимости прохождения KYC. Выводите их в любое время в 14 валютах на ваш банковский счет в 171 стране."
-      },
-      "pending-exchange-transactions": {
-        "label": "Отложенные транзакции обмена"
-      },
-      "receive_label": "Получить",
-      "send_label": "Отправить",
-      "set-contract_label": "Установить контракт",
-      "tx_not_loading": "В настоящее время транзакции не могут быть загружены, пожалуйста, обратитесь к проводнику блоков для просмотра последних транзакций",
-      "has-delegated_card": {
-        "heading": "<strong>{{amount}}</strong> делегировано",
-        "text": "Ваши XTZ делегированы, вы можете проверить свои вознаграждения за каждый цикл."
-      },
-      "not-delegated_card": {
-        "heading": "Делегировать Tezos",
-        "text": "Вы не делегировали <strong>{{amount}}</strong>. Если вы делегируете сейчас, то сможете получать долю каждый цикл."
-      },
-      "migrate-babylon_card": {
-        "heading": "Миграция аккаунта",
-        "text": "Делегируемые <strong>kt-аккаунты</strong> были упразднены, для повторного делегирования переведите ваши XTZ на ваш <strong>tz-аккаунт</strong>."
-      },
-      "migrate-alert": {
-        "header": "Миграция баланса КТ",
-        "message": "Вы хотите перевести <strong>{{amount}}</strong> с этого адреса KT на соответствующий адрес XTZ?",
-        "cancel": "Отменить",
-        "confirm": "Мигрировать"
-      },
-      "no-transactions_text": "Для этого счета еще нет операций."
+  "account-transaction-list": {
+    "title": "Аккаунт",
+    "transactions_label": "Транзакции",
+    "add-tokens_label": "Добавить токены",
+    "collectibles_label": "Коллекционные",
+    "import-accounts_label": "Импорт аккаунтов",
+    "delegate_label": "Делегирование",
+    "undelegate_label": "Отменить делегирование",
+    "claim_rewards_label": "Забрать награду",
+    "vote_label": "Голосование",
+    "migrate_label": "Перенести баланс",
+    "delegation-status_label": "Делегирование",
+    "set-contract_label": "Установить контракт",
+    "change-contract_label": "Изменить контракт",
+    "fund_label": "Счет фонда",
+    "load_more": "Загрузить больше",
+    "pending-transactions": {
+      "label": "Отложенные транзакции",
+      "text": "Отложенные транзакции в настоящее время не включены, пожалуйста, обратитесь к Blockexplorer.",
+      "open-blockexplorer_label": "Открыть Blockexplorer"
     },
-    "account-transaction-detail": {
-      "available_label": "Доступно",
-      "delegated_label": "Делегировано",
-      "unbonding_label": "Всего развязано",
-      "reward_label": "Неполученные вознаграждения",
-      "unbonding_completion": "Завершение развязки"
+    "receive_label": "Получить",
+    "send_label": "Отправить",
+    "tx_not_loading": "В настоящее время транзакции не могут быть загружены, пожалуйста, обратитесь к проводнику блоков для просмотра последних транзакций",
+    "has-delegated_card": {
+      "heading": "<strong>{{amount}}</strong> делегировано",
+      "text": "Ваши XTZ делегированы, вы можете проверить свои вознаграждения за каждый цикл."
     },
-    "introduction": {
-      "title": "Самостоятельная опека стала простой и безопасной",
-      "highest": {
-        "label": "Высочайшая безопасность",
-        "text": "С помощью <b>двух устройств AirGap</b> безопасная работа с ключами становится более доступной.",
-        "desktop_text": "AirGap использует подход с использованием <b>двух устройств</b>, где секретная фраза хранится либо в <b>хранилище AirGap</b>, либо для выбранных монет на <b>аппаратном кошельке Ledger</b>."
-      },
-      "medium": {
-        "label": "Средняя безопасность",
-        "text": "С помощью <b>двух приложений</b> AirGap безопасная работа с ключами становится более доступной."
-      },
-      "vault": {
-        "heading": "Хранилище AirGap",
-        "text": "Закрытый ключ генерируется и надежно хранится на другом устройстве с помощью хранилища AirGap. <b>Вам необходимо установить хранилище AirGap для использования кошелька AirGap</b>",
-        "desktop_heading": "Хранилище и Ledger AirGap",
-        "desktop_text": "Закрытый ключ генерируется и надежно хранится на другом устройстве с хранилищем AirGap или на аппаратном кошельке Ledger. <br><b>Установите AirGap Vault на мобильное устройство или подключите Ledger для использования AirGap Wallet</b>"
-      },
-      "wallet": {
-        "heading": "AirGap Wallet",
-        "text": "<b>Это приложение AirGap Wallet</b>, которое работает только с публичной информацией и отвечает за трансляцию транзакций в блокчейн."
-      },
-      "communication": {
-        "highest_text": "Односторонняя связь с помощью QR-кодов.",
-        "highest_expanded_text": "Подписывайте транзакции полностью автономно на устройстве без подключения к сети с помощью приложения AirGap Knox или AirGap Vault и транслируйте их с помощью вашего повседневного смартфона с приложением AirGap Wallet. Связь между двумя устройствами осуществляется с помощью прозрачных QR-кодов.",
-        "highest_heading": "Двухустройственный подход",
-        "medium_expanded_text": "Вместо установки AirGap Vault на автономное устройство, вы также можете установить AirGap Vault и AirGap Wallet на ваш повседневный смартфон (то же устройство) и получить дополнительную безопасность благодаря изоляции приложений и переключению приложений для связи.",
-        "medium_heading": "Подход с использованием одного устройства",
-        "medium_text": "Безопасное общение с помощью переключения приложений."
-      },
-      "title_mobile":"Взаимодействие с Vault",
-      "vault-install_label": "Установите AirGap Vault",
-      "continue_label": "Вперед"
+    "not-delegated_card": {
+      "heading": "Делегировать Tezos",
+      "text": "Вы не делегировали <strong>{{amount}}</strong>. Если вы делегируете сейчас, то сможете получать долю каждый цикл."
     },
-    "introduction-download": {
-      "title": "Установите AirGap Vault",
-      "heading": "Давайте установим AirGap Vault!",
-      "description": "Не знаете, как и где установить AirGap Vault и AirGap Wallet? У нас есть подробное пошаговое руководство со всеми инструкциями.",
-      "guide-link_label": "Показать руководство",
-      "text": "Существует несколько способов установки AirGap Vault, выберите наиболее подходящий для вас.",
-      "android": "Android",
-      "play-store_text": "Установите AirGap Vault непосредственно из Google Play Store для этого или специального устройства.",
-      "iOS": "iOS",
-      "app-store_text": "Установите AirGap Vault непосредственно из App Store для этого или специального устройства.",
-      "iOS-device-iOS_text": "Установите AirGap Vault из App Store на это устройство.",
-      "iOS-device-android_text": "Установите AirGap Vault из Play Store на выделенное устройство.",
-      "android-device-iOS_text": "Установите AirGap Vault из App Store на выделенное устройство.",
-      "android-device-android_text": "Установите AirGap Vault из Play Store на это устройство.",
-      "linux-distro_label": "Дистрибутив Linux",
-      "install-distro_text": "Установите дистрибутив AirGap Vault на выделенный компьютер для подписания транзакций air gapped.",
-      "go_label": "Вперед"
+    "migrate-babylon_card": {
+      "heading": "Миграция аккаунта",
+      "text": "Делегируемые <strong>kt-аккаунты</strong> были упразднены, для повторного делегирования переведите ваши XTZ на ваш <strong>tz-аккаунт</strong>."
     },
-    "portfolio": {
-      "empty-state_text": "Начните с добавления монет в AirGap Wallet, вам также понадобится приложение <span class=\"style__strong color__primary\">AirGap Vault</span>, где ваша секретная фраза будет надежно храниться.",
-      "empty-state_desktop_text": "Начните с добавления монет в AirGap Wallet, вы можете сделать это либо с помощью приложения <span class=\"style__strong color__primary\">AirGap Vault</span>, либо для отдельных монет с помощью <span class=\"style__strong color__primary\">аппаратного кошелька Ledger</span>.",
-      "add-coins_label": "Добавить монеты",
-      "flip-card":{
-        "back-title": "Превратите ваше устройство в настоящий аппаратный кошелек",
-        "front-title": "Общий баланс"
-      },
-      "shop_banner": "Получите дополнительный уровень безопасности - Получите AirGap Recovery Plate"
+    "migrate-alert": {
+      "header": "Миграция баланса КТ",
+      "message": "Вы хотите перевести <strong>{{amount}}</strong> с этого адреса KT на соответствующий адрес XTZ?",
+      "cancel": "Отменить",
+      "confirm": "Мигрировать"
     },
-    "account-add": {
-      "featured": "Подборка",
-      "others": "Больше доступа",
-      "isolated-module": "Не найдена ваша любимая монета? Создайте изолированный модуль для интеграции",
-      "generic": {
-        "optimism-erc20_label": "Добавить несписанный токен ERC-20 оптимизма",
-        "xtz_label": "Добавить незарегистрированный актив Tezos"
-      }
+    "no-transactions_text": "Для этого аккаунта еще нет операций.",
+    "mtpelerin": {
+      "title": "Mt Pelerin",
+      "buy_label": "Купить",
+      "cash-out_label": "Вывод денег",
+      "cancel_label": "Отмена",
+      "ok_label": "Хорошо",
+      "header": "Эта услуга предоставляется компанией Mt. Pelerin, и вы покинете AirGap Wallet. Изменения можно внести в настройках",
+      "note_description": "Примечание – Mt Pelerin принимает клиентов из всех стран, кроме граждан США и России, а также жителей: Афганистана, Белоруссии, Бурунди, Центральноафриканской Республики, Кубы, Демократической Республики Конго, Гвинеи, Гвинеи-Бисау, Ирана, Ирака, Ливана. , Ливия, материковый Китай (принимаются Гонконг и Тайвань), Мали, Мьянма, Никарагуа, Северная Корея, Россия, Сомали, Судан, Южный Судан, Сирия, Венесуэла, Йемен, Зимбабве"
+    }
+  },
+  "account-transaction-detail": {
+    "available_label": "Доступно",
+    "delegated_label": "Делегировано",
+    "unbonding_label": "Всего отвязано",
+    "reward_label": "Неполученные вознаграждения",
+    "unbonding_completion": "Завершение отвязки"
+  },
+  "introduction": {
+    "title": "Самосохранение стало простым и безопасным",
+    "title_mobile":"Взаимодействие с Vault",
+    "highest": {
+      "label": "Высочайшая безопасность",
+      "text": "С помощью <b>двух устройств AirGap</b> безопасная работа с ключами становится более доступной.",
+      "desktop_text": "AirGap использует подход с использованием <b>двух устройств</b>, где секретная фраза хранится либо в <b>хранилище AirGap</b>, либо для выбранных монет на <b>аппаратном кошельке Ledger</b>."
     },
-    "scan": {
-      "title": "Сканировать QR",
-      "text": "Отсканируйте QR для синхронизации, чтобы добавить счет, или отсканируйте QR для подтверждения и отправки транзакции.",
-      "multi-qr_text": "Эта транзакция состоит из нескольких QR-кодов. Держите камеру на меняющихся QR-кодах и дождитесь, пока все коды будут отсканированы.",
-      "empty-state_heading": "Для сканирования QR-кодов AirGap Wallet необходимо <span class=\"style__strong color__primary\">разрешение камеры</span>.",
-      "grant-permission_label": "Разрешение"
+    "medium": {
+      "label": "Средняя безопасность",
+      "text": "С помощью <b>двух приложений</b> AirGap безопасная работа с ключами становится более доступной."
     },
-    "scan-address": {
-      "title": "Сканировать адрес счета",
-      "text": "Сканируйте QR-код адреса счета."
+    "vault": {
+      "heading": "Хранилище AirGap",
+      "text": "Закрытый ключ генерируется и надежно хранится на другом устройстве с помощью хранилища AirGap. <b>Вам необходимо установить хранилище AirGap для использования кошелька AirGap</b>",
+      "desktop_heading": "Хранилище и Ledger AirGap",
+      "desktop_text": "Закрытый ключ генерируется и надежно хранится на другом устройстве с хранилищем AirGap или на аппаратном кошельке Ledger. <br><b>Установите AirGap Vault на мобильное устройство или подключите Ledger для использования AirGap Wallet</b>"
     },
-    "scan-sync": {
-      "title": "Синхронизация данных учетной записи",
-      "text": "Откройте AirGap Vault, выберите <span ion-text color='white'>счет</span>, затем <span ion-text color='white'>Синхронизировать</span>, отсканируйте QR-код синхронизации с помощью AirGap Wallet.",
-      "description": "В ходе этого процесса не будет передаваться никаких закрытых ключей или каких-либо непубличных данных.",
-      "scan_label": "Сканирование QR-кода синхронизации"
+    "wallet": {
+      "heading": "AirGap Wallet",
+      "text": "<b>Это приложение AirGap Wallet</b>, которое работает только с публичной информацией и отвечает за трансляцию транзакций в блокчейн."
     },
-    "settings": {
-      "title": "Настройки",
-      "appearance_label": "Внешний вид",
-      "theme_label": "Тема",
-      "languages-label": "Языки",
-      "app-language-label": "Язык приложения",
-      "select-theme": {
-        "system": "Тема устройства",
-        "light": "Светлая тема",
-        "dark": "Темная тема"
-      },
-      "add-ons_settings": {
-        "isolated-modules_text": "Изолированные модули",
-        "label": "Дополнения"
+    "communication": {
+      "highest_text": "Односторонняя связь с помощью QR-кодов.",
+      "medium_text": "Безопасное общение с помощью переключения приложений.",
+      "highest_heading": "Подход с использованием двух устройств",
+      "medium_heading": "Подход с использованием одного устройства",
+      "highest_expanded_text": "Подписывайте транзакции полностью автономно на устройстве без подключения к сети с помощью приложения AirGap Knox или AirGap Vault и транслируйте их с помощью вашего повседневного смартфона с приложением AirGap Wallet. Связь между двумя устройствами осуществляется с помощью прозрачных QR-кодов.",
+      "medium_expanded_text": "Вместо того чтобы устанавливать AirGap Vault на автономное устройство, вы можете установить AirGap Vault и AirGap Wallet на свой повседневный смартфон (одно и то же устройство) и получить дополнительную безопасность благодаря изоляции приложений и переключению приложений для связи. "
     },
-    "airgap_shop": "Магазин AirGap",
-    "airgap_website": "Веб-сайт AirGap",
-    "knox-button_label": "Исследуйте Knox сейчас",
-    "knox-text_pt1": "Превратите ваше устройство в настоящий аппаратный кошелек",
-    "knox-text_pt2": "AirGap Knox обеспечивает истинный офлайн-режим и позволяет работать только хранилищу на вашем устройстве",
+    "vault-install_label": "Установите AirGap Vault",
+    "continue_label": "Вперед"
+  },
+  "introduction-download": {
+    "title": "Установите AirGap Vault",
+    "heading": "Давайте установим AirGap Vault!",
+    "description": "Не знаете, как и где установить AirGap Vault и AirGap Wallet? У нас есть подробное пошаговое руководство со всеми инструкциями.",
+    "guide-link_label": "Показать руководство",
+    "text": "Существует несколько способов установки AirGap Vault, выберите наиболее подходящий для вас.",
+    "android": "Android",
+    "play-store_text": "Установите AirGap Vault непосредственно из Google Play Store для этого или специального устройства.",
+    "iOS": "iOS",
+    "app-store_text": "Установите AirGap Vault непосредственно из App Store для этого или специального устройства.",
+    "iOS-device-iOS_text": "Установите AirGap Vault из App Store на это устройство.",
+    "iOS-device-android_text": "Установите AirGap Vault из Play Store на выделенное устройство.",
+    "android-device-iOS_text": "Установите AirGap Vault из App Store на выделенное устройство.",
+    "android-device-android_text": "Установите AirGap Vault из Play Store на это устройство.",
+    "linux-distro_label": "Дистрибутив Linux",
+    "install-distro_text": "Установите дистрибутив AirGap Vault на выделенный компьютер для подписания транзакций air gapped.",
+    "go_label": "Вперед"
+  },
+  "portfolio": {
+    "shop_banner": "Получите дополнительный уровень безопасности - Получите AirGap Recovery Plate",
+    "empty-state_text": "Начните с добавления монет в AirGap Wallet, вам также понадобится приложение <span class=\"style__strong color__primary\">AirGap Vault</span>, где ваша секретная фраза будет надежно храниться.",
+    "empty-state_desktop_text": "Начните с добавления монет в AirGap Wallet, вы можете сделать это либо с помощью приложения <span class=\"style__strong color__primary\">AirGap Vault</span>, либо для отдельных монет с помощью <span class=\"style__strong color__primary\">аппаратного кошелька Ledger</span>.",
+    "add-coins_label": "Добавить монеты",
+    "flip-card": {
+      "front-title": "Общий баланс",
+      "back-title": "Превратите ваше устройство в настоящий аппаратный кошелек"
+    }
+  },
+  "account-add": {
+    "featured": "Подборка",
+    "others": "Больше доступа",
+    "generic": {
+      "xtz_label": "Добавить незарегистрированный актив Tezos",
+      "optimism-erc20_label": "Добавить токен ERC-20 на Optimism, которого нет в листинге"
+    },
+    "isolated-module": "Не найдена ваша любимая монета? Создайте изолированный модуль для интеграции"
+  },
+  "scan": {
+    "title": "Сканировать QR",
+    "text": "Отсканируйте QR для синхронизации, чтобы добавить счет, или отсканируйте QR для подтверждения и отправки транзакции.",
+    "multi-qr_text": "Эта транзакция состоит из нескольких QR-кодов. Держите камеру на меняющихся QR-кодах и дождитесь, пока все коды будут отсканированы.",
+    "empty-state_heading": "Для сканирования QR-кодов AirGap Wallet необходимо <span class=\"style__strong color__primary\">разрешение камеры</span>.",
+    "grant-permission_label": "Разрешение"
+  },
+  "scan-address": {
+    "title": "Сканировать адрес аккаунта",
+    "text": "Сканируйте QR-код адреса аккаунта."
+  },
+  "scan-sync": {
+    "title": "Синхронизация данных аккаунта",
+    "text": "Откройте AirGap Vault, выберите <span ion-text color='white'>аккаунт</span>, затем <span ion-text color='white'>Синхронизировать</span>, отсканируйте QR-код синхронизации с помощью AirGap Wallet.",
+    "description": "В ходе этого процесса не будет передаваться никаких закрытых ключей или каких-либо непубличных данных.",
+    "scan_label": "Сканирование QR-кода синхронизации"
+  },
+  "settings": {
+    "title": "Настройки",
+    "appearance_label": "Внешний вид",
+    "theme_label": "Тема",
+    "select-theme": {
+      "system": "Тема устройства",
+      "light": "Светлая тема",
+      "dark": "Темная тема"
+    },
     "preferred-language_label": "Предпочтительный язык",
-      "select-language": {
-        "en": "Английский",
-        "de": "Немецкий",
-        "es": "Испанский",
-        "pt_BR": "Португальский (Бразилия)",
-        "zh_CN": "Китайский (Китай)"
-      },
-      "help_label": "Помощь и поддержка",
-      "introduction_label": "Введение",
-      "faq_label": "Часто задаваемые вопросы",
-      "discord_label": "Присоединиться в Discord",
-      "share_label": "Поделиться AirGap",
-      "information_label": "Информация",
-      "github_label": "Хранилище GitHub",
-      "other_label": "Другое",
-      "paste-from-clipboard_label": "Вставить код из буфера обмена",
-      "about_label": "Про нас",
-      "alert_title": "выберите канал",
-      "alert_cancel": "отменить",
-      "channel": {
-        "international": "Международный",
-        "chinese": "Китайский"
-      },
-      "select-account": {
-        "title": "Выберите счет",
-        "text": "Выберите учетную запись для расширения Chrome"
-      },
-      "qr": {
-        "settings_label": "Настройки QR",
-        "enable-new-serializer_label": "Включить новый сериализатор",
-        "page-time_label": "Время работы QR-страницы",
-        "page-size_label": "Максимальный размер QR-страницы"
-      },
-      "dapp": {
-        "label": "dApps",
-        "settings_label": "Настройки dApps",
-        "about_label": "Про Beacon",
-        "permission-list_label": "Разрешения dApps"
-      },
-      "qr-advanced-settings_label": "Расширенные настройки QR",
-      "health-check": "Проверка работоспособности API",
-      "interaction": {
-        "label": "Настройка взаимодействия",
-        "text": "Настройки взаимодействия хранилища и кошелька"
-      }
+    "help_label": "Помощь и поддержка",
+    "introduction_label": "Введение",
+    "faq_label": "Часто задаваемые вопросы",
+    "discord_label": "Присоединиться в Discord",
+    "share_label": "Поделиться AirGap",
+    "information_label": "Информация",
+    "airgap_website": "Веб-сайт AirGap",
+    "airgap_shop": "Магазин AirGap",
+    "github_label": "Хранилище GitHub",
+    "other_label": "Другое",
+    "paste-from-clipboard_label": "Вставить код из буфера обмена",
+    "about_label": "О нас",
+    "alert_title": "выберите канал",
+    "alert_cancel": "отменить",
+    "channel": {
+      "international": "Международный",
+      "chinese": "Китайский"
     },
-    "qr-settings-page": {
-      "title": "Настройки QR"
+    "select-account": {
+      "title": "Выберите счет",
+      "text": "Выберите учётную запись для расширения Chrome"
+    },
+    "qr": {
+      "settings_label": "Настройки QR",
+      "enable-new-serializer_label": "Включить новый сериализатор",
+      "page-time_label": "Время работы QR-страницы",
+      "page-size_label": "Максимальный размер QR-страницы"
+    },
+    "dapp": {
+      "label": "dApps",
+      "settings_label": "Настройки dApps",
+      "about_label": "Про Beacon",
+      "permission-list_label": "Разрешения dApps"
+    },
+    "qr-advanced-settings_label": "Расширенные настройки QR",
+    "health-check": "Проверка работоспособности API",
+    "interaction": {
+      "label": "Настройка взаимодействия",
+      "text": "Настройки взаимодействия хранилища и кошелька"
     },
     "trading_settings": {
       "label": "Торговля",
-      "mtpelerin": "Использовать Mt Pelerin",
-      "text": "Расширенные настройки торговли"
-    },
-    "select-wallet": {
-      "title": "Выберите счет",
-      "scanned-address": {
-        "text": "Вы отсканировали адрес. Выберите один из следующих счетов для отправки."
-      },
-      "fund-account": {
-        "xtz_shielded": {
-          "text": "Выберите один из следующих счетов для пополнения счета Shielded Tez."
-        }
-      },
-      "broadcast": {
-        "xtz_shielded": {
-          "text": "Транзакция Sapling должна транслироваться со счета Tezos. Выберите учетную запись Tezos для подписания транзакции в хранилище и последующей трансляции транзакции Sapling."
-        }
-      },
-      "compatible_label": "Кажется, эти счета совместимы",
-      "incompatible_label": "Кажется, эти счета несовместимы"
-    },
-    "web-extension-disclaimer": {
-      "heading": "Это версия <span class=\"style__strong color__primary\">ALPHA</span>, используйте ее только с небольшими суммами.",
-      "text": "В настоящее время расширение протестировано.",
-      "list": {
-        "item-1_text": "MyEtherWallet",
-        "item-2_text": "MyCrypto"
-      },
-      "description": "Другие платформы или dapps могут работать, мы будем очень благодарны за любой вклад, сообщение о проблеме или запрос функции.",
-      "accept_label": "Я понимаю"
-    },
-    "about": {
-      "title": "Про нас"
-    },
-    "transaction-confirm": {
-      "title": "Подтвердить транзакцию",
-      "decline_label": "Отклонить",
-      "confirm_label": "Подтвердить",
-      "qr-data-too-big_warning": "QR-код не может быть создан, данные транзакции слишком велики"
-    },
-    "transaction-detail": {
-      "title": "Деталь транзакции",
-      "open-blockexplorer_label": "Открыть Blockexplorer",
-      "tx-broadcasting": {
-        "heading": "Статус: Трансляция...",
-        "text": "Ваша транзакция транслируется, это может занять несколько секунд."
-      },
-      "tx-pending": {
-        "heading": "Статус: Ожидается...",
-        "text": "В зависимости от установленной вами комиссии, подтверждение транзакции может занять несколько минут."
-      },
-      "tx-success": {
-        "heading": "Статус: Успешно!"
-      }
-    },
-    "transaction-prepare": {
-      "title": "Отправить {{title}}",
-      "to-address_label": "Получатель",
-      "to-address-scan_label": "Сканирование QR",
-      "amount_label": "Сумма",
-      "balance_label": "Баланс:",
-      "warning": "Низкая комиссия может вызвать задержки или сбой транзакции",
-      "fee": {
-        "label": "Комиссия",
-        "slow_label": "медленно и дешево",
-        "fast_label": "быстро и дорого",
-        "max_label": "МАКС"
-      },
-      "advanced": "Расширенный",
-      "memo": "Memo",
-      "paste_label": "Вставить",
-      "existential_deposit": "Игнорировать экзистенциальный залог",
-      "create-transaction": "Создать транзакцию",
-      "error": {
-        "amount_label": "Пожалуйста, введите действительный номер",
-        "address_label": "Похоже на неправильный формат адреса, он должен начинаться с <strong>{{addressPlaceholder}}</strong>"
-      }
-    },
-    "transaction-qr": {
-      "title": "Транзакции QR",
-      "text": "Откройте <span class=\"style__strong color__primary\">AirGap Vault</span> и отсканируйте эту транзакцию, чтобы подписать ее.",
-      "scan_qr_label": "Сканировать QR",
-      "done_label": "Готово",
-      "details": "Подробнее"
-    },
-    "language-selection": {
-      "title": "Выбор языка",
-      "heading": "Пожалуйста, выберите предпочтительный язык",
-      "selector": {
-        "device": "Язык вашего устройства",
-        "en": "Английский",
-        "de": "Немецкий",
-        "es": "Испанский",
-        "pt_BR": "Португальский (Бразилия)",
-        "zh_CN": "Китайский (Китай)"
-      },
-      "continue_label": "Продолжить",
-      "description": "Вы всегда можете изменить свои предпочтения в настройках"
-    },
-    "interaction-selection": {
-      "title": "Взаимодействие с хранилищем",
-      "heading": "Как бы вы хотели взаимодействовать с <span class=\"style__strong color__primary\">AirGap Vault</span>?",
-      "same-device_label": "То же устройство",
-      "same-device_info": "AirGap Vault и AirGap Wallet установлены на одном устройстве.",
-      "offline-device_label": "Устройство в автономном режиме",
-      "offline-device_info": "AirGap Vault установлен на автономном устройстве, отсканируйте QR-код с помощью AirGap Wallet."
-    },
-    "interaction-selection-settings": {
-      "title": "Взаимодействие с кошельком",
-      "same-device_heading": "Похоже, вы используете <span class=\"style__strong color__primary\">AirGap Vault</span> и AirGap Wallet на <span class=\"style__strong color__primary\">одном устройстве</span>.",
-      "offline-device_heading": "Похоже, вы используете <span class=\"style__strong color__primary\">AirGap Vault</span> на <span class=\"style__strong color__primary\">автономном устройстве</span>.",
-      "text": "Вы можете определить, где у вас установлен AirGap Wallet, чтобы немного упростить взаимодействие с хранилищем.",
-      "selector": {
-        "always": "Всегда спрашивать",
-        "same-device": "Хранилище и кошелек на одном устройстве",
-        "offline-device": "Хранилище является автономным устройством",
-        "ledger": "Кошелек в паре с Ledger"
-      },
-      "confirm_label": "Подтвердить",
-      "description": "Вы всегда можете изменить свои предпочтения на вкладке Настройки",
-      "button_text": "Редактировать"
-    },
-    "interaction-selection-desktop": {
-      "title": "Выберите вариант подписанта",
-      "heading": "Выберите устройство для подписания данной транзакции",
-      "vault_label": "AirGap Vault",
-      "vault_info": "AirGap Vault установлен на автономном устройстве, отсканируйте QR-код с помощью AirGap Wallet.",
-      "ledger_label": "Ledger",
-      "ledger_info": "Ledger имеет несколько типов аппаратных кошельков, которые подключаются к вашему устройству для безопасного подписания транзакций."
-    },
-    "wallet-address": {
-      "title": "Адрес счета",
-      "address_label": "Адрес",
-      "done_label": "Готово"
-    },
-    "account-import": {
-      "title": "Подтвердить импорт",
-      "import-text": "Вы хотите импортировать следующие счета?",
-      "warning": "Вы уже добавили эту учетную запись в AirGap.",
-      "syncing_label": "Синхронизация...",
-      "cancel_label": "Отменить",
-      "import_label": "Импортировать"
-    },
-    "account-activate": {
-      "title": "Добавить счета",
-      "message": "Выберите <strong>{{ protocol }}</strong> учетных записей для добавления.",
-      "add-accounts_label": "Добавить счета"
-    },
-    "signed-transaction": {
-      "transaction-unreadable": "Мы не смогли извлечь информацию из этой транзакции. Это не означает, что транзакция недействительна - пожалуйста, убедитесь, что вы знаете, что вы делаете, и можете проверить, что вы знаете, что эта транзакция содержит правильные данные."
-    },
-    "back-button": "Назад",
-    "wallet-edit-popover-component": {
-      "delegate_label": "Делегировать",
-      "undelegate_label": "Отменить делегацию",
-      "settings_label": "Настройки учетной записи",
-      "copy-address_label": "Копировать адрес",
-      "delete_label": "Удалить",
-      "block-explorer_label": "Открыть Blockexplorer",
-      "change-network_label": "Сменить сеть"
-    },
-    "account-edit-popover-component": {
-      "header": "Подтвердите удаление аккаунта",
-      "message": "Вы хотите удалить эту учетную запись? Вы всегда можете синхронизировать ее снова из своего хранилища.",
-      "delete": "Удалить",
-      "cancel": "Отменить"
-    },
-    "tabs": {
-      "wallets": "Аккаунты",
-      "scan": "Сканировать QR",
-      "ledger_import": "Импорт Ledger",
-      "settings": "Настройки",
-      "exchange": "Обмен"
-    },
-    "add-account": {
-      "title": "Добавить монеты"
-    },
-    "add-sub-account": {
-      "title": "Добавить {{ typeLabel }}",
-      "delegation_heading": "Для того чтобы <span class=\"style__strong color__primary\">делегировать</span> XTZ, необходимо сначала импортировать или создать новую учетную запись, прежде чем вы сможете делегировать.",
-      "tokens_label": "Токены",
-      "accounts_label": "Аккаунты",
-      "add-account_card": {
-        "heading": "Создать аккаунт",
-        "text": "Если вы хотите добавить новый счет Tezos, необходимо заплатить сбор в размере <strong>~0,260 XTZ</strong>."
-      },
-      "add-accounts_label": "Добавить {{ typeLabel }}",
-      "no-imports_text": "Не найдено {{ typeLabel }} для импорта."
-    },
-    "add-generic-sub-account": {
-      "title": "Добавить {{ genericSubProtocolName }}",
-      "add-button_label": "Добавить доступ",
-      "optimism-erc20": {
-        "name": "Несписанный токен ERC-20 оптимизма"
-    },
-      "xtz-fa": {
-        "name": "Не котируемый актив Tezos"
-      },
-      "unsupported_text": "Не удается добавить выбранный субсчет."
-    },
-    "sub-account-select": {
-      "title": "Выбрать аккаунт",
-      "text": "Выберите <strong>аккаунт</strong>, который вы хотите делегировать. Вам нужно будет подписать транзакцию для подтверждения делегирования.",
-      "accounts_label": "Аккаунты"
-    },
-    "account-import-onboarding": {
-      "title": "Добавить  {{protocolName}}",
-      "text": "Вам необходимо приложение хранилище AirGap для добавления <strong>{{protocolName}}</strong>. Следуйте инструкциям на следующих нескольких шагах.",
-      "sub-protocol_text": "<strong>{{subProtocol}} не может быть добавлен без учетной записи <strong>{{protocol}}</strong>.",
-      "slides": {
-        "slide-0": {
-          "text": "У <strong>{{protocol}}</strong> есть множество токенов. Чтобы использовать любой из них, необходимо сначала добавить учетную запись <strong>{{protocol}}</strong> из AirGap Vault",
-          "description": "Следуйте инструкциям на следующих нескольких шагах, чтобы добавить учетную запись <strong>{{protocol}}</strong>, прежде чем вы сможете продолжить"
-        },
-        "slide-1": {
-          "text": "Откройте приложение <strong>AirGap Vault</strong> на том же устройстве или на автономном устройстве.",
-          "description": "Перейдите на вкладку <strong>\"Учетные записи\"</strong> и выберите <strong>\"Добавить учетную запись\"</strong>."
-        },
-        "slide-2_text": "Выберите созданную учетную запись и на странице \"Адрес учетной записи\" выберите <strong>\"Синхронизировать учетную запись\"</strong>.",
-        "slide-3": {
-          "text": "Вам необходимо синхронизировать счет из AirGap Vault в AirGap Wallet.",
-          "description": "¬ Если AirGap Vault находится на <strong>автономном устройстве</strong>, отсканируйте <strong>QR-код</strong> на следующей странице.<br>¬ Если AirGap Vault находится на <strong>том же устройстве</strong>, используйте <strong>кнопку синхронизации</strong> того же устройства."
-        },
-        "slide-4": {
-          "text": "Теперь счет можно импортировать в AirGap Wallet.",
-          "description": "Теперь вы готовы к созданию <strong>{{protocolName}}</strong> транзакций с AirGap Vault и AirGap Wallet."
-        }
-      },
-      "back": "Назад",
-      "next": "Далее",
-      "open_vault": "Открыть хранилище"
-    },
-    "account-import-ledger-onboarding": {
-      "title": "Добавить  {{protocolName}}",
-      "text": "Для добавления {{protocolName}} необходимо устройство Ledger с установленным приложением <strong>{{protocolName}}</strong>. Следуйте инструкциям на следующих шагах.",
-      "slides": {
-        "slide-1": "Подключите Ledger к компьютеру и разблокируйте его, введя пин-код.",
-        "slide-2": "Откройте приложение {{protocolName}} на вашем Ledger.",
-        "slide-3": "Подтвердите обмен адресом {{protocolName}} с AirGap Wallet."
-      },
-      "status-card": {
-        "connecting": "Подключение к Ledger...",
-        "error": {
-          "header": "Не удалось подключиться к Ledger.",
-          "message": "Убедитесь, что ваш Ledger подключен к компьютеру, разблокирован и открыто приложение {{protocolName}}."
-        },
-        "success": "Успешное подключение к Ledger",
-        "redirecting": "Перенаправление...",
-        "retry_button": "Повторить"
-      },
-      "back_button": "Назад",
-      "next_button": "Далее",
-      "done_button": "Готово"
-    },
-    "sub-account-import": {
-      "title": "Выберите аккаунт",
-      "text": "Выберите учетную запись, которую вы хотите добавить для <strong>{{subProtocolName}}</strong>.",
-      "empty_text": "Вы добавили все учетные записи <strong>{{tokenName}}</strong> для всех своих учетных записей",
-      "import-all_label": "Импортировать все"
-    },
-    "exchange": {
-      "title": "Обмен",
-      "exchange_label": "Обмен",
-      "powered-by_label": "на основе",
-      "switch-exchange_label": "Обмен",
-      "onboarding": {
-        "heading": "Вы можете обменять <span class=\"style__strong color__primary\">Ethereum</span> на <span class=\"style__strong color__primary\">Bitcoin</span> и совершить другие обмены.",
-        "description": "Легко обменивайте все поддерживаемые криптовалюты прямо в AirGap.",
-        "exchange_label": "Начать обмен"
-      },
-      "no-currencies": {
-        "heading": "Для обмена вам необходимо иметь как минимум две валюты AirGap, такие как <span class=\"style__strong color__primary\">Ethereum</span> и <span class=\"style__strong color__primary\">Bitcoin</span>.",
-        "description": "Прежде чем вы сможете легко обмениваться валютами в AirGap, необходимо добавить как минимум две разные валюты.",
-        "exchange_label": "Добавить монеты"
-      },
-      "loading": {
-        "setup": "Настройка обмена...",
-        "header": "Ошибка загрузки",
-        "message": "Похоже, что в настоящее время обмен не может быть установлен, пожалуйста, извините за неудобства и повторите попытку позже"
-      }
-    },
-    "swap": {
-      "min-amount_label": "(мин. {{minExchangeAmount}})",
-      "sell_label": "Продать",
-      "buy_label": "Купить",
-      "currently_not_supported": "Выбранная торговая пара в настоящее время не поддерживается",
-      "min-amount-error_label": "Минимальная сумма составляет {{minExchangeAmount}}",
-      "amount-higher-than-balance-error_label": "Введенная вами сумма больше, чем баланс вашего счета {{accountBalance}}."
-    },
-    "protocol-select": {
-      "title": "Выберите монету"
-    },
-    "exchange-select": {
-      "title": "Выберите обмен"
-    },
-    "exchange-confirm": {
-      "title": "Подтвердите обмен",
-      "confirm-exchange_label": "Подтвердите обмен",
-      "heading": "Это ваша сводка обмена, вам нужно подписать ее с помощью хранилища AirGap для завершения обмена.",
-      "sell_label": "От",
-      "sell-amount_label": "Сумма",
-      "fee_label": "Комиссия",
-      "exchange-address_label": "Адрес обмена",
-      "buy-amount_label": "Сумма покупки",
-      "receiving-to_label": "Получение в",
-      "disclaimer": "Услуги обмена предоставляются компанией Changelly. Нажимая кнопку Подтвердить обмен, я признаю и понимаю, что моя транзакция может вызвать проверку AML/KYC в соответствии с <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-      "changelly_disclaimer": "Услуги обмена предоставляются компанией Changelly. Нажимая кнопку Подтвердить обмен, я признаю и понимаю, что моя транзакция может вызвать проверку AML/KYC в соответствии с <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-      "changenow_disclaimer": "Услуги обмена предоставляются компанией Changelly. Нажимая кнопку Подтвердить обмен, я признаю и понимаю, что моя транзакция может вызвать проверку AML/KYC в соответствии с <span class=\"style__strong color__primary\">Changelly AML/KYC</span>."
-    },
-    "exchange-custom": {
-      "title": "Выберите Gatekeeper",
-      "text": "Обмен на tzBTC пока не поддерживается непосредственно в AirGap, но вы можете совершить обмен в одном из следующих Gatekeepers.",
-      "confirm-exchange_label": "Подтвердить обмен",
-      "heading": "Обмен tzBTC в приложении пока не поддерживается",
-      "bitcoin-suisse": {
-        "title": "Bitcoin Suisse",
-        "text": "Основанная в 2013 году, компания Bitcoin Suisse стала пионером в предоставлении криптофинансовых услуг. Bitcoin Suisse помог сформировать крипто- и блокчейн-экосистему в Швейцарии. Чтобы получать TZBTC, вы должны быть полностью оформлены как клиент, включая всю документацию KYC /AML. Минимальная сумма для торговли с Bitcoin Suisse составляет 1 BTC или 1 TZBTC. За каждую транзакцию взимается торговый сбор."
-      },
-      "bity": {
-        "title": "Bity",
-        "text": "Основанная в 2014 году, компания Bity SA является ведущим поставщиком крипто-финансовых услуг. Она была основана на убеждении, что блокчейн и другие технологии децентрализации будут иметь одни из самых глубоких социальных последствий в истории. Будучи регулируемым швейцарским финансовым посредником, Bity предлагает криптофинансовые услуги и продукты для физических и юридических лиц по всему миру, предоставляя людям возможность всегда полностью контролировать свои средства."
-      },
-      "sygnum": {
-        "title": "Sygnum",
-        "text": "Sygnum - первый в мире банк цифровых активов и специалист по цифровым активам с глобальным охватом. Sygnum предлагает портфель регулируемых банковских услуг, который позволяет легко интегрировать традиционные и цифровые активы на одном счете, включая основные национальные валюты, Bitcoin, Ethereum, цифровой CHF и токены активов. Основанная на швейцарском и сингапурском наследии, Sygnum дает возможность институциональным клиентам инвестировать в экономику цифровых активов с полным доверием."
-      },
-      "taurus": {
-        "title": "Taurus",
-        "text": "Taurus Group SA - ведущая швейцарская компания в сфере цифровых активов и блокчейна. Она была основана топ-менеджерами с опытом работы в банковской сфере, ИТ, кибербезопасности и регулировании. Taurus предлагает инфраструктурные решения корпоративного уровня для финансового рынка цифровых активов, а также финансовые услуги для институциональных клиентов."
-      },
-      "woorton": {
-        "title": "Woorton",
-        "text": "Woorton предоставляет круглосуточную криптовалютную ликвидность через API или голосовую торговлю. Их торговая инфраструктура банковского класса позволяет размещать капитал на биржах с помощью собственных торговых алгоритмов и повышать ликвидность всех видов активов. Они предлагают беспрепятственный доступ к цифровым активам и предоставляют его инвесторам, брокерским конторам и поставщикам платежей по всему миру. Woorton предоставляет ликвидность tzBTC против 20 валют, включая BTC, ETH, USD, EUR, CHF, GBP, stablecoins и другие."
-      },
-      "disclaimer": "Услуги обмена предоставляются компанией Changelly. Нажимая кнопку Подтвердить обмен, я признаю и понимаю, что моя транзакция может вызвать проверку AML/KYC в соответствии с <span class=\"style__strong color__primary\">Changelly AML/KYC</span>.",
-      "get-tzbtc": "Получить tzBTC от {{Gatekeeper}}"
-    },
-    "exchange-quipuswap": {
-      "slippage-tolerance": {
-        "label": "Допустимое проскальзывание"
-      }
-    },
-    "delegation-detail": {
-      "title": "Детали {{ delegateeLabel }}",
-      "default-delegatee-label": "Делегирование",
-      "default-delegatee-label-plural": "Делегирование",
-      "change-delegatee_label": "Изменить {{ delegateeLabel }}",
-      "your-delegation_label": "Ваша делегация",
-      "your-balance_label": "Ваш баланс",
-      "your-rewards_label": "Ваши награды",
-      "done_button": "Готово",
-      "amount_label": "Сумма",
-      "max-amount_button": "МАКС",
-      "invalid-value_error": "Недопустимое значение",
-      "delegate_label": "Делегировать",
-      "undelegate_label": "Отменить делегацию",
-      "rewards": {
-        "index-col_label": "Индекс",
-        "amount-col_label": "Вознаграждение",
-        "payout-col_label": "Выплаты"
-      }
-    },
-    "delegation-list": {
-      "title": "Список {{ delegateeLabelPlural }}",
-      "your-delegatees_label": "Ваш {{ delegateeLabelPlural }}",
-      "known-delegatees_label": "Известные {{ delegateeLabelPlural }}",
-      "load-more_label": "Загрузить больше",
-      "not-supported_text": "В настоящее время список {{ delegateeLabelPlural }} еще не поддерживается, но вы можете вручную делегировать на адрес с помощью \"Изменить валидатор\" в меню с тремя точками."
-    },
-    "delegation-detail-cosmos": {
-      "delegatee-label": "Валидатор",
-      "delegatee-label-plural": "Валидаторы",
-      "commission_label": "Комиссия",
-      "voting-power_label": "Право голоса",
-      "currently-delegated_label": "В настоящее время делегировано",
-      "unbonding_label": "Без привязки",
-      "unclaimed-rewards_label": "Невостребованные вознаграждения",
-      "delegate": {
-        "label": "Делегировать",
-        "has-delegated_text": "В настоящее время вы <span class=\"style__strong color__primary\">{{ delegated }}</span> делегировали полномочия этому валидатору.",
-        "not-delegated_text": "Выберите сумму, которую вы хотите делегировать.",
-        "can-delegate-has-delegated_text": "Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
-        "can-delegate-not-delegated_text": "Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций)."
-      },
-      "undelegate": {
-        "label": "Отменить делегацию",
-        "text": "В настоящее время вы делегировали полномочия этому валидатору, вы можете отменить делегирование до <span class=\"style__strong color__primary\">{{ delegated }}</span>."
-      },
-      "rewards": {
-        "label": "Вознаграждения",
-        "button": "Претендовать на вознаграждение",
-        "text": "За эту делегацию вы можете получить до <span class=\"style__strong color__primary\">{{ rewards }}</span> вознаграждений."
-      }
-    },
-    "delegation-detail-tezos": {
-      "delegatee-label": "Бейкер",
-      "delegatee-label-plural": "Бейкеры",
-      "status": {
-        "accepts-delegation": "Принимает делегирование",
-        "reached-full-capacity": "Достигнута полная мощность",
-        "deactivated": "Деактивировано"
-      },
-      "fee_label": "Комиссия",
-      "payout-schedule-every-cycle-last-rewards_text": "Каждый {{ payoutTime }}. <small>Каждый цикл, вознаграждение за последний цикл</small>",
-      "payout-schedule-every-cycle-delayed-rewards_text": "Каждый {{ payoutTime }}. <small>Каждый цикл, вознаграждения с {{ payoutDelay }} циклов назад</small>",
-      "payout-schedule-every-n-cycle_text": "Каждый {{ payoutTime }}. <small>Каждый {{ cycles }} цикл</small>",
-      "payout-schedule_label": "График выплат",
-      "next-payout_label": "Следующая выплата",
-      "first-payout_label": "Первая выплата",
-      "return-per-cycle_label": "Предполагаемый доход за цикл",
-      "delegate_label": "Делегировать",
-      "undelegate_label": "Отменить делегацию",
-      "unknown": "Неизвестно",
-      "rewards": {
-        "index-col_label": "Цикл",
-        "amount-col_label": "Ожидаемое вознаграждение",
-        "payout-col_label": "Самая ранняя выплата"
-      }
-    },
-    "delegation-detail-substrate": {
-      "delegatee-label": "Валидатор",
-      "delegatee-label-plural": "Валидаторы",
-      "status": {
-        "unknown": "Неизвестно"
-      },
-      "commission_label": "Комиссия",
-      "expected-reward_label": "Ожидаемое вознаграждение",
-      "delegated_label": "Делегированный",
-      "bonded_label": "Связанные",
-      "locked_label": "Не связанные",
-      "withdraw-ready_label": "Готовность к выводу средств",
-      "next-era_label": "Следующая эра",
-      "becomes-active_label": "Активизируется",
-      "next-payout_label": "Следующая выплата",
-      "delegate": {
-        "label": "Делегировать",
-        "bond-nominate_text": "Выберите сумму, которую вы хотите делегировать. Вы можете делегировать от <span class=\"style__strong color__primary\">{{ minDelegation }}</span> до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после уплаты комиссии за транзакцию).",
-        "bond-nominate-no-max_text": "Выберите сумму, которую вы хотите делегировать.",
-        "rebond-nominate_text": "Выберите сумму, которую вы хотите делегировать. Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после уплаты комиссии за транзакцию).",
-        "rebond-nominate-no-max_text": "Выберите сумму, которую вы хотите делегировать.",
-        "nominate_text": "Делегируйте этому валидатору. В настоящее время у вас {{ bonded }} облигаций.",
-        "bond-extra_text": "В настоящее время вы делегировали <span class=\"style__strong color__primary\">{{ bonded }}</span>. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
-        "bond-extra-no-max_text": "В настоящее время вы делегировали <span class=\"style__strong color__primary\">{{ bonded }}</span>. Вы можете делегировать дополнительные {{ symbol }}.",
-        "rebond-extra_text": "В настоящее время вы делегировали <span class=\"style__strong color__primary\">{{ bonded }}</span>. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
-        "rebond-extra-no-max_text": "В настоящее время вы делегировали <span class=\"style__strong color__primary\">{{ bonded }}</span>. Вы можете делегировать дополнительные {{ symbol }}.",
-        "change-nomination_text": "Измените свое делегирование. В настоящее время вы делегировали <span class=\"style__strong color__primary\">{{ bonded }}</span>.",
-        "unsufficient-funds_text": "У вас недостаточно {{ symbol }}, чтобы покрыть комиссию за транзакцию, требуются дополнительные <span class=\"style__strong color__primary\">{{ extra }}</span>."
-      },
-      "undelegate": {
-        "label": "Отменить делегацию"
-      },
-      "unbond": {
-        "label": "Отменить привязку"
-      },
-      "withdraw-unbonded": {
-        "label": "Вывести средства",
-        "button": "Вывести",
-        "text-full": "Вы можете вывести <span class=\"style__strong color__primary\">{{ unlocked }}</span> незаблокированных средств.",
-        "text-short": "Вы можете снять средства без привязки."
-      },
-      "rewards": {
-        "index-col_label": "Эра",
-        "amount-col_label": "Награда",
-        "payout-col_label": "Выплаты"
-      },
-      "alert": {
-        "polkadot": {
-          "delegation-issues": {
-            "title": "Делегации на Polkadot",
-            "description": "В настоящее время для получения вознаграждения на Polkadot требуется динамическая минимальная сумма DOT. Эта сумма меняется каждый день. Более подробную информацию читайте в блоге Polkadot.",
-            "actions": {
-              "open-blogpost": "Открыть пост в блоге"
-            }
-          }
-        },
-        "election-open": {
-          "title": "Операции делегирования в настоящее время недоступны",
-          "description": "В связи с ограничениями в период выборов операции по делегированию в настоящее время недоступны."
-        },
-        "nomination-inactive": {
-          "title": "Ваше делегирование этому валидатору неактивно",
-          "description": "Валидатор был выбран в набор валидаторов, однако ваша номинация не была выбрана активной в этой эпохе, и вы не получите никаких наград."
-        },
-        "nomination-oversubscribed": {
-          "title": "Этот валидатор переполнен",
-          "description": "Валидаторы могут выплачивать вознаграждение только 256 номинантам за эпоху. Если более 256 номинантов номинируют один и тот же валидатор, он считается \"переполненным\", и вознаграждение выплачивается только 256 номинантам, сделавшим лучшие ставки. Вы не получите никаких вознаграждений в этой эпохе."
-        },
-        "validator-oversubscribed": {
-          "title": "Этот валидатор переполнен",
-          "description": "Валидаторы могут выплачивать вознаграждение только 256 номинантам за эпоху. Если более 256 номинантов номинируют один и тот же валидатор, он становится \"переполненным\", и вознаграждение выплачивается только 256 номинантам, сделавшим лучшие ставки."
-        }
-      }
-    },
-    "delegation-detail-moonbeam": {
-      "delegatee-label": "Коллатор",
-      "delegatee-label-plural": "Коллаторы",
-      "commission_label": "Комиссия",
-      "delegators_label": "Делегаты",
-      "collators_label": "Коллаторы",
-      "currently-delegated_label": "В настоящее время делегировано",
-      "delegator-status": {
-        "label": "Статус",
-        "active_label": "Активно",
-        "leaving_label": "Отмена делегации",
-        "ready-to-leave_label": "Готово к отмене делегации",
-        "unknown_label": "Неизвестно"
-      },
-      "delegate": {
-        "label": "Делегировать",
-        "has-delegated_text": "В настоящее время вы <span class=\"style__strong color__primary\">{{ delegated }}</span> делегировали этому коллатору.",
-        "not-delegated_text": "Выберите сумму, которую вы хотите делегировать.",
-        "can-delegate-has-delegated_text": "Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
-        "can-delegate-not-delegated_text": "Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций)."
-      },
-      "undelegate": {
-        "schedule": {
-          "label": "Расписание без делегации",
-          "text": "В настоящее время вы делегировали полномочия этому коллатору, вы можете отменить делегирование до <span class=\"style__strong color__primary\">{{ delegated }}</span>."
-        },
-        "execute": {
-          "label": "Выполнить отказ от делегации",
-          "text": "Ваш запрос на отмену делегирования <span class=\"style__strong color__primary\">{{ amount }}</span> может быть выполнен сейчас.",
-          "text-unknown-request": "Ваш запрос на отмену делегирования может быть выполнен сейчас."
-        },
-        "cancel": {
-          "label": "Отмена делегации",
-          "text": "Ваш запрос на отмену <span class=\"style__strong color__primary\">{{ amount }}</span> будет исполнен через {{ executableIn }} раундов. Вы можете отменить его до этого момента.",
-          "text-single-round": "Ваш запрос на отмену <span class=\"style__strong color__primary\">{{ amount }}</span> будет исполнен через 1 раунд. Вы можете отменить его до этого момента.",
-          "text-unknown-request": "Ваш запрос на отмену делегирования находится на рассмотрении. Вы можете отменить его, пока он не станет исполняемым."
-        }
-      },
-      "undelegate-all": {
-        "schedule": {
-          "label": "Отменить делегацию всего по расписанию"
-        },
-        "execute": {
-          "label": "Отменить делегацию всего"
-        },
-        "cancel": {
-          "label": "Отменить отмену делегации всего"
-        }
-      },
-      "alert": {
-        "collator-oversubscribed": {
-          "title": "Этот коллатор переполнен",
-          "description": "Коллаторы могут выплачивать вознаграждение только {{ maxTopDelegations }} делегатам за раунд. Если более {{ maxTopDelegations }} делегатов делегируют один и тот же коллатор, вознаграждение выплачивается только делегатам с наибольшей {{ maxTopDelegations }} ставкой. В настоящее время минимальная сумма ставки, позволяющая получить вознаграждение от этого коллатора, составляет <span class=\"style__strong\">{{ minStakingAmount }}</span>."
-        }
-      }
-    },
-    "introduction-push": {
-      "title": "Push-уведомления",
-      "heading": "Вы можете получать push-уведомления, если на ваши счета поступают транзакции.",
-      "description": "Сначала необходимо предоставить AirGap Wallet разрешение на push-уведомления.",
-      "grant-permission_label": "Разрешение"
-    },
-    "isolated-modules": {
-      "loader_message": "Загрузка..."
-    },
-    "isolated-modules-details-page":{
-      "alert": {
-          "remove": {
-              "cancel_label": "Отмена",
-              "header": "Удалить модуль",
-              "message": "Вы уверены, что хотите удалить этот модуль?",
-              "proceed_label": "Удалить"
-          },
-          "update": {
-              "different-public-key": {
-                  "header": "Не удалось обновить модуль",
-                  "message": "Вы не можете обновить этот модуль с выбранным пакетом, так как авторы (открытые ключи) разные.",
-                  "ok_label": "Ок"
-              },
-              "generic": {
-                  "header": "Не удалось обновить модуль",
-                  "message": "Что-то пошло не так! Модуль не может быть обновлен.",
-                  "ok_label": "Ок"
-              },
-              "load-failed": {
-                  "header": "Не удалось обновить модуль",
-                  "message": "Что-то пошло не так! Новый модуль не может быть загружен.",
-                  "ok_label": "Ок"
-              }
-          }
-      },
-      "button": {
-          "install_label": "Установить",
-          "update_label": "Обновить"
-      },
-      "popover": {
-          "remove_label": "Удалить"
-      }
-  },  
-  "isolated-modules-list-page": {
-    "alert": {
-        "add": {
-            "failed": {
-                "header": "Не удалось добавить модуль",
-                "message": "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
-                "ok_label": "Ок"
-            }
-        }
-    },
-    "items": {
-        "search_placeholder": "Поиск изолированных модулей"
-    },
-    "title": "Изолированные модули"
-    },
-    "language-selection-settings":{
-      "continue_label": "Продолжить",
-      "description": "Вы всегда можете изменить свои предпочтения в настройках",
-      "heading": "Пожалуйста, выберите ваш предпочтительный язык",
-      "selector": {
-          "de": "Немецкий",
-          "device": "Язык вашего устройства",
-          "en": "Английский",
-          "es": "Испанский",
-          "pt_BR": "Португальский (Бразилия)",
-          "ru": "Русский",
-          "zh_CN": "Китайский (Китай)"
-      },
-      "title": "Выбор языка"
-    },  
-    "portfolio-item": {
-      "active": "активно"
-    },
-    "current-wallet-group": {
-      "label": "Группа"
-    },
-    "voting": {
-      "title": "Голосование",
-      "heading": "Инициатива вознаграждения за блокчейн (BRI)",
-      "text": "Чтобы превратить aeternity в самодостаточную платформу, мы предлагаем инициативу вознаграждения за блокчейн (BRI), в рамках которой ~0-20% вознаграждения майнеров будет направляться на развитие.",
-      "your-vote_label": "Ваш голос: {{ votePercentage }}%",
-      "voting-period_label": "Проголосовать с <strong>{{startDate}}</strong> по <strong>{{endDate}}</strong>",
-      "further-information": {
-        "heading": "Дополнительная информация",
-        "blog-post_label": "Подробное объяснение в статье блога",
-        "forum_label": "Обсуждение сообществом на форуме",
-        "result_label": "Чтобы проверить свой голос, пожалуйста, посетите <a href=\"https://aeternity.com\">официальную страницу голосования</a>"
-      },
-      "vote-no_label": "Вы проголосовали: Я НЕ поддерживаю BRI",
-      "vote-percentage_label": "Вы проголосовали: {{ oldVotePercentage }}%",
-      "vote-disabled_label": "Голосование в настоящее время отключено",
-      "vote_label": "Голосовать",
-      "change-vote_label": "Изменить голос",
-      "done_label": "Готово"
-    },
-    "delegate-action-popover": {
-      "delegation-settings_label": "Настройки делегации",
-      "change-to-airgap-delegatee_label": "Изменить на AirGap {{ delegateeLabel }}"
-    },
-    "delegate-edit-popover": {
-      "delegation-settings_label": "Настройки делегации",
-      "change-delegatee_label": "Изменить {{ delegateeLabel }}",
-      "change-alert": {
-        "text": "Введите адрес, предоставленный вам {{ delegateeLabel }}.",
-        "placeholder_text": "{{ delegateeLabel }} адрес",
-        "delegatee-address_label": "Адрес валидатора",
-        "cancel_label": "Отменить",
-        "set-delegatee_label": "Установить {{ delegateeLabel }}"
-      }
-    },
-    "delegation-validator-list": {
-      "title": "Список валидатора",
-      "your-validators_label": "Ваши валидаторы",
-      "validators_label": "Валидаторы",
-      "sort_label": "Сортировать валидаторы",
-      "no_validators_found_label": "Валидаторов, соответствующих вашему запросу, не найдено"
-    },
-    "action-alert-tip": {
-      "heading": "Благодарим вас за использование AirGap!",
-      "text": "Мы видели, что в последнее время вы часто пользуетесь AirGap. Хотели бы вы поддержать развитие нашего приложения, оставив нам чаевые?",
-      "cancel_label": "Нет",
-      "ok_label": "Оставить чаевые"
-    },
-    "action-alert-delegation": {
-      "heading": "Благодарим вас за использование AirGap!",
-      "text": "Мы заметили, что у вас есть средства XTZ, которые не делегированы. Делегировав свои средства, вы сможете зарабатывать до 7% годовых! Хотите ли вы делегировать свои средства сейчас?",
-      "cancel_label": "Нет",
-      "ok_label": "Делегировать сейчас"
-    },
-    "ledger-sign": {
-      "title": "Детали транзакции {{title}}",
-      "text": "Подключите устройство Ledger и подпишите транзакцию.",
-      "confirm_label": "Подписать",
-      "error-alert": {
-        "header": "Ошибка",
-        "unknown": "Произошла неизвестная ошибка. Попробуйте повторно подключить устройство.",
-        "confirm": "Ок"
-      }
-    },
-    "account-import-interaction-selection": {
-      "title": "Выберите вариант подписанта",
-      "airgap-vault": {
-        "label": "AirGap Vault",
-        "text": "AirGap Vault можно установить на автономный смартфон или на то же устройство для безопасного подписания транзакций."
-      },
-      "ledger": {
-        "label": "Ledger",
-        "text": "Ledger имеет несколько типов аппаратных кошельков, которые подключаются к вашему устройству для безопасного подписания транзакций."
-      }
-    },
-    "beacon-request": {
-      "sign-data_label": "Хотите ли вы подписать следующие данные?",
-      "blake2b_hash": "Леджер Blake2b - хэш сообщения",
-      "request": {
-        "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> хотел бы подключиться к вашей учетной записи.",
-        "text": "Этот сайт запрашивает следующие разрешения. Всегда доверяйте веб-сайтам, с которыми вы взаимодействуете."
-      },
-      "connect_label": "Подключить",
-      "continue_label": "Продолжить",
-      "cancel_label": "Отменить",
-      "request-by-dapp_label": "Запрос Beacon от DApp",
-      "title": {
-        "permission-request": "Запрос на разрешение",
-        "sign-payload-request": "Подписать запрос на передачу нагрузки",
-        "operation-request": "Запрос на операцию",
-        "broadcast-request": "Запрос разрешения"
-      },
-      "permission": {
-        "sign-transactions": "Операции по подписи",
-        "operation-request": "Запрос операции",
-        "threshold": "Порог"
-      },
-      "select-account": {
-        "alert": "Выберите учетную запись для сопряжения",
-        "button": "Изменить аккунт"
-      }
-    },
-    "dapp-permission-list": {
-      "title": "Разрешения dApps",
-      "connected-dapps": "Подключенные DApps",
-      "remove_label": "Удалить",
-      "no-permissions": "Никаких разрешений не выдавалось.",
-      "delete-permission-alert": {
-        "header": "Удалить разрешение?",
-        "message": "Вы уверены, что хотите удалить это разрешение? DApp больше не сможет выполнять операции, пока не будут предоставлены новые разрешения.",
-        "cancel_label": "Отменить",
-        "yes_label": "Да"
-      }
-    },
-    "dapp-settings": {
-      "title": "Настройки dApps",
-      "remove-all_label": "Удалить все",
-      "delete_label": "Удалить",
-      "no-peers": "Не подключен ни к каким аналогам",
-      "reset": "Скинуть",
-      "alert": {
-        "heading": "Удалить все",
-        "message": "Вы уверены, что хотите удалить всех пиров?",
-        "cancel": "Отменить",
-        "confirm": "Подтвердить"
-      }
-    },
-    "walletconnect": {
-      "connection_request": "WalletConnect - Запрос на подключение",
-      "new_transaction": "WalletConnect - Новая транзакция",
-      "sign_request": "WalletConnect - Запрос подписи",
-      "sign_typed_data": "WalletConnect - Подписание типизированных данных",
-      "wait": "В ожидании WalletConnect",
-      "switch_ethereum_chain": "WalletConnect - Сменить цепочку Ethereum",
-      "alert": {
-        "title": "Не поддерживается",
-        "message": "eth_signTypedData в настоящее время не поддерживается"
-      },
-      "timeout": {
-        "title": "Неисправность соединения",
-        "message": "Похоже, что соединение через WalletConnect не может быть установлено"
-      },
-      "connection_error": "Возникла проблема с подключением к WalletConnect"
-    },
-    "health-check": {
-      "title": "Проверка здоровья",
-      "message": "Проверка работоспособности API"
-    },
-    "group-label": {
-      "all": "Все",
-      "ungrouped": "Другое"
-    },
-    "dapp-confirm": {
-      "title": "Подтверждение запроса Walletconnect",
-      "text": "Вы хотите подтвердить запрос walletconnect?"
-    },
-    "tezos-fa-form": {
-      "header": "Укажите данные контракта Tezos, чтобы добавить не внесенный в список актив Tezos.",
-      "contract-address_label": "Адрес контракта",
-      "network_label": "Сеть",
-      "token-interface_label": "Стандарт FA",
-      "token": {
-        "label": "Доступ",
-        "placeholder": "Выбрать доступ"
-      },
-      "paste_label": "Вставить",
-      "error": {
-        "contract-not-found": "Договор не найден, проверьте правильность адреса и сети.",
-        "interface-unknown": "Не удается определить интерфейс договора, укажите его.",
-        "token-metadata-missing": "Невозможно получить метаданные актива.",
-        "token-vague": "Адрес является контрактом с несколькими активами, пожалуйста, укажите актив, который вы хотите добавить.",
-        "unknown": "Произошла неизвестная ошибка."
-      }
-    },
-    "collectibles-list": {
-      "title": "Коллекционное",
-      "load-more_label": "Загрузить больше",
-      "empty-state_text": "<br>Похоже, у вас еще нет коллекционного. Зайдите на<strong><a href='https://objkt.com' target='blank'> objkt.com</a></strong> и начните коллекционировать.",
-      "error": {
-        "loading": {
-          "message": "Невозможно загрузить коллекционное"
-        },
-        "show-details": {
-          "message": "Невозможно показать детали коллекционного"
-        },
-        "unknown": {
-          "message": "Неизвестная ошибка"
-        }
-      }
-    },
-    "collectibles-item": {
-      "title": "Детали коллекционирования",
-      "details_label": "Детали",
-      "amount_label": "Сумма",
-      "more-details_label": "Больше деталей",
-      "send-button_label": "Отправить",
-      "address": {
-        "contract_label": "Смежный контракт"
-      },
-      "error": {
-        "loading": {
-          "message": "Невозможно загрузить сведения о коллекционере"
-        },
-        "open-url": {
-          "message": "Невозможно открыть URL-адрес"
-        },
-        "send": {
-          "message": "Невозможно подготовить передачу"
-        },
-        "unknown": {
-          "message": "Неизвестная ошибка"
-        }
-      }
-    },
-    "objkt-collectible-explorer": {
-      "more-details": {
-        "view-on": "Смотрите на objkt.com"
-      }
-    },
-    "optimism-erc20-form": {
-      "contract-address_label": "Адрес контракта",
-      "error": {
-          "contract-not-found": "Контракт не найден, проверьте правильность адреса.",
-          "token-metadata-missing": "Не удалось получить метаданные актива.",
-          "unknown": "Произошла неизвестная ошибка."
-      },
-      "header": "Укажите детали контракта Optimism ERC-20, чтобы добавить неперечисленный токен ERC-20.",
-      "paste_label": "Вставить"
-    },
-    "mtpelerin": {
-      "buy_label": "Купить",
-      "cancel_label": "Отмена",
-      "cash-out_label": "Вывести наличные",
-      "header": "Этот сервис предоставлен компанией Mt. Pelerin, и вы покинете кошелек AirGap. Изменения можно внести в настройках",
-      "note_description": "Примечание - Mt. Pelerin принимает клиентов из всех стран, кроме граждан США и России, а также резидентов: Афганистана, Беларуси, Бурунди, Центральноафриканской Республики, Кубы, Демократической Республики Конго, Гвинеи, Гвинеи-Бисау, Ирана, Ирака, Ливана, Ливии, Материкового Китая (Гонконг и Тайвань приняты), Мали, Мьянмы, Никарагуа, Северной Кореи, России, Сомали, Судана, Южного Судана, Сирии, Венесуэлы, Йемена, Зимбабве",
-      "ok_label": "Ок",
-      "title": "Mt Pelerin"
-    },
-    "delegation-detail-icp": {
-        "age_label": "Возраст",
-        "delegatee-label": "Подписант",
-        "delegatee-label-plural": "Подписанты",
-        "disburse": {
-            "label": "Выплатить",
-            "text": "Ваш нейрон был растворен, выведите разблокированные токены."
-        },
-        "dissolve-delay_label": "Задержка растворения",
-        "follow": {
-            "label": "Следовать",
-            "text": "Следуйте за этим нейроном."
-        },
-        "followee-status": {
-            "followed": "Следуется",
-            "not-followed": "Не следуется",
-            "unknown": "Неизвестно (загрузите дополнительные сведения)"
-        },
-        "form": {
-            "dissolve-delay": {
-                "extra-label": "{{ duration }} (Сила голоса {{ votingPower }}x)",
-                "extra-label-no-rewards": "{{ duration }} (Сила голоса {{ votingPower }}x)<br><br>Предупреждение: Задержка растворения не должна быть ниже {{ minDelay }}, в противном случае вы не получите никаких наград.",
-                "invalid-decrease": "Недопустимая задержка растворения, значение может быть только увеличено, поэтому не может быть ниже текущего значения ({{ minDelay }}) и не может превышать {{ maxDelay }}.",
-                "invalid-state": "Задержка растворения не должна быть ниже {{ minDelay }}, иначе вы не получите никаких наград. Максимальная задержка составляет {{ maxDelay }}.",
-                "label": "Задержка растворения (в днях)"
-            }
-        },
-        "increase-dissolve-delay": {
-            "label": "Установить задержку",
-            "text": " <span class=\"style__strong color__primary\">Задержка растворения</span> определяет вашу силу голоса и продолжительность ожидания разблокировки ваших средств после начала растворения вашего нейрона. Ваша текущая задержка растворения установлена на  <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>, и вы можете увеличить ее до  <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
-        },
-        "maturity_label": "Зрелость",
-        "more-details": {
-            "label": "Больше сведений",
-            "text": "Полные сведения о нейроне предназначены для конфиденциальности, поэтому для их получения требуется доступ к закрытому ключу. Создайте и подпишите транзакцию запроса для загрузки дополнительных данных."
-        },
-        "neuron-balance_label": "Баланс субсчета нейрона",
-        "stake-and-follow": {
-            "label": "Следовать",
-            "not-staking-not-following_text": "Следуйте за этим нейроном и делегируйте свою ставку.<br><br>В настоящее время вы не делегируете, выберите сумму, которую хотите делегировать. Вы можете делегировать от <span class=\"style__strong color__primary\">{{ minStake }}</span> до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию).",
-            "staking-following_text": "Вы следуете за этим нейроном. Увеличьте свою ставку, чтобы получить больше силы голоса.<br><br>У вас в настоящее время <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> делегировано. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию).",
-            "staking-not-following_text": "Следуйте за этим нейроном и делегируйте свою ставку.<br><br>В настоящее время у вас делегировано <span class=\"style__strong color__primary\">{{ neuronBalance }}</span>. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию)."
-        },
-        "staked_label": "Делегировано",
-        "start-dissolving": {
-            "label": "Начать растворение"
-        },
-        "stop-dissolving": {
-            "label": "Прекратить растворение",
-            "text": "Ваш нейрон в настоящее время растворяется, ваши средства будут разблокированы через <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Прекратите растворение, чтобы отменить процесс."
-        },
-        "voting-power_label": "Сила голоса"
-    },
-    "delegation-detail-polkadot": {
-      "alert": {
-          "election-open": {
-              "description": "Из-за ограничений периода выборов операции делегирования в настоящее время недоступны.",
-              "title": "Операции делегирования в настоящее время недоступны"
-          },
-          "nomination-inactive": {
-              "description": "Валидатор был избран в состав валидаторов, однако ваша номинация не была выбрана для активации в этой эре, и вы не получите никаких наград.",
-              "title": "Ваше делегирование этому валидатору неактивно"
-          },
-          "nomination-oversubscribed": {
-              "description": "Валидаторы могут выплачивать только 256 номинаторов за эру. Если больше 256 номинаторов номинируют того же валидатора, он «переподписан», и только топ-256 номинаторов с наибольшим количеством долей получают награды. В этой эре вы не получите никаких наград.",
-              "title": "Этот валидатор переподписан"
-          },
-          "polkadot": {
-              "delegation-issues": {
-                  "actions": {
-                      "open-blogpost": "Открыть блогпост"
-                  },
-                  "description": "В настоящее время для получения вознаграждений на Polkadot требуется динамическая минимальная сумма DOT. Сумма меняется каждый день. Пожалуйста, прочтите блогпост Polkadot для получения дополнительной информации.",
-                  "title": "Делегирование на Polkadot"
-              }
-          },
-          "validator-oversubscribed": {
-              "description": "Валидаторы могут выплачивать только 256 номинаторов за эру. Если больше 256 номинаторов номинируют того же валидатора, он «переподписан», и только топ-256 номинаторов с наибольшим количеством долей получают награды.",
-              "title": "Этот валидатор переподписан"
-          }
-      }
+      "text": "Расширенные настройки торговли",
+      "mtpelerin": "Используйте гору Пелерин"
+    },
+    "add-ons_settings": {
+      "label": "Дополнения",
+      "isolated-modules_text": "Изолированные модули"
+    },
+    "knox-text_pt1": "Превратите ваше устройство в настоящий аппаратный кошелек",
+    "knox-text_pt2": "AirGap Knox обеспечивает истинный офлайн-режим и позволяет работать только хранилищу на вашем устройстве",
+    "knox-button_label": "Исследуйте Knox сейчас"
   },
-  "set-contract": {
-    "set-button_label": "Установить адрес",
-    "title": "Установить контракт {{ protocolName }}",
-    "unsupported_text": "Невозможно установить адрес контракта для выбранного протокола.",
-    "xtz_shielded": {
-        "name": "Sapling"
+  "mtpelerin": {
+    "header1": "Покупайте и продавайте криптовалюту с помощью Mt Pelerin – швейцарского шлюза в мир криптовалют.",
+    "paragraph1": "Инвестируйте в биткойны, эфириум и самые популярные активы в нескольких цепочках за несколько кликов, по лучшим ценам на рынке и без необходимости KYC. Выведите их в любое время в 14 валютах обратно на свой банковский счет в 171 стране.",
+    "header2": "Просто и прозрачно",
+    "lineItem1": "Идентификация не требуется",
+    "lineItem2": "Прозрачные тарифы в реальном времени",
+    "lineItem3": "Совершите платёж и получите криптовалюту прямо на AirGap",
+    "button1": "Узнать больше о покупке",
+    "button2": "Узнайте больше о продаже",
+    "note": "Примечание – Mt. Pelerin принимает клиентов из всех стран, кроме граждан США и России, а также жителей: Афганистана, Белоруссии, Бурунди, Центральноафриканской Республики, Кубы, Демократической Республики Конго, Гвинеи, Гвинеи-Бисау, Ирана, Ирака, Ливана. , Ливия, материковый Китай (принимаются Гонконг и Тайвань), Мали, Мьянма, Никарагуа, Северная Корея, Россия, Сомали, Судан, Южный Судан, Сирия, Венесуэла, Йемен, Зимбабве.",
+    "noteLink1": "Дальнейшая информация",
+    "noteLink2": "Условия использования"
+  },
+  "qr-settings-page": {
+    "title": "Настройки QR"
+  },
+  "select-wallet": {
+    "title": "Выберите аккаунт",
+    "scanned-address": {
+      "text": "Вы отсканировали адрес. Выберите один из следующих счетов для отправки."
+    },
+    "fund-account": {
+      "xtz_shielded": {
+        "text": "Выберите один из следующих аккаунтов для пополнения счёта Shielded Tez."
+      }
+    },
+    "broadcast": {
+      "xtz_shielded": {
+        "text": "Транзакция Sapling должна транслироваться со счета Tezos. Выберите учётную запись Tezos для подписания транзакции в хранилище и последующей трансляции транзакции Sapling."
+      }
+    },
+    "compatible_label": "Кажется, эти аккаунты совместимы",
+    "incompatible_label": "Кажется, эти аккауниы несовместимы"
+  },
+  "web-extension-disclaimer": {
+    "heading": "Это версия <span class=\"style__strong color__primary\">ALPHA</span>, используйте ее только с небольшими суммами.",
+    "text": "В настоящее время расширение протестировано.",
+    "list": {
+      "item-1_text": "MyEtherWallet",
+      "item-2_text": "MyCrypto"
+    },
+    "description": "Другие платформы или dapps могут работать, мы будем очень благодарны за любой вклад, сообщение о проблеме или запрос функции.",
+    "accept_label": "Я понимаю"
+  },
+  "about": {
+    "title": "Про нас"
+  },
+  "transaction-confirm": {
+    "title": "Подтвердить транзакцию",
+    "decline_label": "Отклонить",
+    "confirm_label": "Подтвердить",
+    "qr-data-too-big_warning": "QR-код не может быть создан, данные транзакции слишком велики"
+  },
+  "transaction-detail": {
+    "title": "Деталь транзакции",
+    "open-blockexplorer_label": "Открыть Blockexplorer",
+    "tx-broadcasting": {
+      "heading": "Статус: Трансляция...",
+      "text": "Ваша транзакция транслируется, это может занять несколько секунд."
+    },
+    "tx-pending": {
+      "heading": "Статус: Ожидается...",
+      "text": "В зависимости от установленной вами комиссии, подтверждение транзакции может занять несколько минут."
+    },
+    "tx-success": {
+      "heading": "Статус: Успешно!"
     }
   },
+  "transaction-prepare": {
+    "title": "Отправить {{title}}",
+    "to-address_label": "Получатель",
+    "to-address-scan_label": "Сканирование QR",
+    "amount_label": "Сумма",
+    "balance_label": "Баланс:",
+    "warning": "Низкая комиссия может вызвать задержки или сбой транзакции",
+    "fee": {
+      "label": "Комиссия",
+      "slow_label": "медленно и дешево",
+      "fast_label": "быстро и дорого",
+      "max_label": "МАКС"
+    },
+    "advanced": "Расширенный",
+    "memo": "Memo",
+    "paste_label": "Вставить",
+    "existential_deposit": "Игнорировать экзистенциальный залог",
+    "create-transaction": "Создать транзакцию",
+    "error": {
+      "amount_label": "Пожалуйста, введите действительный номер",
+      "address_label": "Похоже, что это неправильный формат адреса, он должен начинаться с <strong>{{addressPlaceholder}}</strong>"
+    }
+  },
+  "transaction-qr": {
+    "title": "Транзакции QR",
+    "text": "Откройте <span class=\"style__strong color__primary\">AirGap Vault</span> и отсканируйте эту транзакцию, чтобы подписать ее.",
+    "scan_qr_label": "Сканировать QR",
+    "done_label": "Готово",
+    "details": "Подробнее"
+  },
+  "interaction-selection": {
+    "title": "Взаимодействие с хранилищем",
+    "heading": "Как бы вы хотели взаимодействовать с <span class=\"style__strong color__primary\">AirGap Vault</span>?",
+    "same-device_label": "То же устройство",
+    "same-device_info": "AirGap Vault и AirGap Wallet установлены на одном устройстве.",
+    "offline-device_label": "Устройство в автономном режиме",
+    "offline-device_info": "AirGap Vault установлен на автономном устройстве, отсканируйте QR-код с помощью AirGap Wallet."
+  },
+  "interaction-selection-settings": {
+    "title": "Взаимодействие с кошельком",
+    "same-device_heading": "Похоже, вы используете <span class=\"style__strong color__primary\">AirGap Vault</span> и AirGap Wallet на <span class=\"style__strong color__primary\">одном устройстве</span>.",
+    "offline-device_heading": "Похоже, вы используете <span class=\"style__strong color__primary\">AirGap Vault</span> на <span class=\"style__strong color__primary\">автономном устройстве</span>.",
+    "text": "Вы можете определить, где у вас установлен AirGap Wallet, чтобы немного упростить взаимодействие с хранилищем.",
+    "selector": {
+      "always": "Всегда спрашивать",
+      "same-device": "Хранилище и кошелек на одном устройстве",
+      "offline-device": "Хранилище является автономным устройством",
+      "ledger": "Кошелек в паре с Ledger"
+    },
+    "confirm_label": "Подтвердить",
+    "description": "Вы всегда можете изменить свои предпочтения на вкладке Настройки",
+    "button_text": "Редактировать"
+  },
+  "interaction-selection-desktop": {
+    "title": "Выберите вариант подписанта",
+    "heading": "Выберите устройство для подписания данной транзакции",
+    "vault_label": "AirGap Vault",
+    "vault_info": "AirGap Vault установлен на автономном устройстве, отсканируйте QR-код с помощью AirGap Wallet.",
+    "ledger_label": "Ledger",
+    "ledger_info": "Ledger имеет несколько типов аппаратных кошельков, которые подключаются к вашему устройству для безопасного подписания транзакций."
+  },
+  "language-selection-settings": {
+    "title": "Выбор языка",
+    "heading": "Пожалуйста, выберите ваш предпочтительный язык",
+    "selector": {
+      "device": "Язык вашего устройства",
+      "en": "Английский",
+      "de": "Немецкий (ИИ перевел)",
+      "es": "Испанский (ИИ перевел)",
+      "fr":"французский (ИИ перевел)",
+      "ru":"русский",
+      "pt_BR": "Португальский (Бразилия)",
+      "zh_CN": "Китайский (Китай)"
+    },
+    "continue_label": "Продолжить",
+    "description": "Вы всегда можете изменить свои предпочтения в настройках"
+  },
+  "wallet-address": {
+    "title": "Адрес счёта",
+    "address_label": "Адрес",
+    "done_label": "Готово"
+  },
+  "account-import": {
+    "title": "Подтвердить импорт",
+    "import-text": "Вы хотите импортировать следующие аккаунты?",
+    "warning": "Вы уже добавили этот аккаунт в AirGap.",
+    "syncing_label": "Синхронизация...",
+    "cancel_label": "Отменить",
+    "import_label": "Импортировать"
+  },
+  "account-activate": {
+    "title": "Добавить аккаунты",
+    "message": "Выберите <strong>{{ protocol }}</strong> аккаунт для добавления.",
+    "add-accounts_label": "Добавить счета"
+  },
+  "signed-transaction": {
+    "transaction-unreadable": "Мы не смогли извлечь информацию из этой транзакции. Это не означает, что транзакция недействительна - пожалуйста, убедитесь, что вы знаете, что вы делаете, и можете проверить, что вы знаете, что эта транзакция содержит правильные данные."
+  },
+  "back-button": "Назад",
+  "wallet-edit-popover-component": {
+    "delegate_label": "Делегировать",
+    "undelegate_label": "Отменить делегирование",
+    "settings_label": "Настройки аккаунта",
+    "copy-address_label": "Копировать адрес",
+    "delete_label": "Удалить",
+    "block-explorer_label": "Открыть Blockexplorer",
+    "change-network_label": "Сменить сеть"
+  },
+  "account-edit-popover-component": {
+    "header": "Подтвердите удаление аккаунта",
+    "message": "Вы хотите удалить этот аккаунт? Вы всегда можете синхронизировать ее снова из своего хранилища.",
+    "delete": "Удалить",
+    "cancel": "Отменить"
+  },
+  "tabs": {
+    "wallets": "Аккаунты",
+    "scan": "Сканировать QR",
+    "ledger_import": "Импорт Ledger",
+    "settings": "Настройки"
+  },
+  "add-account": {
+    "title": "Добавить монеты"
+  },
+  "add-sub-account": {
+    "title": "Добавить {{ typeLabel }}",
+    "delegation_heading": "Для того чтобы <span class=\"style__strong color__primary\">делегировать</span> XTZ, необходимо сначала импортировать или создать новую учетную запись, прежде чем вы сможете делегировать.",
+    "tokens_label": "Токены",
+    "accounts_label": "Аккаунты",
+    "add-account_card": {
+      "heading": "Создать аккаунт",
+      "text": "Если вы хотите добавить новый счет Tezos, необходимо заплатить сбор в размере <strong>~0,260 XTZ</strong>."
+    },
+    "add-accounts_label": "Добавить {{ typeLabel }}",
+    "no-imports_text": "Не найдено {{ typeLabel }} для импорта."
+  },
+  "add-generic-sub-account": {
+    "title": "Добавить {{ genericSubProtocolName }}",
+    "add-button_label": "Добавить доступ",
+    "xtz-fa": {
+      "name": "Некотируемый актив Tezos"
+    },
+    "optimism-erc20": {
+      "name": "Несписанный токен ERC-20 оптимизма"
+    },
+    "unsupported_text": "Не удается добавить выбранный субсчет."
+  },
+  "sub-account-select": {
+    "title": "Выбрать аккаунт",
+    "text": "Выберите <strong>учётную запись</strong>, которую вы хотите делегировать. Вам нужно будет подписать транзакцию для подтверждения делегирования.",
+    "accounts_label": "Аккаунты"
+  },
+  "account-import-onboarding": {
+    "title": "Добавить  {{protocolName}}",
+    "text": "Вам необходимо приложение хранилище AirGap для добавления <strong>{{protocolName}}</strong>. Следуйте инструкциям на следующих нескольких шагах.",
+    "sub-protocol_text": "<strong>{{subProtocol}} не может быть добавлен без аккаунта <strong>{{protocol}}</strong>.",
+    "slides": {
+      "slide-0": {
+        "text": "У <strong>{{protocol}}</strong> есть множество токенов. Чтобы использовать любой из них, необходимо сначала добавить аккаунт <strong>{{protocol}}</strong> из AirGap Vault",
+        "description": "Следуйте инструкциям на следующих нескольких шагах, чтобы добавить аккаунт <strong>{{protocol}}</strong>, прежде чем вы сможете продолжить"
+      },
+      "slide-1": {
+        "text": "Откройте приложение <strong>AirGap Vault</strong> на том же устройстве или на автономном устройстве.",
+        "description": "Перейдите на вкладку <strong>\"Аккаунты\"</strong> и выберите <strong>\"Добавить аккаунты\"</strong>."
+      },
+      "slide-2_text": "Выберите созданный аккаунт и на странице \"Адрес аккаунта\" выберите <strong>\"Синхронизировать аккаунт\"</strong>.",
+      "slide-3": {
+        "text": "Вам необходимо синхронизировать счёт из AirGap Vault в AirGap Wallet.",
+        "description": "¬ Если AirGap Vault находится на <strong>автономном устройстве</strong>, отсканируйте <strong>QR-код</strong> на следующей странице.<br>¬ Если AirGap Vault находится на <strong>том же устройстве</strong>, используйте <strong>кнопку синхронизации</strong> того же устройства."
+      },
+      "slide-4": {
+        "text": "Теперь счёт можно импортировать в AirGap Wallet.",
+        "description": "Теперь вы готовы к созданию <strong>{{protocolName}}</strong> транзакций с AirGap Vault и AirGap Wallet."
+      }
+    },
+    "back": "Назад",
+    "next": "Далее",
+    "open_vault": "Открыть хранилище"
+  },
+  "account-import-ledger-onboarding": {
+    "title": "Добавить  {{protocolName}}",
+    "text": "Для добавления {{protocolName}} необходимо устройство Ledger с установленным приложением <strong>{{protocolName}}</strong>. Следуйте инструкциям на следующих шагах.",
+    "slides": {
+      "slide-1": "Подключите Ledger к компьютеру и разблокируйте его, введя пин-код.",
+      "slide-2": "Откройте приложение {{protocolName}} на вашем Ledger.",
+      "slide-3": "Подтвердите обмен адресом {{protocolName}} с AirGap Wallet."
+    },
+    "status-card": {
+      "connecting": "Подключение к Ledger...",
+      "error": {
+        "header": "Не удалось подключиться к Ledger.",
+        "message": "Убедитесь, что ваш Ledger подключен к компьютеру, разблокирован и открыто приложение {{protocolName}}."
+      },
+      "success": "Успешное подключение к Ledger",
+      "redirecting": "Перенаправление...",
+      "retry_button": "Повторить"
+    },
+    "back_button": "Назад",
+    "next_button": "Далее",
+    "done_button": "Готово"
+  },
+  "sub-account-import": {
+    "title": "Выберите аккаунты",
+    "text": "Выберите аккаунт, которую вы хотите добавить для <strong>{{subProtocolName}}</strong>.",
+    "empty_text": "Вы добавили все аккаунты <strong>{{tokenName}}</strong> для всех своих аккаунтов",
+    "import-all_label": "Импортировать всё"
+  },
+  "remove-liquidity": {
+    "receive": "Вы получаете"
+  },
+  "protocol-select": {
+    "title": "Выберите монету",
+    "swap_info": "Чтобы обменять токены определенного типа, вам необходимо сначала добавить аккаунт соответствующего токена."
+  },
+  "delegation-detail": {
+    "title": "Детали {{ delegateeLabel }}",
+    "default-delegatee-label": "Делегирование",
+    "default-delegatee-label-plural": "Делегирования",
+    "change-delegatee_label": "Изменить {{ delegateeLabel }}",
+    "your-delegation_label": "Ваше делегирование",
+    "your-balance_label": "Ваш баланс",
+    "your-rewards_label": "Ваши награды",
+    "done_button": "Готово",
+    "amount_label": "Сумма",
+    "max-amount_button": "МАКС",
+    "invalid-value_error": "Недопустимое значение",
+    "delegate_label": "Делегировать",
+    "undelegate_label": "Отменить делегирование",
+    "rewards": {
+      "index-col_label": "Индекс",
+      "amount-col_label": "Вознаграждение",
+      "payout-col_label": "Выплаты"
+    }
+  },
+  "delegation-list": {
+    "title": "Список {{ delegateeLabelPlural }}",
+    "your-delegatees_label": "Ваш {{ delegateeLabelPlural }}",
+    "known-delegatees_label": "Известные {{ delegateeLabelPlural }}",
+    "load-more_label": "Загрузить больше",
+    "not-supported_text": "В настоящее время список {{ delegateeLabelPlural }} ещё не поддерживается, но вы можете вручную делегировать на адрес с помощью \"Изменить валидатор\" в меню с тремя точками."
+  },
+  "delegation-detail-cosmos": {
+    "delegatee-label": "Валидатор",
+    "delegatee-label-plural": "Валидаторы",
+    "commission_label": "Комиссия",
+    "voting-power_label": "Право голоса",
+    "currently-delegated_label": "В настоящее время делегировано",
+    "unbonding_label": "Отвязано",
+    "unclaimed-rewards_label": "Невостребованные вознаграждения",
+    "delegate": {
+      "label": "Делегировать",
+      "has-delegated_text": "В настоящее время вы <span class=\"style__strong color__primary\">{{ delegated }}</span> делегировали полномочия этому валидатору.",
+      "not-delegated_text": "Выберите сумму, которую вы хотите делегировать.",
+      "can-delegate-has-delegated_text": "Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
+      "can-delegate-not-delegated_text": "Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций)."
+    },
+    "undelegate": {
+      "label": "Отменить делегирование",
+      "text": "В настоящее время вы делегировали полномочия этому валидатору, вы можете отменить делегирование до <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+    },
+    "rewards": {
+      "label": "Вознаграждения",
+      "button": "Претендовать на вознаграждение",
+      "text": "За эту делегацию вы можете получить до <span class=\"style__strong color__primary\">{{ rewards }}</span> вознаграждений."
+    }
+  },
+  "delegation-detail-tezos": {
+    "delegatee-label": "Бейкер",
+    "delegatee-label-plural": "Бейкеры",
+    "status": {
+      "accepts-delegation": "Принимает делегирование",
+      "reached-full-capacity": "Достигнута полная мощность",
+      "deactivated": "Деактивировано"
+    },
+    "fee_label": "Комиссия",
+    "payout-schedule-every-cycle-last-rewards_text": "Каждый {{ payoutTime }}. <small>Каждый цикл, вознаграждение за последний цикл</small>",
+    "payout-schedule-every-cycle-delayed-rewards_text": "Каждый {{ payoutTime }}. <small>Каждый цикл, вознаграждения с {{ payoutDelay }} циклов назад</small>",
+    "payout-schedule-every-n-cycle_text": "Каждый {{ payoutTime }}. <small>Каждый {{ cycles }} цикл</small>",
+    "payout-schedule_label": "График выплат",
+    "next-payout_label": "Следующая выплата",
+    "first-payout_label": "Первая выплата",
+    "return-per-cycle_label": "Предполагаемый доход за цикл",
+    "delegate_label": "Делегировать",
+    "undelegate_label": "Отменить делегирование",
+    "unknown": "Неизвестно",
+    "rewards": {
+      "index-col_label": "Цикл",
+      "amount-col_label": "Ожидаемое вознаграждение",
+      "payout-col_label": "Самая ранняя выплата"
+    }
+  },
+  "delegation-detail-polkadot": {
+    "delegatee-label": "Валидатор",
+    "delegatee-label-plural": "Валидаторы",
+    "status": {
+      "unknown": "Неизвестный"
+    },
+    "commission_label": "Комиссия",
+    "expected-reward_label": "Ожидаемая награда",
+    "delegated_label": "Делегированный",
+    "bonded_label": "Связанный",
+    "locked_label": "Отвязано",
+    "withdraw-ready_label": "Готово к выводу",
+    "next-era_label": "Следующая эра",
+    "becomes-active_label": "Становится активным",
+    "next-payout_label": "Следующая выплата",
+    "delegate": {
+      "label": "Делегировать",
+      "bond-more_label": "Бонд Мор",
+      "bond-nominate_text": "Выберите сумму, которую хотите делегировать. Вы можете делегировать как минимум <span class=\"style__strong color__primary\">{{ minDelegation }}</span> до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после комиссии за транзакцию).",
+      "bond-nominate-no-max_text": "Выберите сумму, которую хотите делегировать.",
+      "rebond-nominate_text": "Выберите сумму, которую хотите делегировать. Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после учёта комиссии за транзакцию).",
+      "rebond-nominate-no-max_text": "Выберите сумму, которую хотите делегировать.",
+      "nominate_text": "Делегируйте этому валидатору. В настоящее время у вас есть <span class=\"style__strong color__primary\">{{связанные }}</span> связанные связи.",
+      "bond-extra_text": "В настоящее время у вас есть <span class=\"style__strong color__primary\">{{ Bonded }}</span> делегированный. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после учёта комиссии за транзакцию).",
+      "bond-extra-no-max_text": "В настоящее время у вас есть <span class=\"style__strong color__primary\">{{ Bonded }}</span> делегированный. Вы можете делегировать дополнительные {{ символ }}.",
+      "rebond-extra_text": "В настоящее время у вас есть <span class=\"style__strong color__primary\">{{ Bonded }}</span> делегированный. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после учёта комиссии за транзакцию).",
+      "rebond-extra-no-max_text": "В настоящее время у вас есть <span class=\"style__strong color__primary\">{{ Bonded }}</span> делегированный. Вы можете делегировать дополнительные {{ символ }}.",
+      "change-nomination_text": "Смените делегацию. В настоящее время у вас есть <span class=\"style__strong color__primary\">{{ Bonded }}</span> делегированный.",
+      "insufficient-funds-to-cover-fees_text": "У вас недостаточно {{ символа }} для покрытия комиссии за транзакцию, дополнительные <span class=\"style__strong color__primary\">{{ extra }}</span> необходимый.",
+      "insufficient-funds-to-nominate_text": "Вам недостаточно {{ символа }} для делегирования, требуются дополнительные <span class=\"style__strong color__primary\">{{ extra }}</span>.",
+      "min-nominator-bond-not-reached_text": "У вас недостаточно {{symbol }}, привязанного к делегату, требуются дополнительные <span class=\"style__strong color__primary\">{{ extra }}</span>."
+    },
+    "undelegate": {
+      "label": "Отменить делегирование"
+    },
+    "unbond": {
+      "label": "Отвязать"
+    },
+    "withdraw-unbonded": {
+      "label": "Снять",
+      "button": "Отозвать",
+      "text-full": "Вы можете вывести <span class=\"style__strong color__primary\">{{ разблокировано }}</span> отвязанных средств.",
+      "text-short": "Вы можете вывести отвязанные средства."
+    },
+    "rewards": {
+      "index-col_label": "Эра",
+      "amount-col_label": "Награда",
+      "payout-col_label": "Выплата"
+    },
+    "alert": {
+      "polkadot": {
+        "delegation-issues": {
+          "title": "Делегирование на Polkadot",
+          "description": "В настоящее время для получения вознаграждений на Polkadot требуется динамическая минимальная сумма DOT. Сумма меняется каждый день. Пожалуйста, прочтите блогпост Polkadot для получения дополнительной информации.",
+          "actions": {
+            "open-blogpost": "Открыть блогпост"
+          }
+        }
+      },
+      "election-open": {
+        "title": "Операции делегирования в настоящее время недоступны",
+        "description": "Из-за ограничений периода выборов операции делегирования в настоящее время недоступны."
+      },
+      "nomination-inactive": {
+        "title": "Ваше делегирование этому валидатору неактивно",
+        "description": "Валидатор был избран в состав валидаторов, однако ваша номинация не была выбрана для активации в этой эре, и вы не получите никаких наград."
+      },
+      "nomination-oversubscribed": {
+        "title": "Этот валидатор переподписан",
+        "description": "Валидаторы могут выплачивать только 256 номинаторов за эру. Если больше 256 номинаторов номинируют того же валидатора, он «переподписан», и только топ-256 номинаторов с наибольшим количеством долей получают награды. В этой эре вы не получите никаких наград."
+      },
+      "validator-oversubscribed": {
+        "title": "Этот валидатор переподписан",
+        "description": "Валидаторы могут выплачивать только 256 номинаторов за эру. Если больше 256 номинаторов номинируют того же валидатора, он «переподписан», и только топ-256 номинаторов с наибольшим количеством долей получают награды."
+      }
+    }
+  },
+  "delegation-detail-moonbeam": {
+    "delegatee-label": "Коллатор",
+    "delegatee-label-plural": "Коллаторы",
+    "commission_label": "Комиссия",
+    "delegators_label": "Делегаторы",
+    "collators_label": "Коллаторы",
+    "currently-delegated_label": "В настоящее время делегировано",
+    "delegator-status": {
+      "label": "Статус",
+      "active_label": "Активно",
+      "leaving_label": "Отмена делегирования",
+      "ready-to-leave_label": "Готово к отмене делегирования",
+      "unknown_label": "Неизвестно"
+    },
+    "delegate": {
+      "label": "Делегировать",
+      "has-delegated_text": "В настоящее время вы <span class=\"style__strong color__primary\">{{ delegated }}</span> делегировали этому коллатору.",
+      "not-delegated_text": "Выберите сумму, которую вы хотите делегировать.",
+      "can-delegate-has-delegated_text": "Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций).",
+      "can-delegate-not-delegated_text": "Вы можете делегировать до <span class=\"style__strong color__primary\">{{ maxDelegation }}</span> (после оплаты транзакций)."
+    },
+    "undelegate": {
+      "schedule": {
+        "label": "Расписание отмены делегирования",
+        "text": "В настоящее время вы делегировали полномочия этому коллатору, вы можете отменить делегирование до <span class=\"style__strong color__primary\">{{ delegated }}</span>."
+      },
+      "execute": {
+        "label": "Выполнить отмену делегирования",
+        "text": "Ваш запрос на отмену делегирования <span class=\"style__strong color__primary\">{{ amount }}</span> может быть выполнен сейчас.",
+        "text-unknown-request": "Ваш запрос на отмену делегирования может быть выполнен сейчас."
+      },
+      "cancel": {
+        "label": "Отмена отмены делегирования",
+        "text": "Ваш запрос на отмену <span class=\"style__strong color__primary\">{{ amount }}</span> будет исполнен через {{ executableIn }} раундов. Вы можете отменить его до этого момента.",
+        "text-single-round": "Ваш запрос на отмену <span class=\"style__strong color__primary\">{{ amount }}</span> будет исполнен через 1 раунд. Вы можете отменить его до этого момента.",
+        "text-unknown-request": "Ваш запрос на отмену делегирования находится на рассмотрении. Вы можете отменить его, пока он не станет исполняемым."
+      }
+    },
+    "undelegate-all": {
+      "schedule": {
+        "label": "Отменить делегирование всего по расписанию"
+      },
+      "execute": {
+        "label": "Отменить делегирование всего"
+      },
+      "cancel": {
+        "label": "Отменить отмену делегирования всего"
+      }
+    },
+    "alert": {
+      "collator-oversubscribed": {
+        "title": "Этот коллатор переполнен",
+        "description": "Коллаторы могут выплачивать вознаграждение только {{ maxTopDelegations }} делегатам за раунд. Если более {{ maxTopDelegations }} делегатов делегируют один и тот же коллатор, вознаграждение выплачивается только делегатам с наибольшей {{ maxTopDelegations }} ставкой. В настоящее время минимальная сумма ставки, позволяющая получить вознаграждение от этого коллатора, составляет <span class=\"style__strong\">{{ minStakingAmount }}</span>."
+      }
+    }
+  },
+  "delegation-detail-icp": {
+    "delegatee-label": "Последователь",
+    "delegatee-label-plural": "Последователи",
+    "voting-power_label": "Сила голоса",
+    "neuron-balance_label": "Баланс субсчета нейрона",
+    "staked_label": "Делегировано",
+    "maturity_label": "Зрелость",
+    "age_label": "Возраст",
+    "dissolve-delay_label": "Задержка растворения",
+    "followee-status": {
+      "unknown": "Неизвестно (загрузите дополнительные сведения)",
+      "followed": "Следует",
+      "not-followed": "Не следует"
+    },
+    "stake-and-follow": {
+      "label": "Следовать",
+      "not-staking-not-following_text": "Следуйте за этим нейроном и делегируйте свою ставку.<br><br>В настоящее время вы не делегируете, выберите сумму, которую хотите делегировать. Вы можете делегировать от <span class=\"style__strong color__primary\">{{ minStake }}</span> до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию).",
+      "staking-not-following_text": "Следуйте за этим нейроном и делегируйте свою ставку.<br><br>В настоящее время у вас делегировано <span class=\"style__strong color__primary\">{{ neuronBalance }}</span>. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию).",
+      "staking-following_text": "Вы следуете за этим нейроном. Увеличьте свою ставку, чтобы получить больше силы голоса.<br><br>У вас в настоящее время <span class=\"style__strong color__primary\">{{ neuronBalance }}</span> делегировано. Вы можете дополнительно делегировать до <span class=\"style__strong color__primary\">{{ maxStake }}</span> (после оплаты комиссии за транзакцию)."
+    },
+    "follow": {
+      "label": "Следовать",
+      "text": "Следуйте за этим нейроном."
+    },
+    "increase-dissolve-delay": {
+      "label": "Установить задержку",
+      "text": " <span class=\"style__strong color__primary\">Задержка растворения</span> определяет вашу силу голоса и продолжительность ожидания разблокировки ваших средств после начала растворения вашего нейрона. Ваша текущая задержка растворения установлена на  <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>, и вы можете увеличить ее до  <span class=\"style__strong color__primary\">{{ maxDissolveDelay }}</span>."
+    },
+    "more-details": {
+      "label": "Больше сведений",
+      "text": "Полные сведения о нейроне предназначены для конфиденциальности, поэтому для их получения требуется доступ к закрытому ключу. Создайте и подпишите транзакцию запроса для загрузки дополнительных данных."
+    },
+    "disburse": {
+      "label": "Выплатить",
+      "text": "Ваш нейрон был растворен, выведите разблокированные токены."
+    },
+    "start-dissolving": {
+      "label": "Начать растворение"
+    },
+    "stop-dissolving": {
+      "label": "Прекратить растворение",
+      "text": "Ваш нейрон в настоящее время растворяется, ваши средства будут разблокированы через <span class=\"style__strong color__primary\">{{ dissolveDelay }}</span>. Прекратите растворение, чтобы отменить процесс."
+    },
+    "form": {
+      "dissolve-delay": {
+        "label": "Задержка растворения (в днях)",
+        "extra-label": "{{ duration }} (Сила голоса {{ votingPower }}x)",
+        "extra-label-no-rewards": "{{ duration }} (Сила голоса {{ votingPower }}x)<br><br>Предупреждение: Задержка растворения не должна быть ниже {{ minDelay }}, в противном случае вы не получите никаких наград.",
+        "invalid-state": "Задержка растворения не должна быть ниже {{ minDelay }}, иначе вы не получите никаких наград. Максимальная задержка составляет {{ maxDelay }}.",
+        "invalid-decrease": "Недопустимая задержка растворения, значение может быть только увеличено, поэтому не может быть ниже текущего значения ({{ minDelay }}) и не может превышать {{ maxDelay }}."
+      }
+    }
+  },
+  "introduction-push": {
+    "title": "Push-уведомления",
+    "heading": "Вы можете получать push-уведомления, если на ваши счета поступают транзакции.",
+    "description": "Сначала необходимо предоставить AirGap Wallet разрешение на push-уведомления.",
+    "grant-permission_label": "Дать разрешение"
+  },
+  "portfolio-item": {
+    "active": "активно"
+  },
+  "current-wallet-group": {
+    "label": "Группа"
+  },
+  "voting": {
+    "title": "Голосование",
+    "heading": "Инициатива вознаграждения за блокчейн (BRI)",
+    "text": "Чтобы превратить aeternity в самодостаточную платформу, мы предлагаем инициативу вознаграждения за блокчейн (BRI), в рамках которой ~0-20% вознаграждения майнеров будет направляться на развитие.",
+    "your-vote_label": "Ваш голос: {{ votePercentage }}%",
+    "voting-period_label": "Проголосовать с <strong>{{startDate}}</strong> по <strong>{{endDate}}</strong>",
+    "further-information": {
+      "heading": "Дополнительная информация",
+      "blog-post_label": "Подробное объяснение в статье блога",
+      "forum_label": "Обсуждение сообществом на форуме",
+      "result_label": "Чтобы проверить свой голос, пожалуйста, посетите <a href=\"https://aeternity.com\">официальную страницу голосования</a>"
+    },
+    "vote-no_label": "Вы проголосовали: Я НЕ поддерживаю BRI",
+    "vote-percentage_label": "Вы проголосовали: {{ oldVotePercentage }}%",
+    "vote-disabled_label": "Голосование в настоящее время отключено",
+    "vote_label": "Голосовать",
+    "change-vote_label": "Изменить голос",
+    "done_label": "Готово"
+  },
+  "delegate-action-popover": {
+    "delegation-settings_label": "Настройки делегирования",
+    "change-to-airgap-delegatee_label": "Изменить на AirGap {{ delegateeLabel }}"
+  },
+  "delegate-edit-popover": {
+    "delegation-settings_label": "Настройки делегирования",
+    "change-delegatee_label": "Изменить {{ delegateeLabel }}",
+    "change-alert": {
+      "text": "Введите адрес, предоставленный вам {{ delegateeLabel }}.",
+      "placeholder_text": "{{ delegateeLabel }} адрес",
+      "delegatee-address_label": "Адрес валидатора",
+      "cancel_label": "Отменить",
+      "set-delegatee_label": "Установить {{ delegateeLabel }}"
+    }
+  },
+  "delegation-validator-list": {
+    "title": "Список валидатора",
+    "your-validators_label": "Ваши валидаторы",
+    "validators_label": "Валидаторы",
+    "sort_label": "Сортировать валидаторы",
+    "no_validators_found_label": "Валидаторов, соответствующих вашему запросу, не найдено"
+  },
+  "action-alert-tip": {
+    "heading": "Благодарим вас за использование AirGap!",
+    "text": "Мы видели, что в последнее время вы часто пользуетесь AirGap. Хотели бы вы поддержать развитие нашего приложения, оставив нам чаевые?",
+    "cancel_label": "Нет",
+    "ok_label": "Оставить чаевые"
+  },
+  "action-alert-delegation": {
+    "heading": "Благодарим вас за использование AirGap!",
+    "text": "Мы заметили, что у вас есть средства XTZ, которые не делегированы. Делегировав свои средства, вы сможете зарабатывать до 7% годовых! Хотите ли вы делегировать свои средства сейчас?",
+    "cancel_label": "Нет",
+    "ok_label": "Делегировать сейчас"
+  },
+  "ledger-sign": {
+    "title": "Детали транзакции {{title}}",
+    "text": "Подключите устройство Ledger и подпишите транзакцию.",
+    "confirm_label": "Подписать",
+    "error-alert": {
+      "header": "Ошибка",
+      "unknown": "Произошла неизвестная ошибка. Попробуйте повторно подключить устройство.",
+      "confirm": "Ок"
+    }
+  },
+  "account-import-interaction-selection": {
+    "title": "Выберите вариант подписанта",
+    "airgap-vault": {
+      "label": "AirGap Vault",
+      "text": "AirGap Vault можно установить на автономный смартфон или на то же устройство для безопасного подписания транзакций."
+    },
+    "ledger": {
+      "label": "Ledger",
+      "text": "Ledger имеет несколько типов аппаратных кошельков, которые подключаются к вашему устройству для безопасного подписания транзакций."
+    }
+  },
+  "beacon-request": {
+    "sign-data_label": "Хотите ли вы подписать следующие данные?",
+    "blake2b_hash": "Леджер Blake2b - хэш сообщения",
+    "request": {
+      "heading": "<span class=\"style__strong color__primary\">{{ requesterName }}</span> хотел бы подключиться к вашей учётной записи.",
+      "text": "Этот сайт запрашивает следующие разрешения. Всегда доверяйте веб-сайтам, с которыми вы взаимодействуете."
+    },
+    "connect_label": "Подключить",
+    "continue_label": "Продолжить",
+    "cancel_label": "Отменить",
+    "request-by-dapp_label": "Запрос Beacon от DApp",
+    "title": {
+      "permission-request": "Запрос на разрешение",
+      "sign-payload-request": "Подписать запрос на передачу нагрузки",
+      "operation-request": "Запрос на операцию",
+      "broadcast-request": "Запрос разрешения"
+    },
+    "permission": {
+      "sign-transactions": "Операции по подписи",
+      "operation-request": "Запрос операции",
+      "threshold": "Порог"
+    },
+    "select-account": {
+      "alert": "Выберите учётную запись для сопряжения",
+      "button": "Изменить аккунт"
+    }
+  },
+  "dapp-permission-list": {
+    "title": "Разрешения dApps",
+    "connected-dapps": "Подключенные DApps",
+    "remove_label": "Удалить",
+    "no-permissions": "Никаких разрешений не выдавалось.",
+    "delete-permission-alert": {
+      "header": "Удалить разрешение?",
+      "message": "Вы уверены, что хотите удалить это разрешение? DApp больше не сможет выполнять операции, пока не будут предоставлены новые разрешения.",
+      "cancel_label": "Отменить",
+      "yes_label": "Да"
+    }
+  },
+  "dapp-settings": {
+    "title": "Настройки dApps",
+    "remove-all_label": "Удалить все",
+    "delete_label": "Удалить",
+    "no-peers": "Не подключен ни к каким аналогам",
+    "reset": "Скинуть",
+    "alert": {
+      "heading": "Удалить всё",
+      "message": "Вы уверены, что хотите удалить всех пиров?",
+      "cancel": "Отменить",
+      "confirm": "Подтвердить"
+    }
+  },
+  "walletconnect": {
+    "connection_request": "WalletConnect - Запрос на подключение",
+    "new_transaction": "WalletConnect - Новая транзакция",
+    "sign_request": "WalletConnect - Запрос подписи",
+    "switch_ethereum_chain": "WalletConnect - Сменить цепочку Ethereum",
+    "sign_typed_data": "WalletConnect - Подписание типичных данных",
+    "wait": "В ожидании WalletConnect",
+    "alert": {
+      "title": "Не поддерживается",
+      "message": "eth_signTypedData в настоящее время не поддерживается"
+    },
+    "timeout": {
+      "title": "Неисправность соединения",
+      "message": "Похоже, что соединение через WalletConnect не может быть установлено"
+    },
+    "connection_error": "Возникла проблема с подключением к WalletConnect"
+  },
+  "health-check": {
+    "title": "Проверка здоровья",
+    "message": "Проверка работоспособности API"
+  },
+  "group-label": {
+    "all": "Все",
+    "ungrouped": "Другое"
+  },
+  "dapp-confirm": {
+    "title": "Подтверждение запроса Walletconnect",
+    "text": "Вы хотите подтвердить запрос walletconnect?"
+  },
+  "tezos-fa-form": {
+    "header": "Укажите данные контракта Tezos, чтобы добавить не внесенный в список актив Tezos.",
+    "contract-address_label": "Адрес контракта",
+    "network_label": "Сеть",
+    "token-interface_label": "Стандарт FA",
+    "token": {
+      "label": "Доступ",
+      "placeholder": "Выбрать доступ"
+    },
+    "paste_label": "Вставить",
+    "error": {
+      "contract-not-found": "Договор не найден, проверьте правильность адреса и сети.",
+      "interface-unknown": "Не удается определить интерфейс договора, укажите его.",
+      "token-metadata-missing": "Невозможно получить метаданные актива.",
+      "token-vague": "Адрес является контрактом с несколькими активами, пожалуйста, укажите актив, который вы хотите добавить.",
+      "unknown": "Произошла неизвестная ошибка."
+    }
+  },
+  "collectibles-list": {
+    "title": "Коллекционное",
+    "load-more_label": "Загрузить больше",
+    "empty-state_text": "<br>Похоже, у вас еще нет коллекционного. Зайдите на<strong><a href='https://objkt.com' target='blank'> objkt.com</a></strong> и начните коллекционировать.",
+    "error": {
+      "loading": {
+        "message": "Невозможно загрузить коллекционное"
+      },
+      "show-details": {
+        "message": "Невозможно показать детали коллекционного"
+      },
+      "unknown": {
+        "message": "Неизвестная ошибка"
+      }
+    }
+  },
+  "collectibles-item": {
+    "title": "Детали коллекционирования",
+    "details_label": "Детали",
+    "amount_label": "Сумма",
+    "more-details_label": "Больше деталей",
+    "send-button_label": "Отправить",
+    "address": {
+      "contract_label": "Смежный контракт"
+    },
+    "error": {
+      "loading": {
+        "message": "Невозможно загрузить сведения о коллекционере"
+      },
+      "open-url": {
+        "message": "Невозможно открыть URL-адрес"
+      },
+      "send": {
+        "message": "Невозможно подготовить передачу"
+      },
+      "unknown": {
+        "message": "Неизвестная ошибка"
+      }
+    }
+  },
+  "objkt-collectible-explorer": {
+    "more-details": {
+      "view-on": "Смотрите на objkt.com"
+    }
+  },
+  "set-contract": {
+    "title": "Установить контракт {{ protocolName }}",
+    "xtz_shielded": {
+      "name": "Sapling"
+    },
+    "set-button_label": "Установить адрес",
+    "unsupported_text": "Невозможно установить адрес контракта для выбранного протокола."
+  },
   "tezos-sapling-contract-form": {
+    "header": "Укажите детали контракта Tezos Sapling.",
     "contract-address_label": "Адрес контракта",
     "contract-address_text": " AirGap совместим с референсной реализацией умного контракта Sapling, доступной на <a href='' target='_blank'>Tezos GitLab</a>.",
-    "error": {
-        "contract-invalid": "Неверный адрес контракта.",
-        "injector-invalid": "Неверный URL инжектора.",
-        "unknown": "Произошла неизвестная ошибка."
-    },
-    "header": "Укажите детали контракта Tezos Sapling.",
-    "include-injector_label": "Сервис инжектора",
-    "include-injector_text": "Сохранение конфиденциальности и улучшение удобства использования с помощью сервиса инжекторов. Транзакции Sapling должны подписываться только один раз в AirGap, а не дважды с помощью этого сервиса.",
     "injector-url_label": "URL инжектора",
     "injector-url_text": " AirGap совместим с референсной реализацией сервиса инжектора, доступной на <a href='' target='_blank'>GitHub AirGap</a>.",
     "paste_label": "Вставить",
+    "include-injector_label": "Сервис инжектора",
+    "include-injector_text": "Сохранение конфиденциальности и улучшение удобства использования с помощью сервиса инжекторов. Транзакции Sapling должны подписываться только один раз в AirGap, а не дважды с помощью этого сервиса.",
     "warning": {
-        "contract-cannot-assess-compatibility": "Не удалось проверить адрес контракта, вы всё равно можете использовать его, если уверены, что он будет работать.",
-        "contract-not-compatible": "Контракт, кажется, не совместим, вы всё равно можете использовать его, если уверены, что он будет работать."
+      "contract-not-compatible": "Контракт, кажется, не совместим, вы всё равно можете использовать его, если уверены, что он будет работать.",
+      "contract-cannot-assess-compatibility": "Не удалось проверить адрес контракта, вы всё равно можете использовать его, если уверены, что он будет работать."
+    },
+    "error": {
+      "contract-invalid": "Неверный адрес контракта.",
+      "injector-invalid": "Неверный URL инжектора.",
+      "unknown": "Произошла неизвестная ошибка."
+    }
+  },
+  "optimism-erc20-form": {
+    "header": "Укажите детали контракта Optimism ERC-20, чтобы добавить неперечисленный токен ERC-20.",
+    "contract-address_label": "Адрес контракта",
+    "paste_label": "Вставить",
+    "error": {
+      "contract-not-found": "Контракт не найден, проверьте правильность адреса.",
+      "token-metadata-missing": "Не удалось получить метаданные актива.",
+      "unknown": "Произошла неизвестная ошибка."
+    }
+  },
+  "isolated-modules": {
+    "loader_message": "Загрузка..."
+  },
+  "isolated-modules-list-page": {
+    "title": "Изолированные модули",
+    "items": {
+      "search_placeholder": "Поиск изолированных модулей"
+    },
+    "alert": {
+      "add": {
+        "failed": {
+          "header": "Не удалось добавить модуль",
+          "message": "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+          "ok_label": "Ок"
+        }
+      }
+    }
+  },
+  "isolated-modules-details-page": {
+    "button": {
+      "install_label": "Установить",
+      "update_label": "Обновить"
+    },
+    "popover": {
+      "remove_label": "Удалить"
+    },
+    "alert": {
+      "remove": {
+        "header": "Удалить модуль",
+        "message": "Вы уверены, что хотите удалить этот модуль?",
+        "cancel_label": "Отмена",
+        "proceed_label": "Удалить"
+      },
+      "update": {
+        "generic": {
+          "header": "Не удалось обновить модуль",
+          "message": "Что-то пошло не так! Модуль не может быть обновлен.",
+          "ok_label": "Ок"
+        },
+        "load-failed": {
+          "header": "Не удалось обновить модуль",
+          "message": "Что-то пошло не так! Новый модуль не может быть загружен.",
+          "ok_label": "Ок"
+        },
+        "different-public-key": {
+          "header": "Не удалось обновить модуль",
+          "message": "Вы не можете обновить этот модуль с выбранным пакетом, так как авторы (открытые ключи) разные.",
+          "ok_label": "Ок"
+        }
+      }
     }
   }
 }
-  

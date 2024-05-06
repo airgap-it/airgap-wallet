@@ -1,0 +1,1075 @@
+{
+    "account-transaction-list": {
+      "title": "帐户",
+      "transactions_label": "交易",
+      "add-tokens_label": "添加代币",
+      "collectibles_label": "收藏品",
+      "import-accounts_label": "导入帐户",
+      "delegate_label": "委托",
+      "undelegate_label": "取消委托",
+      "claim_rewards_label": "领取奖励",
+      "vote_label": "投票",
+      "migrate_label": "转移余额",
+      "delegation-status_label": "委托",
+      "set-contract_label": "设置合同",
+      "change-contract_label": "更改合约",
+      "fund_label": "基金账户",
+      "load_more": "加载更多",
+      "pending-transactions": {
+        "label": "待交易",
+        "text": "目前未启用待处理交易，请参阅区块浏览器。",
+        "open-blockexplorer_label": "打开区块浏览器"
+      },
+      "receive_label": "收到",
+      "send_label": "发送",
+      "tx_not_loading": "目前无法加载交易，请前往区块浏览器查看最新交易",
+      "has-delegated_card": {
+        "heading": "<strong>{{amount}></strong> 已委托",
+        "text": "您的 XTZ 已被委托并正在烘焙，您可以检查每个周期的奖励。"
+      },
+      "not-delegated_card": {
+        "heading": "委托 Tezos",
+        "text": "您有 <strong>{{amount}></strong> 个未委托。如果您现在委托，您每个周期都可以获得一份。"
+      },
+      "migrate-babylon_card": {
+        "heading": "账户迁移",
+        "text": "可委托的<strong>kt 账户</strong>已被弃用，请重新委托将您的 XTZ 转移到您的<strong>tz 账户</strong>。"
+      },
+      "migrate-alert": {
+        "header": "KT 余额迁移",
+        "message": "您是否要将 <strong>{{amount}></strong> 从此 KT 地址转移到其对应的 XTZ 地址？",
+        "cancel": "取消",
+        "confirm": "迁移"
+      },
+      "no-transactions_text": "此帐户尚无交易。",
+      "mtpelerin": {
+        "title": "Mt Pelerin",
+        "buy_label": "买",
+        "cash-out_label": "兑现",
+        "cancel_label": "取消",
+        "ok_label": "好的",
+        "header": "此服务由 Mt. Pelerin 提供，您将离开 AirGap钱包。可以在设置中进行更改",
+        "note_description": "注意 - Mt. Pelerin 接受来自所有国家的客户，但美国和俄罗斯除外，以及以下国家的居民：阿富汗、白俄罗斯、布隆迪、中非共和国、古巴、刚果民主共和国、几内亚、几内亚比绍、伊朗、伊拉克、黎巴嫩、利比亚、中国大陆（接受香港和台湾）、马里、缅甸、尼加拉瓜、朝鲜、俄罗斯、索马里、苏丹、南苏丹、叙利亚、委内瑞拉、也门、津巴布韦"
+      }
+    },
+    "account-transaction-detail": {
+      "available_label": "可用",
+      "delegated_label": "已委托",
+      "unbonding_label": "完全解绑",
+      "reward_label": "未领取的奖励",
+      "unbonding_completion": "解绑完成"
+    },
+    "introduction": {
+      "title": "自我托管变得简单又安全",
+      "title_mobile":"与Vault互动",
+      "highest": {
+        "label": "最高安全性",
+        "text": "通过 AirGap <b>双设备方法</b>，安全密钥处理变得更加容易。",
+        "desktop_text": "AirGap 采用<b>双设备方法</b>，其中机密存储在<b>AirGap Vault</b>中，或存储在<b>Ledger 硬件钱包</b>中的选定硬币中。"
+      },
+      "medium": {
+        "label": "中等安全性",
+        "text": "借助 AirGap <b>双应用程序方法</b>，安全密钥处理变得更加容易。"
+      },
+      "vault": {
+        "heading": "AirGap Vault",
+        "text": "私钥已生成并安全地存储在使用 AirGap Vault 应用程序的另一台设备上。<b>您必须安装 AirGap Vault 才能使用 AirGap钱包</b>",
+        "desktop_heading": "AirGap Vault 和Ledger",
+        "desktop_text": "私钥已生成并安全地存储在另一台装有 AirGap Vault 应用程序的设备或 Ledger 硬件钱包上。<br><b>在移动设备上安装 AirGap Vault 或连接 Ledger 以使用 AirGap 钱包</b>"
+      },
+      "wallet": {
+        "heading": "AirGap 钱包",
+        "text": "<b>这是 AirGap Wallet 应用程序</b>，它仅处理公共信息并负责将交易广播到区块链。"
+      },
+      "communication": {
+        "highest_text": "使用二维码进行单向通信。",
+        "medium_text": "通过应用程序切换来确保通信安全。",
+        "highest_heading": "双设备方法",
+        "medium_heading": "同一设备方法",
+        "highest_expanded_text": "使用 AirGap Knox 或 AirGap Vault 应用程序在无需任何网络连接的设备上完全离线签署交易，并使用 AirGap钱包应用程序通过您的日常智能手机广播这些交易。两台设备之间的通信通过透明二维码进行。",
+        "medium_expanded_text": "您不需要在离线设备上安装 AirGap Vault，而是可以在日常智能手机（同一设备）上安装 AirGap Vault 和 AirGap钱包，并通过应用程序沙盒和应用程序切换进行通信来提高安全性。"
+      },
+      "vault-install_label": "安装 AirGap Vault",
+      "continue_label": "我们走吧"
+    },
+    "introduction-download": {
+      "title": "安装 AirGap Vault",
+      "heading": "让我们安装 AirGap Vault！",
+      "description": "不确定如何以及在哪里安装 AirGap Vault 和 AirGap Wallet？我们有详细的分步指南，其中包含所有说明。",
+      "guide-link_label": "显示指南",
+      "text": "有几种方法可以安装 AirGap Vault，请选择最适合您的方法。",
+      "android": "安卓",
+      "play-store_text": "为此设备或专用设备直接从 Google Play 商店安装 AirGap Vault。",
+      "iOS": "iOS",
+      "app-store_text": "为此设备或专用设备直接从 App Store 安装 AirGap Vault。",
+      "iOS-device-iOS_text": "在此设备上从 App Store 安装 AirGap Vault。",
+      "iOS-device-android_text": "在专用设备上从 Play Store 安装 AirGap Vault。",
+      "android-device-iOS_text": "在专用设备上从 App Store 安装 AirGap Vault。",
+      "android-device-android_text": "在此设备上从 Play Store 安装 AirGap Vault。",
+      "linux-distro_label": "Linux 发行",
+      "install-distro_text": "在专用计算机上安装 AirGap Vault Distribution，用于签署气隙交易。",
+      "go_label": "我们走吧"
+    },
+    "portfolio": {
+      "shop_banner": "获得额外的安全保障 - 获取 AirGap 恢复板",
+      "empty-state_text": "首先将硬币添加到 AirGap钱包，您还需要 <span class=\"style__strong color__primary\">AirGap Vault</span> 应用程序，您的秘密将安全地存储在其中。",
+      "empty-state_desktop_text": "首先将硬币添加到 AirGap钱包，您可以使用 <span class=\"style__strong color__primary\">AirGap Vault</span> 应用程序执行此操作，也可以使用 <span class=\"style__strong color__primary\">Ledger 硬件钱包为选定的硬币执行此操作。</span>",
+      "add-coins_label": "添加代币",
+      "flip-card": {
+        "front-title": "总余额",
+        "back-title": "将您的设备变成真正的硬件钱包"
+      }
+    },
+    "account-add": {
+      "featured": "精选",
+      "others": "更多资产",
+      "generic": {
+        "xtz_label": "添加未上市的 Tezos 资产",
+        "optimism-erc20_label": "添加未上市的 Optimism ERC-20 代币"
+      },
+      "isolated-module": "找不到你喜欢的代币？创建一个独立模块来集成"
+    },
+    "scan": {
+      "title": "扫描二维码",
+      "text": "扫描同步二维码添加账户或扫描交易二维码确认并发送。",
+      "multi-qr_text": "此交易包含多个二维码。请将相机对准不断变化的二维码，等待所有二维码被扫描。",
+      "empty-state_heading": "为了扫描二维码，AirGap钱包需要<span class=\"style__strong color__primary\">相机权限</span>。",
+      "grant-permission_label": "授予权限"
+    },
+    "scan-address": {
+      "title": "扫描账户地址",
+      "text": "扫描账户地址的二维码。"
+    },
+    "scan-sync": {
+      "title": "同步账户数据",
+      "text": "打开 AirGap Vault，选择一个 <span ion-text color='white'>账户</span>，然后 <span ion-text color='white'>同步</span>，使用 AirGap钱包扫描同步二维码。",
+      "description": "在此过程中不会共享任何私钥或任何非公开数据。",
+      "scan_label": "扫描同步二维码"
+    },
+    "settings": {
+      "title": "设置",
+      "appearance_label": "外貌",
+      "theme_label": "主题",
+      "select-theme": {
+        "system": "设备主题",
+        "light": "浅色主题",
+        "dark": "深色主题"
+      },
+      "preferred-language_label": "首选语言",
+      "help_label": "帮助与支持",
+      "introduction_label": "介绍",
+      "faq_label": "常问问题",
+      "discord_label": "加入 Discord",
+      "share_label": "分享 AirGap",
+      "information_label": "更多",
+      "airgap_website": "AirGap 网站",
+      "airgap_shop": "AirGap 商店",
+      "github_label": "GitHub 存储库",
+      "other_label": "其他",
+      "paste-from-clipboard_label": "从剪贴板粘贴代码",
+      "about_label": "关于",
+      "alert_title": "选择频道",
+      "alert_cancel": "取消",
+      "channel": {
+        "international": "国际",
+        "chinese": "中文"
+      },
+      "select-account": {
+        "title": "选择帐户",
+        "text": "选择 Chrome 扩展程序的帐户"
+      },
+      "qr": {
+        "settings_label": "QR 设置",
+        "enable-new-serializer_label": "启用新的序列化器",
+        "page-time_label": "二维码页面时间",
+        "page-size_label": "QR 最大尺寸"
+      },
+      "dapp": {
+        "label": "Dapps",
+        "settings_label": "Dapp 设置",
+        "about_label": "关于Beacon",
+        "permission-list_label": "Dapp 权限"
+      },
+      "qr-advanced-settings_label": "高级二维码设置",
+      "health-check": "API 健康检查",
+      "interaction": {
+        "label": "交互设置",
+        "text": "Vault和钱包交互设置"
+      },
+      "trading_settings": {
+        "label": "交易",
+        "text": "高级交易设置",
+        "mtpelerin": "使用Mt Pelerin"
+      },
+      "add-ons_settings": {
+        "label": "附加组件",
+        "isolated-modules_text": "隔离模块"
+      },
+      "knox-text_pt1": "将您的设备变成真正的硬件钱包",
+      "knox-text_pt2": "AirGap Knox 强制实施真正的离线模式，并且只允许 Vault 在你的设备上运行",
+      "knox-button_label": "立即探索Knox"
+    },
+    "mtpelerin": {
+      "header1": "在 Mt Pelerin 购买和出售加密货币 – 瑞士通往加密货币世界的门户",
+      "paragraph1": "只需点击几下即可投资比特币、以太币和多条链上最受欢迎的资产，价格在市场上最优，无需 KYC。您可以随时以 14 种货币将其提取到 171 个国家/地区的银行账户中。",
+      "header2": "简单透明",
+      "lineItem1": "无需身份证明",
+      "lineItem2": "实时、透明的费率",
+      "lineItem3": "在 AirGap 上直接付款并获取加密货币",
+      "button1": "了解有关购买的更多信息",
+      "button2": "了解有关销售的更多信息",
+      "note": "注意 - Mt. Pelerin 接受来自所有国家的客户，但美国和俄罗斯人士除外，以及以下国家的居民：阿富汗、白俄罗斯、布隆迪、中非共和国、古巴、刚果民主共和国、几内亚、几内亚比绍、伊朗、伊拉克、黎巴嫩、利比亚、中国大陆（接受香港和台湾）、马里、缅甸、尼加拉瓜、朝鲜、俄罗斯、索马里、苏丹、南苏丹、叙利亚、委内瑞拉、也门、津巴布韦。",
+      "noteLink1": "更多信息",
+      "noteLink2": "条款和条件"
+    },
+    "qr-settings-page": {
+      "title": "QR 设置"
+    },
+    "select-wallet": {
+      "title": "选择帐户",
+      "scanned-address": {
+        "text": "您已扫描地址。请选择以下其中一个帐户进行发送。"
+      },
+      "fund-account": {
+        "xtz_shielded": {
+          "text": "选择以下帐户之一为您的 Shielded Tez 帐户提供资金。"
+        }
+      },
+      "broadcast": {
+        "xtz_shielded": {
+          "text": "Sapling 交易需要从 Tezos 账户广播。选择一个 Tezos 账户在 Vault 中签署交易并最终广播 Sapling 交易。"
+        }
+      },
+      "compatible_label": "这些帐户可以兼容",
+      "incompatible_label": "这些帐户不兼容"
+    },
+    "web-extension-disclaimer": {
+      "heading": "这是<span class=\"style__strong color__primary\">ALPHA</span>版本，仅适用于少量资金。",
+      "text": "该扩展目前已测试过。",
+      "list": {
+        "item-1_text": "MyEther钱包",
+        "item-2_text": "MyCrypto"
+      },
+      "description": "其他平台或 dapps 可能会起作用，我们将非常感谢每一个输入、问题报告或功能请求。",
+      "accept_label": "我明白"
+    },
+    "about": {
+      "title": "关于"
+    },
+    "transaction-confirm": {
+      "title": "确认交易",
+      "decline_label": "拒绝",
+      "confirm_label": "确认",
+      "qr-data-too-big_warning": "无法创建二维码，交易数据太大"
+    },
+    "transaction-detail": {
+      "title": "交易详情",
+      "open-blockexplorer_label": "打开区块浏览器",
+      "tx-broadcasting": {
+        "heading": "状态： 广播中..",
+        "text": "您的交易正在广播，这可能需要几秒钟。"
+      },
+      "tx-pending": {
+        "heading": "状态：待定..",
+        "text": "根据您设定的费用，交易可能需要几分钟才能确认。"
+      },
+      "tx-success": {
+        "heading": "状态：成功！"
+      }
+    },
+    "transaction-prepare": {
+      "title": "发送 {{title}}",
+      "to-address_label": "接受者",
+      "to-address-scan_label": "扫描二维码",
+      "amount_label": "金额",
+      "balance_label": "余额",
+      "warning": "费用过低可能会导致交易延迟或失败",
+      "fee": {
+        "label": "费用",
+        "slow_label": "慢和便宜",
+        "fast_label": "快和贵",
+        "max_label": "最大"
+      },
+      "advanced": "高级",
+      "memo": "备忘录",
+      "paste_label": "粘贴",
+      "existential_deposit": "忽略存在的入金",
+      "create-transaction": "创建交易",
+      "error": {
+        "amount_label": "请输入有效的数字",
+        "address_label": "地址格式似乎有误，应以 <strong>{{addressPlaceholder}></strong> 开头"
+      }
+    },
+    "transaction-qr": {
+      "title": "交易二维码",
+      "text": "打开<span class=\"style__strong color__primary\">AirGap Vault</span>并扫描此交易以对其进行签名。",
+      "scan_qr_label": "扫描二维码",
+      "done_label": "完成",
+      "details": "显示详细信息"
+    },
+    "interaction-selection": {
+      "title": "Vault 交互",
+      "heading": "您希望如何与 <span class=\"style__strong color__primary\">AirGap Vault</span> 进行交互？",
+      "same-device_label": "同一设备",
+      "same-device_info": "AirGap Vault 和 AirGap钱包安装在同一设备上。",
+      "offline-device_label": "离线设备",
+      "offline-device_info": "AirGap Vault 安装在离线设备上，使用 AirGap钱包扫描二维码。"
+    },
+    "interaction-selection-settings": {
+      "title": "钱包互动",
+      "same-device_heading": "看起来您正在<span class=\"style__strong color__primary\">同一设备</span>上使用<span class=\"style__strong color__primary\">AirGap Vault</span>和 AirGap钱包。",
+      "offline-device_heading": "看来您正在<span class=\"style__strong color__primary\">离线设备</span>上使用<span class=\"style__strong color__primary\">AirGap Vault</span>。",
+      "text": "您可以定义安装 AirGap钱包的位置，以使与 Vault 的交互更简单一些。",
+      "selector": {
+        "always": "总是问",
+        "same-device": "同一设备上的Vault和钱包",
+        "offline-device": "Vault 是离线设备",
+        "ledger": "钱包与 Ledger 配对"
+      },
+      "confirm_label": "确认",
+      "description": "您随时可以在“设置”选项卡中更改您的偏好",
+      "button_text": "编辑"
+    },
+    "interaction-selection-desktop": {
+      "title": "选择签名者选项",
+      "heading": "选择设备来签署此交易",
+      "vault_label": "AirGap Vault",
+      "vault_info": "AirGap Vault 安装在离线设备上，使用 AirGap钱包扫描二维码。",
+      "ledger_label": "Ledger",
+      "ledger_info": "Ledger 有多种类型的硬件钱包，可以连接到您的设备以安全地签署交易。"
+    },
+    "language-selection-settings": {
+      "title": "语言选择",
+      "heading": "请选择您的首选语言",
+      "selector": {
+        "device": "您的设备语言",
+        "en": "英语",
+        "de": "德语 (人工智能翻译)",
+        "es": "西班牙语 (人工智能翻译)",
+        "fr": "法语 (人工智能翻译)",
+        "ru":"俄语",
+        "pt_BR": "葡萄牙语（巴西）",
+        "zh_CN": "中文（中国）"
+      },
+      "continue_label": "继续",
+      "description": "您随时可以在设置中更改您的偏好"
+    },
+    "wallet-address": {
+      "title": "帐户地址",
+      "address_label": "地址",
+      "done_label": "完成"
+    },
+    "account-import": {
+      "title": "确认导入",
+      "import-text": "您想导入以下帐户吗？",
+      "warning": "您已在 AirGap 中添加此帐户。",
+      "syncing_label": "正在同步...",
+      "cancel_label": "取消",
+      "import_label": "导入"
+    },
+    "account-activate": {
+      "title": "添加帐户",
+      "message": "选择要添加的 <strong>{{ protocol }></strong> 帐户。",
+      "add-accounts_label": "添加帐户"
+    },
+    "signed-transaction": {
+      "transaction-unreadable": "我们无法从此交易中提取信息。这并不意味着交易无效 - 请确保您知道自己在做什么，并且可以验证您知道此交易包含正确的数据。"
+    },
+    "back-button": "后退",
+    "wallet-edit-popover-component": {
+      "delegate_label": "委托",
+      "undelegate_label": "取消委托",
+      "settings_label": "帐号设定",
+      "copy-address_label": "复制地址",
+      "delete_label": "删除",
+      "block-explorer_label": "打开区块浏览器",
+      "change-network_label": "更改网络"
+    },
+    "account-edit-popover-component": {
+      "header": "确认删除帐户",
+      "message": "您想删除此帐户吗？您可以随时从保管库中再次同步它。",
+      "delete": "删除",
+      "cancel": "取消"
+    },
+    "tabs": {
+      "wallets": "帐户",
+      "scan": "扫描二维码",
+      "ledger_import": "导入Ledger",
+      "settings": "设置"
+    },
+    "add-account": {
+      "title": "添加代币"
+    },
+    "add-sub-account": {
+      "title": "添加 {{ typeLabel }}",
+      "delegation_heading": "为了<span class=\"style__strong color__primary\">委托</span>您的 XTZ，您必须先导入或创建一个新帐户，然后才能委托。",
+      "tokens_label": "代币",
+      "accounts_label": "帐户",
+      "add-account_card": {
+        "heading": "创建账户",
+        "text": "如果您想添加新的 Tezos 帐户，则需要支付<strong>~0.260 XTZ</strong>的费用。"
+      },
+      "add-accounts_label": "添加 {{ typeLabel }}",
+      "no-imports_text": "未找到要导入的 {{ typeLabel }}。"
+    },
+    "add-generic-sub-account": {
+      "title": "添加 {{ genericSubProtocolName }}",
+      "add-button_label": "添加资产",
+      "xtz-fa": {
+        "name": "未上市的 Tezos 资产"
+      },
+      "optimism-erc20": {
+        "name": "未上市的Optimism ERC-20 代币"
+      },
+      "unsupported_text": "无法添加选定的子账户。"
+    },
+    "sub-account-select": {
+      "title": "选择帐户",
+      "text": "选择您要委托的<strong>账户</strong>。您需要签署交易以确认委托。",
+      "accounts_label": "帐户"
+    },
+    "account-import-onboarding": {
+      "title": "添加 {{protocolName}}",
+      "text": "您需要 AirGap Vault 应用程序来添加 <strong>{{protocolName}></strong>。请按照接下来几个步骤中的说明进行操作。",
+      "sub-protocol_text": "如果没有 <strong>{{protocol}></strong> 帐户，则无法添加 <strong>{{subProtocol}></strong>。",
+      "slides": {
+        "slide-0": {
+          "text": "<strong>{{protocol}></strong> 有许多代币。要使用其中任何一个，您需要先从 AirGap Vault 添加 <strong>{{protocol}></strong> 帐户",
+          "description": "按照接下来几个步骤中的说明添加 <strong>{{protocol}></strong> 帐户，然后才能继续"
+        },
+        "slide-1": {
+          "text": "在同一设备或离线设备上打开您的 <strong>AirGap Vault</strong> 应用程序。",
+          "description": "转到<strong>“帐户”</strong>选项，然后选择<strong>“添加帐户”</strong>。"
+        },
+        "slide-2_text": "选择创建的账户，在“账户地址”页面选择<strong>“同步账户”</strong>。",
+        "slide-3": {
+          "text": "您需要将账户从 AirGap Vault 同步到 AirGap钱包。",
+          "description": "¬ 如果 AirGap Vault 位于<strong>离线设备</strong>上，请扫描下一页上的<strong>二维码</strong>。<br>¬ 如果 AirGap Vault 位于<strong>同一设备</strong>上，请使用同一设备<strong>同步按钮</strong>。"
+        },
+        "slide-4": {
+          "text": "现在可以将该帐户导入到 AirGap钱包。",
+          "description": "您现在可以使用 AirGap Vault 和 AirGap钱包创建 <strong>{{protocolName}></strong> 交易。"
+        }
+      },
+      "back": "后退",
+      "next": "下一个",
+      "open_vault": "打开Vault"
+    },
+    "account-import-ledger-onboarding": {
+      "title": "添加 {{protocolName}}",
+      "text": "您需要一个安装了 {{protocolName}} 应用程序的 Ledger 设备来添加 <strong>{{protocolName}></strong>。请按照接下来几个步骤中的说明进行操作。",
+      "slides": {
+        "slide-1": "将您的 Ledger 连接到您的计算机并通过输入密码来解锁。",
+        "slide-2": "在您的 Ledger 上打开 {{protocolName}} 应用程序。",
+        "slide-3": "确认与 AirGap钱包共享您的 {{protocolName}} 地址。"
+      },
+      "status-card": {
+        "connecting": "正在连接到 Ledger...",
+        "error": {
+          "header": "无法连接到 Ledger。",
+          "message": "请确保您的 Ledger 已插入计算机、已解锁并且 {{protocolName}} 应用程序已打开。"
+        },
+        "success": "成功连接到 Ledger",
+        "redirecting": "正在重定向...",
+        "retry_button": "重试"
+      },
+      "back_button": "后退",
+      "next_button": "下一个",
+      "done_button": "完成"
+    },
+    "sub-account-import": {
+      "title": "选择帐户",
+      "text": "选择您要为 <strong>{{subProtocolName}></strong> 添加的帐户。",
+      "empty_text": "您已为所有帐户添加了所有 <strong>{{tokenName}></strong> 帐户",
+      "import-all_label": "导入全部"
+    },
+    "remove-liquidity": {
+      "receive": "你收到"
+    },
+    "protocol-select": {
+      "title": "选择代币",
+      "swap_info": "为了兑换某种代币，你需要先添加相应代币的账户"
+    },
+    "delegation-detail": {
+      "title": "{{ delegateeLabel }} 详细信息",
+      "default-delegatee-label": "委托",
+      "default-delegatee-label-plural": "委托",
+      "change-delegatee_label": "更改 {{ delegateeLabel }}",
+      "your-delegation_label": "您的委托",
+      "your-balance_label": "您的余额",
+      "your-rewards_label": "您的奖励",
+      "done_button": "完成",
+      "amount_label": "金额",
+      "max-amount_button": "最大",
+      "invalid-value_error": "无效数值",
+      "delegate_label": "委托",
+      "undelegate_label": "取消委托",
+      "rewards": {
+        "index-col_label": "指数",
+        "amount-col_label": "奖励",
+        "payout-col_label": "付款"
+      }
+    },
+    "delegation-list": {
+      "title": "{{ delegateeLabelPlural }} 列表",
+      "your-delegatees_label": "您的 {{ delegateeLabelPlural }}",
+      "known-delegatees_label": "已知 {{ delegateeLabelPlural }}",
+      "load-more_label": "加载更多",
+      "not-supported_text": "目前尚不支持 {{ delegateeLabelPlural }} 列表，但您可以使用三点菜单中的“更改验证器”手动委托给地址。"
+    },
+    "delegation-detail-cosmos": {
+      "delegatee-label": "验证者",
+      "delegatee-label-plural": "验证者",
+      "commission_label": "佣金",
+      "voting-power_label": "投票权",
+      "currently-delegated_label": "目前已委托",
+      "unbonding_label": "解除绑定",
+      "unclaimed-rewards_label": "未领取的奖励",
+      "delegate": {
+        "label": "委托",
+        "has-delegated_text": "您当前已 <span class=\"style__strong color__primary\">{{ 委托 }></span> 委托给此验证者。",
+        "not-delegated_text": "选择您想要委托的金额。",
+        "can-delegate-has-delegated_text": "您还可以额外委托最多 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。",
+        "can-delegate-not-delegated_text": "您最多可以委托 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。"
+      },
+      "undelegate": {
+        "label": "取消委托",
+        "text": "您目前已委托给该验证者，您最多可以取消委托 <span class=\"style__strong color__primary\">{{ delegated }></span>。"
+      },
+      "rewards": {
+        "label": "奖励",
+        "button": "领取奖励",
+        "text": "对于此次委托，您最多可领取 <span class=\"style__strong color__primary\">{{ 奖励 }></span> 的奖励。"
+      }
+    },
+    "delegation-detail-tezos": {
+      "delegatee-label": "烘培师",
+      "delegatee-label-plural": "烘培师",
+      "status": {
+        "accepts-delegation": "接受委托",
+        "reached-full-capacity": "达到最大产能",
+        "deactivated": "已停用"
+      },
+      "fee_label": "费用",
+      "payout-schedule-every-cycle-last-rewards_text": "每 {{ payoutTime }} <small>每个周期，从上一个周期获得奖励</small>",
+      "payout-schedule-every-cycle-delayed-rewards_text": "每 {{ payoutTime }} <small>每个周期，从 {{ payoutDelay }} 个周期前开始的奖励</small>",
+      "payout-schedule-every-n-cycle_text": "每 {{ payoutTime }} <small>每 {{ cycles }} 个周期</small>",
+      "payout-schedule_label": "付款时间表",
+      "next-payout_label": "下次付款",
+      "first-payout_label": "首次付款",
+      "return-per-cycle_label": "每周期预计回报",
+      "delegate_label": "委托",
+      "undelegate_label": "取消委托",
+      "unknown": "未知",
+      "rewards": {
+        "index-col_label": "周期",
+        "amount-col_label": "预期回报",
+        "payout-col_label": "最早付款"
+      }
+    },
+    "delegation-detail-polkadot": {
+      "delegatee-label": "验证者",
+      "delegatee-label-plural": "验证者",
+      "status": {
+        "unknown": "未知"
+      },
+      "commission_label": "佣金",
+      "expected-reward_label": "预期回报",
+      "delegated_label": "委托",
+      "bonded_label": "已绑定",
+      "locked_label": "解除绑定",
+      "withdraw-ready_label": "准备出金",
+      "next-era_label": "下一个时代",
+      "becomes-active_label": "变为活跃",
+      "next-payout_label": "下次付款",
+      "delegate": {
+        "label": "委托",
+        "bond-more_label": "绑定更多",
+        "bond-nominate_text": "选择您要委托的金额。您至少可以委托 <span class=\"style__strong color__primary\">{{ minDelegation }></span> 到 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。",
+        "bond-nominate-no-max_text": "选择您想要委托的金额。",
+        "rebond-nominate_text": "选择您要委托的金额。您最多可以委托 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。",
+        "rebond-nominate-no-max_text": "选择您想要委托的金额。",
+        "nominate_text": "委托给此验证者。您目前已 <span class=\"style__strong color__primary\">{{ bonded }></span> 已绑定。",
+        "bond-extra_text": "您目前已委托 <span class=\"style__strong color__primary\">{{ bonded }></span> 。您还可以委托最多 <span class=\"style__strong color__primary\">{{ maxDelegation }></span> （扣除交易费后）。",
+        "bond-extra-no-max_text": "您目前已委托 <span class=\"style__strong color__primary\">{{ bonded }></span> 。您可以委托其他 {{ symbol }} 。",
+        "rebond-extra_text": "您目前已委托 <span class=\"style__strong color__primary\">{{ bonded }></span> 。您还可以委托最多 <span class=\"style__strong color__primary\">{{ maxDelegation }></span> （扣除交易费后）。",
+        "rebond-extra-no-max_text": "您目前已委托 <span class=\"style__strong color__primary\">{{ bonded }></span> 。您可以委托其他 {{ symbol }} 。",
+        "change-nomination_text": "更改您的委托。您目前已委托 <span class=\"style__strong color__primary\">{{ bonded }></span> 。",
+        "insufficient-funds-to-cover-fees_text": "您的 {{ symbol }} 不足以支付交易费用，需要额外的 <span class=\"style__strong color__primary\">{{ extra }></span>。",
+        "insufficient-funds-to-nominate_text": "您没有足够的 {{ symbol }} 来委托，需要额外的 <span class=\"style__strong color__primary\">{{ extra }></span>。",
+        "min-nominator-bond-not-reached_text": "您没有足够的 {{ symbol }} 绑定来委托，需要额外的 <span class=\"style__strong color__primary\">{{ extra }></span>。"
+      },
+      "undelegate": {
+        "label": "取消委托"
+      },
+      "unbond": {
+        "label": "解除绑定"
+      },
+      "withdraw-unbonded": {
+        "label": "出金未绑定",
+        "button": "提取",
+        "text-full": "您可以提取<span class=\"style__strong color__primary\">{{unlocked }></span>的未绑定资金。",
+        "text-short": "您可以提取未绑定的资金。"
+      },
+      "rewards": {
+        "index-col_label": "时代",
+        "amount-col_label": "奖励",
+        "payout-col_label": "付款"
+      },
+      "alert": {
+        "polkadot": {
+          "delegation-issues": {
+            "title": "Polkadot上的委托",
+            "description": "目前，需要动态最低数量的 DOT 才有资格在 Polkadot 上获得奖励。数量每天都会变化。请阅读 Polkadot 博客文章了解更多信息。",
+            "actions": {
+              "open-blogpost": "打开博客文章"
+            }
+          }
+        },
+        "election-open": {
+          "title": "委托操作当前不可用",
+          "description": "由于选举期的限制，委托操作目前不可用。"
+        },
+        "nomination-inactive": {
+          "title": "您对此验证者的委托处于非活跃状态",
+          "description": "验证者已被选入验证者集，但是，您的提名尚未被选中，因此您将不会获得任何奖励。"
+        },
+        "nomination-oversubscribed": {
+          "title": "此验证者已超额订阅",
+          "description": "验证者每个时代只能向 256 位提名人支付奖励。如果超过 256 位提名人提名同一个验证者，则属于“超额订阅”，只有质押额最高的 256 位提名人才能获得奖励。您在这个世代不会获得任何奖励。"
+        },
+        "validator-oversubscribed": {
+          "title": "此验证者已超额订阅",
+          "description": "验证者每个时代只能向 256 位提名者支付奖励。如果超过 256 位提名者提名同一个验证者，则属于“超额订阅”，只有质押额最高的 256 位提名者才能获得奖励。"
+        }
+      }
+    },
+    "delegation-detail-moonbeam": {
+      "delegatee-label": "配页机",
+      "delegatee-label-plural": "配页机",
+      "commission_label": "佣金",
+      "delegators_label": "委托人",
+      "collators_label": "配页机",
+      "currently-delegated_label": "目前已委托",
+      "delegator-status": {
+        "label": "状态",
+        "active_label": "活跃",
+        "leaving_label": "取消委托中",
+        "ready-to-leave_label": "准备取消委托",
+        "unknown_label": "未知"
+      },
+      "delegate": {
+        "label": "委托",
+        "has-delegated_text": "您目前已 <span class=\"style__strong color__primary\">{{ 委托 }></span> 委托给此配页机。",
+        "not-delegated_text": "选择您想要委托的金额。",
+        "can-delegate-has-delegated_text": "您还可以额外委托最多 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。",
+        "can-delegate-not-delegated_text": "您最多可以委托 <span class=\"style__strong color__primary\">{{ maxDelegation }></span>（扣除交易费后）。"
+      },
+      "undelegate": {
+        "schedule": {
+          "label": "安排取消委托",
+          "text": "您目前已委托给此配页机，您最多可以取消委托 <span class=\"style__strong color__primary\">{{ delegated }></span>。"
+        },
+        "execute": {
+          "label": "执行取消委托",
+          "text": "您取消委托 <span class=\"style__strong color__primary\">{{ amount }></span> 的请求现在可以执行。",
+          "text-unknown-request": "您的取消委托请求现在可以执行。"
+        },
+        "cancel": {
+          "label": "取消 取消委托",
+          "text": "您取消委托 <span class=\"style__strong color__primary\">{{ amount }></span> 的请求将在 {{ executableIn }} 轮后执行。您在此之前可以取消该请求。",
+          "text-single-round": "您取消委托 <span class=\"style__strong color__primary\">{{ amount }></span> 的请求将在 1 轮后执行。您在此之前可以取消委托。",
+          "text-unknown-request": "您的取消委托请求尚待处理。您可以在其可执行之前取消该请求。"
+        }
+      },
+      "undelegate-all": {
+        "schedule": {
+          "label": "取消全部委托"
+        },
+        "execute": {
+          "label": "执行取消全部委托"
+        },
+        "cancel": {
+          "label": "取消全部的取消委托"
+        }
+      },
+      "alert": {
+        "collator-oversubscribed": {
+          "title": "此配页机已超额认购",
+          "description": "每轮收集者只能向 {{ maxTopDelegations }} 位委托人支付奖励。如果超过 {{ maxTopDelegations }} 位委托人委托同一个配页机，则只有质押额最高的 {{ maxTopDelegations }} 位委托人才能获得奖励。目前，有资格从该收集者获得奖励的最低质押金额为 <span class=\"style__strong\">{{ minStakingAmount }></span>。"
+        }
+      }
+    },
+    "delegation-detail-icp": {
+      "delegatee-label": "关注者",
+      "delegatee-label-plural": "关注者",
+      "voting-power_label": "投票权",
+      "neuron-balance_label": "神经元子账户余额",
+      "staked_label": "已质押",
+      "maturity_label": "到期",
+      "age_label": "年龄",
+      "dissolve-delay_label": "延迟溶解",
+      "followee-status": {
+        "unknown": "未知（加载更多详细信息）",
+        "followed": "已关注",
+        "not-followed": "未关注"
+      },
+      "stake-and-follow": {
+        "label": "关注",
+        "not-staking-not-following_text": "关注此神经元并委托您的质押。<br><br>目前您尚未质押，请选择您要质押的金额。您可以质押的金额从 <span class=\"style__strong color__primary\"> 到 <span class=\"style__strong color__primary\">{{ minStake }></span>（扣除交易费后）。",
+        "staking-not-following_text": "关注此神经元并委托您的质押。<br><br>您目前已质押 <span class=\"style__strong color__primary\">{{ neuronBalance }></span>。您最多可以额外质押 <span class=\"style__strong color__primary\">{{ maxStake }></span>（扣除交易费后）。",
+        "staking-following_text": "您正在关注此神经元。增加您的质押以获得更多投票权。<br><br>您目前已质押 <span class=\"style__strong color__primary\">{{ neuronBalance }></span>。您最多可以额外质押 <span class=\"style__strong color__primary\">{{ maxStake }></span>（扣除交易费后）。"
+      },
+      "follow": {
+        "label": "关注",
+        "text": "关注这个神经元。"
+      },
+      "increase-dissolve-delay": {
+        "label": "设置延迟",
+        "text": "<span class=\"style__strong color__primary\">解散延迟</span>决定了您拥有多少投票权，以及在您开始解散神经元后，您需要等待多长时间才能解锁资金。您当前的解散延迟设置为 <span class=\"style__strong color__primary\">{{ dissolveDelay }></span>，您可以将其增加到 <span class=\"style__strong color__primary\">{{ maxDissolveDelay }></span>。"
+      },
+      "more-details": {
+        "label": "更多详情",
+        "text": "完整的神经元详细信息应保密，因此需要访问私钥才能获取它们。创建并签署查询交易以加载更多数据。"
+      },
+      "disburse": {
+        "label": "支付",
+        "text": "你的神经元已经解散，请撤回已解锁的代币。"
+      },
+      "start-dissolving": {
+        "label": "开始解散"
+      },
+      "stop-dissolving": {
+        "label": "停止解散",
+        "text": "您的神经元目前正在解散，您的资金将在 <span class=\"style__strong color__primary\">{{ dissolveDelay }></span> 后解锁。停止解散以取消该过程。"
+      },
+      "form": {
+        "dissolve-delay": {
+          "label": "解散延迟（天数）",
+          "extra-label": "{{ duration }}（投票权 {{ votingPower }}x）",
+          "extra-label-no-rewards": "{{ duration }} (投票权 {{ votingPower }}x)<br><br>警告：解散延迟不应低于 {{ minDelay }}，否则您将不会获得任何奖励。",
+          "invalid-state": "解散延迟不应低于 {{ minDelay }}，否则您将不会获得任何奖励。最大延迟为 {{ maxDelay }}。",
+          "invalid-decrease": "无效的解散延迟，该值只能增加，因此不能低于当前值（{{ minDelay }}）并且不能超过 {{ maxDelay }}。"
+        }
+      }
+    },
+    "introduction-push": {
+      "title": "推送通知",
+      "heading": "如果您的账户收到交易，您可以收到推送通知。",
+      "description": "首先，您必须授予 AirGap钱包推送通知权限。",
+      "grant-permission_label": "授予权限"
+    },
+    "portfolio-item": {
+      "active": "活跃"
+    },
+    "current-wallet-group": {
+      "label": "团体"
+    },
+    "voting": {
+      "title": "投票",
+      "heading": "Block Reward Initiative (BRI)区块奖励提案",
+      "text": "为了将aeternity变为一个自我维持的平台，我们提出了BRI区块奖励计划），通过该计划，将约0-20％的矿工奖励分配给开发。",
+      "your-vote_label": "您的投票: {{ votePercentage }}%",
+      "voting-period_label": "投票周期： <strong>{{startDate}}</strong> 到 <strong>{{endDate}}</strong>",
+      "further-information": {
+        "heading": "更多信息",
+        "blog-post_label": "关于BRI提案的详细内容",
+        "forum_label": "官方论坛讨论",
+        "result_label": "请访问 <a href=\"https://aeternity.com\"> 查看投票结果</a>"
+      },
+      "vote-no_label": "您已投票: 拒绝BRI提案",
+      "vote-percentage_label": "您已投票: {{ oldVotePercentage }}%",
+      "vote-disabled_label": "目前暂时无法投票",
+      "vote_label": "投票",
+      "change-vote_label": "改变投票",
+      "done_label": "完成"
+    },
+    "delegate-action-popover": {
+      "delegation-settings_label": "委托设置",
+      "change-to-airgap-delegatee_label": "更改为 AirGap {{ delegateeLabel }}"
+    },
+    "delegate-edit-popover": {
+      "delegation-settings_label": "委托设置",
+      "change-delegatee_label": "更改 {{ delegateeLabel }}",
+      "change-alert": {
+        "text": "输入 {{ delegateeLabel }} 向您提供的地址。",
+        "placeholder_text": "{{ delegateeLabel }} 地址",
+        "delegatee-address_label": "烘培师地址",
+        "cancel_label": "取消",
+        "set-delegatee_label": "设置 {{ delegateeLabel }}"
+      }
+    },
+    "delegation-validator-list": {
+      "title": "验证者列表",
+      "your-validators_label": "你的验证者",
+      "validators_label": "验证者",
+      "sort_label": "排序验证者",
+      "no_validators_found_label": "未找到符合您搜索条件的验证者"
+    },
+    "action-alert-tip": {
+      "heading": "感谢您使用 AirGap！",
+      "text": "我们发现您最近经常使用 AirGap。您愿意给我们打赏来支持我们应用的开发吗？",
+      "cancel_label": "不",
+      "ok_label": "立即打赏"
+    },
+    "action-alert-delegation": {
+      "heading": "感谢您使用 AirGap！",
+      "text": "我们注意到您有未委托的 XTZ 资金。通过委托您的资金，您可以获得高达 7% 的年利率！您想立即委托您的资金吗？",
+      "cancel_label": "不",
+      "ok_label": "立即委托"
+    },
+    "ledger-sign": {
+      "title": "{{title}} 交易详情",
+      "text": "连接 Ledger 设备并签署交易。",
+      "confirm_label": "签署",
+      "error-alert": {
+        "header": "错误",
+        "unknown": "发生未知错误。请尝试重新连接您的设备。",
+        "confirm": "好的"
+      }
+    },
+    "account-import-interaction-selection": {
+      "title": "选择签名者选项",
+      "airgap-vault": {
+        "label": "AirGap Vault",
+        "text": "AirGap Vault 可以安装在离线智能手机或同一设备上，以安全地签署交易。"
+      },
+      "ledger": {
+        "label": "Ledger",
+        "text": "Ledger 有多种类型的硬件钱包，可以连接到您的设备以安全地签署交易。"
+      }
+    },
+    "beacon-request": {
+      "sign-data_label": "您是否要签署以下数据？",
+      "blake2b_hash": "Ledger Blake2b 信息的哈希值",
+      "request": {
+        "heading": "<span class=\"style__strong color__primary\">{{ requesterName }></span> 想要连接到您的帐户。",
+        "text": "此网站请求以下权限。请务必信任与之交互的网站。"
+      },
+      "connect_label": "连接",
+      "continue_label": "继续",
+      "cancel_label": "取消",
+      "request-by-dapp_label": "DApp 的 Beacon 请求",
+      "title": {
+        "permission-request": "权限请求",
+        "sign-payload-request": "签署有效载荷请求",
+        "operation-request": "操作请求",
+        "broadcast-request": "权限请求"
+      },
+      "permission": {
+        "sign-transactions": "签署交易",
+        "operation-request": "操作请求",
+        "threshold": "临界点"
+      },
+      "select-account": {
+        "alert": "选择要配对的帐户",
+        "button": "更改帐户"
+      }
+    },
+    "dapp-permission-list": {
+      "title": "Dapp 权限",
+      "connected-dapps": "连接的 DApp",
+      "remove_label": "删除",
+      "no-permissions": "未授予任何权限。",
+      "delete-permission-alert": {
+        "header": "删除权限？",
+        "message": "您确定要删除此权限吗？在授予新权限之前，DApp 将无法再执行操作。",
+        "cancel_label": "取消",
+        "yes_label": "是"
+      }
+    },
+    "dapp-settings": {
+      "title": "Dapp 设置",
+      "remove-all_label": "移除所有",
+      "delete_label": "删除",
+      "no-peers": "未与任何对等点建立连接",
+      "reset": "重置",
+      "alert": {
+        "heading": "移除所有",
+        "message": "您确实要删除所有对等体吗？",
+        "cancel": "取消",
+        "confirm": "确认"
+      }
+    },
+    "walletconnect": {
+      "connection_request": "WalletConnect - 连接请求",
+      "new_transaction": "WalletConnect - 新交易",
+      "sign_request": "WalletConnect - 签名请求",
+      "switch_ethereum_chain": "WalletConnect - 切换以太坊链",
+      "sign_typed_data": "WalletConnect - 签名类型数据",
+      "wait": "等待 WalletConnect",
+      "alert": {
+        "title": "不支持",
+        "message": "目前不支持 eth_signTypedData"
+      },
+      "timeout": {
+        "title": "连接失败",
+        "message": "似乎无法通过 WalletConnect 建立连接"
+      },
+      "connection_error": "连接 WalletConnect 时出现问题"
+    },
+    "health-check": {
+      "title": "健康检查",
+      "message": "检查 API 健康状况"
+    },
+    "group-label": {
+      "all": "全部",
+      "ungrouped": "其他"
+    },
+    "dapp-confirm": {
+      "title": "确认 Walletconnect 请求",
+      "text": "您想确认 walletconnect 请求吗？"
+    },
+    "tezos-fa-form": {
+      "header": "提供 Tezos 合约详细信息以添加未列出的 Tezos 资产。",
+      "contract-address_label": "合约地址",
+      "network_label": "网络",
+      "token-interface_label": "FA 标准",
+      "token": {
+        "label": "资产",
+        "placeholder": "选择资产"
+      },
+      "paste_label": "粘贴",
+      "error": {
+        "contract-not-found": "未找到合约，请检查地址和网络是否正确。",
+        "interface-unknown": "无法确定合约的接口，请指定一个。",
+        "token-metadata-missing": "无法获取资产元数据。",
+        "token-vague": "该地址是多资产合约，请指定您要添加的资产。",
+        "unknown": "发生了未知错误。"
+      }
+    },
+    "collectibles-list": {
+      "title": "收藏品",
+      "load-more_label": "加载更多",
+      "empty-state_text": "哇...<br>看来您还没有任何收藏品。前往 <strong><a href='https://objkt.com' target='blank'>objkt.com</a></strong> 并开始收藏。",
+      "error": {
+        "loading": {
+          "message": "无法加载收藏品"
+        },
+        "show-details": {
+          "message": "无法显示收藏品的详细信息"
+        },
+        "unknown": {
+          "message": "未知错误"
+        }
+      }
+    },
+    "collectibles-item": {
+      "title": "收藏品详细信息",
+      "details_label": "详情",
+      "amount_label": "金额",
+      "more-details_label": "更多详情",
+      "send-button_label": "发送",
+      "address": {
+        "contract_label": "相关合约"
+      },
+      "error": {
+        "loading": {
+          "message": "无法加载收藏品的详细信息"
+        },
+        "open-url": {
+          "message": "无法打开网址"
+        },
+        "send": {
+          "message": "无法准备转帐"
+        },
+        "unknown": {
+          "message": "未知错误"
+        }
+      }
+    },
+    "objkt-collectible-explorer": {
+      "more-details": {
+        "view-on": "在 objkt.com 上查看"
+      }
+    },
+    "set-contract": {
+      "title": "设置 {{ protocolName }} 合约",
+      "xtz_shielded": {
+        "name": "Sapling"
+      },
+      "set-button_label": "设置地址",
+      "unsupported_text": "无法为所选协议设置合约地址。"
+    },
+    "tezos-sapling-contract-form": {
+      "header": "提供 Tezos Sapling 合约详细信息。",
+      "contract-address_label": "合约地址",
+      "contract-address_text": "AirGap 与 <a href='' target='_blank'>Tezos GitLab</a> 上提供的 Sapling 智能合约参考实现兼容。",
+      "injector-url_label": "注入器 URL",
+      "injector-url_text": "AirGap 与 <a href='' target='_blank'>AirGap GitHub</a> 上提供的注入器服务参考实现兼容。",
+      "paste_label": "粘贴",
+      "include-injector_label": "注入器服务",
+      "include-injector_text": "使用注入器服务保护隐私并提高可用性。Sapling 交易在 AirGap 中只需签名一次，而使用此服务则无需签名两次。",
+      "warning": {
+        "contract-not-compatible": "该合约似乎不兼容，如果您确定它能起作用，您仍然可以使用它。",
+        "contract-cannot-assess-compatibility": "无法验证合约地址，如果您确定它能起作用，您仍然可以使用它。"
+      },
+      "error": {
+        "contract-invalid": "合约地址无效。",
+        "injector-invalid": "注入器 URL 无效。",
+        "unknown": "发生了未知错误。"
+      }
+    },
+    "optimism-erc20-form": {
+      "header": "提供 Optimism ERC-20 合约详细信息以添加未上市的 ERC-20 代币。",
+      "contract-address_label": "合约地址",
+      "paste_label": "粘贴",
+      "error": {
+        "contract-not-found": "未找到合约，请检查地址是否正确。",
+        "token-metadata-missing": "无法获取资产元数据。",
+        "unknown": "发生了未知错误。"
+      }
+    },
+    "isolated-modules": {
+      "loader_message": "加载中..."
+    },
+    "isolated-modules-list-page": {
+      "title": "隔离模块",
+      "items": {
+        "search_placeholder": "搜索隔离模块"
+      },
+      "alert": {
+        "add": {
+          "failed": {
+            "header": "添加模块失败",
+            "message": "出错了！请重试。",
+            "ok_label": "好的"
+          }
+        }
+      }
+    },
+    "isolated-modules-details-page": {
+      "button": {
+        "install_label": "安装",
+        "update_label": "更新"
+      },
+      "popover": {
+        "remove_label": "移除"
+      },
+      "alert": {
+        "remove": {
+          "header": "移除模块",
+          "message": "您确实要移除该模块吗？",
+          "cancel_label": "取消",
+          "proceed_label": "移除"
+        },
+        "update": {
+          "generic": {
+            "header": "更新模块失败",
+            "message": "出错了！无法更新模块。",
+            "ok_label": "好的"
+          },
+          "load-failed": {
+            "header": "更新模块失败",
+            "message": "出错了！无法加载新模块。",
+            "ok_label": "好的"
+          },
+          "different-public-key": {
+            "header": "更新模块失败",
+            "message": "您无法使用所选包更新此模块，作者（公钥）不同。",
+            "ok_label": "好的"
+          }
+        }
+      }
+    }
+  }
