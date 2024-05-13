@@ -88,6 +88,7 @@ build-ios:
     - echo "$IOS_BUILD_JSON" > build.json
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
+    - nvm install 20
     - nvm use 20
     - npm install --legacy-peer-deps
     - npm run prepare-prod-build
