@@ -72,7 +72,7 @@ export const reducer = createReducer(
     toast: {
       id: generateGUID(),
       value: {
-        type: 'loading',
+        type: 'loading' as Toast['type'],
         error
       },
       status: UIActionStatus.PENDING
@@ -83,7 +83,7 @@ export const reducer = createReducer(
     toast: {
       id: generateGUID(),
       value: {
-        type: 'openUrl',
+        type: 'openUrl' as Toast['type'],
         error
       },
       status: UIActionStatus.PENDING
@@ -94,7 +94,7 @@ export const reducer = createReducer(
     toast: {
       id: generateGUID(),
       value: {
-        type: 'send',
+        type: 'send' as Toast['type'],
         error
       },
       status: UIActionStatus.PENDING
