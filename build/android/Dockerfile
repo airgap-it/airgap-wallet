@@ -1,4 +1,4 @@
-FROM beevelop/ionic:v2021.06.1
+FROM beevelop/ionic:v2023.10.1
 
 RUN apt-get update -y && apt-get install -y \
     bzip2 \
@@ -14,10 +14,10 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 RUN mkdir /app
 WORKDIR /app
 
-RUN npm install -g npm@8.19.3 @capacitor/core@5.0.4 @capacitor/android@5.0.4 @capacitor/cli@5.0.4
+RUN npm install -g npm@10.5.2 @capacitor/core@5.0.4 @capacitor/android@5.0.4 @capacitor/cli@5.0.4
 RUN npm cache clean -f
 RUN npm install -g n
-RUN n 16.19.1
+RUN n 20.13.1
 
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app
