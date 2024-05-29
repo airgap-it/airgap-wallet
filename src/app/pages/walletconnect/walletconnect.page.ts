@@ -13,6 +13,7 @@ import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 import { stripV1Wallet } from 'src/app/utils/utils'
+import { Router } from '@angular/router'
 import { WalletconnectV1Handler, WalletconnectV1HandlerContext } from './handler/walletconnect-v1.handler'
 import { WalletconnectV2Handler, WalletconnectV2HandlerContext } from './handler/walletconnect-v2.handler'
 import {
@@ -84,7 +85,8 @@ export class WalletconnectPage implements OnInit {
     private readonly alertCtrl: AlertController,
     private readonly beaconService: BeaconService,
     private readonly translateService: TranslateService,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly router: Router
   ) {}
 
   public get address(): string {
@@ -220,6 +222,7 @@ export class WalletconnectPage implements OnInit {
       await this.responseHandler()
     }
     await this.dismissModal()
+    this.router.navigateByUrl(`tabs/portfolio`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private async signRequest(request: WalletconnectSignRequest<string>) {

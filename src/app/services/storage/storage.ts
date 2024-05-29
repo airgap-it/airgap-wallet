@@ -14,7 +14,9 @@ export type themeOptions = 'light' | 'dark' | 'system'
 export enum LanguagesType {
   EN = 'en',
   DE = 'de',
-  // ES = 'es',
+  ES = 'es',
+  RU = 'ru',
+  FR = 'fr',
   PT_BR = 'pt_BR',
   ZH_CN = 'zh_CN'
 }
