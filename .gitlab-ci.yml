@@ -88,8 +88,8 @@ build-ios:
     - echo "$IOS_BUILD_JSON" > build.json
   script:
     - export DEVELOPER_DIR=$XCODE_PATH
-    - nvm install 20
-    - nvm use 20
+    - nvm install 18
+    - nvm use 18
     - npm install --legacy-peer-deps
     - npm run prepare-prod-build
     - npm run apply-diagnostic-modules # manually remove unused cordova-diagnostic-plugin modules

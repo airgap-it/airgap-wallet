@@ -1,4 +1,5 @@
 {
+  "originHash" : "dd6c7513dabb2fb0805d2f3cf7ccd4e3841f27c3c4a7e3e2600c33b300226f08",
   "pins" : [
     {
       "identity" : "airgap-sapling",
@@ -10,5 +11,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
