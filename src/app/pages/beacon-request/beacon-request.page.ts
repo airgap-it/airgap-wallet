@@ -132,7 +132,6 @@ export class BeaconRequestPage implements OnInit {
       await this.responseHandler()
     }
     await this.dismiss()
-    this.router.navigateByUrl(`tabs/portfolio`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
   private async displayErrorPage(error: Error & { data?: unknown }): Promise<void> {

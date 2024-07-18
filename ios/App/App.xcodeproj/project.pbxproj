@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
+		77DAC8402C469B6C000A5D87 /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DAC83F2C469B6C000A5D87 /* MyViewController.swift */; };
 		881CF03124530A4D007A5381 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881CF03024530A4D007A5381 /* AppInfo.swift */; };
 		881CF03424530A6F007A5381 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 881CF03324530A6F007A5381 /* AppInfo.m */; };
 		8888FC2924581A5D00A8551D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8888FC2824581A5D00A8551D /* GoogleService-Info.plist */; };
@@ -50,6 +51,7 @@
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		77DAC83F2C469B6C000A5D87 /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
 		881CF03024530A4D007A5381 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
 		881CF03224530A6F007A5381 /* App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "App-Bridging-Header.h"; sourceTree = "<group>"; };
 		881CF03324530A6F007A5381 /* AppInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppInfo.m; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
+				77DAC83F2C469B6C000A5D87 /* MyViewController.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				A3FCA8F929E5B5870012FE3C /* JS.swift in Sources */,
 				A3FCA90029E5C2890012FE3C /* FileExplorer.swift in Sources */,
 				A3FCA90229E5C2890012FE3C /* IsolatedModules.m in Sources */,
+				77DAC8402C469B6C000A5D87 /* MyViewController.swift in Sources */,
 				88BD9D0B25F0CDE600780458 /* SaplingNative.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
