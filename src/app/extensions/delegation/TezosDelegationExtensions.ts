@@ -1,9 +1,9 @@
 import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { TezosDelegatorAction, TezosProtocol } from '@airgap/tezos'
+import { TezosDelegatorAction, TezosProtocol, TezosUnits } from '@airgap/tezos'
 import { DecimalPipe } from '@angular/common'
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
 import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
@@ -20,7 +20,14 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/coinlib/coinlib.service'
 
+import { Amount, newAmount } from '@airgap/module-kit'
+import { DecimalValidator } from 'src/app/validators/DecimalValidator'
 import { V1ProtocolDelegationExtensions } from './base/V1ProtocolDelegationExtensions'
+
+enum ArgumentName {
+  STAKE = 'stake',
+  STAKE_CONTROL = 'stakeControl'
+}
 
 export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<TezosProtocol> {
   private static instance: TezosDelegationExtensions
@@ -82,7 +89,12 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     delegatees: string[]
   ): Promise<AirGapDelegationDetails[]> {
     const delegationDetails = await adapter.getDelegationDetailsFromAddress(delegator, delegatees)
-    const extraDetails = await this.getExtraDelegationDetails(adapter, delegationDetails.delegator, delegationDetails.delegatees[0])
+    const extraDetails = await this.getExtraDelegationDetails(
+      adapter,
+      delegator,
+      delegationDetails.delegator,
+      delegationDetails.delegatees[0]
+    )
 
     return [extraDetails]
   }
@@ -121,12 +133,13 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
 
   private async getExtraDelegationDetails(
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
     delegatorDetails: DelegatorDetails,
     delegateeDetails: DelegateeDetails
   ): Promise<AirGapDelegationDetails> {
     const [delegator, delegatee] = await Promise.all([
-      this.getExtraDelegatorDetails(delegatorDetails, delegateeDetails),
-      this.getExtraBakerDetails(adapter, delegateeDetails)
+      this.getExtraDelegatorDetails(adapter, address, delegatorDetails, delegateeDetails),
+      this.getExtraBakerDetails(adapter, delegateeDetails, address)
     ])
 
     return { delegator, delegatees: [delegatee] }
@@ -134,7 +147,8 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
 
   private async getExtraBakerDetails(
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
-    bakerDetails: DelegateeDetails
+    bakerDetails: DelegateeDetails,
+    address: string
   ): Promise<AirGapDelegateeDetails> {
     const [bakerInfo, delegateeDetails, knownBakers] = await Promise.all([
       adapter.protocolV1.bakerDetails(bakerDetails.address),
@@ -164,7 +178,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
       status = 'delegation-detail-tezos.status.deactivated'
     }
 
-    const displayDetails = await this.createDelegateeDisplayDetails(adapter, knownBaker)
+    const displayDetails = await this.createDelegateeDisplayDetails(adapter, address, knownBaker)
 
     return {
       name,
@@ -181,15 +195,38 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async getExtraDelegatorDetails(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
     delegatorDetails: DelegatorDetails,
     bakerDetails: DelegateeDetails
   ): Promise<AirGapDelegatorDetails> {
-    const delegateAction = this.createDelegateAction(delegatorDetails.availableActions, bakerDetails.address)
-    const undelegateAction = this.createUndelegateAction(delegatorDetails.availableActions)
+    const delegateAction = await this.createDelegateAction(adapter, address, delegatorDetails.availableActions, bakerDetails.address)
+    const undelegateAction = await this.createUndelegateAction(adapter, address, delegatorDetails.availableActions)
+    const stakeAction = await this.createStakeAction(adapter, address, delegatorDetails.availableActions)
+    const unstakeAction = await this.createUnstakeAction(adapter, address, delegatorDetails.availableActions)
+    const finalizeUnstakeAction = await this.createUnstakeFinalizeAction(adapter, address, delegatorDetails.availableActions)
+
+    const mainActions: AirGapDelegatorAction[] = []
+
+    if (delegateAction) {
+      mainActions.push(delegateAction)
+    }
+
+    if (stakeAction) {
+      mainActions.push(stakeAction)
+    }
+
+    if (unstakeAction) {
+      mainActions.push(unstakeAction)
+    }
+
+    if (finalizeUnstakeAction) {
+      mainActions.push(finalizeUnstakeAction)
+    }
 
     return {
       ...delegatorDetails,
-      mainActions: delegateAction ? [delegateAction] : undefined,
+      mainActions: mainActions.length !== 0 ? mainActions : undefined,
       secondaryActions: undelegateAction ? [undelegateAction] : undefined
     }
   }
@@ -206,9 +243,10 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
 
   private async createDelegateeDisplayDetails(
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
     baker?: TezosBakerDetails
   ): Promise<UIWidget[]> {
-    return [
+    const delegateeDisplayDetails: UIWidget[] = [
       new UIIconText({
         iconName: 'logo-usd',
         text:
@@ -224,10 +262,61 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
         description: 'delegation-detail-tezos.payout-schedule_label'
       })
     ]
+
+    const stakedBalance = await adapter.protocolV1.getstakeBalance(address)
+    const { requests } = await adapter.protocolV1.getUnfinalizeRequest(address)
+    const metaData = await adapter.protocolV1.getMetadata()
+    const finalizeableBalance = await adapter.protocolV1.getFinalizeableBalance(address)
+
+    if (new BigNumber(stakedBalance.total.value).gt(0)) {
+      delegateeDisplayDetails.push(
+        new UIIconText({
+          iconName: 'logo-usd',
+          text: `${newAmount(stakedBalance.total).convert('tez', metaData.units).value} XTZ`,
+          description: 'delegation-detail-tezos.staked_balance'
+        })
+      )
+    }
+
+    requests.forEach((value) => {
+      const unfinalizeAmount: Amount<TezosUnits> = newAmount(new BigNumber(value.amount), 'blockchain')
+
+      delegateeDisplayDetails.push(
+        new UIIconText({
+          iconName: 'logo-usd',
+          text: `${newAmount(unfinalizeAmount).convert('tez', metaData.units).value} XTZ`,
+          description: `delegation-detail-tezos.unstaked_balance`
+        }),
+        new UIIconText({
+          iconName: 'time-outline',
+          text: `${value.cycle + 2}`,
+          description: `delegation-detail-tezos.finalized_cycle`
+        })
+      )
+    })
+
+    if (new BigNumber(finalizeableBalance.total.value).gt(0)) {
+      delegateeDisplayDetails.push(
+        new UIIconText({
+          iconName: 'logo-usd',
+          text: `${newAmount(finalizeableBalance.total).convert('tez', metaData.units).value} XTZ`,
+          description: 'delegation-detail-tezos.finalizeable_balance'
+        })
+      )
+    }
+
+    return delegateeDisplayDetails
   }
 
-  private createDelegateAction(availableActions: DelegatorAction[], bakerAddress: string): AirGapDelegatorAction | null {
+  private createDelegateAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
+    availableActions: DelegatorAction[],
+    bakerAddress: string
+  ): Promise<AirGapDelegatorAction | null> {
     return this.createDelegatorAction(
+      adapter,
+      address,
       availableActions,
       [TezosDelegatorAction.DELEGATE, TezosDelegatorAction.CHANGE_BAKER],
       'delegation-detail-tezos.delegate_label',
@@ -235,8 +324,56 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     )
   }
 
-  private createUndelegateAction(availableActions: DelegatorAction[]): AirGapDelegatorAction | null {
-    const action = this.createDelegatorAction(
+  private async createStakeAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapDelegatorAction | null> {
+    return this.createDelegatorAction(
+      adapter,
+      address,
+      availableActions,
+      [TezosDelegatorAction.STAKE],
+      'delegation-detail-tezos.stake_label'
+    )
+  }
+
+  private async createUnstakeAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapDelegatorAction | null> {
+    return this.createDelegatorAction(
+      adapter,
+      address,
+      availableActions,
+      [TezosDelegatorAction.UNSTAKE],
+      'delegation-detail-tezos.unstake_label'
+    )
+  }
+
+  private async createUnstakeFinalizeAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapDelegatorAction | null> {
+    return this.createDelegatorAction(
+      adapter,
+      address,
+      availableActions,
+      [TezosDelegatorAction.UNSTAKEFINALIZABLEBALANCE],
+      'delegation-detail-tezos.finalize_unstake_label'
+    )
+  }
+
+  private async createUndelegateAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
+    availableActions: DelegatorAction[]
+  ): Promise<AirGapDelegatorAction | null> {
+    const action = await this.createDelegatorAction(
+      adapter,
+      address,
       availableActions,
       [TezosDelegatorAction.UNDELEGATE],
       'delegation-detail-tezos.undelegate_label'
@@ -249,19 +386,73 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     return action
   }
 
-  private createDelegatorAction(
+  private async createDelegatorAction(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    address: string,
     availableActions: DelegatorAction[],
     types: TezosDelegatorAction[],
     label: string,
     form?: UntypedFormGroup
-  ): AirGapDelegatorAction | null {
-    const action = availableActions.find((action) => types.includes(action.type))
+  ): Promise<AirGapDelegatorAction | null> {
+    const action = availableActions.find((action) => {
+      return types.includes(action.type)
+    })
+
+    const addressBalance = await adapter.protocolV1.getBalanceOfAddress(address)
+    const metaData = await adapter.protocolV1.getMetadata()
+    const stakedBalance = await adapter.protocolV1.getstakeBalance(address)
+
+    let total: Amount<TezosUnits> = newAmount(new BigNumber(0), 'blockchain')
+
+    if (types[0] === TezosDelegatorAction.STAKE) {
+      total = addressBalance.total
+    }
+
+    if (types[0] === TezosDelegatorAction.UNSTAKE) {
+      total = stakedBalance.total
+    }
+
+    const maxValue = newAmount(total).convert('tez', metaData.units).value
+
+    const maxValueShifted = new BigNumber(newAmount(total).blockchain(metaData.units).value)
+
+    const argWidgets = []
+
+    if (action?.args) {
+      form = form
+        ? form
+        : this.formBuilder.group({
+            [ArgumentName.STAKE]: [action.args.includes(ArgumentName.STAKE) && maxValue !== undefined ? maxValue : '0'],
+            [ArgumentName.STAKE_CONTROL]: [
+              maxValueShifted.toFixed(),
+              Validators.compose([
+                Validators.required,
+                DecimalValidator.validate(adapter.decimals),
+                Validators.max(Number(maxValue)),
+                Validators.min(0.000001)
+              ])
+            ]
+          })
+
+      if (action.args.includes(ArgumentName.STAKE)) {
+        argWidgets.push(
+          this.createAmountWidget(ArgumentName.STAKE_CONTROL, maxValue ? maxValue : undefined, '1', {
+            onValueChanged: (value: string) => {
+              form.patchValue({ [ArgumentName.STAKE]: new BigNumber(value).shiftedBy(adapter.decimals).toFixed() })
+            },
+            toggleFixedValueButton: 'delegation-detail.max-amount_button',
+            fixedValue: maxValue.toString()
+          })
+        )
+      }
+    }
 
     return action
       ? {
           type: action.type,
           label,
-          form: form
+          form: form,
+          args: argWidgets
         }
       : null
   }
