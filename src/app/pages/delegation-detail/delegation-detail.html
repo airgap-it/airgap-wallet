@@ -18,8 +18,8 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ion-row class="ion-padding-horizontal">
       <ion-col size="12">
-        <widget-account 
-          *ngIf="delegateeAccountWidget.status === UIResourceStatus.SUCCESS && delegateeAccountWidget.value" 
+        <widget-account
+          *ngIf="delegateeAccountWidget.status === UIResourceStatus.SUCCESS && delegateeAccountWidget.value"
           [widget]="delegateeAccountWidget.value"
         ></widget-account>
         <div *ngIf="delegateeAccountWidget.status === UIResourceStatus.SUCCESS && !delegateeAccountWidget.value">
@@ -55,7 +55,10 @@
       </ion-col>
     </ion-row>
     <ng-container *ngIf="(delegateeDetails$ | async) as delegateeDetails">
-      <ion-row class="ion-padding-horizontal action--container" *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
+      <ion-row
+        class="ion-padding-horizontal action--container"
+        *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value"
+      >
         <ion-col size="12" class="ion-no-padding">
           <ion-button (click)="showDelegateesList()" color="secondary" shape="round" size="small" fill="outline">
             <ion-icon slot="start" name="swap-vertical-outline"></ion-icon>
@@ -97,8 +100,8 @@
             <ion-col size="6" class="ion-no-padding ion-text-right">
               <small *ngIf="delegateeDetails.status === UIResourceStatus.SUCCESS && delegateeDetails.value">
                 <span *ngIf="delegateeDetails.value.usageDetails">
-                  {{ delegateeDetails.value.usageDetails.current.toFixed() | amountConverter: { protocol: wallet.protocol, maxDigits: 3 }
-                  | async }} / {{ delegateeDetails.value.usageDetails.total.toFixed() | amountConverter: { protocol: wallet.protocol,
+                  {{ delegateeDetails.value.usageDetails.current.toFixed() | amountConverter: { protocol: wallet.protocol, maxDigits: 3 } |
+                  async }} / {{ delegateeDetails.value.usageDetails.total.toFixed() | amountConverter: { protocol: wallet.protocol,
                   maxDigits: 3 } | async }}
                 </span>
               </small>
