@@ -289,7 +289,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
         }),
         new UIIconText({
           iconName: 'time-outline',
-          text: `${value.cycle + 2}`,
+          text: `${value.cycle + 4}`,
           description: `delegation-detail-tezos.finalized_cycle`
         })
       )
