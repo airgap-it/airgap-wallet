@@ -560,6 +560,13 @@
     "return-per-cycle_label": "Estimated Return per Cycle",
     "delegate_label": "Delegate",
     "undelegate_label": "Undelegate",
+    "stake_label": "Stake",
+    "staked_balance": "Staked Balance",
+    "finalized_cycle":"Finalizeable Cycle",
+    "finalizeable_balance":"Finalizeable Balance",
+    "unstaked_balance":"Unstaked Balance",
+    "unstake_label": "Unstake", 
+    "finalize_unstake_label":"Finalize",
     "unknown": "Unknown",
     "rewards": {
       "index-col_label": "Cycle",
