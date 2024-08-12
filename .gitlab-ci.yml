@@ -192,9 +192,6 @@ publish-web-prod:
   when: manual
   needs:
     - build-web
-  only:
-    - master
-    - main
 
 deploy-web-dev:
   stage: deploy
@@ -202,8 +199,6 @@ deploy-web-dev:
   needs:
     - publish-web-dev
   when: manual
-  only:
-    - develop
   script:
     - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
     - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
@@ -225,6 +220,3 @@ deploy-web-prod:
     - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
     - kubectl apply -f k8s/airgap-wallet/production/ --recursive
     - kubectl apply -f k8s/airgap-wallet/common/ --recursive
-  only:
-    - master
-    - main
