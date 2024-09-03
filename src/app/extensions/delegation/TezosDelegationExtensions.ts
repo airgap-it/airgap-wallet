@@ -22,6 +22,7 @@ import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app
 
 import { Amount, newAmount /*TransactionDetails*/, TransactionDetails } from '@airgap/module-kit'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { V1ProtocolDelegationExtensions } from './base/V1ProtocolDelegationExtensions'
 
 enum ArgumentName {
@@ -45,7 +46,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
         coinlibService,
         decimalPipe,
-        // amountConverter,
+        _amountConverter,
         shortenStringPipe,
         translateService,
         addressService,
@@ -73,7 +74,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   private constructor(
     private readonly coinlibService: CoinlibService,
     private readonly decimalPipe: DecimalPipe,
-    // private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly addressService: AddressService,
@@ -543,5 +544,41 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     const cycleDuration = moment.duration(cycleNumber * minCycleDuration)
 
     return cycleDuration.locale(this.translateService.currentLang).humanize()
+  }
+
+  public async createAccountExtendedDetails(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    _publicKey: string,
+    address: string
+  ): Promise<UIAccountExtendedDetails> {
+    const results = await Promise.all([
+      adapter.getAvailableBalanceOfAddresses([address]),
+      adapter.protocolV1.getstakeBalance(address),
+      adapter.protocolV1.getUnstakeBalance(address),
+      adapter.protocolV1.getFinalizeableBalance(address)
+    ])
+
+    const items: UIAccountExtendedDetailsItem[] = [
+      {
+        label: 'account-transaction-detail.available_label',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[0], adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.staked_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[1].total.value, adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.unstaked_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[2].total.value, adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.finalizeable_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[3].total.value, adapter, 0)} ${adapter.symbol}`
+      }
+    ]
+
+    return new UIAccountExtendedDetails({
+      items
+    })
   }
 }
