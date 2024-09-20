@@ -427,7 +427,8 @@ export class TransactionPreparePage {
       wallet.protocol.identifier === MainProtocolSymbols.COSMOS ||
       wallet.protocol.identifier === MainProtocolSymbols.KUSAMA ||
       wallet.protocol.identifier === MainProtocolSymbols.POLKADOT ||
-      wallet.protocol.identifier === MainProtocolSymbols.ASTAR
+      wallet.protocol.identifier === MainProtocolSymbols.ASTAR ||
+      wallet.protocol.identifier === MainProtocolSymbols.XTZ
     ) {
       return new BigNumber(await wallet.protocol.getAvailableBalanceOfAddresses([wallet.addresses[0]]))
     } else {

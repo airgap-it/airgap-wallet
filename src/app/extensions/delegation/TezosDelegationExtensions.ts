@@ -1,7 +1,7 @@
 import { AddressService, AmountConverterPipe, ICoinDelegateProtocolAdapter } from '@airgap/angular-core'
 import { DelegateeDetails, DelegatorAction, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { TezosDelegatorAction, TezosProtocol, TezosUnits } from '@airgap/tezos'
+import { TezosDelegatorAction, TezosProtocol, TezosTransactionParameters, TezosUnits } from '@airgap/tezos'
 import { DecimalPipe } from '@angular/common'
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
@@ -20,8 +20,9 @@ import { UIWidget } from 'src/app/models/widgets/UIWidget'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService, TezosBakerCollection, TezosBakerDetails } from 'src/app/services/coinlib/coinlib.service'
 
-import { Amount, newAmount } from '@airgap/module-kit'
+import { Amount, newAmount /*TransactionDetails*/, TransactionDetails } from '@airgap/module-kit'
 import { DecimalValidator } from 'src/app/validators/DecimalValidator'
+import { UIAccountExtendedDetails, UIAccountExtendedDetailsItem } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
 import { V1ProtocolDelegationExtensions } from './base/V1ProtocolDelegationExtensions'
 
 enum ArgumentName {
@@ -45,7 +46,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
       TezosDelegationExtensions.instance = new TezosDelegationExtensions(
         coinlibService,
         decimalPipe,
-        // amountConverter,
+        _amountConverter,
         shortenStringPipe,
         translateService,
         addressService,
@@ -73,7 +74,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   private constructor(
     private readonly coinlibService: CoinlibService,
     private readonly decimalPipe: DecimalPipe,
-    // private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly amountConverterPipe: AmountConverterPipe,
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly addressService: AddressService,
@@ -90,6 +91,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   ): Promise<AirGapDelegationDetails[]> {
     const delegationDetails = await adapter.getDelegationDetailsFromAddress(delegator, delegatees)
     const extraDetails = await this.getExtraDelegationDetails(
+      _publicKey,
       adapter,
       delegator,
       delegationDetails.delegator,
@@ -132,13 +134,14 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async getExtraDelegationDetails(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     delegatorDetails: DelegatorDetails,
     delegateeDetails: DelegateeDetails
   ): Promise<AirGapDelegationDetails> {
     const [delegator, delegatee] = await Promise.all([
-      this.getExtraDelegatorDetails(adapter, address, delegatorDetails, delegateeDetails),
+      this.getExtraDelegatorDetails(_publicKey, adapter, address, delegatorDetails, delegateeDetails),
       this.getExtraBakerDetails(adapter, delegateeDetails, address)
     ])
 
@@ -195,16 +198,23 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async getExtraDelegatorDetails(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     delegatorDetails: DelegatorDetails,
     bakerDetails: DelegateeDetails
   ): Promise<AirGapDelegatorDetails> {
-    const delegateAction = await this.createDelegateAction(adapter, address, delegatorDetails.availableActions, bakerDetails.address)
-    const undelegateAction = await this.createUndelegateAction(adapter, address, delegatorDetails.availableActions)
-    const stakeAction = await this.createStakeAction(adapter, address, delegatorDetails.availableActions)
-    const unstakeAction = await this.createUnstakeAction(adapter, address, delegatorDetails.availableActions)
-    const finalizeUnstakeAction = await this.createUnstakeFinalizeAction(adapter, address, delegatorDetails.availableActions)
+    const delegateAction = await this.createDelegateAction(
+      _publicKey,
+      adapter,
+      address,
+      delegatorDetails.availableActions,
+      bakerDetails.address
+    )
+    const undelegateAction = await this.createUndelegateAction(_publicKey, adapter, address, delegatorDetails.availableActions)
+    const stakeAction = await this.createStakeAction(_publicKey, adapter, address, delegatorDetails.availableActions)
+    const unstakeAction = await this.createUnstakeAction(_publicKey, adapter, address, delegatorDetails.availableActions)
+    const finalizeUnstakeAction = await this.createUnstakeFinalizeAction(_publicKey, adapter, address, delegatorDetails.availableActions)
 
     const mainActions: AirGapDelegatorAction[] = []
 
@@ -309,12 +319,14 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private createDelegateAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[],
     bakerAddress: string
   ): Promise<AirGapDelegatorAction | null> {
     return this.createDelegatorAction(
+      _publicKey,
       adapter,
       address,
       availableActions,
@@ -325,11 +337,13 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async createStakeAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction | null> {
     return this.createDelegatorAction(
+      _publicKey,
       adapter,
       address,
       availableActions,
@@ -339,11 +353,13 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async createUnstakeAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction | null> {
     return this.createDelegatorAction(
+      _publicKey,
       adapter,
       address,
       availableActions,
@@ -353,11 +369,13 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async createUnstakeFinalizeAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction | null> {
     return this.createDelegatorAction(
+      _publicKey,
       adapter,
       address,
       availableActions,
@@ -367,11 +385,13 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async createUndelegateAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[]
   ): Promise<AirGapDelegatorAction | null> {
     const action = await this.createDelegatorAction(
+      _publicKey,
       adapter,
       address,
       availableActions,
@@ -387,6 +407,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
   }
 
   private async createDelegatorAction(
+    _publicKey: string,
     adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
     address: string,
     availableActions: DelegatorAction[],
@@ -405,7 +426,39 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     let total: Amount<TezosUnits> = newAmount(new BigNumber(0), 'blockchain')
 
     if (types[0] === TezosDelegatorAction.STAKE) {
-      total = addressBalance.total
+      // total = addressBalance.total
+
+      const { total: addressTotal } = addressBalance
+
+      try {
+        const totalInUnits = newAmount(addressTotal).blockchain(metaData.units).value
+        const details: TransactionDetails<TezosUnits> = {
+          to: address,
+          amount: newAmount(new BigNumber(totalInUnits).minus(1), 'blockchain')
+        }
+
+        const parameters: TezosTransactionParameters = {
+          entrypoint: 'stake',
+          value: {
+            prim: 'Unit'
+          }
+        }
+
+        const fee = await adapter.protocolV1.getTransactionFee(
+          {
+            type: 'pub',
+            value: _publicKey,
+            format: 'hex'
+          },
+          [details],
+          parameters
+        )
+        const feeInUnits = newAmount(fee.medium).blockchain(metaData.units).value
+
+        total = newAmount(new BigNumber(totalInUnits).minus(feeInUnits), 'blockchain')
+      } catch (error) {
+        total = addressTotal
+      }
     }
 
     if (types[0] === TezosDelegatorAction.UNSTAKE) {
@@ -491,5 +544,41 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     const cycleDuration = moment.duration(cycleNumber * minCycleDuration)
 
     return cycleDuration.locale(this.translateService.currentLang).humanize()
+  }
+
+  public async createAccountExtendedDetails(
+    adapter: ICoinDelegateProtocolAdapter<TezosProtocol>,
+    _publicKey: string,
+    address: string
+  ): Promise<UIAccountExtendedDetails> {
+    const results = await Promise.all([
+      adapter.getAvailableBalanceOfAddresses([address]),
+      adapter.protocolV1.getstakeBalance(address),
+      adapter.protocolV1.getUnstakeBalance(address),
+      adapter.protocolV1.getFinalizeableBalance(address)
+    ])
+
+    const items: UIAccountExtendedDetailsItem[] = [
+      {
+        label: 'account-transaction-detail.available_label',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[0], adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.staked_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[1].total.value, adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.unstaked_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[2].total.value, adapter, 0)} ${adapter.symbol}`
+      },
+      {
+        label: 'delegation-detail-tezos.finalizeable_balance',
+        text: `${await this.amountConverterPipe.transformValueOnly(results[3].total.value, adapter, 0)} ${adapter.symbol}`
+      }
+    ]
+
+    return new UIAccountExtendedDetails({
+      items
+    })
   }
 }
