@@ -54,14 +54,14 @@ class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler {
     }
     
     func awaitResultWithID(_ id: String) async throws -> Any {
-        if let result = await resultManager.result[id] {
-            return try result.get()
-        }
-        
         return try await withCheckedThrowingContinuation { continuation in
             Task {
-                await listenerRegistry.add(forID: id) { result in
+                if let result = await resultManager.result[id] {
                     continuation.resume(with: result)
+                } else {
+                    await listenerRegistry.add(forID: id) { result in
+                    continuation.resume(with: result)
+                }
                 }
             }
         }
