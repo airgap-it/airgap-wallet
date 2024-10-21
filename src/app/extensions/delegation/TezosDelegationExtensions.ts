@@ -428,7 +428,7 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     if (types[0] === TezosDelegatorAction.STAKE) {
       // total = addressBalance.total
 
-      const { total: addressTotal } = addressBalance
+      const { transferable: addressTotal } = addressBalance
 
       try {
         const totalInUnits = newAmount(addressTotal).blockchain(metaData.units).value
