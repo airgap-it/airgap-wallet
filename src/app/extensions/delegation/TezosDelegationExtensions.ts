@@ -153,12 +153,21 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
     bakerDetails: DelegateeDetails,
     address: string
   ): Promise<AirGapDelegateeDetails> {
-    const [bakerInfo, delegateeDetails, knownBakers] = await Promise.all([
+    const [bakerInfo, delegateeDetails, knownBakers, stakedBalance] = await Promise.all([
       adapter.protocolV1.bakerDetails(bakerDetails.address),
       adapter.getDelegateeDetails(bakerDetails.address),
-      this.getKnownBakers()
+      this.getKnownBakers(),
+      adapter.protocolV1.getstakeBalance(bakerDetails.address)
     ])
+
+    const { balance, delegatedBalance, totalDelegatedStake } = bakerInfo
+
+    const ownBalance = new BigNumber(balance.value).minus(stakedBalance.total.value)
+
+    const bakerCurrentUsage = new BigNumber(delegatedBalance.value).minus(totalDelegatedStake.value).plus(ownBalance)
+
     const knownBaker = knownBakers[bakerDetails.address]
+
     const name = knownBaker
       ? knownBaker.alias
       : (await this.addressService.getAlias(bakerDetails.address, adapter)) ||
@@ -169,7 +178,6 @@ export class TezosDelegationExtensions extends V1ProtocolDelegationExtensions<Te
         ? knownBaker.stakingCapacity.shiftedBy(adapter.decimals)
         : new BigNumber(bakerInfo.bakerCapacity).multipliedBy(0.7)
 
-    const bakerCurrentUsage = BigNumber.minimum(new BigNumber(bakerInfo.stakingBalance.value), bakerTotalUsage)
     const bakerUsage = bakerCurrentUsage.dividedBy(bakerTotalUsage)
 
     let status: string
