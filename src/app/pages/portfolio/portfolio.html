@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
-  <div *ngIf="shopBannerText.length > 0" class="shop-banner-wrapper" (click)="onClickLink(shopBannerLink)">
+  <!-- <div *ngIf="shopBannerText.length > 0" class="shop-banner-wrapper" (click)="onClickLink(shopBannerLink)">
     <p class="shop-banner-text">{{ shopBannerText }}</p>
-  </div>
+  </div> -->
   <ion-toolbar color="translucent">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -12,31 +12,29 @@
   <ion-grid fixed="true" class="ion-no-padding">
     <ng-container *ngIf="activeWallets | async as walletsArray">
       <ion-row *ngIf="walletsArray.length > 0" class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
-        <flip-card>
-          <flip-card-front>
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span>{{ 'portfolio.flip-card.front-title' | translate }}</span>
-              <ng-component *ngIf="isVisible && total > 0; then showBalance; else skeletonBalance"></ng-component>
-              <ng-template #showBalance>
-                <h1 [ngClass]="total < 1000000 ? 'large-font': 'small-font'">${{ total | number: '1.2-2' }}</h1>
-              </ng-template>
+        <!-- <flip-card> -->
+        <!-- <flip-card-front> -->
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <span>{{ 'portfolio.flip-card.front-title' | translate }}</span>
+          <ng-component *ngIf="isVisible && total > 0; then showBalance; else skeletonBalance"></ng-component>
+          <ng-template #showBalance>
+            <h1 [ngClass]="total < 1000000 ? 'large-font': 'small-font'">${{ total | number: '1.2-2' }}</h1>
+          </ng-template>
 
-              <ng-template #skeletonBalance>
-                <h1 class="ion-no-margin">
-                  <ion-skeleton-text animated style="width: 130px;"></ion-skeleton-text>
-                </h1>
-              </ng-template>
-            </div>
-          </flip-card-front>
-          <flip-card-back (click)="onClickLink(knoxFlipCardLink)">
+          <ng-template #skeletonBalance>
+            <h1 class="ion-no-margin">
+              <ion-skeleton-text animated style="width: 130px;"></ion-skeleton-text>
+            </h1>
+          </ng-template>
+        </div>
+        <!-- </flip-card-front> -->
+        <!-- <flip-card-back (click)="onClickLink(knoxFlipCardLink)">
             <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
               <svg
                 style="width: 180px; height: auto; display: flex; margin-left: 5%; margin-right: 10px; fill: currentColor;"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 2179.1057 1019.2946"
               >
-                <!-- SVG content goes here -->
-
                 <g id="e">
                   <path
                     class="i"
@@ -92,8 +90,8 @@
               <p>{{knoxFlipCardLine1}}</p>
               <p>{{knoxFlipCardLine2}}</p>
             </div>
-          </flip-card-back>
-        </flip-card>
+          </flip-card-back> -->
+        <!-- </flip-card> -->
       </ion-row>
     </ng-container>
     <ion-toolbar color="translucent">
