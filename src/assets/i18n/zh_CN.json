@@ -6,6 +6,7 @@
       "collectibles_label": "收藏品",
       "import-accounts_label": "导入帐户",
       "delegate_label": "委托和质押",
+      "delegate_tezos_label": "委托和质押",
       "undelegate_label": "取消委托",
       "claim_rewards_label": "领取奖励",
       "vote_label": "投票",
