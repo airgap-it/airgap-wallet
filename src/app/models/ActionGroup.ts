@@ -324,7 +324,11 @@ export class ActionGroup {
   }
 
   private createDelegateButtonAction(): ButtonAction<void, void> {
-    return new ButtonAction({ name: 'account-transaction-list.delegate_label', icon: 'logo-usd', identifier: 'delegate-action' }, () => {
+    const label =
+      this.callerContext.protocolIdentifier === MainProtocolSymbols.XTZ
+        ? 'account-transaction-list.delegate_tezos_label'
+        : 'account-transaction-list.delegate_label'
+    return new ButtonAction({ name: label, icon: 'logo-usd', identifier: 'delegate-action' }, () => {
       return new SimpleAction(() => {
         return new Promise<void>((resolve) => {
           const info = {
