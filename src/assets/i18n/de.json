@@ -5,7 +5,8 @@
     "add-tokens_label": "Token hinzufügen",
     "collectibles_label": "Sammlerstücke",
     "import-accounts_label": "Konten importieren",
-    "delegate_label": "Delegate & Stake",
+    "delegate_tezos_label": "Delegate & Stake",
+    "delegate_label": "Delegate",
     "undelegate_label": "Aufheben der Delegation",
     "claim_rewards_label": "Belohnung entgegennehmen",
     "vote_label": "Wählen",
@@ -167,7 +168,7 @@
     "github_label": "GitHub-Repository",
     "other_label": "Andere",
     "paste-from-clipboard_label": "Code aus der Zwischenablage einfügen",
-    "about_label": "Um",
+    "about_label": "Über",
     "alert_title": "Wählen Sie einen Kanal",
     "alert_cancel": "stornieren",
     "channel": {
