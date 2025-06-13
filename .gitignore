@@ -44,6 +44,8 @@ src/assets/libs/**/*.browserify.js
 src/assets/protocol_modules/
 
 .env
+.npmrc
+npm-package/
 
 screenshots/
 reports/

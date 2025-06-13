@@ -19,6 +19,7 @@ import {
 } from '@airgap/angular-core'
 import { AstarModule } from '@airgap/astar'
 import { BitcoinModule } from '@airgap/bitcoin'
+import { CardanoModule } from '@apex-fusion/cardano'
 import { AcurastModule } from '@airgap/acurast'
 
 import {
@@ -249,6 +250,7 @@ export class AppComponent implements AfterViewInit {
   private async initializeProtocols(): Promise<void> {
     this.modulesService.init([
       new BitcoinModule(),
+      new CardanoModule(),
       new EthereumModule(),
       new TezosModule(),
       new PolkadotModule(),
