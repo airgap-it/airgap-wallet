@@ -80,6 +80,12 @@ export class AccountTransactionListPage {
 
   public accountExtendedDetails: UIAccountExtendedDetails
 
+  //Stellar assets
+  public trustLineDetails: UIAccountExtendedDetails
+
+  //Stellar
+  public multisigWeightsDetails: UIAccountExtendedDetails
+
   // XTZ
   public isKtDelegated: boolean = false
 
@@ -162,6 +168,14 @@ export class AccountTransactionListPage {
       this.isDelegated().catch(handleErrorSentry(ErrorCategory.COINLIB))
     }
 
+    if (this.protocolIdentifier.startsWith(SubProtocolSymbols.STELLAR_ASSET)) {
+      this.getTrustLineBalance().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    }
+
+    if (this.protocolIdentifier === MainProtocolSymbols.STELLAR) {
+      this.getMultisigWeights().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    }
+
     this.actionGroup = new ActionGroup(this)
     this.actionGroup.getActions().then((actions) => {
       this.actions = actions
@@ -173,7 +187,8 @@ export class AccountTransactionListPage {
         this.storageProvider.getCache('mtperelin-currencies').then((savedCurrencies) => {
           this.wallet.protocol.getSymbol().then((symbol) => {
             const validCurrency = Object.values(savedCurrencies).find((currency) => currency.symbol === symbol)
-            this.isMtPerelinActive = !!active && !!validCurrency
+            this.isMtPerelinActive =
+              !!active && !!validCurrency && !this.wallet.protocol.identifier.startsWith(SubProtocolSymbols.STELLAR_ASSET)
           })
         })
       }
@@ -412,6 +427,14 @@ export class AccountTransactionListPage {
         this.accountExtendedDetails = await this.operationsProvider.getAccountExtendedDetails(this.wallet)
       })
     }
+  }
+
+  private async getTrustLineBalance() {
+    this.trustLineDetails = await this.operationsProvider.getStellarAssetTrustline(this.wallet)
+  }
+
+  private async getMultisigWeights() {
+    this.multisigWeightsDetails = await this.operationsProvider.getStellarMustisigWeights(this.wallet)
   }
 
   public ngOnDestroy(): void {

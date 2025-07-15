@@ -25,7 +25,7 @@
     </ion-row>
   </ng-container>
   <ng-container *ngIf="airGapTxs">
-    <airgap-from-to *ngFor="let airGapTx of airGapTxs" [transaction]="airGapTx"></airgap-from-to>
+    <airgap-from-to *ngFor="let airGapTx of airGapTxs" [transaction]="airGapTx" [interactionData]="interactionData"></airgap-from-to>
   </ng-container>
   <span *ngIf="fallbackActivated">
     <ion-row>

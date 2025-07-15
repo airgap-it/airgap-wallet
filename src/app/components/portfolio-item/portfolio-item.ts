@@ -1,12 +1,14 @@
-import { AmountConverterPipe, ProtocolService, getMainIdentifier } from '@airgap/angular-core'
+import { AmountConverterPipe, ICoinProtocolAdapter, ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { AirGapMarketWallet, ICoinSubProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component, Input } from '@angular/core'
 import BigNumber from 'bignumber.js'
 import { Observable, ReplaySubject, Subscription } from 'rxjs'
+import { isMultisig } from '@airgap/module-kit'
 
 import { isSubProtocol } from 'src/app/utils/utils'
 import { supportsDelegation } from '../../helpers/delegation'
+
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
 
@@ -42,10 +44,16 @@ export class PortfolioItemComponent {
   public hideDelegationBadge: boolean = false
 
   @Input()
+  public hideMultisigBadge: boolean = false
+
+  @Input()
   public isToken: boolean = false
 
   @Input()
   public isDelegated: Observable<boolean>
+
+  @Input()
+  public isMultisig: Observable<boolean>
 
   @Input()
   public maxDigits: number
@@ -76,11 +84,13 @@ export class PortfolioItemComponent {
     this.initMarketPrice()
     this.updateDelegationStatus()
     this.updateParentProtocol()
+    this.updateMultisigStatus()
     this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
       await this.updateBalance()
       this.updateMarketPrice()
       this.updateDelegationStatus()
       this.updateParentProtocol()
+      this.updateMultisigStatus()
     })
   }
 
@@ -90,6 +100,18 @@ export class PortfolioItemComponent {
         this.isDelegated = null
       } else {
         this.isDelegated = await this.operationsProvider.getDelegationStatusObservable(this.wallet)
+      }
+    }
+  }
+
+  private async updateMultisigStatus() {
+    if (this.wallet !== undefined && this.wallet?.receivingPublicAddress !== undefined) {
+      const protocol = this.wallet.protocol as ICoinProtocolAdapter
+
+      if (!isMultisig(protocol.protocolV1)) {
+        this.isMultisig = null
+      } else {
+        this.isMultisig = await this.operationsProvider.getMultisigStatusObservable(this.wallet)
       }
     }
   }

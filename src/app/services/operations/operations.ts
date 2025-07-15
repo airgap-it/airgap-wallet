@@ -17,7 +17,7 @@ import {
 } from '@airgap/coinlib-core'
 import { CosmosTransactionSignRequest } from '@airgap/cosmos-core/v1/serializer/v3/schemas/definitions/transaction-sign-request-cosmos'
 import { EthereumTransactionSignRequest } from '@airgap/ethereum'
-import { newAmount, newPublicKey } from '@airgap/module-kit'
+import { isMultisig, newAmount, newPublicKey } from '@airgap/module-kit'
 import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
 import { SubstrateTransactionSignRequest } from '@airgap/substrate'
 import { TezosKtProtocol, TezosSaplingAddress, TezosShieldedTezProtocol, TezosTransactionSignRequest, TzBTCProtocol } from '@airgap/tezos'
@@ -27,6 +27,7 @@ import { LoadingController, ToastController } from '@ionic/angular'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { StellarAssetProtocol, StellarProtocol } from '@airgap/stellar'
 
 import { supportsAirGapDelegation, supportsDelegation } from '../../helpers/delegation'
 import {
@@ -41,6 +42,7 @@ import { UIRewardList } from '../../models/widgets/display/UIRewardList'
 import { UIInputText } from '../../models/widgets/input/UIInputText'
 import { SaplingService } from '../sapling/sapling.service'
 import { ErrorCategory, handleErrorSentry } from '../sentry-error-handler/sentry-error-handler'
+
 export type SerializableTx = (
   | TezosTransactionSignRequest
   | EthereumTransactionSignRequest
@@ -55,6 +57,8 @@ export type SerializableTx = (
 })
 export class OperationsProvider {
   private readonly delegationStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
+
+  private readonly multisigStatuses: BehaviorSubject<Map<string, boolean>> = new BehaviorSubject(new Map())
 
   public constructor(
     private readonly loadingController: LoadingController,
@@ -96,6 +100,74 @@ export class OperationsProvider {
     } else {
       return new UIAccountExtendedDetails({ items: [] })
     }
+  }
+
+  public async getStellarAssetTrustline(wallet: AirGapMarketWallet): Promise<UIAccountExtendedDetails> {
+    const protocol = wallet.protocol as ICoinProtocolAdapter<StellarAssetProtocol>
+
+    const trustline = await protocol.protocolV1.getTrustBalance({
+      value: wallet.publicKey,
+      type: 'pub',
+      format: 'hex'
+    })
+
+    return new UIAccountExtendedDetails({
+      items: [
+        {
+          label: 'Trustline',
+          text: `${trustline.total.value} ${protocol.protocolV1.metadata.assetCode}`
+        }
+      ]
+    })
+  }
+
+  public async getStellarMustisigWeights(wallet: AirGapMarketWallet): Promise<UIAccountExtendedDetails> {
+    const protocol = wallet.protocol as ICoinProtocolAdapter<StellarProtocol>
+
+    const signers = await protocol.protocolV1.getSigners({
+      value: wallet.publicKey,
+      type: 'pub',
+      format: 'hex'
+    })
+
+    const threshold = await protocol.protocolV1.getThresholds({
+      value: wallet.publicKey,
+      type: 'pub',
+      format: 'hex'
+    })
+
+    const items: { label: string; text: string }[] = []
+
+    if (signers.length > 1) {
+      items.push({ label: 'SIGNERS', text: 'Weight' })
+
+      signers.forEach((signer) => {
+        const start = signer.key.slice(0, 6)
+        const end = signer.key.slice(-4)
+        items.push({ label: `${start}...${end}`, text: signer.weight.toString() })
+      })
+
+      items.push({ label: 'THRESHOLD', text: 'Required' })
+
+      items.push({
+        label: 'Low Threshold',
+        text: threshold.low_threshold.toString()
+      })
+
+      items.push({
+        label: 'Medium Threshold',
+        text: threshold.med_threshold.toString()
+      })
+
+      items.push({
+        label: 'High Threshold',
+        text: threshold.high_threshold.toString()
+      })
+    }
+
+    return new UIAccountExtendedDetails({
+      items
+    })
   }
 
   public async getCurrentDelegatees(wallet: AirGapMarketWallet, data?: any): Promise<string[]> {
@@ -342,6 +414,38 @@ export class OperationsProvider {
     })
   }
 
+  public setMultisigStatusOfAddress(address: string, multisig: boolean) {
+    this.multisigStatuses.next(this.multisigStatuses.getValue().set(address, multisig))
+  }
+
+  public async getMultisigStatus(wallet: AirGapMarketWallet, refresh: boolean = false) {
+    const multisigStatus = this.multisigStatuses.getValue().get(wallet.receivingPublicAddress)
+    if (refresh || multisigStatus === undefined) {
+      const isMultisig = await this.checkMultisig(wallet)
+      this.setMultisigStatusOfAddress(wallet.receivingPublicAddress, isMultisig)
+
+      return isMultisig
+    } else {
+      return multisigStatus
+    }
+  }
+
+  public async getMultisigStatusObservable(wallet: AirGapMarketWallet) {
+    await this.getMultisigStatus(wallet)
+
+    return this.multisigStatuses.pipe(map((multisigStatuses) => multisigStatuses.get(wallet.receivingPublicAddress)))
+  }
+
+  public refreshAllMultisigStatuses(wallets: AirGapMarketWallet[]) {
+    Array.from(this.multisigStatuses.getValue().entries()).forEach((entry) => {
+      const address = entry[0]
+      const wallet = wallets.find((wallet) => wallet.receivingPublicAddress === address && supportsDelegation(wallet.protocol))
+      if (wallet) {
+        this.getMultisigStatus(wallet, true).catch(handleErrorSentry(ErrorCategory.OPERATIONS_PROVIDER))
+      }
+    })
+  }
+
   public async prepareSignRequest(
     wallet: AirGapMarketWallet,
     serializableData: any,
@@ -409,6 +513,20 @@ export class OperationsProvider {
             throw e
           }
         })
+      : false
+  }
+
+  public async checkMultisig(wallet: AirGapMarketWallet): Promise<boolean> {
+    const protocol = wallet.protocol as ICoinProtocolAdapter
+
+    return isMultisig(protocol.protocolV1)
+      ? protocol.protocolV1
+          .getMultisigStatus({
+            value: wallet.receivingPublicAddress,
+            type: 'pub',
+            format: 'hex'
+          })
+          .catch(() => false)
       : false
   }
 
