@@ -40,6 +40,13 @@
       [widget]="accountExtendedDetails"
     ></widget-account-extended-details>
 
+    <widget-account-extended-details *ngIf="trustLineDetails !== undefined" [widget]="trustLineDetails"></widget-account-extended-details>
+
+    <widget-account-extended-details
+      *ngIf="multisigWeightsDetails !== undefined"
+      [widget]="multisigWeightsDetails"
+    ></widget-account-extended-details>
+
     <transaction-list
       [transactionType]="'pendingTransaction'"
       [hasPendingTransactions]="hasPendingTransactions"

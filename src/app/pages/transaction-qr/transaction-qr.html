@@ -53,6 +53,8 @@
     </ng-container>
 
     <ng-container *ngIf="airGapTxs">
+      <airgap-transaction-warning *ngFor="let airGapTx of airGapTxs" [transaction]="airGapTx"></airgap-transaction-warning>
+
       <airgap-from-to
         *ngFor="let airGapTx of airGapTxs"
         class="ion-padding-horizontal"

@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { assertNever, ICoinProtocolAdapter } from '@airgap/angular-core'
 import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
@@ -7,7 +8,7 @@ import { generateId, IACMessageType, TransactionSignRequest } from '@airgap/seri
 import { Component, OnInit } from '@angular/core'
 import { AlertController, ModalController, ToastController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-
+import { StellarProtocol, StellarUnsignedTransaction } from '@airgap/stellar'
 import { Subscription } from 'rxjs'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
@@ -23,7 +24,10 @@ import {
   WalletconnectSignRequest,
   WalletconnectMessage,
   WalletconnectPermissionRequest,
-  WalletconnectSwitchAccountRequest
+  WalletconnectSwitchAccountRequest,
+  StellarMethods,
+  WalletconnectsignXDR,
+  WalletconnectsignAndSubmitXDR
 } from './walletconnect.types'
 
 export interface WalletconnectV1Context extends WalletconnectV1HandlerContext {
@@ -42,7 +46,9 @@ enum Mode {
   SIGN_MESSAGE = 'signMessage',
   SWITCH_ACCOUNT = 'switchAccount',
   ETH_SIGN_TYPED_DATA = 'eth_signTypedData',
-  ETH_SIGN = 'eth_sign'
+  ETH_SIGN = 'eth_sign',
+  STELLAR_SIGN_AND_SUBMIT_XDR = 'stellar_signAndSubmitXDR',
+  STELLAR_SIGN_XDR = 'stellar_signXDR'
 }
 
 @Component({
@@ -170,6 +176,23 @@ export class WalletconnectPage implements OnInit {
       }
     }
 
+    if ((this.message.type === 'signAndSubmitXDR' || this.message.type === 'signXDR') && this.message.namespace === Namespace.STELLAR) {
+      switch (this.message.request.method) {
+        case StellarMethods.STELLAR_SIGN_AND_SUBMIT_XDR:
+          this.mode = Mode.STELLAR_SIGN_AND_SUBMIT_XDR
+          this.title = this.translateService.instant('walletconnect.sign_request')
+          await this.stellarSignRequest(this.message as WalletconnectsignAndSubmitXDR)
+          break
+        case StellarMethods.STELLAR_SIGN_XDR:
+          this.mode = Mode.STELLAR_SIGN_XDR
+          this.title = this.translateService.instant('walletconnect.sign_request')
+          await this.stellarSignRequest(this.message as WalletconnectsignXDR)
+          break
+        default:
+          await this.notSupportedAlert()
+      }
+    }
+
     if (
       this.message.type === 'switchAccountRequest' &&
       this.message.namespace === Namespace.ETH &&
@@ -186,6 +209,52 @@ export class WalletconnectPage implements OnInit {
         this.title = this.translateService.instant('walletconnect.sign_typed_data')
       }
       await this.notSupportedAlert()
+    }
+  }
+
+  private async stellarSignRequest(request: WalletconnectsignAndSubmitXDR | WalletconnectsignXDR): Promise<void> {
+    const payload = request.request.params
+    if (!payload.xdr) {
+      throw new Error('Missing XDR in Stellar signing request')
+    }
+
+    const selectableStellarWallets = await this.filterWallets(this.selectableWallets, request.chain)
+
+    this.selectedWallet = selectableStellarWallets[0]
+
+    const adapter = this.selectedWallet.protocol as ICoinProtocolAdapter<StellarProtocol>
+
+    const tx = await adapter.protocolV1.getDetailsFromEncodedGenericTransaction(payload.xdr)
+
+    const selectableWallets = await this.filterWallets(this.selectableWallets, request.chain, tx.source)
+
+    const wallet = selectableWallets[0]
+
+    await this.setWallet(wallet)
+
+    this.rawTransaction = { transaction: payload.xdr, type: 'unsigned' } as StellarUnsignedTransaction
+
+    const walletConnectRequest = {
+      transaction: this.rawTransaction,
+      id: `${request.version}:${request.request.id}`
+    }
+
+    const protocol = this.selectedWallet.protocol
+
+    this.beaconService.addVaultRequest(walletConnectRequest, protocol)
+
+    this.airGapTransactions = await protocol.getTransactionDetails({
+      publicKey: this.selectedWallet.publicKey,
+      transaction: this.rawTransaction
+    })
+
+    this.responseHandler = async () => {
+      this.accountService.startInteraction(
+        this.selectedWallet,
+        this.rawTransaction,
+        IACMessageType.TransactionSignRequest,
+        this.airGapTransactions
+      )
     }
   }
 

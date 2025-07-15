@@ -10,6 +10,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <widget-alert *ngIf="uiAlert" [widget]="uiAlert"></widget-alert>
   <ion-grid fixed="true" class="ion-no-padding">
     <signed-transaction [signedTxs]="messageDefinitionObjects" [protocols]="protocols"></signed-transaction>
   </ion-grid>
@@ -22,7 +23,14 @@
         </ion-button>
       </ion-col>
       <ion-col>
-        <ion-button size="default" expand="full" color="primary" (click)="broadcastTransaction()" shape="round">
+        <ion-button
+          size="default"
+          expand="full"
+          color="primary"
+          (click)="broadcastTransaction()"
+          shape="round"
+          [disabled]="disableBroadcastButton"
+        >
           <ion-icon slot="start" name="checkmark"></ion-icon>
           {{ 'transaction-confirm.confirm_label' | translate }}
         </ion-button>

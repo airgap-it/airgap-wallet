@@ -36,6 +36,14 @@
         </ion-col>
       </ion-row>
     </div>
+
+    <div *ngIf="mode === Mode.STELLAR_SIGN_AND_SUBMIT_XDR || mode === Mode.STELLAR_SIGN_XDR">
+      <ion-row class="rawdata--container">
+        <ion-col class="ion-no-padding">
+          <pre class="ion-no-margin">{{ rawTransaction | json }}</pre>
+        </ion-col>
+      </ion-row>
+    </div>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

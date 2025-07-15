@@ -16,6 +16,10 @@
     "change-contract_label": "Change Contract",
     "fund_label": "Fund Account",
     "load_more": "Load more",
+    "manage_multisig":"Manage MultiSig",
+    "enable_multisig":"Enable MultiSig",
+    "set_trustline":"Set Trustline",
+    "multisig":"Multisig",
     "pending-transactions": {
       "label": "Pending Transactions",
       "text": "Pending transactions are currently not enabled, please refer to the blockexplorer.",

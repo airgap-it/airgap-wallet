@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { UntypedFormGroup } from '@angular/forms'
-import { AirGapMarketWallet, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { AirGapMarketWallet, MainProtocolSymbols, SubProtocolSymbols } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'fee',
@@ -26,6 +26,10 @@ export class FeeComponent {
   public constructor() {}
 
   private checkEnableMemo(wallet: AirGapMarketWallet) {
-    this.enableMemo = wallet?.protocol.identifier === MainProtocolSymbols.COSMOS
+    console.log('wallet?.protocol.identifier', wallet?.protocol.identifier)
+    this.enableMemo =
+      wallet?.protocol.identifier === MainProtocolSymbols.COSMOS ||
+      wallet?.protocol.identifier === MainProtocolSymbols.STELLAR ||
+      wallet?.protocol.identifier.startsWith(SubProtocolSymbols.STELLAR_ASSET)
   }
 }
