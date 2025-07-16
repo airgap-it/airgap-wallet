@@ -2,7 +2,7 @@ import { Web3WalletTypes } from '@walletconnect/web3wallet'
 import V2Client from '@walletconnect/web3wallet'
 import { buildApprovedNamespaces, getSdkError } from '@walletconnect/utils'
 
-import { EthMethods, Namespace, WalletconnectMessage } from '../walletconnect.types'
+import { EthMethods, Namespace, StellarMethods, WalletconnectMessage } from '../walletconnect.types'
 import { WalletconnectHandler } from './walletconnect.handler'
 
 export interface WalletconnectV2HandlerContext {
@@ -101,12 +101,67 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
           }
         }
 
-        const approvedNamespaces = buildApprovedNamespaces({
-          proposal: proposal.params,
-          supportedNamespaces: {
-            [Namespace.ETH]: getEthNamespace(accounts)
+        const getStellarNamespace = (accounts: string[]): any => {
+          const stellarAccounts = accounts.filter((account: string) => account.startsWith(Namespace.STELLAR))
+          if (stellarAccounts.length === 0) {
+            return undefined
           }
-        })
+
+          const requiredStellarNamespace: Web3WalletTypes.SessionProposal['params']['requiredNamespaces'][string] = (proposal.params
+            .requiredNamespaces ?? {})[Namespace.STELLAR] ?? { methods: [], events: [] }
+
+          const optionalStellarNamespace: Web3WalletTypes.SessionProposal['params']['optionalNamespaces'][string] = (proposal.params
+            .optionalNamespaces ?? {})[Namespace.STELLAR] ?? { methods: [], events: [] }
+
+          if (stellarAccounts.length === 1) {
+            const requiredStellarChains = requiredStellarNamespace.chains ?? []
+            const [namespace, network, address] = stellarAccounts[0].split(':')
+
+            stellarAccounts.push(
+              ...requiredStellarChains
+                .filter((chain: string) => chain !== `${namespace}:${network}`)
+                .map((chain: string) => `${chain}:${address}`)
+            )
+          }
+
+          const chains = stellarAccounts.map((account: string) => {
+            const [namespace, network, _address] = account.split(':')
+            return `${namespace}:${network}`
+          })
+
+          const optionalStellarMethods = new Set(optionalStellarNamespace.methods)
+          const methods = new Set([
+            ...requiredStellarNamespace.methods,
+            ...Object.values(StellarMethods).filter((method: StellarMethods) => optionalStellarMethods.has(method))
+          ])
+
+          return {
+            chains,
+            methods: Array.from(methods),
+            events: requiredStellarNamespace?.events ?? [],
+            accounts: stellarAccounts
+          }
+        }
+
+        let approvedNamespaces
+
+        if (getEthNamespace(accounts)) {
+          approvedNamespaces = buildApprovedNamespaces({
+            proposal: proposal.params,
+            supportedNamespaces: {
+              [Namespace.ETH]: getEthNamespace(accounts)
+            }
+          })
+        } else if (getStellarNamespace(accounts)) {
+          approvedNamespaces = buildApprovedNamespaces({
+            proposal: proposal.params,
+            supportedNamespaces: {
+              [Namespace.STELLAR]: getStellarNamespace(accounts)
+            }
+          })
+        } else {
+          throw new Error('cannot Network')
+        }
 
         await client.approveSession({
           id: proposal.id,
@@ -135,7 +190,56 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
       return this.readEthSessionRequest(request, client)
     }
 
+    if (request.params.chainId.startsWith(Namespace.STELLAR)) {
+      return this.readStellarSessionRequest(request, client)
+    }
+
     return { type: 'unsupported' }
+  }
+
+  private readStellarSessionRequest(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    switch (request.params.request.method) {
+      case StellarMethods.STELLAR_SIGN_AND_SUBMIT_XDR:
+        return this.readStellarSignAndSubmitXDR(request, client)
+      case StellarMethods.STELLAR_SIGN_XDR:
+        return this.readStellarSignXDR(request, client)
+      default:
+        return { type: 'unsupported', namespace: Namespace.STELLAR }
+    }
+  }
+
+  private readStellarSignAndSubmitXDR(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    return {
+      type: 'signAndSubmitXDR',
+      version: 2,
+      namespace: Namespace.STELLAR,
+      chain: request.params.chainId,
+      request: {
+        id: `${request.id}:${request.topic}`,
+        method: StellarMethods.STELLAR_SIGN_AND_SUBMIT_XDR,
+        params: request.params.request.params
+      },
+      cancel: async (): Promise<void> => {
+        rejectRequest(client, request.id, request.topic)
+      }
+    }
+  }
+
+  private readStellarSignXDR(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    return {
+      type: 'signXDR',
+      version: 2,
+      namespace: Namespace.STELLAR,
+      chain: request.params.chainId,
+      request: {
+        id: `${request.id}:${request.topic}`,
+        method: StellarMethods.STELLAR_SIGN_XDR,
+        params: request.params.request.params
+      },
+      cancel: async (): Promise<void> => {
+        rejectRequest(client, request.id, request.topic)
+      }
+    }
   }
 
   private readEthSessionRequest(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {

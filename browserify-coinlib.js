@@ -61,6 +61,10 @@ const modules = [
   {
     namespace: 'acurast',
     import: '../../../node_modules/@airgap/acurast'
+  },
+  {
+    namespace: 'stellar',
+    import: '../../../node_modules/@airgap/stellar'
   }
 ]
 

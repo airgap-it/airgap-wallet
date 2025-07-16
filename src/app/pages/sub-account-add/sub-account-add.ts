@@ -88,7 +88,7 @@ export class SubAccountAddPage {
     account.selected = !account.selected
   }
 
-  public addSubAccounts(): void {
+  public async addSubAccounts(): Promise<void> {
     this.actionCallback({ subAccounts: this.subAccounts, accountProvider: this.accountProvider, location: this.navController })
   }
 

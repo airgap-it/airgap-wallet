@@ -31,6 +31,8 @@ import { TezosSaplingContractForm } from './tezos-sapling-contract-form/tezos-sa
 import { TransactionItemComponent } from './transaction-item/transaction-item.component'
 import { TransactionListComponent } from './transaction-list/transaction-list.component'
 import { WalletconnectFromToComponent } from './walletconnect-from-to/walletconnect-from-to.component'
+import { TransactionWarningComponent } from './transaction-warning/transaction-warning.component'
+
 import { WidgetAccountExtendedDetails } from './widget-account-extended-details/widget-account-extended-details'
 import { WidgetAccountSummary } from './widget-account-summary/widget-account-summary'
 import { WidgetAccount } from './widget-account/widget-account'
@@ -71,6 +73,7 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
     FeeComponent,
     FromToComponent,
     WalletconnectFromToComponent,
+    TransactionWarningComponent,
     InteractionSelectionComponent,
     WidgetSelector,
     WidgetAccount,
@@ -119,6 +122,7 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
     CurrentWalletGroupComponent,
     DappPeerComponent,
     WalletconnectFromToComponent,
+    TransactionWarningComponent,
     InteractionSelectionComponent,
     TransactionListComponent,
     TransactionItemComponent,

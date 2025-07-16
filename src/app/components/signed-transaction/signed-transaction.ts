@@ -42,6 +42,7 @@ export class SignedTransactionComponent implements OnChanges {
     | undefined
 
   public rawTxData: SignedTransaction
+  public interactionData: string
 
   public constructor(
     private readonly serializerService: SerializerService,
@@ -79,6 +80,9 @@ export class SignedTransactionComponent implements OnChanges {
                   transactionOwner: signedTx.protocol
                 })
               } else {
+                if (signedTx.protocol === MainProtocolSymbols.STELLAR) {
+                  this.interactionData = payload.transaction
+                }
                 return protocol.getTransactionDetailsFromSigned(payload)
               }
             })

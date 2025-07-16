@@ -40,6 +40,10 @@
         {{ (isDelegated | async) ? 'delegated' : 'undelegated' }}
       </ion-badge>
 
+      <ion-badge *ngIf="(isMultisig | async) && !hideMultisigBadge" color="primary">
+        {{'account-transaction-list.multisig' | translate }}
+      </ion-badge>
+
       <ng-template #syncingHeadingLow>
         <div>
           <h3>

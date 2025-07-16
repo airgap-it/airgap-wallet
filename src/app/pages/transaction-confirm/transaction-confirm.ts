@@ -15,6 +15,8 @@ import { AccountProvider } from 'src/app/services/account/account.provider'
 import { BrowserService } from 'src/app/services/browser/browser.service'
 import { DataService, DataServiceKey } from 'src/app/services/data/data.service'
 import { WalletconnectService } from 'src/app/services/walletconnect/walletconnect.service'
+import { StellarProtocol } from '@airgap/stellar'
+import { UIAlert } from 'src/app/models/widgets/display/UIAlert'
 
 import { BeaconService } from '../../services/beacon/beacon.service'
 import { PushBackendProvider } from '../../services/push-backend/push-backend'
@@ -42,6 +44,8 @@ export class TransactionConfirmPage {
   ][] = []
   public protocols: ICoinProtocol[] = []
   public wallet: AirGapMarketWallet | undefined
+  public uiAlert: UIAlert | undefined
+  public disableBroadcastButton: boolean = false
 
   public constructor(
     private readonly loadingCtrl: LoadingController,
@@ -93,6 +97,27 @@ export class TransactionConfirmPage {
       this.txInfos.push([(messageObject.payload as SignedTransaction).transaction, selectedProtocol, request])
       this.protocols.push(selectedProtocol)
       this.wallet = wallet
+
+      if (protocol.identifier === MainProtocolSymbols.STELLAR) {
+        const stellarProtocol = protocol as ICoinProtocolAdapter<StellarProtocol>
+
+        const multisigStatus = await stellarProtocol.protocolV1.getThresholdReachedStatus(
+          (messageObject.payload as SignedTransaction).transaction
+        )
+
+        if (multisigStatus.currentThreshold < multisigStatus.thresholdRequired) {
+          this.disableBroadcastButton = true
+
+          this.uiAlert = new UIAlert({
+            title: 'Multisig Transaction - Incomplete Signature',
+            description: `Toggle the display details button to view and copy XDR for more signatures. 
+            <br/>Current Threshold: ${multisigStatus.currentThreshold} 
+            <br/>Required Threshold: ${multisigStatus.thresholdRequired}`,
+            icon: 'alert',
+            color: 'light'
+          })
+        }
+      }
     })
   }
 

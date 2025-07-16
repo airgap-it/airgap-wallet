@@ -1,9 +1,16 @@
 export enum Namespace {
-  ETH = 'eip155'
+  ETH = 'eip155',
+  STELLAR = 'stellar'
 }
 
 interface Methods {
   [Namespace.ETH]: EthMethods
+  [Namespace.STELLAR]: StellarMethods
+}
+
+export enum StellarMethods {
+  STELLAR_SIGN_AND_SUBMIT_XDR = 'stellar_signAndSubmitXDR',
+  STELLAR_SIGN_XDR = 'stellar_signXDR'
 }
 
 export interface JSONRPC<T = unknown, M extends string = string> {
@@ -27,6 +34,34 @@ export interface WalletconnectPermissionRequest {
   canOverrideChain?: boolean
   approve?: (accounts: string[]) => Promise<void>
   reject?: () => Promise<void>
+}
+
+export interface WalletconnectsignAndSubmitXDR<N extends Namespace = Namespace> {
+  type: 'signAndSubmitXDR'
+  version: number
+  namespace: N
+  chain: string
+  request: {
+    id: string
+    method: Methods[N]
+    params: { xdr: string }
+  }
+  respond?: () => Promise<void>
+  cancel?: () => Promise<void>
+}
+
+export interface WalletconnectsignXDR<N extends Namespace = Namespace> {
+  type: 'signXDR'
+  version: number
+  namespace: N
+  chain: string
+  request: {
+    id: string
+    method: Methods[N]
+    params: { xdr: string }
+  }
+  respond?: () => Promise<void>
+  cancel?: () => Promise<void>
 }
 
 export interface WalletconnectSignRequest<T = unknown, N extends Namespace = Namespace> {
@@ -68,6 +103,9 @@ export type WalletconnectMessage =
   | WalletconnectSignRequest
   | WalletconnectSwitchAccountRequest
   | WallectconnectUnsupportedRequest
+  | WalletconnectsignAndSubmitXDR
+  | WalletconnectsignXDR
+
 // Ethereum
 
 export enum EthMethods {
