@@ -135,7 +135,7 @@
     "text": "Scannen Sie einen Synchronisierungs-QR, um ein Konto hinzuzufügen, oder scannen Sie einen Transaktions-QR, um es zu bestätigen und zu senden.",
     "multi-qr_text": "Diese Transaktion besteht aus mehreren QR-Codes. Halten Sie Ihre Kamera auf die wechselnden QRs gerichtet und warten Sie, bis alle Codes gescannt sind.",
     "empty-state_heading": "Zum Scannen von QR-Codes benötigt AirGap Wallet die <span class=\"style__strong color__primary\">Kameraberechtigung</span>.",
-    "grant-permission_label": "Erteilen der Berechtigung"
+    "grant-permission_label": "fortfahren"
   },
   "scan-address": {
     "title": "Kontoadresse scannen",
@@ -758,7 +758,7 @@
     "title": "Mitteilungen",
     "heading": "Sie können Push-Benachrichtigungen erhalten, wenn Ihre Konten Transaktionen empfangen.",
     "description": "Zuerst müssen Sie AirGap Wallet die Berechtigung für Push-Benachrichtigungen erteilen.",
-    "grant-permission_label": "Berechtigung erteilen"
+    "grant-permission_label": "fortfahren"
   },
   "portfolio-item": {
     "active": "aktiv"
