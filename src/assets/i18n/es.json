@@ -135,7 +135,7 @@
     "text": "Escanee un QR de sincronización para agregar una cuenta o escanee un QR de transacción para confirmar y enviarla.",
     "multi-qr_text": "Esta transacción consiste en multiples códigos QR. Apunta tu cámara hacia los códigos hasta que todos sean escaneados.",
     "empty-state_heading": "Para escanear códigos QR, AirGap Wallet necesita el <span class=\"style__strong color__primary\">permiso camara</span>.",
-    "grant-permission_label": "Conceder permiso"
+    "grant-permission_label": "continuar"
   },
   "scan-address": {
     "title": "Confirmar transacción",
@@ -758,7 +758,7 @@
     "title": "Notificaciones Push",
     "heading": "Puedes recibir notificaciones push si tus cuentas reciben transacciones.",
     "description": "Primero debes otorgar a AirGap Wallet el permiso de notificación push.",
-    "grant-permission_label": "Dar permiso"
+    "grant-permission_label": "continuar"
   },
   "portfolio-item": {
     "active": "activo"

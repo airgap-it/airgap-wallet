@@ -135,7 +135,7 @@
       "text": "扫描同步二维码添加账户或扫描交易二维码确认并发送。",
       "multi-qr_text": "此交易包含多个二维码。请将相机对准不断变化的二维码，等待所有二维码被扫描。",
       "empty-state_heading": "为了扫描二维码，AirGap钱包需要<span class=\"style__strong color__primary\">相机权限</span>。",
-      "grant-permission_label": "授予权限"
+      "grant-permission_label": "继续"
     },
     "scan-address": {
       "title": "扫描账户地址",
@@ -758,7 +758,7 @@
       "title": "推送通知",
       "heading": "如果您的账户收到交易，您可以收到推送通知。",
       "description": "首先，您必须授予 AirGap钱包推送通知权限。",
-      "grant-permission_label": "授予权限"
+      "grant-permission_label": "继续"
     },
     "portfolio-item": {
       "active": "活跃"
