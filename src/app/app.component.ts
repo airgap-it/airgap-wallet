@@ -119,14 +119,14 @@ export class AppComponent implements AfterViewInit {
     this.isElectron = this.platform.is('electron')
   }
 
-  private _waitReadyResolve: () => void
-  public readonly waitReady: Promise<void> = new Promise((resolve) => {
-    this._waitReadyResolve = resolve
-  })
+  // private _waitReadyResolve: () => void
+  // public readonly waitReady: Promise<void> = new Promise((resolve) => {
+  //   this._waitReadyResolve = resolve
+  // })
 
   public async initializeApp(): Promise<void> {
     await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
-    this._waitReadyResolve()
+    // this._waitReadyResolve()
 
     this.themeService.register()
 
@@ -194,14 +194,14 @@ export class AppComponent implements AfterViewInit {
     }
     if (this.platform.is('hybrid')) {
       this.app.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
-        this.ngZone.run(async () => {
+        this.ngZone.run(() => {
           if (data.url === 'airgap-wallet://' || data.url === 'https://wallet.airgap.it' || data.url === 'https://wallet.airgap.it/') {
             // Ignore empty deeplinks
             return
           }
 
-          await this.waitReady
-          await this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
+          // await this.waitReady
+          this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })
     }
