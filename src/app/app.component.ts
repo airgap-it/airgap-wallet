@@ -119,8 +119,14 @@ export class AppComponent implements AfterViewInit {
     this.isElectron = this.platform.is('electron')
   }
 
+  // private _waitReadyResolve: () => void
+  // public readonly waitReady: Promise<void> = new Promise((resolve) => {
+  //   this._waitReadyResolve = resolve
+  // })
+
   public async initializeApp(): Promise<void> {
     await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
+    // this._waitReadyResolve()
 
     this.themeService.register()
 
@@ -193,6 +199,8 @@ export class AppComponent implements AfterViewInit {
             // Ignore empty deeplinks
             return
           }
+
+          // await this.waitReady
           this.iacService.handleRequest(data.url, IACMessageTransport.DEEPLINK).catch(handleErrorSentry(ErrorCategory.SCHEME_ROUTING))
         })
       })

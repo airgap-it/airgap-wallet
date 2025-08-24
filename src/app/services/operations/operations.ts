@@ -635,11 +635,15 @@ export class OperationsProvider {
         if (wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED) {
           await this.saplingService.initSapling()
         }
-        if (wallet.protocol.identifier === MainProtocolSymbols.BTC_SEGWIT) {
+        if (
+          wallet.protocol.identifier === MainProtocolSymbols.BTC_SEGWIT ||
+          wallet.protocol.identifier === MainProtocolSymbols.BTC_TAPROOT
+        ) {
           // data could already contain "replaceByFee"
           if (!data) {
             data = {}
           }
+          console.log('Preparing transaction for wallet', wallet)
           data.masterFingerprint = wallet.masterFingerprint
         }
         unsignedTx = await wallet.prepareTransaction([address], [amount.toString(10)], fee.toString(10), data)
