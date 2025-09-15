@@ -31,6 +31,7 @@ import { WalletconnectService } from '../walletconnect/walletconnect.service'
 import { AddressHandler } from './custom-handlers/address-handler'
 import { BeaconHandler } from './custom-handlers/beacon-handler'
 import { WalletConnectHandler } from './custom-handlers/walletconnect-handler'
+import { Platform } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,8 @@ export class IACService extends BaseIACService {
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
     private readonly router: Router,
-    @Inject(APP_CONFIG) appConfig: AppConfig
+    @Inject(APP_CONFIG) appConfig: AppConfig,
+    protected readonly platform: Platform
   ) {
     super(
       uiEventElementsService,
@@ -60,7 +62,8 @@ export class IACService extends BaseIACService {
         new AddressHandler(accountProvider, dataService, router, protocolService) // Address handler is flexible because of regex, so it should be last.
       ],
       deeplinkService,
-      appConfig
+      appConfig,
+      platform
     )
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
