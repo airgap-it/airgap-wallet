@@ -637,6 +637,7 @@ export class OperationsProvider {
         }
         if (
           wallet.protocol.identifier === MainProtocolSymbols.BTC_SEGWIT ||
+          wallet.protocol.identifier === MainProtocolSymbols.BTC ||
           wallet.protocol.identifier === MainProtocolSymbols.BTC_TAPROOT
         ) {
           // data could already contain "replaceByFee"
