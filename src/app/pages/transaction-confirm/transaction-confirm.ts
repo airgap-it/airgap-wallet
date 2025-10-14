@@ -316,7 +316,9 @@ export class TransactionConfirmPage {
       try {
         const transactionSignRequest = await protocol.convertUnsignedTransactionV1ToV0(
           await protocol.protocolV1.wrapSaplingTransactions(newPublicKey(wallet.publicKey, 'hex'), transaction),
-          wallet.publicKey
+          wallet.publicKey,
+          undefined,
+          MainProtocolSymbols.XTZ
         )
         const unsignedTx = transactionSignRequest.transaction
 
@@ -325,7 +327,7 @@ export class TransactionConfirmPage {
             publicKey: wallet.publicKey,
             transaction: unsignedTx
           },
-          { knownViewingKeys: this.accountService.getKnownViewingKeys() }
+          { knownViewingKeys: this.accountService.getKnownViewingKeys(), transactionOwner: MainProtocolSymbols.XTZ }
         )
 
         this.accountService.startInteraction(wallet, unsignedTx, IACMessageType.TransactionSignRequest, airGapTxs)
