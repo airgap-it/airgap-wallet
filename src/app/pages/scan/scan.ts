@@ -1,6 +1,8 @@
 import { IACMessageTransport, PermissionsService, QrScannerService } from '@airgap/angular-core'
 import { PercentPipe } from '@angular/common'
 import { Component, NgZone, ViewChild } from '@angular/core'
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support'
+
 // import { Router } from '@angular/router'
 import { Platform } from '@ionic/angular'
 import { ZXingScannerComponent } from '@zxing/ngx-scanner'
@@ -39,6 +41,9 @@ export class ScanPage extends ScanBasePage {
     await super.ionViewWillEnter()
     this.resetScannerPage()
     this.iacService.resetHandlers()
+    if (this.platform.is('android')) {
+      await EdgeToEdge.disable()
+    }
   }
 
   private resetScannerPage(): void {
@@ -69,8 +74,12 @@ export class ScanPage extends ScanBasePage {
     })
   }
 
-  public ionViewWillLeave(): void {
+  public async ionViewWillLeave(): Promise<void> {
     super.ionViewWillLeave()
     this.resetScannerPage()
+
+    if (this.platform.is('android')) {
+      await EdgeToEdge.enable()
+    }
   }
 }
