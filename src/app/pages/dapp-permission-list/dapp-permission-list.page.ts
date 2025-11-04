@@ -47,7 +47,7 @@ export class DappPermissionListPage {
             {
               text: translated['dapp-permission-list.delete-permission-alert.yes_label'],
               handler: async (): Promise<void> => {
-                await this.beaconService.client.removePermission(permission.accountIdentifier)
+                await this.beaconService.client.removePermission(permission.accountIdentifier, permission.senderId)
 
                 await this.loadPermissions()
               }

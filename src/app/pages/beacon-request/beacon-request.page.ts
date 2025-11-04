@@ -1,4 +1,5 @@
-import { createV0TezosProtocol, ICoinProtocolAdapter } from '@airgap/angular-core'
+import { AcurastProtocol } from '@airgap/acurast'
+import { createV0AcurastProtocol, createV0TezosProtocol, ICoinProtocolAdapter } from '@airgap/angular-core'
 import {
   BeaconMessageType,
   BroadcastRequestOutput,
@@ -8,7 +9,13 @@ import {
   PermissionResponseInput,
   PermissionScope,
   SigningType,
-  SignPayloadRequestOutput
+  SignPayloadRequestOutput,
+  BeaconMessageWrapper,
+  SubstratePermissionRequest,
+  SubstratePermissionResponse,
+  SubstrateSignPayloadRequest,
+  SubstrateTransferRequest,
+  SubstrateMessageType
 } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
@@ -41,7 +48,8 @@ export function isUnknownObject(x: unknown): x is { [key in PropertyKey]: unknow
 })
 export class BeaconRequestPage implements OnInit {
   public title: string = ''
-  public request: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  public request?: PermissionRequestOutput | OperationRequestOutput | SignPayloadRequestOutput | BroadcastRequestOutput | undefined
+  public requestSubstrateV3?: BeaconMessageWrapper<SubstratePermissionRequest | SubstrateSignPayloadRequest | undefined>
   public network: ProtocolNetwork | undefined
   public requesterName: string = ''
   public inputs: CheckboxInput[] = []
@@ -53,7 +61,7 @@ export class BeaconRequestPage implements OnInit {
   public modal: HTMLIonModalElement | undefined
 
   public blake2bHash: string | undefined
-  private readonly subscription: Subscription
+  private subscription: Subscription
 
   public responseHandler: (() => Promise<void>) | undefined
   private readonly beaconService: BeaconService | undefined
@@ -67,14 +75,7 @@ export class BeaconRequestPage implements OnInit {
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly toastController: ToastController
-  ) {
-    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
-      this.selectableWallets = wallets.filter(
-        (wallet: AirGapMarketWallet) =>
-          wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.status === AirGapWalletStatus.ACTIVE
-      )
-    })
-  }
+  ) {}
 
   public get address(): string {
     if (this.selectedWallet !== undefined) {
@@ -84,26 +85,59 @@ export class BeaconRequestPage implements OnInit {
   }
 
   public async ngOnInit(): Promise<void> {
-    this.requesterName = this.request.appMetadata.name
-    this.network = await this.getNetworkFromRequest(this.request)
-    if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
-      this.title = 'beacon-request.title.permission-request'
-      await this.permissionRequest(this.request)
-    }
+    this.subscription = this.accountService.allWallets$.asObservable().subscribe((wallets: AirGapMarketWallet[]) => {
+      this.selectableWallets = wallets.filter((wallet: AirGapMarketWallet) => {
+        if (this.requestSubstrateV3) {
+          return wallet.protocol.identifier === MainProtocolSymbols.ACURAST && wallet.status === AirGapWalletStatus.ACTIVE
+        } else {
+          return wallet.protocol.identifier === MainProtocolSymbols.XTZ && wallet.status === AirGapWalletStatus.ACTIVE
+        }
+      })
+    })
 
-    if (this.request && this.request.type === BeaconMessageType.SignPayloadRequest) {
-      this.title = 'beacon-request.title.sign-payload-request'
-      await this.signRequest(this.request)
-    }
+    if (this.requestSubstrateV3) {
+      if ('appMetadata' in this.requestSubstrateV3.message.blockchainData) {
+        this.requesterName = this.requestSubstrateV3.message.blockchainData.appMetadata.name
+      } else {
+        this.requesterName = 'Unknown App'
+      }
+      this.network = await this.getNetworkFromRequestAcurast(this.requestSubstrateV3)
 
-    if (this.request && this.request.type === BeaconMessageType.OperationRequest) {
-      this.title = 'beacon-request.title.operation-request'
-      await this.operationRequest(this.request)
-    }
+      if (this.requestSubstrateV3.message.type === BeaconMessageType.PermissionRequest) {
+        this.title = 'beacon-request.title.permission-request'
+        await this.permissionRequestSubstrateV3(this.requestSubstrateV3 as BeaconMessageWrapper<SubstratePermissionRequest>)
+      }
 
-    if (this.request && this.request.type === BeaconMessageType.BroadcastRequest) {
-      this.title = 'beacon-request.title.broadcast-request'
-      await this.broadcastRequest(this.request)
+      if (
+        this.requestSubstrateV3.message.type === BeaconMessageType.BlockchainRequest &&
+        this.requestSubstrateV3.message.blockchainData.type === SubstrateMessageType.sign_payload_request
+      ) {
+        this.title = 'beacon-request.title.sign-payload-request'
+
+        await this.signRequestSubstrateV3(this.requestSubstrateV3 as BeaconMessageWrapper<SubstrateSignPayloadRequest>)
+      }
+    } else {
+      this.requesterName = this.request.appMetadata.name
+      this.network = await this.getNetworkFromRequest(this.request)
+      if (this.request && this.request.type === BeaconMessageType.PermissionRequest) {
+        this.title = 'beacon-request.title.permission-request'
+        await this.permissionRequest(this.request)
+      }
+
+      if (this.request && this.request.type === BeaconMessageType.SignPayloadRequest) {
+        this.title = 'beacon-request.title.sign-payload-request'
+        await this.signRequest(this.request)
+      }
+
+      if (this.request && this.request.type === BeaconMessageType.OperationRequest) {
+        this.title = 'beacon-request.title.operation-request'
+        await this.operationRequest(this.request)
+      }
+
+      if (this.request && this.request.type === BeaconMessageType.BroadcastRequest) {
+        this.title = 'beacon-request.title.broadcast-request'
+        await this.broadcastRequest(this.request)
+      }
     }
   }
 
@@ -118,9 +152,28 @@ export class BeaconRequestPage implements OnInit {
     return protocol.options.network
   }
 
+  public async getNetworkFromRequestAcurast(
+    requestSubstrateV3: BeaconMessageWrapper<
+      SubstratePermissionRequest | SubstratePermissionResponse | SubstrateSignPayloadRequest | SubstrateTransferRequest | undefined
+    >
+  ): Promise<ProtocolNetwork | undefined> {
+    if (!requestSubstrateV3) {
+      return undefined
+    }
+
+    const protocol: ICoinProtocol = await this.beaconService.getAcurastProtocolNetwork()
+
+    return protocol.options.network
+  }
+
   public async cancel(): Promise<void> {
-    await this.beaconService.sendAbortedError(this.request)
-    await this.dismiss()
+    if (this.requestSubstrateV3) {
+      await this.beaconService.sendAbortedError(this.requestSubstrateV3.message.blockchainData as any)
+      await this.dismiss()
+    } else {
+      await this.beaconService.sendAbortedError(this.request)
+      await this.dismiss()
+    }
   }
 
   public async dismiss(): Promise<boolean | void> {
@@ -193,10 +246,51 @@ export class BeaconRequestPage implements OnInit {
         type: BeaconMessageType.PermissionResponse,
         publicKey: edpkPublicKey,
         network: request.network,
-        scopes
+        scopes,
+        walletType: 'implicit'
       }
 
       await this.beaconService.respond(response, request)
+    }
+  }
+
+  private async permissionRequestSubstrateV3(request: BeaconMessageWrapper<SubstratePermissionRequest>): Promise<void> {
+    if (this.selectableWallets.length > 0) {
+      this.selectedWallet = this.selectableWallets[0]
+    }
+    if (!this.selectedWallet) {
+      // await this.beaconService.sendAccountNotFound(request)
+      return
+    }
+
+    this.responseHandler = async (): Promise<void> => {
+      const { appMetadata, scopes } = request.message.blockchainData
+      const { id: accountId } = request
+      const { blockchainIdentifier } = request.message
+
+      type OmitBeaconMessageWrapper = Omit<BeaconMessageWrapper<SubstratePermissionResponse>, 'version' | 'senderId'>
+
+      const response: OmitBeaconMessageWrapper = {
+        id: accountId,
+        message: {
+          blockchainIdentifier,
+          type: BeaconMessageType.PermissionResponse,
+          blockchainData: {
+            appMetadata,
+            scopes,
+            accounts: [
+              {
+                accountId,
+                publicKey: this.selectedWallet.publicKey,
+                address: this.selectedWallet.addresses[0],
+                acurast_signatureType: 'sr25519'
+              } as any
+            ]
+          }
+        }
+      }
+
+      await this.beaconService.respond(response as any, request.message.blockchainData as any)
     }
   }
 
@@ -272,6 +366,47 @@ export class BeaconRequestPage implements OnInit {
 
     const clonedRequest = { ...request }
     clonedRequest.id = new BigNumber(generatedId).toString() // TODO: Remove?
+
+    this.responseHandler = async () => {
+      this.accountService.startInteraction(selectedWallet, clonedRequest, IACMessageType.MessageSignRequest, undefined, false, generatedId)
+    }
+  }
+
+  private async signRequestSubstrateV3(request: BeaconMessageWrapper<SubstrateSignPayloadRequest>): Promise<void> {
+    const acurastProtocol: ICoinProtocolAdapter<AcurastProtocol> = await createV0AcurastProtocol()
+
+    const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
+      (wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ACURAST
+    )
+
+    if (!selectedWallet) {
+      // await this.beaconService.sendAccountNotFound(request)
+      return
+    }
+
+    const payload = request.message.blockchainData.payload as {
+      type: 'raw'
+      isMutable: boolean
+      dataType: 'bytes' | 'payload'
+      data: string
+    }
+
+    const data = payload.data
+
+    const requestMessage = {
+      type: BeaconMessageType.SignPayloadRequest,
+      signingType: SigningType.RAW,
+      payload: data,
+      sourceAddress: selectedWallet.receivingPublicAddress
+    } as SignPayloadRequestOutput
+
+    const generatedId = generateId(8)
+
+    await this.beaconService.addVaultRequest(request, acurastProtocol, true)
+
+    const clonedRequest = { ...requestMessage }
+
+    clonedRequest.id = new BigNumber(generatedId).toString()
 
     this.responseHandler = async () => {
       this.accountService.startInteraction(selectedWallet, clonedRequest, IACMessageType.MessageSignRequest, undefined, false, generatedId)
