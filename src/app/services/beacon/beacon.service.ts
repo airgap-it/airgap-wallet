@@ -1,4 +1,4 @@
-import { createV0TezosProtocol, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
+import { createV0Protocol, createV0TezosProtocol, ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
 import {
   AppMetadata,
   BeaconErrorType,
@@ -12,12 +12,20 @@ import {
   OperationRequest,
   P2PPairingRequest,
   StorageKey,
-  WalletClient
+  WalletClient,
+  BeaconMessageWrapper,
+  SubstratePermissionRequest,
+  SubstratePermissionResponse,
+  SubstrateSignPayloadRequest,
+  SubstrateTransferRequest,
+  SubstrateBlockchain
 } from '@airgap/beacon-sdk'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { UnsignedTransaction } from '@airgap/module-kit'
 import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
 import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
+import { AcurastModule, AcurastProtocol, createAcurastProtocol } from '@airgap/acurast'
+import { ACURAST_MAINNET_PROTOCOL_NETWORK } from '@airgap/acurast/v1/protocol/AcurastProtocol'
 import { Injectable } from '@angular/core'
 import { LoadingController, ModalController, ToastController } from '@ionic/angular'
 
@@ -64,25 +72,48 @@ export class BeaconService {
     })
   }
 
-  public async presentModal(request: BeaconRequestOutputMessage) {
-    const modal = await this.modalController.create({
-      component: BeaconRequestPage,
-      componentProps: {
-        request,
-        client: this.client,
-        beaconService: this
-      }
-    })
+  public async presentModal(
+    request:
+      | BeaconRequestOutputMessage
+      | BeaconMessageWrapper<
+          SubstratePermissionRequest | SubstratePermissionResponse | SubstrateSignPayloadRequest | SubstrateTransferRequest | undefined
+        >
+  ) {
+    let modal
+    if ('message' in request && request.message.blockchainIdentifier === 'substrate') {
+      modal = await this.modalController.create({
+        component: BeaconRequestPage,
+        componentProps: {
+          requestSubstrateV3: request,
+          client: this.client,
+          beaconService: this
+        }
+      })
+    } else {
+      modal = await this.modalController.create({
+        component: BeaconRequestPage,
+        componentProps: {
+          request,
+          client: this.client,
+          beaconService: this
+        }
+      })
+    }
 
     return modal.present()
   }
 
   public async addVaultRequest(
-    request: BeaconRequestOutputMessage | { transaction: UnsignedTransaction; id: string },
-    protocol: ICoinProtocol
+    request:
+      | BeaconRequestOutputMessage
+      | { transaction: UnsignedTransaction; id: string }
+      | BeaconMessageWrapper<SubstrateSignPayloadRequest>,
+    protocol: ICoinProtocol,
+    isSubstrate?: boolean
   ): Promise<void> {
     const network = (request as OperationRequest).network
-    if (network) {
+
+    if (network || isSubstrate) {
       const isProtocolAvailable = await this.protocolService.isProtocolAvailable(protocol.identifier, protocol.options.network.identifier)
       if (!isProtocolAvailable) {
         await this.protocolService.addActiveProtocols(protocol)
@@ -223,19 +254,24 @@ export class BeaconService {
     )
   }
 
-  public async sendAbortedError(request: BeaconRequestOutputMessage): Promise<void> {
+  public async sendAbortedError(request: BeaconRequestOutputMessage, isSubstrate?: boolean): Promise<void> {
     const responseInput = {
       id: request.id,
       type: BeaconMessageType.Error,
       errorType: BeaconErrorType.ABORTED_ERROR
     } as any // TODO: Fix type
 
-    const response: BeaconResponseInputMessage = {
+    const response = {
+      blockchainIdentifier: isSubstrate ? 'substrate' : undefined,
       senderId: await getSenderId(await this.client.beaconId), // TODO: Remove senderId and version from input message
       version: BEACON_VERSION,
+      error: {
+        type: BeaconErrorType.ABORTED_ERROR
+      },
       ...responseInput
     }
-    await this.respond(response, request)
+
+    await this.respond(response, request as any)
   }
 
   public async sendNetworkNotSupportedError(request: BeaconRequestOutputMessage): Promise<void> {
@@ -314,8 +350,17 @@ export class BeaconService {
         | BeaconNetworkType.JAKARTANET
         | BeaconNetworkType.ITHACANET
         | BeaconNetworkType.KATHMANDUNET
-        | BeaconNetworkType.MONDAYNET
         | BeaconNetworkType.DAILYNET
+        | BeaconNetworkType.LIMANET
+        | BeaconNetworkType.MUMBAINET
+        | BeaconNetworkType.NAIROBINET
+        | BeaconNetworkType.OXFORDNET
+        | BeaconNetworkType.PARISNET
+        | BeaconNetworkType.QUEBECNET
+        | BeaconNetworkType.RIONET
+        | BeaconNetworkType.SEOULNET
+        | BeaconNetworkType.SHADOWNET
+        | BeaconNetworkType.WEEKLYNET
       >]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: TEZOS_MAINNET_PROTOCOL_NETWORK,
@@ -339,6 +384,24 @@ export class BeaconService {
     return createV0TezosProtocol({ network: configs[network.type] })
   }
 
+  public async getAcurastProtocolNetwork(network?: Network | undefined): Promise<ICoinProtocolAdapter<AcurastProtocol>> {
+    return this.createV0AcurastProtocol({
+      network: {
+        ...ACURAST_MAINNET_PROTOCOL_NETWORK,
+        name: network ? network.name : ACURAST_MAINNET_PROTOCOL_NETWORK.name,
+        rpcUrl: network ? network.rpcUrl : ACURAST_MAINNET_PROTOCOL_NETWORK.rpcUrl
+      }
+    })
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private createV0AcurastProtocol(...args: Parameters<typeof createAcurastProtocol>): Promise<ICoinProtocolAdapter<AcurastProtocol>> {
+    const protocol: AcurastProtocol = createAcurastProtocol(...args)
+    const module: AcurastModule = new AcurastModule()
+
+    return createV0Protocol(protocol, module)
+  }
+
   public getResponseByRequestType(requestType: BeaconMessageType) {
     const map: Map<BeaconMessageType, BeaconMessageType> = new Map()
     map.set(BeaconMessageType.BroadcastRequest, BeaconMessageType.BroadcastResponse)
@@ -354,6 +417,8 @@ export class BeaconService {
   }
 
   private getClient(): WalletClient {
-    return new WalletClient({ name: 'AirGap Wallet' })
+    const client = new WalletClient({ name: 'AirGap Wallet' })
+    client.addBlockchain(new SubstrateBlockchain())
+    return client
   }
 }

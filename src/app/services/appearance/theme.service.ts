@@ -4,6 +4,8 @@ import { Inject, Injectable } from '@angular/core'
 import { StatusBarPlugin, Style } from '@capacitor/status-bar'
 import { Subject } from 'rxjs'
 import { WalletStorageService, themeOptions, WalletStorageKey } from './../storage/storage'
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -48,6 +50,9 @@ export class ThemeService {
         this.statusBar.setStyle({ style: isDarkMode ? Style.Dark : Style.Light }),
         this.statusBar.setBackgroundColor({ color: isDarkMode ? '#1f1f1f' : '#FFFFFF' })
       ])
+    }
+    if (this.platform.is('android')) {
+      await EdgeToEdge.setBackgroundColor({ color: isDarkMode ? '#1f1f1f' : '#FFFFFF' })
     }
   }
 

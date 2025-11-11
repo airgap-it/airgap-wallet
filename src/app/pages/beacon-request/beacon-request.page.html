@@ -74,20 +74,71 @@
         </ng-container>
       </div>
     </ng-container>
+
+    <ng-container *ngIf="requestSubstrateV3">
+      <ng-container *ngIf="requestSubstrateV3.message.type !== 'permission_request'">
+        <ion-card class="ion-margin-bottom">
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <airgap-identicon [address]="requesterName"></airgap-identicon>
+            </ion-avatar>
+            <ion-label class="ion-margin-start">
+              <p>{{ 'beacon-request.request-by-dapp_label' | translate }}</p>
+              <h3>{{requesterName}}</h3>
+            </ion-label>
+            <ion-icon src="assets/img/beacon_logo.svg" slot="end"></ion-icon>
+          </ion-item>
+        </ion-card>
+      </ng-container>
+
+      <ng-container *ngIf="requestSubstrateV3.message.type === 'permission_request'">
+        <permission-request
+          [address]="address"
+          [requesterName]="requesterName"
+          [inputs]="inputs"
+          [network]="network"
+          [targetProtocolSymbol]="'cACU'"
+          (walletSetEmitter)="setWallet($event)"
+        ></permission-request>
+      </ng-container>
+
+      <div
+        *ngIf="requestSubstrateV3.message.type === 'blockchain_request' && this.requestSubstrateV3.message.blockchainData.type === 'sign_payload_request'"
+        class="ion-padding-top"
+      >
+        <ion-row class="rawdata--container ion-padding-bottom">
+          <ion-col class="ion-no-padding">
+            <p>{{ 'beacon-request.sign-data_label' | translate }}</p>
+            <pre class="ion-no-margin">{{ requestSubstrateV3.message.blockchainData.payload | json }}</pre>
+          </ion-col>
+        </ion-row>
+      </div>
+    </ng-container>
   </ion-grid>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="request">
+    <ion-button shape="round" color="secondary" (click)="cancel()">{{ 'beacon-request.cancel_label' | translate }}</ion-button>
+
+    <ion-button *ngIf="request.type !== 'permission_request' && responseHandler" shape="round" color="primary" (click)="done()">
+      <ng-container>{{ 'beacon-request.continue_label' | translate }}</ng-container>
+    </ion-button>
+    <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
+      <ng-container>{{ 'beacon-request.connect_label' | translate }}</ng-container>
+    </ion-button>
+  </ion-fab>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="requestSubstrateV3">
     <ion-button shape="round" color="secondary" (click)="cancel()">{{ 'beacon-request.cancel_label' | translate }}</ion-button>
 
     <ion-button
-      *ngIf="request.type !== 'permission_request' && responseHandler"
+      *ngIf="requestSubstrateV3.message.type === 'blockchain_request' && responseHandler"
       shape="round"
       color="primary"
       (click)="done()"
     >
       <ng-container>{{ 'beacon-request.continue_label' | translate }}</ng-container>
     </ion-button>
-    <ion-button *ngIf="request.type === 'permission_request'" shape="round" color="primary" (click)="done()">
+    <ion-button *ngIf="requestSubstrateV3.message.type === 'permission_request'" shape="round" color="primary" (click)="done()">
       <ng-container>{{ 'beacon-request.connect_label' | translate }}</ng-container>
     </ion-button>
   </ion-fab>

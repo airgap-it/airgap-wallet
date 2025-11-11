@@ -11,13 +11,21 @@ import {
   RelayMessage,
   UiEventElementsService
 } from '@airgap/angular-core'
-import { BeaconMessageType, SigningType, SignPayloadResponseInput } from '@airgap/beacon-sdk'
+import {
+  BeaconMessageType,
+  BeaconMessageWrapper,
+  BlockchainMessage,
+  SigningType,
+  SignPayloadResponseInput,
+  SubstrateSignPayloadRequest
+} from '@airgap/beacon-sdk'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { isOnlineProtocol, supportsWalletConnect } from '@airgap/module-kit'
 import { AccountShareResponse, IACMessageDefinitionObjectV3, IACMessageType, MessageSignResponse } from '@airgap/serializer'
 import { Inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { transportToInteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
+import { Platform } from '@ionic/angular'
 
 import { AccountSync } from '../../types/AccountSync'
 import { AccountProvider } from '../account/account.provider'
@@ -48,7 +56,8 @@ export class IACService extends BaseIACService {
     private readonly storageSerivce: WalletStorageService,
     private readonly priceService: PriceService,
     private readonly router: Router,
-    @Inject(APP_CONFIG) appConfig: AppConfig
+    @Inject(APP_CONFIG) appConfig: AppConfig,
+    protected readonly platform: Platform
   ) {
     super(
       uiEventElementsService,
@@ -60,7 +69,8 @@ export class IACService extends BaseIACService {
         new AddressHandler(accountProvider, dataService, router, protocolService) // Address handler is flexible because of regex, so it should be last.
       ],
       deeplinkService,
-      appConfig
+      appConfig,
+      platform
     )
 
     this.serializerMessageHandlers[IACMessageType.AccountShareResponse] = this.handleWalletSync.bind(this)
@@ -148,6 +158,31 @@ export class IACService extends BaseIACService {
     }
     if (protocolIdentifier === MainProtocolSymbols.XTZ) {
       await this.beaconService.respond(response, cachedRequest[0])
+    } else if (protocolIdentifier === MainProtocolSymbols.ACURAST) {
+      const request = (cachedRequest[0] as unknown) as BeaconMessageWrapper<SubstrateSignPayloadRequest>
+
+      const payload = request.message.blockchainData.payload as {
+        type: 'raw'
+        isMutable: boolean
+        dataType: 'bytes' | 'payload'
+        data: string
+      }
+
+      const substrateResponse: BeaconMessageWrapper<BlockchainMessage<'substrate'>> = {
+        message: {
+          blockchainData: {
+            signature: response.signature.startsWith('0x') ? response.signature.slice(2) : response.signature,
+            payload: payload.data
+          },
+          blockchainIdentifier: 'substrate',
+          type: BeaconMessageType.BlockchainResponse
+        },
+        id: request.id,
+        senderId: request.senderId,
+        version: request.version
+      }
+
+      await this.beaconService.respond(substrateResponse as any, request.message.blockchainData as any)
     } else {
       const protocol = await this.protocolService.getProtocol(protocolIdentifier)
       if (!(protocol instanceof ICoinProtocolAdapter)) {
