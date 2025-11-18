@@ -131,7 +131,7 @@
     "@ngx-translate/http-loader": "^8.0.0",
     "@obsidiansystems/hw-app-xtz": "^4.72.3",
     "@sentry/browser": "6.2.5",
-    "@taquito/taquito": "^20.0.1",
+    "@taquito/taquito": "^23.0.3",
     "@types/ledgerhq__hw-transport": "^4.21.2",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.0",
