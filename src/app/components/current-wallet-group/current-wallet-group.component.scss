@@ -2,8 +2,8 @@
     flex: 0 0 auto;
 }
 
-ion-select {
-    width: 400px;
+:host ion-select {
+    width: 100%;
 }
 
 ion-select::part(text) {
