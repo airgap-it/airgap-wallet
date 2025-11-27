@@ -270,6 +270,8 @@ export class BeaconRequestPage implements OnInit {
 
       type OmitBeaconMessageWrapper = Omit<BeaconMessageWrapper<SubstratePermissionResponse>, 'version' | 'senderId'>
 
+      localStorage.setItem(`beacon_acurast_selected_address:${request.senderId}`, this.selectedWallet.addresses[0])
+
       const response: OmitBeaconMessageWrapper = {
         id: accountId,
         message: {
@@ -375,13 +377,17 @@ export class BeaconRequestPage implements OnInit {
   private async signRequestSubstrateV3(request: BeaconMessageWrapper<SubstrateSignPayloadRequest>): Promise<void> {
     const acurastProtocol: ICoinProtocolAdapter<AcurastProtocol> = await createV0AcurastProtocol()
 
-    const selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
+    let selectedWallet: AirGapMarketWallet = this.selectableWallets.find(
       (wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ACURAST
     )
 
-    if (!selectedWallet) {
-      // await this.beaconService.sendAccountNotFound(request)
-      return
+    const selectedAddress = localStorage.getItem(`beacon_acurast_selected_address:${request.senderId}`)
+
+    if (selectedAddress) {
+      selectedWallet = this.selectableWallets.find(
+        (wallet: AirGapMarketWallet) =>
+          wallet.protocol.identifier === MainProtocolSymbols.ACURAST && wallet.addresses[0] === selectedAddress
+      )
     }
 
     const payload = request.message.blockchainData.payload as {
