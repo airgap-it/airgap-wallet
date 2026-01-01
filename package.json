@@ -146,7 +146,7 @@
     "@zxing/ngx-scanner": "16.0.1",
     "angular2-uuid": "^1.1.1",
     "angularx-qrcode": "^16.0.0",
-    "axios": "^0.21.1",
+    "axios": "^0.30.2",
     "bignumber.js": "9.0.1",
     "browserify-zlib": "^0.2.0",
     "bs58check": "^2.1.2",
