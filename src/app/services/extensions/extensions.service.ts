@@ -12,7 +12,7 @@ import { V1ProtocolDelegationExtensions } from '../../extensions/delegation/base
 import { CosmosDelegationExtensions } from '../../extensions/delegation/CosmosDelegationExtensions'
 import { MoonbeamDelegationExtensions } from '../../extensions/delegation/MoonbeamDelegationExtensions'
 import { PolkadotDelegationExtensions } from '../../extensions/delegation/PolkadotDelegationExtensions'
-import { TezosDelegationExtensions } from '../../extensions/delegation/TezosDelegationExtensions'
+// import { TezosDelegationExtensions } from '../../extensions/delegation/TezosDelegationExtensions' // DISABLED: Build errors
 import { ShortenStringPipe } from '../../pipes/shorten-string/shorten-string.pipe'
 import { CoinlibService } from '../coinlib/coinlib.service'
 
@@ -46,19 +46,20 @@ export class ExtensionsService {
           this.translateService
         )
     ],
-    [
-      MainProtocolSymbols.XTZ,
-      async () =>
-        TezosDelegationExtensions.create(
-          this.coinlibService,
-          this.decimalPipe,
-          this.amountConverterPipe,
-          this.shortenStringPipe,
-          this.translateService,
-          this.addressService,
-          this.formBuilder
-        )
-    ],
+    // DISABLED: Build errors with TezosDelegationExtensions
+    // [
+    //   MainProtocolSymbols.XTZ,
+    //   async () =>
+    //     TezosDelegationExtensions.create(
+    //       this.coinlibService,
+    //       this.decimalPipe,
+    //       this.amountConverterPipe,
+    //       this.shortenStringPipe,
+    //       this.translateService,
+    //       this.addressService,
+    //       this.formBuilder
+    //     )
+    // ],
     [
       MainProtocolSymbols.COSMOS,
       async () =>
@@ -114,6 +115,7 @@ export class ExtensionsService {
     private readonly shortenStringPipe: ShortenStringPipe,
     private readonly translateService: TranslateService,
     private readonly coinlibService: CoinlibService,
+    // @ts-ignore - DISABLED: addressService only used by TezosDelegationExtensions which has build errors
     private readonly addressService: AddressService,
     private readonly protocolService: ProtocolService
   ) {}

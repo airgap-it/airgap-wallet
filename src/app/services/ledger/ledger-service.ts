@@ -4,8 +4,8 @@ import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, ProtocolSymbols
 
 import { TezosLedgerApp } from 'src/app/ledger/app/tezos/TezosLedgerApp'
 import { LedgerApp } from '../../ledger/app/LedgerApp'
-import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp'
-import { PolkadotLedgerApp } from '../../ledger/app/substrate/PolkadotLedgerApp'
+// import { KusamaLedgerApp } from '../../ledger/app/substrate/KusamaLedgerApp' // DISABLED: Build errors
+// import { PolkadotLedgerApp } from '../../ledger/app/substrate/PolkadotLedgerApp' // DISABLED: Build errors
 import { LedgerConnection, LedgerConnectionDetails, LedgerConnectionType } from '../../ledger/connection/LedgerConnection'
 import { ReturnCode } from '../../ledger/ReturnCode'
 import { isType } from '../../utils/utils'
@@ -19,8 +19,9 @@ const MAX_RETRIES = 1
 })
 export class LedgerService {
   private readonly supportedApps: Map<string, (connection: LedgerConnection) => LedgerApp> = new Map([
-    [MainProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
-    [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
+    // DISABLED: Build errors
+    // [MainProtocolSymbols.KUSAMA, (connection: LedgerConnection): LedgerApp => new KusamaLedgerApp(connection)],
+    // [MainProtocolSymbols.POLKADOT, (connection: LedgerConnection): LedgerApp => new PolkadotLedgerApp(connection)],
     [MainProtocolSymbols.XTZ, (connection: LedgerConnection): LedgerApp => new TezosLedgerApp(connection)]
   ] as [string, (connection: LedgerConnection) => LedgerApp][])
 
