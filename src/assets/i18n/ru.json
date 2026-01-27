@@ -157,6 +157,13 @@
       "dark": "Темная тема"
     },
     "preferred-language_label": "Предпочтительный язык",
+    "currency_label": "Валюта отображения",
+    "select-currency": {
+      "usd": "Доллар США (USD)",
+      "eur": "Евро (EUR)",
+      "gbp": "Британский фунт (GBP)",
+      "chf": "Швейцарский франк (CHF)"
+    },
     "help_label": "Помощь и поддержка",
     "introduction_label": "Введение",
     "faq_label": "Часто задаваемые вопросы",

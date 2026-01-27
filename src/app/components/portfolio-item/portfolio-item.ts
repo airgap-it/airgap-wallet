@@ -32,6 +32,9 @@ export class PortfolioItemComponent {
   public showBalances: boolean = true
 
   @Input()
+  public hideBalances: boolean = false
+
+  @Input()
   public isExpendable: boolean = false
 
   @Input()
@@ -148,8 +151,11 @@ export class PortfolioItemComponent {
     this.updateMarketPrice()
   }
 
-  private updateMarketPrice() {
-    this.marketPrice = this.wallet?.getCurrentMarketPrice()
+  private async updateMarketPrice() {
+    if (this.wallet) {
+      await this.wallet.fetchCurrentMarketPrice()
+      this.marketPrice = this.wallet.getCurrentMarketPrice()
+    }
   }
 
   public digits(): number {

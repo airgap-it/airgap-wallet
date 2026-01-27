@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { AirGapMarketWallet, ICoinDelegateProtocol } from '@airgap/coinlib-core'
+import { Injector } from '@angular/core'
 import BigNumber from 'bignumber.js'
 
 import { AirGapDelegationDetails, IAirGapCoinDelegateProtocol } from '../../../interfaces/IAirGapCoinDelegateProtocol'
@@ -7,6 +8,18 @@ import { UIAccountExtendedDetails } from '../../../models/widgets/display/UIAcco
 import { UIAccountSummary } from '../../../models/widgets/display/UIAccountSummary'
 import { UIRewardList } from '../../../models/widgets/display/UIRewardList'
 import { UIInputText, UIInputTextConfig } from '../../../models/widgets/input/UIInputText'
+import { CurrencyService } from '../../../services/currency/currency.service'
+
+// Global injector reference that can be set from app module
+let appInjector: Injector | null = null
+
+export function setAppInjector(injector: Injector): void {
+  appInjector = injector
+}
+
+export function getAppInjector(): Injector | null {
+  return appInjector
+}
 
 export abstract class ProtocolDelegationExtensions {
   protected static readonly extensionProperitesWithType: [keyof IAirGapCoinDelegateProtocol, 'property' | 'function'][] = [
@@ -33,7 +46,9 @@ export abstract class ProtocolDelegationExtensions {
       createExtraLabel: (value: string, wallet?: AirGapMarketWallet) => {
         if (wallet) {
           const marketPrice = new BigNumber(value || 0).multipliedBy(wallet.getCurrentMarketPrice())
-          return `$${marketPrice.toFixed(2)}`
+          const injector = getAppInjector()
+          const currencySymbol = injector ? injector.get(CurrencyService).getCurrencySymbol() : '$'
+          return `${currencySymbol}${marketPrice.toFixed(2)}`
         } else {
           return ''
         }

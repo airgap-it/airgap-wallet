@@ -4,11 +4,20 @@ import { Injectable } from '@angular/core'
 import BigNumber from 'bignumber.js'
 import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { CachingService, CachingServiceKey, StorageObject } from '../caching/caching.service'
+import { CurrencyService } from '../currency/currency.service'
+import { FiatCurrencyType } from '../storage/storage'
 
 export interface CryptoPrices {
   time: number
   price: number
   baseCurrencySymbol: string
+}
+
+export interface ExchangeRates {
+  usd: number
+  eur: number
+  gbp: number
+  chf: number
 }
 
 @Injectable({
@@ -17,8 +26,49 @@ export interface CryptoPrices {
 export class PriceService implements AirGapWalletPriceService {
   private readonly baseURL: string = 'https://crypto-prices-api.prod.gke.papers.tech'
   private readonly pendingMarketPriceRequests: { [key: string]: Promise<BigNumber> } = {}
+  private exchangeRates: ExchangeRates | null = null
+  private exchangeRatesTimestamp: number = 0
+  private readonly EXCHANGE_RATES_CACHE_DURATION = 30 * 60 * 1000 // 30 minutes
 
-  public constructor(private readonly cachingService: CachingService) {}
+  public constructor(private readonly cachingService: CachingService, private readonly currencyService: CurrencyService) {}
+
+  private async fetchExchangeRates(): Promise<ExchangeRates> {
+    if (this.exchangeRates && Date.now() - this.exchangeRatesTimestamp < this.EXCHANGE_RATES_CACHE_DURATION) {
+      return this.exchangeRates
+    }
+
+    try {
+      // Fetch exchange rates relative to USD from a free API
+      const response = await axios.get<{ rates: { EUR: number; GBP: number; CHF: number } }>(
+        'https://api.exchangerate-api.com/v4/latest/USD'
+      )
+      this.exchangeRates = {
+        usd: 1,
+        eur: response.data.rates.EUR,
+        gbp: response.data.rates.GBP,
+        chf: response.data.rates.CHF
+      }
+      this.exchangeRatesTimestamp = Date.now()
+      return this.exchangeRates
+    } catch (error) {
+      // Fallback exchange rates if API fails
+      return {
+        usd: 1,
+        eur: 0.92,
+        gbp: 0.79,
+        chf: 0.88
+      }
+    }
+  }
+
+  public async convertToSelectedCurrency(usdPrice: BigNumber): Promise<BigNumber> {
+    const currency = this.currencyService.getCurrency()
+    if (currency === FiatCurrencyType.USD) {
+      return usdPrice
+    }
+    const rates = await this.fetchExchangeRates()
+    return usdPrice.multipliedBy(rates[currency])
+  }
 
   public async fetchPriceData(marketSymbols: string[], timeInterval: TimeInterval): Promise<CryptoPrices[]> {
     const cachedPriceData: StorageObject = await this.cachingService.getPriceData(marketSymbols, timeInterval)
@@ -47,10 +97,13 @@ export class PriceService implements AirGapWalletPriceService {
     }
     // TODO change when market data is available for USDtz
     if (protocol.identifier === SubProtocolSymbols.XTZ_USD) {
-      return new BigNumber(1)
+      const usdPrice = new BigNumber(1)
+      return this.convertToSelectedCurrency(usdPrice)
     }
 
-    const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[protocol.marketSymbol]
+    const currency = this.currencyService.getCurrency()
+    const cacheKey = `${protocol.marketSymbol}_${currency}`
+    const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[cacheKey]
     if (pendingRequest) {
       return pendingRequest
     }
@@ -61,8 +114,10 @@ export class PriceService implements AirGapWalletPriceService {
         .then(async (response) => {
           if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
             const cryptoPrices: CryptoPrices = response.data[0]
-            if (cryptoPrices.price) {
-              resolve(new BigNumber(cryptoPrices.price))
+            if (cryptoPrices.price && cryptoPrices.price > 0) {
+              const usdPrice = new BigNumber(cryptoPrices.price)
+              const convertedPrice = await this.convertToSelectedCurrency(usdPrice)
+              resolve(convertedPrice)
             } else {
               const price = await this.fetchFromCoinGecko(protocol)
               resolve(price)
@@ -78,11 +133,11 @@ export class PriceService implements AirGapWalletPriceService {
         })
     })
 
-    this.pendingMarketPriceRequests[protocol.marketSymbol] = promise
+    this.pendingMarketPriceRequests[cacheKey] = promise
 
     promise
       .then(() => {
-        this.pendingMarketPriceRequests[protocol.marketSymbol] = undefined
+        this.pendingMarketPriceRequests[cacheKey] = undefined
       })
       .catch()
 
@@ -217,16 +272,22 @@ export class PriceService implements AirGapWalletPriceService {
         yfi: 'yearn-finance',
         zb: 'zb-token',
         zil: 'zilliqa',
-        xchf: 'cryptofranc'
+        xchf: 'cryptofranc',
+        xtz: 'tezos',
+        xlm: 'stellar',
+        paxg: 'pax-gold',
+        sdn: 'shiden'
       }
 
       const id = symbolMapping[protocol.marketSymbol.toLowerCase()]
       if (id) {
         try {
-          const response = await axios.get<{ data: { usd: string }[] }>(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`
+          const currency = this.currencyService.getCurrency()
+
+          const response = await axios.get<{ [key: string]: { [currency: string]: number } }>(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=${currency}`
           )
-          const price = response.data !== undefined ? new BigNumber(response.data[id].usd) : new BigNumber(0)
+          const price = response.data !== undefined && response.data[id] ? new BigNumber(response.data[id][currency]) : new BigNumber(0)
           resolve(price)
         } catch (error) {
           reject(error)

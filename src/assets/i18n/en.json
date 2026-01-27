@@ -161,6 +161,13 @@
       "dark": "Dark Theme"
     },
     "preferred-language_label": "Preferred Language",
+    "currency_label": "Display Currency",
+    "select-currency": {
+      "usd": "US Dollar (USD)",
+      "eur": "Euro (EUR)",
+      "gbp": "British Pound (GBP)",
+      "chf": "Swiss Franc (CHF)"
+    },
     "help_label": "Help & Support",
     "introduction_label": "Introduction",
     "faq_label": "FAQ",
