@@ -53,7 +53,7 @@ import {
 } from '@airgap/tezos/v0'
 import { TEZOS_GHOSTNET_PROTOCOL_NETWORK, TEZOS_MAINNET_PROTOCOL_NETWORK } from '@airgap/tezos/v1/protocol/TezosProtocol'
 import { HttpClient } from '@angular/common/http'
-import { AfterViewInit, Component, Inject, NgZone } from '@angular/core'
+import { AfterViewInit, Component, Inject, Injector, NgZone } from '@angular/core'
 import { Router } from '@angular/router'
 import { AppPlugin, URLOpenListenerEvent } from '@capacitor/app'
 import { SplashScreenPlugin } from '@capacitor/splash-screen'
@@ -72,6 +72,8 @@ import { NavigationService } from './services/navigation/navigation.service'
 import { PushProvider } from './services/push/push'
 import { SaplingNativeService } from './services/sapling-native/sapling-native.service'
 import { ErrorCategory, handleErrorSentry, setSentryRelease, setSentryUser } from './services/sentry-error-handler/sentry-error-handler'
+import { CurrencyService } from './services/currency/currency.service'
+import { setAppInjector } from './extensions/delegation/base/ProtocolDelegationExtensions'
 import { LanguagesType, WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
@@ -110,10 +112,14 @@ export class AppComponent implements AfterViewInit {
     private readonly navigationService: NavigationService,
     private readonly modulesService: WalletModulesService,
     private readonly http: HttpClient,
+    private readonly currencyService: CurrencyService,
+    private readonly injector: Injector,
     @Inject(APP_PLUGIN) private readonly app: AppPlugin,
     @Inject(APP_INFO_PLUGIN) private readonly appInfo: AppInfoPlugin,
     @Inject(SPLASH_SCREEN_PLUGIN) private readonly splashScreen: SplashScreenPlugin
   ) {
+    // Set the injector for non-Angular components to access services
+    setAppInjector(this.injector)
     this.initializeApp().catch(handleErrorSentry(ErrorCategory.OTHER))
     this.isMobile = this.platform.is('android') || this.platform.is('ios')
     this.isElectron = this.platform.is('electron')
@@ -125,7 +131,13 @@ export class AppComponent implements AfterViewInit {
   // })
 
   public async initializeApp(): Promise<void> {
-    await Promise.all([this.initializeTranslations(), this.platform.ready(), this.initializeProtocols(), this.initializeWalletConnect()])
+    await Promise.all([
+      this.initializeTranslations(),
+      this.platform.ready(),
+      this.initializeProtocols(),
+      this.initializeWalletConnect(),
+      this.currencyService.init()
+    ])
     // this._waitReadyResolve()
 
     this.themeService.register()

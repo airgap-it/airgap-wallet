@@ -113,7 +113,7 @@
           <ion-col offset="2" class="ion-no-padding">
             <ion-text class="ion-no-margin" color="blackLight">
               <p class="ion-no-margin">
-                ${{ state.marketPrice.toNumber() | number: '1.2-2' }}
+                {{ '' | fiatCurrencySymbol }}{{ state.marketPrice.toNumber() | number: '1.2-2' }}
               </p>
             </ion-text>
           </ion-col>

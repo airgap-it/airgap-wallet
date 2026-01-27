@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular'
 import { TranslateModule } from '@ngx-translate/core'
 
 import { ComponentsModule } from '../../components/components.module'
+import { PipesModule } from '../../pipes/pipes.module'
 
 import { PortfolioPage } from './portfolio'
 
@@ -19,7 +20,8 @@ import { PortfolioPage } from './portfolio'
     ComponentsModule,
     TranslateModule,
     RouterModule.forChild([{ path: '', component: PortfolioPage }]),
-    AirGapAngularCoreModule
+    AirGapAngularCoreModule,
+    PipesModule
   ],
   declarations: [PortfolioPage]
 })

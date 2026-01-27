@@ -11,7 +11,9 @@ import { IACService } from 'src/app/services/iac/iac.service'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { IntroductionPage } from '../introduction/introduction'
-import { WalletStorageKey, WalletStorageService } from 'src/app/services/storage/storage'
+import { FiatCurrencyType, WalletStorageKey, WalletStorageService } from 'src/app/services/storage/storage'
+import { CurrencyService } from 'src/app/services/currency/currency.service'
+import { AccountProvider } from '../../services/account/account.provider'
 
 @Component({
   selector: 'page-settings',
@@ -21,6 +23,7 @@ export class SettingsPage implements OnInit {
   public readonly platform: string = Capacitor.getPlatform()
   public readonly getTheme = this.themeService.getTheme()
   public showKnoxBanner: boolean
+  public selectedCurrency: FiatCurrencyType = FiatCurrencyType.USD
 
   private readonly knoxLink: string = 'https://shop.airgap.it/product/airgap-knox/?ref=Wallet-Settings-Knox'
 
@@ -34,11 +37,14 @@ export class SettingsPage implements OnInit {
     private readonly iacService: IACService,
     private readonly browserService: BrowserService,
     @Inject(SHARE_PLUGIN) private readonly sharePlugin: SharePlugin,
-    private readonly walletStorageService: WalletStorageService
+    private readonly walletStorageService: WalletStorageService,
+    private readonly currencyService: CurrencyService,
+    private readonly accountProvider: AccountProvider
   ) {}
 
   async ngOnInit() {
     this.showKnoxBanner = await this.isKnoxBannerEnabled()
+    this.selectedCurrency = this.currencyService.getCurrency()
   }
 
   async dismissKnoxBanner() {
@@ -50,6 +56,14 @@ export class SettingsPage implements OnInit {
     this.themeService.themeSubject.next(event.detail.value)
 
     await this.themeService.setStorageItem(event.detail.value)
+  }
+
+  public async onCurrencySelection(event) {
+    const currency = event.detail.value as FiatCurrencyType
+    this.selectedCurrency = currency
+    await this.currencyService.setCurrency(currency)
+    // Trigger wallet price refresh to update displayed prices in the new currency
+    this.accountProvider.triggerWalletChanged()
   }
 
   public about(): void {

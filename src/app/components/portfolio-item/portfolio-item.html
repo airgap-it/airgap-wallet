@@ -55,32 +55,42 @@
   </ng-container>
 
   <div class="ion-text-right" slot="end" *ngIf="!isExpendable && !hideFiatAmounts">
-    <ng-container *ngIf="balance; else syncingPrice">
-      <ion-text color="black">
-        <p class="font--weight__bold porfolio-item__margin">
-          {{ balanceFormatted }} {{ wallet.protocol.symbol}}
+    <ng-container *ngIf="!hideBalances">
+      <ng-container *ngIf="balance; else syncingPrice">
+        <ion-text color="black">
+          <p class="font--weight__bold porfolio-item__margin">
+            {{ balanceFormatted }} {{ wallet.protocol.symbol}}
+          </p>
+        </ion-text>
+      </ng-container>
+      <ng-template #syncingPrice>
+        <p>
+          <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
-      </ion-text>
-    </ng-container>
-    <ng-template #syncingPrice>
-      <p>
-        <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
-      </p>
-    </ng-template>
+      </ng-template>
 
-    <ng-container *ngIf="balance && marketPrice; else syncingBalance">
-      <ion-text color="blackLight">
-        <p class="porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
-          ${{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice: marketPrice } | async | number:
-          '1.2-2' }}
+      <ng-container *ngIf="balance && marketPrice; else syncingBalance">
+        <ion-text color="blackLight">
+          <p class="porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
+            {{ '' | fiatCurrencySymbol }}{{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
+            marketPrice } | async | number: '1.2-2' }}
+          </p>
+        </ion-text>
+      </ng-container>
+      <ng-template #syncingBalance>
+        <p>
+          <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngIf="hideBalances">
+      <ion-text color="black">
+        <p class="font--weight__bold porfolio-item__margin">*****</p>
+      </ion-text>
+      <ion-text color="blackLight">
+        <p class="porfolio-item__margin">***</p>
       </ion-text>
     </ng-container>
-    <ng-template #syncingBalance>
-      <p>
-        <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
-      </p>
-    </ng-template>
   </div>
   <ion-icon
     slot="end"

@@ -113,13 +113,35 @@ flip-card span {
 }
 
 .large-font {
-  margin-top: 0px;
+  margin: 0;
   font-size: 43px;
   font-weight: 350;
 }
 
 .small-font {
-  margin-top: 0px;
+  margin: 0;
   font-size: 30px;
   font-weight: 350;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  h1 {
+    margin: 0;
+    line-height: 1;
+  }
+}
+
+.balance-toggle-btn {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
 }

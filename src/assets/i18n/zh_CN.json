@@ -157,6 +157,13 @@
         "dark": "深色主题"
       },
       "preferred-language_label": "首选语言",
+      "currency_label": "显示货币",
+      "select-currency": {
+        "usd": "美元 (USD)",
+        "eur": "欧元 (EUR)",
+        "gbp": "英镑 (GBP)",
+        "chf": "瑞士法郎 (CHF)"
+      },
       "help_label": "帮助与支持",
       "introduction_label": "介绍",
       "faq_label": "常问问题",
