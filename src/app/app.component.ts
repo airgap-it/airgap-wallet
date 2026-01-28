@@ -40,6 +40,7 @@ import { ICPModule } from '@airgap/icp'
 import { protocolNetworkIdentifier } from '@airgap/module-kit'
 import { MoonbeamModule } from '@airgap/moonbeam'
 import { OptimismModule } from '@airgap/optimism'
+import { BnbModule } from '@airgap/bnb'
 import { BaseModule } from '@airgap/base'
 import { SerializedERC20Token } from '@airgap/optimism/v1/protocol/erc20/ERC20Token'
 import { PolkadotModule } from '@airgap/polkadot'
@@ -282,6 +283,7 @@ export class AppComponent implements AfterViewInit {
       new ICPModule(),
       new CoreumModule(),
       new OptimismModule(),
+      new BnbModule(),
       new BaseModule(),
       new AcurastModule(),
       new StellarModule()
