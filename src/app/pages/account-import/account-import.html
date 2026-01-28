@@ -38,7 +38,7 @@
     <ion-button id="dismiss" shape="round" color="secondary" (click)="dismiss()">
       {{ 'account-import.cancel_label' | translate }}
     </ion-button>
-    <ion-button id="import" shape="round" color="primary" (click)="import()">
+    <ion-button id="import" shape="round" color="primary" (click)="import()" [disabled]="isSyncing">
       {{ 'account-import.import_label' | translate }}
     </ion-button>
   </ion-fab>
