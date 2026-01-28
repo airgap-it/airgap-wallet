@@ -29,6 +29,8 @@ export class AccountImportPage implements OnDestroy {
   public loading: HTMLIonLoadingElement
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
 
+  public isSyncing: boolean = true
+
   private readonly ngDestroyed$: Subject<void> = new Subject()
 
   public constructor(
@@ -51,6 +53,18 @@ export class AccountImportPage implements OnDestroy {
 
   public async ionViewWillEnter(): Promise<void> {
     this.accountImports.clear()
+    this.isSyncing = true
+
+    await this.platform.ready()
+
+    // Create loading BEFORE setting up subscription to avoid race condition
+    this.loading = await this.loadingCtrl.create({
+      message: 'Syncing...',
+      backdropDismiss: false
+    })
+
+    this.loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+
     if (this.route.snapshot.data.special) {
       this.dataService
         .getAccountSyncs()
@@ -66,41 +80,44 @@ export class AccountImportPage implements OnDestroy {
               alreadyExists: false
             })
           })
-          this.ionViewDidEnter()
+          this.startSync()
         })
     }
-
-    await this.platform.ready()
-
-    this.loading = await this.loadingCtrl.create({
-      message: 'Syncing...',
-      backdropDismiss: true
-    })
-
-    this.loading.present().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async ionViewDidEnter(): Promise<void> {
+  private async startSync(): Promise<void> {
     const options: AirGapWallet[] = this.allAccountImports.map((accountImport) => accountImport.wallet)
 
     const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(options)
     this.allAccountImports.forEach((accountImport: AccountImport) => {
       accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
 
-      const key = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
+      const key: string = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
       accountImport.wallet.addresses = addresses[key]
+      accountImport.wallet.status = AirGapWalletStatus.ACTIVE
+    })
+
+    this.isSyncing = false
+    if (this.loading) {
+      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+    }
+
+    this.fetchBalancesInBackground()
+  }
+
+  private fetchBalancesInBackground(): void {
+    this.allAccountImports.forEach((accountImport: AccountImport) => {
+      // Fire and forget - don't await
       accountImport.wallet
         .synchronize()
+        .catch(() => {
+          // Silently ignore errors - balance will show as 0
+        })
         .then(() => {
-          if (accountImport.wallet.getCurrentBalance() !== undefined && accountImport.wallet.getCurrentBalance().gt(0)) {
-            accountImport.wallet.status = AirGapWalletStatus.ACTIVE
-          }
           this.ngZone.run(() => {
             this.accountProvider.triggerWalletChanged()
           })
         })
-        .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
-      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
     })
   }
 
