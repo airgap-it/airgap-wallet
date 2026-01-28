@@ -65,6 +65,10 @@ const modules = [
   {
     namespace: 'stellar',
     import: '../../../node_modules/@airgap/stellar'
+  },
+  {
+    namespace: 'base',
+    import: '../../../node_modules/@airgap/base'
   }
 ]
 
