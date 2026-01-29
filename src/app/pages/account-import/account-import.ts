@@ -12,6 +12,9 @@ import { DataService } from '../../services/data/data.service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
 import { AccountSync } from '../../types/AccountSync'
 
+const ROOTSTOCK_IDENTIFIER: string = 'rbtc'
+const SYNC_TIMEOUT_MS: number = 60000
+
 interface AccountImport extends AccountSync {
   alreadyExists: boolean
 }
@@ -86,23 +89,65 @@ export class AccountImportPage implements OnDestroy {
   }
 
   private async startSync(): Promise<void> {
-    const options: AirGapWallet[] = this.allAccountImports.map((accountImport) => accountImport.wallet)
+    try {
+      const allWallets: AirGapWallet[] = this.allAccountImports.map((accountImport) => accountImport.wallet)
 
-    const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(options)
-    this.allAccountImports.forEach((accountImport: AccountImport) => {
-      accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
+      const rootstockWallets: AirGapWallet[] = allWallets.filter((wallet) => wallet.protocol.identifier.startsWith(ROOTSTOCK_IDENTIFIER))
+      const otherWallets: AirGapWallet[] = allWallets.filter((wallet) => !wallet.protocol.identifier.startsWith(ROOTSTOCK_IDENTIFIER))
 
-      const key: string = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
-      accountImport.wallet.addresses = addresses[key]
-      accountImport.wallet.status = AirGapWalletStatus.ACTIVE
-    })
+      const syncWork: Promise<void> = this.deriveAllAddresses(otherWallets, rootstockWallets)
 
-    this.isSyncing = false
-    if (this.loading) {
-      this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      // Race the sync work against a timeout
+      await Promise.race([syncWork, new Promise<void>((resolve) => setTimeout(resolve, SYNC_TIMEOUT_MS))])
+    } catch (error) {
+      handleErrorSentry(ErrorCategory.OTHER)(error)
+    } finally {
+      this.isSyncing = false
+      if (this.loading) {
+        this.loading.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+      }
+      this.fetchBalancesInBackground()
+    }
+  }
+
+  private async deriveAllAddresses(otherWallets: AirGapWallet[], rootstockWallets: AirGapWallet[]): Promise<void> {
+    // Batch others
+    if (otherWallets.length > 0) {
+      const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(otherWallets)
+      this.applyAddresses(addresses)
     }
 
-    this.fetchBalancesInBackground()
+    // Sequential derive for rootstock wallets (isolated module, one at a time because it generally affects the performance on iOS)
+    for (const wallet of rootstockWallets) {
+      await this.deriveWithRetry(wallet)
+    }
+  }
+
+  private async deriveWithRetry(wallet: AirGapWallet): Promise<void> {
+    const maxAttempts: number = 2
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(wallet)
+        this.applyAddresses(addresses)
+        return
+      } catch (error) {
+        if (attempt === maxAttempts) {
+          handleErrorSentry(ErrorCategory.OTHER)(error)
+        }
+      }
+    }
+  }
+
+  private applyAddresses(addresses: Record<string, string[]>): void {
+    this.allAccountImports.forEach((accountImport: AccountImport) => {
+      const key: string = `${accountImport.wallet.protocol.identifier}_${accountImport.wallet.publicKey}`
+      if (addresses[key]) {
+        accountImport.alreadyExists = this.accountProvider.walletExists(accountImport.wallet)
+        accountImport.wallet.addresses = addresses[key]
+        accountImport.wallet.status = AirGapWalletStatus.ACTIVE
+      }
+    })
   }
 
   private fetchBalancesInBackground(): void {
