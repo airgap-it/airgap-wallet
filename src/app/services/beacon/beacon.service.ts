@@ -361,6 +361,8 @@ export class BeaconService {
         | BeaconNetworkType.SEOULNET
         | BeaconNetworkType.SHADOWNET
         | BeaconNetworkType.WEEKLYNET
+        | BeaconNetworkType.TALLINNNET
+        | BeaconNetworkType.TEZLINK_SHADOWNET
       >]: TezosProtocolNetwork
     } = {
       [BeaconNetworkType.MAINNET]: TEZOS_MAINNET_PROTOCOL_NETWORK,

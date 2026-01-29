@@ -62,7 +62,7 @@
     "@airgap/angular-core": "0.0.61",
     "@airgap/angular-ngrx": "0.0.61",
     "@airgap/astar": "0.13.45",
-    "@airgap/beacon-sdk": "5.0.0-alpha.2",
+    "@airgap/beacon-sdk": "5.0.0-beta.3",
     "@airgap/bitcoin": "0.13.45",
     "@airgap/coinlib-core": "0.13.45",
     "@airgap/coreum": "0.13.45",
