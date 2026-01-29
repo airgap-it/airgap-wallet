@@ -16,16 +16,24 @@
         <!-- <flip-card-front> -->
         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <span>{{ 'portfolio.flip-card.front-title' | translate }}</span>
-          <ng-component *ngIf="isVisible && total > 0; then showBalance; else skeletonBalance"></ng-component>
-          <ng-template #showBalance>
-            <h1 [ngClass]="total < 1000000 ? 'large-font': 'small-font'">${{ total | number: '1.2-2' }}</h1>
-          </ng-template>
-
-          <ng-template #skeletonBalance>
-            <h1 class="ion-no-margin">
-              <ion-skeleton-text animated style="width: 130px;"></ion-skeleton-text>
-            </h1>
-          </ng-template>
+          <div class="balance-row">
+            <ng-container *ngIf="!isBalanceHidden">
+              <ng-container *ngIf="isVisible && total > 0; else skeletonBalance">
+                <h1 [ngClass]="total < 1000000 ? 'large-font': 'small-font'">{{ '' | fiatCurrencySymbol }}{{ total | number: '1.2-2' }}</h1>
+              </ng-container>
+              <ng-template #skeletonBalance>
+                <h1 class="large-font">
+                  <ion-skeleton-text animated style="width: 130px;"></ion-skeleton-text>
+                </h1>
+              </ng-template>
+            </ng-container>
+            <ng-container *ngIf="isBalanceHidden">
+              <h1 class="large-font">******</h1>
+            </ng-container>
+            <ion-button fill="clear" size="small" (click)="toggleBalanceVisibility()" class="balance-toggle-btn">
+              <ion-icon [name]="isBalanceHidden ? 'eye-outline' : 'eye-off-outline'" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
         </div>
         <!-- </flip-card-front> -->
         <!-- <flip-card-back (click)="onClickLink(knoxFlipCardLink)">
@@ -107,6 +115,7 @@
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
               [wallet]="walletGroup.mainWallet"
+              [hideBalances]="isBalanceHidden"
               tappable
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
@@ -114,6 +123,7 @@
               *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async"
               [wallet]="subWallet"
               [parentWalletName]="walletGroup.mainWallet.protocol.name"
+              [hideBalances]="isBalanceHidden"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"
             ></portfolio-item>

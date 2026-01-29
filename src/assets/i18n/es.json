@@ -157,6 +157,13 @@
       "dark": "Tema Nocturno"
     },
     "preferred-language_label": "Idioma Preferido",
+    "currency_label": "Moneda de Visualización",
+    "select-currency": {
+      "usd": "Dólar Estadounidense (USD)",
+      "eur": "Euro (EUR)",
+      "gbp": "Libra Esterlina (GBP)",
+      "chf": "Franco Suizo (CHF)"
+    },
     "help_label": "Ayuda y Soporte",
     "introduction_label": "Introducción",
     "faq_label": "FAQ",

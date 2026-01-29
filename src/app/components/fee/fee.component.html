@@ -71,7 +71,7 @@
                 {{ 'transaction-prepare.amount_label' | translate }}
               </ng-container>
               <ng-container *ngIf="form.controls['fee'].valid" color="primary">
-                ${{ form.get('fee').value * state.feeCurrentMarketPrice | number: '1.2-4' }}
+                {{ '' | fiatCurrencySymbol }}{{ form.get('fee').value * state.feeCurrentMarketPrice | number: '1.2-4' }}
               </ng-container>
             </span>
             <span id="fee-amount-advanced" *ngIf="state?.fee?.value > 0">

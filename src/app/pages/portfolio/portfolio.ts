@@ -14,6 +14,7 @@ import { AccountProvider, MainWalletGroup } from '../../services/account/account
 import { DataServiceKey } from '../../services/data/data.service'
 import { OperationsProvider } from '../../services/operations/operations'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+import { WalletStorageKey, WalletStorageService } from '../../services/storage/storage'
 
 @Component({
   selector: 'page-portfolio',
@@ -44,13 +45,17 @@ export class PortfolioPage {
   public knoxFlipCardLine2: string = ''
   public knoxFlipCardLink: string = ''
 
+  // Balance visibility
+  public isBalanceHidden: boolean = false
+
   public constructor(
     private readonly router: Router,
     private readonly walletsProvider: AccountProvider,
     private readonly operationsProvider: OperationsProvider,
     private readonly protocolService: ProtocolService,
     public platform: Platform,
-    private readonly shopService: ShopService
+    private readonly shopService: ShopService,
+    private readonly storageService: WalletStorageService
   ) {
     this.isDesktop = !this.platform.is('hybrid')
 
@@ -101,8 +106,14 @@ export class PortfolioPage {
     })
   }
 
-  public ionViewDidEnter() {
+  public async ionViewDidEnter() {
+    this.isBalanceHidden = await this.storageService.get(WalletStorageKey.BALANCE_HIDDEN)
     this.doRefresh().catch(handleErrorSentry())
+  }
+
+  public async toggleBalanceVisibility() {
+    this.isBalanceHidden = !this.isBalanceHidden
+    await this.storageService.set(WalletStorageKey.BALANCE_HIDDEN, this.isBalanceHidden)
   }
 
   public openDetail(mainWallet: AirGapMarketWallet, subWallet?: AirGapMarketWallet) {

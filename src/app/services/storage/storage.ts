@@ -11,6 +11,27 @@ import { SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWall
 export type BeaconRequest = [string, any, ICoinProtocol]
 export type themeOptions = 'light' | 'dark' | 'system'
 
+export enum FiatCurrencyType {
+  USD = 'usd',
+  EUR = 'eur',
+  GBP = 'gbp',
+  CHF = 'chf'
+}
+
+export const FIAT_CURRENCY_SYMBOL: Record<FiatCurrencyType, string> = {
+  [FiatCurrencyType.USD]: '$',
+  [FiatCurrencyType.EUR]: '€',
+  [FiatCurrencyType.GBP]: '£',
+  [FiatCurrencyType.CHF]: 'CHF'
+}
+
+export const FIAT_CURRENCY_NAME: Record<FiatCurrencyType, string> = {
+  [FiatCurrencyType.USD]: 'US Dollar',
+  [FiatCurrencyType.EUR]: 'Euro',
+  [FiatCurrencyType.GBP]: 'British Pound',
+  [FiatCurrencyType.CHF]: 'Swiss Franc'
+}
+
 export enum LanguagesType {
   EN = 'en',
   DE = 'de',
@@ -44,8 +65,10 @@ export enum WalletStorageKey {
   CONTRACT_ADDRESSES = 'CONTRACT_ADDRESSES',
   THEME = 'theme',
   LANGUAGE_TYPE = 'LANGUAGE_TYPE',
+  FIAT_CURRENCY = 'FIAT_CURRENCY',
   ISOLATED_MODULES_ONBOARDING_DISABLED = 'ISOLATED_MODULES_ONBOARDING_DISABLED',
-  KNOX_BANNER_DISABLED = 'KNOX_BANNER_DISABLED'
+  KNOX_BANNER_DISABLED = 'KNOX_BANNER_DISABLED',
+  BALANCE_HIDDEN = 'BALANCE_HIDDEN'
 }
 
 interface IBroadcastTransaction {
@@ -70,8 +93,10 @@ interface WalletStorageKeyReturnType {
   [WalletStorageKey.CONTRACT_ADDRESSES]: Record<string, { address: string; configuration?: any }>
   [WalletStorageKey.THEME]: themeOptions
   [WalletStorageKey.LANGUAGE_TYPE]: LanguagesType | undefined
+  [WalletStorageKey.FIAT_CURRENCY]: FiatCurrencyType | undefined
   [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: boolean
   [WalletStorageKey.KNOX_BANNER_DISABLED]: boolean
+  [WalletStorageKey.BALANCE_HIDDEN]: boolean
 }
 
 type WalletStorageKeyReturnDefaults = { [key in WalletStorageKey]: WalletStorageKeyReturnType[key] }
@@ -92,8 +117,10 @@ const defaultValues: WalletStorageKeyReturnDefaults = {
   [WalletStorageKey.CONTRACT_ADDRESSES]: {},
   [WalletStorageKey.THEME]: undefined,
   [WalletStorageKey.LANGUAGE_TYPE]: undefined,
+  [WalletStorageKey.FIAT_CURRENCY]: undefined,
   [WalletStorageKey.ISOLATED_MODULES_ONBOARDING_DISABLED]: false,
-  [WalletStorageKey.KNOX_BANNER_DISABLED]: false
+  [WalletStorageKey.KNOX_BANNER_DISABLED]: false,
+  [WalletStorageKey.BALANCE_HIDDEN]: false
 }
 
 @Injectable({

@@ -111,6 +111,16 @@
         <ion-icon name="language-outline" slot="start"></ion-icon>
         {{ 'settings.preferred-language_label' | translate }}
       </ion-item>
+      <ion-item>
+        <ion-icon name="cash-outline" slot="start"></ion-icon>
+        {{ 'settings.currency_label' | translate }}
+        <ion-select [value]="selectedCurrency" (ionChange)="onCurrencySelection($event)" interface="action-sheet" slot="end">
+          <ion-select-option value="usd">{{ 'settings.select-currency.usd' | translate }}</ion-select-option>
+          <ion-select-option value="eur">{{ 'settings.select-currency.eur' | translate }}</ion-select-option>
+          <ion-select-option value="gbp">{{ 'settings.select-currency.gbp' | translate }}</ion-select-option>
+          <ion-select-option value="chf">{{ 'settings.select-currency.chf' | translate }}</ion-select-option>
+        </ion-select>
+      </ion-item>
     </ion-list>
     <ion-list lines="none">
       <ion-list-header class="ion-no-margin" lines="none">

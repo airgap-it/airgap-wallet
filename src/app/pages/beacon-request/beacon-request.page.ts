@@ -18,6 +18,7 @@ import {
   SubstrateMessageType
 } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
+import { blake2bAsBytes } from '@airgap/coinlib-core/utils/blake2b'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
 import { ProtocolNetwork } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { newPublicKey, PublicKey } from '@airgap/module-kit'
@@ -399,10 +400,16 @@ export class BeaconRequestPage implements OnInit {
 
     const data = payload.data
 
+    // payload > 256 bytes, it must be blake2b-256 hashed before signing
+    const dataHex = data.startsWith('0x') ? data.slice(2) : data
+    const dataBuffer = Buffer.from(dataHex, 'hex')
+    const messageToSign: Uint8Array = dataBuffer.length > 256 ? blake2bAsBytes(new Uint8Array(dataBuffer), 256) : new Uint8Array(dataBuffer)
+    const signingPayload = `0x${Buffer.from(messageToSign).toString('hex')}`
+
     const requestMessage = {
       type: BeaconMessageType.SignPayloadRequest,
       signingType: SigningType.RAW,
-      payload: data,
+      payload: signingPayload,
       sourceAddress: selectedWallet.receivingPublicAddress
     } as SignPayloadRequestOutput
 
