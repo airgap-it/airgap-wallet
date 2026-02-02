@@ -69,15 +69,15 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
           const optionalEthNamespace: Web3WalletTypes.SessionProposal['params']['optionalNamespaces'][string] = (proposal.params
             .optionalNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
 
-          // for now, let's use the selected account for all required chains
+          // use the selected account for all required and optional chains
           if (ethAccounts.length === 1) {
             const requiredEthChains = requiredEthNamespace.chains ?? []
+            const optionalEthChains = optionalEthNamespace.chains ?? []
+            const allEthChains = [...requiredEthChains, ...optionalEthChains]
             const [namespace, chainId, address] = ethAccounts[0].split(':')
 
             ethAccounts.push(
-              ...requiredEthChains
-                .filter((chain: string) => chain !== `${namespace}:${chainId}`)
-                .map((chain: string) => `${chain}:${address}`)
+              ...allEthChains.filter((chain: string) => chain !== `${namespace}:${chainId}`).map((chain: string) => `${chain}:${address}`)
             )
           }
 
@@ -356,13 +356,31 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
         params: request.params.request.params
       },
       respond: async (chainId: number): Promise<void> => {
+        const targetChain = `${Namespace.ETH}:${chainId}`
+        const session = client.getActiveSessions()[request.topic]
+        const currentNamespace = session?.namespaces?.[Namespace.ETH]
+
+        // Ensure the target chain and account are in the session namespaces before emitting
+        if (currentNamespace && !currentNamespace.chains?.includes(targetChain)) {
+          const address = account ?? accounts[0]?.split(':')[2]
+          const updatedNamespaces = {
+            ...session.namespaces,
+            [Namespace.ETH]: {
+              ...currentNamespace,
+              chains: [...(currentNamespace.chains ?? []), targetChain],
+              accounts: [...(currentNamespace.accounts ?? []), `${targetChain}:${address}`]
+            }
+          }
+          await client.updateSession({ topic: request.topic, namespaces: updatedNamespaces })
+        }
+
         client.emitSessionEvent({
           topic: request.topic,
           event: {
             name: 'chainChanged',
             data: accounts
           },
-          chainId: `${Namespace.ETH}:${chainId}`
+          chainId: targetChain
         })
       },
       cancel: async (): Promise<void> => {
