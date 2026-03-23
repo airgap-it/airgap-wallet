@@ -174,7 +174,7 @@
     "rxjs": "^7.8.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
-    "swiper": "^9.4.0",
+    "swiper": "^12.1.2",
     "tslib": "^2.2.0",
     "url": "^0.11.1",
     "uuid": "^3.4.0",
