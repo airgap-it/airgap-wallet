@@ -18,6 +18,13 @@ export enum InteractionSetting {
   LEDGER = 'ledger'
 }
 
+export enum SyncSource {
+  QR = 'qr',
+  DEEPLINK = 'deeplink',
+  PASTE = 'paste',
+  LEDGER = 'ledger'
+}
+
 export const transportToInteractionSetting = (transport: IACMessageTransport): InteractionSetting => {
   switch (transport) {
     case IACMessageTransport.DEEPLINK:
@@ -26,6 +33,17 @@ export const transportToInteractionSetting = (transport: IACMessageTransport): I
       return InteractionSetting.OFFLINE_DEVICE
     case IACMessageTransport.PASTE:
       return InteractionSetting.UNDETERMINED
+  }
+}
+
+export const transportToSyncSource = (transport: IACMessageTransport): SyncSource => {
+  switch (transport) {
+    case IACMessageTransport.DEEPLINK:
+      return SyncSource.DEEPLINK
+    case IACMessageTransport.QR_SCANNER:
+      return SyncSource.QR
+    case IACMessageTransport.PASTE:
+      return SyncSource.PASTE
   }
 }
 

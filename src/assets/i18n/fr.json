@@ -3,6 +3,12 @@
       "title": "Compte",
       "transactions_label": "Transactions",
       "add-tokens_label": "Ajouter des jetons",
+      "sync-source": {
+        "qr": "QR",
+        "deeplink": "Même appareil",
+        "paste": "Collé",
+        "ledger": "Ledger"
+      },
       "collectibles_label": "Objets de collection",
       "import-accounts_label": "Comptes d'importation",
       "delegate_label": "Déléguer",
