@@ -32,7 +32,7 @@ import {
 } from '@airgap/angular-ngrx'
 import { CommonModule, DecimalPipe, PercentPipe } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
-import { NgModule } from '@angular/core'
+import { ErrorHandler, NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -57,6 +57,7 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner'
 import CordovaSQLiteDriver from 'localforage-cordovasqlitedriver'
 import { MomentModule } from 'ngx-moment'
 
+import * as SentryAngular from '@sentry/angular'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { metaReducers, ROOT_REDUCERS } from './app.reducers'
@@ -150,6 +151,7 @@ export function createTranslateLoader(http: HttpClient): AirGapTranslateLoader {
     IsolatedModulesOnboardingPageModule
   ],
   providers: [
+    { provide: ErrorHandler, useValue: SentryAngular.createErrorHandler() },
     { provide: APP_PLUGIN, useValue: App },
     { provide: APP_INFO_PLUGIN, useValue: AppInfo },
     { provide: APP_LAUNCHER_PLUGIN, useValue: AppLauncher },
