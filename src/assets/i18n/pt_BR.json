@@ -3,6 +3,12 @@
     "title": "Conta",
     "transactions_label": "Transações",
     "add-tokens_label": "Adicionar Tokens",
+    "sync-source": {
+      "qr": "QR",
+      "deeplink": "Mesmo dispositivo",
+      "paste": "Colado",
+      "ledger": "Ledger"
+    },
     "collectibles_label": "Colecionáveis",
     "import-accounts_label": "Importar contas",
     "delegate_label": "Delegar",

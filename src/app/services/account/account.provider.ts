@@ -21,7 +21,7 @@ import { auditTime, map, take } from 'rxjs/operators'
 
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
-import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup } from '../../models/AirGapMarketWalletGroup'
+import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup, SyncSource } from '../../models/AirGapMarketWalletGroup'
 import { isSubProtocol, isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
@@ -51,6 +51,7 @@ export interface WalletAddInfo {
   walletToAdd: AirGapMarketWallet
   groupId?: string
   groupLabel?: string
+  syncSource?: SyncSource
   options?: { override?: boolean; updateState?: boolean }
 }
 
@@ -68,6 +69,7 @@ export interface MainWalletGroup {
 export class AccountProvider {
   private readonly activeGroup$: ReplaySubject<ActiveWalletGroup> = new ReplaySubject(1)
   private readonly walletGroups: Map<string | undefined, AirGapMarketWalletGroup> = new Map()
+  private readonly walletSyncSources: Map<string, SyncSource> = new Map()
 
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
 
@@ -383,6 +385,13 @@ export class AccountProvider {
       // add derived addresses
       airGapWallet.addresses = serializedWallet.addresses
 
+      // restore sync source
+      const syncSource = (serializedWallet as any).syncSource as SyncSource | undefined
+      if (syncSource) {
+        const identifier = this.createWalletIdentifier(serializedWallet.protocolIdentifier, serializedWallet.publicKey)
+        this.walletSyncSources.set(identifier, syncSource)
+      }
+
       return airGapWallet
     } catch (error) {
       console.warn(error)
@@ -460,6 +469,15 @@ export class AccountProvider {
           throw new Error('wallet already exists')
         }
       }
+
+      if (walletAddInfo.syncSource) {
+        const identifier = this.createWalletIdentifier(
+          walletAddInfo.walletToAdd.protocol.identifier,
+          walletAddInfo.walletToAdd.publicKey
+        )
+        this.walletSyncSources.set(identifier, walletAddInfo.syncSource)
+      }
+
       await this.addWallet(walletAddInfo, resolvedOptions)
     }
 
@@ -654,7 +672,13 @@ export class AccountProvider {
         await Promise.all(
           this.allWallets
             .filter((wallet: AirGapMarketWallet) => wallet.status !== AirGapWalletStatus.TRANSIENT)
-            .map((wallet: AirGapMarketWallet) => wallet.toJSON())
+            .map(async (wallet: AirGapMarketWallet) => {
+              const serialized = await wallet.toJSON()
+              const identifier = this.createWalletIdentifier(serialized.protocolIdentifier, serialized.publicKey)
+              const syncSource = this.walletSyncSources.get(identifier)
+
+              return syncSource ? { ...serialized, syncSource } : serialized
+            })
         )
       )
     ])
@@ -805,6 +829,12 @@ export class AccountProvider {
     )
 
     return others !== undefined ? [...sorted, others] : sorted
+  }
+
+  public getSyncSource(wallet: AirGapMarketWallet): SyncSource | undefined {
+    const identifier = this.createWalletIdentifier(wallet.protocol.identifier, wallet.publicKey)
+
+    return this.walletSyncSources.get(identifier)
   }
 
   private createWalletIdentifier(protocolIdentifier: string, publicKey: string): string {

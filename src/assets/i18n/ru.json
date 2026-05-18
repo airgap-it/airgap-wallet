@@ -3,6 +3,12 @@
     "title": "Аккаунт",
     "transactions_label": "Транзакции",
     "add-tokens_label": "Добавить токены",
+    "sync-source": {
+      "qr": "QR",
+      "deeplink": "То же устройство",
+      "paste": "Вставлено",
+      "ledger": "Ledger"
+    },
     "collectibles_label": "Коллекционные",
     "import-accounts_label": "Импорт аккаунтов",
     "delegate_label": "Делегировать",
