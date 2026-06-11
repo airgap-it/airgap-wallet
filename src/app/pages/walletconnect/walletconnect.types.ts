@@ -89,6 +89,7 @@ export interface WalletconnectSwitchAccountRequest<T = unknown, N extends Namesp
     params: T[]
   }
   respond?: (chainId: number) => Promise<void>
+  rejectUnrecognizedChain?: () => Promise<void>
   cancel?: () => Promise<void>
 }
 
@@ -115,6 +116,7 @@ export enum EthMethods {
   ETH_SIGN_TYPED_DATA_V3 = 'eth_signTypedData_v3',
   ETH_SIGN_TYPED_DATA_V4 = 'eth_signTypedData_v4',
   WALLET_SWITCH_ETHEREUM_CHAIN = 'wallet_switchEthereumChain',
+  WALLET_ADD_ETHEREUM_CHAIN = 'wallet_addEthereumChain',
   ETH_SIGN = 'eth_sign'
 }
 
