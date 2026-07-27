@@ -196,7 +196,8 @@ export class WalletconnectPage implements OnInit {
     if (
       this.message.type === 'switchAccountRequest' &&
       this.message.namespace === Namespace.ETH &&
-      this.message.request.method === EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN
+      (this.message.request.method === EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN ||
+        this.message.request.method === EthMethods.WALLET_ADD_ETHEREUM_CHAIN)
     ) {
       this.mode = Mode.SWITCH_ACCOUNT
       this.title = this.translateService.instant('walletconnect.switch_ethereum_chain')
@@ -297,11 +298,13 @@ export class WalletconnectPage implements OnInit {
 
     const selectableWallets = await this.filterWallets(this.selectableWallets, request.chain, address)
     const wallet = selectableWallets[0]
-    await this.setWallet(wallet)
 
-    if (!this.selectedWallet) {
-      throw new Error('no wallet found!')
+    if (!wallet) {
+      await this.handleNoWalletForChain(request.chain, request.cancel)
+      return
     }
+
+    await this.setWallet(wallet)
     const requestId = `${request.version}:${request.request.id}`
     const generatedId = generateId(8)
     const protocol = this.selectedWallet.protocol
@@ -343,14 +346,34 @@ export class WalletconnectPage implements OnInit {
       this.setWallet(wallet)
     ])
 
-    if (!this.selectedWallet) {
-      throw new Error('no wallet found!')
+    if (!this.selectedWallet && !request.canOverrideChain) {
+      await this.handleNoWalletForChain(request.chains, request.reject)
+      return
     }
 
     this.responseHandler = async (): Promise<void> => {
-      const protocolChain = this.selectedWallet ? await this.getWalletConnectChain(this.selectedWallet) : undefined
-      const chains = protocolChain ? [protocolChain] : request.chains ?? [':']
-      const accounts = chains.map((chain: string) => `${chain}:${this.address}`)
+      if (!this.selectedWallet) {
+        return
+      }
+
+      const selectedAddress = this.address
+      const selectedChain = await this.getWalletConnectChain(this.selectedWallet)
+      const matchingWallets = await this.filterWallets(this.selectableWallets, request.chains, selectedAddress)
+      const accounts: string[] = []
+      const seenChains = new Set<string>()
+
+      if (selectedChain) {
+        accounts.push(`${selectedChain}:${selectedAddress}`)
+        seenChains.add(selectedChain)
+      }
+
+      for (const wallet of matchingWallets) {
+        const chain = await this.getWalletConnectChain(wallet)
+        if (chain && !seenChains.has(chain)) {
+          accounts.push(`${chain}:${selectedAddress}`)
+          seenChains.add(chain)
+        }
+      }
 
       if (request.approve) {
         request.approve(accounts)
@@ -362,11 +385,13 @@ export class WalletconnectPage implements OnInit {
     const eth = request.request.params[0]
     const selectableWallets = await this.filterWallets(this.selectableWallets, request.chain, eth.from)
     const wallet = selectableWallets[0]
-    await this.setWallet(wallet)
 
-    if (!this.selectedWallet) {
-      throw new Error('no wallet found!')
+    if (!wallet) {
+      await this.handleNoWalletForChain(request.chain, request.cancel)
+      return
     }
+
+    await this.setWallet(wallet)
 
     this.rawTransaction = await this.prepareWalletConnectTransaction(this.selectedWallet, eth)
 
@@ -404,11 +429,13 @@ export class WalletconnectPage implements OnInit {
 
     const selectableWallets = await this.filterWallets(this.selectableWallets, `${Namespace.ETH}:${chainId}`, address)
     const wallet = selectableWallets[0]
-    await Promise.all([this.setTargetProtocolSymbol([]), this.setWallet(wallet)])
 
-    if (!this.selectedWallet) {
-      throw new Error('no wallet found!')
+    if (!wallet) {
+      await this.handleNoWalletForChain(`${Namespace.ETH}:${chainId}`, request.rejectUnrecognizedChain ?? request.cancel)
+      return
     }
+
+    await Promise.all([this.setTargetProtocolSymbol([]), this.setWallet(wallet)])
 
     this.responseHandler = async (): Promise<void> => {
       if (request.respond) {
@@ -447,6 +474,31 @@ export class WalletconnectPage implements OnInit {
       ]
     })
     alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+  }
+
+  private async handleNoWalletForChain(chainOrChains: string | string[], reject?: () => Promise<void>): Promise<void> {
+    const chains = typeof chainOrChains === 'string' ? [chainOrChains] : chainOrChains
+    const chainLabel = chains.map((chain) => chain.replace(`${Namespace.ETH}:`, '')).join(', ')
+
+    const alert: HTMLIonAlertElement = await this.alertCtrl.create({
+      header: this.translateService.instant('walletconnect.no_wallet_for_chain.title'),
+      message: this.translateService.instant('walletconnect.no_wallet_for_chain.message', { chain: chainLabel }),
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'ok',
+          role: 'cancel',
+          handler: () => {
+            this.dismissModal()
+          }
+        }
+      ]
+    })
+    await alert.present().catch(handleErrorSentry(ErrorCategory.IONIC_ALERT))
+
+    if (reject) {
+      await reject()
+    }
   }
 
   public async setWallet(wallet: AirGapMarketWallet) {

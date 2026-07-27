@@ -928,6 +928,10 @@
       "title": "Not supported",
       "message": "eth_signTypedData is currently not supported"
     },
+    "no_wallet_for_chain": {
+      "title": "Network not available",
+      "message": "No account found for chain {{chain}}. Please add an account for this network in AirGap Wallet."
+    },
     "timeout": {
       "title": "Connection Failure",
       "message": "It seems like the connection via WalletConnect cannot be established"

@@ -29,6 +29,20 @@ function rejectRequest(client: V2Client, id: number, topic: string) {
   })
 }
 
+function rejectUnrecognizedChain(client: V2Client, id: number, topic: string) {
+  client.respondSessionRequest({
+    topic,
+    response: {
+      id,
+      jsonrpc: '2.0',
+      error: {
+        code: 4902,
+        message: 'Unrecognized chain ID. Try adding the chain first.'
+      }
+    }
+  })
+}
+
 export class WalletconnectV2Handler implements WalletconnectHandler<WalletconnectV2HandlerContext> {
   public async readMessage(context: WalletconnectV2HandlerContext): Promise<WalletconnectMessage> {
     switch (context.message.type) {
@@ -69,15 +83,15 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
           const optionalEthNamespace: Web3WalletTypes.SessionProposal['params']['optionalNamespaces'][string] = (proposal.params
             .optionalNamespaces ?? {})[Namespace.ETH] ?? { methods: [], events: [] }
 
-          // use the selected account for all required and optional chains
+          // Expand a single approved account only for required chains (not optional chains without a backing wallet)
           if (ethAccounts.length === 1) {
             const requiredEthChains = requiredEthNamespace.chains ?? []
-            const optionalEthChains = optionalEthNamespace.chains ?? []
-            const allEthChains = [...requiredEthChains, ...optionalEthChains]
             const [namespace, chainId, address] = ethAccounts[0].split(':')
 
             ethAccounts.push(
-              ...allEthChains.filter((chain: string) => chain !== `${namespace}:${chainId}`).map((chain: string) => `${chain}:${address}`)
+              ...requiredEthChains
+                .filter((chain: string) => chain !== `${namespace}:${chainId}`)
+                .map((chain: string) => `${chain}:${address}`)
             )
           }
 
@@ -250,6 +264,8 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
         return this.readPersonalSign(request, client)
       case EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN:
         return this.readWalletSwitchEthereumChain(request, client)
+      case EthMethods.WALLET_ADD_ETHEREUM_CHAIN:
+        return this.readWalletAddEthereumChain(request, client)
       case EthMethods.ETH_SIGN_TYPED_DATA:
       case EthMethods.ETH_SIGN_TYPED_DATA_V3:
       case EthMethods.ETH_SIGN_TYPED_DATA_V4:
@@ -333,12 +349,23 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
     }
   }
 
-  // TODO: check if it's working (couldn't find a dApp that would send that message)
   private readWalletSwitchEthereumChain(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    return this.readWalletChainChangeRequest(request, client, EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN)
+  }
+
+  private readWalletAddEthereumChain(request: Web3WalletTypes.SessionRequest, client: V2Client): WalletconnectMessage {
+    return this.readWalletChainChangeRequest(request, client, EthMethods.WALLET_ADD_ETHEREUM_CHAIN)
+  }
+
+  private readWalletChainChangeRequest(
+    request: Web3WalletTypes.SessionRequest,
+    client: V2Client,
+    method: EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN | EthMethods.WALLET_ADD_ETHEREUM_CHAIN
+  ): WalletconnectMessage {
     const [namespace] = request.params.chainId.split(':', 1)
     const session = client.getActiveSessions()[request.topic]
     const accounts = session.namespaces[namespace]?.accounts ?? []
-    const account = accounts ? accounts[0].split(':')[2] : undefined
+    const account = accounts.length > 0 ? accounts[0].split(':')[2] : undefined
 
     return {
       type: 'switchAccountRequest',
@@ -352,40 +379,61 @@ export class WalletconnectV2Handler implements WalletconnectHandler<Walletconnec
       },
       request: {
         id: `${request.id}:${request.topic}`,
-        method: EthMethods.WALLET_SWITCH_ETHEREUM_CHAIN,
+        method,
         params: request.params.request.params
       },
       respond: async (chainId: number): Promise<void> => {
-        const targetChain = `${Namespace.ETH}:${chainId}`
-        const session = client.getActiveSessions()[request.topic]
-        const currentNamespace = session?.namespaces?.[Namespace.ETH]
-
-        // Ensure the target chain and account are in the session namespaces before emitting
-        if (currentNamespace && !currentNamespace.chains?.includes(targetChain)) {
-          const address = account ?? accounts[0]?.split(':')[2]
-          const updatedNamespaces = {
-            ...session.namespaces,
-            [Namespace.ETH]: {
-              ...currentNamespace,
-              chains: [...(currentNamespace.chains ?? []), targetChain],
-              accounts: [...(currentNamespace.accounts ?? []), `${targetChain}:${address}`]
-            }
-          }
-          await client.updateSession({ topic: request.topic, namespaces: updatedNamespaces })
-        }
-
-        client.emitSessionEvent({
-          topic: request.topic,
-          event: {
-            name: 'chainChanged',
-            data: accounts
-          },
-          chainId: targetChain
-        })
+        await this.completeChainSwitch(client, request, chainId, account)
+      },
+      rejectUnrecognizedChain: async (): Promise<void> => {
+        rejectUnrecognizedChain(client, request.id, request.topic)
       },
       cancel: async (): Promise<void> => {
         rejectRequest(client, request.id, request.topic)
       }
     }
+  }
+
+  private async completeChainSwitch(
+    client: V2Client,
+    request: Web3WalletTypes.SessionRequest,
+    chainId: number,
+    account?: string
+  ): Promise<void> {
+    const targetChain = `${Namespace.ETH}:${chainId}`
+    const session = client.getActiveSessions()[request.topic]
+    const sessionAccounts = session?.namespaces?.[Namespace.ETH]?.accounts ?? []
+    const currentNamespace = session?.namespaces?.[Namespace.ETH]
+
+    if (currentNamespace && !currentNamespace.chains?.includes(targetChain)) {
+      const address = account ?? sessionAccounts[0]?.split(':')[2]
+      const updatedNamespaces = {
+        ...session.namespaces,
+        [Namespace.ETH]: {
+          ...currentNamespace,
+          chains: [...(currentNamespace.chains ?? []), targetChain],
+          accounts: [...(currentNamespace.accounts ?? []), `${targetChain}:${address}`]
+        }
+      }
+      await client.updateSession({ topic: request.topic, namespaces: updatedNamespaces })
+    }
+
+    await client.respondSessionRequest({
+      topic: request.topic,
+      response: {
+        id: request.id,
+        jsonrpc: '2.0',
+        result: null
+      }
+    })
+
+    client.emitSessionEvent({
+      topic: request.topic,
+      event: {
+        name: 'chainChanged',
+        data: chainId
+      },
+      chainId: targetChain
+    })
   }
 }
