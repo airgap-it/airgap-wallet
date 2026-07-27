@@ -205,7 +205,7 @@
     "@types/node": "20.3.1",
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "5.59.7",
-    "angular-cli-ghpages": "^1.0.6",
+    "angular-cli-ghpages": "^3.1.0",
     "browserify": "17.0.0",
     "clipboardy": "^2.0.0",
     "dotenv": "^8.2.0",
