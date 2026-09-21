@@ -3,7 +3,7 @@ import { createV0BitcoinProtocol, createV0EthereumProtocol } from '@airgap/angul
 import { AirGapCoinWallet, AirGapMarketWallet, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { AirGapWalletPriceService } from '@airgap/coinlib-core/wallet/AirGapMarketWallet'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 
 // tslint:disable:max-classes-per-file
 

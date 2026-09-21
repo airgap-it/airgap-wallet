@@ -2,7 +2,7 @@ import { AmountConverterPipe, ICoinProtocolAdapter, ProtocolService, getMainIden
 import { AirGapMarketWallet, ICoinSubProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { Component, Input } from '@angular/core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Observable, ReplaySubject, Subscription } from 'rxjs'
 import { isMultisig } from '@airgap/module-kit'
 

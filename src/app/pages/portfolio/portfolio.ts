@@ -5,7 +5,7 @@ import { Observable, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
 import { ProtocolService } from '@airgap/angular-core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
 import { map } from 'rxjs/operators'
 import { promiseTimeout } from '../../helpers/promise'

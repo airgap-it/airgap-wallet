@@ -10,7 +10,7 @@ import {
 import { IACMessageDefinitionObject } from '@airgap/serializer'
 import { TezosSaplingProtocol } from '@airgap/tezos'
 import { Component, Input, OnChanges } from '@angular/core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { AccountProvider } from 'src/app/services/account/account.provider'
 
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'

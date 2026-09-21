@@ -3,7 +3,7 @@ import { implementsInterface } from '@airgap/module-kit'
 import { TransactionSignRequest } from '@airgap/serializer'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 
 interface UnsignedTransactionWithGas {
   gasLimit: string
