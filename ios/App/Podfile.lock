@@ -83,7 +83,13 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (2.0.0)
-  - ZIPFoundation (0.9.16)
+  - Sentry (9.8.0):
+    - Sentry/Core (= 9.8.0)
+  - Sentry/Core (9.8.0)
+  - SentryCapacitor (3.2.0):
+    - Capacitor
+    - Sentry (= 9.8.0)
+  - ZIPFoundation (0.9.20)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -102,7 +108,8 @@ DEPENDENCIES:
   - "CapawesomeCapacitorFilePicker (from `../../node_modules/@capawesome/capacitor-file-picker`)"
   - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
   - Firebase/Messaging
-  - ZIPFoundation (~> 0.9)
+  - "SentryCapacitor (from `../../node_modules/@sentry/capacitor`)"
+  - ZIPFoundation (~> 0.9.20)
 
 SPEC REPOS:
   trunk:
@@ -115,6 +122,7 @@ SPEC REPOS:
     - GoogleUtilities
     - nanopb
     - PromisesObjC
+    - Sentry
     - ZIPFoundation
 
 EXTERNAL SOURCES:
@@ -148,23 +156,25 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capawesome/capacitor-file-picker"
   CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
+  SentryCapacitor:
+    :path: "../../node_modules/@sentry/capacitor"
 
 SPEC CHECKSUMS:
-  Capacitor: 187bd7847b6f71467015a20200a1a071be3e5f14
-  CapacitorApp: 9d53aec7101f7b030a950c5bdc4df8612576b279
-  CapacitorAppLauncher: ca97e232064f293cc23a0083f237af74a2976add
-  CapacitorBrowser: 473c7fd70ddbe541608ff09ec1be14da0078279e
-  CapacitorClipboard: 80282f684154124b9019ebf401235b70b0cf4994
+  Capacitor: 3aff4dee0552f6badcd04f47ab3174387d71f47d
+  CapacitorApp: 30145f2ea2311e4f3744472119ec87d2ddf4c0a7
+  CapacitorAppLauncher: 1b35f1fc220c3053085bebc45015f079e7328b55
+  CapacitorBrowser: 6c0e04dc80556a966ebc2269ac72f09d83eec1ce
+  CapacitorClipboard: c1cb27fea166aab5c99bda605d3bc768cf00eabe
   CapacitorCordova: be703980ca797f847c3356f78fa175d21c8330c2
-  CapacitorFilesystem: 60e59ba274c234a979e7a3be2552feaadcee4263
-  CapacitorHaptics: 9ebc9363f0e9b8eb4295088a0b474530acf1859b
-  CapacitorKeyboard: 5f32a712adf41e07a61caafb82cf29fb6d8ba123
-  CapacitorPushNotifications: 293fabe42c7229756078e81f2d3a60394ba4e5d8
-  CapacitorShare: 02222f2457ff003e642370a9c1ecd101baaa27c8
-  CapacitorSplashScreen: 61645214e8f955ff2b80f16a6a3648960fe4c89f
-  CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
-  CapawesomeCapacitorFilePicker: 3c6c193300649c9c7ce49426e17582edbf7ed601
-  CordovaPlugins: bc9dd476898b7b0402ac526b307e61def2530e92
+  CapacitorFilesystem: 9c2cc1e89d3b8b91503b316e9f6c2915c9bf9419
+  CapacitorHaptics: 0cea833e6a8bf489dd6acaaebf6d953b90086c59
+  CapacitorKeyboard: f38d730356be5569d72eb87ad9c8166947728c36
+  CapacitorPushNotifications: 36c5b49e33c5ab2b22e0dca04e37d69e359c0e63
+  CapacitorShare: ec1bcbc16696696133740ac876192c0480ca3018
+  CapacitorSplashScreen: d2d8fe9541d7bebdf735839b89edf6e762cea969
+  CapacitorStatusBar: 129c68650d3f950e080e8e7e03d69c3b361dbe52
+  CapawesomeCapacitorFilePicker: 2674b1aa1915b69786783236abeff82c36f1a381
+  CordovaPlugins: ef9cd3db32f695294028bd7b1a12b04d85383c70
   Firebase: 580d09e8edafc3073ebf09c03fd42e4d80d35fe9
   FirebaseCore: 8138de860a90ca7eec5e324da5788fb0ebf1d93c
   FirebaseCoreDiagnostics: 3b40dfadef5b90433a60ae01f01e90fe87aa76aa
@@ -174,8 +184,10 @@ SPEC CHECKSUMS:
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
-  ZIPFoundation: d170fa8e270b2a32bef9dcdcabff5b8f1a5deced
+  Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
+  SentryCapacitor: e330a47b73f225ba1e485a7fbab2a67b27702763
+  ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
 
-PODFILE CHECKSUM: e315223308d6a03ceb49f5f9760e913733b8ae7b
+PODFILE CHECKSUM: 295fe92f33397a5d29ad82622a2b10a5be0239ae
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

@@ -33,6 +33,7 @@
 		"SplashScreenPlugin",
 		"StatusBarPlugin",
 		"FilePickerPlugin",
+		"SentryCapacitorPlugin",
 		"CDVPlugin"
 	]
 }
