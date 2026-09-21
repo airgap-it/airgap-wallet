@@ -1,8 +1,7 @@
 FROM electronuserland/builder:wine
 
 RUN wget -qO - https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/xUbuntu_18.04/Release.key | apt-key add -
-RUN apt-get update -y
-RUN apt-get install -y libusb-1.0-0 libudev-dev
+RUN apt-get update -y && apt-get install -y --no-install-recommends libusb-1.0-0 libudev-dev
 
 # set cache dirs
 ENV ELECTRON_CACHE "/root/.cache/electron"
