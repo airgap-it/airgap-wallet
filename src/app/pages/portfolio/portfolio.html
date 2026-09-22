@@ -34,7 +34,7 @@
               <ion-icon [name]="isBalanceHidden ? 'eye-outline' : 'eye-off-outline'" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
-          <div *ngIf="syncWarningNames.length > 0" class="sync-warning">
+          <div *ngIf="syncWarningNames.length > 0 || (isTotalIncomplete && !isSyncing)" class="sync-warning">
             <ion-icon name="alert-circle-outline"></ion-icon>
             <span>{{ 'portfolio.sync-warning' | translate }}</span>
           </div>
@@ -114,7 +114,7 @@
     <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
       <ng-container *ngIf="walletGroupsArray.length; else noItems">
         <ion-list class="walletGroups ion-no-padding" lines="none">
-          <ion-card *ngFor="let walletGroup of walletGroupsArray">
+          <ion-card *ngFor="let walletGroup of walletGroupsArray; trackBy: trackByGroup">
             <portfolio-item
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
@@ -124,7 +124,7 @@
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
             <portfolio-item
-              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async"
+              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async; trackBy: trackByWallet"
               [wallet]="subWallet"
               [parentWalletName]="walletGroup.mainWallet.protocol.name"
               [hideBalances]="isBalanceHidden"

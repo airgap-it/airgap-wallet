@@ -12,7 +12,7 @@
   <ng-container *ngIf="!isSimplified">
     <ion-label class="protocol__container">
       <ion-text color="black">
-        <p class="font--weight__bold" *ngIf="balance; else syncingHeading">
+        <p class="font--weight__bold" *ngIf="balance || syncFailed; else syncingHeading">
           {{wallet.protocol.name}}
         </p>
       </ion-text>
@@ -64,9 +64,14 @@
         </ion-text>
       </ng-container>
       <ng-template #syncingPrice>
-        <p>
+        <p *ngIf="!syncFailed; else syncFailedText">
           <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
+      </ng-template>
+      <ng-template #syncFailedText>
+        <ion-text color="blackLight">
+          <p class="font--weight__bold porfolio-item__margin">&ndash; {{ wallet.protocol.symbol }}</p>
+        </ion-text>
       </ng-template>
 
       <ng-container *ngIf="balance && marketPrice; else syncingBalance">
@@ -78,7 +83,7 @@
         </ion-text>
       </ng-container>
       <ng-template #syncingBalance>
-        <p>
+        <p *ngIf="!syncFailed && !(balance && marketPrice === undefined)">
           <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
       </ng-template>
