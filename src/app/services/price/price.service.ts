@@ -27,6 +27,9 @@ export class PriceService implements AirGapWalletPriceService {
   private readonly baseURL: string = 'https://crypto-prices-api.prod.gke.papers.tech'
   private readonly pendingMarketPriceRequests: Map<string, Promise<BigNumber>> = new Map()
   private readonly marketPriceCache: Map<string, { price: BigNumber; timestamp: number }> = new Map()
+  /** Symbols whose last lookup failed, with the time before which we do not retry. */
+  private readonly marketPriceRetryAfter: Map<string, number> = new Map()
+  private readonly MARKET_PRICE_RETRY_DELAY_MS: number = 2 * 60 * 1000
   private marketPriceBatch: { symbols: Set<string>; promise: Promise<Map<string, number>> } | undefined = undefined
   private readonly MARKET_PRICE_CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
   private readonly MARKET_PRICE_BATCH_WINDOW_MS = 50
@@ -116,6 +119,13 @@ export class PriceService implements AirGapWalletPriceService {
       return cached.price
     }
 
+    // A symbol no price source knows (or a source that is down) would otherwise be
+    // re-requested on every refresh; back off for a while instead.
+    const retryAfter = this.marketPriceRetryAfter.get(cacheKey)
+    if (retryAfter !== undefined && Date.now() < retryAfter) {
+      return cached !== undefined ? cached.price : new BigNumber(NaN)
+    }
+
     const pendingRequest = this.pendingMarketPriceRequests.get(cacheKey)
     if (pendingRequest !== undefined) {
       return pendingRequest
@@ -125,10 +135,12 @@ export class PriceService implements AirGapWalletPriceService {
       .then((price: BigNumber | undefined) => {
         if (price !== undefined && !price.isNaN()) {
           this.marketPriceCache.set(cacheKey, { price, timestamp: Date.now() })
+          this.marketPriceRetryAfter.delete(cacheKey)
           return price
         }
         // Request failed: fall back to the last known price if we have one, otherwise
         // signal "unknown" with NaN. Never leave the caller hanging.
+        this.marketPriceRetryAfter.set(cacheKey, Date.now() + this.MARKET_PRICE_RETRY_DELAY_MS)
         return cached !== undefined ? cached.price : new BigNumber(NaN)
       })
       .finally(() => {
