@@ -301,7 +301,7 @@ export class AccountProvider {
       {}
     )
 
-    const walletInitPromises: Promise<void>[] = []
+    const walletsToInitialize: AirGapMarketWallet[] = []
 
     // read groups
     await Promise.all(
@@ -317,7 +317,7 @@ export class AccountProvider {
               walletMap[walletIdentifier] = undefined
               const airGapWallet = await this.readSerializedWallet(serializedWallet)
               if (airGapWallet !== undefined) {
-                walletInitPromises.push(this.initializeWallet(airGapWallet))
+                walletsToInitialize.push(airGapWallet)
               }
               return airGapWallet
             })
@@ -338,7 +338,7 @@ export class AccountProvider {
           .map(async (serializedWallet: SerializedAirGapWallet) => {
             const airGapWallet = await this.readSerializedWallet(serializedWallet)
             if (airGapWallet !== undefined) {
-              walletInitPromises.push(this.initializeWallet(airGapWallet))
+              walletsToInitialize.push(airGapWallet)
             }
             return airGapWallet
           })
@@ -350,9 +350,11 @@ export class AccountProvider {
       this.walletGroups.set(others.id, others)
     }
 
-    Promise.all(walletInitPromises).then(() => {
-      this.triggerWalletChanged()
-    })
+    this.initializeWallets(walletsToInitialize)
+      .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
+      .finally(() => {
+        this.triggerWalletChanged()
+      })
 
     if (this.allWallets.length > 0) {
       this.pushProvider.setupPush()
@@ -400,29 +402,76 @@ export class AccountProvider {
     }
   }
 
-  private async initializeWallet(airGapWallet: AirGapMarketWallet): Promise<void> {
-    try {
-      const identifier = await airGapWallet.protocol.getIdentifier()
-      // if we have no addresses, derive using webworker and sync, else just sync
-      // TODO: configure it on the protocol level
-      const includedProtocols = [MainProtocolSymbols.BTC, MainProtocolSymbols.BTC_SEGWIT, MainProtocolSymbols.GRS]
-      const isWalletIncluded = includedProtocols.some((protocolSymbol: ProtocolSymbols) => identifier.startsWith(protocolSymbol))
-      if (
-        airGapWallet.addresses.length === 0 ||
-        (airGapWallet.isExtendedPublicKey && isWalletIncluded && airGapWallet.addresses.length < 20)
-      ) {
-        const addresses = await this.modulesService.deriveAddresses(airGapWallet)
-        const key = `${identifier}_${airGapWallet.publicKey}`
-        airGapWallet.addresses = addresses[key]
-        if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
-          await airGapWallet.synchronize()
+  /**
+   * Derives missing addresses for all wallets in one worker round trip, syncs every
+   * active wallet, and persists newly derived addresses so the derivation does not
+   * repeat on the next launch.
+   */
+  private async initializeWallets(wallets: AirGapMarketWallet[]): Promise<void> {
+    const walletsNeedingAddresses: AirGapMarketWallet[] = []
+    const walletsReadyToSync: AirGapMarketWallet[] = []
+
+    await Promise.all(
+      wallets.map(async (wallet: AirGapMarketWallet) => {
+        if (await this.needsAddressDerivation(wallet)) {
+          walletsNeedingAddresses.push(wallet)
+        } else {
+          walletsReadyToSync.push(wallet)
         }
-      } else if (airGapWallet.status === AirGapWalletStatus.ACTIVE) {
-        await airGapWallet.synchronize()
+      })
+    )
+
+    // Wallets that already have addresses start syncing right away while the
+    // remaining ones derive their addresses in the worker.
+    const readySync: Promise<void> = this.synchronizeWallets(walletsReadyToSync)
+
+    let derivedAny: boolean = false
+    if (walletsNeedingAddresses.length > 0) {
+      try {
+        const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(walletsNeedingAddresses)
+        await Promise.all(
+          walletsNeedingAddresses.map(async (wallet: AirGapMarketWallet) => {
+            const identifier = await wallet.protocol.getIdentifier()
+            const derived: string[] | undefined = addresses[`${identifier}_${wallet.publicKey}`]
+            if (derived !== undefined && derived.length > 0) {
+              wallet.addresses = derived
+              derivedAny = true
+            }
+          })
+        )
+      } catch (error) {
+        console.error(error)
       }
-    } catch (error) {
-      console.error(error)
     }
+
+    const derivedSync: Promise<void> = this.synchronizeWallets(walletsNeedingAddresses)
+
+    if (derivedAny) {
+      await this.persist().catch(handleErrorSentry(ErrorCategory.STORAGE))
+    }
+
+    await Promise.all([readySync, derivedSync])
+  }
+
+  private async needsAddressDerivation(wallet: AirGapMarketWallet): Promise<boolean> {
+    if (wallet.addresses.length === 0) {
+      return true
+    }
+
+    // TODO: configure it on the protocol level
+    const identifier = await wallet.protocol.getIdentifier()
+    const includedProtocols = [MainProtocolSymbols.BTC, MainProtocolSymbols.BTC_SEGWIT, MainProtocolSymbols.GRS]
+    const isWalletIncluded = includedProtocols.some((protocolSymbol: ProtocolSymbols) => identifier.startsWith(protocolSymbol))
+
+    return wallet.isExtendedPublicKey && isWalletIncluded && wallet.addresses.length < 20
+  }
+
+  private async synchronizeWallets(wallets: AirGapMarketWallet[]): Promise<void> {
+    await Promise.all(
+      wallets
+        .filter((wallet: AirGapMarketWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+        .map((wallet: AirGapMarketWallet) => wallet.synchronize().catch((error) => console.error(error)))
+    )
   }
 
   public getWalletList(): AirGapMarketWallet[] {
