@@ -28,6 +28,10 @@ export class PortfolioPage {
   public isTotalIncomplete: boolean = false
   public syncWarningNames: string[] = []
 
+  /** Entering the page re-syncs only wallets that were not synced within this window. */
+  private static readonly AUTO_REFRESH_INTERVAL_MS = 60000
+  private static readonly SYNC_TIMEOUT_MS = 10000
+
   public total: number = 0
   public changePercentage: number = 0
 
@@ -112,7 +116,7 @@ export class PortfolioPage {
 
   public async ionViewDidEnter() {
     this.isBalanceHidden = await this.storageService.get(WalletStorageKey.BALANCE_HIDDEN)
-    this.doRefresh().catch(handleErrorSentry())
+    this.doRefresh(null, PortfolioPage.AUTO_REFRESH_INTERVAL_MS).catch(handleErrorSentry())
   }
 
   public async toggleBalanceVisibility() {
@@ -149,11 +153,29 @@ export class PortfolioPage {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async doRefresh(event: any = null) {
-    this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getActiveWalletList())
+  /**
+   * Re-syncs the active wallets. Pull-to-refresh (`maxAgeMs = 0`) syncs every
+   * wallet; entering the page passes an age so wallets synced a moment ago (for
+   * example by the account provider on startup) are not fetched again.
+   */
+  public async doRefresh(event: any = null, maxAgeMs: number = 0) {
+    const now = Date.now()
+    const activeWallets = this.walletsProvider.getActiveWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+    const wallets = activeWallets.filter((wallet) => {
+      const lastAttempt = this.walletsProvider.getLastSyncAttempt(wallet)
+      return lastAttempt === undefined || now - lastAttempt >= maxAgeMs
+    })
 
-    const SYNC_TIMEOUT_MS = 10000
-    const wallets = this.walletsProvider.getActiveWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+    if (wallets.length === 0) {
+      await this.calculateTotal(activeWallets)
+      if (event?.target) {
+        event.target.complete()
+      }
+      return
+    }
+
+    this.operationsProvider.refreshAllDelegationStatuses(wallets)
+
     const failedNames: Set<string> = new Set()
 
     this.isSyncing = true
@@ -161,7 +183,7 @@ export class PortfolioPage {
     await Promise.all(
       wallets.map(async (wallet) => {
         try {
-          await promiseTimeout(SYNC_TIMEOUT_MS, wallet.synchronize())
+          await promiseTimeout(PortfolioPage.SYNC_TIMEOUT_MS, this.walletsProvider.synchronizeWallet(wallet))
         } catch (error) {
           handleErrorSentry(ErrorCategory.COINLIB)(error)
           failedNames.add(wallet.protocol.name)
@@ -174,7 +196,7 @@ export class PortfolioPage {
 
     this.isSyncing = false
     this.syncWarningNames = [...failedNames]
-    await this.calculateTotal(wallets)
+    await this.calculateTotal(activeWallets)
 
     if (event?.target) {
       event.target.complete()

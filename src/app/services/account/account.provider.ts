@@ -70,6 +70,7 @@ export class AccountProvider {
   private readonly activeGroup$: ReplaySubject<ActiveWalletGroup> = new ReplaySubject(1)
   private readonly walletGroups: Map<string | undefined, AirGapMarketWalletGroup> = new Map()
   private readonly walletSyncSources: Map<string, SyncSource> = new Map()
+  private readonly lastSyncAttempts: WeakMap<AirGapMarketWallet, number> = new WeakMap()
 
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
 
@@ -470,8 +471,26 @@ export class AccountProvider {
     await Promise.all(
       wallets
         .filter((wallet: AirGapMarketWallet) => wallet.status === AirGapWalletStatus.ACTIVE)
-        .map((wallet: AirGapMarketWallet) => wallet.synchronize().catch((error) => console.error(error)))
+        .map((wallet: AirGapMarketWallet) => this.synchronizeWallet(wallet).catch((error) => console.error(error)))
     )
+  }
+
+  /**
+   * Syncs a wallet's balance and market price and records when the attempt was
+   * made, so views can avoid re-syncing wallets that were refreshed a moment ago.
+   */
+  public synchronizeWallet(wallet: AirGapMarketWallet): Promise<void> {
+    this.lastSyncAttempts.set(wallet, Date.now())
+
+    return wallet.synchronize()
+  }
+
+  /**
+   * Timestamp (ms) of the last `synchronizeWallet` call for this wallet, or
+   * `undefined` if it was never synced through the provider.
+   */
+  public getLastSyncAttempt(wallet: AirGapMarketWallet): number | undefined {
+    return this.lastSyncAttempts.get(wallet)
   }
 
   public getWalletList(): AirGapMarketWallet[] {
