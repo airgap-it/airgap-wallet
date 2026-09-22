@@ -78,6 +78,7 @@ import { CurrencyService } from './services/currency/currency.service'
 import { setAppInjector } from './extensions/delegation/base/ProtocolDelegationExtensions'
 import { LanguagesType, WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
+import { promiseTimeout } from './helpers/promise'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID, getProtocolAndNetworkIdentifier } from './utils/utils'
 
@@ -89,8 +90,12 @@ register()
   templateUrl: 'app.component.html'
 })
 export class AppComponent implements AfterViewInit {
-  private static readonly SPLASH_SCREEN_TIMEOUT_MS: number = 10000
+  /** After this, the app starts without waiting for the remaining initializers. */
+  private static readonly INITIALIZATION_TIMEOUT_MS: number = 10000
   private splashScreenHidden: boolean = false
+
+  /** Initializers that have not finished yet, reported to Sentry if startup times out. */
+  private readonly pendingInitializers: Set<string> = new Set()
 
   public isMobile: boolean = false
   public isElectron: boolean = false
@@ -136,34 +141,38 @@ export class AppComponent implements AfterViewInit {
   // })
 
   public async initializeApp(): Promise<void> {
-    // The splash screen is configured with `launchAutoHide: false`, so the app has
-    // to hide it itself. Hide it no matter how the initialization ends: a rejected
-    // or hanging initializer must never leave the user stuck on the splash screen.
-    const splashWatchdog: ReturnType<typeof setTimeout> = setTimeout(() => {
-      handleErrorSentry(ErrorCategory.OTHER)(new Error('App initialization did not finish in time, hiding the splash screen'))
-      this.hideSplashScreen()
-    }, AppComponent.SPLASH_SCREEN_TIMEOUT_MS)
-
+    // The splash screen is configured with `launchAutoHide: false`, so the app has to
+    // hide it itself. Make sure that happens no matter how the initialization ends: a
+    // rejected or hanging initializer must never leave the user on the splash screen.
     try {
-      await Promise.all([
-        this.initializeTranslations().catch(handleErrorSentry(ErrorCategory.OTHER)),
-        this.platform.ready(),
-        this.initializeProtocols(),
-        this.initializeWalletConnect().catch(handleErrorSentry(ErrorCategory.OTHER)),
-        this.currencyService.init().catch(handleErrorSentry(ErrorCategory.STORAGE))
-      ])
+      await promiseTimeout(
+        AppComponent.INITIALIZATION_TIMEOUT_MS,
+        Promise.all([
+          this.trackInitializer('translations', this.initializeTranslations()).catch(handleErrorSentry(ErrorCategory.OTHER)),
+          this.trackInitializer('platform', this.platform.ready()),
+          this.trackInitializer('protocols', this.initializeProtocols()),
+          this.trackInitializer('walletconnect', this.initializeWalletConnect()).catch(handleErrorSentry(ErrorCategory.OTHER)),
+          this.trackInitializer('currencies', this.currencyService.init()).catch(handleErrorSentry(ErrorCategory.STORAGE))
+        ])
+      )
+    } catch (error) {
+      handleErrorSentry(ErrorCategory.OTHER)(
+        new Error(`App initialization did not finish (${[...this.pendingInitializers].join(', ') || 'none'} pending): ${error}`)
+      )
     } finally {
-      clearTimeout(splashWatchdog)
       this.hideSplashScreen()
     }
     // this._waitReadyResolve()
 
     this.themeService.register()
 
-    this.themeService.statusBarStyleDark(await this.themeService.isDarkMode())
+    this.themeService
+      .isDarkMode()
+      .then((isDarkMode: boolean) => this.themeService.statusBarStyleDark(isDarkMode))
+      .catch(handleErrorSentry(ErrorCategory.OTHER))
 
     if (this.platform.is('hybrid')) {
-      await this.pushProvider.initPush()
+      this.pushProvider.initPush().catch(handleErrorSentry(ErrorCategory.PUSH))
 
       this.appInfo
         .get()
@@ -173,12 +182,7 @@ export class AppComponent implements AfterViewInit {
         .catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
     }
 
-    let userId: string = await this.storageProvider.get(WalletStorageKey.USER_ID)
-    if (!userId) {
-      userId = generateGUID()
-      this.storageProvider.set(WalletStorageKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
-    }
-    setSentryUser(userId)
+    this.initializeUserId().catch(handleErrorSentry(ErrorCategory.STORAGE))
 
     const url: URL = new URL(location.href)
 
@@ -201,7 +205,18 @@ export class AppComponent implements AfterViewInit {
         this.storageProvider.setCache('mtperelin-currencies', result)
       })
 
+    // Everything below this point loads wallets and data, nothing here may block on
+    // an optional service anymore.
     this.appSerivce.setReady()
+  }
+
+  private async initializeUserId(): Promise<void> {
+    let userId: string = await this.storageProvider.get(WalletStorageKey.USER_ID)
+    if (!userId) {
+      userId = generateGUID()
+      this.storageProvider.set(WalletStorageKey.USER_ID, userId).catch(handleErrorSentry(ErrorCategory.STORAGE))
+    }
+    setSentryUser(userId)
   }
 
   public async ngAfterViewInit(): Promise<void> {
@@ -272,6 +287,15 @@ export class AppComponent implements AfterViewInit {
     this.router.navigateByUrl(`/transaction-qr/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  /** Remembers that `promise` is still running, so a startup timeout can name it. */
+  private trackInitializer<T>(name: string, promise: Promise<T>): Promise<T> {
+    this.pendingInitializers.add(name)
+
+    return promise.finally(() => {
+      this.pendingInitializers.delete(name)
+    })
+  }
+
   private hideSplashScreen(): void {
     if (this.splashScreenHidden || !this.platform.is('hybrid')) {
       return
@@ -312,24 +336,30 @@ export class AppComponent implements AfterViewInit {
       new AcurastModule(),
       new StellarModule()
     ])
-    const v1Protocols = await this.modulesService.loadProtocols('online', [
+    const v1Protocols = await this.trackInitializer(
+      'protocols.load',
+      this.modulesService.loadProtocols('online', [
       MainProtocolSymbols.XTZ_SHIELDED,
       SubProtocolSymbols.XTZ_STKR,
-      SubProtocolSymbols.XTZ_W
-    ])
-    await this.protocolService.init({
-      activeProtocols: v1Protocols.activeProtocols,
-      passiveProtocols: v1Protocols.passiveProtocols,
-      activeSubProtocols: v1Protocols.activeSubProtocols,
-      passiveSubProtocols: v1Protocols.passiveSubProtocols
-    })
+        SubProtocolSymbols.XTZ_W
+      ])
+    )
+    await this.trackInitializer(
+      'protocols.init',
+      this.protocolService.init({
+        activeProtocols: v1Protocols.activeProtocols,
+        passiveProtocols: v1Protocols.passiveProtocols,
+        activeSubProtocols: v1Protocols.activeSubProtocols,
+        passiveSubProtocols: v1Protocols.passiveSubProtocols
+      })
+    )
 
     // None of these is required for the app to start; a failure in one must not
     // prevent the others (or the app) from initializing.
     await Promise.all([
-      this.initSaplingProtocols().catch(handleErrorSentry(ErrorCategory.COINLIB)),
-      this.getGenericSubProtocols().catch(handleErrorSentry(ErrorCategory.STORAGE)),
-      this.initializeTezosDomains().catch(handleErrorSentry(ErrorCategory.COINLIB))
+      this.trackInitializer('protocols.sapling', this.initSaplingProtocols()).catch(handleErrorSentry(ErrorCategory.COINLIB)),
+      this.trackInitializer('protocols.generic', this.getGenericSubProtocols()).catch(handleErrorSentry(ErrorCategory.STORAGE)),
+      this.trackInitializer('protocols.tezosDomains', this.initializeTezosDomains()).catch(handleErrorSentry(ErrorCategory.COINLIB))
     ])
   }
 
