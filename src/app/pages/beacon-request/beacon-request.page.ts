@@ -272,6 +272,10 @@ export class BeaconRequestPage implements OnInit {
       type OmitBeaconMessageWrapper = Omit<BeaconMessageWrapper<SubstratePermissionResponse>, 'version' | 'senderId'>
 
       localStorage.setItem(`beacon_acurast_selected_address:${request.senderId}`, this.selectedWallet.addresses[0])
+      // Remember which address this accountId maps to, so later sign requests
+      // can target the exact account the dApp asks for (a pairing can hold
+      // several accounts at once).
+      this.storeAcurastAccount(request.senderId, accountId, this.selectedWallet.addresses[0])
 
       const response: OmitBeaconMessageWrapper = {
         id: accountId,
@@ -382,13 +386,24 @@ export class BeaconRequestPage implements OnInit {
       (wallet: AirGapMarketWallet) => wallet.protocol.identifier === MainProtocolSymbols.ACURAST
     )
 
-    const selectedAddress = localStorage.getItem(`beacon_acurast_selected_address:${request.senderId}`)
+    // Resolve the account the dApp explicitly requested. A single pairing can
+    // hold several accounts; the dApp targets one via the request's accountId.
+    // Fall back to the last permissioned address, then to the first wallet, so
+    // older dApps that don't set accountId keep working.
+    const requestedAccountId = (request.message as any).accountId as string | undefined
+    const mappedAddress = requestedAccountId
+      ? this.readAcurastAccountAddress(request.senderId, requestedAccountId)
+      : undefined
+    const selectedAddress = mappedAddress ?? localStorage.getItem(`beacon_acurast_selected_address:${request.senderId}`)
 
     if (selectedAddress) {
-      selectedWallet = this.selectableWallets.find(
+      const match = this.selectableWallets.find(
         (wallet: AirGapMarketWallet) =>
           wallet.protocol.identifier === MainProtocolSymbols.ACURAST && wallet.addresses[0] === selectedAddress
       )
+      if (match) {
+        selectedWallet = match
+      }
     }
 
     const payload = request.message.blockchainData.payload as {
@@ -423,6 +438,42 @@ export class BeaconRequestPage implements OnInit {
 
     this.responseHandler = async () => {
       this.accountService.startInteraction(selectedWallet, clonedRequest, IACMessageType.MessageSignRequest, undefined, false, generatedId)
+    }
+  }
+
+  /**
+   * Per-pairing map of Acurast accountId -> address. A single Beacon pairing can
+   * grant several accounts; the dApp targets one via the sign request's
+   * accountId, so we persist this mapping at permission time and resolve it when
+   * signing.
+   */
+  private acurastAccountsStorageKey(senderId: string): string {
+    return `beacon_acurast_accounts:${senderId}`
+  }
+
+  private storeAcurastAccount(senderId: string, accountId: string, address: string): void {
+    if (!accountId) {
+      return
+    }
+    const map = this.readAcurastAccounts(senderId)
+    map[accountId] = address
+    localStorage.setItem(this.acurastAccountsStorageKey(senderId), JSON.stringify(map))
+  }
+
+  private readAcurastAccountAddress(senderId: string, accountId: string): string | undefined {
+    return this.readAcurastAccounts(senderId)[accountId]
+  }
+
+  private readAcurastAccounts(senderId: string): Record<string, string> {
+    try {
+      const raw = localStorage.getItem(this.acurastAccountsStorageKey(senderId))
+      if (!raw) {
+        return {}
+      }
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {}
     }
   }
 
