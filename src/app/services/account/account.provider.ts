@@ -212,6 +212,17 @@ export class AccountProvider {
       })
 
     walletMap.forEach((value: MainWalletGroup) => {
+      // Sub wallets used to be filtered by the main wallet's network in the template,
+      // where a pure pipe was called with a freshly created argument object on every
+      // change detection cycle. That returned a new promise each time, which the async
+      // pipe resolved into yet another change detection run, for every group.
+      const network = value.mainWallet?.protocol?.options?.network
+      if (network !== undefined) {
+        value.subWallets = value.subWallets.filter(
+          (subWallet: AirGapMarketWallet) => subWallet.protocol.options.network.identifier === network.identifier
+        )
+      }
+
       groups.push(value)
     })
 

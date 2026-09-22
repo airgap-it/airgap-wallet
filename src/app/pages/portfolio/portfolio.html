@@ -111,10 +111,10 @@
     </ion-toolbar>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-    <ng-container *ngIf="walletGroups | async as walletGroupsArray; else loading">
-      <ng-container *ngIf="walletGroupsArray.length; else noItems">
+    <ng-container *ngIf="hasGroups !== undefined; else loading">
+      <ng-container *ngIf="hasGroups; else noItems">
         <ion-list class="walletGroups ion-no-padding" lines="none">
-          <ion-card *ngFor="let walletGroup of walletGroupsArray; trackBy: trackByGroup">
+          <ion-card *ngFor="let walletGroup of visibleGroups; trackBy: trackByGroup">
             <portfolio-item
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
@@ -124,9 +124,9 @@
               (click)="openDetail(walletGroup.mainWallet)"
             ></portfolio-item>
             <portfolio-item
-              *ngFor="let subWallet of walletGroup.subWallets | walletFilter: { network: walletGroup.mainWallet?.protocol?.options?.network } | async; trackBy: trackByWallet"
+              *ngFor="let subWallet of walletGroup.subWallets; trackBy: trackByWallet"
               [wallet]="subWallet"
-              [parentWalletName]="walletGroup.mainWallet.protocol.name"
+              [parentWalletName]="walletGroup.mainWallet?.protocol?.name"
               [hideBalances]="isBalanceHidden"
               tappable
               (click)="openDetail(walletGroup.mainWallet, subWallet)"

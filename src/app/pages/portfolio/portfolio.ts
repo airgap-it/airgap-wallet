@@ -37,8 +37,18 @@ export class PortfolioPage {
 
   public wallets: Observable<AirGapMarketWallet[]>
   public activeWallets: Observable<AirGapMarketWallet[]>
-  public walletGroups: Observable<MainWalletGroup[]>
   public isDesktop: boolean = false
+
+  /** Groups currently in the DOM. Grows in chunks, see `renderGroups`. */
+  public visibleGroups: MainWalletGroup[] = []
+  /** `undefined` until the first groups arrive, so the skeleton is shown until then. */
+  public hasGroups: boolean | undefined = undefined
+
+  /** Number of groups added to the DOM per frame. */
+  private static readonly RENDER_CHUNK_SIZE = 12
+
+  private allGroups: MainWalletGroup[] = []
+  private renderHandle: number | undefined
 
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
 
@@ -69,7 +79,10 @@ export class PortfolioPage {
 
     this.wallets = this.walletsProvider.wallets$.asObservable()
     this.activeWallets = this.wallets.pipe(map((wallets) => wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE) ?? []))
-    this.walletGroups = walletsProvider.walletsGroupedByMainWallet$
+    const groupSub = this.walletsProvider.walletsGroupedByMainWallet$.subscribe((groups: MainWalletGroup[]) => {
+      this.renderGroups(groups)
+    })
+    this.subscriptions.push(groupSub)
 
     // If a wallet gets added or removed, recalculate all values
     const walletSub = this.wallets.subscribe(() => {
@@ -122,6 +135,44 @@ export class PortfolioPage {
   public async toggleBalanceVisibility() {
     this.isBalanceHidden = !this.isBalanceHidden
     await this.storageService.set(WalletStorageKey.BALANCE_HIDDEN, this.isBalanceHidden)
+  }
+
+  /**
+   * Renders the wallet groups in chunks instead of all at once. Creating a few
+   * hundred portfolio items in a single change detection pass blocks the main
+   * thread for over a second; one chunk per frame keeps the page responsive and
+   * shows the first accounts immediately.
+   */
+  private renderGroups(groups: MainWalletGroup[]): void {
+    this.cancelProgressiveRender()
+
+    this.allGroups = groups
+    this.hasGroups = groups.length > 0
+
+    const initialCount = Math.max(this.visibleGroups.length, PortfolioPage.RENDER_CHUNK_SIZE)
+    this.visibleGroups = groups.slice(0, initialCount)
+
+    this.scheduleNextChunk()
+  }
+
+  private scheduleNextChunk(): void {
+    if (this.visibleGroups.length >= this.allGroups.length) {
+      this.renderHandle = undefined
+      return
+    }
+
+    this.renderHandle = requestAnimationFrame(() => {
+      this.renderHandle = undefined
+      this.visibleGroups = this.allGroups.slice(0, this.visibleGroups.length + PortfolioPage.RENDER_CHUNK_SIZE)
+      this.scheduleNextChunk()
+    })
+  }
+
+  private cancelProgressiveRender(): void {
+    if (this.renderHandle !== undefined) {
+      cancelAnimationFrame(this.renderHandle)
+      this.renderHandle = undefined
+    }
   }
 
   public trackByGroup(_index: number, group: MainWalletGroup): string {
@@ -247,6 +298,7 @@ export class PortfolioPage {
   }
 
   public ngOnDestroy(): void {
+    this.cancelProgressiveRender()
     for (const sub of this.subscriptions) {
       sub.unsubscribe()
     }
