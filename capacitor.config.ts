@@ -10,7 +10,11 @@ const config: CapacitorConfig = {
       presentationOptions: ['alert']
     },
     SplashScreen: {
-      launchAutoHide: false,
+      // The app hides the splash screen itself once it is ready, see AppComponent.
+      // The duration is only a backstop: if the web layer never gets that far, the
+      // native side hides it anyway instead of leaving the user on the splash forever.
+      launchAutoHide: true,
+      launchShowDuration: 15000,
       androidSplashResourceName: 'screen'
     }
   },

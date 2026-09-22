@@ -10,7 +10,8 @@
 			]
 		},
 		"SplashScreen": {
-			"launchAutoHide": false,
+			"launchAutoHide": true,
+			"launchShowDuration": 15000,
 			"androidSplashResourceName": "screen"
 		}
 	},
