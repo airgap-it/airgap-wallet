@@ -7,7 +7,7 @@ import { Platform } from '@ionic/angular'
 import { ProtocolService } from '@airgap/angular-core'
 import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
-import { map } from 'rxjs/operators'
+import { auditTime, map } from 'rxjs/operators'
 import { promiseTimeout } from '../../helpers/promise'
 import { ShopService } from 'src/app/services/shop/shop.service'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
@@ -25,12 +25,16 @@ import { WalletStorageKey, WalletStorageService } from '../../services/storage/s
 export class PortfolioPage {
   public isVisible: boolean = false
   public isSyncing: boolean = false
+  /** True while the account provider is still syncing wallets on its own. */
+  public isProviderSyncing: boolean = false
   public isTotalIncomplete: boolean = false
   public syncWarningNames: string[] = []
 
   /** Entering the page re-syncs only wallets that were not synced within this window. */
   private static readonly AUTO_REFRESH_INTERVAL_MS = 60000
   private static readonly SYNC_TIMEOUT_MS = 10000
+  /** Wallets finish syncing one by one; recalculate the total at most this often. */
+  private static readonly TOTAL_RECALCULATION_INTERVAL_MS = 500
 
   public total: number = 0
   public changePercentage: number = 0
@@ -89,10 +93,24 @@ export class PortfolioPage {
       this.calculateTotal(this.walletsProvider.getActiveWalletList())
     })
     this.subscriptions.push(walletSub)
-    const walletChangedSub = this.walletsProvider.walletChangedObservable.subscribe(() => {
-      this.calculateTotal(this.walletsProvider.getActiveWalletList())
-    })
+    // Each wallet reports separately as it finishes syncing, so the total is
+    // recalculated on a timer instead of once per wallet.
+    const walletChangedSub = this.walletsProvider.walletChangedObservable
+      .pipe(auditTime(PortfolioPage.TOTAL_RECALCULATION_INTERVAL_MS))
+      .subscribe(() => {
+        this.calculateTotal(this.walletsProvider.getActiveWalletList())
+      })
     this.subscriptions.push(walletChangedSub)
+
+    // Keeps the skeleton up while the provider is still loading balances, and
+    // settles the total once it is done.
+    const syncingSub = this.walletsProvider.syncingObservable.subscribe((isSyncing: boolean) => {
+      this.isProviderSyncing = isSyncing
+      if (!isSyncing) {
+        this.calculateTotal(this.walletsProvider.getActiveWalletList())
+      }
+    })
+    this.subscriptions.push(syncingSub)
 
     this.shopService.getShopData().then((response) => {
       this.shopBannerText = ''
@@ -293,8 +311,9 @@ export class PortfolioPage {
     this.total = runningTotal.toNumber()
     this.isTotalIncomplete = incomplete
     // Show the total once something has loaded; keep the skeleton only while
-    // nothing has arrived yet and a sync is still running.
-    this.isVisible = this.isVisible || loadedCount > 0 || wallets.length === 0 || !this.isSyncing
+    // nothing has arrived yet and a sync is still running, either the page's own
+    // one or the provider's initial one.
+    this.isVisible = this.isVisible || loadedCount > 0 || wallets.length === 0 || (!this.isSyncing && !this.isProviderSyncing)
   }
 
   public ngOnDestroy(): void {

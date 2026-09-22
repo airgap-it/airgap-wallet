@@ -16,12 +16,13 @@ import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { PushNotificationSchema } from '@capacitor/push-notifications'
 import { AlertController, LoadingController, PopoverController, ToastController } from '@ionic/angular'
-import { Observable, ReplaySubject, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs'
 import { auditTime, map, take } from 'rxjs/operators'
 
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
 import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup, SyncSource } from '../../models/AirGapMarketWalletGroup'
+import { promiseTimeout } from '../../helpers/promise'
 import { isSubProtocol, isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
@@ -72,6 +73,15 @@ export class AccountProvider {
   private readonly walletSyncSources: Map<string, SyncSource> = new Map()
   private readonly lastSyncAttempts: WeakMap<AirGapMarketWallet, number> = new WeakMap()
 
+  /** Wallets currently being synced by the provider. */
+  private readonly syncingWallets: Set<AirGapMarketWallet> = new Set()
+  /** True until the wallets loaded on startup have been synced once. */
+  private initialSyncPending: boolean = true
+  private readonly syncingBehaviour: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true)
+
+  /** A single protocol client that never answers must not hold up the whole sync. */
+  private static readonly SYNC_TIMEOUT_MS: number = 20000
+
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
 
   public refreshPageSubject: Subject<void> = new Subject()
@@ -84,6 +94,22 @@ export class AccountProvider {
   public usedProtocols$: ReplaySubject<ICoinProtocol[]> = new ReplaySubject(1)
 
   private readonly walletChangedBehaviour: Subject<void> = new Subject()
+
+  /** Emits whether the provider is currently syncing any wallet. */
+  public get syncingObservable(): Observable<boolean> {
+    return this.syncingBehaviour.asObservable()
+  }
+
+  public isSyncing(): boolean {
+    return this.initialSyncPending || this.syncingWallets.size > 0
+  }
+
+  private updateSyncingState(): void {
+    const isSyncing: boolean = this.isSyncing()
+    if (isSyncing !== this.syncingBehaviour.value) {
+      this.syncingBehaviour.next(isSyncing)
+    }
+  }
 
   public get walletChangedObservable() {
     return this.walletChangedBehaviour.asObservable().pipe(auditTime(50))
@@ -122,7 +148,12 @@ export class AccountProvider {
       .then(() => {
         this.walletsHaveLoaded.next(true)
       })
-      .catch(console.error)
+      .catch((error) => {
+        // Nothing will be synced, so views must not keep waiting for it.
+        this.initialSyncPending = false
+        this.updateSyncingState()
+        console.error(error)
+      })
     this.wallets$.pipe(map((wallets) => wallets.filter((wallet) => 'subProtocolType' in wallet.protocol))).subscribe(this.subWallets$)
     this.wallets$.pipe(map((wallets) => this.getProtocolsFromWallets(wallets))).subscribe(this.usedProtocols$)
     this.walletsGroupedByMainWallet$ = this.wallets$.pipe(map((wallets) => this.walletsByMainWallet(wallets)))
@@ -365,6 +396,8 @@ export class AccountProvider {
     this.initializeWallets(walletsToInitialize)
       .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
       .finally(() => {
+        this.initialSyncPending = false
+        this.updateSyncingState()
         this.triggerWalletChanged()
       })
 
@@ -489,11 +522,27 @@ export class AccountProvider {
   /**
    * Syncs a wallet's balance and market price and records when the attempt was
    * made, so views can avoid re-syncing wallets that were refreshed a moment ago.
+   * Notifies subscribers as soon as this wallet is done, and gives up after
+   * `SYNC_TIMEOUT_MS` so an unreachable node cannot stall the sync indefinitely.
    */
   public synchronizeWallet(wallet: AirGapMarketWallet): Promise<void> {
     this.lastSyncAttempts.set(wallet, Date.now())
 
-    return wallet.synchronize()
+    this.syncingWallets.add(wallet)
+    this.updateSyncingState()
+
+    const synchronization: Promise<void> = wallet.synchronize()
+    // A wallet that answers after we stopped waiting for it should still show up.
+    synchronization.then(() => this.triggerWalletChanged()).catch(() => undefined)
+
+    return promiseTimeout(AccountProvider.SYNC_TIMEOUT_MS, synchronization).finally(() => {
+      this.syncingWallets.delete(wallet)
+      this.updateSyncingState()
+      // Views read the wallet state on this event. Emitting per wallet instead of
+      // once all of them are done lets balances and the total add up as they arrive
+      // (emissions are coalesced by `walletChangedObservable`).
+      this.triggerWalletChanged()
+    })
   }
 
   /**

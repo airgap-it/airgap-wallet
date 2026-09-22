@@ -34,7 +34,7 @@
               <ion-icon [name]="isBalanceHidden ? 'eye-outline' : 'eye-off-outline'" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
-          <div *ngIf="syncWarningNames.length > 0 || (isTotalIncomplete && !isSyncing)" class="sync-warning">
+          <div *ngIf="syncWarningNames.length > 0 || (isTotalIncomplete && !isSyncing && !isProviderSyncing)" class="sync-warning">
             <ion-icon name="alert-circle-outline"></ion-icon>
             <span>{{ 'portfolio.sync-warning' | translate }}</span>
           </div>
