@@ -89,6 +89,9 @@ register()
   templateUrl: 'app.component.html'
 })
 export class AppComponent implements AfterViewInit {
+  private static readonly SPLASH_SCREEN_TIMEOUT_MS: number = 10000
+  private splashScreenHidden: boolean = false
+
   public isMobile: boolean = false
   public isElectron: boolean = false
 
@@ -133,13 +136,26 @@ export class AppComponent implements AfterViewInit {
   // })
 
   public async initializeApp(): Promise<void> {
-    await Promise.all([
-      this.initializeTranslations(),
-      this.platform.ready(),
-      this.initializeProtocols(),
-      this.initializeWalletConnect(),
-      this.currencyService.init()
-    ])
+    // The splash screen is configured with `launchAutoHide: false`, so the app has
+    // to hide it itself. Hide it no matter how the initialization ends: a rejected
+    // or hanging initializer must never leave the user stuck on the splash screen.
+    const splashWatchdog: ReturnType<typeof setTimeout> = setTimeout(() => {
+      handleErrorSentry(ErrorCategory.OTHER)(new Error('App initialization did not finish in time, hiding the splash screen'))
+      this.hideSplashScreen()
+    }, AppComponent.SPLASH_SCREEN_TIMEOUT_MS)
+
+    try {
+      await Promise.all([
+        this.initializeTranslations().catch(handleErrorSentry(ErrorCategory.OTHER)),
+        this.platform.ready(),
+        this.initializeProtocols(),
+        this.initializeWalletConnect().catch(handleErrorSentry(ErrorCategory.OTHER)),
+        this.currencyService.init().catch(handleErrorSentry(ErrorCategory.STORAGE))
+      ])
+    } finally {
+      clearTimeout(splashWatchdog)
+      this.hideSplashScreen()
+    }
     // this._waitReadyResolve()
 
     this.themeService.register()
@@ -147,7 +163,7 @@ export class AppComponent implements AfterViewInit {
     this.themeService.statusBarStyleDark(await this.themeService.isDarkMode())
 
     if (this.platform.is('hybrid')) {
-      await Promise.all([this.splashScreen.hide(), this.pushProvider.initPush()])
+      await this.pushProvider.initPush()
 
       this.appInfo
         .get()
@@ -256,6 +272,14 @@ export class AppComponent implements AfterViewInit {
     this.router.navigateByUrl(`/transaction-qr/${DataServiceKey.TRANSACTION}`).catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
+  private hideSplashScreen(): void {
+    if (this.splashScreenHidden || !this.platform.is('hybrid')) {
+      return
+    }
+    this.splashScreenHidden = true
+    this.splashScreen.hide().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
+  }
+
   private async initializeTranslations(): Promise<void> {
     this.translateService.setDefaultLang(LanguagesType.EN)
 
@@ -300,7 +324,13 @@ export class AppComponent implements AfterViewInit {
       passiveSubProtocols: v1Protocols.passiveSubProtocols
     })
 
-    await Promise.all([this.initSaplingProtocols(), this.getGenericSubProtocols(), this.initializeTezosDomains()])
+    // None of these is required for the app to start; a failure in one must not
+    // prevent the others (or the app) from initializing.
+    await Promise.all([
+      this.initSaplingProtocols().catch(handleErrorSentry(ErrorCategory.COINLIB)),
+      this.getGenericSubProtocols().catch(handleErrorSentry(ErrorCategory.STORAGE)),
+      this.initializeTezosDomains().catch(handleErrorSentry(ErrorCategory.COINLIB))
+    ])
   }
 
   private async initSaplingProtocols(networks: ProtocolNetwork[] = []): Promise<void> {
@@ -343,14 +373,16 @@ export class AppComponent implements AfterViewInit {
       .filter((network) => network.type == NetworkType.TESTNET)
       .map((network) => network.identifier)
     const protocolsOrUndefineds = await Promise.all(
-      identifiersWithSerialized.map(([protocolNetworkIdentifier, serialized]) => {
+      identifiersWithSerialized.map(async ([protocolNetworkIdentifier, serialized]) => {
         const [protocolIdentifier] = protocolNetworkIdentifier.split(':')
 
         try {
           if (protocolIdentifier.startsWith(MainProtocolSymbols.XTZ)) {
-            return this.deserializeGenericTezosSubProtocol(protocolIdentifier, serialized, supportedTezosTestNetworkIdentifiers)
+            // `await` so that a rejected deserialization is caught here instead of
+            // failing the whole initialization.
+            return await this.deserializeGenericTezosSubProtocol(protocolIdentifier, serialized, supportedTezosTestNetworkIdentifiers)
           } else if (protocolIdentifier.startsWith(MainProtocolSymbols.OPTIMISM)) {
-            return this.deserializeOptimismERC20Token(serialized)
+            return await this.deserializeOptimismERC20Token(serialized)
           }
 
           return undefined
