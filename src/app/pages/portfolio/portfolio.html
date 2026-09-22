@@ -19,7 +19,14 @@
           <div class="balance-row">
             <ng-container *ngIf="!isBalanceHidden">
               <ng-container *ngIf="isVisible; else skeletonBalance">
-                <h1 [ngClass]="total < 1000000 ? 'large-font': 'small-font'">{{ '' | fiatCurrencySymbol }}{{ total | number: '1.2-2' }}</h1>
+                <h1
+                  [ngClass]="total < 1000000 ? 'large-font': 'small-font'"
+                  [class.balance-incomplete]="isSyncing || isProviderSyncing"
+                >
+                  {{ '' | fiatCurrencySymbol }}{{ total | number: '1.2-2' }}
+                </h1>
+                <!-- The total keeps growing while wallets sync, so say it is not final yet. -->
+                <ion-spinner *ngIf="isSyncing || isProviderSyncing" name="dots" class="balance-spinner"></ion-spinner>
               </ng-container>
               <ng-template #skeletonBalance>
                 <h1 class="large-font">

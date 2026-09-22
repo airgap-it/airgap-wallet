@@ -133,6 +133,17 @@ flip-card span {
     margin: 0;
     line-height: 1;
   }
+
+  // Dimmed while wallets are still being synced: the number is not final yet.
+  h1.balance-incomplete {
+    opacity: 0.5;
+  }
+
+  .balance-spinner {
+    width: 20px;
+    height: 20px;
+    color: var(--ion-color-medium);
+  }
 }
 
 .sync-warning {
