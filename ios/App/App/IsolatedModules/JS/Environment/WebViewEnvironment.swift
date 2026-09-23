@@ -105,7 +105,7 @@ class WebViewEnvironment: NSObject, JSEnvironment, WKNavigationDelegate {
                     webViewConfiguration.userContentController = userContentController
                     
                     let webView = WKWebView(frame: .zero, configuration: webViewConfiguration)
-                    webView.navigationDelegate = env
+                    webView.navigationDelegate = jsAsyncResult
                     
                     do {
                         guard let scriptSource = String(data: try env.fileExplorer.readIsolatedModulesScript(), encoding: .utf8) else {
