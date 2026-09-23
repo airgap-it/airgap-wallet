@@ -92,7 +92,10 @@ register()
 export class AppComponent implements AfterViewInit {
   /** After this, the app starts without waiting for the remaining initializers. */
   private static readonly INITIALIZATION_TIMEOUT_MS: number = 10000
+  /** Longest the splash screen waits for translations, so the shell does not flash raw keys. */
+  private static readonly SPLASH_TRANSLATIONS_TIMEOUT_MS: number = 1000
   private splashScreenHidden: boolean = false
+  private translationsReady: Promise<void> = Promise.resolve()
 
   /** Initializers that have not finished yet, reported to Sentry if startup times out. */
   private readonly pendingInitializers: Set<string> = new Set()
@@ -141,14 +144,14 @@ export class AppComponent implements AfterViewInit {
   // })
 
   public async initializeApp(): Promise<void> {
-    // The splash screen is configured with `launchAutoHide: false`, so the app has to
-    // hide it itself. Make sure that happens no matter how the initialization ends: a
-    // rejected or hanging initializer must never leave the user on the splash screen.
+    // The splash screen is hidden as soon as the app shell is rendered (see `ngAfterViewInit`),
+    // the pages show their own loading state while this is still running.
+    this.translationsReady = this.trackInitializer('translations', this.initializeTranslations()).catch(handleErrorSentry(ErrorCategory.OTHER))
     try {
       await promiseTimeout(
         AppComponent.INITIALIZATION_TIMEOUT_MS,
         Promise.all([
-          this.trackInitializer('translations', this.initializeTranslations()).catch(handleErrorSentry(ErrorCategory.OTHER)),
+          this.translationsReady,
           this.trackInitializer('platform', this.platform.ready()),
           this.trackInitializer('protocols', this.initializeProtocols()),
           this.trackInitializer('walletconnect', this.initializeWalletConnect()).catch(handleErrorSentry(ErrorCategory.OTHER)),
@@ -159,8 +162,6 @@ export class AppComponent implements AfterViewInit {
       handleErrorSentry(ErrorCategory.OTHER)(
         new Error(`App initialization did not finish (${[...this.pendingInitializers].join(', ') || 'none'} pending): ${error}`)
       )
-    } finally {
-      this.hideSplashScreen()
     }
     // this._waitReadyResolve()
 
@@ -221,6 +222,9 @@ export class AppComponent implements AfterViewInit {
 
   public async ngAfterViewInit(): Promise<void> {
     await this.platform.ready()
+    await promiseTimeout(AppComponent.SPLASH_TRANSLATIONS_TIMEOUT_MS, this.translationsReady).catch(() => undefined)
+    this.hideSplashScreen()
+
     if (this.platform.is('android')) {
       this.platform.backButton.subscribeWithPriority(-1, () => {
         this.navigationService.handleBackNavigation(this.router.url)
