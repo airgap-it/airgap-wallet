@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations'
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
@@ -20,7 +21,13 @@ import { WalletStorageKey, WalletStorageService } from '../../services/storage/s
 @Component({
   selector: 'page-portfolio',
   templateUrl: 'portfolio.html',
-  styleUrls: ['./portfolio.scss']
+  styleUrls: ['./portfolio.scss'],
+  animations: [
+    // Cross-fades the skeleton list into the real cards instead of swapping them.
+    trigger('skeletonLeave', [
+      transition(':leave', [style({ position: 'absolute', top: 0, left: 0, opacity: 1 }), animate('250ms ease-out', style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class PortfolioPage {
   public isVisible: boolean = false
@@ -50,9 +57,15 @@ export class PortfolioPage {
 
   /** Number of groups added to the DOM per frame. */
   private static readonly RENDER_CHUNK_SIZE = 12
+  /** Cards after this index fade in together instead of one after the other. */
+  public readonly MAX_STAGGER: number = 8
 
   private allGroups: MainWalletGroup[] = []
   private renderHandle: number | undefined
+
+  /** `true` once the page has been painted, which starts the fade-in of the content. */
+  public contentReady: boolean = false
+  private readyHandle: number | undefined
 
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
 
@@ -80,6 +93,7 @@ export class PortfolioPage {
     private readonly storageService: WalletStorageService
   ) {
     this.isDesktop = !this.platform.is('hybrid')
+    this.revealContentAfterFirstPaint()
 
     this.wallets = this.walletsProvider.wallets$.asObservable()
     this.activeWallets = this.wallets.pipe(map((wallets) => wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE) ?? []))
@@ -318,7 +332,26 @@ export class PortfolioPage {
     this.isVisible = this.isVisible || loadedCount > 0 || wallets.length === 0 || (!this.isSyncing && !this.isProviderSyncing)
   }
 
+  /**
+   * Flips `contentReady` on the frame after the first paint. The first
+   * `requestAnimationFrame` callback runs before that paint, the second one
+   * after it, so the browser has painted the hidden state once and the CSS
+   * transition actually gets to run.
+   */
+  private revealContentAfterFirstPaint(): void {
+    this.readyHandle = requestAnimationFrame(() => {
+      this.readyHandle = requestAnimationFrame(() => {
+        this.readyHandle = undefined
+        this.contentReady = true
+      })
+    })
+  }
+
   public ngOnDestroy(): void {
+    if (this.readyHandle !== undefined) {
+      cancelAnimationFrame(this.readyHandle)
+      this.readyHandle = undefined
+    }
     this.cancelProgressiveRender()
     for (const sub of this.subscriptions) {
       sub.unsubscribe()

@@ -9,8 +9,22 @@
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen="true">
-  <ion-grid fixed="true" class="ion-no-padding">
-    <ng-container *ngIf="activeWallets | async as walletsArray">
+  <!-- Faded in on the first painted frame so the content does not pop in while the page is still building. -->
+  <ion-grid fixed="true" class="ion-no-padding portfolio-content" [class.portfolio-content--ready]="contentReady">
+    <!-- Until the wallets are loaded from storage, show the header as a skeleton so the page does not look empty. -->
+    <ng-template #headerLoading>
+      <ion-row class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <span>{{ 'portfolio.flip-card.front-title' | translate }}</span>
+          <div class="balance-row">
+            <h1 class="large-font">
+              <ion-skeleton-text animated style="width: 130px;"></ion-skeleton-text>
+            </h1>
+          </div>
+        </div>
+      </ion-row>
+    </ng-template>
+    <ng-container *ngIf="activeWallets | async as walletsArray; else headerLoading">
       <ion-row *ngIf="walletsArray.length > 0" class="ion-padding-horizontal ion-align-items-end ion-justify-content-center">
         <!-- <flip-card> -->
         <!-- <flip-card-front> -->
@@ -20,10 +34,11 @@
             <ng-container *ngIf="!isBalanceHidden">
               <ng-container *ngIf="isVisible; else skeletonBalance">
                 <h1
+                  class="fade-in"
                   [ngClass]="total < 1000000 ? 'large-font': 'small-font'"
                   [class.balance-incomplete]="isSyncing || isProviderSyncing"
                 >
-                  {{ '' | fiatCurrencySymbol }}{{ total | number: '1.2-2' }}
+                  {{ '' | fiatCurrencySymbol }}<animated-number [value]="total"></animated-number>
                 </h1>
                 <!-- The total keeps growing while wallets sync, so say it is not final yet. -->
                 <ion-spinner *ngIf="isSyncing || isProviderSyncing" name="dots" class="balance-spinner"></ion-spinner>
@@ -118,10 +133,16 @@
     </ion-toolbar>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)"><ion-refresher-content></ion-refresher-content></ion-refresher>
 
-    <ng-container *ngIf="hasGroups !== undefined; else loading">
-      <ng-container *ngIf="hasGroups; else noItems">
-        <ion-list class="walletGroups ion-no-padding" lines="none">
-          <ion-card *ngFor="let walletGroup of visibleGroups; trackBy: trackByGroup">
+    <!-- Positioned so the leaving skeleton list can fade out on top of the arriving cards. -->
+    <div class="accounts">
+      <ng-container *ngIf="hasGroups !== undefined; else loading">
+        <ng-container *ngIf="hasGroups; else noItems">
+          <ion-list class="walletGroups ion-no-padding" lines="none">
+            <ion-card
+              *ngFor="let walletGroup of visibleGroups; let i = index; trackBy: trackByGroup"
+              class="fade-in"
+              [style.--stagger]="i < MAX_STAGGER ? i : MAX_STAGGER"
+            >
             <portfolio-item
               *ngIf="walletGroup.mainWallet"
               class="mainWallet"
@@ -156,8 +177,8 @@
         ></empty-state>
       </ng-template>
     </ng-container>
-    <ng-template #loading>
-      <ion-list lines="none" class="ion-margin-top">
+      <ng-template #loading>
+        <ion-list lines="none" class="ion-margin-top skeleton-list" [@skeletonLeave]>
         <ion-card>
           <portfolio-item></portfolio-item>
         </ion-card>
@@ -171,7 +192,8 @@
           <portfolio-item></portfolio-item>
         </ion-card>
       </ion-list>
-    </ng-template>
+      </ng-template>
+    </div>
   </ion-grid>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ng-container *ngIf="wallets | async | walletFilter: { status: AirGapWalletStatus.ACTIVE } | async as walletsArray">

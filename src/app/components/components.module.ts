@@ -10,6 +10,7 @@ import { QRCodeModule } from 'angularx-qrcode'
 import { MomentModule } from 'ngx-moment'
 import { PipesModule } from '../pipes/pipes.module'
 import { AccountEditPopoverComponent } from './account-edit-popover/account-edit-popover.component'
+import { AnimatedNumberComponent } from './animated-number/animated-number'
 import { AmountComponent } from './amount/amount.component'
 import { CardActionableComponent } from './card-actionable/card-actionable'
 import { CurrencyItemComponent } from './currency-item/currency-item'
@@ -52,6 +53,7 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
 @NgModule({
   declarations: [
     PortfolioItemComponent,
+    AnimatedNumberComponent,
     AccountEditPopoverComponent,
     AmountComponent,
     CardActionableComponent,
@@ -106,6 +108,7 @@ import { FlipCardBackComponent } from './flip-card/flip-card-back'
   ],
   exports: [
     PortfolioItemComponent,
+    AnimatedNumberComponent,
     AmountComponent,
     AccountEditPopoverComponent,
     CardActionableComponent,

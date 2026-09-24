@@ -282,3 +282,27 @@ swiper-slide img {
   height: auto;
   max-height: 100%;
 }
+/* Subtle enter animation for content that replaces a skeleton or appears in
+   chunks. Set `--stagger` (an index) on the element to delay siblings a bit. */
+/* No `to` frame on purpose: the element eases towards its own opacity, so a
+   dimmed element (for example the incomplete total) stays dimmed afterwards. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.fade-in {
+  animation: fade-in 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  // Only `backwards`: the element is invisible while it waits for its turn and is
+  // released to its normal styles once the animation is done.
+  animation-fill-mode: backwards;
+  animation-delay: calc(var(--stagger, 0) * 40ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none;
+  }
+}
