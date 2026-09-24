@@ -23,7 +23,7 @@ import {
   ToastController
 } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { BigNumber } from 'bignumber.js'
+import { BigNumber } from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Subscription } from 'rxjs'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'

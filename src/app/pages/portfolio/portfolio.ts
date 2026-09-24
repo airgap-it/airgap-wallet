@@ -1,13 +1,14 @@
-import { ChangeDetectorRef, Component, NgZone } from '@angular/core'
+import { animate, style, transition, trigger } from '@angular/animations'
+import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { AirGapMarketWallet } from '@airgap/coinlib-core'
 import { Observable, Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 
 import { ProtocolService } from '@airgap/angular-core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { AirGapWalletStatus } from '@airgap/coinlib-core/wallet/AirGapWallet'
-import { map } from 'rxjs/operators'
+import { auditTime, map } from 'rxjs/operators'
 import { promiseTimeout } from '../../helpers/promise'
 import { ShopService } from 'src/app/services/shop/shop.service'
 import { CryptoToFiatPipe } from '../../pipes/crypto-to-fiat/crypto-to-fiat.pipe'
@@ -20,19 +21,51 @@ import { WalletStorageKey, WalletStorageService } from '../../services/storage/s
 @Component({
   selector: 'page-portfolio',
   templateUrl: 'portfolio.html',
-  styleUrls: ['./portfolio.scss']
+  styleUrls: ['./portfolio.scss'],
+  animations: [
+    // Cross-fades the skeleton list into the real cards instead of swapping them.
+    trigger('skeletonLeave', [
+      transition(':leave', [style({ position: 'absolute', top: 0, left: 0, opacity: 1 }), animate('250ms ease-out', style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class PortfolioPage {
   public isVisible: boolean = false
+  public isSyncing: boolean = false
+  /** True while the account provider is still syncing wallets on its own. */
+  public isProviderSyncing: boolean = false
+  public isTotalIncomplete: boolean = false
   public syncWarningNames: string[] = []
+
+  /** Entering the page re-syncs only wallets that were not synced within this window. */
+  private static readonly AUTO_REFRESH_INTERVAL_MS = 60000
+  private static readonly SYNC_TIMEOUT_MS = 10000
+  /** Wallets finish syncing one by one; recalculate the total at most this often. */
+  private static readonly TOTAL_RECALCULATION_INTERVAL_MS = 500
 
   public total: number = 0
   public changePercentage: number = 0
 
   public wallets: Observable<AirGapMarketWallet[]>
   public activeWallets: Observable<AirGapMarketWallet[]>
-  public walletGroups: Observable<MainWalletGroup[]>
   public isDesktop: boolean = false
+
+  /** Groups currently in the DOM. Grows in chunks, see `renderGroups`. */
+  public visibleGroups: MainWalletGroup[] = []
+  /** `undefined` until the first groups arrive, so the skeleton is shown until then. */
+  public hasGroups: boolean | undefined = undefined
+
+  /** Number of groups added to the DOM per frame. */
+  private static readonly RENDER_CHUNK_SIZE = 12
+  /** Cards after this index fade in together instead of one after the other. */
+  public readonly MAX_STAGGER: number = 8
+
+  private allGroups: MainWalletGroup[] = []
+  private renderHandle: number | undefined
+
+  /** `true` once the page has been painted, which starts the fade-in of the content. */
+  public contentReady: boolean = false
+  private readyHandle: number | undefined
 
   public readonly AirGapWalletStatus: typeof AirGapWalletStatus = AirGapWalletStatus
 
@@ -57,25 +90,41 @@ export class PortfolioPage {
     private readonly protocolService: ProtocolService,
     public platform: Platform,
     private readonly shopService: ShopService,
-    private readonly storageService: WalletStorageService,
-    private readonly ngZone: NgZone,
-    private readonly cdr: ChangeDetectorRef
+    private readonly storageService: WalletStorageService
   ) {
     this.isDesktop = !this.platform.is('hybrid')
+    this.revealContentAfterFirstPaint()
 
     this.wallets = this.walletsProvider.wallets$.asObservable()
     this.activeWallets = this.wallets.pipe(map((wallets) => wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE) ?? []))
-    this.walletGroups = walletsProvider.walletsGroupedByMainWallet$
+    const groupSub = this.walletsProvider.walletsGroupedByMainWallet$.subscribe((groups: MainWalletGroup[]) => {
+      this.renderGroups(groups)
+    })
+    this.subscriptions.push(groupSub)
 
     // If a wallet gets added or removed, recalculate all values
     const walletSub = this.wallets.subscribe(() => {
       this.calculateTotal(this.walletsProvider.getActiveWalletList())
     })
     this.subscriptions.push(walletSub)
-    const walletChangedSub = this.walletsProvider.walletChangedObservable.subscribe(() => {
-      this.calculateTotal(this.walletsProvider.getActiveWalletList())
-    })
+    // Each wallet reports separately as it finishes syncing, so the total is
+    // recalculated on a timer instead of once per wallet.
+    const walletChangedSub = this.walletsProvider.walletChangedObservable
+      .pipe(auditTime(PortfolioPage.TOTAL_RECALCULATION_INTERVAL_MS))
+      .subscribe(() => {
+        this.calculateTotal(this.walletsProvider.getActiveWalletList())
+      })
     this.subscriptions.push(walletChangedSub)
+
+    // Keeps the skeleton up while the provider is still loading balances, and
+    // settles the total once it is done.
+    const syncingSub = this.walletsProvider.syncingObservable.subscribe((isSyncing: boolean) => {
+      this.isProviderSyncing = isSyncing
+      if (!isSyncing) {
+        this.calculateTotal(this.walletsProvider.getActiveWalletList())
+      }
+    })
+    this.subscriptions.push(syncingSub)
 
     this.shopService.getShopData().then((response) => {
       this.shopBannerText = ''
@@ -112,12 +161,58 @@ export class PortfolioPage {
 
   public async ionViewDidEnter() {
     this.isBalanceHidden = await this.storageService.get(WalletStorageKey.BALANCE_HIDDEN)
-    this.doRefresh().catch(handleErrorSentry())
+    this.doRefresh(null, PortfolioPage.AUTO_REFRESH_INTERVAL_MS).catch(handleErrorSentry())
   }
 
   public async toggleBalanceVisibility() {
     this.isBalanceHidden = !this.isBalanceHidden
     await this.storageService.set(WalletStorageKey.BALANCE_HIDDEN, this.isBalanceHidden)
+  }
+
+  /**
+   * Renders the wallet groups in chunks instead of all at once. Creating a few
+   * hundred portfolio items in a single change detection pass blocks the main
+   * thread for over a second; one chunk per frame keeps the page responsive and
+   * shows the first accounts immediately.
+   */
+  private renderGroups(groups: MainWalletGroup[]): void {
+    this.cancelProgressiveRender()
+
+    this.allGroups = groups
+    this.hasGroups = groups.length > 0
+
+    const initialCount = Math.max(this.visibleGroups.length, PortfolioPage.RENDER_CHUNK_SIZE)
+    this.visibleGroups = groups.slice(0, initialCount)
+
+    this.scheduleNextChunk()
+  }
+
+  private scheduleNextChunk(): void {
+    if (this.visibleGroups.length >= this.allGroups.length) {
+      this.renderHandle = undefined
+      return
+    }
+
+    this.renderHandle = requestAnimationFrame(() => {
+      this.renderHandle = undefined
+      this.visibleGroups = this.allGroups.slice(0, this.visibleGroups.length + PortfolioPage.RENDER_CHUNK_SIZE)
+      this.scheduleNextChunk()
+    })
+  }
+
+  private cancelProgressiveRender(): void {
+    if (this.renderHandle !== undefined) {
+      cancelAnimationFrame(this.renderHandle)
+      this.renderHandle = undefined
+    }
+  }
+
+  public trackByGroup(_index: number, group: MainWalletGroup): string {
+    return group.mainWallet ? `${group.mainWallet.protocol.identifier}:${group.mainWallet.publicKey}` : `${_index}`
+  }
+
+  public trackByWallet(_index: number, wallet: AirGapMarketWallet): string {
+    return `${wallet.protocol.identifier}:${wallet.publicKey}:${wallet.addressIndex ?? ''}`
   }
 
   public openDetail(mainWallet: AirGapMarketWallet, subWallet?: AirGapMarketWallet) {
@@ -141,119 +236,123 @@ export class PortfolioPage {
     this.router.navigateByUrl('/account-add').catch(handleErrorSentry(ErrorCategory.NAVIGATION))
   }
 
-  public async doRefresh(event: any = null) {
-    this.operationsProvider.refreshAllDelegationStatuses(this.walletsProvider.getActiveWalletList())
+  /**
+   * Re-syncs the active wallets. Pull-to-refresh (`maxAgeMs = 0`) syncs every
+   * wallet; entering the page passes an age so wallets synced a moment ago (for
+   * example by the account provider on startup) are not fetched again.
+   */
+  public async doRefresh(event: any = null, maxAgeMs: number = 0) {
+    const now = Date.now()
+    const activeWallets = this.walletsProvider.getActiveWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+    const wallets = activeWallets.filter((wallet) => {
+      const lastAttempt = this.walletsProvider.getLastSyncAttempt(wallet)
+      return lastAttempt === undefined || now - lastAttempt >= maxAgeMs
+    })
 
-    this.syncWarningNames = []
-    this.total = 0
-    this.isVisible = false
+    // Cheap (re-checks already known addresses) and the delegation state may have
+    // changed on the account page since the last sync, so refresh it on every visit.
+    this.operationsProvider.refreshAllDelegationStatuses(activeWallets)
 
-    const SYNC_TIMEOUT_MS = 10000
-    const wallets = this.walletsProvider.getActiveWalletList().filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
+    if (wallets.length === 0) {
+      await this.calculateTotal(activeWallets)
+      if (event?.target) {
+        event.target.complete()
+      }
+      return
+    }
 
-    const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
     const failedNames: Set<string> = new Set()
+
+    this.isSyncing = true
 
     await Promise.all(
       wallets.map(async (wallet) => {
         try {
-          await promiseTimeout(SYNC_TIMEOUT_MS, wallet.synchronize())
+          await promiseTimeout(PortfolioPage.SYNC_TIMEOUT_MS, this.walletsProvider.synchronizeWallet(wallet))
         } catch (error) {
           handleErrorSentry(ErrorCategory.COINLIB)(error)
           failedNames.add(wallet.protocol.name)
         }
-
-        try {
-          if (wallet.getCurrentMarketPrice() === undefined || wallet.getCurrentMarketPrice()?.isNaN()) {
-            await wallet.fetchCurrentMarketPrice()
-          }
-
-          const fiatValue = await cryptoToFiatPipe.transform(wallet.getCurrentBalance(), {
-            protocolIdentifier: wallet.protocol.identifier,
-            currentMarketPrice: wallet.getCurrentMarketPrice()
-          })
-
-          if (fiatValue !== '') {
-            this.ngZone.run(() => {
-              this.total = new BigNumber(this.total).plus(fiatValue).toNumber()
-              this.isVisible = true
-              this.syncWarningNames = [...failedNames]
-              this.cdr.detectChanges()
-            })
-          } else {
-            failedNames.add(wallet.protocol.name)
-            this.ngZone.run(() => {
-              this.isVisible = true
-              this.syncWarningNames = [...failedNames]
-              this.cdr.detectChanges()
-            })
-          }
-        } catch {
-          failedNames.add(wallet.protocol.name)
-          this.ngZone.run(() => {
-            this.isVisible = true
-            this.syncWarningNames = [...failedNames]
-            this.cdr.detectChanges()
-          })
-        }
+        // Let the portfolio items pick up this wallet's new state as it arrives
+        // (emissions are coalesced by the provider).
+        this.walletsProvider.triggerWalletChanged()
       })
     )
+
+    this.isSyncing = false
+    this.syncWarningNames = [...failedNames]
+    await this.calculateTotal(activeWallets)
 
     if (event?.target) {
       event.target.complete()
     }
   }
 
-  public async calculateTotal(wallets: AirGapMarketWallet[], refresher: any = null): Promise<void> {
+  /**
+   * Sums the fiat value of all wallets from their already loaded state. Never
+   * triggers network requests; syncing is owned by the account provider and
+   * `doRefresh`.
+   */
+  public async calculateTotal(wallets: AirGapMarketWallet[]): Promise<void> {
     const cryptoToFiatPipe = new CryptoToFiatPipe(this.protocolService)
     wallets = wallets.filter((wallet) => wallet.status === AirGapWalletStatus.ACTIVE)
-    const failedNames: Set<string> = new Set()
 
     let runningTotal = new BigNumber(0)
+    let incomplete = false
+    let loadedCount = 0
 
     await Promise.all(
       wallets.map(async (wallet) => {
-        try {
-          if (wallet.getCurrentMarketPrice() === undefined || wallet.getCurrentMarketPrice()?.isNaN()) {
-            await wallet.fetchCurrentMarketPrice()
-          }
+        const balance = wallet.getCurrentBalance()
+        const marketPrice = wallet.getCurrentMarketPrice()
+        if (balance === undefined || marketPrice === undefined || marketPrice.isNaN()) {
+          incomplete = true
+          return
+        }
 
-          const fiatValue = await cryptoToFiatPipe.transform(wallet.getCurrentBalance(), {
-            protocolIdentifier: wallet.protocol.identifier,
-            currentMarketPrice: wallet.getCurrentMarketPrice()
-          })
+        const fiatValue = await cryptoToFiatPipe.transform(balance, {
+          protocolIdentifier: wallet.protocol.identifier,
+          currentMarketPrice: marketPrice
+        })
 
-          if (fiatValue !== '') {
-            runningTotal = runningTotal.plus(fiatValue)
-            this.ngZone.run(() => {
-              this.total = runningTotal.toNumber()
-              this.cdr.detectChanges()
-            })
-          } else {
-            failedNames.add(wallet.protocol.name)
-          }
-        } catch {
-          failedNames.add(wallet.protocol.name)
+        if (fiatValue !== '') {
+          runningTotal = runningTotal.plus(fiatValue)
+          loadedCount++
+        } else {
+          incomplete = true
         }
       })
     )
 
-    if (failedNames.size > 0) {
-      const existing = new Set(this.syncWarningNames)
-      failedNames.forEach((n) => existing.add(n))
-      this.syncWarningNames = [...existing]
-    }
-
     this.total = runningTotal.toNumber()
+    this.isTotalIncomplete = incomplete
+    // Show the total once something has loaded; keep the skeleton only while
+    // nothing has arrived yet and a sync is still running, either the page's own
+    // one or the provider's initial one.
+    this.isVisible = this.isVisible || loadedCount > 0 || wallets.length === 0 || (!this.isSyncing && !this.isProviderSyncing)
+  }
 
-    if (refresher) {
-      refresher.complete()
-    }
-
-    this.isVisible = true
+  /**
+   * Flips `contentReady` on the frame after the first paint. The first
+   * `requestAnimationFrame` callback runs before that paint, the second one
+   * after it, so the browser has painted the hidden state once and the CSS
+   * transition actually gets to run.
+   */
+  private revealContentAfterFirstPaint(): void {
+    this.readyHandle = requestAnimationFrame(() => {
+      this.readyHandle = requestAnimationFrame(() => {
+        this.readyHandle = undefined
+        this.contentReady = true
+      })
+    })
   }
 
   public ngOnDestroy(): void {
+    if (this.readyHandle !== undefined) {
+      cancelAnimationFrame(this.readyHandle)
+      this.readyHandle = undefined
+    }
+    this.cancelProgressiveRender()
     for (const sub of this.subscriptions) {
       sub.unsubscribe()
     }

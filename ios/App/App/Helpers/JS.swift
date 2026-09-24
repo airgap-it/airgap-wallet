@@ -22,9 +22,7 @@ protocol JSONConvertible {
     func toJSONString() throws -> String
 }
 
-class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler {
-    private typealias Listener = (Result<Any, Error>) -> ()
-        
+class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler, WKNavigationDelegate {
     private static let defaultName: String = "jsAsyncResult"
     
     private static let fieldID: String = "id"
@@ -32,37 +30,25 @@ class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler {
     private static let fieldError: String = "error"
     
     public let id: String
-    private var resultManager: ResultManager
-    private let listenerRegistry: ListenerRegistry
+    private let results: Results
+    
+    /// Called when the web content process behind this result was terminated. The scripts
+    /// loaded into the webview are gone with it, so its owner should discard the webview.
+    var onProcessTerminated: (() -> Void)?
     
     init(id: String = "\(JSAsyncResult.defaultName)\(Int(Date().timeIntervalSince1970))") {
         self.id = id
-        self.resultManager = .init()
-        self.listenerRegistry = .init()
+        self.results = .init()
     }
     
     func createID() async -> String {
-        let id = await listenerRegistry.createID()
-        await listenerRegistry.add(forID: id) { [weak self] result in
-            let selfWeak = self
-            Task {
-                await selfWeak?.resultManager.setResult(result, forID: id)
-            }
-        }
-
-        return id
+        await results.createID()
     }
     
     func awaitResultWithID(_ id: String) async throws -> Any {
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             Task {
-                if let result = await resultManager.result[id] {
-                    continuation.resume(with: result)
-                } else {
-                    await listenerRegistry.add(forID: id) { result in
-                    continuation.resume(with: result)
-                }
-                }
+                await results.wait(for: id, with: continuation)
             }
         }
     }
@@ -73,53 +59,80 @@ class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler {
         Task {
             guard let id = body[Self.fieldID] as? String else { return }
             
-            do {
-                let result = body[Self.fieldResult]
-                let error = body[Self.fieldError]
+            let result = body[Self.fieldResult]
+            let error = body[Self.fieldError]
 
-                if let result = result, error == nil {
-                    await listenerRegistry.notifyAllWithID(id, with: .success(result))
-                } else if let error = error {
-                    throw JSError.fromScript(error)
-                } else {
-                    throw JSError.invalidJSON
-                }
-            } catch {
-                await listenerRegistry.notifyAllWithID(id, with: .failure(error))
+            if let result = result, error == nil {
+                await results.deliver(.success(result), forID: id)
+            } else if let error = error {
+                await results.deliver(.failure(JSError.fromScript(error)), forID: id)
+            } else {
+                await results.deliver(.failure(JSError.invalidJSON), forID: id)
             }
         }
     }
     
-    private actor ResultManager {
-        private(set) var result: [String: Result<Any, Error>] = [:]
-        
-        func setResult(_ result: Result<Any, Error>, forID id: String) {
-            self.result[id] = result
+    // A terminated web content process (e.g. killed by the system under memory pressure)
+    // never posts the pending results, fail them instead of waiting forever.
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Task {
+            await results.failAll(with: JSError.processTerminated)
         }
+        onProcessTerminated?()
     }
     
-    private actor ListenerRegistry {
-        private(set) var listeners: [String: [Listener]] = [:]
+    /// Keeps results and the continuations waiting for them in one place, so a result
+    /// that arrives before anyone waits for it is kept until it is asked for, and a
+    /// continuation that starts waiting after the result arrived is resumed right away.
+    private actor Results {
+        private var pending: Set<String> = []
+        private var continuations: [String: CheckedContinuation<Any, Error>] = [:]
+        private var delivered: [String: Result<Any, Error>] = [:]
+        private var terminationError: Error?
         
         func createID() -> String {
             let id = UUID().uuidString
-            listeners[id] = []
+            pending.insert(id)
             
             return id
         }
         
-        func add(forID id: String, _ listener: @escaping Listener) {
-            listeners[id]?.append(listener)
+        func wait(for id: String, with continuation: CheckedContinuation<Any, Error>) {
+            if let result = delivered.removeValue(forKey: id) {
+                pending.remove(id)
+                continuation.resume(with: result)
+            } else if let terminationError = terminationError {
+                pending.remove(id)
+                continuation.resume(throwing: terminationError)
+            } else {
+                continuations[id] = continuation
+            }
         }
         
-        func notifyAllWithID(_ id: String, with result: Result<Any, Error>) {
-            listeners[id]?.forEach { $0(result) }
-            listeners.removeValue(forKey: id)
+        func deliver(_ result: Result<Any, Error>, forID id: String) {
+            guard pending.contains(id) else { return }
+            
+            if let continuation = continuations.removeValue(forKey: id) {
+                pending.remove(id)
+                continuation.resume(with: result)
+            } else {
+                delivered[id] = result
+            }
+        }
+        
+        func failAll(with error: Error) {
+            terminationError = error
+            for (id, continuation) in continuations {
+                pending.remove(id)
+                continuation.resume(throwing: error)
+            }
+            continuations.removeAll()
         }
     }
 }
 
 enum JSError: Swift.Error {
     case invalidJSON
+    case processTerminated
     case fromScript(Any)
 }

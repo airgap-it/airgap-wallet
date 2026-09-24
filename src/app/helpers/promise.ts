@@ -39,3 +39,17 @@ export async function promiseRetry<T>(
 
   return retry(options.maxRetries)
 }
+
+/**
+ * Lets the browser run pending tasks (paint, input) before continuing. Awaiting
+ * promises alone never does that: a chain of resolved promises runs to the end
+ * in one go, so a long initialization sequence freezes the page until it is done.
+ */
+export function yieldToMain(): Promise<void> {
+  const scheduler: { yield?: () => Promise<void> } | undefined = (globalThis as any).scheduler
+  if (scheduler?.yield !== undefined) {
+    return scheduler.yield()
+  }
+
+  return new Promise((resolve) => setTimeout(resolve, 0))
+}

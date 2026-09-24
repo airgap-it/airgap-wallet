@@ -1,6 +1,6 @@
 FROM beevelop/ionic:v2023.10.1
 
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
     bzip2 \
     build-essential  \
     pkg-config  \

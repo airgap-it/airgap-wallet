@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
 import { UntypedFormGroup } from '@angular/forms'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Subscription } from 'rxjs'
 import { UIInputDelay } from 'src/app/models/widgets/input/UIInputDelay'
 

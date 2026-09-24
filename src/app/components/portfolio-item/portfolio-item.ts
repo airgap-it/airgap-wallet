@@ -1,13 +1,14 @@
 import { AmountConverterPipe, ICoinProtocolAdapter, ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { AirGapMarketWallet, ICoinSubProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { Component, Input } from '@angular/core'
-import BigNumber from 'bignumber.js'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Observable, ReplaySubject, Subscription } from 'rxjs'
 import { isMultisig } from '@airgap/module-kit'
 
 import { isSubProtocol } from 'src/app/utils/utils'
 import { supportsDelegation } from '../../helpers/delegation'
+import { promiseTimeout } from '../../helpers/promise'
 
 import { AccountProvider } from '../../services/account/account.provider'
 import { OperationsProvider } from '../../services/operations/operations'
@@ -15,7 +16,10 @@ import { OperationsProvider } from '../../services/operations/operations'
 @Component({
   selector: 'portfolio-item',
   templateUrl: 'portfolio-item.html',
-  styleUrls: ['./portfolio-item.scss']
+  styleUrls: ['./portfolio-item.scss'],
+  // A portfolio shows dozens of items and every network response triggers a
+  // change detection pass; only re-check an item when its own state changed.
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PortfolioItemComponent {
   public readonly networkType: typeof NetworkType = NetworkType
@@ -67,6 +71,7 @@ export class PortfolioItemComponent {
   public balance: BigNumber | undefined
   public balanceFormatted: string | undefined
   public marketPrice: BigNumber | undefined
+  public syncFailed: boolean = false
 
   public parentProtocol: ReplaySubject<ICoinSubProtocol> = new ReplaySubject(1)
 
@@ -74,27 +79,66 @@ export class PortfolioItemComponent {
   public readonly smallFontDecimalThreshold = 16
   private readonly defaultMaxDigits = 15
 
+  private static readonly SYNC_TIMEOUT_MS = 20000
+
+  /** Address the delegation/multisig/parent statuses were last resolved for, `null` if never. */
+  private statusesAddress: string | undefined | null = null
+
   private walletChanged?: Subscription
+  private readonly amountConverter: AmountConverterPipe
 
   public constructor(
     private readonly operationsProvider: OperationsProvider,
     public accountProvider: AccountProvider,
-    private readonly protocolService: ProtocolService
-  ) {}
+    private readonly protocolService: ProtocolService,
+    private readonly changeDetectorRef: ChangeDetectorRef
+  ) {
+    this.amountConverter = new AmountConverterPipe(this.protocolService)
+  }
 
   public ngOnInit(): void {
-    this.initBalance()
-    this.initMarketPrice()
-    this.updateDelegationStatus()
-    this.updateParentProtocol()
-    this.updateMultisigStatus()
-    this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(async () => {
-      await this.updateBalance()
-      this.updateMarketPrice()
+    this.refresh().catch(() => undefined)
+    this.walletChanged = this.accountProvider.walletChangedObservable.subscribe(() => {
+      this.refresh().catch(() => undefined)
+    })
+  }
+
+  /**
+   * Reads the wallet's current balance and market price into the view. If the wallet
+   * has not been synced yet, it joins the (deduplicated) `synchronize()` call that the
+   * account provider or portfolio page already started. After a failed sync the item
+   * shows a failed state and stops retrying until someone else refreshes the wallet.
+   */
+  private async refresh(): Promise<void> {
+    if (!this.wallet) {
+      return
+    }
+
+    // The statuses only depend on the wallet's address; the provider emits once per
+    // synced wallet, so do not resolve them again on every emission.
+    if (this.statusesAddress === null || this.statusesAddress !== this.wallet.receivingPublicAddress) {
+      this.statusesAddress = this.wallet.receivingPublicAddress
       this.updateDelegationStatus()
       this.updateParentProtocol()
       this.updateMultisigStatus()
-    })
+    }
+
+    await this.readWalletState()
+    // The wallet object is mutated in place (addresses, balance), so the view
+    // has to be marked explicitly.
+    this.changeDetectorRef.markForCheck()
+
+    if (this.wallet.getCurrentBalance() === undefined && !this.syncFailed) {
+      try {
+        // Some protocol clients never settle when their node is unreachable; do not
+        // keep the skeleton forever in that case.
+        await promiseTimeout(PortfolioItemComponent.SYNC_TIMEOUT_MS, this.wallet.synchronize())
+      } catch {
+        this.syncFailed = this.wallet.getCurrentBalance() === undefined
+      }
+      await this.readWalletState()
+      this.changeDetectorRef.markForCheck()
+    }
   }
 
   private async updateDelegationStatus() {
@@ -104,6 +148,7 @@ export class PortfolioItemComponent {
       } else {
         this.isDelegated = await this.operationsProvider.getDelegationStatusObservable(this.wallet)
       }
+      this.changeDetectorRef.markForCheck()
     }
   }
 
@@ -116,46 +161,33 @@ export class PortfolioItemComponent {
       } else {
         this.isMultisig = await this.operationsProvider.getMultisigStatusObservable(this.wallet)
       }
+      this.changeDetectorRef.markForCheck()
     }
   }
 
-  private async initBalance() {
-    if (this.wallet?.getCurrentBalance() === undefined) {
-      await this.wallet?.balanceOf()
-    }
-    await this.updateBalance()
-  }
-
-  private async updateBalance() {
+  private async readWalletState(): Promise<void> {
     if (!this.wallet) {
       return
     }
 
-    await this.wallet.balanceOf()
-    if (this.wallet.getCurrentBalance() !== undefined) {
-      const converter = new AmountConverterPipe(this.protocolService)
-      this.balance = this.wallet.getCurrentBalance()
-      this.balanceFormatted = await converter.transformValueOnly(this.balance, this.wallet.protocol, this.digits())
-      const balanceSplit = this.balanceFormatted.split('.')
-      if (balanceSplit.length == 2) {
-        const decimals = balanceSplit.pop()
-        this.numberOfDecimalsInBalance = decimals.length
+    const balance: BigNumber | undefined = this.wallet.getCurrentBalance()
+    const marketPrice: BigNumber | undefined = this.wallet.getCurrentMarketPrice()
+
+    if (balance !== undefined) {
+      this.syncFailed = false
+      if (this.balance === undefined || !this.balance.isEqualTo(balance)) {
+        this.balance = balance
+        await this.formatBalance(balance)
       }
     }
+
+    this.marketPrice = marketPrice !== undefined && !marketPrice.isNaN() ? marketPrice : undefined
   }
 
-  private async initMarketPrice() {
-    if (this.wallet?.getCurrentMarketPrice() === undefined) {
-      await this.wallet?.fetchCurrentMarketPrice()
-    }
-    this.updateMarketPrice()
-  }
-
-  private async updateMarketPrice() {
-    if (this.wallet) {
-      await this.wallet.fetchCurrentMarketPrice()
-      this.marketPrice = this.wallet.getCurrentMarketPrice()
-    }
+  private async formatBalance(balance: BigNumber): Promise<void> {
+    this.balanceFormatted = await this.amountConverter.transformValueOnly(balance, this.wallet.protocol, this.digits())
+    const balanceSplit = this.balanceFormatted.split('.')
+    this.numberOfDecimalsInBalance = balanceSplit.length === 2 ? balanceSplit[1].length : 0
   }
 
   public digits(): number {

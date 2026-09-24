@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import * as actions from './app.actions'
 
 export interface State {

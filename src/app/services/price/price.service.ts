@@ -1,7 +1,7 @@
 import { AirGapMarketWallet, AirGapWalletPriceService, SubProtocolSymbols, ICoinProtocol, TimeInterval } from '@airgap/coinlib-core'
-import axios from 'axios'
+import axios from '@airgap/coinlib-core/dependencies/src/axios-0.33.0/index'
 import { Injectable } from '@angular/core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { IAirGapTransactionResult } from '@airgap/coinlib-core/interfaces/IAirGapTransaction'
 import { CachingService, CachingServiceKey, StorageObject } from '../caching/caching.service'
 import { CurrencyService } from '../currency/currency.service'
@@ -25,7 +25,16 @@ export interface ExchangeRates {
 })
 export class PriceService implements AirGapWalletPriceService {
   private readonly baseURL: string = 'https://crypto-prices-api.prod.gke.papers.tech'
-  private readonly pendingMarketPriceRequests: { [key: string]: Promise<BigNumber> } = {}
+  private readonly pendingMarketPriceRequests: Map<string, Promise<BigNumber>> = new Map()
+  private readonly marketPriceCache: Map<string, { price: BigNumber; timestamp: number }> = new Map()
+  /** Symbols whose last lookup failed, with the time before which we do not retry. */
+  private readonly marketPriceRetryAfter: Map<string, number> = new Map()
+  private readonly MARKET_PRICE_RETRY_DELAY_MS: number = 2 * 60 * 1000
+  private marketPriceBatch: { symbols: Set<string>; promise: Promise<Map<string, number>> } | undefined = undefined
+  private readonly MARKET_PRICE_CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+  private readonly MARKET_PRICE_BATCH_WINDOW_MS = 50
+  private readonly MARKET_PRICE_BATCH_SIZE = 50
+  private readonly MARKET_PRICE_REQUEST_TIMEOUT_MS = 15 * 1000
   private exchangeRates: ExchangeRates | null = null
   private exchangeRatesTimestamp: number = 0
   private readonly EXCHANGE_RATES_CACHE_DURATION = 30 * 60 * 1000 // 30 minutes
@@ -101,47 +110,109 @@ export class PriceService implements AirGapWalletPriceService {
       return this.convertToSelectedCurrency(usdPrice)
     }
 
+    const symbol = protocol.marketSymbol.toUpperCase()
     const currency = this.currencyService.getCurrency()
-    const cacheKey = `${protocol.marketSymbol}_${currency}`
-    const pendingRequest: Promise<BigNumber> = this.pendingMarketPriceRequests[cacheKey]
-    if (pendingRequest) {
+    const cacheKey = `${symbol}_${currency}`
+
+    const cached = this.marketPriceCache.get(cacheKey)
+    if (cached !== undefined && Date.now() - cached.timestamp < this.MARKET_PRICE_CACHE_DURATION) {
+      return cached.price
+    }
+
+    // A symbol no price source knows (or a source that is down) would otherwise be
+    // re-requested on every refresh; back off for a while instead.
+    const retryAfter = this.marketPriceRetryAfter.get(cacheKey)
+    if (retryAfter !== undefined && Date.now() < retryAfter) {
+      return cached !== undefined ? cached.price : new BigNumber(NaN)
+    }
+
+    const pendingRequest = this.pendingMarketPriceRequests.get(cacheKey)
+    if (pendingRequest !== undefined) {
       return pendingRequest
     }
 
-    const promise: Promise<BigNumber> = new Promise((resolve) => {
-      axios
-        .get(`${this.baseURL}/api/v3/prices/latest-usd?baseCurrencySymbols=${protocol.marketSymbol.toUpperCase()}`)
-        .then(async (response) => {
-          if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
-            const cryptoPrices: CryptoPrices = response.data[0]
-            if (cryptoPrices.price && cryptoPrices.price > 0) {
-              const usdPrice = new BigNumber(cryptoPrices.price)
-              const convertedPrice = await this.convertToSelectedCurrency(usdPrice)
-              resolve(convertedPrice)
-            } else {
-              const price = await this.fetchFromCoinGecko(protocol)
-              resolve(price)
-            }
-          } else {
-            const price = await this.fetchFromCoinGecko(protocol)
-            resolve(price)
-          }
-        })
-        .catch(async () => {
-          const price = await this.fetchFromCoinGecko(protocol)
-          resolve(price)
-        })
-    })
-
-    this.pendingMarketPriceRequests[cacheKey] = promise
-
-    promise
-      .then(() => {
-        this.pendingMarketPriceRequests[cacheKey] = undefined
+    const promise: Promise<BigNumber> = this.resolveMarketPrice(protocol, symbol)
+      .then((price: BigNumber | undefined) => {
+        if (price !== undefined && !price.isNaN()) {
+          this.marketPriceCache.set(cacheKey, { price, timestamp: Date.now() })
+          this.marketPriceRetryAfter.delete(cacheKey)
+          return price
+        }
+        // Request failed: fall back to the last known price if we have one, otherwise
+        // signal "unknown" with NaN. Never leave the caller hanging.
+        this.marketPriceRetryAfter.set(cacheKey, Date.now() + this.MARKET_PRICE_RETRY_DELAY_MS)
+        return cached !== undefined ? cached.price : new BigNumber(NaN)
       })
-      .catch()
+      .finally(() => {
+        this.pendingMarketPriceRequests.delete(cacheKey)
+      })
+
+    this.pendingMarketPriceRequests.set(cacheKey, promise)
 
     return promise
+  }
+
+  private async resolveMarketPrice(protocol: ICoinProtocol, symbol: string): Promise<BigNumber | undefined> {
+    const usdPrice: number | undefined = await this.fetchLatestUsdPrice(symbol)
+    if (usdPrice !== undefined && usdPrice > 0) {
+      return this.convertToSelectedCurrency(new BigNumber(usdPrice))
+    }
+
+    return this.fetchFromCoinGecko(protocol)
+  }
+
+  /**
+   * Coalesces all price lookups that arrive within a short window into a single
+   * request, so N wallets sharing M symbols cost one round trip instead of N.
+   */
+  private fetchLatestUsdPrice(symbol: string): Promise<number | undefined> {
+    if (this.marketPriceBatch === undefined) {
+      const symbols: Set<string> = new Set()
+      const batch = {
+        symbols,
+        promise: new Promise<void>((resolve) => setTimeout(resolve, this.MARKET_PRICE_BATCH_WINDOW_MS)).then(() => {
+          if (this.marketPriceBatch === batch) {
+            this.marketPriceBatch = undefined
+          }
+          return this.requestLatestUsdPrices(Array.from(symbols))
+        })
+      }
+      this.marketPriceBatch = batch
+    }
+
+    this.marketPriceBatch.symbols.add(symbol)
+
+    return this.marketPriceBatch.promise.then((prices: Map<string, number>) => prices.get(symbol))
+  }
+
+  private async requestLatestUsdPrices(symbols: string[]): Promise<Map<string, number>> {
+    const prices: Map<string, number> = new Map()
+    const chunks: string[][] = []
+    for (let i = 0; i < symbols.length; i += this.MARKET_PRICE_BATCH_SIZE) {
+      chunks.push(symbols.slice(i, i + this.MARKET_PRICE_BATCH_SIZE))
+    }
+
+    await Promise.all(
+      chunks.map(async (chunk: string[]) => {
+        try {
+          const response = await axios.get<CryptoPrices[]>(
+            `${this.baseURL}/api/v3/prices/latest-usd?baseCurrencySymbols=${chunk.join(',')}`,
+            { timeout: this.MARKET_PRICE_REQUEST_TIMEOUT_MS }
+          )
+          if (response && Array.isArray(response.data)) {
+            for (const entry of response.data) {
+              if (entry && typeof entry.baseCurrencySymbol === 'string' && typeof entry.price === 'number') {
+                prices.set(entry.baseCurrencySymbol.toUpperCase(), entry.price)
+              }
+            }
+          }
+        } catch {
+          // Missing symbols fall through to the CoinGecko fallback per symbol.
+        }
+      })
+    )
+
+    return prices
   }
 
   public async fetchTransactions(wallet: AirGapMarketWallet): Promise<IAirGapTransactionResult> {
@@ -174,8 +245,8 @@ export class PriceService implements AirGapWalletPriceService {
     })
   }
 
-  public async fetchFromCoinGecko(protocol: ICoinProtocol): Promise<BigNumber> {
-    return new Promise(async (resolve, reject) => {
+  public async fetchFromCoinGecko(protocol: ICoinProtocol): Promise<BigNumber | undefined> {
+    return new Promise(async (resolve) => {
       const symbolMapping = {
         acu: 'acurast',
         zrx: '0x',
@@ -286,15 +357,18 @@ export class PriceService implements AirGapWalletPriceService {
           const currency = this.currencyService.getCurrency()
 
           const response = await axios.get<{ [key: string]: { [currency: string]: number } }>(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=${currency}`
+            `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=${currency}`,
+            { timeout: this.MARKET_PRICE_REQUEST_TIMEOUT_MS }
           )
-          const price = response.data !== undefined && response.data[id] ? new BigNumber(response.data[id][currency]) : new BigNumber(0)
+          // No data for the id means "unknown", not a price of 0, so the total can be flagged as incomplete.
+          const price = response.data !== undefined && response.data[id] ? new BigNumber(response.data[id][currency]) : undefined
           resolve(price)
         } catch (error) {
-          reject(error)
+          // Rate limited or blocked: report "unknown" instead of rejecting so callers never hang.
+          resolve(undefined)
         }
       } else {
-        resolve(new BigNumber(0))
+        resolve(undefined)
       }
     })
   }

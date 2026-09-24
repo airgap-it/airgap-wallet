@@ -1,5 +1,5 @@
 import { AbstractControl } from '@angular/forms'
-import { BigNumber } from 'bignumber.js'
+import { BigNumber } from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 
 export class DecimalValidator {
   public static validate(decimals: number): (control: AbstractControl) => { pattern: string } | null {

@@ -1,7 +1,7 @@
 import { ProtocolService } from '@airgap/angular-core'
 import { MainProtocolSymbols } from '@airgap/coinlib-core'
 import { TestBed } from '@angular/core/testing'
-import { BigNumber } from 'bignumber.js'
+import { BigNumber } from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
 import { CryptoToFiatPipe } from './crypto-to-fiat.pipe'

@@ -45,17 +45,20 @@
 
   <h2 [innerHTML]="'beacon-request.request.heading' | translate: { requesterName: requesterName }"></h2>
 
-  <ion-item *ngIf="totalWalletsLength > 1" lines="none" class="ion-no-padding">
-    <ion-avatar slot="start">
-      <airgap-identicon [address]="address"></airgap-identicon>
-    </ion-avatar>
-    <ion-label>
-      <p class="ion-no-margin">{{ address | shortenString }}</p>
-    </ion-label>
-    <ion-button (click)="changeAccount()" color="secondary" shape="round" size="small" fill="outline" slot="end">
-      {{ 'beacon-request.select-account.button' | translate }}
-    </ion-button>
-  </ion-item>
+  <ng-container *ngIf="selectableWallets.length > 1">
+    <p class="ion-padding-top">{{ 'beacon-request.select-account.alert' | translate }}</p>
+    <ion-list lines="none" class="account-options ion-no-padding">
+      <div
+        *ngFor="let wallet of selectableWallets; trackBy: trackByWallet"
+        class="account-option"
+        [class.account-option--selected]="isSelected(wallet)"
+        tappable
+        (click)="selectWallet(wallet)"
+      >
+        <portfolio-item [wallet]="wallet" [hideDelegationBadge]="true" [hideMultisigBadge]="true"></portfolio-item>
+      </div>
+    </ion-list>
+  </ng-container>
 
   <ng-container *ngIf="inputs && inputs.length > 0">
     <p class="ion-padding-top">{{ 'beacon-request.request.text' | translate }}</p>

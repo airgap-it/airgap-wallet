@@ -25,7 +25,7 @@ RUN npm run browserify-coinlib
 COPY . /app
 
 # set to production
-RUN export NODE_ENV=production
+ENV NODE_ENV=production
 
 # build
 RUN npx ionic build --prod
