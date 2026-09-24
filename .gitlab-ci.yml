@@ -34,6 +34,21 @@ unit:
       - lcov.info
       - lintReport.json
 
+trivy:
+  stage: test
+  image:
+    name: aquasec/trivy:0.74.0
+    entrypoint: ['']
+  variables:
+    TRIVY_CACHE_DIR: .trivycache/
+  cache:
+    key: trivy
+    paths:
+      - .trivycache/
+  # runs from the repo root so .trivyignore is picked up
+  script:
+    - trivy fs . --scanners vuln,misconfig,secret --skip-dirs node_modules --skip-dirs www --skip-dirs .trivycache --exit-code 1
+
 # qa:
 #   stage: qa
 #   script:
