@@ -1,7 +1,7 @@
 import { AmountConverterPipe, ICoinProtocolAdapter, ProtocolService, getMainIdentifier } from '@airgap/angular-core'
 import { AirGapMarketWallet, ICoinSubProtocol, SubProtocolSymbols } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
-import { Component, Input } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core'
 import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Observable, ReplaySubject, Subscription } from 'rxjs'
 import { isMultisig } from '@airgap/module-kit'
@@ -16,7 +16,10 @@ import { OperationsProvider } from '../../services/operations/operations'
 @Component({
   selector: 'portfolio-item',
   templateUrl: 'portfolio-item.html',
-  styleUrls: ['./portfolio-item.scss']
+  styleUrls: ['./portfolio-item.scss'],
+  // A portfolio shows dozens of items and every network response triggers a
+  // change detection pass; only re-check an item when its own state changed.
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PortfolioItemComponent {
   public readonly networkType: typeof NetworkType = NetworkType
@@ -87,7 +90,8 @@ export class PortfolioItemComponent {
   public constructor(
     private readonly operationsProvider: OperationsProvider,
     public accountProvider: AccountProvider,
-    private readonly protocolService: ProtocolService
+    private readonly protocolService: ProtocolService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.amountConverter = new AmountConverterPipe(this.protocolService)
   }
@@ -120,6 +124,9 @@ export class PortfolioItemComponent {
     }
 
     await this.readWalletState()
+    // The wallet object is mutated in place (addresses, balance), so the view
+    // has to be marked explicitly.
+    this.changeDetectorRef.markForCheck()
 
     if (this.wallet.getCurrentBalance() === undefined && !this.syncFailed) {
       try {
@@ -130,6 +137,7 @@ export class PortfolioItemComponent {
         this.syncFailed = this.wallet.getCurrentBalance() === undefined
       }
       await this.readWalletState()
+      this.changeDetectorRef.markForCheck()
     }
   }
 
@@ -140,6 +148,7 @@ export class PortfolioItemComponent {
       } else {
         this.isDelegated = await this.operationsProvider.getDelegationStatusObservable(this.wallet)
       }
+      this.changeDetectorRef.markForCheck()
     }
   }
 
@@ -152,6 +161,7 @@ export class PortfolioItemComponent {
       } else {
         this.isMultisig = await this.operationsProvider.getMultisigStatusObservable(this.wallet)
       }
+      this.changeDetectorRef.markForCheck()
     }
   }
 

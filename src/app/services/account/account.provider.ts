@@ -21,8 +21,13 @@ import { auditTime, map, take } from 'rxjs/operators'
 
 import { DelegateAlertAction } from '../../models/actions/DelegateAlertAction'
 import { AirGapTipUsAction } from '../../models/actions/TipUsAction'
-import { AirGapMarketWalletGroup, InteractionSetting, SerializedAirGapMarketWalletGroup, SyncSource } from '../../models/AirGapMarketWalletGroup'
-import { promiseTimeout } from '../../helpers/promise'
+import {
+  AirGapMarketWalletGroup,
+  InteractionSetting,
+  SerializedAirGapMarketWalletGroup,
+  SyncSource
+} from '../../models/AirGapMarketWalletGroup'
+import { promiseTimeout, yieldToMain } from '../../helpers/promise'
 import { isSubProtocol, isType } from '../../utils/utils'
 import { AppService } from '../app/app.service'
 import { DataService } from '../data/data.service'
@@ -348,6 +353,10 @@ export class AccountProvider {
 
     const walletsToInitialize: AirGapMarketWallet[] = []
 
+    // Deserializing a large portfolio takes a while; let the pages paint their
+    // loading state first.
+    await yieldToMain()
+
     // read groups
     await Promise.all(
       groups.map(async (group: SerializedAirGapMarketWalletGroup) => {
@@ -394,6 +403,10 @@ export class AccountProvider {
       const others: AirGapMarketWalletGroup = new AirGapMarketWalletGroup(undefined, undefined, undefined, ungroupedWallets, true)
       this.walletGroups.set(others.id, others)
     }
+
+    // Deserializing is done; give the browser a frame before the address
+    // derivation and the syncing start.
+    await yieldToMain()
 
     this.initializeWallets(walletsToInitialize)
       .catch(handleErrorSentry(ErrorCategory.WALLET_PROVIDER))
@@ -489,6 +502,10 @@ export class AccountProvider {
             }
           })
         )
+        // Views show the addresses before the balances arrive.
+        if (derivedAny) {
+          this.triggerWalletChanged()
+        }
       } catch (error) {
         console.error(error)
       }
@@ -604,10 +621,7 @@ export class AccountProvider {
       }
 
       if (walletAddInfo.syncSource) {
-        const identifier = this.createWalletIdentifier(
-          walletAddInfo.walletToAdd.protocol.identifier,
-          walletAddInfo.walletToAdd.publicKey
-        )
+        const identifier = this.createWalletIdentifier(walletAddInfo.walletToAdd.protocol.identifier, walletAddInfo.walletToAdd.publicKey)
         this.walletSyncSources.set(identifier, walletAddInfo.syncSource)
       }
 

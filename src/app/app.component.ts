@@ -78,7 +78,7 @@ import { CurrencyService } from './services/currency/currency.service'
 import { setAppInjector } from './extensions/delegation/base/ProtocolDelegationExtensions'
 import { LanguagesType, WalletStorageKey, WalletStorageService } from './services/storage/storage'
 import { WalletconnectService } from './services/walletconnect/walletconnect.service'
-import { promiseTimeout } from './helpers/promise'
+import { promiseTimeout, yieldToMain } from './helpers/promise'
 import { faProtocolSymbol } from './types/GenericProtocolSymbols'
 import { generateGUID, getProtocolAndNetworkIdentifier } from './utils/utils'
 
@@ -207,7 +207,8 @@ export class AppComponent implements AfterViewInit {
       })
 
     // Everything below this point loads wallets and data, nothing here may block on
-    // an optional service anymore.
+    // an optional service anymore. Give the shell a frame to paint first.
+    await yieldToMain()
     this.appSerivce.setReady()
   }
 
@@ -350,6 +351,9 @@ export class AppComponent implements AfterViewInit {
         SubProtocolSymbols.XTZ_W
       ])
     )
+    // Loading and initializing the protocols are the two heaviest steps of the
+    // startup; let the browser paint in between instead of freezing throughout.
+    await yieldToMain()
     await this.trackInitializer(
       'protocols.init',
       this.protocolService.init({
@@ -359,6 +363,8 @@ export class AppComponent implements AfterViewInit {
         passiveSubProtocols: v1Protocols.passiveSubProtocols
       })
     )
+
+    await yieldToMain()
 
     // None of these is required for the app to start; a failure in one must not
     // prevent the others (or the app) from initializing.
