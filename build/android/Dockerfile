@@ -84,3 +84,8 @@ RUN cp android-release-unsigned.apk android-debug.apk
 # sign using debug key
 RUN zipalign -p -f -v 4 android-debug.apk android-debug-aligned.apk \
     && apksigner sign --ks ./build/android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android android-debug-aligned.apk
+
+# build-only image: CI copies the apks out with docker cp, nothing runs as a service
+RUN useradd --system --uid 10001 builder
+USER builder
+HEALTHCHECK NONE

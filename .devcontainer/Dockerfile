@@ -37,3 +37,7 @@ RUN  apt-get update \
 
 # [Optional] Uncomment if you want to install more global node packages
 RUN su node -c "npm install -g @ionic/cli"
+
+# dev container, not a service
+USER node
+HEALTHCHECK NONE
