@@ -235,6 +235,10 @@ export class PortfolioPage {
       return lastAttempt === undefined || now - lastAttempt >= maxAgeMs
     })
 
+    // Cheap (re-checks already known addresses) and the delegation state may have
+    // changed on the account page since the last sync, so refresh it on every visit.
+    this.operationsProvider.refreshAllDelegationStatuses(activeWallets)
+
     if (wallets.length === 0) {
       await this.calculateTotal(activeWallets)
       if (event?.target) {
@@ -242,8 +246,6 @@ export class PortfolioPage {
       }
       return
     }
-
-    this.operationsProvider.refreshAllDelegationStatuses(wallets)
 
     const failedNames: Set<string> = new Set()
 

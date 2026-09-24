@@ -78,6 +78,9 @@ export class PortfolioItemComponent {
 
   private static readonly SYNC_TIMEOUT_MS = 20000
 
+  /** Address the delegation/multisig/parent statuses were last resolved for, `null` if never. */
+  private statusesAddress: string | undefined | null = null
+
   private walletChanged?: Subscription
   private readonly amountConverter: AmountConverterPipe
 
@@ -107,9 +110,14 @@ export class PortfolioItemComponent {
       return
     }
 
-    this.updateDelegationStatus()
-    this.updateParentProtocol()
-    this.updateMultisigStatus()
+    // The statuses only depend on the wallet's address; the provider emits once per
+    // synced wallet, so do not resolve them again on every emission.
+    if (this.statusesAddress === null || this.statusesAddress !== this.wallet.receivingPublicAddress) {
+      this.statusesAddress = this.wallet.receivingPublicAddress
+      this.updateDelegationStatus()
+      this.updateParentProtocol()
+      this.updateMultisigStatus()
+    }
 
     await this.readWalletState()
 

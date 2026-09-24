@@ -136,6 +136,13 @@ class WebViewEnvironment: NSObject, JSEnvironment, WKNavigationDelegate {
                                 userContentController: userContentController,
                                 jsAsyncResult: jsAsyncResult
                             )
+                            // A terminated content process loses the loaded module sources, drop the
+                            // cached webview so the next call creates a fresh one instead of failing forever.
+                            jsAsyncResult.onProcessTerminated = { [weak self] in
+                                Task {
+                                    await self?.evict(runRef: runRef, for: module, webView: webView)
+                                }
+                            }
                         }
                         
                         return (webView, userContentController, jsAsyncResult)
@@ -165,6 +172,18 @@ class WebViewEnvironment: NSObject, JSEnvironment, WKNavigationDelegate {
         
         func getAll() -> [(WKWebView, WKUserContentController, JSAsyncResult)] {
             webViews.values.flatMap { Array($0.values) }
+        }
+        
+        func evict(runRef: String, for module: JSModule, webView: WKWebView) {
+            guard let cached = webViews[runRef]?[module.identifier], cached.0 === webView else {
+                return
+            }
+            
+            webViews[runRef]?.removeValue(forKey: module.identifier)
+            Task { @MainActor in
+                activeTasks[runRef]?.removeValue(forKey: module.identifier)
+                onFinish(webView: cached.0, userContentController: cached.1, jsAsyncResult: cached.2)
+            }
         }
         
         func remove(at runRef: String) {

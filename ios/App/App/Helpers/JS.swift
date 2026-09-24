@@ -32,6 +32,10 @@ class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler, WKNavigatio
     public let id: String
     private let results: Results
     
+    /// Called when the web content process behind this result was terminated. The scripts
+    /// loaded into the webview are gone with it, so its owner should discard the webview.
+    var onProcessTerminated: (() -> Void)?
+    
     init(id: String = "\(JSAsyncResult.defaultName)\(Int(Date().timeIntervalSince1970))") {
         self.id = id
         self.results = .init()
@@ -74,6 +78,7 @@ class JSAsyncResult: NSObject, Identifiable, WKScriptMessageHandler, WKNavigatio
         Task {
             await results.failAll(with: JSError.processTerminated)
         }
+        onProcessTerminated?()
     }
     
     /// Keeps results and the continuations waiting for them in one place, so a result

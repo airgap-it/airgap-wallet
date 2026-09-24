@@ -360,14 +360,15 @@ export class PriceService implements AirGapWalletPriceService {
             `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=${currency}`,
             { timeout: this.MARKET_PRICE_REQUEST_TIMEOUT_MS }
           )
-          const price = response.data !== undefined && response.data[id] ? new BigNumber(response.data[id][currency]) : new BigNumber(0)
+          // No data for the id means "unknown", not a price of 0, so the total can be flagged as incomplete.
+          const price = response.data !== undefined && response.data[id] ? new BigNumber(response.data[id][currency]) : undefined
           resolve(price)
         } catch (error) {
           // Rate limited or blocked: report "unknown" instead of rejecting so callers never hang.
           resolve(undefined)
         }
       } else {
-        resolve(new BigNumber(0))
+        resolve(undefined)
       }
     })
   }

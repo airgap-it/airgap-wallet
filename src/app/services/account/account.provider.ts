@@ -81,6 +81,8 @@ export class AccountProvider {
 
   /** A single protocol client that never answers must not hold up the whole sync. */
   private static readonly SYNC_TIMEOUT_MS: number = 20000
+  /** Deriving addresses for many wallets in the worker is slow, but must not stall the initial sync forever. */
+  private static readonly ADDRESS_DERIVATION_TIMEOUT_MS: number = 60000
 
   public walletsHaveLoaded: ReplaySubject<boolean> = new ReplaySubject(1)
 
@@ -473,7 +475,10 @@ export class AccountProvider {
     let derivedAny: boolean = false
     if (walletsNeedingAddresses.length > 0) {
       try {
-        const addresses: Record<string, string[]> = await this.modulesService.deriveAddresses(walletsNeedingAddresses)
+        const addresses: Record<string, string[]> = await promiseTimeout(
+          AccountProvider.ADDRESS_DERIVATION_TIMEOUT_MS,
+          this.modulesService.deriveAddresses(walletsNeedingAddresses)
+        )
         await Promise.all(
           walletsNeedingAddresses.map(async (wallet: AirGapMarketWallet) => {
             const identifier = await wallet.protocol.getIdentifier()
