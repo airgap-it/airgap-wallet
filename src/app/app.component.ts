@@ -92,10 +92,12 @@ register()
 export class AppComponent implements AfterViewInit {
   /** After this, the app starts without waiting for the remaining initializers. */
   private static readonly INITIALIZATION_TIMEOUT_MS: number = 10000
-  /** Longest the splash screen waits for translations, so the shell does not flash raw keys. */
-  private static readonly SPLASH_TRANSLATIONS_TIMEOUT_MS: number = 1000
+  /** Longest the splash screen waits for translations and the theme, so the shell does not flash raw keys or the wrong colors. */
+  private static readonly SPLASH_SHELL_TIMEOUT_MS: number = 1000
+  private static readonly SPLASH_FADE_OUT_MS: number = 300
   private splashScreenHidden: boolean = false
   private translationsReady: Promise<void> = Promise.resolve()
+  private themeReady: Promise<void> = Promise.resolve()
 
   /** Initializers that have not finished yet, reported to Sentry if startup times out. */
   private readonly pendingInitializers: Set<string> = new Set()
@@ -146,12 +148,17 @@ export class AppComponent implements AfterViewInit {
   public async initializeApp(): Promise<void> {
     // The splash screen is hidden as soon as the app shell is rendered (see `ngAfterViewInit`),
     // the pages show their own loading state while this is still running.
-    this.translationsReady = this.trackInitializer('translations', this.initializeTranslations()).catch(handleErrorSentry(ErrorCategory.OTHER))
+    this.translationsReady = this.trackInitializer('translations', this.initializeTranslations()).catch(
+      handleErrorSentry(ErrorCategory.OTHER)
+    )
+    // Applied before the splash screen goes, so the shell never paints in the wrong theme.
+    this.themeReady = this.trackInitializer('theme', this.themeService.register()).catch(handleErrorSentry(ErrorCategory.OTHER))
     try {
       await promiseTimeout(
         AppComponent.INITIALIZATION_TIMEOUT_MS,
         Promise.all([
           this.translationsReady,
+          this.themeReady,
           this.trackInitializer('platform', this.platform.ready()),
           this.trackInitializer('protocols', this.initializeProtocols()),
           this.trackInitializer('walletconnect', this.initializeWalletConnect()).catch(handleErrorSentry(ErrorCategory.OTHER)),
@@ -164,13 +171,6 @@ export class AppComponent implements AfterViewInit {
       )
     }
     // this._waitReadyResolve()
-
-    this.themeService.register()
-
-    this.themeService
-      .isDarkMode()
-      .then((isDarkMode: boolean) => this.themeService.statusBarStyleDark(isDarkMode))
-      .catch(handleErrorSentry(ErrorCategory.OTHER))
 
     if (this.platform.is('hybrid')) {
       this.pushProvider.initPush().catch(handleErrorSentry(ErrorCategory.PUSH))
@@ -222,7 +222,9 @@ export class AppComponent implements AfterViewInit {
 
   public async ngAfterViewInit(): Promise<void> {
     await this.platform.ready()
-    await promiseTimeout(AppComponent.SPLASH_TRANSLATIONS_TIMEOUT_MS, this.translationsReady).catch(() => undefined)
+    await promiseTimeout(AppComponent.SPLASH_SHELL_TIMEOUT_MS, Promise.all([this.translationsReady, this.themeReady])).catch(
+      () => undefined
+    )
     this.hideSplashScreen()
 
     if (this.platform.is('android')) {
@@ -305,7 +307,7 @@ export class AppComponent implements AfterViewInit {
       return
     }
     this.splashScreenHidden = true
-    this.splashScreen.hide().catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
+    this.splashScreen.hide({ fadeOutDuration: AppComponent.SPLASH_FADE_OUT_MS }).catch(handleErrorSentry(ErrorCategory.CORDOVA_PLUGIN))
   }
 
   private async initializeTranslations(): Promise<void> {
