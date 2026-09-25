@@ -1,5 +1,9 @@
 FROM beevelop/ionic:v2023.10.1
 
+# the base image lists NodeSource's node_18.x repo, which is gone (404) and breaks apt-get update;
+# node comes from the image and is switched with n below, so the repo is not needed
+RUN grep -rl nodesource /etc/apt/sources.list.d | xargs -r rm -f
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     bzip2 \
     build-essential  \
