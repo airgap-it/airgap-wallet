@@ -20,29 +20,30 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 	&& apt-get purge --auto-remove -y curl \
 	&& rm -rf /src/*.deb
 
-# create app directory
-RUN mkdir /app
+# install static webserver
+RUN npm install node-static -g
+
+# create app directory, owned by the unprivileged node user
+RUN mkdir /app && chown node:node /app
 WORKDIR /app
+USER node
 
 # Install app dependencies, using wildcard if package-lock exists
-COPY package.json /app
-COPY package-lock.json /app
-COPY config /app/config
-COPY apply-diagnostic-modules.js /app
-COPY fix-qrscanner-gradle.js /app
-COPY patch-dependency-versions.js /app
-COPY patch-coinlib.js /app
-COPY copy-builtin-modules.js /app
-COPY browserify-coinlib.js /app
+COPY --chown=node:node package.json /app
+COPY --chown=node:node package-lock.json /app
+COPY --chown=node:node config /app/config
+COPY --chown=node:node apply-diagnostic-modules.js /app
+COPY --chown=node:node fix-qrscanner-gradle.js /app
+COPY --chown=node:node patch-dependency-versions.js /app
+COPY --chown=node:node patch-coinlib.js /app
+COPY --chown=node:node copy-builtin-modules.js /app
+COPY --chown=node:node browserify-coinlib.js /app
 
 # install dependencies
 RUN npm install --legacy-peer-deps
 
-# install static webserver
-RUN npm install node-static -g
-
 # Bundle app source
-COPY . /app
+COPY --chown=node:node . /app
 
 # browserify coin-lib
 RUN npm run browserify-coinlib
@@ -52,5 +53,7 @@ ENV NODE_ENV=production
 
 # build
 RUN npm run build:prod
+
+HEALTHCHECK CMD node -e "require('http').get('http://localhost:8100', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
 
 CMD ["static", "-p", "8100", "-a", "0.0.0.0", "www"]

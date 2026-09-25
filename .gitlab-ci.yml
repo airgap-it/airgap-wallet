@@ -4,13 +4,7 @@ include:
 
 variables:
   TEST_TAG: test_$CI_COMMIT_SHA
-  GOOGLE_TAG: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_SHA
-  GOOGLE_TAG_LATEST: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
-  GOOGLE_TAG_DEV: eu.gcr.io/papers-dev-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAMESPACE:$CI_COMMIT_SHA
-  GOOGLE_TAG_LATEST_DEV: eu.gcr.io/papers-dev-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAMESPACE:latest
   GOOGLE_TAG_ANDROID_CURRENT: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:android-$CI_COMMIT_SHA
-  GOOGLE_TAG_ELECTRON_LINUX_CURRENT: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:electron-linux-$CI_COMMIT_SHA
-  GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:electron-windows-$CI_COMMIT_SHA
 
 stages:
   - build
@@ -18,7 +12,6 @@ stages:
   # - qa
   - platform_build
   - publish
-  - deploy
 
 build_ionic:
   stage: build
@@ -40,6 +33,21 @@ unit:
     paths:
       - lcov.info
       - lintReport.json
+
+trivy:
+  stage: test
+  image:
+    name: aquasec/trivy:0.74.0
+    entrypoint: ['']
+  variables:
+    TRIVY_CACHE_DIR: .trivycache/
+  cache:
+    key: trivy
+    paths:
+      - .trivycache/
+  # runs from the repo root so .trivyignore is picked up
+  script:
+    - trivy fs . --scanners vuln,misconfig,secret --skip-dirs node_modules --skip-dirs www --skip-dirs .trivycache --exit-code 1
 
 # qa:
 #   stage: qa
@@ -102,69 +110,6 @@ build-ios:
   tags:
     - ios
 
-# build-mac:
-#   stage: platform_build
-#   when: manual
-#   script:
-#     - 'sed -i -e "s/\"version\": \"0.0.1\"/\"version\": \"${VERSION}\"/g" electron/package.json'
-#     - nvm use 16
-#     - npm install
-#     - npm run prepare-prod-build
-#     - npm --prefix electron/ install
-#     - npm run build:electron:prod
-#     - npx cap sync electron
-#     - npm --prefix electron/ run build:mac
-#   artifacts:
-#     name: 'electron_macos'
-#     paths:
-#       - electron/build/airgap-wallet-$VERSION.dmg
-#       - electron/build/airgap-wallet-$VERSION.dmg.blockmap
-#       - electron/build/airgap-wallet-$VERSION-mac.zip
-#   tags:
-#     - ios
-
-# build-linux:
-#   stage: platform_build
-#   when: manual
-#   variables:
-#     LOCAL_LINUX: 'linux-$CI_PIPELINE_ID'
-#   script:
-#     - docker build -f build/electron/linux/Dockerfile -t $GOOGLE_TAG_ELECTRON_LINUX_CURRENT --build-arg VERSION="$VERSION" .
-#     - docker run --name $LOCAL_LINUX $GOOGLE_TAG_ELECTRON_LINUX_CURRENT echo "container ran."
-#     - docker cp $LOCAL_LINUX:/app/electron/build/airgap-wallet-$VERSION.AppImage electron/airgap-wallet-$VERSION.AppImage
-#   after_script:
-#     - docker rm -f $LOCAL_LINUX || true
-#   artifacts:
-#     name: 'electron_linux'
-#     paths:
-#       - electron/airgap-wallet-$VERSION.AppImage
-
-# build-windows:
-#   stage: platform_build
-#   when: manual
-#   variables:
-#     LOCAL_WINDOWS: 'windows-$CI_PIPELINE_ID'
-#   script:
-#     - docker build -f build/electron/windows/Dockerfile -t $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT --build-arg VERSION="$VERSION" .
-#     - docker run --name $LOCAL_WINDOWS $GOOGLE_TAG_ELECTRON_WINDOWS_CURRENT echo "container ran."
-#     - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe electron/airgap-wallet-$VERSION.exe
-#     - docker cp $LOCAL_WINDOWS:/app/electron/build/airgap-wallet-$VERSION.exe.blockmap electron/airgap-wallet-$VERSION.exe.blockmap
-#   after_script:
-#     - docker rm -f $LOCAL_WINDOWS || true
-#   artifacts:
-#     name: 'electron_windows'
-#     paths:
-#       - electron/airgap-wallet-$VERSION.exe
-#       - electron/airgap-wallet-$VERSION.exe.blockmap
-
-build-web:
-  stage: platform_build
-  when: manual
-  tags:
-    - docker
-  script:
-    - docker build -f build/web/Dockerfile -t $GOOGLE_TAG -t $GOOGLE_TAG_DEV .
-
 publish-ios:
   stage: publish
   when: manual
@@ -178,45 +123,3 @@ publish-ios:
     - xcrun altool --upload-app -f ios/App.ipa -t ios -u $IOS_USERNAME -p $IOS_PASSWORD
   tags:
     - ios
-
-publish-web-dev:
-  stage: publish
-  extends: .publish-dev
-  when: manual
-  needs:
-    - build-web
-
-publish-web-prod:
-  stage: publish
-  extends: .publish-prod
-  when: manual
-  needs:
-    - build-web
-
-deploy-web-dev:
-  stage: deploy
-  extends: .run_dev
-  needs:
-    - publish-web-dev
-  when: manual
-  script:
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__TO_BE_REPLACED_BY_IMAGE_TAG__|"$GOOGLE_TAG_DEV"|g" {} +
-    - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
-    - kubectl apply -f k8s/airgap-wallet/development/ --recursive
-    - kubectl apply -f k8s/airgap-wallet/common/ --recursive
-
-deploy-web-prod:
-  stage: deploy
-  extends: .run_prod
-  needs:
-    - publish-web-prod
-  when: manual
-  script:
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__NAMESPACE__|"$NAMESPACE"|g" {} +
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__CI_PROJECT_NAME__|"$CI_PROJECT_NAME"|g" {} +
-    - find k8s -type f -name \*.yaml -exec sed -i "s|__TO_BE_REPLACED_BY_IMAGE_TAG__|"$GOOGLE_TAG"|g" {} +
-    - kubectl apply -f k8s/airgap-wallet/common/namespace.yaml
-    - kubectl apply -f k8s/airgap-wallet/production/ --recursive
-    - kubectl apply -f k8s/airgap-wallet/common/ --recursive

@@ -56,7 +56,7 @@
       [initialSlide]="0"
       [speed]="400"
       [pagination]="slidePagination"
-      (slidechangetransitionend)="onSlideChange()">
+      (swiperslidechangetransitionend)="onSlideChange()">
       <ng-container *ngIf="protocol">
         <swiper-slide class="ion-padding-horizontal" *ngFor="let slide of slideAssets">
           <div class="slide-zoom">

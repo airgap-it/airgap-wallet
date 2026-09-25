@@ -1,5 +1,9 @@
 FROM beevelop/ionic:v2023.10.1
 
+# the base image lists NodeSource's node_18.x repo, which is gone (404) and breaks apt-get update;
+# node comes from the image and is switched with n below, so the repo is not needed
+RUN grep -rl nodesource /etc/apt/sources.list.d | xargs -r rm -f
+
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     bzip2 \
     build-essential  \
@@ -84,3 +88,8 @@ RUN cp android-release-unsigned.apk android-debug.apk
 # sign using debug key
 RUN zipalign -p -f -v 4 android-debug.apk android-debug-aligned.apk \
     && apksigner sign --ks ./build/android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android android-debug-aligned.apk
+
+# build-only image: CI copies the apks out with docker cp, nothing runs as a service
+RUN useradd --system --uid 10001 builder
+USER builder
+HEALTHCHECK NONE
