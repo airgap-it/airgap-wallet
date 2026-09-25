@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosResponse } from '@airgap/coinlib-core/dependencies/src/axios-0.33.0/index'
 
 @Injectable({
   providedIn: 'root'

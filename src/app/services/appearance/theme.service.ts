@@ -20,7 +20,15 @@ export class ThemeService {
     @Inject(STATUS_BAR_PLUGIN) private readonly statusBar: StatusBarPlugin
   ) {}
 
-  public async register() {
+  /**
+   * The last applied theme is mirrored to `localStorage` under this key. The inline
+   * script in `index.html` reads it before Angular boots so the very first paint
+   * already has the right colors; the real setting lives in `WalletStorageService`.
+   */
+  public static readonly LOCAL_STORAGE_MIRROR_KEY: string = 'airgap-theme'
+
+  /** Applies the stored theme and keeps following changes. Resolves once the theme is applied. */
+  public async register(): Promise<void> {
     this.systemThemeQuery().addEventListener('change', async () => {
       const theme = await this.getTheme()
 
@@ -29,19 +37,26 @@ export class ThemeService {
       }
     })
 
-    this.themeSubject.subscribe(async (theme) => {
-      if (await this.isDarkMode(theme)) {
-        this.toggleDarkMode(true)
-        this.statusBarStyleDark(true)
-
-        return
-      }
-
-      this.statusBarStyleDark(false)
-      this.toggleDarkMode(false)
+    this.themeSubject.subscribe((theme: themeOptions) => {
+      this.applyTheme(theme).catch(console.error)
     })
 
-    this.themeSubject.next(await this.getTheme())
+    await this.applyTheme(await this.getTheme())
+  }
+
+  private async applyTheme(theme: themeOptions): Promise<void> {
+    const isDarkMode: boolean = await this.isDarkMode(theme)
+    this.toggleDarkMode(isDarkMode)
+    this.rememberTheme(theme)
+    await this.statusBarStyleDark(isDarkMode)
+  }
+
+  private rememberTheme(theme: themeOptions): void {
+    try {
+      localStorage.setItem(ThemeService.LOCAL_STORAGE_MIRROR_KEY, theme ?? this.fallBackTheme())
+    } catch {
+      // Storage unavailable: the first paint falls back to the system preference.
+    }
   }
 
   public async statusBarStyleDark(isDarkMode: boolean) {

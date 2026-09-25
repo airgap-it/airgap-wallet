@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { IonicSlides } from '@ionic/angular'
 
 import { promiseRetry } from '../../helpers/promise'
+import { SyncSource } from '../../models/AirGapMarketWalletGroup'
 import { DataService, DataServiceKey } from '../../services/data/data.service'
 import { LedgerService } from '../../services/ledger/ledger-service'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
@@ -123,7 +124,8 @@ export class AccountImportLedgerOnboardingPage {
 
               const accountSyncs: AccountSync[] = [
                 {
-                  wallet
+                  wallet,
+                  syncSource: SyncSource.LEDGER
                 }
               ]
 

@@ -3,6 +3,12 @@
       "title": "帐户",
       "transactions_label": "交易",
       "add-tokens_label": "添加代币",
+      "sync-source": {
+        "qr": "QR",
+        "deeplink": "同设备",
+        "paste": "粘贴",
+        "ledger": "Ledger"
+      },
       "collectibles_label": "收藏品",
       "import-accounts_label": "导入帐户",
       "delegate_label": "委托和质押",

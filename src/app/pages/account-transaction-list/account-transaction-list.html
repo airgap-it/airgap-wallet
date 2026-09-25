@@ -4,7 +4,10 @@
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/tabs/portfolio"></ion-back-button>
       </ion-buttons>
-      <ion-title>{{ wallet?.protocol.symbol }} {{ 'account-transaction-list.title' | translate }}</ion-title>
+      <ion-title>
+        {{ wallet?.protocol.symbol }} {{ 'account-transaction-list.title' | translate }}
+        <span *ngIf="syncSource" class="sync-source-badge">{{ 'account-transaction-list.sync-source.' + syncSource | translate }}</span>
+      </ion-title>
       <ion-buttons slot="end">
         <ion-button id="edit-popover" (click)="presentEditPopover($event)" color="secondary">
           <ion-icon name="ellipsis-vertical-outline"></ion-icon>

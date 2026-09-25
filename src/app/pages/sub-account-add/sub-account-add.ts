@@ -6,7 +6,7 @@ import { AirGapOnlineProtocol, Amount, canGetTokenBalances, isSingleTokenSubProt
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NavController } from '@ionic/angular'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { AirGapMarketWalletGroup } from 'src/app/models/AirGapMarketWalletGroup'
 import { PriceService } from 'src/app/services/price/price.service'
 import { stripV1Wallet } from 'src/app/utils/utils'

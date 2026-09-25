@@ -3,6 +3,12 @@
     "title": "Account",
     "transactions_label": "Transactions",
     "add-tokens_label": "Add Tokens",
+    "sync-source": {
+      "qr": "QR",
+      "deeplink": "Same Device",
+      "paste": "Pasted",
+      "ledger": "Ledger"
+    },
     "collectibles_label": "Collectibles",
     "import-accounts_label": "Import Accounts",
     "delegate_tezos_label": "Delegate & Stake",
@@ -921,6 +927,10 @@
     "alert": {
       "title": "Not supported",
       "message": "eth_signTypedData is currently not supported"
+    },
+    "no_wallet_for_chain": {
+      "title": "Network not available",
+      "message": "No account found for chain {{chain}}. Please add an account for this network in AirGap Wallet."
     },
     "timeout": {
       "title": "Connection Failure",

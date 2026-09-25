@@ -2,7 +2,7 @@ import { UntypedFormGroup } from '@angular/forms'
 import { SafeUrl } from '@angular/platform-browser'
 import { ICoinDelegateProtocol } from '@airgap/coinlib-core'
 import { DelegateeDetails, DelegatorDetails } from '@airgap/coinlib-core/protocols/ICoinDelegateProtocol'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 
 import { UIAccountExtendedDetails } from '../models/widgets/display/UIAccountExtendedDetails'
 import { UIAccountSummary } from '../models/widgets/display/UIAccountSummary'

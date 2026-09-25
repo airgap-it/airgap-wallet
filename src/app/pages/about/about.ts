@@ -1,8 +1,14 @@
 import { AndroidFlavor, APP_INFO_PLUGIN, AppInfoPlugin } from '@airgap/angular-core'
 import { Component, Inject } from '@angular/core'
 import { Capacitor } from '@capacitor/core'
-import type { IpcRenderer } from 'electron'
 import { ErrorCategory, handleErrorSentry } from '../../services/sentry-error-handler/sentry-error-handler'
+
+// minimal subset of electron's IpcRenderer, the electron package is no longer a dependency
+interface IpcRenderer {
+  send(channel: string, ...args: any[]): void
+  sendSync(channel: string, ...args: any[]): any
+  on(channel: string, listener: (event: unknown, ...args: any[]) => void): this
+}
 
 declare global {
   interface Window {

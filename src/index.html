@@ -31,9 +31,32 @@
       }
     </script>
     <script src="cordova.js"></script>
+    <style>
+      /* Painted before the app's stylesheets arrive. Keep in sync with src/theme/variables.scss. */
+      body {
+        background: #ffffff;
+      }
+      body.dark {
+        background: #1e1e1e;
+      }
+    </style>
   </head>
 
   <body>
+    <script>
+      // Applies the theme before Angular boots, so the first paint behind the splash
+      // screen is already dark when it should be. Reads the theme ThemeService mirrored
+      // to localStorage (see ThemeService.LOCAL_STORAGE_MIRROR_KEY).
+      ;(function () {
+        try {
+          var theme = localStorage.getItem('airgap-theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          if (theme === 'dark' || (theme !== 'light' && prefersDark)) {
+            document.body.classList.add('dark')
+          }
+        } catch (e) {}
+      })()
+    </script>
     <app-root></app-root>
   </body>
 </html>

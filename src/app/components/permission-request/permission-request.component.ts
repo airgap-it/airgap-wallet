@@ -2,11 +2,7 @@ import { flattened } from '@airgap/angular-core'
 import { PermissionScope } from '@airgap/beacon-sdk'
 import { AirGapMarketWallet, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
-import { AlertController, ModalController } from '@ionic/angular'
-import { TranslateService } from '@ngx-translate/core'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { AccountProvider } from 'src/app/services/account/account.provider'
-import { ErrorCategory, handleErrorSentry } from 'src/app/services/sentry-error-handler/sentry-error-handler'
 
 export interface CheckboxInput {
   name: string
@@ -26,7 +22,8 @@ export class PermissionRequestComponent implements OnChanges {
   public readonly networkType: typeof NetworkType = NetworkType
 
   public wallets: Partial<Record<ProtocolSymbols, AirGapMarketWallet[]>> = {}
-  public totalWalletsLength: number = 0
+  /** The wallets the dApp can be paired with, grouped by protocol, in display order. */
+  public selectableWallets: AirGapMarketWallet[] = []
 
   @Input()
   public address: string = ''
@@ -52,13 +49,7 @@ export class PermissionRequestComponent implements OnChanges {
   @Output()
   public readonly walletSetEmitter: EventEmitter<AirGapMarketWallet> = new EventEmitter<AirGapMarketWallet>()
 
-  public constructor(
-    private readonly modalController: ModalController,
-    private readonly alertController: AlertController,
-    private readonly shortenStringPipe: ShortenStringPipe,
-    private readonly translateService: TranslateService,
-    private readonly accountService: AccountProvider
-  ) {}
+  public constructor(private readonly accountService: AccountProvider) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes.targetProtocolSymbol?.currentValue !== changes.targetProtocolSymbol?.previousValue) {
@@ -77,55 +68,22 @@ export class PermissionRequestComponent implements OnChanges {
 
         return Object.assign(obj, { [protocolIdentifier]: wallets })
       }, {})
-      this.totalWalletsLength = Object.values(this.wallets)
-        .map((wallets) => wallets.length)
-        .reduce((acc, next) => acc + next, 0)
+      this.selectableWallets = flattened(Object.values(this.wallets))
     }
   }
 
-  public async changeAccount(): Promise<void> {
-    return new Promise(async () => {
-      if (Object.entries(this.wallets).length === 1 && Object.entries(this.wallets)[0][1].length === 1) {
-        return
-      }
-      const groupedWallets: [number, AirGapMarketWallet][] = flattened(
-        Object.values(this.wallets).map((wallets, index) => wallets.map((wallet) => [index, wallet]))
-      )
-
-      const alert = await this.alertController.create({
-        header: this.translateService.instant('beacon-request.select-account.alert'),
-        inputs: groupedWallets.map(([index, wallet]) => ({
-          tabindex: index,
-          label: `${this.shortenStringPipe.transform(wallet.receivingPublicAddress)} (${wallet.protocol.name})`,
-          type: 'radio',
-          value: wallet,
-          checked:
-            wallet.receivingPublicAddress === this.address &&
-            (this.protocolIdentifier ? wallet.protocol.identifier === this.protocolIdentifier : true)
-        })),
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel',
-            cssClass: 'secondary',
-            handler: () => {
-              this.dismiss()
-            }
-          },
-          {
-            text: 'Ok',
-            handler: (wallet) => {
-              this.walletSetEmitter.emit(wallet)
-            }
-          }
-        ]
-      })
-
-      await alert.present()
-    })
+  public isSelected(wallet: AirGapMarketWallet): boolean {
+    return (
+      wallet.receivingPublicAddress === this.address &&
+      (this.protocolIdentifier ? wallet.protocol.identifier === this.protocolIdentifier : true)
+    )
   }
 
-  public async dismiss(): Promise<boolean | void> {
-    return this.modalController.dismiss().catch(handleErrorSentry(ErrorCategory.NAVIGATION))
+  public selectWallet(wallet: AirGapMarketWallet): void {
+    this.walletSetEmitter.emit(wallet)
+  }
+
+  public trackByWallet(_index: number, wallet: AirGapMarketWallet): string {
+    return `${wallet.protocol.identifier}:${wallet.publicKey}:${wallet.addressIndex ?? ''}`
   }
 }

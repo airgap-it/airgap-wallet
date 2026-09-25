@@ -3,6 +3,12 @@
     "title": "Konto",
     "transactions_label": "Transaktionen",
     "add-tokens_label": "Token hinzufügen",
+    "sync-source": {
+      "qr": "QR",
+      "deeplink": "Selbes Gerät",
+      "paste": "Eingefügt",
+      "ledger": "Ledger"
+    },
     "collectibles_label": "Sammlerstücke",
     "import-accounts_label": "Konten importieren",
     "delegate_tezos_label": "Delegate & Stake",

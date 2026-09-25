@@ -13,3 +13,19 @@
 .badge__margin {
   margin: 0px 6px 0px 0px;
 }
+
+.account-options {
+  background: transparent;
+}
+
+.account-option {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  margin-bottom: 4px;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out;
+
+  &--selected {
+    border-color: var(--ion-color-primary);
+    background-color: rgba(var(--ion-color-primary-rgb), 0.06);
+  }
+}

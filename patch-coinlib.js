@@ -8,6 +8,9 @@ const coreDependencies = path.join(rootdir, 'node_modules/@airgap/coinlib-core/d
 
 const dependencies = [coreDependencies]
 
+// vendored packages the app imports directly; their type declarations must survive
+const keepTypes = ['axios-0.33.0', 'bignumber.js-9.0.0', 'bs58check-2.1.2']
+
 function removeTypes(path) {
   const isDirectory = fs.lstatSync(path).isDirectory()
   if (!isDirectory) {
@@ -17,6 +20,9 @@ function removeTypes(path) {
   const files = fs.readdirSync(path)
   for (const file of files) {
     const absoluteFilePath = `${path}/${file}`
+    if (keepTypes.some((keep) => absoluteFilePath.includes(`/dependencies/src/${keep}`))) {
+      continue
+    }
     if (file.endsWith('.d.ts')) {
       fs.rmSync(absoluteFilePath)
       console.log('Removed: ', absoluteFilePath)

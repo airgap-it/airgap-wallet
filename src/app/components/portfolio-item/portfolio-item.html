@@ -12,7 +12,7 @@
   <ng-container *ngIf="!isSimplified">
     <ion-label class="protocol__container">
       <ion-text color="black">
-        <p class="font--weight__bold" *ngIf="balance; else syncingHeading">
+        <p class="font--weight__bold fade-in" *ngIf="balance || syncFailed; else syncingHeading">
           {{wallet.protocol.name}}
         </p>
       </ion-text>
@@ -24,7 +24,7 @@
       </ng-template>
       <ng-container *ngIf="!isToken">
         <ion-text color="blackLight">
-          <p *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono d-flex ion-align-items-center">
+          <p *ngIf="wallet.addresses.length > 0; else syncingHeadingLow" class="typography--mono d-flex ion-align-items-center fade-in">
             <airgap-identicon *ngIf="!isToken" [address]="wallet.receivingPublicAddress"></airgap-identicon>
             <ion-badge slot="end" color="primary" *ngIf="isActive">{{ 'portfolio-item.active' | translate }}</ion-badge>
             <span class="address__span">{{ wallet.receivingPublicAddress | shortenString }}</span>
@@ -58,27 +58,32 @@
     <ng-container *ngIf="!hideBalances">
       <ng-container *ngIf="balance; else syncingPrice">
         <ion-text color="black">
-          <p class="font--weight__bold porfolio-item__margin">
+          <p class="font--weight__bold porfolio-item__margin fade-in">
             {{ balanceFormatted }} {{ wallet.protocol.symbol}}
           </p>
         </ion-text>
       </ng-container>
       <ng-template #syncingPrice>
-        <p>
+        <p *ngIf="!syncFailed; else syncFailedText">
           <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
+      </ng-template>
+      <ng-template #syncFailedText>
+        <ion-text color="blackLight">
+          <p class="font--weight__bold porfolio-item__margin">&ndash; {{ wallet.protocol.symbol }}</p>
+        </ion-text>
       </ng-template>
 
       <ng-container *ngIf="balance && marketPrice; else syncingBalance">
         <ion-text color="blackLight">
-          <p class="porfolio-item__margin" *ngIf="marketPrice && marketPrice.toNumber() > 0">
+          <p class="porfolio-item__margin fade-in" *ngIf="marketPrice && marketPrice.toNumber() > 0">
             {{ '' | fiatCurrencySymbol }}{{ balance | cryptoToFiat: { protocolIdentifier: wallet.protocol.identifier, currentMarketPrice:
             marketPrice } | async | number: '1.2-2' }}
           </p>
         </ion-text>
       </ng-container>
       <ng-template #syncingBalance>
-        <p>
+        <p *ngIf="!syncFailed && !(balance && marketPrice === undefined)">
           <ion-skeleton-text animated style="width: 40px;"></ion-skeleton-text>
         </p>
       </ng-template>

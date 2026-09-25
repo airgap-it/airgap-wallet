@@ -182,6 +182,7 @@ export class AccountImportPage implements OnDestroy {
         groupId: accountimport.groupId,
         groupLabel: accountimport.groupLabel,
         interactionSetting: accountimport.interactionSetting,
+        syncSource: accountimport.syncSource,
         options: { override: true }
       }
     })

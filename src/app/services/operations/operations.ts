@@ -24,7 +24,7 @@ import { TezosKtProtocol, TezosSaplingAddress, TezosShieldedTezProtocol, TezosTr
 import { Injectable } from '@angular/core'
 import { UntypedFormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { BehaviorSubject } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { StellarAssetProtocol, StellarProtocol } from '@airgap/stellar'

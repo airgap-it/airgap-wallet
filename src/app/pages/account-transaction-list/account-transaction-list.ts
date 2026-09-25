@@ -23,7 +23,7 @@ import {
   ToastController
 } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
-import { BigNumber } from 'bignumber.js'
+import { BigNumber } from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import { Subscription } from 'rxjs'
 import { supportsDelegation } from 'src/app/helpers/delegation'
 import { UIAccountExtendedDetails } from 'src/app/models/widgets/display/UIAccountExtendedDetails'
@@ -34,6 +34,7 @@ import { InteractionService } from 'src/app/services/interaction/interaction.ser
 import { MtPelerinComponent } from 'src/app/components/mt-pelerin/mt-pelerin.component'
 import { AccountEditPopoverComponent } from '../../components/account-edit-popover/account-edit-popover.component'
 import { promiseTimeout } from '../../helpers/promise'
+import { SyncSource } from '../../models/AirGapMarketWalletGroup'
 import { ActionGroup } from '../../models/ActionGroup'
 import { AirGapTezosMigrateAction } from '../../models/actions/TezosMigrateAction'
 import { AccountProvider } from '../../services/account/account.provider'
@@ -73,6 +74,8 @@ export class AccountTransactionListPage {
   public isSearchOpen: boolean = false
   public searchTerm: string = ''
   public isLoadingAllTransactions: boolean = false
+
+  public syncSource: SyncSource | undefined
 
   public protocolIdentifier: string
 
@@ -154,6 +157,7 @@ export class AccountTransactionListPage {
     }
 
     this.wallet = this.accountProvider.walletByPublicKeyAndProtocolAndAddressIndex(this.publicKey, this.protocolID, this.addressIndex)
+    this.syncSource = this.accountProvider.getSyncSource(this.wallet)
     this.balance = this.wallet.getCurrentBalance()
 
     this.updateExtendedDetails()

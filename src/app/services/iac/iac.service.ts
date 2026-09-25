@@ -24,7 +24,7 @@ import { isOnlineProtocol, supportsWalletConnect } from '@airgap/module-kit'
 import { AccountShareResponse, IACMessageDefinitionObjectV3, IACMessageType, MessageSignResponse } from '@airgap/serializer'
 import { Inject, Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { transportToInteractionSetting } from 'src/app/models/AirGapMarketWalletGroup'
+import { transportToInteractionSetting, transportToSyncSource } from 'src/app/models/AirGapMarketWalletGroup'
 import { Platform } from '@ionic/angular'
 
 import { AccountSync } from '../../types/AccountSync'
@@ -116,7 +116,8 @@ export class IACService extends BaseIACService {
           wallet,
           groupId: accountShare.groupId,
           groupLabel: accountShare.groupLabel,
-          interactionSetting: transportToInteractionSetting(transport)
+          interactionSetting: transportToInteractionSetting(transport),
+          syncSource: transportToSyncSource(transport)
         }
       })
     )

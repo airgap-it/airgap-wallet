@@ -14,7 +14,7 @@ import { PolkadotBaseProtocol } from '@airgap/polkadot/v1/protocol/PolkadotBaseP
 import { DecimalPipe } from '@angular/common'
 import { UntypedFormBuilder, Validators } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core'
-import BigNumber from 'bignumber.js'
+import BigNumber from '@airgap/coinlib-core/dependencies/src/bignumber.js-9.0.0/bignumber'
 import * as moment from 'moment'
 
 import {

@@ -85,6 +85,20 @@ svg {
   gap: 4px;
 }
 
+.sync-source-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  vertical-align: middle;
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .mt-perelin-button {
   border: 1px solid gray;
   border-radius: 100px;

@@ -132,6 +132,19 @@ flip-card span {
   h1 {
     margin: 0;
     line-height: 1;
+    // Ease back to full opacity once the last wallet has synced.
+    transition: opacity 300ms ease-out;
+  }
+
+  // Dimmed while wallets are still being synced: the number is not final yet.
+  h1.balance-incomplete {
+    opacity: 0.5;
+  }
+
+  .balance-spinner {
+    width: 20px;
+    height: 20px;
+    color: var(--ion-color-medium);
   }
 }
 
@@ -158,5 +171,34 @@ flip-card span {
 
   &:hover {
     opacity: 1;
+  }
+}
+
+.accounts {
+  position: relative;
+}
+
+// While leaving, the skeleton list is lifted out of the flow (see `skeletonLeave`)
+// so the real cards take its place underneath and it fades out over them.
+.skeleton-list {
+  width: 100%;
+  pointer-events: none;
+}
+
+// Hidden until the page has painted once (see `contentReady`), then eased in.
+// A CSS animation alone would already have run out while the main thread was
+// busy building the page, so the fade is keyed to a real frame instead.
+.portfolio-content {
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+
+  &--ready {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-content {
+    transition: none;
   }
 }

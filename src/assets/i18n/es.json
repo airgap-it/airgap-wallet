@@ -3,6 +3,12 @@
     "title": "Cuenta",
     "transactions_label": "Transacciones",
     "add-tokens_label": "Añadir Token",
+    "sync-source": {
+      "qr": "QR",
+      "deeplink": "Mismo dispositivo",
+      "paste": "Pegado",
+      "ledger": "Ledger"
+    },
     "collectibles_label": "NFTs",
     "import-accounts_label": "Importar Cuentas",
     "delegate_label": "Delegar",

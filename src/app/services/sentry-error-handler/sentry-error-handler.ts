@@ -1,24 +1,5 @@
 import { ErrorHandler } from '@angular/core'
-import * as Sentry from '@sentry/browser'
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  release: 'unknown',
-  beforeSend: (data: Sentry.Event): Sentry.Event => {
-    const stacktrace: Sentry.Stacktrace | undefined =
-      data.stacktrace || (data.exception && data.exception.values && data.exception.values[0].stacktrace)
-
-    if (stacktrace && stacktrace.frames) {
-      stacktrace.frames.forEach((frame: Sentry.StackFrame) => {
-        if (frame.filename) {
-          frame.filename = frame.filename.substring(frame.filename.lastIndexOf('/'))
-        }
-      })
-    }
-
-    return data
-  }
-})
+import * as Sentry from '@sentry/capacitor'
 
 export enum ErrorCategory {
   CORDOVA_PLUGIN = 'cordova_plugin',
@@ -61,19 +42,14 @@ const handleErrorIgnore = (error) => {
 }
 
 const setSentryRelease = (release: string) => {
-  Sentry.configureScope((scope) => {
-    scope.addEventProcessor(async (event) => {
-      event.release = release
-
-      return event
-    })
+  Sentry.addEventProcessor((event) => {
+    event.release = release
+    return event
   })
 }
 
 const setSentryUser = (UUID: string) => {
-  Sentry.configureScope((scope) => {
-    scope.setUser({ id: UUID })
-  })
+  Sentry.setUser({ id: UUID })
 }
 
 export { setSentryRelease, setSentryUser, handleErrorIgnore, handleErrorSentry }
