@@ -1,5 +1,5 @@
 PODS:
-  - Capacitor (6.1.0):
+  - Capacitor (6.2.2):
     - CapacitorCordova
   - CapacitorApp (6.0.0):
     - Capacitor
@@ -9,7 +9,7 @@ PODS:
     - Capacitor
   - CapacitorClipboard (6.0.0):
     - Capacitor
-  - CapacitorCordova (6.1.0)
+  - CapacitorCordova (6.2.2)
   - CapacitorFilesystem (6.0.0):
     - Capacitor
   - CapacitorHaptics (6.0.0):
@@ -160,12 +160,12 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@sentry/capacitor"
 
 SPEC CHECKSUMS:
-  Capacitor: 3aff4dee0552f6badcd04f47ab3174387d71f47d
+  Capacitor: 6591a78b923b7e6dde28506ffeea820356e68013
   CapacitorApp: 30145f2ea2311e4f3744472119ec87d2ddf4c0a7
   CapacitorAppLauncher: 1b35f1fc220c3053085bebc45015f079e7328b55
   CapacitorBrowser: 6c0e04dc80556a966ebc2269ac72f09d83eec1ce
   CapacitorClipboard: c1cb27fea166aab5c99bda605d3bc768cf00eabe
-  CapacitorCordova: be703980ca797f847c3356f78fa175d21c8330c2
+  CapacitorCordova: c2c76283b5c00cf6073bab0b1311e3b10bd17254
   CapacitorFilesystem: 9c2cc1e89d3b8b91503b316e9f6c2915c9bf9419
   CapacitorHaptics: 0cea833e6a8bf489dd6acaaebf6d953b90086c59
   CapacitorKeyboard: f38d730356be5569d72eb87ad9c8166947728c36
