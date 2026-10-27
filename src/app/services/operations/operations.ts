@@ -21,6 +21,7 @@ import { isMultisig, newAmount, newPublicKey } from '@airgap/module-kit'
 import { IACMessageDefinitionObjectV3, IACMessageType } from '@airgap/serializer'
 import { SubstrateTransactionSignRequest } from '@airgap/substrate'
 import { TezosKtProtocol, TezosSaplingAddress, TezosShieldedTezProtocol, TezosTransactionSignRequest, TzBTCProtocol } from '@airgap/tezos'
+import { TezosSaplingStateDiff } from '@airgap/tezos/v1/types/sapling/TezosSaplingStateDiff'
 import { Injectable } from '@angular/core'
 import { UntypedFormBuilder } from '@angular/forms'
 import { LoadingController, ToastController } from '@ionic/angular'
@@ -468,7 +469,10 @@ export class OperationsProvider {
   ): Promise<IACMessageDefinitionObjectV3[]> {
     const payload = {
       publicKey: wallet.publicKey,
-      transaction: transaction as any, // TODO: Type
+      transaction:
+        wallet.protocol.identifier === MainProtocolSymbols.XTZ_SHIELDED
+          ? this.stripSaplingStateDiff(transaction as any)
+          : (transaction as any), // TODO: Type
       callbackURL: 'airgap-wallet://?d='
     }
     return [
@@ -479,6 +483,27 @@ export class OperationsProvider {
         payload: payload
       }
     ]
+  }
+
+  // The unsigned sapling transaction carries the whole sapling state of the contract, but the Vault only needs
+  // the commitments (and the root) to rebuild the Merkle tree. Ciphertexts and nullifiers make up the vast majority
+  // of the payload and would blow up the QR code, so they are blanked out (the schema still requires the fields).
+  private stripSaplingStateDiff<T extends { stateDiff?: TezosSaplingStateDiff }>(transaction: T): T {
+    if (transaction?.stateDiff === undefined) {
+      return transaction
+    }
+
+    return {
+      ...transaction,
+      stateDiff: {
+        root: transaction.stateDiff.root,
+        commitments_and_ciphertexts: transaction.stateDiff.commitments_and_ciphertexts.map(([commitment]) => [
+          commitment,
+          { cv: '', epk: '', payload_enc: '', nonce_enc: '', payload_out: '', nonce_out: '' }
+        ]),
+        nullifiers: []
+      }
+    }
   }
 
   public async prepareMessageSignRequest(

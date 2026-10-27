@@ -1,7 +1,7 @@
 # Findings that cannot be fixed by a dependency update in this repo.
 # Each entry says why; remove it once the blocker is gone.
 
-# @angular/common and @angular/core 16.1.1. The fixes start at 19.2.x / 20.3.28, but
+# @angular/common, @angular/core and @angular/router 16.1.1. The fixes start at 19.2.x / 20.3.28, but
 # @airgap/angular-core and @airgap/angular-ngrx declare @angular/* ^16.1.0 as peers, so the
 # Angular upgrade has to start with a new angular-core release built against Angular 20+.
 CVE-2025-66035
@@ -18,6 +18,9 @@ CVE-2026-69151
 CVE-2026-50557
 CVE-2026-52725
 CVE-2026-88057
+CVE-2026-101896
+CVE-2026-111752
+CVE-2026-111753
 
 # @stablelib/ed25519 1.0.3 (via @taquito/utils, CJS). Fixed only in 2.1.0, which is ESM-only, so the 1.x copy
 # cannot be overridden. The 2.x copies (beacon) are overridden to 2.1.0 in package.json. Note: @airgap/tezos
@@ -31,3 +34,11 @@ CVE-2025-14505
 # decode-uri-component 0.2.2 (via query-string in @walletconnect/client 1.x and @walletconnect/utils 2.x).
 # The only fix is 0.5.0, which is ESM-only; query-string 5/6/7 require() it and would break.
 CVE-2026-45822
+
+# braces 3.0.3 is the latest release. No fixed version published. Reached at runtime only via
+# unstorage -> chokidar (@walletconnect/keyvaluestorage), which never watches files in the app.
+CVE-2026-93687
+
+# node-forge 1.4.0 is the latest release. No fixed version published. Only pulled in by
+# webpack-dev-server/selfsigned and unstorage -> listhen; neither verifies RSA signatures in the app.
+CVE-2026-85393
