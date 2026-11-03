@@ -144,7 +144,7 @@ export class WalletconnectService {
           component: ErrorPage,
           componentProps: {
             title: error.message ?? 'Error',
-            message: this.translateService.instant('walletconnect.error'),
+            message: this.translateService.instant('walletconnect.connection_error'),
             data: undefined
           }
         })
