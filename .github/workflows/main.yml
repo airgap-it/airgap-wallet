@@ -33,8 +33,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # --ignore-scripts: no dependency lifecycle script runs. The repo's own postinstall
+      # (coinlib patch and browserify, jetifier, diagnostic modules, patches) is then run explicitly.
       - name: 🔧 Install dependencies
-        run: npm ci --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund --ignore-scripts && npm run postinstall
 
       - name: 💅 Prettier
         run: npm run actions:prettier
@@ -70,8 +72,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # --ignore-scripts: no dependency lifecycle script runs. The repo's own postinstall
+      # (coinlib patch and browserify, jetifier, diagnostic modules, patches) is then run explicitly.
       - name: 🔧 Install dependencies
-        run: npm ci --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund --ignore-scripts && npm run postinstall
 
       - name: 🏗️ Build
         run: npm run prepare-prod-build && npm run build:prod
