@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Keep in sync with the Dockerfile (node:20).
-  NODE_VERSION: '20'
+  # Keep in sync with the Dockerfile (node:24) and airgap-vault.
+  NODE_VERSION: '24'
 
 jobs:
   test:
