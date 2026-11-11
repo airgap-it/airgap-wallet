@@ -87,3 +87,41 @@ jobs:
           path: www
           if-no-files-found: error
           retention-days: 7
+
+      # GitHub Pages serves the app from /airgap-wallet/ (same base href as the angular.json deploy target).
+      # 404.html lets deep links fall back to the app's router.
+      - name: 🗂️ Prepare GitHub Pages
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: |
+          cp -R www pages
+          sed -i 's|<base href="[^"]*"|<base href="/airgap-wallet/"|' pages/index.html
+          grep -q '<base href="/airgap-wallet/"' pages/index.html
+          cp pages/index.html pages/404.html
+
+      - name: 📦 Upload GitHub Pages
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: pages
+
+  pages:
+    name: 🚀 Deploy GitHub Pages
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    needs: [test, web]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    # Never cancel a deployment halfway; a newer one waits for it instead.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+
+    steps:
+      - name: 🚀 Deploy
+        id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
