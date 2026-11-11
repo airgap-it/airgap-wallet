@@ -21,7 +21,7 @@ WORKDIR /app
 RUN npm install -g npm@10.5.2 @capacitor/core@5.0.4 @capacitor/android@5.0.4 @capacitor/cli@5.0.4
 RUN npm cache clean -f
 RUN npm install -g n
-RUN n 20.13.1
+RUN n 24
 
 # Install app dependencies, using wildcard if package-lock exists
 COPY package.json /app
