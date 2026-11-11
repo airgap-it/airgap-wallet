@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:24
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq --no-install-recommends libgconf-2-4 bzip2 build-essential libxtst6

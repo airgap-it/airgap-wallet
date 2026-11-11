@@ -8,17 +8,17 @@ module.exports = {
     '@angular-eslint/directive-selector': [
       'warn',
       {
-        'type': 'attribute',
-        'prefix': ['app'],
-        'style': 'camelCase'
+        type: 'attribute',
+        prefix: ['app'],
+        style: 'camelCase'
       }
     ],
     '@angular-eslint/component-selector': [
       'warn',
       {
-        'type': 'element',
-        'prefix': ['app', 'page'],
-        'style': 'kebab-case'
+        type: 'element',
+        prefix: ['app', 'page'],
+        style: 'kebab-case'
       }
     ]
   }

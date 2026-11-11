@@ -391,9 +391,7 @@ export class BeaconRequestPage implements OnInit {
     // Fall back to the last permissioned address, then to the first wallet, so
     // older dApps that don't set accountId keep working.
     const requestedAccountId = (request.message as any).accountId as string | undefined
-    const mappedAddress = requestedAccountId
-      ? this.readAcurastAccountAddress(request.senderId, requestedAccountId)
-      : undefined
+    const mappedAddress = requestedAccountId ? this.readAcurastAccountAddress(request.senderId, requestedAccountId) : undefined
     const selectedAddress = mappedAddress ?? localStorage.getItem(`beacon_acurast_selected_address:${request.senderId}`)
 
     if (selectedAddress) {
