@@ -18,8 +18,10 @@ import {
   SubstratePermissionResponse,
   SubstrateSignPayloadRequest,
   SubstrateTransferRequest,
-  SubstrateBlockchain
-} from '@airgap/beacon-sdk'
+  SubstrateBlockchain,
+  networkFromTezosCaip2,
+  networkTypeFromTezosCaip2
+} from '@tezos-x/octez.connect-sdk'
 import { ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { UnsignedTransaction } from '@airgap/module-kit'
 import { TezosProtocol, TezosProtocolNetwork } from '@airgap/tezos'
@@ -338,33 +340,22 @@ export class BeaconService {
     } as any)
   }
 
-  public async getProtocolBasedOnBeaconNetwork(network: Network): Promise<ICoinProtocolAdapter<TezosProtocol>> {
-    const configs: {
-      [key in Exclude<
-        BeaconNetworkType,
-        | BeaconNetworkType.DELPHINET
-        | BeaconNetworkType.EDONET
-        | BeaconNetworkType.FLORENCENET
-        | BeaconNetworkType.GRANADANET
-        | BeaconNetworkType.HANGZHOUNET
-        | BeaconNetworkType.JAKARTANET
-        | BeaconNetworkType.ITHACANET
-        | BeaconNetworkType.KATHMANDUNET
-        | BeaconNetworkType.DAILYNET
-        | BeaconNetworkType.LIMANET
-        | BeaconNetworkType.MUMBAINET
-        | BeaconNetworkType.NAIROBINET
-        | BeaconNetworkType.OXFORDNET
-        | BeaconNetworkType.PARISNET
-        | BeaconNetworkType.QUEBECNET
-        | BeaconNetworkType.RIONET
-        | BeaconNetworkType.SEOULNET
-        | BeaconNetworkType.SHADOWNET
-        | BeaconNetworkType.WEEKLYNET
-        | BeaconNetworkType.TALLINNNET
-        | BeaconNetworkType.TEZLINK_SHADOWNET
-      >]: TezosProtocolNetwork
-    } = {
+  /**
+   * Since beacon v4 (octez.connect), operation and broadcast requests may carry a CAIP-2 chain id
+   * string instead of a `Network` object. Normalize it so the rest of the wallet keeps working on `Network`.
+   */
+  public toBeaconNetwork(network: Network | string): Network {
+    if (typeof network !== 'string') {
+      return network
+    }
+    const type: BeaconNetworkType | undefined = networkTypeFromTezosCaip2(network)
+
+    return type !== undefined ? { type } : networkFromTezosCaip2(network)
+  }
+
+  public async getProtocolBasedOnBeaconNetwork(networkOrChainId: Network | string): Promise<ICoinProtocolAdapter<TezosProtocol>> {
+    const network: Network = this.toBeaconNetwork(networkOrChainId)
+    const configs: Partial<Record<BeaconNetworkType, TezosProtocolNetwork>> = {
       [BeaconNetworkType.MAINNET]: TEZOS_MAINNET_PROTOCOL_NETWORK,
       [BeaconNetworkType.GHOSTNET]: {
         ...TEZOS_GHOSTNET_PROTOCOL_NETWORK,

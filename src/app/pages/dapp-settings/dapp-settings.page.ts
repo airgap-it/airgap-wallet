@@ -1,5 +1,5 @@
 import { UiEventService } from '@airgap/angular-core'
-import { P2PPairingRequest } from '@airgap/beacon-sdk'
+import { P2PPairingRequest } from '@tezos-x/octez.connect-sdk'
 import { Component, OnInit } from '@angular/core'
 import { BeaconService } from 'src/app/services/beacon/beacon.service'
 

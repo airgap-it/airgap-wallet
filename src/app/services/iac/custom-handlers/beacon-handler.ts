@@ -1,5 +1,5 @@
 import { IACMessageWrapper, IACSinglePartHandler } from '@airgap/angular-core'
-import { P2PPairingRequest, Serializer } from '@airgap/beacon-sdk'
+import { P2PPairingRequest, Serializer } from '@tezos-x/octez.connect-sdk'
 
 import { BeaconService } from '../../beacon/beacon.service'
 

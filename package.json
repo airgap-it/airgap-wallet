@@ -58,7 +58,7 @@
     "@airgap/angular-ngrx": "0.1.0",
     "@airgap/astar": "0.14.0",
     "@airgap/base": "0.14.0",
-    "@airgap/beacon-sdk": "5.0.0-beta.3",
+    "@tezos-x/octez.connect-sdk": "5.0.5",
     "@airgap/bitcoin": "0.14.0",
     "@airgap/bnb": "0.14.0",
     "@airgap/coinlib-core": "0.14.0",

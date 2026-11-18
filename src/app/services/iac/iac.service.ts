@@ -18,7 +18,7 @@ import {
   SigningType,
   SignPayloadResponseInput,
   SubstrateSignPayloadRequest
-} from '@airgap/beacon-sdk'
+} from '@tezos-x/octez.connect-sdk'
 import { AirGapCoinWallet, AirGapMarketWallet, AirGapWalletStatus, MainProtocolSymbols, ProtocolSymbols } from '@airgap/coinlib-core'
 import { isOnlineProtocol, supportsWalletConnect } from '@airgap/module-kit'
 import { AccountShareResponse, IACMessageDefinitionObjectV3, IACMessageType, MessageSignResponse } from '@airgap/serializer'

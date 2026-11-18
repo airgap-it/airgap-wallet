@@ -1,6 +1,6 @@
 import { AeternityTransactionSignRequest } from '@airgap/aeternity'
 import { ICoinProtocolAdapter, ICoinSubProtocolAdapter, ProtocolService } from '@airgap/angular-core'
-import { SignPayloadRequestOutput } from '@airgap/beacon-sdk'
+import { SignPayloadRequestOutput } from '@tezos-x/octez.connect-sdk'
 import { BitcoinTransactionSignRequest } from '@airgap/bitcoin'
 import {
   AirGapMarketWallet,
