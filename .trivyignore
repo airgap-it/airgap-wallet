@@ -43,3 +43,10 @@ CVE-2026-93687
 # node-forge 1.4.0 is the latest release. No fixed version published. Only pulled in by
 # webpack-dev-server/selfsigned and unstorage -> listhen; neither verifies RSA signatures in the app.
 CVE-2026-85393
+
+# node-forge 1.4.2 (dev server via webpack-dev-server/selfsigned, unstorage -> listhen). Fixed in 1.4.3.
+# Ignored on this develop hotfix only; v4 already resolves them.
+CVE-2026-125332
+CVE-2026-125333
+CVE-2026-125334
+CVE-2026-125335

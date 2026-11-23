@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { assertNever, ICoinProtocolAdapter } from '@airgap/angular-core'
-import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@airgap/beacon-sdk'
+import { BeaconMessageType, BeaconRequestOutputMessage, SigningType } from '@tezos-x/octez.connect-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ProtocolSymbols } from '@airgap/coinlib-core'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
 import { isOnlineProtocol, isSubProtocol, ProtocolSymbol, supportsWalletConnect, UnsignedTransaction } from '@airgap/module-kit'

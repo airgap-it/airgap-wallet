@@ -16,7 +16,7 @@ import {
   SubstrateSignPayloadRequest,
   SubstrateTransferRequest,
   SubstrateMessageType
-} from '@airgap/beacon-sdk'
+} from '@tezos-x/octez.connect-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { blake2bAsBytes } from '@airgap/coinlib-core/utils/blake2b'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
@@ -488,7 +488,7 @@ export class BeaconRequestPage implements OnInit {
       return
     }
 
-    if (request.network.type !== BeaconNetworkType.MAINNET) {
+    if (this.beaconService.toBeaconNetwork(request.network).type !== BeaconNetworkType.MAINNET) {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
@@ -545,7 +545,7 @@ export class BeaconRequestPage implements OnInit {
     let tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await createV0TezosProtocol()
     const signedTx: string = request.signedTransaction
 
-    if (request.network.type !== BeaconNetworkType.MAINNET) {
+    if (this.beaconService.toBeaconNetwork(request.network).type !== BeaconNetworkType.MAINNET) {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 

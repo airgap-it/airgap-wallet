@@ -1,5 +1,5 @@
 import { flattened } from '@airgap/angular-core'
-import { PermissionScope } from '@airgap/beacon-sdk'
+import { PermissionScope } from '@tezos-x/octez.connect-sdk'
 import { AirGapMarketWallet, NetworkType, ProtocolNetwork, ProtocolSymbols } from '@airgap/coinlib-core'
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { AccountProvider } from 'src/app/services/account/account.provider'

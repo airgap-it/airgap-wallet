@@ -34,6 +34,7 @@ COPY --chown=node:node package-lock.json /app
 COPY --chown=node:node config /app/config
 COPY --chown=node:node apply-diagnostic-modules.js /app
 COPY --chown=node:node fix-qrscanner-gradle.js /app
+COPY --chown=node:node fix-qrscanner-orientation.js /app
 COPY --chown=node:node patch-dependency-versions.js /app
 COPY --chown=node:node patch-coinlib.js /app
 COPY --chown=node:node copy-builtin-modules.js /app
