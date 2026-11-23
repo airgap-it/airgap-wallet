@@ -345,11 +345,7 @@ export class AppComponent implements AfterViewInit {
     ])
     const v1Protocols = await this.trackInitializer(
       'protocols.load',
-      this.modulesService.loadProtocols('online', [
-      MainProtocolSymbols.XTZ_SHIELDED,
-      SubProtocolSymbols.XTZ_STKR,
-        SubProtocolSymbols.XTZ_W
-      ])
+      this.modulesService.loadProtocols('online', [MainProtocolSymbols.XTZ_SHIELDED, SubProtocolSymbols.XTZ_STKR, SubProtocolSymbols.XTZ_W])
     )
     // Loading and initializing the protocols are the two heaviest steps of the
     // startup; let the browser paint in between instead of freezing throughout.

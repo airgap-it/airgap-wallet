@@ -29,6 +29,7 @@ COPY package-lock.json /app
 COPY config /app/config
 COPY apply-diagnostic-modules.js /app
 COPY fix-qrscanner-gradle.js /app
+COPY fix-qrscanner-orientation.js /app
 COPY patch-dependency-versions.js /app
 COPY patch-coinlib.js /app
 COPY copy-builtin-modules.js /app

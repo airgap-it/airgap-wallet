@@ -16,7 +16,7 @@ import {
   SubstrateSignPayloadRequest,
   SubstrateTransferRequest,
   SubstrateMessageType
-} from '@airgap/beacon-sdk'
+} from '@tezos-x/octez.connect-sdk'
 import { AirGapMarketWallet, AirGapWalletStatus, IAirGapTransaction, ICoinProtocol, MainProtocolSymbols } from '@airgap/coinlib-core'
 import { blake2bAsBytes } from '@airgap/coinlib-core/utils/blake2b'
 import { isHex } from '@airgap/coinlib-core/utils/hex'
@@ -391,9 +391,7 @@ export class BeaconRequestPage implements OnInit {
     // Fall back to the last permissioned address, then to the first wallet, so
     // older dApps that don't set accountId keep working.
     const requestedAccountId = (request.message as any).accountId as string | undefined
-    const mappedAddress = requestedAccountId
-      ? this.readAcurastAccountAddress(request.senderId, requestedAccountId)
-      : undefined
+    const mappedAddress = requestedAccountId ? this.readAcurastAccountAddress(request.senderId, requestedAccountId) : undefined
     const selectedAddress = mappedAddress ?? localStorage.getItem(`beacon_acurast_selected_address:${request.senderId}`)
 
     if (selectedAddress) {
@@ -490,7 +488,7 @@ export class BeaconRequestPage implements OnInit {
       return
     }
 
-    if (request.network.type !== BeaconNetworkType.MAINNET) {
+    if (this.beaconService.toBeaconNetwork(request.network).type !== BeaconNetworkType.MAINNET) {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 
@@ -547,7 +545,7 @@ export class BeaconRequestPage implements OnInit {
     let tezosProtocol: ICoinProtocolAdapter<TezosProtocol> = await createV0TezosProtocol()
     const signedTx: string = request.signedTransaction
 
-    if (request.network.type !== BeaconNetworkType.MAINNET) {
+    if (this.beaconService.toBeaconNetwork(request.network).type !== BeaconNetworkType.MAINNET) {
       tezosProtocol = await this.beaconService.getProtocolBasedOnBeaconNetwork(request.network)
     }
 

@@ -1,5 +1,5 @@
 import { BaseStorage } from '@airgap/angular-core'
-import { Network } from '@airgap/beacon-sdk'
+import { Network } from '@tezos-x/octez.connect-sdk'
 import { ICoinProtocol, SerializedAirGapWallet } from '@airgap/coinlib-core'
 import { ProtocolOptions } from '@airgap/coinlib-core/utils/ProtocolOptions'
 import { Injectable } from '@angular/core'

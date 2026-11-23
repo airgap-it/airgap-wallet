@@ -1,5 +1,5 @@
 import { ICoinProtocolAdapter, ProtocolService } from '@airgap/angular-core'
-import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@airgap/beacon-sdk'
+import { BeaconRequestOutputMessage, BeaconResponseInputMessage } from '@tezos-x/octez.connect-sdk'
 import { AirGapMarketWallet, ICoinProtocol, MainProtocolSymbols, SignedTransaction } from '@airgap/coinlib-core'
 import { NetworkType } from '@airgap/coinlib-core/utils/ProtocolNetwork'
 import { EthereumTransactionSignRequest } from '@airgap/ethereum'

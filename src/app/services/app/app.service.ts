@@ -1,4 +1,4 @@
-import { ExposedPromise } from '@airgap/beacon-sdk'
+import { ExposedPromise } from '@tezos-x/octez.connect-sdk'
 import { Injectable } from '@angular/core'
 
 @Injectable({

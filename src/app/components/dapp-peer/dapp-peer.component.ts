@@ -1,4 +1,4 @@
-import { AppMetadata } from '@airgap/beacon-sdk'
+import { AppMetadata } from '@tezos-x/octez.connect-sdk'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 
 @Component({

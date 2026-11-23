@@ -1,4 +1,4 @@
-import { NetworkType, PermissionInfo } from '@airgap/beacon-sdk'
+import { NetworkType, PermissionInfo } from '@tezos-x/octez.connect-sdk'
 import { Component } from '@angular/core'
 import { AlertController } from '@ionic/angular'
 import { TranslateService } from '@ngx-translate/core'
