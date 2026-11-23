@@ -77,9 +77,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
 
-    def saplingVersion = "0.0.7"
-    implementation "com.github.airgap-it:airgap-sapling:$saplingVersion"
-
     implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
     implementation "androidx.javascriptengine:javascriptengine:1.0.0-alpha05"
