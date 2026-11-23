@@ -202,7 +202,7 @@
       "dapp": {
         "label": "Dapps",
         "settings_label": "Paramètres Dapp",
-        "about_label": "À propos de Beacon",
+        "about_label": "À propos d'octez.connect",
         "permission-list_label": "Autorisations Dapp"
       },
       "qr-advanced-settings_label": "Paramètres QR avancés",

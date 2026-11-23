@@ -202,7 +202,7 @@
       "dapp": {
         "label": "Dapps",
         "settings_label": "Dapp 设置",
-        "about_label": "关于Beacon",
+        "about_label": "关于octez.connect",
         "permission-list_label": "Dapp 权限"
       },
       "qr-advanced-settings_label": "高级二维码设置",
@@ -864,7 +864,7 @@
       "connect_label": "连接",
       "continue_label": "继续",
       "cancel_label": "取消",
-      "request-by-dapp_label": "DApp 的 Beacon 请求",
+      "request-by-dapp_label": "DApp 的 octez.connect 请求",
       "title": {
         "permission-request": "权限请求",
         "sign-payload-request": "签署有效载荷请求",

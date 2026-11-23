@@ -152,8 +152,8 @@ export class SettingsPage implements OnInit {
     this.browserService.openUrl('https://support.airgap.it')
   }
 
-  public aboutBeacon(): void {
-    this.browserService.openUrl('https://walletbeacon.io')
+  public aboutOctezConnect(): void {
+    this.browserService.openUrl('https://octez-connect.tezos.com')
   }
 
   public goToQrSettings(): void {

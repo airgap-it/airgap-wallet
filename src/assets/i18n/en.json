@@ -206,7 +206,7 @@
     "dapp": {
       "label": "Dapps",
       "settings_label": "Dapp Settings",
-      "about_label": "About Beacon",
+      "about_label": "About octez.connect",
       "permission-list_label": "Dapp Permissions"
     },
     "qr-advanced-settings_label": "Advanced QR Settings",
@@ -875,7 +875,7 @@
     "connect_label": "Connect",
     "continue_label": "Continue",
     "cancel_label": "Cancel",
-    "request-by-dapp_label": "Beacon request by DApp",
+    "request-by-dapp_label": "octez.connect request by DApp",
     "title": {
       "permission-request": "Permission Request",
       "sign-payload-request": "Sign Payload Request",
