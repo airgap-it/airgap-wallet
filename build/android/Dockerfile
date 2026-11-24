@@ -75,6 +75,10 @@ RUN cap sync android
 # accept licenses
 RUN echo y | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --update
 
+# Google Play requires API 36; the base image only ships older platforms
+RUN yes | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --licenses > /dev/null \
+    && sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platforms;android-36" "build-tools;35.0.0"
+
 # clean project
 RUN /app/android/gradlew --project-dir /app/android clean
 
